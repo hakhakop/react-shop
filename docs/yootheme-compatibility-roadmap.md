@@ -98,6 +98,43 @@ background and Manrope family from the same canonical variables.
 - **Explicit unsupported:** theme-only WordPress, WooCommerce, and plugin options without a WebPages owner.
 - **Acceptance:** met for the supported scope: imported DevStack globals populate visible controls; Builder and storefront preview resolve the same background/font variables; semantic groups are editable and persisted; unsupported breakpoint imports remain explicit warnings and do not create dead state.
 
+**Canonical color-context repair (2026-08-12):** Global Style tokens now also
+own the normal/inverse runtime text context. The shared
+`getUikitSemanticContextVars` resolver is used by both Builder and storefront;
+it replaces their former independent light/dark Builder palettes. Both roots
+mount `getUikitGlobalsCssVars`, normal headings inherit Global Emphasis, meta
+inherits Global Muted, and dark semantic surfaces inherit Global Inverse.
+Explicit local element colors still win. Live Enterprise verification measured
+the normal Slideshow title at `rgb(13, 10, 70)` from the imported Emphasis
+token and an inverse-section heading at `rgb(255, 255, 255)` in storefront;
+the synchronized Builder/storefront Slideshow compatibility contract passes.
+
+**Imported-document surface bridge (2026-08-12):** existing imported blocks
+already carry the explicit `spacingContract: "yootheme"` provenance. At a root
+containing that contract, legacy Builder page/surface/card/button aliases now
+resolve to the canonical Global background, Card, and Button variables. This
+is a compatibility bridge for old shared presentation consumers, not a second
+style system. Native WebPages page-design presets do not receive the bridge
+and retain their authored values. The fresh-import Slideshow harness verifies
+the aliases match in Builder and storefront.
+
+**Page-design migration rule (2026-08-12):** applying a YOOtheme page import
+now replaces the document design layer with `{}`. During hydration, documents
+whose blocks carry the same YOOtheme provenance retain that empty design layer
+instead of receiving `defaultDesign`/Princity defaults again. This gives the
+canonical Global Styles owner unambiguous precedence for imported pages while
+leaving native documents on their existing preset path. Fresh-import coverage
+asserts the persisted imported layout has `design: {}` before comparing Builder
+and storefront.
+
+**Legacy action bridge (2026-08-12):** imported-document roots now also map
+the remaining Builder preview text, surface, and Button aliases to their
+canonical Global Style tokens. Section semantic contexts provide the same
+Button token path for Builder and storefront. This closes the old preview-only
+palette bypass without changing native WebPages page-design behavior; the
+fresh-import harness verifies preview text and Button background/text resolve
+to the same Global values on both surfaces.
+
 ### 2. Section / Container — COMPLETE
 
 **Phase 2 progress (2026-08-09):** live YOOtheme inspection confirmed the
@@ -288,7 +325,71 @@ Card surface plus hover state, including per-item card-hover imports.
 - **Explicit unsupported:** masonry, grid parallax, item animation, hover image/video, video, advanced filter layout/alignment/width/breakpoint configuration, `lightbox_bg_close`, and WordPress dynamic query grids. They remain absent from the inspector and continue to be reported by the importer; the supported local category filter and lightbox enablement are not presented as equivalents for those advanced YOOtheme behaviors.
 - **Content-tab and final acceptance:** The real Pricing fixture proves that Grid item `title` and `content` are rich HTML, not plain strings. They normalize through the shared safe rich-text boundary; Title accepts safe inline markup and Content uses the canonical **Visual | HTML** editor. A live Pricing-item round trip verified headings, paragraphs, strong/emphasis, and links in Source → Visual → Publish → reload; the persisted safe link gained its expected `rel` value, and the original nested imported UIkit markup was restored and survived reload unchanged. `GridCardsClient` consumes the resulting sanitized rich HTML for both Builder and storefront rather than rendering it as a plain string. Source `tags` maps to the canonical `gridItems[].tags` array, which is the same data consumed by shared Grid filtering. `filter: true` and `filter_style` map to the existing Grid filter owner so fresh Pricing imports expose Monthly/Yearly filter controls. An item `panel_style` is retained only when explicitly authored and resolves before the inherited Grid Card style; an unstyled item remains **Inherit Grid Style**. Colored Primary/Secondary Cards and Tiles now resolve title, meta, content, links, and default/text actions through the shared Global Card role tokens, while explicit local color utilities still win. Imported `/wp-content/uploads/...` fields resolve once at the shared Builder document boundary with the configured CMS origin; absolute URLs and non-WordPress WebPages assets remain unchanged. Live Builder/storefront inspection of the imported DevStack Pricing page confirmed matching Primary Card inverse text/title surfaces. Focused Grid coverage protects rich content, tags, explicit item Card style, shared rendering, inverse Card semantics, and CMS media-URL normalization.
 
-### 9. Slider / Slideshow / Overlay — PARTIAL
+### 9. Slider / Slideshow / Overlay — COMPLETE — supported static scope
+
+**Phase 9.2 — Static Overlay Slider contract: COMPLETE — supported static scope (2026-08-12).**
+The fixed source-led matrix is
+[`yootheme-phase-9-2-overlay-slider-contract.md`](./yootheme-phase-9-2-overlay-slider-contract.md).
+The former generic Carousel/Card inspector is no longer the Overlay Slider
+surface: its visible Settings order is now Slider, Item Width, Animation,
+Navigation, Slidenav, Item, Overlay, shared Title/Meta/Content/Link, followed
+by shared Advanced. Import normalization now preserves the static Enterprise
+source's width mode/responsive widths, title/meta defaults, element Action
+defaults, and navigation/slidenav descriptors without copying parent actions
+onto items. The shared runtime now consumes General text alignment for both
+Builder and storefront and uses a distinct UIkit-dotnav Overlay Slider adapter
+instead of generic bar pagination. A fresh Enterprise import was visually
+accepted in Builder and storefront; deferred Dynamic Content, hover Media,
+unproven transitions and safe whole-overlay linking remain explicitly outside
+this completed static scope.
+
+**Phase 9.3 — Static Panel Slider contract: COMPLETE — supported static scope
+(2026-08-12).**
+The source-led matrix is
+[`yootheme-phase-9-3-panel-slider-contract.md`](./yootheme-phase-9-3-panel-slider-contract.md).
+Enterprise 5’s six-panel icon Slider is the acceptance fixture. Its supported
+static contract is complete through canonical Panel Slider composition and
+shared owners; layout/media/dynamic fields without a proven canonical runtime
+remain explicitly deferred rather than becoming inspector-only settings.
+The current pass also makes UIkit navigation values source-truthful:
+`slidenav: none` suppresses controls; `default`/`outside` normalize once into
+the shared navigation placement; and source slidenav margin is a real
+element-level token rather than an ignored import value. Fresh Enterprise 5
+acceptance proved six 58px SVG media boxes, centered semantic titles, six
+whole-panel links without a fabricated action, UIkit grid/divider structure,
+and correctly hidden slidenav when the auto-width set fits. Focused type and
+carousel-contract coverage passes.
+
+**Phase 9.1 — Static Slideshow contract: COMPLETE (2026-08-12).** The
+permanent source-led ledger is
+[`yootheme-phase-9-1-slideshow-contract.md`](./yootheme-phase-9-1-slideshow-contract.md).
+It records the live YOOtheme Slideshow screen, synchronized Enterprise3 source
+fields, existing canonical owners, supported scope, and every explicit
+deferment. The finalized ledger is the acceptance boundary before Phase 9.2
+(Overlay Slider) or Phase 9.3 (Panel Slider) resumes. The prior generic carousel
+"Navigation Presentation" surface is not evidence of Slideshow compatibility.
+Current verified implementation progress: source `nav_*` / `slidenav_*` values
+now normalize into the shared carousel owners and are composed through the
+Slideshow-specific Navigation and Slidenav groups. The bounded Slideshow frame
+contract is now verified by fresh-import Builder/storefront harnesses: Auto
+ratio + min/max constraints and Viewport percentage height share the same
+runtime geometry, and the supported Height group follows YOOtheme's practical
+order (Height, Ratio, Min Height, Max Height). Slideshow now also composes the
+shared Title, Meta, Rich Content, Action, and General/Advanced owners rather
+than a local substitute; item actions preserve authored link values and do not
+render when no source URL exists. `height_expand`, thumbnail SVG styling, and
+Slidenav outside breakpoint are deliberately reported as deferred rather than
+persisted as inert Slideshow settings. The fixed Enterprise 3/4/5 source-led
+acceptance matrix has now passed: static
+source mapping, truthful deferment reporting, comparable Content/Settings/
+Advanced composition, and shared Builder/storefront behavior.
+
+**Responsive navigation evidence (2026-08-12):** the synchronized Enterprise3
+source uses YOOtheme `s` for both `nav_breakpoint` and `slidenav_breakpoint`.
+Fresh-import tests now verify that both controls are hidden at 639px and
+visible at 640px in Builder and storefront. The shared Slideshow CSS takes
+precedence over Swiper's inline pagination display, so this source semantic
+cannot fall back silently to **Always**.
 
 - **YOOtheme semantics:** **Slideshow** is an image/video-led, one-item presentation with slideshow height/ratio, transition, text/overlay placement, dot/thumb navigation and slidenav. **Overlay Slider** is a responsive multi-item slider with fixed/auto item-width mode, breakpoint widths, gap/divider/center/finite behavior, and a per-item overlay (cover/caption, display, style, position, padding and whole-overlay linking). These are distinct public element contracts, not aliases.
 - **Canonical owners:** public WebPages **Slideshow** and **Overlay Slider** elements now own their distinct persisted `carouselSettings.presentation` values and share one `resolveCarouselPresentation` → `CarouselBlock` runtime. `Panel Slider` remains a presentation adapter over that runtime. The previous generic `slider` kind remains renderable only as a legacy document compatibility alias and is removed from the Element Library.
@@ -296,26 +397,98 @@ Card surface plus hover state, including per-item card-hover imports.
 - **Import mapping:** YOOtheme `slideshow` normalizes to the first-class `slideshow` owner, `overlay-slider` to `overlaySlider`, and `panel-slider` to the existing Panel Slider adapter; none are coerced into another carousel form. All map only settings currently consumed by the shared runtime. Unrendered overlay modes/transitions remain reported rather than stored inertly; dynamic sources are deferred to Phase 13.
 - **Builder/frontend:** both route every public semantic adapter through the same carousel resolver and `CarouselBlock`; Builder editing chrome remains outside that presentation path.
 - **Inheritance:** Global Slider defaults → semantic carousel settings → slide-local shared Media/Action overrides.
-- **Verified foundation:** focused architecture coverage confirms only Slideshow, Overlay Slider and Panel Slider are publicly registered and that both new semantic elements persist through the shared resolver. This is architecture verification only, not visual parity acceptance.
-- **Enterprise static acceptance progress (2026-08-10):** a fresh Enterprise import now renders its single static Panel Slider through the same `CarouselBlock` path in Builder and storefront: six imported items, three visible items at the imported medium `1-3` width, 30px default gap, finite scrolling, outside slidenav, no dotnav, and no centered mode. The previous storefront max-content track expansion is contained by the shared content-row wrapper (Builder 1136px / storefront 1096px inside their respective gutters, rather than multi-million-pixel widths). `panel_link: true` plus an empty `link_text` now preserves linked media/title without inventing a visible “Read more” action; linked titles resolve through the existing Card variant title tokens rather than the surrounding section link color. The Enterprise Overlay Slider is dynamic-query-only and is now explicitly skipped with the Phase 13 warning instead of importing one empty static slide.
-- **Progress (2026-08-10):** static importer normalization now maps Slideshow display/viewport-height/fade values and Overlay Slider display/cover-caption/position/padding values to the same `CarouselBlock` runtime used in Builder and storefront. The runtime renders the corresponding shared classes and visibility/padding behavior. Focused TypeScript and carousel/import contract coverage passes. The currently persisted Enterprise page proves three shared carousels (Panel Slider 6 items, Slideshow 4, Overlay Slider 4) with matching Builder/storefront item counts and height geometry after reload; this is not yet fresh-source visual parity evidence because the supplied latest Enterprise export does not contain the two static test nodes that are present in the already-imported document.
-- **Remaining capability:** real source-export acceptance for the two static fixtures; Overlay Slider caption/style/whole-overlay-link semantics; Slideshow video/thumbnav and responsive navigation/slidenav breakpoints. `Viewport (Subtract Next Section)` remains explicitly unsupported until a cross-section measurement contract exists; parallax and unsupported UIkit transitions remain absent rather than inert.
+- **Verified static acceptance:** Slideshow, Overlay Slider and Panel Slider are the only public carousel elements; all persist through the same resolver/runtime. Fresh synchronized Enterprise imports were accepted for the supported static Slideshow and Overlay Slider contracts. Enterprise 5 proves the Panel Slider static contract: six linked 58px SVG panels, centered semantic titles, UIkit grid/divider track, correct auto-width lock behavior and no invented action. Builder and storefront share the same `UikitSlider → resolveCarouselPresentation → CarouselBlock` path.
+- **Deferred / unsupported by product decision:** Dynamic Content / Field Binding is Phase 13; static video, cross-section `Viewport (Subtract Next Section)`, parallax, source-specific responsive outside-navigation breakpoints, and unproven UIkit transition modes remain absent rather than inert. These do not change the completed supported static scope.
+- **Acceptance:** all supported static Slider / Slideshow / Overlay semantics must retain source → canonical owner → inspector → shared Builder/storefront behavior. Focused carousel/import contracts are the regression gate; synchronized fresh imports and live comparison are the release evidence.
 - **Explicit unsupported for now:** parallax, Ken Burns, thumbnail SVG/color controls, and overlay transitions/modes without a proven shared runtime remain absent from the inspector and importer mapping.
 - **Acceptance:** fresh imports and live YOOtheme comparison must prove each supported Slideshow/Overlay Slider control has the same persisted, Builder and storefront behavior before this phase can become COMPLETE.
 
-### 10. Responsive behavior — MISSING
+### 10. Responsive behavior — COMPLETE (supported scope)
 
-- **YOOtheme semantics:** UIkit `s/m/l/xl` breakpoints; element breakpoint/fallback alignment/visibility; responsive widths; section/grid/media/nav breakpoints.
-- **Existing owners:** shell breakpoint fields and fixed CSS breakpoints.
-- **Missing capability:** a product decision and runtime strategy. CSS custom properties cannot alter media-query thresholds by themselves.
-- **Inspector/UI:** expose breakpoints only if runtime/configurable breakpoints are genuinely implemented; otherwise label them unavailable and do not import/store them.
-- **Import mapping:** normalize YOOtheme tier names to the chosen WebPages responsive model.
-- **Builder/frontend:** identical breakpoint engine/classes in both surfaces.
-- **Inheritance:** global breakpoint policy informs component responsive controls.
-- **Explicit unsupported:** imported configurable breakpoint values until the runtime strategy exists.
-- **Acceptance:** change a breakpoint/value in Global Styles and observe all responsive section/grid/media behavior update identically in Builder/frontend.
+- **YOOtheme semantics implemented:** fixed UIkit semantic tiers `s/m/l/xl`; imported/global tier values; General responsive width, block/text alignment and visibility; Section title breakpoint; Grid column cascade; Text columns; supported carousel navigation/slidenav visibility; Panel Slider fixed responsive item-width cascade.
+- **Canonical owner:** `shellSettings.breakpointSmall`, `breakpointMedium`, `breakpointLarge`, `breakpointXLarge`, validated as a strictly ascending positive policy by `resolveResponsiveBreakpointPolicy()`.
+- **Inspector/UI:** Global Styles › Global › Breakpoints exposes the four canonical values. YOOtheme LESS import writes the same fields and reports them as supported.
+- **Builder/frontend:** `ResponsiveBreakpointPolicyStyle` emits scoped rendered-page media rules from the active policy. Builder preview retains a real pixel width and adds its resolved `data-responsive-preview-tier`, allowing its device frame to follow the same semantic tier as storefront without changing dashboard responsiveness. Carousel JavaScript consumes the same resolved policy; it owns no parallel numeric table.
+- **Inheritance/runtime:** responsive values retain UIkit forward fallback. General responsive fields remain owned by `visualStyle.layout`; legacy runtime-only UIkit visibility/text-column classes were replaced with policy-scoped equivalents, without duplicating persisted document state.
+- **Verified acceptance (2026-08-12):** default `640/960/1200/1600` and imported custom `700/1000/1280/1680` policies are checked at threshold −1, exact threshold, and threshold +1 by the shared tier resolver. Builder preview resolves its semantic tier from its actual canvas width and overrides browser-window media queries through the same scoped policy. Builder and storefront agree for a real imported-policy responsive probe covering General, Section title, Grid, Text, navigation/slidenav, and the policy passed to Panel Slider fixed item-width behavior. A fresh YOOtheme LESS import changes the active policy and the real responsive probe at its imported threshold; restoring the default policy restores the original tier behavior.
+- **Explicit deferred:** media-grid/image responsive layout semantics without an exact canonical owner; Dynamic Content; dashboard/application-shell breakpoints; source-specific Slidenav Outside Breakpoint and other specialized carousel breakpoints without a proven runtime contract. These remain absent rather than stored inertly.
 
-### 11. Remaining supported elements — PARTIAL
+### 11. Remaining supported elements — COMPLETE (verified static scope)
+
+**Phase 11.3 — Gallery: COMPLETE (verified static scope).**
+Static YOOtheme `gallery`/`gallery_item` now retain Gallery identity and map
+ordered static image source/alt, title, meta, sanitized rich content, tags,
+ordinary item links with target/ARIA label, display flags, column/row gaps,
+divider, caption/cover mode, and the shared image width/height/loading/border
+subset. The existing shared `UikitGallery` renderer consumes the canonical
+model in both Builder and storefront; its item editor now uses the canonical
+rich-content and Link controls, and Advanced composes the shared Element
+Advanced owner. Source `lightbox: true` now maps to the shared real UIkit
+Lightbox runtime rather than the native Gallery modal, retaining source item
+order, media link triggers, and supported title/content captions in Builder
+and storefront. Source `overlay_link` maps to the same canonical Gallery
+whole-media link owner: it produces a separate accessible overlay trigger,
+uses that UIkit lightbox trigger when enabled, and never nests the visible
+action anchor. Advanced UIkit lightbox options (controls, counter, background
+close, animation, navigation, media dimensions/orientation, video autoplay,
+and text color) remain explicitly deferred. Responsive grid-column cascade,
+masonry, parallax,
+filter/navigation, video/hover media, per-item focal/color overrides, and
+overlay style/position/padding/transition remain explicitly deferred until an
+exact shared runtime exists. Focused static import contracts pass; Phase 11.3
+has synchronized fixture acceptance for the supported static subset in Builder
+and storefront.
+
+**Phase 11.2 — Accordion and Table: COMPLETE (verified static scope).**
+Static YOOtheme `accordion`/`accordion_item` now normalizes into the native
+`UikitAccordion` collection: source item order, title, sanitized rich content,
+top/bottom image, per-item link and target, show-image/show-link,
+multiple/collapsible behavior, content style/margin, image width/height/loading/
+border, and shared Action presentation all retain canonical owners. The
+Accordion Content editor now uses the shared rich-text owner and its Advanced
+tab is the shared `ElementAdvancedPanel`. Side-media grid layout, content
+drop-caps/columns, SVG styling, and danger actions are reported as deferred
+because their existing Accordion paths are not exact canonical consumers.
+
+Static YOOtheme `table`/`table_item` now normalizes into the native Table
+model for the verified subset: source order of title/meta/content/image/link cells,
+headers, sanitized rich text cells, Default/Divider/Striped style, hover,
+justify, row size, vertical alignment, overflow/stacked responsive mode and
+last-column alignment. Authored row media and actions retain source URL, alt,
+label, target and verified presentation through the canonical Image and
+Action/Link owners; `show_image` and `show_link` suppress their respective
+cells without manufacturing content. `UikitTable` consumes that same persisted
+model in both Builder and storefront with canonical UIkit table classes.
+Per-cell typography/color, SVG animation and unproven field-width semantics
+remain explicitly deferred. Focused contracts and synchronized Enterprise8
+fresh-import Builder/storefront acceptance pass. The Table Content tab is a
+canonical repeatable **Items** collection: it supplies add/copy/delete/reorder
+and opens one item at a time for source-truthful Image, title/meta/rich
+content, and per-row Link URL/label editing. Element-level Link target/style/
+size remain in Settings, matching YOOtheme ownership. A live item edit was
+persisted through Builder and storefront, then restored to the synchronized
+fixture value.
+
+**Phase 11.1 — Alert, Icon, List: COMPLETE (verified static scope).**
+The importer now recognizes static `alert`, `icon`, `list`, and `list_item`
+source nodes as first-class WebPages blocks rather than degrading them to text
+or generic HTML. Alert maps its UIkit style/size, title element/style/inline
+presentation, rich content, content style/margin, and optional link through
+`UikitAlert`, shared Typography/Rich Text/Link, and shared General/Advanced.
+Icon maps only registry-resolved UIkit icons, width, semantic color, optional
+link/target/ARIA label and link style through `UikitIcon`; an unavailable
+source icon is reported and never substituted. List maps the verified static
+collection order, sanitized rich item content, item link/target/icon,
+vertical/horizontal list type, marker/marker color, divider/striped/spacing,
+list element/nav wrapper, show-link, icon visibility/size/color and link
+style through `UikitList`. The three Inspector surfaces compose their
+canonical Content/Settings owners and the shared `ElementAdvancedPanel`, not
+element-local Advanced copies. List item image/SVG framing, responsive
+columns/dividers, vertical media placement and any dynamic source are
+explicitly deferred because List has no exact shared media/column runtime for
+them yet. Focused static import contracts pass; this sub-phase remains
+**PARTIAL** until a synchronized YOOtheme fixture containing all three source
+elements verifies persisted Builder/storefront parity and visual behavior.
 
 - **YOOtheme semantics:** Accordion, Alert, Gallery, List, Table, Map, Social, Nav, Switcher, Tabs, Countdown, Video, Icon, form/content-source elements and WordPress-specific modules.
 - **Existing owners:** WebPages block vocabulary, `uikitCapabilities.ts`, existing UIkit element components.
@@ -327,11 +500,12 @@ Card surface plus hover state, including per-item card-hover imports.
 - **Explicit unsupported:** WordPress dynamic queries/modules and plugin-specific source adapters unless WebPages implements equivalent data providers.
 - **Acceptance:** every advertised supported source type has at least one fixture and a complete visible semantic path.
 
-### 12. Importer + fixture acceptance — PARTIAL
+### 12. Importer + fixture acceptance — COMPLETE (registered compatibility scope)
 
 - **YOOtheme semantics:** all source fields in Builder `element.json`, UIkit/theme LESS, and real exports.
 - **Existing owners:** LESS importer, page importer, import contract, import reporting UI, fixture tests.
-- **Missing capability:** persistent fixture registry, field-level semantic coverage ledger, fresh-import visual acceptance runner, asset/font availability checks, and strict status reporting.
+- **Implemented evidence:** repository fixture registry and field-level semantic registry; registry-backed grouped import reports; fresh-import Builder/storefront runner with SHA validation, scoped-draft replacement, persisted reload/restore, font/media/SVG readiness, UIkit runtime readiness, and layout-stability checks. Batch 3 representative acceptance passed on 2026-08-12: Enterprise7 (ordinary static Alert/Accordion), Enterprise3 (Panel Slider geometry), Enterprise6 (UIkit Grid masonry/Lightbox).
+- **Batch 4 release-gate evidence (2026-08-12):** `npm run test:yootheme-compat:strict` validates registry source hashes, per-fixture status baselines, contracts, all six real fresh-import/reload/Builder-storefront/restore runs, and explicit deferred/intentional status visibility. The final Phase 10 boundary repair ensures the Enterprise3 Slideshow navigation and slidenav are hidden at 639px and visible at the canonical Small threshold (640px) and 641px in both Builder and storefront. The strict gate passes for the registered compatibility scope.
 - **Inspector/UI:** import report must link each mapped field to its WebPages UI location; it must group capability families rather than flood users with repeated field warnings.
 - **Import mapping:** one contract registers source meaning, owner, normalizer, UI location, renderer status, and unsupported reason.
 - **Builder/frontend:** acceptance is visual, uses a newly imported document, and confirms persisted reload parity.

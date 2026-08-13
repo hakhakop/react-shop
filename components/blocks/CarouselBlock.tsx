@@ -22,6 +22,7 @@ import {
   getUikitImageClass,
   getUikitImageStyle,
   getUikitImageWrapperClass,
+  getUikitMarginClass,
   getUikitSvgColor,
   getUikitSvgColorClass,
   getUikitPanelMediaStyle,
@@ -31,6 +32,7 @@ import {
 import { typographyRoleClass, type SemanticTypographyRole } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolvePanelSliderRuntime } from "@/lib/panelSliderRuntime";
+import { resolveResponsiveBreakpointPolicy, type ResponsiveBreakpointPolicy } from "@/lib/responsiveBreakpointPolicy";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import { useBuilderCarouselGeometryCoordinator } from "@/components/builder/BuilderCarouselGeometryCoordinator";
@@ -52,6 +54,9 @@ export type CarouselSlide = {
   id: string;
   imageUrl?: string | null;
   imageAlt?: string | null;
+  /** Dedicated YOOtheme Thumbnav media; falls back to imageUrl when absent. */
+  thumbnailUrl?: string | null;
+  thumbnailPosition?: string | null;
   title?: string | null;
   meta?: string | null;
   subtitle?: string | null;
@@ -88,6 +93,11 @@ export type CarouselSlide = {
   imageShadow?: string | null;
   imageAlignment?: string | null;
   imagePosition?: string | null;
+  /** Per-slide YOOtheme text context and semantic item element. */
+  textColor?: "none" | "light" | "dark" | string | null;
+  itemElement?: "div" | "article" | "section" | "li" | string | null;
+  navigationLabel?: string | null;
+  buttonAriaLabel?: string | null;
   imageLoading?: "lazy" | "eager" | string | null;
   imageWidth?: string | null;
   imageHeight?: string | number | null;
@@ -99,6 +109,7 @@ export type CarouselSlide = {
   iconSize?: number | null;
   showAction?: boolean | null;
   fullWidthButton?: boolean | null;
+  linkMarginTop?: string | null;
   buttonStyle?: string | null;
   buttonSize?: string | null;
 };
@@ -141,6 +152,21 @@ export type CarouselSettings = {
   slidenavBreakpoint?: "small" | "medium" | "large" | "xlarge" | string | null;
   paginationStyle?: "simple-dots" | "minimal-dots" | "expanding-pills" | "fraction" | "progress" | "thumbs" | "hidden" | string | null;
   paginationPosition?: "bottom" | "top" | "overlay" | string | null;
+  navigationType?: "none" | "dotnav" | "thumbnav" | string | null;
+  navigationMargin?: "none" | "small" | "medium" | "large" | string | null;
+  navigationBreakpoint?: "small" | "medium" | "large" | "xlarge" | "always" | string | null;
+  navigationBelow?: boolean | "true" | "false" | 1 | 0 | null;
+  navigationHoverOnly?: boolean | "true" | "false" | 1 | 0 | null;
+  navigationVertical?: boolean | "true" | "false" | 1 | 0 | null;
+  thumbnavWidth?: number | string | null;
+  thumbnavHeight?: number | string | null;
+  thumbnavNoWrap?: boolean | "true" | "false" | 1 | 0 | null;
+  thumbnavInlineSvg?: boolean | "true" | "false" | 1 | 0 | null;
+  thumbnavSvgColor?: string | null;
+  slidenavHoverOnly?: boolean | "true" | "false" | 1 | 0 | null;
+  slidenavLarger?: boolean | "true" | "false" | 1 | 0 | null;
+  slidenavMargin?: "none" | "small" | "medium" | "large" | string | null;
+  slidenavOutsideBreakpoint?: "small" | "medium" | "large" | "xlarge" | string | null;
   aspectRatio?: "auto" | "16:9" | "4:3" | "1:1" | "21:9" | "full" | string | null;
   overlayGradient?: "none" | "subtle" | "dark-glass" | "vibrant" | string | null;
   overlayPosition?: "bottom-left" | "bottom-center" | "bottom-right" | "center" | "top-left" | "top-right" | string | null;
@@ -149,22 +175,33 @@ export type CarouselSettings = {
   overlayMode?: "cover" | "caption";
   overlayDisplay?: "always" | "hover" | "active";
   overlayPadding?: string | null;
+  /** UIkit Overlay/Tile surface, independent from media fit and content position. */
+  overlayStyle?: "none" | "default" | "primary" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | string | null;
   /** Visibility belongs to the YOOtheme carousel element, not individual slides. */
   showTitle?: boolean | "true" | "false" | 1 | 0 | null;
   showImage?: boolean | "true" | "false" | 1 | 0 | null;
   showMeta?: boolean | "true" | "false" | 1 | 0 | null;
   showContent?: boolean | "true" | "false" | 1 | 0 | null;
   showLink?: boolean | "true" | "false" | 1 | 0 | null;
+  fullWidthButton?: boolean | null;
+  linkMarginTop?: string | null;
+  /** YOOtheme Thumbnav can deliberately show a numbered thumbnail instead of slide media. */
+  showNavigationThumbnail?: boolean | "true" | "false" | 1 | 0 | null;
   overlayLink?: boolean;
   itemWidthMode?: "fixed" | "auto";
   slideshowHeight?: "auto" | "viewport" | "section";
+  slideshowViewportHeight?: number | string | null;
+  slideshowHeightExpand?: boolean | "true" | "false" | 1 | 0 | null;
   slideshowMinHeight?: number | string | null;
+  slideshowMaxHeight?: number | string | null;
   slideshowRatio?: string | null;
   kenBurns?: boolean | "true" | "false" | 1 | 0 | null;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
   headingSize?: string | null;
   titleTypographyRole?: string | null;
   metaTypographyRole?: string | null;
+  metaPosition?: "above-title" | "below-title" | "below-content" | string | null;
+  metaHtmlElement?: "div" | "p" | "span" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
   metaStyle?: string | null;
   contentTypographyRole?: string | null;
   contentStyle?: string | null;
@@ -173,7 +210,10 @@ export type CarouselSettings = {
   headingAlign?: "left" | "center" | "right" | string | null;
   buttonStyle?: string | null;
   buttonSize?: string | null;
+  buttonLabel?: string | null;
   linkTarget?: string | null;
+  elementLinkUrl?: string | null;
+  elementLinkTarget?: string | null;
   panelStyle?: string | null;
   panelSize?: string | null;
   panelHover?: boolean | null;
@@ -203,6 +243,8 @@ type CarouselBlockProps = {
   settings?: CarouselSettings;
   className?: string;
   onUploadSlideImage?: (slideIndex: number, currentUrl?: string) => void;
+  /** The one rendered-page policy, supplied by Builder/storefront adapters. */
+  breakpointPolicy?: ResponsiveBreakpointPolicy;
 };
 
 function isPlaceholderSvgUrl(url?: string | null): boolean {
@@ -215,6 +257,20 @@ function toCssDimension(value?: string | number | null): string | undefined {
   return typeof value === "number" ? `${value}px` : value;
 }
 
+function toCssObjectPosition(value?: string | null): string | undefined {
+  return value && /^(?:top|center|bottom)-(?:left|center|right)$/.test(value)
+    ? value.replace("-", " ")
+    : undefined;
+}
+
+/** Accept YOOtheme's authoring form (for example `1600:900`) without
+ * allowing arbitrary persisted CSS into the carousel frame. */
+function toCssAspectRatio(value?: string | null): string | undefined {
+  const match = value?.trim().match(/^(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)$/);
+  if (!match || Number(match[1]) <= 0 || Number(match[2]) <= 0) return undefined;
+  return `${match[1]} / ${match[2]}`;
+}
+
 function getUikitTextColorClass(value?: string | null): string {
   if (!value || value === "none" || value === "default" || value === "inherit") return "";
   return value.startsWith("uk-text-") ? value : `uk-text-${value}`;
@@ -225,12 +281,16 @@ export default function CarouselBlock({
   settings,
   className,
   onUploadSlideImage,
+  breakpointPolicy: suppliedBreakpointPolicy,
 }: CarouselBlockProps) {
+  const breakpointPolicy = suppliedBreakpointPolicy ?? resolveResponsiveBreakpointPolicy();
   const builderGeometryCoordinator =
     useBuilderCarouselGeometryCoordinator();
   const [panelSliderLocked, setPanelSliderLocked] = useState(false);
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const [activeSlideshowIndex, setActiveSlideshowIndex] = useState(0);
+  const [activeOverlayIndex, setActiveOverlayIndex] = useState(0);
 
   useEffect(() => {
     if (!builderGeometryCoordinator || !mainSwiper) return;
@@ -262,6 +322,9 @@ export default function CarouselBlock({
   // itself. Its panel-item flex group inherits that context for both text and
   // inline media; it is not an Image-alignment setting.
   const panelContentAlignment = isPanelSlider
+    ? resolveCarouselContentAlignment(settings?.contentAlign)
+    : null;
+  const overlayContentAlignment = settings?.presentation === "overlay-slider"
     ? resolveCarouselContentAlignment(settings?.contentAlign)
     : null;
 
@@ -307,7 +370,7 @@ export default function CarouselBlock({
     xlarge: xlargeCardsPerView,
   };
   const panelSliderRuntime = settings?.presentation === "panel-slider"
-    ? resolvePanelSliderRuntime(settings)
+    ? resolvePanelSliderRuntime(settings, breakpointPolicy)
     : null;
 
   const booleanSetting = (
@@ -339,6 +402,13 @@ export default function CarouselBlock({
     // gutter. A Panel Slider is locked when all item boxes fit that logical
     // grid span, rather than only Swiper's clipped viewport width.
     return totalItemSpan <= swiper.width + leadingGridGutter + 0.5;
+  };
+  const applySlideshowNavigationPresentation = (swiper: any) => {
+    if (!isSlideshow) return;
+    const previous = swiper?.navigation?.prevEl as HTMLElement | undefined;
+    const next = swiper?.navigation?.nextEl as HTMLElement | undefined;
+    previous?.classList.add("uk-slidenav", "uk-slidenav-previous");
+    next?.classList.add("uk-slidenav", "uk-slidenav-next");
   };
 
   const swiperEffect = (() => {
@@ -395,6 +465,30 @@ export default function CarouselBlock({
   const arrowPosition = settings?.arrowPosition ?? "overlay";
   const paginationStyle = settings?.paginationStyle ?? "minimal-dots";
   const paginationPosition = settings?.paginationPosition ?? "bottom";
+  const slideshowNavigationType = isSlideshow
+    ? (settings?.navigationType === "dotnav" || settings?.navigationType === "thumbnav" ||
+        (settings?.navigationType === undefined && booleanSetting(settings?.showDots, true))
+        ? (settings?.navigationType === "thumbnav" ? "thumbnav" : "dotnav")
+        : "none")
+    : null;
+  const overlayNavigationType = settings?.presentation === "overlay-slider"
+    ? (settings?.navigationType === "dotnav" ||
+      (settings?.navigationType === undefined && booleanSetting(settings?.showDots, false))
+        ? "dotnav"
+        : "none")
+    : null;
+  const slideshowNavigationMargin = settings?.navigationMargin ?? "medium";
+  const slideshowNavigationBreakpoint = settings?.navigationBreakpoint ?? "always";
+  const slideshowNavigationBelow = booleanSetting(settings?.navigationBelow, false);
+  const slideshowNavigationHoverOnly = booleanSetting(settings?.navigationHoverOnly, false);
+  const slideshowNavigationVertical = booleanSetting(settings?.navigationVertical, false);
+  const slideshowSlidenavHoverOnly = booleanSetting(settings?.slidenavHoverOnly, false);
+  const slideshowSlidenavLarger = booleanSetting(settings?.slidenavLarger, false);
+  const slideshowSlidenavMargin = settings?.slidenavMargin ?? "medium";
+  const slideshowThumbnavWidth = Math.max(1, numberSetting(settings?.thumbnavWidth, 100, 1, 480));
+  const slideshowThumbnavHeight = Math.max(1, numberSetting(settings?.thumbnavHeight, 75, 1, 360));
+  const slideshowThumbnavNoWrap = booleanSetting(settings?.thumbnavNoWrap, false);
+  const slideshowShowNavigationThumbnail = booleanSetting(settings?.showNavigationThumbnail, true);
   const overlayGradient = settings?.overlayGradient ?? "none";
   const overlayPosition = settings?.overlayPosition ?? "bottom-left";
   const overlayColor = settings?.overlayColor ?? "dark";
@@ -402,19 +496,30 @@ export default function CarouselBlock({
   const overlayMode = settings?.overlayMode ?? "cover";
   const overlayDisplay = settings?.overlayDisplay ?? "always";
   const overlayPadding = settings?.overlayPadding ?? "default";
+  const overlayStyle = settings?.overlayStyle ?? "none";
   const slideshowHeight = settings?.slideshowHeight ?? "auto";
+  const slideshowViewportHeight = numberSetting(settings?.slideshowViewportHeight, 100, 0, 100);
+  const slideshowAspectRatio = toCssAspectRatio(settings?.slideshowRatio ?? settings?.aspectRatio) ?? "16 / 9";
   const isKenBurns = booleanSetting(settings?.kenBurns, false);
   const showTitle = booleanSetting(settings?.showTitle, true);
   const showImage = booleanSetting(settings?.showImage, true);
   const showMeta = booleanSetting(settings?.showMeta, true);
   const showContent = booleanSetting(settings?.showContent, true);
   const showLink = booleanSetting(settings?.showLink, true);
+  const slideshowElementLinkUrl = isSlideshow && settings?.elementLinkUrl?.trim()
+    ? settings.elementLinkUrl.trim()
+    : undefined;
+  const slideshowElementLinkTarget = settings?.elementLinkTarget;
   // arrowStyle="hidden" or showArrows===false both suppress arrows
   const showArrows =
     arrowStyle !== "hidden" && booleanSetting(settings?.showArrows, true);
   // paginationStyle="hidden" or showDots===false both suppress dots
-  const showDots =
-    paginationStyle !== "hidden" && booleanSetting(settings?.showDots, true);
+  const showDots = isSlideshow
+    ? slideshowNavigationType === "dotnav"
+    : overlayNavigationType !== null
+      ? overlayNavigationType === "dotnav"
+      : paginationStyle !== "hidden" && booleanSetting(settings?.showDots, true);
+  const showThumbnav = isSlideshow && slideshowNavigationType === "thumbnav";
 
   const explicitSlideMode = settings?.slideMode ?? "auto";
   const headingLevel = settings?.headingLevel ?? undefined;
@@ -423,10 +528,17 @@ export default function CarouselBlock({
   const metaRole = settings?.metaTypographyRole as SemanticTypographyRole | undefined;
   const contentRole = settings?.contentTypographyRole as SemanticTypographyRole | undefined;
   const SlideTitle = (headingLevel ?? "h3") as React.ElementType;
+  const renderSlideTitle = (title: string, className: string) => (
+    <SlideTitle
+      className={className}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }}
+    />
+  );
+  const SlideMeta = (settings?.metaHtmlElement ?? "div") as React.ElementType;
+  const slideshowMetaPosition = settings?.metaPosition ?? "below-title";
   const titleClass = getUikitHeadingClass(headingLevel ?? "h3", headingSize);
   const metaClass = getUikitTextClass(settings?.metaStyle ?? undefined);
   const contentClass = getUikitTextClass(settings?.contentStyle ?? undefined);
-  const buttonClass = getUikitButtonClass(settings?.buttonStyle ?? undefined, settings?.buttonSize ?? undefined);
 
   // Unique React key — includes every Swiper structural prop so it remounts cleanly
   // when variant, nav visibility, pagination type, or effects change
@@ -463,15 +575,34 @@ export default function CarouselBlock({
         isPanelSlider ? "el-element" : "",
         panelContentAlignment ? `uk-text-${panelContentAlignment}` : "",
         isPanelSlider && panelSliderLocked ? "shop-builder-swiper--locked" : "",
+        isPanelSlider ? `shop-builder-panel-slidenav-margin--${settings?.slidenavMargin ?? "medium"}` : "",
         `shop-builder-arrow--${arrowStyle}`,
         settings?.slidenavBreakpoint ? `shop-builder-slidenav-from-${settings.slidenavBreakpoint}` : "",
         showArrows ? `shop-builder-arrow-pos--${arrowPosition}` : "",
         `shop-builder-pag--${paginationStyle}`,
         `shop-builder-pag-pos--${paginationPosition}`,
-        showDots ? "shop-builder-swiper--has-pagination" : "",
+        // Generic carousels reserve flow space for Swiper's pagination. A
+        // YOOtheme Slideshow owns a separate UIkit-style navigation frame;
+        // reserving that legacy space moves its overlay dots below the media.
+        showDots && !isSlideshow && settings?.presentation !== "overlay-slider" ? "shop-builder-swiper--has-pagination" : "",
+        isSlideshow ? `shop-builder-slideshow-nav--${slideshowNavigationType}` : "",
+        isSlideshow ? `shop-builder-slideshow-nav-pos--${paginationPosition}` : "",
+        isSlideshow ? `shop-builder-slideshow-nav-margin--${slideshowNavigationMargin}` : "",
+        isSlideshow && slideshowNavigationBreakpoint !== "always"
+          ? `shop-builder-slideshow-nav-from-${slideshowNavigationBreakpoint}`
+          : "",
+        isSlideshow && slideshowNavigationBelow ? "shop-builder-slideshow-nav-below" : "",
+        isSlideshow && slideshowNavigationHoverOnly ? "shop-builder-slideshow-nav-hover" : "",
+        isSlideshow && slideshowNavigationVertical ? "shop-builder-slideshow-nav-vertical" : "",
+        isSlideshow && slideshowThumbnavNoWrap ? "shop-builder-slideshow-thumbnav-nowrap" : "",
+        isSlideshow && slideshowSlidenavHoverOnly ? "shop-builder-slideshow-slidenav-hover" : "",
+        isSlideshow && slideshowSlidenavLarger ? "shop-builder-slideshow-slidenav-large" : "",
+        isSlideshow ? `shop-builder-slideshow-slidenav-margin--${slideshowSlidenavMargin}` : "",
         isSlideshow ? `shop-builder-slideshow-overlay--${overlayPosition}` : "",
         isSlideshow ? `shop-builder-slideshow-padding--${overlayPadding}` : "",
-        isSlideshow ? `shop-builder-slideshow-text--${overlayTextColor === "light" ? "light" : "dark"}` : "",
+        isSlideshow && (overlayTextColor === "light" || overlayTextColor === "dark")
+          ? `shop-builder-slideshow-text--${overlayTextColor}`
+          : "",
         isSlideshow && overlayTextColor === "light" ? "uk-light" : "",
         isSlideshow && slideshowHeight === "viewport"
           ? `shop-builder-slideshow-height--${slideshowHeight}`
@@ -479,6 +610,14 @@ export default function CarouselBlock({
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-mode--${overlayMode}` : "",
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-display--${overlayDisplay}` : "",
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-padding--${overlayPadding}` : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-style--${overlayStyle}` : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-nav--${overlayNavigationType}` : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-nav-pos--${paginationPosition}` : "",
+        settings?.presentation === "overlay-slider" && settings?.navigationBelow === true ? "shop-builder-overlay-nav-below" : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-nav-margin--${settings?.navigationMargin ?? "medium"}` : "",
+        settings?.presentation === "overlay-slider" && settings?.navigationBreakpoint && settings.navigationBreakpoint !== "always"
+          ? `shop-builder-overlay-nav-from-${settings.navigationBreakpoint}`
+          : "",
         aspectRatioClass,
         is3DEffect ? "shop-builder-swiper--3d" : "",
         className ?? "",
@@ -487,6 +626,13 @@ export default function CarouselBlock({
         ...(settings?.presentation === "slideshow" && toCssDimension(settings.slideshowMinHeight)
           ? { "--shop-builder-slideshow-min-height": toCssDimension(settings.slideshowMinHeight) }
           : {}),
+        ...(isSlideshow ? {
+          "--shop-builder-slideshow-aspect-ratio": slideshowAspectRatio,
+          "--shop-builder-slideshow-viewport-height": `${slideshowViewportHeight}vh`,
+          ...(toCssDimension(settings?.slideshowMaxHeight)
+            ? { "--shop-builder-slideshow-max-height": toCssDimension(settings?.slideshowMaxHeight) }
+            : {}),
+        } : {}),
       } as React.CSSProperties}
     >
       <Swiper
@@ -563,6 +709,11 @@ export default function CarouselBlock({
         watchOverflow
         onAfterInit={(swiper) => {
           if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
+          applySlideshowNavigationPresentation(swiper);
+        }}
+        onSlideChange={(swiper) => {
+          if (isSlideshow) setActiveSlideshowIndex(swiper.realIndex);
+          if (overlayNavigationType === "dotnav") setActiveOverlayIndex(swiper.realIndex);
         }}
         onLock={(swiper) => {
           if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
@@ -574,7 +725,7 @@ export default function CarouselBlock({
           if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
         }}
         pagination={
-          showDots
+          showDots && !isSlideshow && settings?.presentation !== "overlay-slider"
             ? {
                 clickable: true,
                 type:
@@ -591,28 +742,29 @@ export default function CarouselBlock({
           panelSliderRuntime
             ? panelSliderRuntime.breakpoints
               ? {
-                  320: { ...panelSliderRuntime.breakpoints[320], spaceBetween: swiperSpaceBetween },
-                  640: { ...panelSliderRuntime.breakpoints[640], spaceBetween: swiperSpaceBetween },
-                  960: { ...panelSliderRuntime.breakpoints[960], spaceBetween: swiperSpaceBetween },
-                  1200: { ...panelSliderRuntime.breakpoints[1200], spaceBetween: swiperSpaceBetween },
-                  1600: { ...panelSliderRuntime.breakpoints[1600], spaceBetween: swiperSpaceBetween },
+                  0: { ...panelSliderRuntime.breakpoints[0], spaceBetween: swiperSpaceBetween },
+                  [breakpointPolicy.small]: { ...panelSliderRuntime.breakpoints[breakpointPolicy.small], spaceBetween: swiperSpaceBetween },
+                  [breakpointPolicy.medium]: { ...panelSliderRuntime.breakpoints[breakpointPolicy.medium], spaceBetween: swiperSpaceBetween },
+                  [breakpointPolicy.large]: { ...panelSliderRuntime.breakpoints[breakpointPolicy.large], spaceBetween: swiperSpaceBetween },
+                  [breakpointPolicy.xlarge]: { ...panelSliderRuntime.breakpoints[breakpointPolicy.xlarge], spaceBetween: swiperSpaceBetween },
                 }
               : undefined
             : !is3DEffect && !isHeroOrFadeMode && !isMarquee
               ? {
-                320: {
+                0: {
                   slidesPerView: responsiveCardsPerView.phone,
                   spaceBetween: 12,
                 },
-                640: {
+                [breakpointPolicy.small]: {
                   slidesPerView: responsiveCardsPerView.small,
                   spaceBetween: Math.min(spaceBetween, 16),
                 },
-                1024: {
+                [breakpointPolicy.medium]: {
                   slidesPerView: responsiveCardsPerView.medium,
                   spaceBetween,
                 },
-                1280: { slidesPerView: responsiveCardsPerView.large, spaceBetween },
+                [breakpointPolicy.large]: { slidesPerView: responsiveCardsPerView.large, spaceBetween },
+                [breakpointPolicy.xlarge]: { slidesPerView: responsiveCardsPerView.xlarge, spaceBetween },
               }
               : undefined
         }
@@ -624,11 +776,46 @@ export default function CarouselBlock({
         }
       >
         {slides.map((slide, idx) => {
+          const slideshowElementLink = slideshowElementLinkUrl ? (
+            <a
+              className="shop-builder-slideshow-element-link"
+              href={slideshowElementLinkUrl}
+              aria-label={`Open slideshow${slide.title ? `: ${slide.title}` : ""}`}
+              {...builderLinkTargetProps(slideshowElementLinkTarget)}
+            />
+          ) : null;
           const hasRealImage = showImage && Boolean(slide.imageUrl && slide.imageUrl.trim());
+          const slideButtonLabel = slide.buttonLabel ?? settings?.buttonLabel;
           const hasTextContent = Boolean(
-            (showTitle && slide.title?.trim()) || (showMeta && slide.subtitle?.trim()) ||
-            (showContent && slide.text?.trim()) || (showLink && slide.buttonLabel?.trim())
+            (showTitle && slide.title?.trim()) || (showMeta && (slide.meta ?? slide.subtitle)?.trim()) ||
+            (showContent && slide.text?.trim()) || (showLink && slideButtonLabel?.trim())
           );
+          const itemMeta = slide.meta ?? slide.subtitle;
+          const SlideshowItemElement = isSlideshow && ["div", "article", "section", "li"].includes(slide.itemElement ?? "")
+            ? slide.itemElement as React.ElementType
+            : "article";
+          const slideshowItemTextContext = isSlideshow && (slide.textColor === "light" || slide.textColor === "dark")
+            ? `uk-${slide.textColor}`
+            : "";
+          // Every public carousel presentation consumes the same canonical
+          // action contract. Panel Slider has its own panel-specific adapter
+          // below; Slideshow and Overlay/standard cards resolve their local
+          // values before the element-level defaults.
+          const slideButtonClass = getUikitButtonClass(
+            slide.buttonStyle ?? settings?.buttonStyle ?? undefined,
+            slide.buttonSize ?? settings?.buttonSize ?? undefined,
+          );
+          const slideButtonFullWidth = slide.fullWidthButton ?? settings?.fullWidthButton;
+          const slideButtonMarginClass = getUikitMarginClass(
+            slide.linkMarginTop ?? settings?.linkMarginTop,
+            "top",
+          );
+          const renderSlideshowMeta = () =>
+            showMeta && itemMeta ? (
+              <SlideMeta className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-swiper-text`.trim()}>
+                {itemMeta}
+              </SlideMeta>
+            ) : null;
 
           // Decide effective slide mode
           const effectiveMode =
@@ -652,10 +839,10 @@ export default function CarouselBlock({
 
           if (effectiveMode === "panel") {
             const panelClass = getUikitCardClass(
-              slide.panelStyle ?? (settings?.presentation === "panel-slider" ? "blank" : "default"),
+              slide.panelStyle ?? settings?.panelStyle ?? (settings?.presentation === "panel-slider" ? "blank" : "default"),
               {
-              hover: slide.panelHover ? "hover" : "none",
-              padding: slide.panelSize ?? "none",
+              hover: (slide.panelHover ?? settings?.panelHover) ? "hover" : "none",
+              padding: slide.panelSize ?? settings?.panelSize ?? "none",
               },
             );
             const itemImage = resolveUikitImageSemantics({
@@ -696,8 +883,13 @@ export default function CarouselBlock({
               slide.buttonStyle ?? settings?.buttonStyle ?? undefined,
               slide.buttonSize ?? settings?.buttonSize ?? undefined,
             );
+            const itemButtonFullWidth = slide.fullWidthButton ?? settings?.fullWidthButton;
+            const itemButtonMarginClass = getUikitMarginClass(
+              slide.linkMarginTop ?? settings?.linkMarginTop,
+              "top",
+            );
             const itemMeta = slide.meta ?? slide.subtitle;
-            const metaPosition = slide.gridMetaAlign ?? "below-title";
+            const metaPosition = slide.gridMetaAlign ?? settings?.metaPosition ?? "below-title";
             const textAlign = isPanelSlider
               ? panelContentAlignment!
               : resolveCarouselContentAlignment(slide.contentAlign ?? slide.headingAlign ?? settings?.contentAlign);
@@ -709,8 +901,9 @@ export default function CarouselBlock({
                 : "";
             const panelLinkProps = builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget);
             const panelLinkUrl = slide.buttonUrl || "#";
-            const hasPanelLink = slide.linkPanel === true && Boolean(slide.buttonUrl);
-            const hasAction = slide.showAction !== false && Boolean(slide.buttonLabel);
+            const hasPanelLink = (slide.linkPanel ?? settings?.linkPanel) === true && Boolean(slide.buttonUrl);
+            const itemButtonLabel = slide.buttonLabel ?? settings?.buttonLabel;
+            const hasAction = slide.showAction !== false && Boolean(itemButtonLabel && slide.buttonUrl);
             const mediaStyle: React.CSSProperties = {
               aspectRatio: itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
               // UIkit's width-only inline icon presentation uses the same
@@ -841,7 +1034,7 @@ export default function CarouselBlock({
                         className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
                         {...panelLinkProps}
                       >
-                        {slide.buttonLabel}
+                        {itemButtonLabel}
                       </a>
                     )}
                   </div>
@@ -887,11 +1080,7 @@ export default function CarouselBlock({
                       {((showTitle && slide.title) || slide.badge) && (
                         <div className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
                           {slide.badge && <span className="opacity-75">{slide.badge}</span>}
-                          {showTitle && slide.title && (
-                            <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)}`.trim()}>
-                              {slide.title}
-                            </SlideTitle>
-                          )}
+                          {showTitle && slide.title && renderSlideTitle(slide.title, `${titleClass} ${typographyRoleClass(titleRole)}`.trim())}
                         </div>
                       )}
                     </div>
@@ -908,6 +1097,7 @@ export default function CarouselBlock({
                       </span>
                     </div>
                   )}
+                  {slideshowElementLink}
                 </article>
               </SwiperSlide>
             );
@@ -935,7 +1125,9 @@ export default function CarouselBlock({
             // Determine backdrop style
             const isLightBg = overlayColor === "light" || overlayColor === "glass-light";
             const backdropClass =
-              effectiveMode === "glass-card"
+              overlayStyle === "none"
+                ? "bg-transparent p-0"
+                : effectiveMode === "glass-card"
                 ? isLightBg
                   ? "bg-white/85 backdrop-blur-xl border border-slate-200/80 shadow-2xl p-5 md:p-6 rounded-2xl"
                   : overlayColor === "brand"
@@ -1006,7 +1198,9 @@ export default function CarouselBlock({
                           <span>Change Image</span>
                         </button>
                       )}
-                      <div className={`shop-builder-media-overlay shop-builder-media-overlay--${overlayGradient !== "none" ? overlayGradient : "subtle"}`} />
+                      {overlayStyle !== "none" && (
+                        <div className={`shop-builder-media-overlay shop-builder-media-overlay--${overlayGradient !== "none" ? overlayGradient : "subtle"}`} />
+                      )}
                     </>
                   ) : (
                     <div
@@ -1021,42 +1215,39 @@ export default function CarouselBlock({
                   )}
 
                   {/* Dynamic Color-Aware & Positioned Text Overlay */}
-                  <div className={`shop-builder-overlay-slide-content z-10 flex flex-col gap-2.5 ${posClass} ${backdropClass}`}>
+                  <div
+                    className={`shop-builder-overlay-slide-content z-10 flex flex-col gap-2.5 ${posClass} ${backdropClass}`}
+                    data-overlay-content-align={overlayContentAlignment ?? undefined}
+                    style={overlayContentAlignment ? { textAlign: overlayContentAlignment } : undefined}
+                  >
                     {slide.badge && (
                       <span className={textColors.badge}>
                         {slide.badge}
                       </span>
                     )}
-                    {showTitle && slide.title && (
-                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} ${textColors.title}`.trim()}>
-                        {slide.title}
-                      </SlideTitle>
-                    )}
-                    {showMeta && slide.subtitle && (
-                      <div className={`${metaClass} ${typographyRoleClass(metaRole)} ${textColors.text}`.trim()}>
-                        {slide.subtitle}
-                      </div>
-                    )}
+                    {slideshowMetaPosition === "above-title" && renderSlideshowMeta()}
+
+                    {showTitle && slide.title && renderSlideTitle(slide.title, `${titleClass} ${typographyRoleClass(titleRole)} ${textColors.title}`.trim())}
+                    {slideshowMetaPosition !== "above-title" && slideshowMetaPosition !== "below-content" && renderSlideshowMeta()}
                     {showContent && slide.text && (
-                      <div className={`${contentClass} ${typographyRoleClass(contentRole)} text-xs md:text-sm line-clamp-3 ${textColors.text}`.trim()}>
-                        {slide.text}
-                      </div>
+                      <div
+                        className={`${contentClass} ${typographyRoleClass(contentRole)} text-xs md:text-sm line-clamp-3 ${textColors.text}`.trim()}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(slide.text) }}
+                      />
                     )}
+                    {slideshowMetaPosition === "below-content" && renderSlideshowMeta()}
                     {slide.price && (
                       <div className={`text-lg ${textColors.price}`}>
                         {slide.price}
                       </div>
                     )}
-                    {showLink && slide.buttonLabel && slide.buttonUrl && (
+                    {showLink && slideButtonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
-                        className={buttonClass}
+                        className={`${slideButtonClass} ${slideButtonMarginClass} ${slideButtonFullWidth ? "uk-width-1-1" : ""}`.trim()}
                         {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
                       >
-                        <span>{slide.buttonLabel}</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
+                        <span>{slideButtonLabel}</span>
                       </a>
                     )}
                   </div>
@@ -1069,7 +1260,7 @@ export default function CarouselBlock({
             // MODE 2: Full-bleed Hero Banner Slide (Clean Text Overlay over Image)
             return (
               <SwiperSlide key={slide.id || idx}>
-                <article className="shop-builder-hero-slide-card">
+                <SlideshowItemElement className={`shop-builder-hero-slide-card ${slideshowItemTextContext}`.trim()}>
                   {hasRealImage ? (
                     <div className="shop-builder-swiper-media">
                       <Image
@@ -1077,6 +1268,7 @@ export default function CarouselBlock({
                         alt={slide.imageAlt ?? slide.title ?? ""}
                         fill
                         className={`object-cover ${isKenBurns ? "is-ken-burns" : ""}`}
+                        style={{ objectPosition: toCssObjectPosition(slide.imagePosition) }}
                         sizes="(min-width: 1180px) 100vw, 100vw"
                         priority={idx === 0}
                       />
@@ -1110,42 +1302,35 @@ export default function CarouselBlock({
                       </span>
                     )}
 
-                    {showTitle && slide.title && (
-                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} ${isSlideshow ? "uk-margin-remove" : "shop-builder-swiper-title"}`.trim()}>
-                        {slide.title}
-                      </SlideTitle>
-                    )}
+                    {showTitle && slide.title && renderSlideTitle(slide.title, `${titleClass} ${typographyRoleClass(titleRole)} ${isSlideshow ? "uk-margin-remove" : "shop-builder-swiper-title"}`.trim())}
 
-                    {showMeta && slide.subtitle && (
-                      <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-swiper-text`.trim()}>
-                        {slide.subtitle}
-                      </div>
-                    )}
+                    {slideshowMetaPosition !== "above-title" && slideshowMetaPosition !== "below-content" && renderSlideshowMeta()}
 
                     {showContent && slide.text && (
-                      <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-swiper-text`.trim()}>
-                        {slide.text}
-                      </div>
+                      <div
+                        className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-swiper-text`.trim()}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(slide.text) }}
+                      />
                     )}
+                    {slideshowMetaPosition === "below-content" && renderSlideshowMeta()}
 
                     {slide.price && (
                       <div className="shop-builder-swiper-price">{slide.price}</div>
                     )}
 
-                    {showLink && slide.showAction !== false && slide.buttonLabel && slide.buttonUrl && (
+                    {showLink && slide.showAction !== false && slideButtonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
-                        className={buttonClass}
+                        className={`${slideButtonClass} ${slideButtonMarginClass} ${slideButtonFullWidth ? "uk-width-1-1" : ""}`.trim()}
+                        aria-label={slide.buttonAriaLabel || undefined}
                         {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
                       >
-                        <span>{slide.buttonLabel}</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
+                        <span>{slideButtonLabel}</span>
                       </a>
                     )}
                   </div>
-                </article>
+                  {slideshowElementLink}
+                </SlideshowItemElement>
               </SwiperSlide>
             );
           }
@@ -1182,39 +1367,109 @@ export default function CarouselBlock({
                   {slide.badge && (
                     <span className="shop-builder-slide-badge">{slide.badge}</span>
                   )}
-                  {showTitle && slide.title && (
-                    <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-slide-title`.trim()}>
-                      {slide.title}
-                    </SlideTitle>
-                  )}
-                  {showMeta && slide.subtitle && (
-                    <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-slide-text`.trim()}>
-                      {slide.subtitle}
-                    </div>
-                  )}
+                  {slideshowMetaPosition === "above-title" && renderSlideshowMeta()}
+                  {showTitle && slide.title && renderSlideTitle(slide.title, `${titleClass} ${typographyRoleClass(titleRole)} shop-builder-slide-title`.trim())}
+                  {slideshowMetaPosition !== "above-title" && slideshowMetaPosition !== "below-content" && renderSlideshowMeta()}
                   {showContent && slide.text && (
-                    <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-slide-text`.trim()}>
-                      {slide.text}
-                    </div>
+                    <div
+                      className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-slide-text`.trim()}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(slide.text) }}
+                    />
                   )}
+                  {slideshowMetaPosition === "below-content" && renderSlideshowMeta()}
                   {slide.price && (
                     <div className="shop-builder-slide-price">{slide.price}</div>
                   )}
                   {showLink && slide.buttonLabel && slide.buttonUrl && (
                     <a
                       href={slide.buttonUrl}
-                      className={buttonClass}
+                      className={`${slideButtonClass} ${slideButtonMarginClass} ${slideButtonFullWidth ? "uk-width-1-1" : ""}`.trim()}
                       {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
                     >
                       <span>{slide.buttonLabel}</span>
                     </a>
                   )}
                 </div>
+                {slideshowElementLink}
               </article>
             </SwiperSlide>
           );
         })}
       </Swiper>
+
+      {isSlideshow && (showDots || showThumbnav) && (
+        <div
+          className="shop-builder-slideshow-navigation-frame"
+          data-slideshow-navigation-placement={slideshowNavigationBelow ? "below" : "overlay"}
+          style={slideshowNavigationBelow
+            ? { position: "relative", inset: "auto", height: "auto", pointerEvents: "auto" }
+            : { position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none" }}
+        >
+          <ul
+            className={showThumbnav ? "swiper-pagination uk-thumbnav uk-flex-center" : "swiper-pagination uk-dotnav uk-flex-center"}
+            style={showThumbnav ? {
+              "--shop-builder-thumbnav-width": `${slideshowThumbnavWidth}px`,
+              "--shop-builder-thumbnav-height": `${slideshowThumbnavHeight}px`,
+            } as React.CSSProperties : undefined}
+          >
+            {slides.map((slide, index) => (
+              <li
+                key={slide.id || index}
+                className={activeSlideshowIndex === index ? "uk-active" : undefined}
+              >
+                {showThumbnav ? (
+                  <button
+                    type="button"
+                    className="shop-builder-slideshow-thumbnav-item"
+                    aria-label={slide.navigationLabel || slide.title || `Go to slide ${index + 1}`}
+                    aria-current={activeSlideshowIndex === index ? "true" : undefined}
+                    onClick={() => mainSwiper?.slideToLoop(index)}
+                  >
+                    {slideshowShowNavigationThumbnail && (slide.thumbnailUrl || slide.imageUrl) && !isPlaceholderSvgUrl(slide.thumbnailUrl || slide.imageUrl) ? (
+                      <Image
+                        src={(slide.thumbnailUrl || slide.imageUrl)!}
+                        alt={slide.imageAlt ?? slide.title ?? ""}
+                        fill
+                        className="object-cover"
+                        sizes="100px"
+                        style={{ objectPosition: toCssObjectPosition(slide.thumbnailPosition) }}
+                      />
+                    ) : (
+                      <span>{index + 1}</span>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={`swiper-pagination-bullet ${activeSlideshowIndex === index ? "swiper-pagination-bullet-active" : ""}`.trim()}
+                    aria-label={slide.navigationLabel || slide.title || `Go to slide ${index + 1}`}
+                    aria-current={activeSlideshowIndex === index ? "true" : undefined}
+                    onClick={() => mainSwiper?.slideToLoop(index)}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {settings?.presentation === "overlay-slider" && overlayNavigationType === "dotnav" && (
+        <div className="shop-builder-overlay-navigation-frame" data-overlay-navigation-placement={settings?.navigationBelow ? "below" : "overlay"}>
+          <ul className="shop-builder-overlay-dotnav uk-dotnav uk-flex-center">
+            {slides.map((slide, index) => (
+              <li key={slide.id || index} className={activeOverlayIndex === index ? "uk-active" : undefined}>
+                <button
+                  type="button"
+                  className={`swiper-pagination-bullet ${activeOverlayIndex === index ? "swiper-pagination-bullet-active" : ""}`.trim()}
+                  aria-label={slide.navigationLabel || slide.title || `Go to slide ${index + 1}`}
+                  aria-current={activeOverlayIndex === index ? "true" : undefined}
+                  onClick={() => mainSwiper?.slideToLoop(index)}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Interactive Filmstrip Thumbs Bar */}
       {swiperVariant === "thumbs" && slides.length > 1 && (

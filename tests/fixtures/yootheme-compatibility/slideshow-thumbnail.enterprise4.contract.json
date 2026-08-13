@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "slideshow-thumbnail.enterprise4.v1",
+  "fixture": {
+    "fileName": "Enterprise 4.json",
+    "sha256": "9232c14c35780ec2f4269b9a01105556000e670ce752cc3dfbc15b4cf165788f",
+    "sourcePath": "children.1.children.0.children.0.children.0",
+    "elementType": "slideshow"
+  },
+  "expected": {
+    "itemCount": 4,
+    "navigationType": "thumbnav",
+    "showNavigationThumbnail": true,
+    "navigationPosition": "bottom-center",
+    "navigationBreakpoint": "small",
+    "thumbnavWidth": 100,
+    "thumbnavHeight": 75,
+    "slidenavBreakpoint": "small",
+    "firstItem": {
+      "imageUrl": "/wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
+      "thumbnailUrl": "/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack.jpg"
+    }
+  }
+}

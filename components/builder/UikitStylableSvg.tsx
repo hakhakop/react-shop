@@ -15,6 +15,7 @@ export function sanitizeStylableSvg(
   source: string,
   fit: "contain" | "cover" | "fill" = "contain",
   svgClassName = "",
+  preserveIntrinsicSize = false,
 ) {
   const clean = DOMPurify.sanitize(source, {
     USE_PROFILES: { svg: true, svgFilters: true },
@@ -22,7 +23,7 @@ export function sanitizeStylableSvg(
     FORBID_ATTR: ["style", "onload", "onclick", "onerror"],
   });
   const document = new DOMParser().parseFromString(clean, "image/svg+xml");
-  const svg = document.documentElement;
+  const svg = document.documentElement as unknown as SVGSVGElement;
   if (svg.tagName.toLowerCase() !== "svg" || document.querySelector("parsererror")) {
     throw new Error("Invalid SVG document");
   }
@@ -40,16 +41,28 @@ export function sanitizeStylableSvg(
   });
   if (colorablePaint(svg.getAttribute("fill"))) svg.setAttribute("fill", "currentColor");
   if (colorablePaint(svg.getAttribute("stroke"))) svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("width", "100%");
+  const intrinsicDimensions = resolveIntrinsicSvgDimensions(svg);
+  if (preserveIntrinsicSize && fit === "contain") {
+    // YOOtheme's ViewHelper/SvgHelper fills a missing SVG width or height
+    // from its intrinsic root dimensions (or viewBox) before rendering. Keep
+    // that source geometry for a no-width inline SVG instead of converting it
+    // into a full-width media frame.
+    if (intrinsicDimensions.width) svg.setAttribute("width", intrinsicDimensions.width);
+    else svg.removeAttribute("width");
+    if (intrinsicDimensions.height) svg.setAttribute("height", intrinsicDimensions.height);
+    else svg.removeAttribute("height");
+  } else {
+    svg.setAttribute("width", "100%");
+  }
   // `contain` is the natural, non-framing SVG presentation. Leaving a
   // percentage height here makes a width-only SVG depend on whatever wrapper
   // stylesheet happens to be present (Builder vs storefront). Preserve the
   // SVG's intrinsic viewBox ratio instead. Framed cover/fill media retains a
   // deliberate full-height SVG.
-  if (fit === "contain") {
+  if (fit === "contain" && !preserveIntrinsicSize) {
     svg.removeAttribute("height");
     svg.style.setProperty("height", "auto", "important");
-  } else {
+  } else if (fit !== "contain") {
     svg.setAttribute("height", "100%");
   }
   svg.setAttribute("focusable", "false");
@@ -57,6 +70,38 @@ export function sanitizeStylableSvg(
   svg.setAttribute("preserveAspectRatio", fit === "fill" ? "none" : fit === "cover" ? "xMidYMid slice" : "xMidYMid meet");
   svg.setAttribute("class", [svg.getAttribute("class"), svgClassName, "uk-svg"].filter(Boolean).join(" "));
   return new XMLSerializer().serializeToString(svg);
+}
+
+function numericSvgDimension(value: string | null) {
+  const match = value?.trim().match(/^([0-9]+(?:\.[0-9]+)?)(?:px)?$/i);
+  const number = Number(match?.[1]);
+  return Number.isFinite(number) && number > 0 ? number : undefined;
+}
+
+/** Mirrors YOOtheme SvgHelper's numeric root/viewBox dimension fallback. */
+function resolveIntrinsicSvgDimensions(svg: SVGSVGElement) {
+  let width = numericSvgDimension(svg.getAttribute("width"));
+  let height = numericSvgDimension(svg.getAttribute("height"));
+  const viewBox = svg.getAttribute("viewBox")
+    ?.trim()
+    .split(/[\s,]+/)
+    .map(Number);
+  const viewBoxWidth = viewBox && viewBox.length === 4 && Number.isFinite(viewBox[2]) && viewBox[2] > 0
+    ? viewBox[2]
+    : undefined;
+  const viewBoxHeight = viewBox && viewBox.length === 4 && Number.isFinite(viewBox[3]) && viewBox[3] > 0
+    ? viewBox[3]
+    : undefined;
+
+  if (!width && height && viewBoxWidth && viewBoxHeight) width = Math.round(viewBoxWidth * (height / viewBoxHeight));
+  if (!height && width && viewBoxWidth && viewBoxHeight) height = Math.round(viewBoxHeight * (width / viewBoxWidth));
+  if (!width && viewBoxWidth) width = Math.round(viewBoxWidth);
+  if (!height && viewBoxHeight) height = Math.round(viewBoxHeight);
+
+  return {
+    width: width ? String(width) : undefined,
+    height: height ? String(height) : undefined,
+  };
 }
 
 const requestUrl = (src: string) => {
@@ -74,14 +119,19 @@ const intrinsicSvgAspectRatio = (markup: string | null, fit: "contain" | "cover"
   return width > 0 && height > 0 ? `${width} / ${height}` : undefined;
 };
 
-const loadSvg = (src: string, fit: "contain" | "cover" | "fill", svgClassName: string) => {
-  const key = `${src}|${fit}|${svgClassName}`;
+const loadSvg = (
+  src: string,
+  fit: "contain" | "cover" | "fill",
+  svgClassName: string,
+  preserveIntrinsicSize: boolean,
+) => {
+  const key = `${src}|${fit}|${svgClassName}|${preserveIntrinsicSize ? "intrinsic" : "frame"}`;
   const existing = svgCache.get(key);
   if (existing) return existing;
   const promise = fetch(requestUrl(src), { credentials: "same-origin" })
     .then(async (response) => {
       if (!response.ok) throw new Error(`SVG request failed (${response.status})`);
-      return sanitizeStylableSvg(await response.text(), fit, svgClassName);
+      return sanitizeStylableSvg(await response.text(), fit, svgClassName, preserveIntrinsicSize);
     });
   svgCache.set(key, promise);
   promise.catch(() => svgCache.delete(key));
@@ -95,6 +145,8 @@ type Props = {
   color?: string;
   fit?: "contain" | "cover" | "fill";
   loading?: "lazy" | "eager";
+  /** Keep a no-width YOOtheme SVG at its source/viewBox dimensions. */
+  preserveIntrinsicSize?: boolean;
   style?: CSSProperties;
   fallback: ReactNode;
 };
@@ -107,11 +159,12 @@ export default function UikitStylableSvg({
   color,
   fit = "contain",
   loading = "lazy",
+  preserveIntrinsicSize = false,
   style,
   fallback,
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
-  const requestKey = `${src}|${fit}|${className ?? ""}`;
+  const requestKey = `${src}|${fit}|${className ?? ""}|${preserveIntrinsicSize ? "intrinsic" : "frame"}`;
   const [result, setResult] = useState<{ key: string; markup?: string; failed?: boolean }>({ key: "" });
   const markup = result.key === requestKey ? result.markup ?? null : null;
   const failed = result.key === requestKey && result.failed === true;
@@ -121,7 +174,7 @@ export default function UikitStylableSvg({
     let cancelled = false;
     let observer: IntersectionObserver | undefined;
     const start = () => {
-      void loadSvg(src, fit, className ?? "").then(
+      void loadSvg(src, fit, className ?? "", preserveIntrinsicSize).then(
         (value) => { if (!cancelled) setResult({ key: requestKey, markup: value }); },
         () => { if (!cancelled) setResult({ key: requestKey, failed: true }); },
       );
@@ -137,14 +190,14 @@ export default function UikitStylableSvg({
       observer.observe(ref.current);
     }
     return () => { cancelled = true; observer?.disconnect(); };
-  }, [className, fit, loading, requestKey, src]);
+  }, [className, fit, loading, preserveIntrinsicSize, requestKey, src]);
 
   if (failed) return fallback;
 
   return (
     <span
       ref={ref}
-      className="shop-builder-stylable-svg-host"
+      className={`shop-builder-stylable-svg-host${preserveIntrinsicSize ? " shop-builder-stylable-svg-host--intrinsic" : ""}`}
       role="img"
       aria-label={alt || undefined}
       data-svg-state={markup ? "ready" : "loading"}

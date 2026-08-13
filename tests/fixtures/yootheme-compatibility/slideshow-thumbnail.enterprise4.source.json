@@ -1,0 +1,66 @@
+{
+  "fixture": {
+    "originalFileName": "Enterprise 4.json",
+    "originalSha256": "9232c14c35780ec2f4269b9a01105556000e670ce752cc3dfbc15b4cf165788f",
+    "originalSourcePath": "children.1.children.0.children.0.children.0",
+    "purpose": "Minimal synchronized source projection for the static Slideshow navigation-thumbnail contract."
+  },
+  "source": {
+    "type": "layout",
+    "children": [
+      { "type": "section", "children": [] },
+      {
+        "type": "section",
+        "children": [{ "type": "row", "children": [{ "type": "column", "children": [{
+          "type": "slideshow",
+          "props": {
+            "nav": "thumbnav",
+            "nav_breakpoint": "s",
+            "nav_position": "bottom-center",
+            "nav_position_margin": "medium",
+            "show_thumbnail": true,
+            "slidenav": "default",
+            "slidenav_breakpoint": "s",
+            "slidenav_margin": "medium",
+            "slidenav_outside_breakpoint": "xl",
+            "slideshow_min_height": 300,
+            "thumbnav_height": "75",
+            "thumbnav_width": "100",
+            "title_element": "h3"
+          },
+          "children": [
+            {
+              "type": "slideshow_item",
+              "props": {
+                "image": "wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
+                "thumbnail": "wp-content/uploads/yootheme/blog-post-customer-stories-fullstack.jpg",
+                "title": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro"
+              }
+            },
+            {
+              "type": "slideshow_item",
+              "props": {
+                "image": "wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
+                "title": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro"
+              }
+            },
+            {
+              "type": "slideshow_item",
+              "props": {
+                "image": "wp-content/uploads/yootheme/blog-post-5-incredible-video-conference-products-you-ll-wish-you-discovered-sooner-intro.jpg",
+                "title": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro"
+              }
+            },
+            {
+              "type": "slideshow_item",
+              "props": {
+                "image": "wp-content/uploads/yootheme/blog-post-how-to-build-a-high-efficiency-sales-team-from-the-ground-up-intro.jpg",
+                "title": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro"
+              }
+            }
+          ]
+        }] }] }]
+      }
+    ]
+  }
+}

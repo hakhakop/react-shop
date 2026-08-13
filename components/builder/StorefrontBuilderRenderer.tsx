@@ -50,6 +50,7 @@ import CarouselBlock, {
 import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import CategoryBar from "@/components/CategoryBar";
@@ -68,6 +69,13 @@ import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import type { SaaSWebsite } from "@/lib/websites";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
+import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import { resolveResponsiveBreakpointPolicy } from "@/lib/responsiveBreakpointPolicy";
+import {
+  getUikitSemanticContextVars,
+  getYoothemeImportGlobalAliases,
+  hasYoothemeImportContract,
+} from "@/lib/uikitSemanticContext";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import type {
   BuilderLayout,
@@ -327,66 +335,7 @@ function getContextVars(
   scheme: "light" | "dark" | "auto",
   customBg?: string,
 ): Record<string, string | undefined> {
-  if (scheme === "auto") {
-    return {
-      "--context-bg": customBg || "transparent",
-      "--context-text": "var(--builder-text)",
-      "--context-muted": "var(--builder-muted)",
-      "--context-surface": "var(--builder-surface)",
-      "--context-button-bg": "var(--builder-button-bg)",
-      "--context-button-text": "var(--builder-button-text)",
-      "--context-card-bg": "var(--builder-card-bg)",
-      "--context-card-border": "var(--builder-card-border)",
-
-      // Legacy variables mapping for correct cascade
-      "--builder-active-text": "var(--builder-text)",
-      "--builder-active-muted": "var(--builder-muted)",
-      "--builder-active-surface": "var(--builder-surface)",
-      "--builder-active-button-bg": "var(--builder-button-bg)",
-      "--builder-active-button-text": "var(--builder-button-text)",
-      "--builder-card-bg": "var(--builder-card-bg)",
-      "--builder-card-border": "var(--builder-card-border)",
-    };
-  }
-
-  const schemeColors =
-    scheme === "dark" ? builderDarkScheme : builderLightScheme;
-  const cardBorder =
-    scheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(17, 17, 17, 0.08)";
-  return {
-    "--context-bg": customBg || schemeColors.pageBackground,
-    "--context-text": schemeColors.textColor,
-    "--context-muted": schemeColors.mutedTextColor,
-    "--context-surface": schemeColors.surfaceColor,
-    "--context-button-bg": schemeColors.buttonBackground,
-    "--context-button-text": schemeColors.buttonTextColor,
-    "--context-card-bg": schemeColors.surfaceColor,
-    "--context-card-border": cardBorder,
-
-    // Legacy variables mapping for correct cascade
-    "--builder-active-text": schemeColors.textColor,
-    "--builder-active-muted": schemeColors.mutedTextColor,
-    "--builder-active-surface": schemeColors.surfaceColor,
-    "--builder-active-button-bg": schemeColors.buttonBackground,
-    "--builder-active-button-text": schemeColors.buttonTextColor,
-    "--builder-card-bg": schemeColors.surfaceColor,
-    "--builder-card-border": cardBorder,
-    // A semantic dark Section establishes the same inverse action context as
-    // UIkit's `uk-light`: Default remains the light surface, while the
-    // inheriting Secondary/Text action becomes a light outline/link. Local
-    // button colors still win on the action itself.
-    ...(scheme === "dark" ? {
-      "--uk-button-secondary-background": "transparent",
-      "--uk-button-secondary-text": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-border": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-hover-background": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-hover-text": "var(--uk-global-emphasis-color, #111)",
-      "--uk-button-secondary-hover-border": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-text-color": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-link-color": "var(--uk-global-inverse-color, #fff)",
-      "--uk-global-link-color": "var(--uk-global-inverse-color, #fff)",
-    } : {}),
-  };
+  return getUikitSemanticContextVars(scheme, customBg);
 }
 
 function resolveSectionColorScheme(
@@ -423,9 +372,9 @@ function designStyle(layout: BuilderLayout): BuilderStyle {
   const colors = resolveDesignColors(layout);
   return {
     background: colors.pageBackground,
-    color: colors.textColor,
-    "--builder-text": colors.textColor,
-    "--builder-muted": colors.mutedTextColor,
+    color: "var(--uk-global-text-color, #111827)",
+    "--builder-text": "var(--uk-global-text-color, #111827)",
+    "--builder-muted": "var(--uk-global-muted-text-color, #6b7280)",
     "--builder-accent": colors.accentColor,
     "--builder-surface": colors.surfaceColor,
     "--builder-button-bg": colors.buttonBackground,
@@ -437,7 +386,7 @@ function designStyle(layout: BuilderLayout): BuilderStyle {
     "--builder-heading-size": design?.headingSize,
     "--builder-heading-weight": design?.headingWeight,
     "--builder-heading-line-height": design?.headingLineHeight,
-    "--builder-heading-color": design?.headingColor,
+    "--builder-heading-color": "var(--builder-active-heading, var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827)))",
     "--builder-card-bg": design?.cardBg,
     "--builder-card-radius": design?.cardRadius,
     "--builder-card-border": design?.cardBorder,
@@ -634,25 +583,6 @@ function sectionStyle(
   layoutScheme: "light" | "dark" | "auto" = "light",
 ): BuilderStyle {
   const colorScheme = resolveSectionColorScheme(section, layoutScheme);
-  const schemeVars =
-    colorScheme === "dark"
-      ? ({
-          "--builder-section-text": builderDarkScheme.textColor,
-          "--builder-section-muted": builderDarkScheme.mutedTextColor,
-          "--builder-section-surface": builderDarkScheme.surfaceColor,
-          "--builder-section-button-bg": builderDarkScheme.buttonBackground,
-          "--builder-section-button-text": builderDarkScheme.buttonTextColor,
-        } satisfies BuilderStyle)
-      : colorScheme === "light"
-        ? ({
-            "--builder-section-text": builderLightScheme.textColor,
-            "--builder-section-muted": builderLightScheme.mutedTextColor,
-            "--builder-section-surface": builderLightScheme.surfaceColor,
-            "--builder-section-button-bg": builderLightScheme.buttonBackground,
-            "--builder-section-button-text": builderLightScheme.buttonTextColor,
-          } satisfies BuilderStyle)
-        : ({} satisfies BuilderStyle);
-
   const visual = section.visualStyle as BuilderVisualStyle | undefined;
   const resolvedBackground = resolveSectionBackground(section);
   const contextVars = getContextVars(colorScheme, resolvedBackground.override);
@@ -674,7 +604,6 @@ function sectionStyle(
       section.bottomMargin,
       "sectionMargin",
     ),
-    ...schemeVars,
     ...contextVars,
     ...visualStyleToCss(visual),
   };
@@ -2937,7 +2866,12 @@ function SliderSection({
       buttonUrl: slide.buttonUrl,
     })) ?? [];
 
-  const carousel = resolveCarouselPresentation(carouselSettings, slides as any[], shellSettings) as { settings: any; slides: CarouselSlide[] };
+  const carousel = resolveCarouselPresentation({
+    ...carouselSettings,
+    // Keep the canonical General text-alignment owner intact for every public
+    // carousel adapter. A component value, when explicitly authored, wins.
+    contentAlign: carouselSettings.contentAlign ?? (section as any).textAlign,
+  }, slides as any[], shellSettings) as { settings: any; slides: CarouselSlide[] };
 
   return (
     <SectionFrame
@@ -2956,6 +2890,7 @@ function SliderSection({
         }}
         slides={carousel.slides}
         settings={carousel.settings}
+        breakpointPolicy={resolveResponsiveBreakpointPolicy(shellSettings)}
       />
     </SectionFrame>
   );
@@ -3150,6 +3085,7 @@ function StorefrontBuilderRendererBase({
   const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
   const transparentSectionHeader = firstVisibleSection?.headerTransparent === true;
   const RootElement = rootElement;
+  const responsiveBreakpointPolicy = resolveResponsiveBreakpointPolicy(shellSettings);
 
   useEffect(() => {
     if (!isPageDocument) return;
@@ -3169,15 +3105,25 @@ function StorefrontBuilderRendererBase({
         data-builder-page-shell
         dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}
       /> : null}
+      {isPageDocument ? <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} /> : null}
       <RootElement
         className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
         style={
           {
+            ...getUikitGlobalsCssVars(shellSettings),
             ...designStyle(layout),
+            ...(hasYoothemeImportContract(layout)
+              ? getYoothemeImportGlobalAliases()
+              : {}),
             ...builderGeometryCssVariables(),
           } as CSSProperties
         }
         data-builder-page-root
+        data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
+        data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}
+        data-responsive-breakpoint-medium={responsiveBreakpointPolicy.medium}
+        data-responsive-breakpoint-large={responsiveBreakpointPolicy.large}
+        data-responsive-breakpoint-xlarge={responsiveBreakpointPolicy.xlarge}
         data-gsap-home={isHomePage ? true : undefined}
         data-overlap-header={isPageDocument && (pullUnderHeader || transparentSectionHeader || headerOverlay) ? "true" : undefined}
       >

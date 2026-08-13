@@ -18,6 +18,7 @@ import type {
   BuilderShellSettings,
   BuilderHeaderTextMode,
 } from "@/lib/builderShell";
+import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 
 export type {
   BuilderHeaderLayout,
@@ -41,6 +42,7 @@ export type BuilderPanelStyle =
   | "flat-dark"
   | "flat-white"
   | "antigravity";
+export type BuilderButtonStyle = CanonicalButtonVariant;
 export type MenuPresentationSettings = {
   showHeading: boolean;
   icon: string | null;
@@ -266,12 +268,12 @@ export type BuilderLayoutBlock = {
   buttonLabel?: string;
   buttonUrl?: string;
   buttonTarget?: "_self" | "_blank";
-  buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "light";
+  buttonStyle?: BuilderButtonStyle;
   size?: "small" | "default" | "large";
   secondaryButtonLabel?: string;
   secondaryButtonUrl?: string;
   secondaryButtonTarget?: "_self" | "_blank";
-  secondaryButtonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  secondaryButtonStyle?: BuilderButtonStyle;
   secondaryButtonSize?: "small" | "default" | "large";
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
@@ -283,7 +285,7 @@ export type BuilderLayoutBlock = {
     label?: string;
     url?: string;
     target?: "_self" | "_blank";
-    style?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "light";
+    style?: BuilderButtonStyle;
   }[];
   buttonBg?: string;
   buttonTextColor?: string;
@@ -307,6 +309,8 @@ export type BuilderLayoutBlock = {
   imageBorderRadius?: number;
   imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
+  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
@@ -344,7 +348,7 @@ export type BuilderLayoutBlock = {
   panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
   panelContentWidth?: "auto" | "small" | "medium" | "large" | "full";
   panelActionVisible?: boolean;
-  panelActionStyle?: "default" | "primary" | "secondary" | "text";
+  panelActionStyle?: BuilderButtonStyle;
   panelActionSize?: "small" | "default" | "large";
   panelActionAlign?: "inherit" | "left" | "center" | "right";
   hoverPreset?: string;
@@ -454,6 +458,32 @@ export type BuilderLayoutBlock = {
   dateLabel?: string;
   tableHeadings?: string[];
   tableRows?: string[][];
+  /** Canonical structured rows used when a Table contains media or actions. */
+  tableItems?: {
+    id: string;
+    title?: string;
+    meta?: string;
+    content?: string;
+    imageUrl?: string;
+    imageAlt?: string;
+    linkUrl?: string;
+    linkLabel?: string;
+    linkTarget?: "_self" | "_blank";
+  }[];
+  tableColumnFields?: ("image" | "title" | "meta" | "content" | "link")[];
+  tableShowImage?: boolean;
+  tableShowLink?: boolean;
+  tableImageWidth?: string | number;
+  tableImageHeight?: string | number;
+  tableImageLoading?: "lazy" | "eager";
+  tableImageBorder?: "none" | "rounded" | "circle" | "pill" | string;
+  tableImageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
+  tableImageSvgInline?: boolean;
+  tableImageSvgColor?: string;
+  tableLinkStyle?: string;
+  tableLinkSize?: string;
+  tableLinkFullWidth?: boolean;
+  tableLinkTarget?: "_self" | "_blank";
   tableStyle?: "striped" | "bordered" | "plain";
   gridSource?: "static" | "products";
   gridRows?: number;
@@ -477,6 +507,7 @@ export type BuilderLayoutBlock = {
   showImage?: boolean;
   showVideo?: boolean;
   showLink?: boolean;
+  showNavigationThumbnail?: boolean;
   showHoverImage?: boolean;
   showHoverVideo?: boolean;
   gridMasonry?: string;
@@ -493,6 +524,8 @@ export type BuilderLayoutBlock = {
   filterAnimation?: string;
   filterStyle?: string;
   enableLightbox?: boolean;
+  /** YOOtheme Gallery whole-media/overlay link. Kept separate from visible item actions. */
+  overlayLink?: boolean;
   lightboxAnimation?: string;
   lightboxNav?: string;
   gridShowImage?: boolean;
@@ -515,6 +548,8 @@ export type BuilderLayoutBlock = {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
+    thumbnailUrl?: string;
+    thumbnailPosition?: BuilderCarouselImagePosition;
     eyebrow?: string;
     /** Canonical Grid filter metadata. Source tags normalize to this array. */
     tags?: string[];
@@ -523,7 +558,7 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
-    buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "link";
+    buttonStyle?: BuilderButtonStyle;
     buttonAlign?: "left" | "center" | "right";
     buttonTarget?: "_self" | "_blank";
     renderer?: "plain" | "card";
@@ -537,7 +572,7 @@ export type BuilderLayoutBlock = {
     textAlign?: "left" | "center" | "right";
     titleElement?: "h2" | "h3" | "h4" | "div";
     titleStyle?: "inherit" | "h3" | "h4" | "h5";
-    actionStyle?: "default" | "primary" | "secondary" | "text";
+    actionStyle?: BuilderButtonStyle;
     actionSize?: "small" | "default" | "large";
     typography?: TypographySettings;
     items?: string[];
@@ -812,6 +847,8 @@ export type BuilderSection = {
     badge?: string;
     imageUrl?: string;
     imageAlt?: string;
+    thumbnailUrl?: string;
+    thumbnailPosition?: BuilderCarouselImagePosition;
     imagePadding?: SlideImagePadding;
     imageFit?: BuilderCarouselImageFit;
     imageRatio?: BuilderCarouselImageRatio;
@@ -819,6 +856,10 @@ export type BuilderSection = {
     imageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
     imageAlignment?: BuilderCarouselImageAlignment;
     imagePosition?: BuilderCarouselImagePosition;
+    textColor?: "none" | "light" | "dark";
+    itemElement?: "div" | "article" | "section" | "li";
+    navigationLabel?: string;
+    buttonAriaLabel?: string;
     imageWidth?: string;
     imageHeight?: string | number;
     imageLoading?: "lazy" | "eager";
@@ -911,6 +952,9 @@ export type BuilderSection = {
     metaHtmlElement?: BuilderCarouselMetaElement;
     metaStyle?: string;
     linkTarget?: BuilderCarouselActionTarget;
+    /** Whole-element link; distinct from an individual slide action. */
+    elementLinkUrl?: string;
+    elementLinkTarget?: BuilderCarouselActionTarget;
     /** Shared Panel Slider divider between visible items. */
     divider?: boolean;
     showArrows?: boolean;
@@ -938,9 +982,29 @@ export type BuilderSection = {
     panelHover?: boolean;
     itemWidthMode?: "fixed" | "auto";
     slideshowHeight?: "auto" | "viewport" | "section";
+    slideshowViewportHeight?: number;
+    slideshowHeightExpand?: boolean;
     slideshowRatio?: string;
+    slideshowMinHeight?: number;
+    slideshowMaxHeight?: number;
     /** Persisted source values; runtime responsiveness remains deferred. */
     navigationBreakpoint?: BuilderCarouselBreakpoint;
+    /** Slideshow navigation is a UIkit semantic (none / dotnav). */
+    navigationType?: "none" | "dotnav" | "thumbnav" | string;
+    /** UIkit navigation position and its semantic inset/margin tier. */
+    navigationMargin?: "none" | "small" | "medium" | "large" | string;
+    navigationBelow?: boolean;
+    navigationHoverOnly?: boolean;
+    navigationVertical?: boolean;
+    thumbnavWidth?: number;
+    thumbnavHeight?: number;
+    thumbnavNoWrap?: boolean;
+    showNavigationThumbnail?: boolean;
+    thumbnavInlineSvg?: boolean;
+    thumbnavSvgColor?: string;
+    slidenavHoverOnly?: boolean;
+    slidenavLarger?: boolean;
+    slidenavMargin?: "none" | "small" | "medium" | "large" | string;
     slidenavOutsideBreakpoint?: BuilderCarouselBreakpoint;
     kenBurns?: boolean;
     scrubSpeed?: number;

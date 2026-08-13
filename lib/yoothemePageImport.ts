@@ -5,6 +5,7 @@ import type {
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { sanitizeHtml } from "@/lib/safeHtml";
+import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import {
   normalizeYoothemeMedia,
   normalizeYoothemeGridPanelPresentation,
@@ -14,6 +15,8 @@ import {
   normalizeYoothemeTypographyRole,
   normalizeYoothemeTextPresentation,
 } from "@/lib/yoothemeImportContract";
+import { createYoothemePageImportReport, formatYoothemeImportWarnings, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
+import type { UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
 
 /**
  * Pure compatibility analysis and static-content mapping for YOOtheme layout exports.
@@ -36,6 +39,12 @@ export type YoothemeImportElementKind =
   | "image"
   | "grid"
   | "panel"
+  | "alert"
+  | "icon"
+  | "list"
+  | "accordion"
+  | "table"
+  | "gallery"
   | "slideshow"
   | "overlaySlider"
   | "panelSlider";
@@ -79,6 +88,10 @@ export type YoothemeStaticImportMapping = {
   sections: BuilderSection[];
   warnings: string[];
   globalStylePatch: Partial<BuilderShellSettings>;
+  /** Registry-backed reporting projection; legacy warnings remain readable during Batch 2 migration. */
+  report: YoothemeImportReport;
+  /** Compatibility bridge for existing string[] preview consumers. */
+  reportWarnings: string[];
 };
 
 export type YoothemeGlobalStyleBoundary = {
@@ -106,6 +119,16 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   grid: "grid",
   grid_item: "grid",
   panel: "panel",
+  alert: "alert",
+  icon: "icon",
+  list: "list",
+  list_item: "list",
+  accordion: "accordion",
+  accordion_item: "accordion",
+  table: "table",
+  table_item: "table",
+  gallery: "gallery",
+  gallery_item: "gallery",
   "panel-slider": "panelSlider",
   "panel-slider_item": "panelSlider",
   slideshow: "slideshow",
@@ -269,7 +292,10 @@ const sourceVisibility = (value: unknown): string | undefined => {
 
 const sourceAnimation = (value: unknown): string | undefined => {
   const normalized = String(value ?? "").toLowerCase();
-  if (!normalized || normalized === "none" || normalized === "parallax") return normalized || undefined;
+  // YOOtheme's parallax is a compound UIkit runtime (`uk-parallax`) with
+  // coordinate/easing/target fields, not a one-shot CSS animation preset.
+  // Do not persist an inert `uk-animation-parallax` approximation.
+  if (!normalized || normalized === "none" || normalized === "parallax") return undefined;
   return ["fade", "scale-up", "scale-down", "slide-top-small", "slide-bottom-small", "slide-left-small", "slide-right-small", "slide-top-medium", "slide-bottom-medium", "slide-left-medium", "slide-right-medium", "slide-top", "slide-bottom", "slide-left", "slide-right"].includes(normalized)
     ? normalized
     : undefined;
@@ -339,7 +365,6 @@ const sourceGeneralVisualStyle = (
       ...(blendWithPage ? { blendWithPage: true } : {}),
       ...(visibilityMode ? { visibilityMode } : {}),
     },
-    ...(maxWidth ? { effects: { maxWidth } } : {}),
     ...(customClass ? { customClass } : {}),
     ...(customAttributes ? { customAttributes } : {}),
     ...(customCss ? { customCss } : {}),
@@ -501,11 +526,11 @@ export const analyzeYoothemeGlobalStyleBoundary = (
       ["text_style", sourceTextVariant, "WebPages Global Styles"],
       ["meta_style", sourceTextVariant, "WebPages Global Styles"],
       ["button_style", (value) =>
-        ["default", "primary", "secondary", "text", "link"].includes(String(value))
+        ["", "default", "primary", "secondary", "danger", "text", "link", "link-muted", "link-text"].includes(String(value))
           ? sourceButtonStyle(value)
           : undefined, "UIkit token"],
       ["link_style", (value) =>
-        ["default", "primary", "secondary", "text", "link"].includes(String(value))
+        ["", "default", "primary", "secondary", "danger", "text", "link", "link-muted", "link-text"].includes(String(value))
           ? sourceButtonStyle(value)
           : undefined, "UIkit token"],
       ["panel_style", sourcePanelStyle, "UIkit token"],
@@ -584,12 +609,16 @@ const sourceTextVariant = (
 
 const sourceButtonStyle = (
   value: unknown,
-): "primary" | "secondary" | "default" | "text" => {
+): UikitYoothemeButtonVariant => {
+  // YOOtheme uses an empty `button_style` value for its plain Link treatment.
+  // Preserve it as a semantic value rather than falling back to Default.
+  if (value === "" || value === "link") return "link";
   if (value === "primary") return "primary";
   if (value === "secondary") return "secondary";
-  // `link` is a YOOtheme presentation alias for the canonical UIkit Text
-  // button. Do not store either semantic in the historic ghost/outline set.
-  if (value === "text" || value === "link") return "text";
+  if (value === "danger") return "danger";
+  if (value === "text") return "text";
+  if (value === "link-muted") return "link-muted";
+  if (value === "link-text") return "link-text";
   if (value === "default") return "default";
   return "default";
 };
@@ -727,11 +756,25 @@ const sourceSliderItem = (
   const itemProps = sourceProps(node);
   const props = { ...parentProps, ...itemProps };
   const media = normalizeYoothemeMedia(props);
-  const actionLabel = asString(props.link_text);
-  const actionUrl = asString(props.link);
+  // Element-level links must not leak into each item as manufactured actions.
+  // Item action ownership belongs only to its own source node.
+  const actionLabel = asString(itemProps.link_text);
+  const actionUrl = asString(itemProps.link);
+  const sourceFocalPoint = (value: unknown) => {
+    const focal = asString(value);
+    return focal === "top-left" || focal === "top-center" || focal === "top-right" ||
+      focal === "center-left" || focal === "center" || focal === "center-right" ||
+      focal === "bottom-left" || focal === "bottom-center" || focal === "bottom-right"
+      ? focal
+      : undefined;
+  };
+  const itemElement = asString(itemProps.item_element);
   return {
     id: sourcePathId(path, "panel-slide"),
-    title: asString(props.title) ?? "",
+    // YOOtheme title fields may carry safe inline markup (for example a
+    // deliberate line break). Preserve it through the shared rich-inline
+    // sanitizer instead of reducing a title to plain text at import time.
+    title: sanitizeHtml(asString(props.title) ?? ""),
     meta: asString(props.meta) ?? "",
     // Slider item content uses the same persisted safe-HTML contract as Grid
     // and Panel content. Keep imported YOOtheme markup intact at the importer
@@ -739,6 +782,8 @@ const sourceSliderItem = (
     text: sanitizeHtml(asString(props.content) ?? ""),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
+    thumbnailUrl: resolveYoothemeAssetUrl(itemProps.thumbnail),
+    thumbnailPosition: sourceFocalPoint(itemProps.thumbnail_focal_point),
     // Width and Height are Panel Slider element media defaults. Retain these
     // on an item only when the source item explicitly authored its own value;
     // copying a parent value here would mask later element-level edits.
@@ -750,7 +795,7 @@ const sourceSliderItem = (
     imageFit: media.imageFit,
     imageRatio: media.imageRatio,
     imageAlignment: media.imageAlignment,
-    imagePosition: media.imagePosition,
+    imagePosition: sourceFocalPoint(itemProps.image_focal_point) ?? media.imagePosition,
     imageLoading: media.imageLoading,
     // Item fields are true local overrides only. Parent element values belong
     // to carouselSettings so a missing item value can inherit correctly.
@@ -778,8 +823,20 @@ const sourceSliderItem = (
     ...(itemProps.link_target !== undefined
       ? { buttonTarget: itemProps.link_target === "blank" ? "_blank" : "_self" }
       : {}),
+    buttonAriaLabel: asString(itemProps.link_aria_label) ?? undefined,
+    navigationLabel: asString(itemProps.label) ?? undefined,
+    ...(itemProps.text_color === "light" || itemProps.text_color === "dark" || itemProps.text_color === "none"
+      ? { textColor: itemProps.text_color }
+      : {}),
+    ...(itemElement === "div" || itemElement === "article" || itemElement === "section" || itemElement === "li"
+      ? { itemElement }
+      : {}),
     ...(itemProps.link_style !== undefined ? { buttonStyle: sourceButtonStyle(itemProps.link_style) } : {}),
     ...(sourceButtonSize(itemProps.link_size) ? { buttonSize: sourceButtonSize(itemProps.link_size) } : {}),
+    ...(Object.prototype.hasOwnProperty.call(itemProps, "link_fullwidth")
+      ? { fullWidthButton: itemProps.link_fullwidth === true || itemProps.link_fullwidth === "true" }
+      : {}),
+    ...(sourceMargin(itemProps.link_margin) ? { linkMarginTop: sourceMargin(itemProps.link_margin) } : {}),
     // Panel/Card presentation belongs to the shared Card owner. Preserve an
     // explicitly authored item value; parent-level defaults are applied by
     // the Panel Slider adapter below.
@@ -792,7 +849,9 @@ const sourceSliderItem = (
     ...(Object.prototype.hasOwnProperty.call(itemProps, "panel_link_hover")
       ? { panelHover: itemProps.panel_link_hover === true || itemProps.panel_link_hover === "true" || itemProps.panel_style === "card-hover" }
       : {}),
-    linkPanel: props.panel_link === true || props.panel_link === "true",
+    ...(Object.prototype.hasOwnProperty.call(itemProps, "panel_link")
+      ? { linkPanel: itemProps.panel_link === true || itemProps.panel_link === "true" }
+      : {}),
   };
 };
 
@@ -901,7 +960,7 @@ const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
   "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
   "slider_autoplay", "slider_autoplay_interval", "slider_autoplay_pause", "slider_center", "slider_finite", "slider_gap", "slider_width",
   "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge",
-  "slider_divider", "slidenav", "slidenav_breakpoint", "nav", "nav_position",
+  "slider_divider", "slidenav", "slidenav_margin", "slidenav_breakpoint", "nav", "nav_position",
   // Dynamic source descriptors are classified by reportUnsupportedDynamicSource.
   "source", "query", "content_source", "item_source",
 ]);
@@ -909,13 +968,14 @@ const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
 const PANEL_SLIDER_DEFERRED_FIELDS = new Set([
   "image_align",
   "text_color",
+  "panel_match",
   "nav_breakpoint",
   "slidenav_outside_breakpoint",
 ]);
 
 const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
   "content_column_breakpoint", "icon_width", "image_grid_breakpoint", "image_grid_width",
-  "show_hover_image", "show_hover_video", "show_video", "slidenav_margin", "slider_sets",
+  "show_hover_image", "show_hover_video", "show_video", "slider_sets",
   "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
   "link_image", "image_transition", "animate_strokes", "image_icon_width", "image_icon_color",
   "grid_column_gap", "grid_row_gap", "vertical_align", "margin_top", "link_margin", "title_margin",
@@ -926,6 +986,7 @@ const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
 const PANEL_SLIDER_DEFERRED_MESSAGES: Record<string, string> = {
   image_align: "Panel Slider structural image alignment requires the shared media-grid layout runtime, which is not in the current supported scope.",
   text_color: "Panel Slider has no canonical shared text-context owner that applies this source value across title, meta, content, and actions.",
+  panel_match: "equal-height Panel Slider sets require the shared item-height contract, which is not in the current supported scope.",
   nav_breakpoint: "navigation breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
   slidenav_outside_breakpoint: "outside-arrow breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
 };
@@ -1081,11 +1142,25 @@ const mapStaticElement = (
       // canonical imageWidth. The resolver prefers imageWidth.
       imageMaxWidth: sourceImageMaxWidth(props),
       ...media,
+      // YOOtheme's Image template only creates its cover frame when
+      // `image_ratio` is authored. An omitted source ratio is therefore an
+      // explicit natural-media instruction for an imported Image, not an
+      // opportunity to inherit WebPages' native global media framing.
+      imageRatio: media.imageRatio ?? "natural",
       imageLinkUrl: asString(props.link) ?? undefined,
       imageLinkTarget: props.link ? linkTarget : undefined,
       imageShape: props.image_border === "rounded" || props.image_border === "circle" || props.image_border === "pill"
         ? props.image_border
         : "none",
+      ...(["none", "small", "medium", "large", "xlarge"].includes(asString(props.image_box_shadow) ?? "")
+        ? {
+          imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge",
+          imageBoxShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge",
+        }
+        : {}),
+      ...(["none", "default", "primary", "secondary"].includes(asString(props.image_box_decoration) ?? "")
+        ? { imageBoxDecoration: asString(props.image_box_decoration) as "none" | "default" | "primary" | "secondary" }
+        : {}),
       imageAlignment: sourceImageAlignment(props, media.imageAlignment),
     }, props);
   }
@@ -1135,8 +1210,10 @@ const mapStaticElement = (
         ? (props.grid_row_gap as "none" | "small" | "medium" | "large")
         : undefined,
       showDividers: Boolean(props.grid_divider),
-      // YOOtheme's grid_column_align is its Vertical Alignment toggle.
-      centerRows: Boolean(props.grid_column_align),
+      // YOOtheme emits these independently on the Grid track:
+      // `grid_column_align` -> uk-flex-center, `grid_row_align` -> uk-flex-middle.
+      centerColumns: Boolean(props.grid_column_align),
+      centerRows: Boolean(props.grid_row_align),
       columnsPhonePortrait: typeof props.grid_default === "string" ? props.grid_default : undefined,
       columnsPhoneLandscape: typeof props.grid_small === "string" ? props.grid_small : undefined,
       // UIkit's `grid_medium` is the Tablet Landscape tier. Keep it on the
@@ -1222,14 +1299,313 @@ const mapStaticElement = (
     }, props);
   }
 
+  if (type === "alert") {
+    const style = asString(props.alert_style);
+    warnUnsupported(path, props, [
+      "title", "content", "link", "link_target", "alert_style", "alert_size",
+      "title_style", "title_element", "title_inline", "content_style", "content_margin",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "alert"),
+      kind: "alert",
+      title: asString(props.title) ?? "",
+      body: sanitizeHtml(asString(props.content) ?? ""),
+      alertStyle: ["primary", "success", "warning", "danger"].includes(style ?? "") ? style as "primary" | "success" | "warning" | "danger" : undefined,
+      alertLarge: props.alert_size === true || props.alert_size === "true",
+      alertTitleElement: sourceHeadingLevel(props.title_element) ?? "h3",
+      alertTitleStyle: sourceHeadingSize(props.title_style),
+      alertTitleInline: props.title_inline === true || props.title_inline === "true",
+      alertContentStyle: sourceTextVariant(props.content_style),
+      alertContentMargin: sourceMargin(props.content_margin),
+      alertLinkUrl: asString(props.link) ?? undefined,
+      alertLinkTarget: props.link_target === "blank" ? "_blank" : "_self",
+    }, props);
+  }
+
+  if (type === "icon") {
+    const sourceIcon = asString(props.icon);
+    const icon = resolveUikitIconName(sourceIcon);
+    if (sourceIcon && !icon) {
+      warnings.push(path + ".icon: '" + sourceIcon + "' is unavailable in the canonical WebPages UIkit icon registry and was not substituted.");
+    }
+    const color = asString(props.icon_color);
+    const linkStyle = asString(props.link_style);
+    warnUnsupported(path, props, [
+      "icon", "link", "link_target", "link_aria_label", "icon_color", "icon_width", "link_style",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "icon"),
+      kind: "icon",
+      iconName: icon ?? undefined,
+      icon: icon ?? undefined,
+      iconSize: Number.isFinite(Number(props.icon_width)) ? Number(props.icon_width) : undefined,
+      iconColorScheme: ["muted", "emphasis", "primary", "secondary", "success", "warning", "danger"].includes(color ?? "") ? color : "default",
+      iconLinkUrl: asString(props.link) ?? undefined,
+      iconLinkTarget: props.link_target === "blank" ? "_blank" : "_self",
+      iconLinkAriaLabel: asString(props.link_aria_label) ?? undefined,
+      iconLinkStyle: ["button", "link", "muted", "text", "reset"].includes(linkStyle ?? "") ? linkStyle : "icon",
+    }, props);
+  }
+
+  if (type === "list") {
+    const listItems = sourceChildren(node)
+      .filter((child) => child.type === "list_item")
+      .map((child, index) => {
+        const item = sourceProps(child);
+        const sourceIcon = asString(item.icon);
+        const icon = resolveUikitIconName(sourceIcon);
+        if (sourceIcon && !icon) warnings.push(path + "." + index + ".icon: '" + sourceIcon + "' is unavailable in the canonical WebPages UIkit icon registry and was not substituted.");
+        ["image", "image_alt", "image_focal_point", "icon_color"].forEach((key) => {
+          if (item[key] !== undefined && item[key] !== "" && item[key] !== false) {
+            warnings.push(path + "." + index + "." + key + ": DEFERRED — List item media/icon-color runtime has no canonical consumer yet.");
+          }
+        });
+        return {
+          id: sourcePathId(path + "." + index, "list-item"),
+          text: sanitizeHtml(asString(item.content) ?? ""),
+          url: asString(item.link) ?? undefined,
+          target: (item.link_target === "blank" ? "_blank" : "_self") as "_blank" | "_self",
+          iconName: icon ?? undefined,
+        };
+      });
+    const marker = asString(props.list_marker);
+    const presentation = asString(props.list_style);
+    const size = asString(props.list_size);
+    warnUnsupported(path, props, [
+      "content", "show_image", "show_link", "list_type", "list_marker", "list_marker_color",
+      "list_style", "list_size", "list_horizontal_separator", "list_element", "html_element",
+      "content_style", "icon", "icon_color", "icon_width", "link_style",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    // Image framing/SVG animation and responsive columns remain intentionally
+    // unclaimed until List has an exact shared media/column runtime owner.
+    ["image_width", "image_height", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_align", "image_vertical_align", "column", "column_divider", "column_breakpoint"].forEach((key) => {
+      if (props[key] !== undefined && props[key] !== "" && props[key] !== false) {
+        warnings.push(path + "." + key + ": DEFERRED — List media/column runtime has no canonical consumer yet.");
+      }
+    });
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "list"),
+      kind: "list",
+      listItems,
+      listType: asString(props.list_type) === "horizontal" ? "horizontal" : "vertical",
+      listMarker: (["disc", "circle", "square"].includes(marker ?? "") ? marker : "none") as "none" | "disc" | "circle" | "square",
+      listMarkerColor: asString(props.list_marker_color) ?? undefined,
+      listPresentation: presentation === "divider" || presentation === "striped" ? presentation : "default",
+      listSpacing: size === "large" ? "large" : size === "collapse" ? "compact" : "default",
+      listHorizontalSeparator: asString(props.list_horizontal_separator) ?? ", ",
+      listElement: asString(props.list_element) === "ol" ? "ol" : "ul",
+      listWrapNav: props.html_element === true || props.html_element === "true",
+      listShowLink: props.show_link !== false,
+      contentStyle: sourceTextVariant(props.content_style),
+      listShowImage: props.show_image !== false,
+      listIcon: (props.show_image !== false ? resolveUikitIconName(asString(props.icon)) ?? undefined : undefined) as any,
+      listIconColor: asString(props.icon_color) ?? undefined,
+      listIconSize: Number.isFinite(Number(props.icon_width)) ? Number(props.icon_width) : undefined,
+      listLinkStyle: asString(props.link_style) ?? "default",
+    }, props);
+  }
+
+  if (type === "accordion") {
+    const items = sourceChildren(node)
+      .filter((child) => child.type === "accordion_item")
+      .map((child, index) => {
+        const item = sourceProps(child);
+        const url = asString(item.link);
+        return {
+          id: sourcePathId(path + "." + index, "accordion-item"),
+          title: asString(item.title) ?? "",
+          content: sanitizeHtml(asString(item.content) ?? ""),
+          imageUrl: asString(item.image) ?? undefined,
+          imageAlt: asString(item.image_alt) ?? undefined,
+          ...(url ? {
+            buttonUrl: url,
+            buttonLabel: asString(item.link_text) ?? asString(props.link_text) ?? undefined,
+            buttonTarget: props.link_target === true || props.link_target === "true" ? "_blank" : "_self",
+          } : {}),
+        };
+      });
+    const imageAlign = asString(props.image_align);
+    const unsupportedImageLayout = imageAlign === "left" || imageAlign === "right";
+    if (unsupportedImageLayout) warnings.push(path + ".image_align: DEFERRED — Accordion side-media grid layout has no exact canonical runtime yet.");
+    if (props.link_style === "danger") warnings.push(path + ".link_style: DEFERRED — the canonical shared Action owner does not yet support UIkit danger buttons.");
+    ["content_dropcap", "content_column", "content_column_divider", "content_column_breakpoint", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin", "image_svg_inline", "image_svg_color"].forEach((key) => {
+      if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Accordion has no exact canonical runtime consumer yet.");
+    });
+    warnUnsupported(path, props, [
+      "content", "show_image", "show_link", "multiple", "collapsible", "content_style", "content_margin",
+      "image_width", "image_height", "image_loading", "image_border", "image_align",
+      "link_text", "link_target", "link_style", "link_size", "link_fullwidth", "link_margin",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "accordion"), kind: "accordion", accordionItems: items as any,
+      accordionMultiple: props.multiple === true || props.multiple === "true",
+      accordionCollapsible: props.collapsible !== false && props.collapsible !== "false",
+      accordionOpenItems: [], accordionTitleLevel: "div",
+      accordionShowImage: props.show_image !== false, accordionShowLink: props.show_link !== false,
+      accordionContentStyle: sourceTextVariant(props.content_style) ?? "inherit",
+      accordionContentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin) ?? "default",
+      imageWidth: Number.isFinite(Number(props.image_width)) ? Number(props.image_width) : undefined,
+      imageHeight: Number.isFinite(Number(props.image_height)) ? Number(props.image_height) : undefined,
+      imageLoading: props.image_loading === true || props.image_loading === "true" ? "eager" : "lazy",
+      imageBorder: asString(props.image_border) || undefined,
+      ...(imageAlign === "top" || imageAlign === "bottom" ? { accordionMediaPlacement: imageAlign } : {}),
+      accordionLinkText: asString(props.link_text) ?? undefined,
+      accordionLinkTarget: props.link_target === true || props.link_target === "true" ? "_blank" : "_self",
+      accordionButtonStyle: props.link_style === "danger" ? undefined : sourceButtonStyle(props.link_style),
+      accordionButtonSize: sourceButtonSize(props.link_size),
+      accordionFullWidth: props.link_fullwidth === true || props.link_fullwidth === "true",
+      accordionLinkMargin: props.link_margin === "remove" ? "none" : sourceMargin(props.link_margin) ?? undefined,
+    } as any, props);
+  }
+
+  if (type === "table") {
+    const show = (name: string) => props[`show_${name}`] !== false;
+    const order = ({ "1": ["meta", "image", "title", "content", "link"], "2": ["title", "image", "meta", "content", "link"], "3": ["image", "title", "content", "meta", "link"], "4": ["image", "title", "meta", "content", "link"], "5": ["title", "meta", "content", "link", "image"], "6": ["meta", "title", "content", "link", "image"] } as Record<string, string[]>)[asString(props.table_order) ?? "1"] ?? ["meta", "image", "title", "content", "link"];
+    const children = sourceChildren(node).filter((child) => child.type === "table_item");
+    const hasValue = (field: string) => children.some((child) => Boolean(asString(sourceProps(child)[field])));
+    const fields = order.filter((field) => show(field) && hasValue(field));
+    const hasAuthoredHeadings = fields.some((field) => Boolean(asString(props[`table_head_${field}`])));
+    ["title_style", "title_font_family", "title_color", "meta_style", "meta_color", "content_style", "image_svg_animate"].forEach((key) => {
+      if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Table cell typography/media/action has no exact canonical table-cell consumer yet.");
+    });
+    warnUnsupported(path, props, [
+      "content", "show_title", "show_meta", "show_content", "show_image", "show_link", "table_style", "table_hover", "table_justify", "table_size", "table_order", "table_vertical_align", "table_responsive", "table_last_align", "table_width_title", "table_width_meta", "table_width_content", "table_head_title", "table_head_meta", "table_head_content", "table_head_image", "table_head_link",
+      "image_width", "image_height", "image_loading", "image_border", "image_box_shadow", "image_svg_inline", "image_svg_color",
+      "link_text", "link_target", "link_style", "link_size", "link_fullwidth",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "table"), kind: "table",
+      // Table may have no authored General visual fields, but it is still an
+      // imported YOOtheme block. Keep that provenance so its inspector can
+      // compose the source-truthful row media/action contract instead of the
+      // native CSV-only surface.
+      elementPadding: "none",
+      spacingContract: "yootheme",
+      tableHeadings: hasAuthoredHeadings
+        ? fields.map((field) => asString(props[`table_head_${field}`]) ?? "")
+        : [],
+      tableRows: children.map((child) => {
+        const item = sourceProps(child);
+        return fields.map((field) => sanitizeHtml(asString(item[field]) ?? ""));
+      }),
+      tableItems: children.map((child, index) => {
+        const item = sourceProps(child);
+        const sourceLink = asString(item.link);
+        return {
+          id: sourcePathId(`${path}.${index}`, "table-item"),
+          title: asString(item.title) ?? "",
+          meta: asString(item.meta) ?? "",
+          content: sanitizeHtml(asString(item.content) ?? ""),
+          ...(show("image") && asString(item.image) ? {
+            imageUrl: resolveYoothemeAssetUrl(item.image),
+            imageAlt: asString(item.image_alt) ?? asString(item.title) ?? "",
+          } : {}),
+          ...(show("link") && sourceLink ? {
+            linkUrl: sourceLink,
+            linkLabel: asString(item.link_text) ?? asString(props.link_text) ?? "",
+            linkTarget: props.link_target === true || props.link_target === "true" || props.link_target === "blank" ? "_blank" : "_self",
+          } : {}),
+        };
+      }),
+      tableColumnFields: fields as any,
+      tableShowImage: show("image"), tableShowLink: show("link"),
+      tableImageWidth: typeof props.image_width === "number" ? props.image_width : asString(props.image_width) ?? undefined,
+      tableImageHeight: typeof props.image_height === "number" ? props.image_height : asString(props.image_height) ?? undefined,
+      tableImageLoading: props.image_loading === true || props.image_loading === "true" ? "eager" : "lazy",
+      tableImageBorder: asString(props.image_border) || "none",
+      tableImageShadow: asString(props.image_box_shadow) || "none",
+      tableImageSvgInline: props.image_svg_inline === true || props.image_svg_inline === "true",
+      tableImageSvgColor: asString(props.image_svg_color) || undefined,
+      tableLinkStyle: asString(props.link_style) || "default",
+      tableLinkSize: sourceButtonSize(props.link_size) ?? "default",
+      tableLinkFullWidth: props.link_fullwidth === true || props.link_fullwidth === "true",
+      tableLinkTarget: props.link_target === true || props.link_target === "true" || props.link_target === "blank" ? "_blank" : "_self",
+      tableStyle: asString(props.table_style) === "divider" ? "divider" : asString(props.table_style) === "striped" ? "striped" : "default",
+      tableSize: asString(props.table_size) || "default", tableHover: props.table_hover === true || props.table_hover === "true",
+      tableJustify: props.table_justify === true || props.table_justify === "true", tableVerticalAlign: props.table_vertical_align === true || props.table_vertical_align === "true",
+      tableResponsive: asString(props.table_responsive) === "responsive" ? "responsive" : "overflow",
+      tableLastAlign: ["left", "center", "right"].includes(asString(props.table_last_align) ?? "") ? asString(props.table_last_align) : undefined,
+    } as any, props);
+  }
+
+  if (type === "gallery") {
+    const items = sourceChildren(node)
+      .filter((child) => child.type === "gallery_item")
+      .map((child, index) => {
+        const item = sourceProps(child);
+        const sourceLink = asString(item.link);
+        ["video", "video_title", "hover_image", "hover_video", "text_color", "text_color_hover", "lightbox_image_focal_point", "lightbox_text_color", "image_focal_point", "hover_image_focal_point"].forEach((key) => {
+          if (item[key] !== undefined && item[key] !== "" && item[key] !== false) warnings.push(path + "." + index + "." + key + ": DEFERRED — Gallery item runtime has no exact canonical consumer yet.");
+        });
+        return {
+          id: sourcePathId(path + "." + index, "gallery-item"),
+          imageUrl: asString(item.image) ?? undefined,
+          imageAlt: asString(item.image_alt) ?? undefined,
+          title: asString(item.title) ?? "",
+          meta: asString(item.meta) ?? "",
+          content: sanitizeHtml(asString(item.content) ?? ""),
+          tags: asString(item.tags)?.split(",").map((tag) => tag.trim()).filter(Boolean) ?? [],
+          ...(sourceLink ? {
+            linkUrl: sourceLink,
+            linkTarget: props.link_target === "blank" || props.link_target === true || props.link_target === "true" ? "_blank" : "_self",
+            linkLabel: asString(item.link_text) ?? asString(props.link_text) ?? undefined,
+            linkAriaLabel: asString(item.link_aria_label) ?? asString(props.link_aria_label) ?? undefined,
+          } : {}),
+        };
+      });
+    ["grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end", "grid_small", "grid_large", "grid_xlarge", "filter", "filter_animation", "filter_order", "filter_reverse", "filter_order_manual", "filter_style", "filter_all", "filter_all_label", "filter_position", "filter_style_primary", "filter_align", "filter_margin", "filter_grid_width", "filter_grid_column_gap", "filter_grid_row_gap", "filter_grid_breakpoint", "lightbox_controls", "lightbox_counter", "lightbox_bg_close", "lightbox_animation", "lightbox_nav", "lightbox_image_width", "lightbox_image_height", "lightbox_image_orientation", "lightbox_video_autoplay", "lightbox_text_color", "title_display", "content_display", "image_expand", "overlay_padding", "item_animation"].forEach((key) => {
+      if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Gallery has no exact canonical runtime for this YOOtheme semantic yet.");
+    });
+    warnUnsupported(path, props, [
+      "content", "show_title", "show_meta", "show_content", "show_link", "link_target", "link_text", "link_style", "link_aria_label", "grid_column_gap", "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "overlay_mode", "overlay_link", "show_hover_image", "show_hover_video",
+      "lightbox",
+      "image_width", "image_height", "image_loading", "image_border", "image_box_shadow", ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "gallery"), kind: "gallery", galleryItems: items,
+      gridShowTitle: props.show_title !== false, gridShowMeta: props.show_meta !== false,
+      gridShowText: props.show_content !== false, gridShowButton: props.show_link !== false,
+      gridShowHoverImage: false, gridShowHoverVideo: false,
+      gridGap: props.grid_column_gap === "collapse" ? "none" : sourceMargin(props.grid_column_gap) ?? "medium",
+      gridRowGap: props.grid_row_gap === "collapse" ? "none" : sourceMargin(props.grid_row_gap) ?? "medium",
+      showDividers: props.grid_divider === true || props.grid_divider === "true",
+      columnsPhonePortrait: asString(props.grid_default) || undefined,
+      columnsTabletLandscape: asString(props.grid_medium) || undefined,
+      masonry: asString(props.grid_masonry) === "pack" ? "pack" : undefined,
+      overlayMode: asString(props.overlay_mode) === "caption" ? "caption" : "cover",
+      overlayStyle: asString(props.overlay_style) || undefined,
+      overlayPosition: asString(props.overlay_position) || undefined,
+      overlayHover: props.overlay_hover === true || props.overlay_hover === "true",
+      overlayTransition: asString(props.overlay_transition) || undefined,
+      overlayLink: props.overlay_link === true || props.overlay_link === "true",
+      headingLevel: sourceHeadingLevel(props.title_element) ?? undefined,
+      metaStyle: asString(props.meta_style) || undefined,
+      textAlign: sourceAlignment(props.text_align),
+      enableLightbox: props.lightbox === true || props.lightbox === "true",
+      linkText: asString(props.link_text) || undefined,
+      buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+      imageWidth: Number.isFinite(Number(props.image_width)) ? Number(props.image_width) : undefined,
+      imageHeight: Number.isFinite(Number(props.image_height)) ? Number(props.image_height) : undefined,
+      imageLoading: props.image_loading === true || props.image_loading === "true" ? "eager" : "lazy",
+      imageBorder: asString(props.image_border) || undefined,
+      imageShadow: asString(props.image_box_shadow) || undefined,
+      imageBoxShadow: asString(props.image_box_shadow) || undefined,
+    } as any, props);
+  }
+
   if (type === "slideshow") {
     const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
     if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
-      "show_title", "show_meta", "show_content", "show_link",
-      "slideshow_height", "slideshow_ratio", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
-      "nav", "nav_position", "nav_breakpoint", "slidenav", "slidenav_breakpoint", "slidenav_outside_breakpoint", "text_color",
-      "overlay_position", "overlay_padding", "title_element", "title_style",
+      "show_title", "show_meta", "show_content", "show_link", "link", "link_target", "link_text", "link_style", "link_size", "link_fullwidth", "link_margin", "margin",
+      "slideshow_height", "slideshow_height_viewport", "slideshow_ratio", "slideshow_min_height", "slideshow_max_height", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
+      "nav", "nav_below", "nav_hover", "nav_vertical", "nav_position", "nav_position_margin", "nav_breakpoint", "show_thumbnail", "thumbnav_width", "thumbnav_height", "thumbnav_wrap", "thumbnav_nowrap", "slidenav", "slidenav_hover", "slidenav_large", "slidenav_margin", "slidenav_breakpoint", "text_color",
+      "overlay_position", "overlay_padding", "title_element", "title_style", "meta_align", "meta_element", "meta_style",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     if (props.slideshow_height === "section") {
@@ -1248,26 +1624,64 @@ const mapStaticElement = (
         aspectRatio: asString(props.slideshow_ratio) ?? undefined,
         slideshowRatio: asString(props.slideshow_ratio) ?? undefined,
         slideshowHeight: sourceSlideshowHeight(props.slideshow_height),
+        slideshowViewportHeight: Number.isFinite(Number(props.slideshow_height_viewport)) ? Number(props.slideshow_height_viewport) : undefined,
         slideshowMinHeight: Number.isFinite(Number(props.slideshow_min_height)) ? Number(props.slideshow_min_height) : undefined,
+        slideshowMaxHeight: Number.isFinite(Number(props.slideshow_max_height)) ? Number(props.slideshow_max_height) : undefined,
         showTitle: props.show_title !== false,
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
+        // YOOtheme Slideshow owns the presentation of its item actions at
+        // element level. Individual item link_style/link_size remain local
+        // overrides in sourceSliderItem; otherwise actions inherit these
+        // canonical shared Button values.
+        buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+        buttonSize: sourceButtonSize(props.link_size),
+        buttonLabel: asString(props.link_text) ?? undefined,
+        linkTarget: props.link_target === "blank" ? "_blank" : undefined,
+        fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
+        linkMarginTop: sourceMargin(props.link_margin),
+        showNavigationThumbnail: props.show_thumbnail !== false,
+        elementLinkUrl: asString(props.link) ?? undefined,
+        elementLinkTarget: props.link_target === "blank" ? "_blank" : "_self",
         headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
         headingSize: sourceHeadingSize(props.title_style),
+        metaPosition: props.meta_align === "above-title" || props.meta_align === "below-title" || props.meta_align === "below-content"
+          ? props.meta_align
+          : undefined,
+        metaHtmlElement: sourceMetaElement(props.meta_element),
+        metaStyle: sourceTextVariant(props.meta_style),
         autoplay: props.slideshow_autoplay === true || props.slideshow_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slideshow_autoplay_interval)) ? Number(props.slideshow_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slideshow_autoplay_pause !== false,
-        showArrows: Boolean(props.slidenav),
-        showDots: Boolean(props.nav),
-        arrowPosition: asString(props.slidenav) === "outside" ? "outer" : "overlay",
+        // YOOtheme represents an explicitly disabled Slidenav as the string
+        // "none". Treat that as false rather than truthy source data.
+        showArrows: asString(props.slidenav) !== "none" && Boolean(props.slidenav),
+        // Navigation is a distinct YOOtheme Slideshow contract. Do not reduce
+        // its source type/position/margin to WebPages' old generic dot style.
+        navigationType: props.nav === "dotnav" || props.nav === "thumbnav" ? props.nav : "none",
+        showDots: props.nav === "dotnav",
+        arrowPosition: asString(props.slidenav) === "default" ? "overlay" : (asString(props.slidenav) === "outside" ? "outer" : asString(props.slidenav) ?? "overlay"),
         paginationPosition: asString(props.nav_position) ?? undefined,
+        navigationMargin: asString(props.nav_position_margin) ?? undefined,
+        navigationBreakpoint: sourceBreakpoint(props.nav_breakpoint),
+        navigationBelow: props.nav_below === true || props.nav_below === "true",
+        navigationHoverOnly: props.nav_hover === true || props.nav_hover === "true",
+        navigationVertical: props.nav_vertical === true || props.nav_vertical === "true",
+        thumbnavWidth: Number.isFinite(Number(props.thumbnav_width)) ? Number(props.thumbnav_width) : undefined,
+        thumbnavHeight: Number.isFinite(Number(props.thumbnav_height)) ? Number(props.thumbnav_height) : undefined,
+        thumbnavNoWrap: props.thumbnav_nowrap === true || props.thumbnav_nowrap === "true" || props.thumbnav_wrap === false || props.thumbnav_wrap === "false",
+        slidenavHoverOnly: props.slidenav_hover === true || props.slidenav_hover === "true",
+        slidenavLarger: props.slidenav_large === true || props.slidenav_large === "true",
+        slidenavMargin: asString(props.slidenav_margin) ?? undefined,
+        slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
         effect: props.slideshow_animation === "fade" ? "fade" : "slide",
         overlayPosition: sourceCarouselOverlayPosition(props.overlay_position),
         overlayPadding: sourceCarouselOverlayPadding(props.overlay_padding),
-        // UIkit Slideshow defaults to the normal dark semantic context. Only
-        // an explicit source `light` value opts into inverse typography.
-        overlayTextColor: props.text_color === "light" ? "light" : "dark",
+        // Preserve YOOtheme's explicit text context. An omitted/`none` source
+        // value inherits the surrounding semantic context rather than being
+        // rewritten to a WebPages-specific dark default.
+        overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
       },
     }, props);
   }
@@ -1275,6 +1689,8 @@ const mapStaticElement = (
   if (type === "panel-slider") {
     const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props, warnings);
     if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    const sourceSlidenav = asString(props.slidenav);
+    const sourceNavigation = asString(props.nav);
     // Panel Slider's Image Alignment is structural (`top` / `left`) and
     // requires the deferred media-grid layout contract. Do not coerce it into
     // the unrelated shared Image horizontal alignment owner.
@@ -1283,16 +1699,7 @@ const mapStaticElement = (
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "panel-slider"),
       kind: "panelSlider",
-      slides: slides.map(({ imageAlignment: _deferredItemImageAlignment, ...slide }) => ({
-        ...slide,
-        // Panel Slider has no implicit Card surface in UIkit. Only an
-        // explicit source panel style may opt into a Card presentation.
-        panelStyle: slide.panelStyle ?? sourceCardVariant(props.panel_style),
-        panelSize: slide.panelSize ?? (props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
-          ? props.panel_padding
-          : "none"),
-        panelHover: slide.panelHover ?? (props.panel_link_hover === true || props.panel_link_hover === "true" || props.panel_style === "card-hover"),
-      })),
+      slides: slides.map(({ imageAlignment: _deferredItemImageAlignment, ...slide }) => slide),
       carouselSettings: {
         presentation: "panel-slider",
         variant: "panel",
@@ -1319,9 +1726,20 @@ const mapStaticElement = (
         imageFit: "natural",
         imageRatio: "natural",
         linkPanel: props.panel_link === true || props.panel_link === "true",
+        // Panel/card presentation is element-owned in YOOtheme Panel Slider.
+        // Preserve an explicitly authored item override from sourceSliderItem,
+        // but do not copy these parent values into every item.
+        panelStyle: sourceCardVariant(props.panel_style),
+        panelSize: props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
+          ? props.panel_padding
+          : "none",
+        panelHover: props.panel_link_hover === true || props.panel_link_hover === "true" || props.panel_style === "card-hover",
         buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
         buttonSize: sourceButtonSize(props.link_size),
+        buttonLabel: asString(props.link_text) ?? undefined,
         linkTarget: props.link_target === "blank" ? "_blank" : "_self",
+        fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
+        linkMarginTop: sourceMargin(props.link_margin),
         autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,
@@ -1335,12 +1753,15 @@ const mapStaticElement = (
         cardsPerViewMedium: sourceSliderItemsPerView(props.slider_width_medium),
         cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large),
         cardsPerViewXLarge: sourceSliderItemsPerView(props.slider_width_xlarge),
-        showArrows: Boolean(props.slidenav),
-        showDots: Boolean(props.nav),
-        arrowPosition: asString(props.slidenav) ?? undefined,
+        // Source values are semantic strings, not truthy flags: `none` must
+        // suppress the shared controls, while UIkit's `default`/`outside`
+        // normalize to the established CarouselBlock presentation contract.
+        showArrows: Boolean(sourceSlidenav && sourceSlidenav !== "none"),
+        showDots: sourceNavigation === "dotnav",
+        navigationType: sourceNavigation === "dotnav" ? "dotnav" : "none",
+        arrowPosition: sourceSlidenav === "outside" ? "outer" : sourceSlidenav === "default" ? "overlay" : undefined,
+        slidenavMargin: asString(props.slidenav_margin) ?? undefined,
         slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
-        slidenavOutsideBreakpoint: sourceBreakpoint(props.slidenav_outside_breakpoint),
-        navigationBreakpoint: sourceBreakpoint(props.nav_breakpoint),
         paginationPosition: asString(props.nav_position) ?? undefined,
         effect: "slide",
       },
@@ -1351,8 +1772,8 @@ const mapStaticElement = (
     const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "overlay-slider_item", path, props);
     if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
-      "show_content", "show_link", "show_meta", "show_title", "nav", "nav_align", "nav_position", "slidenav", "slider_autoplay_pause", "slider_center", "slider_autoplay", "slider_autoplay_interval", "slider_finite",
-      "slider_divider", "slider_gap", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "overlay_mode", "overlay_display", "overlay_position", "overlay_padding", "text_color", "text_align", "title_element", "margin", "visibility",
+      "show_content", "show_link", "show_meta", "show_title", "nav", "nav_below", "nav_position", "nav_position_margin", "nav_breakpoint", "slidenav", "slidenav_margin", "slidenav_breakpoint", "slider_autoplay_pause", "slider_center", "slider_autoplay", "slider_autoplay_interval", "slider_finite",
+      "slider_divider", "slider_gap", "slider_width", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "overlay_mode", "overlay_display", "overlay_position", "overlay_padding", "overlay_style", "text_color", "text_align", "title_element", "title_style", "meta_align", "meta_element", "meta_style", "link_text", "link_style", "link_size", "link_target", "link_margin", "margin", "visibility",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -1367,6 +1788,7 @@ const mapStaticElement = (
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
+        itemWidthMode: props.slider_width === "fixed" ? "fixed" : "auto",
         autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,
@@ -1379,14 +1801,33 @@ const mapStaticElement = (
         cardsPerViewMedium: sourceSliderItemsPerView(props.slider_width_medium),
         cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large ?? props.slider_width_xlarge),
         showArrows: Boolean(props.slidenav),
-        showDots: Boolean(props.nav),
-        arrowPosition: asString(props.slidenav) === "outside" ? "outer" : "overlay",
+        showDots: props.nav === "dotnav",
+        navigationType: props.nav === "dotnav" ? "dotnav" : "none",
+        navigationBelow: props.nav_below === true || props.nav_below === "true",
+        navigationMargin: sourceMargin(props.nav_position_margin) ?? "default",
+        navigationBreakpoint: sourceBreakpoint(props.nav_breakpoint),
+        arrowPosition: asString(props.slidenav) === "outside" ? "outside" : asString(props.slidenav) === "" ? "none" : "overlay",
+        slidenavMargin: asString(props.slidenav_margin) ?? "medium",
         paginationPosition: asString(props.nav_position) ?? undefined,
+        slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
+        headingLevel: sourceHeadingLevel(props.title_element),
+        headingSize: sourceHeadingSize(props.title_style),
+        metaPosition: props.meta_align === "above-title" || props.meta_align === "below-content" ? props.meta_align : "below-title",
+        metaHtmlElement: sourceMetaElement(props.meta_element) ?? "div",
+        metaStyle: sourceTextVariant(props.meta_style),
+        buttonLabel: asString(props.link_text) ?? undefined,
+        buttonStyle: sourceButtonStyle(props.link_style),
+        buttonSize: sourceButtonSize(props.link_size),
+        linkTarget: props.link_target === "blank" ? "_blank" : "_self",
+        linkMarginTop: sourceMargin(props.link_margin),
         effect: "slide",
         overlayMode: props.overlay_mode === "caption" ? "caption" : "cover",
         overlayDisplay: sourceCarouselOverlayDisplay(props.overlay_display),
         overlayPosition: sourceCarouselOverlayPosition(props.overlay_position),
         overlayPadding: sourceCarouselOverlayPadding(props.overlay_padding),
+        overlayStyle: ["default", "primary", "tile-default", "tile-muted", "tile-primary", "tile-secondary"].includes(asString(props.overlay_style) ?? "")
+          ? asString(props.overlay_style)
+          : "none",
         overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
       },
     }, props);
@@ -1493,7 +1934,8 @@ export const mapYoothemeStaticContent = (
   const warnings = [...structure.warnings];
 
   if (!root || root.type !== "layout") {
-    return { sections: [], warnings, globalStylePatch: {} };
+    const report = createYoothemePageImportReport(source);
+    return { sections: [], warnings, globalStylePatch: {}, report, reportWarnings: formatYoothemeImportWarnings(report) };
   }
 
   const sections: BuilderSection[] = [];
@@ -1567,7 +2009,7 @@ export const mapYoothemeStaticContent = (
       headerTransparent: sectionProps.header_transparent === "transparent" || sectionProps.header_transparent === "pull" || Boolean(sectionProps.header_transparent),
       pullUnderHeader: sectionProps.header_transparent === "pull",
       headerTextColor: sectionProps.header_transparent_color === "light" || sectionProps.header_transparent_color === "dark" ? sectionProps.header_transparent_color : "none",
-      animation: typeof sectionProps.animation === "string" && sectionProps.animation !== "none" ? (sectionProps.animation as any) : undefined,
+      animation: sourceAnimation(sectionProps.animation) as any,
       animationDelay: sectionProps.animation_delay ? Number(sectionProps.animation_delay) : undefined,
       sectionTitlePosition: typeof sectionProps.title_position === "string" ? sectionProps.title_position : undefined,
       sectionTitleRotation: sectionProps.title_rotation === "left" || sectionProps.title_rotation === "right" ? sectionProps.title_rotation : "none",
@@ -1582,7 +2024,8 @@ export const mapYoothemeStaticContent = (
     });
   });
 
-  return { sections, warnings, globalStylePatch: sourceGlobalBackgroundPatch(root) };
+  const report = createYoothemePageImportReport(source);
+  return { sections, warnings, globalStylePatch: sourceGlobalBackgroundPatch(root), report, reportWarnings: formatYoothemeImportWarnings(report) };
 };
 
 export const analyzeYoothemeLayout = (

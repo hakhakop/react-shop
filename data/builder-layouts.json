@@ -4,31 +4,7 @@
     "key": "home",
     "page": "home",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "yootheme-section-1",
@@ -78,6 +54,8 @@
                 "headingAlign": "center",
                 "elementAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -99,8 +77,8 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -110,9 +88,7 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -133,20 +109,14 @@
                     "url": "?page_id=20",
                     "target": "_self",
                     "style": "default"
-                  },
-                  {
-                    "id": "yootheme-button-0-0-0-2-item-mslt0ded",
-                    "label": "Button",
-                    "url": "#",
-                    "target": "_self",
-                    "style": "default"
                   }
                 ],
-                "size": "default",
+                "size": "large",
+                "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -157,9 +127,7 @@
                   "customCss": "@media (max-width: 639px) {\n    .el-item a {min-width: 203px;}\n}",
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "primary",
-                "buttonLabel": "fsfsdsfsdfsdf"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -168,13 +136,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "600",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -195,13 +164,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 1100,
                 "imageWidth": "1100",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -222,13 +192,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 700,
                 "imageWidth": "700",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -249,13 +220,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 950,
                 "imageWidth": "950",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -276,13 +248,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "600",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "s",
                 "visibilityMode": "s",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -310,6 +283,7 @@
                 "imageAlt": "",
                 "imageMaxWidth": 750,
                 "imageWidth": "750",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageLinkUrl": "wp-content/uploads/yootheme/home-hero-video.mp4",
                 "imageLinkTarget": "_self",
@@ -317,8 +291,8 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -336,13 +310,14 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
                 "imageAlt": "",
                 "imageMaxWidth": 100,
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -405,14 +380,15 @@
                 "headingLevel": "div",
                 "headingAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
                   },
                   "effects": {},
                   "card": {}
-                },
-                "headingSize": "text-meta"
+                }
               },
               {
                 "id": "yootheme-grid-1-0-0-1",
@@ -428,8 +404,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -444,8 +418,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -460,8 +432,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -476,8 +446,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -492,8 +460,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -508,8 +474,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "plain",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -520,22 +484,31 @@
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
                 "gridItemRenderer": "plain",
-                "gridCardVariant": "default",
-                "gridCardSize": "default",
+                "gridCardVariant": "blank",
+                "gridCardSize": "none",
+                "gridCardHover": false,
                 "gridMediaPlacement": "top",
                 "gridItemAlign": "center",
                 "gridGap": "large",
                 "showDividers": false,
+                "centerColumns": true,
                 "centerRows": true,
                 "columnsPhonePortrait": "auto",
-                "columnsDesktop": "",
                 "gridMediaWidth": "medium",
+                "imageSvgInline": true,
+                "imageSvgColor": "muted",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
                 "textAlign": "center",
                 "visualStyle": {
                   "margin": {
@@ -556,8 +529,8 @@
                 "gridMetaHtmlElement": "div",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -615,15 +588,15 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "maxWidth": "2xlarge",
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "2xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -640,15 +613,15 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "maxWidth": "xlarge",
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
@@ -664,15 +637,17 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate-floating-icon.svg",
                 "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -691,13 +666,27 @@
                 "id": "yootheme-panel-2-1-0-1",
                 "kind": "panel",
                 "title": "Integrate",
+                "eyebrow": "",
                 "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate.svg",
                 "imageAlt": "Integrate",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "buttonLabel": "Learn More",
                 "buttonUrl": "#",
-                "buttonStyle": "ghost",
-                "panelVariant": "default",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "linkMarginTop": "medium",
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "below-title",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -721,22 +710,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit",
-                "panelHeightExpand": false,
-                "panelExpand": "none",
-                "panelMetaPosition": "below-title",
-                "linkPanel": false
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -750,13 +725,15 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
                 "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -774,15 +751,29 @@
                 "id": "yootheme-panel-2-1-1-1",
                 "kind": "panel",
                 "title": "Automate",
+                "eyebrow": "",
                 "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate.svg",
                 "imageAlt": "Automate",
                 "imageMaxWidth": 280,
                 "imageWidth": "280",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "buttonLabel": "Learn More",
                 "buttonUrl": "#",
-                "buttonStyle": "ghost",
-                "panelVariant": "default",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "linkMarginTop": "medium",
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "below-title",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -806,22 +797,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit",
-                "panelHeightExpand": false,
-                "panelExpand": "none",
-                "panelMetaPosition": "below-title",
-                "linkPanel": false
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -835,13 +812,15 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
                 "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -859,15 +838,29 @@
                 "id": "yootheme-panel-2-1-2-1",
                 "kind": "panel",
                 "title": "Innovate",
+                "eyebrow": "",
                 "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@s\"> invidunt ut labore et magna aliquyam.",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate.svg",
                 "imageAlt": "Innovate",
                 "imageMaxWidth": 280,
                 "imageWidth": "280",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
                 "buttonLabel": "Learn More",
                 "buttonUrl": "#",
-                "buttonStyle": "ghost",
-                "panelVariant": "default",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "linkMarginTop": "medium",
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "below-title",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -891,22 +884,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit",
-                "panelHeightExpand": false,
-                "panelExpand": "none",
-                "panelMetaPosition": "below-title",
-                "linkPanel": false
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -963,6 +942,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -984,12 +965,12 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "removeBottomMargin": true,
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -1000,9 +981,7 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -1021,8 +1000,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#deployment",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1039,8 +1016,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#automation",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1057,8 +1032,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#ci-cd",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1075,8 +1048,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#infrastructure",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1093,8 +1064,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#security",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1111,8 +1080,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#integrations",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1129,8 +1096,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#features",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1147,8 +1112,6 @@
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=19#features",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1160,24 +1123,33 @@
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
                 "gridItemRenderer": "card",
                 "gridCardVariant": "default",
                 "gridCardSize": "default",
+                "gridCardHover": false,
                 "gridMediaPlacement": "top",
                 "gridItemAlign": "center",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "2",
-                "columnsDesktop": "4",
+                "columnsTabletLandscape": "4",
                 "gridMediaWidth": "medium",
                 "imageWidth": "68",
+                "imageSvgInline": true,
+                "imageSvgColor": "primary",
                 "imageMaxWidth": 68,
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
+                "buttonLabel": "Learn More",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
                 "textAlign": "center",
                 "visualStyle": {
                   "margin": {
@@ -1198,11 +1170,11 @@
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
                 "animation": {
                   "preset": "fade"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1218,12 +1190,13 @@
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
                 "imageWidth": "1000",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -1244,14 +1217,15 @@
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "600",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -1315,6 +1289,8 @@
                 "headingAlign": "left",
                 "elementAlign": "center",
                 "textAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "blockAlign": "center",
@@ -1345,10 +1321,11 @@
                     "style": "primary"
                   }
                 ],
+                "fullWidthButton": false,
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -1358,9 +1335,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -1368,58 +1343,7 @@
             "id": "yootheme-section-5-row-2-column-1",
             "rowId": "yootheme-section-5-row-2",
             "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "yootheme-panel-slider-4-1-0-0",
-                "kind": "panelSlider",
-                "slides": [
-                  {
-                    "id": "yootheme-panel-slide-4-1-0-0-0",
-                    "title": "",
-                    "meta": "",
-                    "text": "",
-                    "imageUrl": "",
-                    "imageAlt": "",
-                    "imageWidth": "800",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": false,
-                    "buttonLabel": "Read Story",
-                    "buttonUrl": "#",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "outline"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "panel",
-                  "slideMode": "panel",
-                  "loop": true,
-                  "autoplay": false,
-                  "pauseOnHover": true,
-                  "align": "center",
-                  "spaceBetween": 15,
-                  "showArrows": true,
-                  "showDots": false,
-                  "arrowPosition": "default",
-                  "paginationPosition": "bottom-center",
-                  "effect": "slide"
-                },
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "removeBottomMargin": true,
-                "visualStyle": {
-                  "layout": {
-                    "marginMode": "large",
-                    "removeBottomMargin": true,
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                }
-              }
-            ]
+            "blocks": []
           }
         ]
       },
@@ -1472,6 +1396,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -1496,14 +1422,12 @@
                     "id": "yootheme-grid-item-5-1-0-0-0",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-cta-01.svg",
                     "imageAlt": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
-                    "title": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
+                    "title": "Ship Faster with<br> the Leading DevOps Platform",
                     "meta": "",
                     "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr dolore magna aliquyam erat, sed diam voluptua.",
                     "buttonLabel": "View Features",
                     "buttonUrl": "?page_id=19",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "titleElement": "h3",
@@ -1531,20 +1455,31 @@
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
                 "gridItemRenderer": "card",
                 "gridCardVariant": "default",
                 "gridCardSize": "large",
+                "gridCardHover": false,
                 "gridMediaPlacement": "top",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
-                "columnsDesktop": "2",
+                "columnsTabletLandscape": "2",
                 "gridMediaWidth": "medium",
+                "imageSvgColor": "emphasis",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "size": "large",
+                "fullWidthButton": false,
+                "linkMarginTop": "medium",
                 "visualStyle": {
                   "margin": {
                     "top": "var(--uk-global-margin)"
@@ -1563,8 +1498,8 @@
                 },
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
-                "margin": "default",
-                "marginMode": "default"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1580,12 +1515,13 @@
                 "imageAlt": "",
                 "imageMaxWidth": 800,
                 "imageWidth": "800",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -1606,14 +1542,15 @@
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
                 "imageWidth": "1000",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -1680,6 +1617,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -1698,11 +1637,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -1710,9 +1649,7 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -1725,16 +1662,17 @@
                     "label": "Visit Our Blog",
                     "url": "?post_type=post",
                     "target": "_self",
-                    "style": "default"
+                    "style": "text"
                   }
                 ],
+                "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -1742,9 +1680,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -1760,8 +1696,6 @@
                     "text": "",
                     "buttonLabel": "Read more",
                     "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "default",
                     "mediaPlacement": "top",
                     "mediaFit": "natural",
                     "textAlign": "center",
@@ -1773,24 +1707,33 @@
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
                 "gridItemRenderer": "card",
                 "gridCardVariant": "default",
                 "gridCardSize": "default",
+                "gridCardHover": false,
                 "gridMediaPlacement": "top",
                 "gridItemAlign": "center",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "2",
-                "columnsDesktop": "3",
+                "columnsTabletLandscape": "3",
                 "gridMediaWidth": "medium",
                 "imageWidth": "610",
+                "imageSvgColor": "emphasis",
                 "imageMaxWidth": 610,
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
+                "buttonLabel": "Read more",
+                "buttonStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
                 "textAlign": "center",
                 "visualStyle": {
                   "margin": {
@@ -1814,91 +1757,16 @@
                 "gridMetaAlign": "above-title",
                 "gridMetaHtmlElement": "div",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "removeBottomMargin": true
+                "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
         ]
-      },
-      {
-        "id": "contentLayout-mslzw5oa-4iyk5",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-mslzw8wt-column-1",
-            "rowId": "layout-row-mslzw8wt",
-            "rowLayout": "3-col-equal",
-            "blocks": [
-              {
-                "id": "panel-block-mslzwc70-yuuw3",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imagePadding": "frameless",
-                "imageFit": "cover",
-                "panelVariant": "default",
-                "panelHover": false,
-                "panelSize": "default",
-                "panelShowMedia": true,
-                "panelMediaPlacement": "top",
-                "panelMediaFit": "cover",
-                "panelMediaWidth": "medium",
-                "panelMediaAlignment": "center",
-                "panelTextAlign": "left",
-                "panelVerticalAlign": "top",
-                "panelTitleElement": "h3",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "small",
-                "panelActionAlign": "inherit",
-                "panelHeightExpand": false,
-                "panelExpand": "none",
-                "panelMetaPosition": "below-title",
-                "linkPanel": false
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mslzw8wt-column-2",
-            "rowId": "layout-row-mslzw8wt",
-            "rowLayout": "3-col-equal",
-            "blocks": []
-          },
-          {
-            "id": "layout-row-mslzw8wt-column-3",
-            "rowId": "layout-row-mslzw8wt",
-            "rowLayout": "3-col-equal",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-08-10T14:18:24.487Z"
+    "updatedAt": "2026-08-12T23:01:21.902Z"
   },
   "shop": {
     "version": 1,
@@ -6625,31 +6493,7 @@
     "key": "page:devstack-pricing",
     "page": "page:devstack-pricing",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "yootheme-section-1",
@@ -6698,6 +6542,8 @@
                 "headingSize": "small",
                 "headingAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -6718,8 +6564,8 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -6876,6 +6722,7 @@
                 "columnsPhonePortrait": "1",
                 "columnsTabletLandscape": "3",
                 "gridMediaWidth": "medium",
+                "imageSvgColor": "emphasis",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
@@ -6909,8 +6756,8 @@
                 "gridMetaHtmlElement": "div",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-text-0-0-0-3",
@@ -6920,6 +6767,8 @@
                 "textAlign": "center",
                 "textColumnBreakpoint": "medium",
                 "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -6937,16 +6786,17 @@
                 "imageAlt": "",
                 "imageMaxWidth": 700,
                 "imageWidth": "700",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
                 "animation": {
                   "preset": "fade"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -6967,18 +6817,19 @@
                 "imageAlt": "",
                 "imageMaxWidth": 450,
                 "imageWidth": "450",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
                 "animation": {
                   "preset": "fade"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -7000,13 +6851,14 @@
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "600",
+                "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -7073,6 +6925,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -7091,12 +6945,12 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "removeTopMargin": true,
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "medium",
@@ -7118,14 +6972,15 @@
                 "imageAlt": "",
                 "imageMaxWidth": 800,
                 "imageWidth": "800",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -7147,14 +7002,15 @@
                 "imageAlt": "",
                 "imageMaxWidth": 450,
                 "imageWidth": "450",
+                "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
                 "textAlign": "left",
                 "headingAlign": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -7217,6 +7073,8 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -7236,8 +7094,8 @@
                 "elementAlign": "center",
                 "textColumnBreakpoint": "medium",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -7258,9 +7116,9 @@
                 "textAlign": "center",
                 "textColumnBreakpoint": "medium",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "large",
@@ -7282,38 +7140,14 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-10T14:13:20.928Z"
+    "updatedAt": "2026-08-12T13:47:14.556Z"
   },
   "page:enterprise": {
     "version": 1,
     "key": "page:enterprise",
     "page": "page:enterprise",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "yootheme-section-1",
@@ -7391,9 +7225,7 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -7443,13 +7275,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-powerful-api.svg",
                     "imageAlt": "Powerful API",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#powerful-api",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#powerful-api"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-1",
@@ -7458,13 +7287,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-efficient-workflow.svg",
                     "imageAlt": "Efficient Workflow",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#efficient-workflow",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#efficient-workflow"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-2",
@@ -7473,13 +7299,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-project-management.svg",
                     "imageAlt": "Project Management",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#project-management",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#project-management"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-3",
@@ -7488,13 +7311,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-collaboration.svg",
                     "imageAlt": "Collaboration",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#collaboration",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#collaboration"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-4",
@@ -7503,13 +7323,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-client-stories.svg",
                     "imageAlt": "Customer Stories",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#testimonials",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#testimonials"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-5",
@@ -7518,13 +7335,10 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-community.svg",
                     "imageAlt": "Community",
+                    "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonUrl": "?page_id=2#community",
-                    "linkPanel": true,
-                    "panelStyle": "blank",
-                    "panelSize": "none",
-                    "panelHover": false
+                    "buttonUrl": "?page_id=2#community"
                   }
                 ],
                 "carouselSettings": {
@@ -7540,7 +7354,6 @@
                   "showMeta": true,
                   "showContent": true,
                   "showLink": true,
-                  "contentAlign": "center",
                   "metaPosition": "below-title",
                   "metaHtmlElement": "div",
                   "metaStyle": "text-meta",
@@ -7548,8 +7361,12 @@
                   "imageFit": "natural",
                   "imageRatio": "natural",
                   "linkPanel": true,
+                  "panelStyle": "blank",
+                  "panelSize": "none",
+                  "panelHover": false,
                   "buttonStyle": "default",
                   "linkTarget": "_self",
+                  "fullWidthButton": false,
                   "autoplay": false,
                   "pauseOnHover": true,
                   "centered": false,
@@ -7561,10 +7378,10 @@
                   "cardsPerViewMedium": 3,
                   "showArrows": true,
                   "showDots": false,
-                  "arrowPosition": "outside",
+                  "navigationType": "none",
+                  "arrowPosition": "outer",
+                  "slidenavMargin": "medium",
                   "slidenavBreakpoint": "xlarge",
-                  "slidenavOutsideBreakpoint": "xlarge",
-                  "navigationBreakpoint": "small",
                   "effect": "slide"
                 },
                 "elementAlign": "center",
@@ -7613,62 +7430,550 @@
         "pullUnderHeader": false,
         "headerTextColor": "none",
         "visible": true,
-        "layout": "1-col",
-        "layoutColumns": 1,
+        "layout": "3-col-equal",
+        "layoutColumns": 3,
         "layoutRows": 1,
         "layoutItems": [
           {
             "id": "yootheme-section-2-row-1-column-1",
             "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-accordion-1-0-0-0",
+                "kind": "accordion",
+                "accordionItems": [
+                  {
+                    "id": "yootheme-accordion-item-1-0-0-0-0",
+                    "title": "1eeeeee",
+                    "content": "<p>2</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                    "buttonUrl": "#",
+                    "buttonLabel": "eeee",
+                    "buttonTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-accordion-item-1-0-0-0-1",
+                    "title": "1eeeeee",
+                    "content": "<p>2</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                    "buttonUrl": "#",
+                    "buttonLabel": "eeee",
+                    "buttonTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-accordion-item-1-0-0-0-2",
+                    "title": "1eeeeee",
+                    "content": "<p>2</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                    "buttonUrl": "#",
+                    "buttonLabel": "eeee",
+                    "buttonTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-accordion-item-1-0-0-0-3",
+                    "title": "1eeeeee",
+                    "content": "<p>2</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                    "buttonUrl": "#",
+                    "buttonLabel": "eeee",
+                    "buttonTarget": "_self"
+                  }
+                ],
+                "accordionMultiple": false,
+                "accordionCollapsible": true,
+                "accordionOpenItems": [],
+                "accordionTitleLevel": "div",
+                "accordionShowImage": true,
+                "accordionShowLink": true,
+                "accordionContentStyle": "inherit",
+                "accordionContentMarginTop": "default",
+                "imageLoading": "lazy",
+                "accordionMediaPlacement": "top",
+                "accordionLinkText": "Read more",
+                "accordionLinkTarget": "_self",
+                "accordionButtonStyle": "default",
+                "accordionFullWidth": false
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-list-1-0-1-0",
+                "kind": "list",
+                "listItems": [
+                  {
+                    "id": "yootheme-list-item-1-0-1-0-0",
+                    "text": "1",
+                    "url": "#",
+                    "target": "_self",
+                    "iconName": "receiver"
+                  },
+                  {
+                    "id": "yootheme-list-item-1-0-1-0-1",
+                    "text": "1",
+                    "url": "#",
+                    "target": "_self",
+                    "iconName": "receiver"
+                  },
+                  {
+                    "id": "yootheme-list-item-1-0-1-0-2",
+                    "text": "1",
+                    "url": "#",
+                    "target": "_self",
+                    "iconName": "receiver"
+                  }
+                ],
+                "listType": "vertical",
+                "listMarker": "none",
+                "listPresentation": "default",
+                "listSpacing": "default",
+                "listHorizontalSeparator": ", ",
+                "listElement": "ul",
+                "listWrapNav": false,
+                "listShowLink": true,
+                "listShowImage": true,
+                "listLinkStyle": "default"
+              },
+              {
+                "id": "yootheme-icon-1-0-1-1",
+                "kind": "icon",
+                "iconName": "heart",
+                "icon": "heart",
+                "iconSize": 60,
+                "iconColorScheme": "danger",
+                "iconLinkTarget": "_self",
+                "iconLinkStyle": "icon",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-3",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-alert-1-0-2-0",
+                "kind": "alert",
+                "title": "2",
+                "body": "<p>dfsdfsdfsdfsdf dfsdfsdfsdfsdfdfsdfsdfsdfsdfdfs dfsdfsdfsdfdfsdfsdfsdfsdfdfsdfs dfsdfsdfdfsdfsdfsdfsdfdfsdf sdfsdfsdfdfsdfsdfsdfsdfdf sdfsdfsdfsdfdfsdfsdfsdfsdfdfsdfsdfsdfsdf</p>",
+                "alertLarge": false,
+                "alertTitleElement": "h3",
+                "alertTitleInline": false,
+                "alertLinkUrl": "#",
+                "alertLinkTarget": "_self"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Imported Section 3",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "contentVerticalAlign": "center",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-slideshow-1-0-0-0",
+                "id": "yootheme-table-2-0-0-0",
+                "kind": "table",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "tableHeadings": [],
+                "tableRows": [
+                  [
+                    "222222",
+                    "wp-content/uploads/yootheme/icon-configurations.svg",
+                    "111111",
+                    "<p>3333333</p>",
+                    "#"
+                  ],
+                  [
+                    "222222",
+                    "wp-content/uploads/yootheme/icon-configurations.svg",
+                    "111111",
+                    "<p>3333333</p>",
+                    "#"
+                  ],
+                  [
+                    "222222",
+                    "wp-content/uploads/yootheme/icon-configurations.svg",
+                    "111111",
+                    "<p>3333333</p>",
+                    "#"
+                  ],
+                  [
+                    "222222",
+                    "wp-content/uploads/yootheme/icon-configurations.svg",
+                    "111111",
+                    "<p>3333333</p>",
+                    "#"
+                  ],
+                  [
+                    "222222",
+                    "wp-content/uploads/yootheme/icon-configurations.svg",
+                    "111111",
+                    "<p>3333333</p>",
+                    "#"
+                  ]
+                ],
+                "tableItems": [
+                  {
+                    "id": "yootheme-table-item-2-0-0-0-0",
+                    "title": "111111",
+                    "meta": "222222",
+                    "content": "<p>3333333</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                    "imageAlt": "111111",
+                    "linkUrl": "#",
+                    "linkLabel": "Read more",
+                    "linkTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-table-item-2-0-0-0-1",
+                    "title": "111111",
+                    "meta": "222222",
+                    "content": "<p>3333333</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                    "imageAlt": "111111",
+                    "linkUrl": "#",
+                    "linkLabel": "Read more",
+                    "linkTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-table-item-2-0-0-0-2",
+                    "title": "111111",
+                    "meta": "222222",
+                    "content": "<p>3333333</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                    "imageAlt": "111111",
+                    "linkUrl": "#",
+                    "linkLabel": "Read more",
+                    "linkTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-table-item-2-0-0-0-3",
+                    "title": "111111",
+                    "meta": "222222",
+                    "content": "<p>3333333</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                    "imageAlt": "111111",
+                    "linkUrl": "#",
+                    "linkLabel": "Read more",
+                    "linkTarget": "_self"
+                  },
+                  {
+                    "id": "yootheme-table-item-2-0-0-0-4",
+                    "title": "111111",
+                    "meta": "222222",
+                    "content": "<p>3333333</p>",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                    "imageAlt": "111111",
+                    "linkUrl": "#",
+                    "linkLabel": "Read more",
+                    "linkTarget": "_self"
+                  }
+                ],
+                "tableColumnFields": [
+                  "meta",
+                  "image",
+                  "title",
+                  "content",
+                  "link"
+                ],
+                "tableShowImage": true,
+                "tableShowLink": true,
+                "tableImageLoading": "lazy",
+                "tableImageBorder": "none",
+                "tableImageShadow": "none",
+                "tableImageSvgInline": false,
+                "tableImageSvgColor": "emphasis",
+                "tableLinkStyle": "default",
+                "tableLinkSize": "default",
+                "tableLinkFullWidth": false,
+                "tableLinkTarget": "_self",
+                "tableStyle": "default",
+                "tableSize": "default",
+                "tableHover": false,
+                "tableJustify": false,
+                "tableVerticalAlign": false,
+                "tableResponsive": "overflow"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Imported Section 4",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "contentVerticalAlign": "center",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-gallery-3-0-0-0",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-6-ways-coronavirus-changed-the-it-industry-forever.jpg",
+                    "title": "Blog Post 6 Ways Coronavirus Changed The It Industry Forever",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-gravy.jpg",
+                    "title": "Blog Post Customer Stories Gravy",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-2",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/our-story-hero.jpg",
+                    "title": "Our Story Hero",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-3",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-sway.jpg",
+                    "title": "Blog Post Customer Stories Sway",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-4",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/job-description-contact.jpg",
+                    "title": "Job Description Contact",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-5",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-ambitech-teaser.jpg",
+                    "title": "Blog Post Customer Stories Ambitech Teaser",
+                    "meta": "",
+                    "content": "",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-6",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-monday-teaser.jpg",
+                    "title": "Blog Post Customer Stories Monday Teaser",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  },
+                  {
+                    "id": "yootheme-gallery-item-3-0-0-0-7",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-6-routines-every-saas-product-marketer-should-know-intro.jpg",
+                    "title": "Blog Post 6 Routines Every Saas Product Marketer Should Know Intro",
+                    "meta": "",
+                    "content": "<p>Content comes here</p>",
+                    "tags": []
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "columnsPhonePortrait": "1",
+                "columnsTabletLandscape": "3",
+                "masonry": "pack",
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayTransition": "fade",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "textAlign": "center",
+                "enableLightbox": true,
+                "linkText": "Read more",
+                "buttonStyle": "default",
+                "imageWidth": 600,
+                "imageLoading": "lazy",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Imported Section 5",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "contentVerticalAlign": "center",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-slideshow-4-0-0-0",
                 "kind": "slideshow",
                 "slides": [
                   {
-                    "id": "yootheme-panel-slide-1-0-0-0-0",
+                    "id": "yootheme-panel-slide-4-0-0-0-0",
                     "title": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro",
-                    "meta": "",
-                    "text": "",
+                    "meta": "Meta 1",
+                    "text": "Content 1",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
                     "imageAlt": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack.jpg",
+                    "showAction": true,
+                    "buttonLabel": "link to live project ",
+                    "buttonUrl": "https://react.webpages.am",
+                    "textColor": "light"
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-0-1",
+                    "id": "yootheme-panel-slide-4-0-0-0-1",
                     "title": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                    "meta": "",
-                    "text": "",
+                    "meta": "Meta 2 ",
+                    "text": "Content 2 ",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                     "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-scale-security-and-productivity-with-this-new-feature-intro.jpg",
+                    "showAction": true,
+                    "buttonLabel": "Link 2",
+                    "buttonUrl": "https://react.webpages.am",
+                    "textColor": "dark"
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-0-2",
+                    "id": "yootheme-panel-slide-4-0-0-0-2",
                     "title": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-5-incredible-video-conference-products-you-ll-wish-you-discovered-sooner-intro.jpg",
                     "imageAlt": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-0-3",
+                    "id": "yootheme-panel-slide-4-0-0-0-3",
                     "title": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-build-a-high-efficiency-sales-team-from-the-ground-up-intro.jpg",
                     "imageAlt": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   }
                 ],
                 "carouselSettings": {
@@ -7680,13 +7985,37 @@
                   "showMeta": true,
                   "showContent": true,
                   "showLink": true,
+                  "buttonStyle": "default",
+                  "buttonLabel": "Read more",
+                  "fullWidthButton": false,
+                  "showNavigationThumbnail": true,
+                  "elementLinkTarget": "_self",
+                  "headingLevel": "h3",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "meta",
                   "autoplay": false,
                   "pauseOnHover": true,
                   "showArrows": true,
-                  "showDots": true,
+                  "navigationType": "thumbnav",
+                  "showDots": false,
                   "arrowPosition": "overlay",
                   "paginationPosition": "bottom-center",
-                  "effect": "slide"
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "navigationBelow": false,
+                  "navigationHoverOnly": false,
+                  "navigationVertical": false,
+                  "thumbnavWidth": 100,
+                  "thumbnavHeight": 75,
+                  "thumbnavNoWrap": false,
+                  "slidenavHoverOnly": false,
+                  "slidenavLarger": false,
+                  "slidenavMargin": "medium",
+                  "slidenavBreakpoint": "small",
+                  "effect": "slide",
+                  "overlayPosition": "center-left",
+                  "overlayPadding": "default"
                 },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
@@ -7699,52 +8028,48 @@
                 }
               },
               {
-                "id": "yootheme-overlay-slider-1-0-0-1",
+                "id": "yootheme-overlay-slider-4-0-0-1",
                 "kind": "overlaySlider",
                 "slides": [
                   {
-                    "id": "yootheme-panel-slide-1-0-0-1-0",
+                    "id": "yootheme-panel-slide-4-0-0-1-0",
                     "title": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                     "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-1-1",
+                    "id": "yootheme-panel-slide-4-0-0-1-1",
                     "title": "Author Image",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/author-image.jpg",
                     "imageAlt": "Author Image",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-1-2",
+                    "id": "yootheme-panel-slide-4-0-0-1-2",
                     "title": "Blog Post Customer Stories Icon Intro",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-intro.jpg",
                     "imageAlt": "Blog Post Customer Stories Icon Intro",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   },
                   {
-                    "id": "yootheme-panel-slide-1-0-0-1-3",
+                    "id": "yootheme-panel-slide-4-0-0-1-3",
                     "title": "Blog Post Customer Stories Icon Teaser",
                     "meta": "",
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-teaser.jpg",
                     "imageAlt": "Blog Post Customer Stories Icon Teaser",
-                    "showAction": false,
-                    "buttonLabel": "Read more",
-                    "linkPanel": false
+                    "thumbnailUrl": "",
+                    "showAction": false
                   }
                 ],
                 "carouselSettings": {
@@ -7755,6 +8080,7 @@
                   "showMeta": true,
                   "showContent": true,
                   "showLink": true,
+                  "itemWidthMode": "fixed",
                   "autoplay": false,
                   "pauseOnHover": true,
                   "centered": false,
@@ -7765,13 +8091,27 @@
                   "cardsPerViewMedium": 3,
                   "showArrows": true,
                   "showDots": true,
+                  "navigationType": "dotnav",
+                  "navigationBelow": true,
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
                   "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
                   "paginationPosition": "bottom-center",
+                  "slidenavBreakpoint": "small",
+                  "headingLevel": "h3",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "meta",
+                  "buttonLabel": "Read more",
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
                   "effect": "slide",
                   "overlayMode": "cover",
                   "overlayDisplay": "always",
                   "overlayPosition": "center",
-                  "overlayPadding": "default"
+                  "overlayPadding": "default",
+                  "overlayStyle": "none"
                 },
                 "textAlign": "center",
                 "headingAlign": "center",
@@ -7791,7 +8131,7 @@
         ]
       },
       {
-        "id": "yootheme-section-3",
+        "id": "yootheme-section-6",
         "kind": "contentLayout",
         "title": "Feature API",
         "background": "transparent",
@@ -7824,12 +8164,12 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-3-row-1-column-1",
-            "rowId": "yootheme-section-3-row-1",
+            "id": "yootheme-section-6-row-1-column-1",
+            "rowId": "yootheme-section-6-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-2-0-0-0",
+                "id": "yootheme-heading-5-0-0-0",
                 "kind": "heading",
                 "headingText": "Powerful API for Clean Code",
                 "title": "Powerful API for Clean Code",
@@ -7837,9 +8177,6 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -7851,7 +8188,7 @@
                 }
               },
               {
-                "id": "yootheme-text-2-0-0-1",
+                "id": "yootheme-text-5-0-0-1",
                 "kind": "text",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
@@ -7860,9 +8197,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -7872,26 +8206,24 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
             ]
           },
           {
-            "id": "yootheme-section-3-row-2-column-1",
-            "rowId": "yootheme-section-3-row-2",
+            "id": "yootheme-section-6-row-2-column-1",
+            "rowId": "yootheme-section-6-row-2",
             "rowLayout": "3-col-equal",
             "blocks": [
               {
-                "id": "yootheme-grid-2-1-0-0",
+                "id": "yootheme-grid-5-1-0-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-2-1-0-0-0",
+                    "id": "yootheme-grid-item-5-1-0-0-0",
                     "imageUrl": "",
                     "imageAlt": "Fast Code Delivery",
                     "title": "Fast Code Delivery",
@@ -7906,7 +8238,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-2-1-0-0-1",
+                    "id": "yootheme-grid-item-5-1-0-0-1",
                     "imageUrl": "",
                     "imageAlt": "Scale Testing",
                     "title": "Scale Testing",
@@ -7935,6 +8267,7 @@
                 "gridItemAlign": "center",
                 "gridRowGap": "large",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "gridMediaWidth": "medium",
@@ -7963,30 +8296,25 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "medium"
-                  }
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "maxWidth": "medium",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme"
               }
             ]
           },
           {
-            "id": "yootheme-section-3-row-2-column-2",
-            "rowId": "yootheme-section-3-row-2",
+            "id": "yootheme-section-6-row-2-column-2",
+            "rowId": "yootheme-section-6-row-2",
             "rowLayout": "3-col-equal",
             "blocks": [
               {
-                "id": "yootheme-image-2-1-1-0",
+                "id": "yootheme-image-5-1-1-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-api.svg",
                 "imageAlt": "",
@@ -7994,6 +8322,7 @@
                 "imageWidth": "370",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "rounded",
                 "imageAlignment": "center",
                 "textAlign": "center",
@@ -8012,17 +8341,17 @@
             ]
           },
           {
-            "id": "yootheme-section-3-row-2-column-3",
-            "rowId": "yootheme-section-3-row-2",
+            "id": "yootheme-section-6-row-2-column-3",
+            "rowId": "yootheme-section-6-row-2",
             "rowLayout": "3-col-equal",
             "blocks": [
               {
-                "id": "yootheme-grid-2-1-2-0",
+                "id": "yootheme-grid-5-1-2-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-2-1-2-0-0",
+                    "id": "yootheme-grid-item-5-1-2-0-0",
                     "imageUrl": "",
                     "imageAlt": "Private Repositories",
                     "title": "Private Repositories",
@@ -8037,7 +8366,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-2-1-2-0-1",
+                    "id": "yootheme-grid-item-5-1-2-0-1",
                     "imageUrl": "",
                     "imageAlt": "Live Code Previews",
                     "title": "Live Code Previews",
@@ -8066,6 +8395,7 @@
                 "gridItemAlign": "center",
                 "gridRowGap": "large",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "gridMediaWidth": "medium",
@@ -8094,18 +8424,13 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "medium"
-                  }
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "maxWidth": "medium",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme"
               }
@@ -8114,7 +8439,7 @@
         ]
       },
       {
-        "id": "yootheme-section-4",
+        "id": "yootheme-section-7",
         "kind": "contentLayout",
         "title": "Feature Efficient Workflow",
         "background": "transparent",
@@ -8147,12 +8472,12 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-4-row-1-column-1",
-            "rowId": "yootheme-section-4-row-1",
+            "id": "yootheme-section-7-row-1-column-1",
+            "rowId": "yootheme-section-7-row-1",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-heading-3-0-0-0",
+                "id": "yootheme-heading-6-0-0-0",
                 "kind": "heading",
                 "headingText": "Fast and<br class=\"uk-visible@m\"> Efficient<br class=\"uk-hidden@m\"> Way<br class=\"uk-visible@m\"> to Create",
                 "title": "Fast and<br class=\"uk-visible@m\"> Efficient<br class=\"uk-hidden@m\"> Way<br class=\"uk-visible@m\"> to Create",
@@ -8161,9 +8486,6 @@
                 "headingAlign": "left",
                 "maxWidth": "large",
                 "textAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8175,14 +8497,12 @@
                     "textAlignBreakpoint": "medium",
                     "textAlignFallback": "center"
                   },
-                  "effects": {
-                    "maxWidth": "large"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
               {
-                "id": "yootheme-text-3-0-0-1",
+                "id": "yootheme-text-6-0-0-1",
                 "kind": "text",
                 "body": "Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla consequat massa quis enim.",
                 "textVariant": "lead",
@@ -8190,9 +8510,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "large",
                 "headingAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8205,18 +8522,16 @@
                     "textAlignBreakpoint": "medium",
                     "textAlignFallback": "center"
                   },
-                  "effects": {
-                    "maxWidth": "large"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
               {
-                "id": "yootheme-button-3-0-0-2",
+                "id": "yootheme-button-6-0-0-2",
                 "kind": "button",
                 "buttons": [
                   {
-                    "id": "yootheme-button-3-0-0-2-0",
+                    "id": "yootheme-button-6-0-0-2-0",
                     "label": "See More Features",
                     "url": "?page_id=20#DevOps",
                     "target": "_self",
@@ -8226,9 +8541,6 @@
                 "fullWidthButton": false,
                 "textAlign": "left",
                 "headingAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8245,16 +8557,17 @@
             ]
           },
           {
-            "id": "yootheme-section-4-row-1-column-2",
-            "rowId": "yootheme-section-4-row-1",
+            "id": "yootheme-section-7-row-1-column-2",
+            "rowId": "yootheme-section-7-row-1",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-image-3-0-1-0",
+                "id": "yootheme-image-6-0-1-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow.svg",
                 "imageAlt": "",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
@@ -8272,19 +8585,17 @@
                 }
               },
               {
-                "id": "yootheme-image-3-0-1-1",
+                "id": "yootheme-image-6-0-1-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow-floating-icon.svg",
                 "imageAlt": "",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8303,17 +8614,17 @@
             ]
           },
           {
-            "id": "yootheme-section-4-row-2-column-1",
-            "rowId": "yootheme-section-4-row-2",
+            "id": "yootheme-section-7-row-2-column-1",
+            "rowId": "yootheme-section-7-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-grid-3-1-0-0",
+                "id": "yootheme-grid-6-1-0-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-0",
+                    "id": "yootheme-grid-item-6-1-0-0-0",
                     "imageUrl": "",
                     "imageAlt": "Unlimited Deployments",
                     "title": "Unlimited Deployments",
@@ -8328,7 +8639,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-1",
+                    "id": "yootheme-grid-item-6-1-0-0-1",
                     "imageUrl": "",
                     "imageAlt": "Quick Rollbacks",
                     "title": "Quick Rollbacks",
@@ -8343,7 +8654,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-2",
+                    "id": "yootheme-grid-item-6-1-0-0-2",
                     "imageUrl": "",
                     "imageAlt": "Flexible Pipelines",
                     "title": "Flexible Pipelines",
@@ -8358,7 +8669,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-3",
+                    "id": "yootheme-grid-item-6-1-0-0-3",
                     "imageUrl": "",
                     "imageAlt": "Enterprise Security",
                     "title": "Enterprise Security",
@@ -8373,7 +8684,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-4",
+                    "id": "yootheme-grid-item-6-1-0-0-4",
                     "imageUrl": "",
                     "imageAlt": "Powerful API",
                     "title": "Powerful API",
@@ -8388,7 +8699,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-3-1-0-0-5",
+                    "id": "yootheme-grid-item-6-1-0-0-5",
                     "imageUrl": "",
                     "imageAlt": "Cutting Edge Software",
                     "title": "Cutting Edge Software",
@@ -8418,6 +8729,7 @@
                 "gridGap": "large",
                 "gridRowGap": "large",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "2",
@@ -8455,20 +8767,18 @@
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "headingAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme"
               },
               {
-                "id": "yootheme-image-3-1-0-1",
+                "id": "yootheme-image-6-1-0-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
                 "imageWidth": "1000",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "left",
                 "visibility": "xl",
@@ -8492,7 +8802,7 @@
         ]
       },
       {
-        "id": "yootheme-section-5",
+        "id": "yootheme-section-8",
         "kind": "contentLayout",
         "title": "Feature Project Management",
         "background": "transparent",
@@ -8524,12 +8834,12 @@
         "layoutRows": 3,
         "layoutItems": [
           {
-            "id": "yootheme-section-5-row-1-column-1",
-            "rowId": "yootheme-section-5-row-1",
+            "id": "yootheme-section-8-row-1-column-1",
+            "rowId": "yootheme-section-8-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-4-0-0-0",
+                "id": "yootheme-heading-7-0-0-0",
                 "kind": "heading",
                 "headingText": "Keep All Work in One Place",
                 "title": "Keep All Work in One Place",
@@ -8537,9 +8847,6 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8553,7 +8860,7 @@
                 }
               },
               {
-                "id": "yootheme-text-4-0-0-1",
+                "id": "yootheme-text-7-0-0-1",
                 "kind": "text",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
@@ -8562,9 +8869,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8576,26 +8880,25 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
             ]
           },
           {
-            "id": "yootheme-section-5-row-2-column-1",
-            "rowId": "yootheme-section-5-row-2",
+            "id": "yootheme-section-8-row-2-column-1",
+            "rowId": "yootheme-section-8-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-image-4-1-0-0",
+                "id": "yootheme-image-7-1-0-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-02.svg",
                 "imageAlt": "",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
@@ -8617,20 +8920,18 @@
                 }
               },
               {
-                "id": "yootheme-image-4-1-0-1",
+                "id": "yootheme-image-7-1-0-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-01.svg",
                 "imageAlt": "",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8649,17 +8950,17 @@
             ]
           },
           {
-            "id": "yootheme-section-5-row-3-column-1",
-            "rowId": "yootheme-section-5-row-3",
+            "id": "yootheme-section-8-row-3-column-1",
+            "rowId": "yootheme-section-8-row-3",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-grid-4-2-0-0",
+                "id": "yootheme-grid-7-2-0-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-4-2-0-0-0",
+                    "id": "yootheme-grid-item-7-2-0-0-0",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-coordinate-progress.svg",
                     "imageAlt": "Coordinate Progress",
                     "title": "Coordinate Progress",
@@ -8674,7 +8975,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-4-2-0-0-1",
+                    "id": "yootheme-grid-item-7-2-0-0-1",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-monitor-activity.svg",
                     "imageAlt": "Monitor Activity",
                     "title": "Monitor Activity",
@@ -8689,7 +8990,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-4-2-0-0-2",
+                    "id": "yootheme-grid-item-7-2-0-0-2",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-report-changes.svg",
                     "imageAlt": "Report Changes in Real Time",
                     "title": "Report Changes in Real Time",
@@ -8718,6 +9019,7 @@
                 "gridItemAlign": "center",
                 "gridGap": "large",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "3",
@@ -8761,11 +9063,11 @@
                 "spacingContract": "yootheme"
               },
               {
-                "id": "yootheme-button-4-2-0-1",
+                "id": "yootheme-button-7-2-0-1",
                 "kind": "button",
                 "buttons": [
                   {
-                    "id": "yootheme-button-4-2-0-1-0",
+                    "id": "yootheme-button-7-2-0-1-0",
                     "label": "See All Features",
                     "url": "?page_id=20#Projectmanagement",
                     "target": "_self",
@@ -8791,7 +9093,7 @@
         ]
       },
       {
-        "id": "yootheme-section-6",
+        "id": "yootheme-section-9",
         "kind": "contentLayout",
         "title": "Collaboration",
         "background": "transparent",
@@ -8824,12 +9126,12 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-6-row-1-column-1",
-            "rowId": "yootheme-section-6-row-1",
+            "id": "yootheme-section-9-row-1-column-1",
+            "rowId": "yootheme-section-9-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-5-0-0-0",
+                "id": "yootheme-heading-8-0-0-0",
                 "kind": "heading",
                 "headingText": "Empower Your Team and<br class=\"uk-visible@s\"> Scale Your Business",
                 "title": "Empower Your Team and<br class=\"uk-visible@s\"> Scale Your Business",
@@ -8837,9 +9139,6 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8851,7 +9150,7 @@
                 }
               },
               {
-                "id": "yootheme-text-5-0-0-1",
+                "id": "yootheme-text-8-0-0-1",
                 "kind": "text",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
@@ -8860,9 +9159,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8872,21 +9168,19 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
             ]
           },
           {
-            "id": "yootheme-section-6-row-2-column-1",
-            "rowId": "yootheme-section-6-row-2",
+            "id": "yootheme-section-9-row-2-column-1",
+            "rowId": "yootheme-section-9-row-2",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-image-5-1-0-0",
+                "id": "yootheme-image-8-1-0-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration.svg",
                 "imageAlt": "",
@@ -8894,6 +9188,7 @@
                 "imageWidth": "380",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
@@ -8910,17 +9205,15 @@
                 }
               },
               {
-                "id": "yootheme-image-5-1-0-1",
+                "id": "yootheme-image-8-1-0-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration-floating-icon.svg",
                 "imageAlt": "",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -8936,7 +9229,7 @@
                 }
               },
               {
-                "id": "yootheme-panel-5-1-0-2",
+                "id": "yootheme-panel-8-1-0-2",
                 "kind": "panel",
                 "title": "Team Collaboration",
                 "eyebrow": "",
@@ -8980,27 +9273,25 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme"
               }
             ]
           },
           {
-            "id": "yootheme-section-6-row-2-column-2",
-            "rowId": "yootheme-section-6-row-2",
+            "id": "yootheme-section-9-row-2-column-2",
+            "rowId": "yootheme-section-9-row-2",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-image-5-1-1-0",
+                "id": "yootheme-image-8-1-1-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud.svg",
                 "imageAlt": "",
                 "imageMaxWidth": 380,
                 "imageWidth": "380",
                 "imageSvgInline": true,
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "center",
                 "textAlign": "center",
@@ -9017,17 +9308,15 @@
                 }
               },
               {
-                "id": "yootheme-image-5-1-1-1",
+                "id": "yootheme-image-8-1-1-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud-floating-icon.svg",
                 "imageAlt": "",
                 "imageSvgInline": true,
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -9043,7 +9332,7 @@
                 }
               },
               {
-                "id": "yootheme-panel-5-1-1-2",
+                "id": "yootheme-panel-8-1-1-2",
                 "kind": "panel",
                 "title": "Enterprise Cloud",
                 "eyebrow": "",
@@ -9088,9 +9377,6 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme"
               }
@@ -9099,7 +9385,7 @@
         ]
       },
       {
-        "id": "yootheme-section-7",
+        "id": "yootheme-section-10",
         "kind": "contentLayout",
         "title": "Customer Stories",
         "background": "transparent",
@@ -9130,12 +9416,12 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-7-row-1-column-1",
-            "rowId": "yootheme-section-7-row-1",
+            "id": "yootheme-section-10-row-1-column-1",
+            "rowId": "yootheme-section-10-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-6-0-0-0",
+                "id": "yootheme-heading-9-0-0-0",
                 "kind": "heading",
                 "headingText": "Trusted By Clients<br class=\"uk-visible@m\"> and Industry Experts Alike",
                 "title": "Trusted By Clients<br class=\"uk-visible@m\"> and Industry Experts Alike",
@@ -9154,11 +9440,11 @@
                 }
               },
               {
-                "id": "yootheme-button-6-0-0-1",
+                "id": "yootheme-button-9-0-0-1",
                 "kind": "button",
                 "buttons": [
                   {
-                    "id": "yootheme-button-6-0-0-1-0",
+                    "id": "yootheme-button-9-0-0-1-0",
                     "label": "See All Custumer Stories",
                     "url": "?post_type=post",
                     "target": "_self",
@@ -9184,15 +9470,15 @@
             ]
           },
           {
-            "id": "yootheme-section-7-row-2-column-1",
-            "rowId": "yootheme-section-7-row-2",
+            "id": "yootheme-section-10-row-2-column-1",
+            "rowId": "yootheme-section-10-row-2",
             "rowLayout": "1-col",
             "blocks": []
           }
         ]
       },
       {
-        "id": "yootheme-section-8",
+        "id": "yootheme-section-11",
         "kind": "contentLayout",
         "title": "Community",
         "background": "transparent",
@@ -9224,12 +9510,12 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-8-row-1-column-1",
-            "rowId": "yootheme-section-8-row-1",
+            "id": "yootheme-section-11-row-1-column-1",
+            "rowId": "yootheme-section-11-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-7-0-0-0",
+                "id": "yootheme-heading-10-0-0-0",
                 "kind": "heading",
                 "headingText": "Our Community",
                 "title": "Our Community",
@@ -9237,9 +9523,6 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -9251,7 +9534,7 @@
                 }
               },
               {
-                "id": "yootheme-text-7-0-0-1",
+                "id": "yootheme-text-10-0-0-1",
                 "kind": "text",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
@@ -9260,9 +9543,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -9272,19 +9552,17 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               },
               {
-                "id": "yootheme-grid-7-0-0-2",
+                "id": "yootheme-grid-10-0-0-2",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-7-0-0-2-0",
+                    "id": "yootheme-grid-item-10-0-0-2-0",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-meetups-events.svg",
                     "imageAlt": "Meetups &<br class=\"uk-visible@m\"> Events",
                     "title": "Meetups &amp;<br> Events",
@@ -9298,7 +9576,7 @@
                     "titleElement": "h3"
                   },
                   {
-                    "id": "yootheme-grid-item-7-0-0-2-1",
+                    "id": "yootheme-grid-item-10-0-0-2-1",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-workshops-trainings.svg",
                     "imageAlt": "Workshops & Trainings",
                     "title": "Workshops &amp; Trainings",
@@ -9312,7 +9590,7 @@
                     "titleElement": "h3"
                   },
                   {
-                    "id": "yootheme-grid-item-7-0-0-2-2",
+                    "id": "yootheme-grid-item-10-0-0-2-2",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-community-chat.svg",
                     "imageAlt": "Community<br class=\"uk-visible@m\"> Chat",
                     "title": "Community<br> Chat",
@@ -9326,7 +9604,7 @@
                     "titleElement": "h3"
                   },
                   {
-                    "id": "yootheme-grid-item-7-0-0-2-3",
+                    "id": "yootheme-grid-item-10-0-0-2-3",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-help-guides.svg",
                     "imageAlt": "Help Guides",
                     "title": "Help Guides",
@@ -9340,7 +9618,7 @@
                     "titleElement": "h3"
                   },
                   {
-                    "id": "yootheme-grid-item-7-0-0-2-4",
+                    "id": "yootheme-grid-item-10-0-0-2-4",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-24-7-support.svg",
                     "imageAlt": "24/7 Support",
                     "title": "24/7 Support",
@@ -9367,7 +9645,8 @@
                 "gridMediaPlacement": "top",
                 "gridItemAlign": "center",
                 "showDividers": false,
-                "centerRows": true,
+                "centerColumns": true,
+                "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "2",
                 "columnsTabletLandscape": "3",
@@ -9414,18 +9693,19 @@
             ]
           },
           {
-            "id": "yootheme-section-8-row-2-column-1",
-            "rowId": "yootheme-section-8-row-2",
+            "id": "yootheme-section-11-row-2-column-1",
+            "rowId": "yootheme-section-11-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-image-7-1-0-0",
+                "id": "yootheme-image-10-1-0-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
                 "imageAlt": "",
                 "imageMaxWidth": 500,
                 "imageWidth": "500",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "left",
                 "visibility": "l",
@@ -9450,7 +9730,7 @@
         ]
       },
       {
-        "id": "yootheme-section-9",
+        "id": "yootheme-section-12",
         "kind": "contentLayout",
         "title": "Feature Grid",
         "background": "transparent",
@@ -9483,21 +9763,18 @@
         "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "yootheme-section-9-row-1-column-1",
-            "rowId": "yootheme-section-9-row-1",
+            "id": "yootheme-section-12-row-1-column-1",
+            "rowId": "yootheme-section-12-row-1",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-heading-8-0-0-0",
+                "id": "yootheme-heading-11-0-0-0",
                 "kind": "heading",
                 "headingText": "We’ll Set You up<br class=\"uk-visible@m\"> for Success",
                 "title": "We’ll Set You up<br class=\"uk-visible@m\"> for Success",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "textAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -9511,7 +9788,7 @@
                 }
               },
               {
-                "id": "yootheme-text-8-0-0-1",
+                "id": "yootheme-text-11-0-0-1",
                 "kind": "text",
                 "body": "In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus.",
                 "textVariant": "lead",
@@ -9519,9 +9796,6 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "large",
                 "headingAlign": "left",
-                "animation": {
-                  "preset": "none"
-                },
                 "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
@@ -9534,26 +9808,24 @@
                     "textAlignBreakpoint": "medium",
                     "textAlignFallback": "center"
                   },
-                  "effects": {
-                    "maxWidth": "large"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
             ]
           },
           {
-            "id": "yootheme-section-9-row-1-column-2",
-            "rowId": "yootheme-section-9-row-1",
+            "id": "yootheme-section-12-row-1-column-2",
+            "rowId": "yootheme-section-12-row-1",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "yootheme-grid-8-0-1-0",
+                "id": "yootheme-grid-11-0-1-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-8-0-1-0-0",
+                    "id": "yootheme-grid-item-11-0-1-0-0",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                     "imageAlt": "Around the Clock Support",
                     "title": "Around the Clock Support",
@@ -9568,7 +9840,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-8-0-1-0-1",
+                    "id": "yootheme-grid-item-11-0-1-0-1",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                     "imageAlt": "Project Dashboard",
                     "title": "Project Dashboard",
@@ -9583,7 +9855,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-8-0-1-0-2",
+                    "id": "yootheme-grid-item-11-0-1-0-2",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                     "imageAlt": "Dedicated Account Manager",
                     "title": "Dedicated Account Manager",
@@ -9598,7 +9870,7 @@
                     "titleStyle": "h4"
                   },
                   {
-                    "id": "yootheme-grid-item-8-0-1-0-3",
+                    "id": "yootheme-grid-item-11-0-1-0-3",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                     "imageAlt": "Short Implementation Time",
                     "title": "Short Implementation Time",
@@ -9628,6 +9900,7 @@
                 "gridGap": "large",
                 "gridRowGap": "large",
                 "showDividers": false,
+                "centerColumns": false,
                 "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsPhoneLandscape": "2",
@@ -9662,9 +9935,7 @@
                     "textAlignBreakpoint": "medium",
                     "textAlignFallback": "center"
                   },
-                  "effects": {
-                    "maxWidth": "2xlarge"
-                  }
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
@@ -9678,18 +9949,19 @@
             ]
           },
           {
-            "id": "yootheme-section-9-row-2-column-1",
-            "rowId": "yootheme-section-9-row-2",
+            "id": "yootheme-section-12-row-2-column-1",
+            "rowId": "yootheme-section-12-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-image-8-1-0-0",
+                "id": "yootheme-image-11-1-0-0",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                 "imageAlt": "",
                 "imageMaxWidth": 900,
                 "imageWidth": "900",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "left",
                 "visibility": "l",
@@ -9708,13 +9980,14 @@
                 }
               },
               {
-                "id": "yootheme-image-8-1-0-1",
+                "id": "yootheme-image-11-1-0-1",
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 450,
                 "imageWidth": "450",
                 "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
                 "imageShape": "none",
                 "imageAlignment": "right",
                 "textAlign": "right",
@@ -9740,7 +10013,7 @@
         ]
       },
       {
-        "id": "yootheme-section-10",
+        "id": "yootheme-section-13",
         "kind": "contentLayout",
         "title": "Pricing",
         "background": "transparent",
@@ -9772,12 +10045,12 @@
         "layoutRows": 3,
         "layoutItems": [
           {
-            "id": "yootheme-section-10-row-1-column-1",
-            "rowId": "yootheme-section-10-row-1",
+            "id": "yootheme-section-13-row-1-column-1",
+            "rowId": "yootheme-section-13-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-heading-9-0-0-0",
+                "id": "yootheme-heading-12-0-0-0",
                 "kind": "heading",
                 "headingText": "Simple, flexible pricing.<br class=\"uk-visible@m\"> Unlimited repositories and<br class=\"uk-visible@m\"> deployments.",
                 "title": "Simple, flexible pricing.<br class=\"uk-visible@m\"> Unlimited repositories and<br class=\"uk-visible@m\"> deployments.",
@@ -9796,7 +10069,7 @@
                 }
               },
               {
-                "id": "yootheme-text-9-0-0-1",
+                "id": "yootheme-text-12-0-0-1",
                 "kind": "text",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
                 "textVariant": "default",
@@ -9816,26 +10089,24 @@
                     "blockAlign": "center",
                     "textAlign": "center"
                   },
-                  "effects": {
-                    "maxWidth": "large"
-                  },
+                  "effects": {},
                   "card": {}
                 }
               }
             ]
           },
           {
-            "id": "yootheme-section-10-row-2-column-1",
-            "rowId": "yootheme-section-10-row-2",
+            "id": "yootheme-section-13-row-2-column-1",
+            "rowId": "yootheme-section-13-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-grid-9-1-0-0",
+                "id": "yootheme-grid-12-1-0-0",
                 "kind": "grid",
                 "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "yootheme-grid-item-9-1-0-0-0",
+                    "id": "yootheme-grid-item-12-1-0-0-0",
                     "imageUrl": "",
                     "imageAlt": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                     "title": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
@@ -9853,7 +10124,7 @@
                     "titleStyle": "h1"
                   },
                   {
-                    "id": "yootheme-grid-item-9-1-0-0-1",
+                    "id": "yootheme-grid-item-12-1-0-0-1",
                     "imageUrl": "",
                     "imageAlt": "<p class=\"uk-margin-remove\">$120</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                     "title": "<p class=\"uk-margin-remove\">$120</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
@@ -9884,7 +10155,8 @@
                 "gridMediaPlacement": "top",
                 "gridItemAlign": "center",
                 "showDividers": false,
-                "centerRows": true,
+                "centerColumns": true,
+                "centerRows": false,
                 "columnsPhonePortrait": "1",
                 "columnsTabletLandscape": "2",
                 "gridMediaWidth": "medium",
@@ -9925,16 +10197,16 @@
             ]
           },
           {
-            "id": "yootheme-section-10-row-3-column-1",
-            "rowId": "yootheme-section-10-row-3",
+            "id": "yootheme-section-13-row-3-column-1",
+            "rowId": "yootheme-section-13-row-3",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "yootheme-button-9-2-0-0",
+                "id": "yootheme-button-12-2-0-0",
                 "kind": "button",
                 "buttons": [
                   {
-                    "id": "yootheme-button-9-2-0-0-0",
+                    "id": "yootheme-button-12-2-0-0-0",
                     "label": "See All Our Plans and Features",
                     "url": "?page_id=21",
                     "target": "_self",
@@ -9961,7 +10233,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-11T20:12:57.599Z"
+    "updatedAt": "2026-08-13T00:43:15.196Z"
   },
   "page:clean": {
     "version": 1,
@@ -10029,6 +10301,6 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-11T05:48:09.805Z"
+    "updatedAt": "2026-08-12T15:49:55.222Z"
   }
 }

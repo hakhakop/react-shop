@@ -31,11 +31,26 @@ test("button inspector exposes semantic UIkit variant and size controls", async 
   const size = inspector.getByRole("radiogroup", { name: "Button size" });
   await expect(variant).toBeVisible();
   await expect(size).toBeVisible();
+  // This is a native Button fixture. Its historical native Inspector vocabulary
+  // intentionally remains separate from the complete imported-YOOtheme set.
   const variants = ["default", "primary", "secondary", "text"] as const;
+  const expectedVariantClasses: Record<(typeof variants)[number], string | null> = {
+    default: "uk-button-default",
+    primary: "uk-button-primary",
+    secondary: "uk-button-secondary",
+    text: "uk-button-text",
+  };
+  const variantLabels: Record<(typeof variants)[number], string> = {
+    default: "Default",
+    primary: "Primary",
+    secondary: "Secondary",
+    text: "Text",
+  };
   const variantStyles: Record<string, { background: string; color: string }> = {};
   for (const value of variants) {
-    await variant.locator("button").filter({ hasText: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
-    await expect(button).toHaveClass(new RegExp(`uk-button-${value === "default" ? "default" : value}`));
+    await variant.getByRole("button", { name: variantLabels[value], exact: true }).click();
+    const expectedClass = expectedVariantClasses[value];
+    await expect(button).toHaveClass(new RegExp(`\\b${expectedClass}\\b`));
     variantStyles[value] = await button.evaluate((element) => {
       const style = getComputedStyle(element);
       return { background: style.backgroundColor, color: style.color };
@@ -50,10 +65,29 @@ test("button inspector exposes semantic UIkit variant and size controls", async 
     heights[value] = await button.evaluate((element) => element.getBoundingClientRect().height);
   }
   expect(heights.small).not.toBe(heights.large);
-  await variant.locator("button").filter({ hasText: "Secondary" }).click();
+  await variant.getByRole("button", { name: "Secondary", exact: true }).click();
   await size.locator("button").filter({ hasText: "Large" }).click();
   await expect(button).toHaveClass(/uk-button-secondary/);
   await expect(button).toHaveClass(/uk-button-large/);
+
+  // Shared token consumption must beat normal-state declarations and UIkit's
+  // active class, not only the browser's transient :active pseudo-state.
+  await variant.getByRole("button", { name: "Default", exact: true }).click();
+  await button.evaluate((element) => {
+    element.style.setProperty("--uk-button-default-hover-background", "rgb(17, 34, 51)");
+    element.style.setProperty("--uk-button-default-active-background", "rgb(68, 85, 102)");
+  });
+  await button.hover();
+  await expect.poll(() => button.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(17, 34, 51)");
+  await button.evaluate((element) => element.classList.add("uk-active"));
+  await page.mouse.move(0, 0);
+  await expect.poll(() => button.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(68, 85, 102)");
+  await button.evaluate((element) => element.classList.remove("uk-active"));
+  await variant.getByRole("button", { name: "Secondary", exact: true }).click();
+  await button.evaluate((element) => element.style.setProperty("--uk-button-secondary-hover-background", "rgb(19, 52, 86)"));
+  await button.hover();
+  await expect.poll(() => button.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(19, 52, 86)");
+  await page.mouse.move(0, 0);
   await page.mouse.move(0, 0);
   const finalBuilderStyle = await button.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color, height: style.height }; });
   await expect(inspector.locator("label.builder-field", { hasText: "Outline" })).toHaveCount(0);

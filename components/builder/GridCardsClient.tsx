@@ -162,6 +162,12 @@ export function GridCardsClient({
 
   const columnGapCss = parseGapPx(colGapValue);
   const rowGapCss = parseGapPx(rowGapValue);
+  const usesYoothemeColumnCentering = rawBlock.spacingContract === "yootheme" && Boolean(rawBlock.centerColumns);
+  const itemBasisForColumns = (columns: GridColumns) => {
+    if (columns === "auto") return "auto";
+    const gapCount = Math.max(0, columns - 1);
+    return `calc((100% - (${gapCount} * ${columnGapCss})) / ${columns})`;
+  };
   const selectFilter = (event: React.SyntheticEvent, filter: string) => {
     // UIkit's subnav/tab runtime can stop a bubbling click after changing its
     // visual active state. Pointer/key activation updates the canonical React
@@ -210,7 +216,7 @@ export function GridCardsClient({
       )}
 
       <div
-        className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} ${rawBlock.showDividers ? "uk-grid-divider" : ""} ${rawBlock.centerColumns ? "uk-flex-center" : ""}`}
+        className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} ${rawBlock.showDividers ? "uk-grid-divider" : ""} ${usesYoothemeColumnCentering ? "shop-builder-grid--yootheme-column-center uk-flex-center" : ""}`}
         style={
           {
             "--shop-builder-grid-template": gridTemplate(phonePortraitColumns),
@@ -233,6 +239,11 @@ export function GridCardsClient({
             "--shop-builder-grid-display-tablet": displayForColumns(tabletLandscapeColumns),
             "--shop-builder-grid-display-desktop": displayForColumns(desktopColumns),
             "--shop-builder-grid-display-xlarge": displayForColumns(largeScreenColumns),
+            "--shop-builder-grid-item-basis-base": itemBasisForColumns(phonePortraitColumns),
+            "--shop-builder-grid-item-basis-phone-landscape": itemBasisForColumns(phoneLandscapeColumns),
+            "--shop-builder-grid-item-basis-tablet": itemBasisForColumns(tabletLandscapeColumns),
+            "--shop-builder-grid-item-basis-desktop": itemBasisForColumns(desktopColumns),
+            "--shop-builder-grid-item-basis-xlarge": itemBasisForColumns(largeScreenColumns),
             columnGap: columnGapCss,
             rowGap: rowGapCss,
             alignItems: rawBlock.justifyColumns ? "end" : rawBlock.centerRows ? "center" : undefined,

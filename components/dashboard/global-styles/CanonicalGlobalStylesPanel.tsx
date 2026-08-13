@@ -5,6 +5,12 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { BuilderCustomGlobalStylePreset, BuilderShellSettings } from "@/lib/builderShell";
+import {
+  RESPONSIVE_BREAKPOINT_KEYS,
+  parseResponsiveBreakpoint,
+  validateResponsiveBreakpointSettings,
+  type ResponsiveBreakpointKey,
+} from "@/lib/responsiveBreakpointPolicy";
 import { YOOTHEME_DEVSTACK_PRESETS } from "@/lib/yoothemeLessImporter";
 import { resolveBundledYoothemeDevstackPreset } from "@/lib/yoothemeDevstackPresets";
 import { GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
@@ -87,6 +93,52 @@ function Gradient({ label, value, onChange }: { label: string; value: unknown; o
 function Length({ label, value, onChange, units = ["px", "rem", "%"] }: { label: string; value: unknown; onChange: (value: string) => void; units?: string[] }) {
   const parsed = parseLength(value);
   return <div className="builder-design-control builder-design-length"><span>{label}</span><div><input aria-label={`${label} value`} type="number" value={parsed.number} onChange={(event) => onChange(`${event.target.value}${parsed.unit}`)} /><select aria-label={`${label} unit`} value={parsed.unit} onChange={(event) => onChange(`${parsed.number || 0}${event.target.value}`)}>{units.map((unit) => <option key={unit} value={unit}>{unit}</option>)}</select></div></div>;
+}
+
+function Breakpoint({ label, value, settings, onChange }: {
+  label: string;
+  value: unknown;
+  settings: Pick<BuilderShellSettings, ResponsiveBreakpointKey>;
+  onChange: (value: string) => void;
+}) {
+  const canonical = asString(value);
+  const [raw, setRaw] = useState(canonical.replace(/\s*px\s*$/i, ""));
+  const [error, setError] = useState("");
+  useEffect(() => setRaw(canonical.replace(/\s*px\s*$/i, "")), [canonical]);
+
+  const commit = (next: string) => {
+    const numeric = parseResponsiveBreakpoint(`${next}px`);
+    const candidate = { ...settings, [labelToBreakpointKey(label)]: numeric == null ? `${next}px` : `${numeric}px` };
+    const validation = validateResponsiveBreakpointSettings(candidate);
+    if (!validation.valid) {
+      setError(validation.message);
+      return;
+    }
+    setError("");
+    onChange(`${numeric}px`);
+  };
+
+  return <label className="builder-design-control builder-design-length">
+    <span>{label}</span>
+    <div>
+      <input
+        aria-label={`${label} breakpoint value`}
+        aria-invalid={Boolean(error)}
+        min="1"
+        step="1"
+        type="number"
+        value={raw}
+        onChange={(event) => { const next = event.target.value; setRaw(next); commit(next); }}
+        onBlur={() => { if (error) { setRaw(canonical.replace(/\s*px\s*$/i, "")); setError(""); } }}
+      />
+      <span className="builder-design-static-unit" aria-hidden="true">px</span>
+    </div>
+    {error ? <small role="alert">{error}</small> : null}
+  </label>;
+}
+
+function labelToBreakpointKey(label: string): ResponsiveBreakpointKey {
+  return `breakpoint${label.replace(/[^a-z]/gi, "")}` as ResponsiveBreakpointKey;
 }
 
 function Shadow({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
@@ -247,7 +299,13 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
       isOpen={isLessModalOpen}
       onClose={() => setIsLessModalOpen(false)}
       onImport={(importedPatch) => {
-        setDraft((current) => ({ ...current, ...importedPatch }));
+        const containsBreakpoint = RESPONSIVE_BREAKPOINT_KEYS.some((key) => key in importedPatch);
+        const next = { ...draft, ...importedPatch };
+        const breakpointValidation = validateResponsiveBreakpointSettings(next);
+        if (containsBreakpoint && !breakpointValidation.valid) {
+          return `YOOtheme breakpoint import rejected: ${breakpointValidation.message}`;
+        }
+        setDraft(next);
         updateShellSettings(importedPatch);
       }}
     />
@@ -304,7 +362,19 @@ function ShellSpacingGroup({ draft, set }: { draft: BuilderShellSettings; set: (
 }
 function SpacingGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Spacing">{([["marginSmall", "Small margin"], ["marginDefault", "Default margin"], ["marginMedium", "Medium margin"], ["marginLarge", "Large margin"], ["marginXLarge", "Xlarge margin"], ["gridGutterSmall", "Small gutter"], ["gridGutterDefault", "Default gutter"], ["gridGutterMedium", "Medium gutter"], ["gridGutterLarge", "Large gutter"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
 function ControlGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Controls"><Length label="Small height" value={draft.controlHeightSmall} onChange={(value) => set("controlHeightSmall", value)} /><Length label="Default height" value={draft.controlHeightDefault} onChange={(value) => set("controlHeightDefault", value)} /><Length label="Large height" value={draft.controlHeightLarge} onChange={(value) => set("controlHeightLarge", value)} /></Group>; }
-function InfrastructureGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Z index"><Length label="Z index" value={draft.globalZIndex} onChange={(value) => set("globalZIndex", value)} units={[""]} /></Group><section className="builder-design-group"><h3>Breakpoints</h3><div className="builder-import-readonly"><strong>Fixed responsive tiers</strong><span>YOOtheme breakpoint values are intentionally unsupported until WebPages has one shared runtime breakpoint engine for Builder and frontend.</span></div></section></>; }
+function InfrastructureGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) {
+  const breakpointSettings = Object.fromEntries(RESPONSIVE_BREAKPOINT_KEYS.map((key) => [key, draft[key]])) as Pick<BuilderShellSettings, ResponsiveBreakpointKey>;
+  return <>
+    <Group title="Z index"><Length label="Z index" value={draft.globalZIndex} onChange={(value) => set("globalZIndex", value)} units={[""]} /></Group>
+    <Group title="Breakpoints">
+      <div className="builder-import-readonly"><strong>Global responsive tiers</strong><span>These editable UIkit/YOOtheme thresholds are inherited by responsive capability selections. Runtime adoption remains Phase 10 Batch 2.</span></div>
+      <Breakpoint label="Small" value={draft.breakpointSmall} settings={breakpointSettings} onChange={(value) => set("breakpointSmall", value)} />
+      <Breakpoint label="Medium" value={draft.breakpointMedium} settings={breakpointSettings} onChange={(value) => set("breakpointMedium", value)} />
+      <Breakpoint label="Large" value={draft.breakpointLarge} settings={breakpointSettings} onChange={(value) => set("breakpointLarge", value)} />
+      <Breakpoint label="XLarge" value={draft.breakpointXLarge} settings={breakpointSettings} onChange={(value) => set("breakpointXLarge", value)} />
+    </Group>
+  </>;
+}
 function ContainerGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Containers">{([["containerSmall", "Small"], ["containerDefault", "Default"], ["containerLarge", "Large"], ["containerXLarge", "Xlarge"], ["pageContainerMaxWidth", "Page max width"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
 
 function ButtonEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Appearance"><Color label="Primary background" value={draft.buttonPrimaryBackground} onChange={(value) => set("buttonPrimaryBackground", value)} /><Color label="Primary text" value={draft.buttonPrimaryText} onChange={(value) => set("buttonPrimaryText", value)} /><Color label="Default background" value={draft.buttonDefaultBackground} onChange={(value) => set("buttonDefaultBackground", value)} /><Color label="Default text" value={draft.buttonDefaultText} onChange={(value) => set("buttonDefaultText", value)} /><Color label="Secondary background" value={draft.buttonSecondaryBackground} onChange={(value) => set("buttonSecondaryBackground", value)} /><Color label="Secondary text" value={draft.buttonSecondaryText} onChange={(value) => set("buttonSecondaryText", value)} /><Color label="Primary hover background" value={draft.buttonHoverBg} onChange={(value) => set("buttonHoverBg", value)} /><Color label="Primary hover text" value={draft.buttonHoverTextColor} onChange={(value) => set("buttonHoverTextColor", value)} /><Color label="Default hover background" value={draft.buttonDefaultHoverBackground} onChange={(value) => set("buttonDefaultHoverBackground", value)} /><Color label="Default hover text" value={draft.buttonDefaultHoverText} onChange={(value) => set("buttonDefaultHoverText", value)} /><Color label="Secondary hover background" value={draft.buttonSecondaryHoverBackground} onChange={(value) => set("buttonSecondaryHoverBackground", value)} /><Color label="Secondary hover text" value={draft.buttonSecondaryHoverText} onChange={(value) => set("buttonSecondaryHoverText", value)} /><Color label="Text hover" value={draft.buttonTextHoverColor} onChange={(value) => set("buttonTextHoverColor", value)} /><Color label="Primary gradient" value={draft.buttonPrimaryGradient} onChange={(value) => set("buttonPrimaryGradient", value)} /></Group><Group title="Typography"><Length label="Default font size" value={draft.buttonFontSize} onChange={(value) => set("buttonFontSize", value)} /><Length label="Large font size" value={draft.buttonLargeFontSize} onChange={(value) => set("buttonLargeFontSize", value)} /><Length label="Letter spacing" value={draft.buttonLetterSpacing} onChange={(value) => set("buttonLetterSpacing", value)} /><Select label="Font family" value={draft.fontFamilyBody} options={["inherit", "Manrope", "Inter", "system-ui"]} onChange={(value) => set("fontFamilyBody", value)} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700"]} onChange={(value) => set("headingFontWeight", value)} /></Group><Group title="Sizing"><Length label="Small height" value={draft.controlHeightSmall} onChange={(value) => set("controlHeightSmall", value)} /><Length label="Default height" value={draft.buttonHeight} onChange={(value) => set("buttonHeight", value)} /><Length label="Large height" value={draft.controlHeightLarge} onChange={(value) => set("controlHeightLarge", value)} /><Length label="Horizontal padding" value={draft.buttonPaddingX} onChange={(value) => set("buttonPaddingX", value)} /><Length label="Radius" value={draft.buttonRadius} onChange={(value) => set("buttonRadius", value)} /><Length label="Border width" value={draft.buttonBorderWidth} onChange={(value) => set("buttonBorderWidth", value)} /><Length label="Transition" value={draft.buttonTransitionDuration} onChange={(value) => set("buttonTransitionDuration", value)} units={["s", "ms"]} /></Group><Group title="Elevation"><Shadow label="Default shadow" value={draft.buttonDefaultShadow} onChange={(value) => set("buttonDefaultShadow", value)} /><Shadow label="Default hover shadow" value={draft.buttonDefaultHoverShadow} onChange={(value) => set("buttonDefaultHoverShadow", value)} /><Shadow label="Primary shadow" value={draft.buttonPrimaryShadow} onChange={(value) => set("buttonPrimaryShadow", value)} /><Shadow label="Primary hover shadow" value={draft.buttonPrimaryHoverShadow} onChange={(value) => set("buttonPrimaryHoverShadow", value)} /></Group></>; }

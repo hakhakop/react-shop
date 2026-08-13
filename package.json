@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:header-browser": "playwright test tests/header-browser-parity.spec.ts",
     "test:yootheme-compat": "playwright test tests/yootheme-compatibility-harness.spec.ts",
+    "test:yootheme-compat:strict": "playwright test tests/yootheme-compatibility-registry.spec.ts tests/yootheme-import-report.spec.ts tests/yootheme-compatibility-harness.spec.ts tests/panel-slider-contract.spec.ts tests/yootheme-phase11-simple-elements.spec.ts tests/yootheme-phase11-accordion-table.spec.ts tests/yootheme-phase11-gallery.spec.ts tests/yootheme-fresh-import-acceptance.spec.ts tests/yootheme-compatibility-strict.spec.ts",
     "audit:builder-fidelity": "node scripts/audit-builder-fidelity.mjs"
   },
   "dependencies": {

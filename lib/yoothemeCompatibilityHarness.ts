@@ -144,6 +144,10 @@ export type SlideshowContentCompatibilityContract = {
     elementType: "slideshow";
     overlayPosition: string;
     overlayPadding: string;
+    navigationType: string;
+    navigationPosition: string;
+    navigationMargin: string;
+    navigationBreakpoint: string;
     titleElement: string;
     titleStyle: string;
     itemCount: number;
@@ -164,6 +168,18 @@ export type SlideshowContentCompatibilityContract = {
       centerOffsetYPx: number;
     };
     actionCount: number;
+    slidenav: {
+      widthPx: number;
+      heightPx: number;
+      insetPx: number;
+    };
+    dotnav: {
+      itemCount: number;
+      itemWidthPx: number;
+      itemHeightPx: number;
+      spacingPx: number;
+      bottomInsetPx: number;
+    };
   };
   tolerances: { geometryPx: number };
 };
@@ -184,6 +200,16 @@ export type SlideshowContentProbe = {
   titleColor: string;
   titleCenterOffsetYPx: number;
   actionCount: number;
+  slidenavUsesUikit: boolean;
+  slidenavWidthPx: number;
+  slidenavHeightPx: number;
+  slidenavInsetPx: number;
+  dotnavUsesUikit: boolean;
+  dotnavItemCount: number;
+  dotnavItemWidthPx: number;
+  dotnavItemHeightPx: number;
+  dotnavSpacingPx: number;
+  dotnavBottomInsetPx: number;
 };
 
 type YoothemeNode = {
@@ -604,6 +630,34 @@ export function validateSlideshowContentSource(
         : `FAIL: overlay padding expected ${contract.fixture.overlayPadding}, actual ${String(props?.overlay_padding ?? "default")}`,
     },
     {
+      id: "source.navigation",
+      passed: props?.nav === contract.fixture.navigationType,
+      message: props?.nav === contract.fixture.navigationType
+        ? `PASS: navigation ${contract.fixture.navigationType}`
+        : `FAIL: navigation expected ${contract.fixture.navigationType}, actual ${String(props?.nav)}`,
+    },
+    {
+      id: "source.navigation_position",
+      passed: props?.nav_position === contract.fixture.navigationPosition,
+      message: props?.nav_position === contract.fixture.navigationPosition
+        ? `PASS: navigation position ${contract.fixture.navigationPosition}`
+        : `FAIL: navigation position expected ${contract.fixture.navigationPosition}, actual ${String(props?.nav_position)}`,
+    },
+    {
+      id: "source.navigation_margin",
+      passed: props?.nav_position_margin === contract.fixture.navigationMargin,
+      message: props?.nav_position_margin === contract.fixture.navigationMargin
+        ? `PASS: navigation margin ${contract.fixture.navigationMargin}`
+        : `FAIL: navigation margin expected ${contract.fixture.navigationMargin}, actual ${String(props?.nav_position_margin)}`,
+    },
+    {
+      id: "source.navigation_breakpoint",
+      passed: props?.nav_breakpoint === "s" && contract.fixture.navigationBreakpoint === "small",
+      message: props?.nav_breakpoint === "s" && contract.fixture.navigationBreakpoint === "small"
+        ? "PASS: navigation breakpoint small"
+        : `FAIL: navigation breakpoint expected small/s, actual ${String(props?.nav_breakpoint)}`,
+    },
+    {
       id: "source.title_element",
       passed: String(props?.title_element ?? "h3") === contract.fixture.titleElement,
       message: String(props?.title_element ?? "h3") === contract.fixture.titleElement
@@ -627,8 +681,11 @@ export function evaluateSlideshowContentContract(
   const tolerance = contract.tolerances.geometryPx;
   const expectedClass = `shop-builder-slideshow-overlay--${contract.reference.overlayPosition}`;
   const colorChannels = probe.titleColor.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
-  const titleIsDark = colorChannels.length === 3 &&
-    (colorChannels[0]! * 0.2126 + colorChannels[1]! * 0.7152 + colorChannels[2]! * 0.0722) < 128;
+  const expectedTitleChannels = contract.reference.title.color
+    .match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+  const titleColorMatchesGlobalContext = colorChannels.length === 3 &&
+    expectedTitleChannels.length === 3 &&
+    colorChannels.every((channel, index) => Math.abs(channel - expectedTitleChannels[index]!) <= 1);
   return report(contract.id, [
     {
       id: "persisted.overlay_position",
@@ -683,12 +740,12 @@ export function evaluateSlideshowContentContract(
     },
     {
       id: "title.color",
-      // The reference color is the synchronized DevStack token. Compatibility
-      // owns the semantic dark context here; the active Global heading token
-      // remains authoritative for the exact site-specific RGB value.
-      passed: titleIsDark && probe.rootClasses.includes("shop-builder-slideshow-text--dark"),
-      message: titleIsDark && probe.rootClasses.includes("shop-builder-slideshow-text--dark")
-        ? `PASS: title uses dark semantic context (${probe.titleColor}; DevStack reference ${contract.reference.title.color})`
+      // A source item with no explicit text_color inherits Global Typography's
+      // emphasis token. A component-only "dark" class would be a parallel,
+      // and incorrect, ownership path.
+      passed: titleColorMatchesGlobalContext,
+      message: titleColorMatchesGlobalContext
+        ? `PASS: title inherits Global emphasis color ${probe.titleColor}`
         : `FAIL: title expected dark semantic context (DevStack ${contract.reference.title.color}), actual ${probe.titleColor}`,
     },
     geometryCheck("title.vertical-position", "title center offset", probe.titleCenterOffsetYPx, contract.reference.title.centerOffsetYPx, tolerance),
@@ -699,6 +756,34 @@ export function evaluateSlideshowContentContract(
         ? `PASS: action count ${probe.actionCount}`
         : `FAIL: action count expected ${contract.reference.actionCount}, actual ${probe.actionCount}`,
     },
+    {
+      id: "slidenav.uikit",
+      passed: probe.slidenavUsesUikit,
+      message: probe.slidenavUsesUikit
+        ? "PASS: slidenav uses UIkit classes"
+        : "FAIL: slidenav is missing UIkit classes",
+    },
+    geometryCheck("slidenav.width", "slidenav width", probe.slidenavWidthPx, contract.reference.slidenav.widthPx, tolerance),
+    geometryCheck("slidenav.height", "slidenav height", probe.slidenavHeightPx, contract.reference.slidenav.heightPx, tolerance),
+    geometryCheck("slidenav.inset", "slidenav frame inset", probe.slidenavInsetPx, contract.reference.slidenav.insetPx, tolerance),
+    {
+      id: "dotnav.uikit",
+      passed: probe.dotnavUsesUikit,
+      message: probe.dotnavUsesUikit
+        ? "PASS: dotnav uses UIkit classes and item structure"
+        : "FAIL: dotnav is missing UIkit classes/item structure",
+    },
+    {
+      id: "dotnav.count",
+      passed: probe.dotnavItemCount === contract.reference.dotnav.itemCount,
+      message: probe.dotnavItemCount === contract.reference.dotnav.itemCount
+        ? `PASS: dotnav item count ${probe.dotnavItemCount}`
+        : `FAIL: dotnav item count expected ${contract.reference.dotnav.itemCount}, actual ${probe.dotnavItemCount}`,
+    },
+    geometryCheck("dotnav.width", "dotnav item width", probe.dotnavItemWidthPx, contract.reference.dotnav.itemWidthPx, tolerance),
+    geometryCheck("dotnav.height", "dotnav item height", probe.dotnavItemHeightPx, contract.reference.dotnav.itemHeightPx, tolerance),
+    geometryCheck("dotnav.spacing", "dotnav spacing", probe.dotnavSpacingPx, contract.reference.dotnav.spacingPx, tolerance),
+    geometryCheck("dotnav.bottom-inset", "dotnav frame bottom inset", probe.dotnavBottomInsetPx, contract.reference.dotnav.bottomInsetPx, tolerance),
   ]);
 }
 

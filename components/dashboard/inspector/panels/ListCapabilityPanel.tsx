@@ -17,6 +17,8 @@ import {
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { ContentSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -112,15 +114,14 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             onReorder={reorderItems}
             renderItem={(item, index) => (
               <>
-                <InspectorFieldRow label="Text">
-                  <InspectorTextField
+                <InspectorFieldRow label="Content">
+                  <RichTextEditor
                     value={item.text}
                     onChange={(value) =>
                       updateItems(
                         items.map((entry, itemIndex) => (itemIndex === index ? { ...entry, text: value } : entry))
                       )
                     }
-                    ariaLabel={`List item ${index + 1} text`}
                   />
                 </InspectorFieldRow>
                 <InspectorFieldRow label="Link URL">
@@ -190,44 +191,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="list-advanced">
-        <InspectorDivision title="ADVANCED">
-          <InspectorFieldRow label="ID">
-            <InspectorTextField
-              value={(block as any).customId ?? block.id ?? ""}
-              onChange={(v) => update({ customId: v, id: v } as any)}
-              placeholder="e.g. features-list"
-              ariaLabel="Custom ID"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Class">
-            <InspectorTextField
-              value={(block as any).customClass ?? ""}
-              onChange={(v) => update({ customClass: v } as any)}
-              placeholder="e.g. my-custom-list"
-              ariaLabel="Custom Class"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Attributes">
-            <InspectorTextField
-              value={(block as any).customAttributes ?? ""}
-              onChange={(v) => update({ customAttributes: v } as any)}
-              placeholder='data-custom="value"'
-              ariaLabel="Custom Attributes"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom CSS">
-            <InspectorTextarea
-              value={(block as any).customCss ?? ""}
-              onChange={(v) => update({ customCss: v } as any)}
-              placeholder="/* CSS rules */"
-              ariaLabel="Custom CSS"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-      </div>
-    );
+    return <ElementAdvancedPanel block={block} update={update} />;
   }
 
   // SETTINGS TAB (Default)
@@ -242,6 +206,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
       />
 
       <InspectorDivision title="LIST">
+        <InspectorFieldRow label="Type"><InspectorSelect value={(block as any).listType ?? "vertical"} options={[{ value: "vertical", label: "Vertical" }, { value: "horizontal", label: "Horizontal" }]} onChange={(value) => update({ listType: value } as any)} ariaLabel="List type" /></InspectorFieldRow>
         <InspectorFieldRow label="Presentation">
           <InspectorSelect
             value={block.listPresentation ?? "default"}
@@ -258,6 +223,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             ariaLabel="List marker"
           />
         </InspectorFieldRow>
+        <InspectorFieldRow label="Marker Color"><InspectorSelect value={(block as any).listMarkerColor ?? ""} options={[{ value: "", label: "None" }, { value: "muted", label: "Muted" }, { value: "emphasis", label: "Emphasis" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }]} onChange={(value) => update({ listMarkerColor: value || undefined } as any)} ariaLabel="List marker color" /></InspectorFieldRow>
         <InspectorFieldRow label="Alignment">
           <InspectorAlignmentControl
             value={block.listAlign ?? "left"}
@@ -273,9 +239,14 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             ariaLabel="List spacing"
           />
         </InspectorFieldRow>
+        {(block as any).listType === "horizontal" ? <InspectorFieldRow label="Separator"><InspectorTextField value={(block as any).listHorizontalSeparator ?? ", "} onChange={(value) => update({ listHorizontalSeparator: value } as any)} ariaLabel="List horizontal separator" /></InspectorFieldRow> : <>
+          <InspectorFieldRow label="HTML Element"><InspectorSelect value={(block as any).listElement ?? "ul"} options={[{ value: "ul", label: "ul" }, { value: "ol", label: "ol" }]} onChange={(value) => update({ listElement: value } as any)} ariaLabel="List HTML Element" /></InspectorFieldRow>
+          <InspectorFieldRow label="Wrap with nav"><label className="builder-inspector-checkbox-row"><input type="checkbox" checked={(block as any).listWrapNav === true} onChange={(event) => update({ listWrapNav: event.target.checked } as any)} /><span>Wrap with nav element</span></label></InspectorFieldRow>
+        </>}
       </InspectorDivision>
 
       <InspectorDivision title="ICON">
+        <InspectorFieldRow label="Show icon"><label className="builder-inspector-checkbox-row"><input type="checkbox" checked={(block as any).listShowImage !== false} onChange={(event) => update({ listShowImage: event.target.checked } as any)} /><span>Show icon</span></label></InspectorFieldRow>
         <InspectorFieldRow label="Default Icon">
           <IconPicker
             value={block.listIcon}
@@ -292,6 +263,11 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             ariaLabel="List icon size"
           />
         </InspectorFieldRow>
+        <InspectorFieldRow label="Color"><InspectorSelect value={(block as any).listIconColor ?? ""} options={[{ value: "", label: "None" }, { value: "muted", label: "Muted" }, { value: "emphasis", label: "Emphasis" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }, { value: "success", label: "Success" }, { value: "warning", label: "Warning" }, { value: "danger", label: "Danger" }]} onChange={(value) => update({ listIconColor: value || undefined } as any)} ariaLabel="List icon color" /></InspectorFieldRow>
+      </InspectorDivision>
+      <InspectorDivision title="LINK">
+        <InspectorFieldRow label="Show link"><label className="builder-inspector-checkbox-row"><input type="checkbox" checked={(block as any).listShowLink !== false} onChange={(event) => update({ listShowLink: event.target.checked } as any)} /><span>Show the link</span></label></InspectorFieldRow>
+        <InspectorFieldRow label="Style"><InspectorSelect value={(block as any).listLinkStyle ?? "default"} options={[{ value: "default", label: "None" }, { value: "muted", label: "Muted" }, { value: "text", label: "Text" }, { value: "heading", label: "Heading" }, { value: "reset", label: "Reset" }]} onChange={(value) => update({ listLinkStyle: value } as any)} ariaLabel="List link style" /></InspectorFieldRow>
       </InspectorDivision>
     </div>
   );

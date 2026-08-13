@@ -399,11 +399,13 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
     ...(positioned && layout.bottom?.trim() ? { bottom: layout.bottom.trim() } : {}),
     ...(positioned && layout.left?.trim() ? { left: layout.left.trim() } : {}),
     ...(positioned && layout.zIndex !== undefined ? { zIndex: layout.zIndex } : {}),
-    ...(layout.textAlign ? { textAlign: layout.textAlign } : {}),
+    // Responsive General alignment is emitted by the page breakpoint policy.
+    // An inline style would otherwise win before its semantic tier activates.
+    ...(layout.textAlign && !layout.textAlignBreakpoint ? { textAlign: layout.textAlign } : {}),
     ...(maxWidthValue ? { maxWidth: maxWidthValue } : {}),
-    ...(layout.blockAlign === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
-    ...(layout.blockAlign === "right" ? { marginLeft: "auto" } : {}),
-    ...(layout.blockAlign === "left" ? { marginRight: "auto" } : {}),
+    ...(!layout.blockAlignBreakpoint && layout.blockAlign === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
+    ...(!layout.blockAlignBreakpoint && layout.blockAlign === "right" ? { marginLeft: "auto" } : {}),
+    ...(!layout.blockAlignBreakpoint && layout.blockAlign === "left" ? { marginRight: "auto" } : {}),
     ...(marginValue ? { marginTop: marginValue, marginBottom: marginValue } : {}),
     ...(layout.removeTopMargin ? { marginTop: 0 } : {}),
     ...(layout.removeBottomMargin ? { marginBottom: 0 } : {}),
@@ -415,14 +417,16 @@ export function builderGeneralVisibilityClassName(value?: string): string {
   if (!value || value === "always") return "";
   const normalized = value === "s" ? "visible-s" : value === "m" ? "visible-m" : value === "l" ? "visible-l" : value === "xl" ? "visible-xl" : value;
   const visibilityMap: Record<string, string> = {
-    "visible-s": "uk-visible@s",
-    "visible-m": "uk-visible@m",
-    "visible-l": "uk-visible@l",
-    "visible-xl": "uk-visible@xl",
-    "hidden-s": "uk-hidden@s",
-    "hidden-m": "uk-hidden@m",
-    "hidden-l": "uk-hidden@l",
-    "hidden-xl": "uk-hidden@xl",
+    // These intentionally avoid UIkit's static `@s/@m/...` classes. The
+    // rendered-page policy emits their thresholds from Global Styles.
+    "visible-s": "builder-general-visible-from-small",
+    "visible-m": "builder-general-visible-from-medium",
+    "visible-l": "builder-general-visible-from-large",
+    "visible-xl": "builder-general-visible-from-xlarge",
+    "hidden-s": "builder-general-hidden-from-small",
+    "hidden-m": "builder-general-hidden-from-medium",
+    "hidden-l": "builder-general-hidden-from-large",
+    "hidden-xl": "builder-general-hidden-from-xlarge",
   };
   return visibilityMap[normalized] ?? "";
 }

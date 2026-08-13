@@ -12,6 +12,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import { ImageSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -23,6 +24,7 @@ type Props = {
 
 export default function ImageCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const image = block;
+  const isImportedYoothemeImage = image.spacingContract === "yootheme" || image.id?.startsWith("yootheme-image-");
 
   // CONTENT TAB
   if (tab === "content") {
@@ -79,26 +81,28 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Image Caption"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Make SVG stylable with CSS">
-            <input
-              type="checkbox"
-              checked={image.imageSvgInline === true}
-              onChange={(event) => update({ imageSvgInline: event.target.checked || undefined })}
-              aria-label="Make SVG stylable with CSS"
-            />
-          </InspectorFieldRow>
-          {image.imageSvgInline === true && <InspectorFieldRow label="SVG color">
-            <InspectorSelect
-              value={image.imageSvgColor ?? "primary"}
-              options={[
-                { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" },
-                { value: "default", label: "Default" }, { value: "muted", label: "Muted" },
-                { value: "inverse", label: "Inverse" },
-              ]}
-              onChange={(value) => update({ imageSvgColor: value })}
-              ariaLabel="SVG color"
-            />
-          </InspectorFieldRow>}
+          {!isImportedYoothemeImage && <>
+            <InspectorFieldRow label="Make SVG stylable with CSS">
+              <input
+                type="checkbox"
+                checked={image.imageSvgInline === true}
+                onChange={(event) => update({ imageSvgInline: event.target.checked || undefined })}
+                aria-label="Make SVG stylable with CSS"
+              />
+            </InspectorFieldRow>
+            {image.imageSvgInline === true && <InspectorFieldRow label="SVG color">
+              <InspectorSelect
+                value={image.imageSvgColor ?? "primary"}
+                options={[
+                  { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" },
+                  { value: "default", label: "Default" }, { value: "muted", label: "Muted" },
+                  { value: "inverse", label: "Inverse" },
+                ]}
+                onChange={(value) => update({ imageSvgColor: value })}
+                ariaLabel="SVG color"
+              />
+            </InspectorFieldRow>}
+          </>}
         </InspectorDivision>
 
         <InspectorDivision title="LINK">
@@ -168,7 +172,16 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
   // SETTINGS TAB (Default)
   return (
     <div className="builder-inspector-stack" data-uikit-capability="image-style">
-      <ImageSettingsGroup block={block} update={update} showDimensions={false} showFrameControls={false} />
+      <ImageSettingsGroup
+        block={block}
+        update={update}
+        showDimensions={false}
+        showFrameControls={false}
+        showAlignment={!isImportedYoothemeImage}
+        showSvgControls={isImportedYoothemeImage}
+        svgColorLabel="SVG Color"
+        svgColorOptions={isImportedYoothemeImage ? UIKIT_YOOTHEME_SVG_COLOR_OPTIONS : undefined}
+      />
     </div>
   );
 }

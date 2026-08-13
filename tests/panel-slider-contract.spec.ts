@@ -13,7 +13,6 @@ const panelSliderTypeContractCheck: {
   carouselSettings: Pick<NonNullable<BuilderSection["carouselSettings"]>,
     | "imageWidth" | "imageHeight" | "imageSvgInline" | "imageSvgColor"
     | "metaPosition" | "metaHtmlElement" | "metaStyle"
-    | "navigationBreakpoint" | "slidenavOutsideBreakpoint"
   >;
   slide: Pick<NonNullable<BuilderSection["slides"]>[number],
     | "meta" | "imageWidth" | "imageHeight" | "imageSvgInline" | "imageSvgColor"
@@ -24,7 +23,6 @@ const panelSliderTypeContractCheck: {
   carouselSettings: {
     imageWidth: "58", imageHeight: "240", imageSvgInline: true, imageSvgColor: "emphasis",
     metaPosition: "below-title", metaHtmlElement: "div", metaStyle: "text-meta",
-    navigationBreakpoint: "large", slidenavOutsideBreakpoint: "xlarge",
   },
   slide: {
     meta: "Meta", imageWidth: "280", imageHeight: "140", imageSvgInline: true, imageSvgColor: "emphasis",
@@ -47,6 +45,16 @@ test("Panel Slider Settings does not compose a duplicate text-alignment control"
     "utf8",
   );
   expect(source).not.toContain('label="Text alignment"');
+});
+
+test("Panel Slider outside slidenav never consumes the auto-width track viewport", () => {
+  const css = readFileSync(
+    path.join(process.cwd(), "app/styles/shop-builder.css"),
+    "utf8",
+  );
+  expect(css).toContain(".shop-builder-swiper--panel.shop-builder-arrow-pos--outer {\n  padding-inline: 0;");
+  expect(css).toContain("left: calc(-36px - var(--shop-builder-panel-slidenav-inset)) !important;");
+  expect(css).toContain("right: calc(-36px - var(--shop-builder-panel-slidenav-inset)) !important;");
 });
 
 test("Panel Slider maps its element-level UIkit contract without per-item Card defaults", () => {
@@ -78,11 +86,15 @@ test("Panel Slider maps its element-level UIkit contract without per-item Card d
     imageWidth: "58", imageHeight: "240", imageLoading: "eager", imageSvgInline: true,
     imageSvgColor: "emphasis", imageShape: "rounded", itemWidthMode: "auto", cardsPerViewPhone: 1,
     cardsPerViewMedium: 3, cardsPerViewXLarge: 6, showArrows: true, showDots: false,
-    arrowPosition: "outside", slidenavBreakpoint: "xlarge", navigationBreakpoint: "large", slidenavOutsideBreakpoint: "xlarge", loop: false, divider: true,
+    arrowPosition: "outer", slidenavBreakpoint: "xlarge", loop: false, divider: true,
+    panelStyle: "primary", panelSize: "large", panelHover: true,
   });
-  expect(block.slides[0]).toMatchObject({ title: "API", text: "Copy", panelStyle: "primary", panelSize: "large", panelHover: true });
+  expect(block.slides[0]).toMatchObject({ title: "API", text: "Copy" });
   expect(block.slides[0]).not.toHaveProperty("imageWidth");
   expect(block.slides[0]).not.toHaveProperty("imageHeight");
+  expect(block.slides[0]).not.toHaveProperty("panelStyle");
+  expect(block.slides[0]).not.toHaveProperty("panelSize");
+  expect(block.slides[0]).not.toHaveProperty("panelHover");
   expect(block.carouselSettings.divider).toBe(true);
   expect(block.carouselSettings).not.toHaveProperty("imageAlignment");
   expect(block.carouselSettings).not.toHaveProperty("contentAlign");
@@ -165,22 +177,24 @@ test("Panel Slider Auto is content-sized and does not apply persisted fraction w
   });
 });
 
-test("Panel Slider Fixed applies UIkit breakpoints and inherits omitted widths", () => {
+test("Panel Slider Fixed uses the canonical responsive policy and inherits omitted widths", () => {
   expect(resolvePanelSliderRuntime({
     itemWidthMode: "fixed",
     cardsPerViewPhone: 1,
     cardsPerViewMedium: 3,
     cardsPerViewXLarge: 6,
+  }, {
+    small: 700, medium: 1000, large: 1280, xlarge: 1680, id: "custom",
   })).toMatchObject({
     mode: "fixed",
     slidesPerView: 1,
     counts: { base: 1, small: 1, medium: 3, large: 3, xlarge: 6 },
     breakpoints: {
-      320: { slidesPerView: 1 },
-      640: { slidesPerView: 1 },
-      960: { slidesPerView: 3 },
-      1200: { slidesPerView: 3 },
-      1600: { slidesPerView: 6 },
+      0: { slidesPerView: 1 },
+      700: { slidesPerView: 1 },
+      1000: { slidesPerView: 3 },
+      1280: { slidesPerView: 3 },
+      1680: { slidesPerView: 6 },
     },
   });
 });
@@ -227,8 +241,9 @@ test("Panel Slider keeps element typography and actions canonical while preservi
   expect(block.slides[0]).toMatchObject({
     headingLevel: "h4", headingSize: "small", gridMetaAlign: "above-title",
     metaHtmlElement: "span", metaStyle: "meta", buttonStyle: "text",
-    buttonSize: "small", buttonTarget: "_blank", linkPanel: true,
+    buttonSize: "small", buttonTarget: "_blank",
   });
+  expect(block.slides[0]).not.toHaveProperty("linkPanel");
   expect(block.slides[0].text).toContain("<strong>HTML</strong>");
   expect(block.slides[0].text).not.toContain("<script");
 });

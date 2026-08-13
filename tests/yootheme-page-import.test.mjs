@@ -257,7 +257,7 @@ test("YOOtheme Grid image and responsive settings map to the canonical Grid cont
               grid_row_gap: "small",
               grid_divider: true,
               grid_column_align: true,
-              grid_row_align: true,
+              grid_row_align: false,
               image_width: "68",
               image_height: "auto",
               image_loading: true,
@@ -277,11 +277,12 @@ test("YOOtheme Grid image and responsive settings map to the canonical Grid cont
   const grid = mapping.sections[0].layoutItems[0].blocks[0];
   assert.equal(grid.columnsPhonePortrait, "1");
   assert.equal(grid.columnsPhoneLandscape, "2");
-  assert.equal(grid.columnsDesktop, "3");
+  assert.equal(grid.columnsTabletLandscape, "3");
   assert.equal(grid.gridGap, "large");
   assert.equal(grid.gridRowGap, "small");
   assert.equal(grid.showDividers, true);
-  assert.equal(grid.centerRows, true);
+  assert.equal(grid.centerColumns, true);
+  assert.equal(grid.centerRows, false);
   assert.equal(grid.gridMediaWidth, "large");
   assert.equal(grid.imageMaxWidth, 68);
   assert.equal(grid.imageLoading, "eager");

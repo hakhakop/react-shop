@@ -84,6 +84,9 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   const imageAttributes = getUikitImageAttributes(imageSemantics);
   const imageClass = `${getUikitImageClass(imageSemantics)} el-image`.trim();
   const figureClass = getUikitImageWrapperClass(imageSemantics);
+  const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
+    ? `uk-background-${rawBlock.imageBoxDecoration}`
+    : "";
   const isPlaceholder = !rawBlock.imageUrl || !rawBlock.imageUrl.trim();
   // Framed media deliberately clips cover/ratio content. An explicit element
   // Advanced stylesheet may intentionally move `.el-image` outside that frame
@@ -95,6 +98,14 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   // 3:2 ratio before the real asset can define its natural geometry.
   const usesIntrinsicGeometry = !imageStyle.aspectRatio && !imageStyle.height;
   const isStylableSvg = rawBlock.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(rawBlock.imageUrl ?? "");
+  // YOOtheme only turns Image sizing into a frame when width, height, or
+  // ratio is authored. A site-level Image-fit default must not turn an
+  // otherwise un-sized inline SVG into width:100% / height:100% media.
+  // Keep the source SVG's intrinsic root/viewBox geometry in that case.
+  const preserveIntrinsicSvgSize = isStylableSvg
+    && !imageStyle.width
+    && !imageStyle.height
+    && !imageStyle.aspectRatio;
   const svgColor = getUikitSvgColor(rawBlock.imageSvgColor);
   const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
   const usesContextualSvgColor = Boolean(svgColorClass);
@@ -109,12 +120,17 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
       alt={rawBlock.imageAlt}
       className={`${imageClass} ${svgColorClass}`.trim()}
       color={usesContextualSvgColor ? undefined : svgColor}
-      fit={imageSemantics.fit === "cover" || imageSemantics.fit === "fill" ? imageSemantics.fit : "contain"}
+      fit={preserveIntrinsicSvgSize
+        ? "contain"
+        : imageSemantics.fit === "cover" || imageSemantics.fit === "fill"
+          ? imageSemantics.fit
+          : "contain"}
       loading={imageLoading}
+      preserveIntrinsicSize={preserveIntrinsicSvgSize}
       fallback={fallbackImage}
       style={{
-        width: "100%",
-        height: imageStyle.aspectRatio ? "100%" : "auto",
+        width: preserveIntrinsicSvgSize ? undefined : "100%",
+        height: imageStyle.aspectRatio ? "100%" : preserveIntrinsicSvgSize ? undefined : "auto",
         aspectRatio: imageStyle.aspectRatio,
         position: imageStyle.position,
         inset: imageStyle.inset,
@@ -152,7 +168,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
         }}
       >
         <div
-          className={`shop-builder-image-media ${hasAdvancedCss ? "has-advanced-css" : ""} ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
+          className={`shop-builder-image-media ${imageDecorationClass} ${hasAdvancedCss ? "has-advanced-css" : ""} ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
             isPlaceholder ? "is-empty" : ""
           }`}
           data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
@@ -165,7 +181,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
           {!isPlaceholder ? (
             <>
               {rawBlock.imageLinkUrl ? (
-                <a href={rawBlock.imageLinkUrl} {...builderLinkTargetProps(rawBlock.imageLinkTarget)}>
+                <a className="el-link" href={rawBlock.imageLinkUrl} {...builderLinkTargetProps(rawBlock.imageLinkTarget)}>
                   {renderImage()}
                 </a>
               ) : (

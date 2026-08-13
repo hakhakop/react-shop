@@ -8,6 +8,10 @@
     "elementType": "slideshow",
     "overlayPosition": "center-left",
     "overlayPadding": "default",
+    "navigationType": "dotnav",
+    "navigationPosition": "bottom-center",
+    "navigationMargin": "medium",
+    "navigationBreakpoint": "small",
     "titleElement": "h3",
     "titleStyle": "",
     "itemCount": 4,
@@ -27,7 +31,19 @@
       "color": "rgb(13, 10, 70)",
       "centerOffsetYPx": 0
     },
-    "actionCount": 0
+    "actionCount": 0,
+    "slidenav": {
+      "widthPx": 48,
+      "heightPx": 48,
+      "insetPx": 30
+    },
+    "dotnav": {
+      "itemCount": 4,
+      "itemWidthPx": 12,
+      "itemHeightPx": 12,
+      "spacingPx": 12,
+      "bottomInsetPx": 30
+    }
   },
   "tolerances": { "geometryPx": 1 }
 }

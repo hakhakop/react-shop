@@ -259,8 +259,8 @@ export function InspectorSwitch({ checked, onChange, label, disabled = false }: 
   return <label className="inspector-switch"><input type="checkbox" role="switch" aria-label={label} checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} /><span className="inspector-switch-track" aria-hidden="true"><span /></span>{label && <span className="inspector-switch-label">{label}</span>}</label>;
 }
 
-export function InspectorTextField({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
-  return <input className="inspector-control inspector-text-field" aria-label={ariaLabel} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />;
+export function InspectorTextField({ value, onChange, placeholder, ariaLabel, disabled = false }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string; disabled?: boolean }) {
+  return <input className="inspector-control inspector-text-field" aria-label={ariaLabel} value={value} placeholder={placeholder} disabled={disabled} onChange={(event) => onChange(event.target.value)} />;
 }
 
 export function InspectorTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {

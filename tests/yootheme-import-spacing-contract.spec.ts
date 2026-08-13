@@ -4,6 +4,10 @@ import {
   getGeneralElementShellStyle,
 } from "@/lib/builderElementShell";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import {
+  renderResponsiveBreakpointPolicyCss,
+  resolveResponsiveBreakpointPolicy,
+} from "@/lib/responsiveBreakpointPolicy";
 
 const fixture = {
   type: "layout",
@@ -51,6 +55,7 @@ test("YOOtheme imports own spacing once on the canonical General shell", () => {
   ]);
 
   expect(getGeneralElementShellStyle(blocks[2])).toMatchObject({ padding: "0px" });
+  expect(getGeneralElementShellStyle(blocks[1]).margin).toBeUndefined();
   expect(getGeneralElementShellClassName(blocks[1])).toContain("uk-margin");
   expect(getGeneralElementShellClassName(blocks[2])).toContain("uk-margin-medium");
   expect(getGeneralElementShellClassName(blocks[3])).toContain("uk-margin-xlarge");
@@ -72,4 +77,53 @@ test("legacy imported documents use the same compatibility spacing contract", ()
   };
   expect(getGeneralElementShellStyle(legacy)).toMatchObject({ padding: "0px" });
   expect(getGeneralElementShellClassName(legacy)).toContain("uk-margin-medium");
+});
+
+test("YOOtheme General max width uses UIkit width utilities, not container tiers", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [{
+            type: "text",
+            props: {
+              content: "Enterprise8 xlarge text",
+              maxwidth: "xlarge",
+              block_align: "center",
+            },
+          }],
+        }],
+      }],
+    }],
+  });
+  const text = mapped.sections[0].layoutItems?.[0]?.blocks?.[0]!;
+
+  expect(getGeneralElementShellClassName(text)).toContain("uk-width-xlarge");
+  expect(getGeneralElementShellStyle(text)).toMatchObject({
+    padding: "0px",
+    marginLeft: "auto",
+    marginRight: "auto",
+  });
+  expect(getGeneralElementShellStyle(text).maxWidth).toBeUndefined();
+
+  const css = renderResponsiveBreakpointPolicyCss(resolveResponsiveBreakpointPolicy());
+  expect(css).toContain("builder-yootheme-width-xlarge-from-medium");
+  expect(css).toContain("--uk-width-xlarge-width,600px");
+});
+
+test("YOOtheme Grid column and row alignment keep their separate UIkit owners", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "grid",
+      props: { grid_column_align: false, grid_row_align: true },
+      children: [],
+    }] }] }] }],
+  });
+  const grid = mapped.sections[0].layoutItems?.[0]?.blocks?.[0] as any;
+  expect(grid).toMatchObject({ centerColumns: false, centerRows: true });
 });

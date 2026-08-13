@@ -11,6 +11,7 @@ const WORDPRESS_UPLOAD_PATH = /^(?:\/)?wp-content\/uploads(?:\/|$)/i;
 
 const MEDIA_URL_KEYS = new Set([
   "imageUrl",
+  "thumbnailUrl",
   "image",
   "imageSrc",
   "hoverImageUrl",

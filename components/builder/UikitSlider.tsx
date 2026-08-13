@@ -7,6 +7,7 @@ import { resolveCarouselContentAlignment, resolveCarouselPresentation } from "@/
 import CarouselBlock, { type CarouselSlide } from "@/components/blocks/CarouselBlock";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { Typog } from "@/components/builder/BuilderRenderHelpers";
+import { resolveResponsiveBreakpointPolicy } from "@/lib/responsiveBreakpointPolicy";
 
 type Props = {
   block: any;
@@ -39,6 +40,7 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
 export default function UikitSlider({ block, panelMode = false, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
   const rawCarouselSettings = rawBlock.carouselSettings ?? {};
+  const breakpointPolicy = resolveResponsiveBreakpointPolicy(shellSettings);
   // Do not let the retired Panel Slider-specific persisted field reach the
   // shared carousel runtime. General is its single canonical owner.
   const { contentAlign: _retiredPanelContentAlign, ...panelCarouselSettings } = rawCarouselSettings;
@@ -164,6 +166,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
           fieldGroupName: "ReactBuilderColumnSlider",
         }}
         slides={carousel.slides}
+        breakpointPolicy={breakpointPolicy}
         settings={
           panelMode
             ? {

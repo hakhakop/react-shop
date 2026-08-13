@@ -1,7 +1,7 @@
 "use client";
 
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
-import { getUikitButtonClass } from "@/lib/uikitTokens";
+import { getUikitButtonClass, getUikitButtonLocalOverride } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 
 type Props = {
@@ -29,6 +29,17 @@ export default function UikitButton({ block }: Props) {
   // it, so the inspector and the rendered content have one source of truth.
   const hasCanonicalItems = Array.isArray(rawBlock.buttons);
   const buttonsList = hasCanonicalItems ? rawBlock.buttons : [];
+  const localOverride = getUikitButtonLocalOverride(rawBlock);
+  const isImportedYoothemeButton = rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
+  const actionClassName = (style: string | undefined, size: string | undefined) =>
+    `${getUikitButtonClass(
+      // Historic native documents used `link` as a Text-button alias before
+      // YOOtheme Link became a distinct, bare-`uk-button` source semantic.
+      // Preserve that native alias without allowing it to collapse imported
+      // YOOtheme Button items.
+      !isImportedYoothemeButton && style === "link" ? "native-link" : style,
+      size,
+    )} ${localOverride.className} ${isFullWidth ? "uk-width-1-1" : ""}`.trim();
 
   return (
     <div
@@ -41,8 +52,9 @@ export default function UikitButton({ block }: Props) {
       >
         {!hasCanonicalItems && rawBlock.buttonLabel && (
           <a
-            className={`${getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)} ${isFullWidth ? "uk-width-1-1" : ""}`.trim()}
+            className={actionClassName(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
             href={rawBlock.buttonUrl || "#"}
+            style={localOverride.style}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
           >
             {rawBlock.buttonLabel}
@@ -51,8 +63,9 @@ export default function UikitButton({ block }: Props) {
         {buttonsList.map((btn: any, btnIdx: number) => (
           <a
             key={btn.id ?? btnIdx}
-            className={`${getUikitButtonClass(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)} ${isFullWidth ? "uk-width-1-1" : ""}`.trim()}
+            className={actionClassName(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)}
             href={btn.url || "#"}
+            style={localOverride.style}
             {...builderLinkTargetProps(btn.target)}
           >
             {btn.label || btn.text || `Button ${btnIdx + 1}`}

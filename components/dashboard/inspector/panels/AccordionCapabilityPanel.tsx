@@ -14,6 +14,8 @@ import {
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 import {
   ActionSettingsGroup,
   CONTENT_STYLE_OPTIONS,
@@ -168,10 +170,9 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
                         />
                       </InspectorFieldRow>
                       <InspectorFieldRow label="Content">
-                        <InspectorTextarea
+                        <RichTextEditor
                           value={item.content}
                           onChange={(value) => updateItem(index, { content: value })}
-                          ariaLabel={`Accordion item ${index + 1} content`}
                         />
                       </InspectorFieldRow>
                     </div>
@@ -301,44 +302,7 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="accordion-advanced">
-        <InspectorDivision title="ADVANCED">
-          <InspectorFieldRow label="ID">
-            <InspectorTextField
-              value={(block as any).customId ?? block.id ?? ""}
-              onChange={(v) => update({ customId: v, id: v } as any)}
-              placeholder="e.g. faq-accordion"
-              ariaLabel="Custom ID"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Class">
-            <InspectorTextField
-              value={(block as any).customClass ?? ""}
-              onChange={(v) => update({ customClass: v } as any)}
-              placeholder="e.g. my-custom-accordion"
-              ariaLabel="Custom Class"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Attributes">
-            <InspectorTextField
-              value={(block as any).customAttributes ?? ""}
-              onChange={(v) => update({ customAttributes: v } as any)}
-              placeholder='data-custom="value"'
-              ariaLabel="Custom Attributes"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom CSS">
-            <InspectorTextarea
-              value={(block as any).customCss ?? ""}
-              onChange={(v) => update({ customCss: v } as any)}
-              placeholder="/* CSS rules */"
-              ariaLabel="Custom CSS"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-      </div>
-    );
+    return <ElementAdvancedPanel block={block} update={update} />;
   }
 
   // SETTINGS TAB (Default)

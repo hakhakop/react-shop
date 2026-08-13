@@ -32,6 +32,7 @@ test("fresh YOOtheme import invalidates only its scoped page draft", () => {
   const storage = new MemoryStorage();
   const draftsKey = "react-shop-visual-builder-drafts-v2:header-parity-site";
   const stateKey = "react-shop-visual-builder-v1:header-parity-site";
+  const draftMetadataKey = "react-shop-visual-builder-draft-metadata-v1:header-parity-site";
   const imported = { page: "home", sections: [{ id: "yootheme-section-1" }] };
 
   storage.setItem(draftsKey, JSON.stringify({
@@ -39,10 +40,15 @@ test("fresh YOOtheme import invalidates only its scoped page draft", () => {
     shop: { page: "shop", sections: [{ id: "keep-shop-draft" }] },
     "page:about": { page: "page:about", sections: [{ id: "keep-about-draft" }] },
   }));
+  storage.setItem(draftMetadataKey, JSON.stringify({
+    home: { basePublishedSignature: "stale-home" },
+    shop: { basePublishedSignature: "keep-shop" },
+  }));
 
   invalidateImportedBuilderDraft(storage as unknown as Storage, {
     draftsKey,
     stateKey,
+    draftMetadataKey,
     pageKey: "home",
     importedState: imported,
   });
@@ -52,6 +58,9 @@ test("fresh YOOtheme import invalidates only its scoped page draft", () => {
     "page:about": { page: "page:about", sections: [{ id: "keep-about-draft" }] },
   });
   expect(JSON.parse(storage.getItem(stateKey) ?? "{}")).toEqual(imported);
+  expect(JSON.parse(storage.getItem(draftMetadataKey) ?? "{}")).toEqual({
+    shop: { basePublishedSignature: "keep-shop" },
+  });
 });
 
 test("fresh Home import replaces the matching stale Builder draft", async ({ page, context }) => {

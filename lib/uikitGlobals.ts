@@ -63,10 +63,27 @@ export function getUikitGlobalsCssVars(
   shellSettings?: Partial<BuilderShellSettings>,
   design?: Record<string, any>
 ): Record<string, string> {
-  const primary = resolveGlobalStyleToken("primaryColor", shellSettings, design, "#111111").value;
+  // `backgroundPrimary` is the canonical UIkit/YOOtheme primary surface.
+  // `primaryColor` remains a legacy native alias, but must not replace an
+  // imported YOOtheme `@global-primary-background`.
+  const legacyPrimary = resolveGlobalStyleToken("primaryColor", shellSettings, design, "#111111").value;
+  const primary = resolveGlobalStyleToken("backgroundPrimary", shellSettings, design, legacyPrimary).value;
   const accent = resolveGlobalStyleToken("accentColor", shellSettings, design, "#111111").value;
   const value = (key: string, fallback: string) =>
     resolveGlobalStyleToken(key, shellSettings, design, fallback).value;
+  const buttonValue = (key: string, fallback: string) => {
+    const provenance = shellSettings?.buttonTokenInheritance?.[key];
+    const raw = shellSettings?.[key as keyof BuilderShellSettings];
+    if (provenance !== "inherit" && raw !== undefined && raw !== null && String(raw).trim() !== "") {
+      // Migration for imports saved before token provenance existed. Only
+      // discard the old generic WebPages default on a recognized YOOtheme
+      // style; a non-default authored value remains an explicit override.
+      const legacyYoothemeImport = !provenance && /^devstack\b/i.test(String(shellSettings?.globalStylePresetName ?? ""));
+      const genericDefault = resolveGlobalStyleToken(key, undefined, undefined, fallback).value;
+      if (!legacyYoothemeImport || String(raw) !== genericDefault) return String(raw);
+    }
+    return fallback;
+  };
   const globalRadius = value("borderRadius", design?.radius || "8px");
   const cardRadius = value("cardBorderRadius", shellSettings?.productCardRadius || globalRadius);
   const inheritedFamily = (family: string, fallback: string) => family.trim().toLowerCase() === "inherit" ? fallback : family;
@@ -88,12 +105,25 @@ export function getUikitGlobalsCssVars(
   const backgroundMuted = resolveBackgroundPaint(value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")), "#f8fafc");
   const backgroundPrimary = resolveBackgroundPaint(value("backgroundPrimary", primary), primary);
   const backgroundSecondary = resolveBackgroundPaint(value("backgroundSecondary", value("secondaryColor", "#64748b")), "#64748b");
+  const globalText = value("textColor", "#111827");
+  const globalInverse = value("inverseColor", "#fff");
+  const globalLink = value("linkColor", primary);
+  const globalBorder = value("borderColor", "transparent");
   const cardDefaultBackground = resolveBackgroundPaint(value("cardBackground", "#ffffff"), "#ffffff");
   const cardPrimaryBackground = resolveBackgroundPaint(value("cardPrimaryBackground", primary), primary);
   const cardSecondaryBackground = resolveBackgroundPaint(value("cardSecondaryBackground", "#111827"), "#111827");
   const cardDefaultHoverBackground = resolveBackgroundPaint(value("cardDefaultHoverBackground", cardDefaultBackground), cardDefaultBackground);
   const cardPrimaryHoverBackground = resolveBackgroundPaint(value("cardPrimaryHoverBackground", cardPrimaryBackground), cardPrimaryBackground);
   const cardSecondaryHoverBackground = resolveBackgroundPaint(value("cardSecondaryHoverBackground", cardSecondaryBackground), cardSecondaryBackground);
+  // Alert presentation is its own UIkit semantic surface. An imported
+  // @alert-background must not be collapsed into a generic Builder/card
+  // background; when it is absent, UIkit's normal muted/default surface
+  // remains the canonical fallback.
+  const alertBackground = resolveBackgroundPaint(value("alertBackground", "#f8f8f8"), "#f8f8f8");
+  const alertPrimaryBackground = resolveBackgroundPaint(value("alertPrimaryBackground", "#d8eafc"), "#d8eafc");
+  const alertSuccessBackground = resolveBackgroundPaint(value("alertSuccessBackground", "#edfbf6"), "#edfbf6");
+  const alertWarningBackground = resolveBackgroundPaint(value("alertWarningBackground", "#fef5ee"), "#fef5ee");
+  const alertDangerBackground = resolveBackgroundPaint(value("alertDangerBackground", "#fef4f6"), "#fef4f6");
 
   const vars: Record<string, string> = {
     // Spacing scale
@@ -198,6 +228,20 @@ export function getUikitGlobalsCssVars(
     "--uk-base-mark-color": value("baseMarkColor", primary),
     "--uk-global-border-width": value("borderWidth", "1px"),
     "--uk-global-border-color": value("borderColor", "#e5e7eb"),
+    // UIkit Alert presentation. These values are consumed by the shared
+    // `.uk-alert` renderer in both Builder and storefront, never by a
+    // fixture-specific selector.
+    "--uk-alert-background": alertBackground,
+    "--uk-alert-color": value("alertColor", "#666"),
+    "--uk-alert-border-radius": value("alertBorderRadius", "0"),
+    "--uk-alert-primary-background": alertPrimaryBackground,
+    "--uk-alert-primary-color": value("alertPrimaryColor", "#1e87f0"),
+    "--uk-alert-success-background": alertSuccessBackground,
+    "--uk-alert-success-color": value("alertSuccessColor", "#32d296"),
+    "--uk-alert-warning-background": alertWarningBackground,
+    "--uk-alert-warning-color": value("alertWarningColor", "#faa05a"),
+    "--uk-alert-danger-background": alertDangerBackground,
+    "--uk-alert-danger-color": value("alertDangerColor", "#f0506e"),
     "--uk-card-default-background": cardDefaultBackground,
     "--uk-card-primary-background": cardPrimaryBackground,
     "--uk-card-secondary-background": cardSecondaryBackground,
@@ -246,9 +290,9 @@ export function getUikitGlobalsCssVars(
     "--uk-card-meta-spacing": value("cardMetaSpacing", "10px"),
     "--uk-card-header-spacing": value("cardHeaderSpacing", "20px"),
     "--uk-card-footer-spacing": value("cardFooterSpacing", "20px"),
-    "--uk-button-primary-background": value("buttonPrimaryBackground", primary),
-    "--uk-button-primary-text": value("buttonPrimaryText", "#fff"),
-    "--uk-button-primary-hover-background": value("buttonHoverBg", primary),
+    "--uk-button-primary-background": buttonValue("buttonPrimaryBackground", primary),
+    "--uk-button-primary-text": buttonValue("buttonPrimaryText", globalInverse),
+    "--uk-button-primary-hover-background": buttonValue("buttonHoverBg", buttonValue("buttonPrimaryBackground", primary)),
     "--uk-button-font-size": value("buttonFontSize", "15px"),
     "--uk-button-font-family": value("buttonFontFamily", "inherit"),
     "--uk-button-font-style": value("buttonFontStyle", "normal"),
@@ -268,28 +312,28 @@ export function getUikitGlobalsCssVars(
     "--uk-button-large-padding-x": value("buttonLargePaddingX", value("gridGutterMedium", value("buttonPaddingX", "40px"))),
     "--uk-button-large-radius": value("buttonLargeRadius", value("buttonRadius", cardRadius)),
     "--uk-button-letter-spacing": value("buttonLetterSpacing", "0px"),
-    "--uk-button-default-hover-background": value("buttonDefaultHoverBackground", value("buttonDefaultBackground", "#fff")),
-    "--uk-button-default-hover-text": value("buttonDefaultHoverText", value("buttonDefaultText", "#111")),
-    "--uk-button-default-border": value("buttonDefaultBorder", value("borderColor", "transparent")),
-    "--uk-button-default-hover-border": value("buttonDefaultHoverBorder", value("buttonDefaultBorder", "#b2b2b2")),
-    "--uk-button-default-active-background": value("buttonDefaultActiveBackground", value("buttonDefaultBackground", "#fff")),
-    "--uk-button-default-active-text": value("buttonDefaultActiveText", value("buttonDefaultText", "#111")),
-    "--uk-button-default-active-border": value("buttonDefaultActiveBorder", value("buttonDefaultBorder", "transparent")),
-    "--uk-button-default-active-shadow": value("buttonDefaultActiveShadow", value("shadowSmall", "none")),
-    "--uk-button-secondary-hover-background": value("buttonSecondaryHoverBackground", primary),
-    "--uk-button-secondary-hover-text": value("buttonSecondaryHoverText", "#fff"),
-    "--uk-button-secondary-border": value("buttonSecondaryBorder", primary),
-    "--uk-button-secondary-hover-border": value("buttonSecondaryHoverBorder", primary),
-    "--uk-button-secondary-active-background": value("buttonSecondaryActiveBackground", primary),
-    "--uk-button-secondary-active-text": value("buttonSecondaryActiveText", "#fff"),
-    "--uk-button-secondary-active-border": value("buttonSecondaryActiveBorder", primary),
-    "--uk-button-secondary-active-shadow": value("buttonSecondaryActiveShadow", value("shadowSmall", "none")),
-    "--uk-button-primary-hover-border": value("buttonPrimaryHoverBorder", "transparent"),
-    "--uk-button-primary-hover-text": value("buttonPrimaryHoverText", value("buttonHoverTextColor", "#fff")),
-    "--uk-button-primary-active-background": value("buttonPrimaryActiveBackground", primary),
-    "--uk-button-primary-active-text": value("buttonPrimaryActiveText", "#fff"),
-    "--uk-button-primary-active-border": value("buttonPrimaryActiveBorder", "transparent"),
-    "--uk-button-primary-active-shadow": value("buttonPrimaryActiveShadow", value("shadowSmall", "none")),
+    "--uk-button-default-hover-background": buttonValue("buttonDefaultHoverBackground", buttonValue("buttonDefaultBackground", backgroundDefault)),
+    "--uk-button-default-hover-text": buttonValue("buttonDefaultHoverText", buttonValue("buttonDefaultText", globalText)),
+    "--uk-button-default-border": buttonValue("buttonDefaultBorder", globalBorder),
+    "--uk-button-default-hover-border": buttonValue("buttonDefaultHoverBorder", buttonValue("buttonDefaultBorder", globalBorder)),
+    "--uk-button-default-active-background": buttonValue("buttonDefaultActiveBackground", buttonValue("buttonDefaultBackground", backgroundDefault)),
+    "--uk-button-default-active-text": buttonValue("buttonDefaultActiveText", buttonValue("buttonDefaultText", globalText)),
+    "--uk-button-default-active-border": buttonValue("buttonDefaultActiveBorder", buttonValue("buttonDefaultBorder", globalBorder)),
+    "--uk-button-default-active-shadow": buttonValue("buttonDefaultActiveShadow", value("shadowSmall", "none")),
+    "--uk-button-secondary-hover-background": buttonValue("buttonSecondaryHoverBackground", primary),
+    "--uk-button-secondary-hover-text": buttonValue("buttonSecondaryHoverText", globalInverse),
+    "--uk-button-secondary-border": buttonValue("buttonSecondaryBorder", primary),
+    "--uk-button-secondary-hover-border": buttonValue("buttonSecondaryHoverBorder", buttonValue("buttonSecondaryBorder", primary)),
+    "--uk-button-secondary-active-background": buttonValue("buttonSecondaryActiveBackground", buttonValue("buttonSecondaryHoverBackground", primary)),
+    "--uk-button-secondary-active-text": buttonValue("buttonSecondaryActiveText", globalInverse),
+    "--uk-button-secondary-active-border": buttonValue("buttonSecondaryActiveBorder", buttonValue("buttonSecondaryBorder", primary)),
+    "--uk-button-secondary-active-shadow": buttonValue("buttonSecondaryActiveShadow", value("shadowSmall", "none")),
+    "--uk-button-primary-hover-border": buttonValue("buttonPrimaryHoverBorder", "transparent"),
+    "--uk-button-primary-hover-text": buttonValue("buttonPrimaryHoverText", buttonValue("buttonHoverTextColor", globalInverse)),
+    "--uk-button-primary-active-background": buttonValue("buttonPrimaryActiveBackground", buttonValue("buttonPrimaryBackground", primary)),
+    "--uk-button-primary-active-text": buttonValue("buttonPrimaryActiveText", globalInverse),
+    "--uk-button-primary-active-border": buttonValue("buttonPrimaryActiveBorder", "transparent"),
+    "--uk-button-primary-active-shadow": buttonValue("buttonPrimaryActiveShadow", value("shadowSmall", "none")),
     "--uk-button-danger-background": value("buttonDangerBackground", value("dangerColor", "#f0506e")),
     "--uk-button-danger-text": value("buttonDangerText", "#fff"),
     "--uk-button-danger-border": value("buttonDangerBorder", "transparent"),
@@ -304,31 +348,59 @@ export function getUikitGlobalsCssVars(
     "--uk-button-disabled-background": value("buttonDisabledBackground", "#f8f8f8"),
     "--uk-button-disabled-text": value("buttonDisabledText", "#999"),
     "--uk-button-disabled-border": value("buttonDisabledBorder", "transparent"),
-    "--uk-button-text-background": value("buttonTextBackground", "transparent"),
-    "--uk-button-text-hover-color": value("buttonTextHoverColor", primary),
-    "--uk-button-text-border": value("buttonTextBorder", "transparent"),
-    "--uk-button-text-hover-border": value("buttonTextHoverBorder", primary),
-    "--uk-button-text-active-color": value("buttonTextActiveColor", primary),
-    "--uk-button-link-color": value("buttonLinkColor", primary),
-    "--uk-button-link-hover-color": value("buttonLinkHoverColor", primary),
+    "--uk-button-text-background": buttonValue("buttonTextBackground", "transparent"),
+    "--uk-button-text-hover-color": buttonValue("buttonTextHoverColor", primary),
+    "--uk-button-text-border": buttonValue("buttonTextBorder", "transparent"),
+    "--uk-button-text-hover-border": buttonValue("buttonTextHoverBorder", primary),
+    "--uk-button-text-active-color": buttonValue("buttonTextActiveColor", primary),
+    "--uk-button-link-color": buttonValue("buttonLinkColor", globalLink),
+    "--uk-button-link-hover-color": buttonValue("buttonLinkHoverColor", value("linkHoverColor", globalLink)),
     "--uk-button-backdrop-filter": value("buttonBackdropFilter", "none"),
     "--uk-button-transition-duration": value("buttonTransitionDuration", "0.2s"),
-    "--uk-button-primary-gradient": value("buttonPrimaryGradient", "none"),
-    "--uk-button-primary-hover-gradient": value("buttonPrimaryHoverGradient", value("buttonPrimaryGradient", "none")),
-    "--uk-button-primary-active-gradient": value("buttonPrimaryActiveGradient", value("buttonPrimaryGradient", "none")),
-    "--uk-button-secondary-hover-gradient": value("buttonSecondaryHoverGradient", "none"),
-    "--uk-button-secondary-active-gradient": value("buttonSecondaryActiveGradient", "none"),
-    "--uk-button-default-shadow": value("buttonDefaultShadow", value("shadowLarge", "none")),
-    "--uk-button-default-hover-shadow": value("buttonDefaultHoverShadow", value("shadowMedium", "none")),
-    "--uk-button-primary-shadow": value("buttonPrimaryShadow", value("shadowLarge", "none")),
-    "--uk-button-primary-hover-shadow": value("buttonPrimaryHoverShadow", value("buttonHoverShadow", "none")),
-    "--uk-button-secondary-shadow": value("buttonSecondaryShadow", "none"),
-    "--uk-button-secondary-hover-shadow": value("buttonSecondaryHoverShadow", value("buttonHoverShadow", "none")),
-    "--uk-button-default-background": value("buttonDefaultBackground", "#fff"),
-    "--uk-button-default-text": value("buttonDefaultText", "#111"),
-    "--uk-button-secondary-background": value("buttonSecondaryBackground", "#e5e7eb"),
-    "--uk-button-secondary-text": value("buttonSecondaryText", "#111"),
-    "--uk-button-text-color": value("buttonTextColorSemantic", primary),
+    "--uk-button-primary-gradient": buttonValue("buttonPrimaryGradient", "none"),
+    "--uk-button-primary-hover-gradient": buttonValue("buttonPrimaryHoverGradient", buttonValue("buttonPrimaryGradient", "none")),
+    "--uk-button-primary-active-gradient": buttonValue("buttonPrimaryActiveGradient", buttonValue("buttonPrimaryGradient", "none")),
+    "--uk-button-secondary-hover-gradient": buttonValue("buttonSecondaryHoverGradient", "none"),
+    "--uk-button-secondary-active-gradient": buttonValue("buttonSecondaryActiveGradient", "none"),
+    // Inverse Button tokens remain aliases at the Global Styles layer. The
+    // semantic surface context consumes them only for dark/inverse sections,
+    // so the normal Button presentation retains its authored values.
+    // UIkit's inverse Button defaults are part of the same canonical Global
+    // Styles owner. Theme LESS can override any token below; the fallbacks
+    // are UIkit theme defaults, not a separate WebPages palette.
+    // UIkit's inverse default Button inherits the inverse primary surface
+    // (normally the global inverse color) and the normal global text color.
+    // DevStack leaves these variables undeclared and relies on this exact
+    // UIkit fallback, as the live YOOtheme hero demonstrates.
+    "--uk-button-inverse-default-background": buttonValue("buttonInverseDefaultBackground", globalInverse),
+    "--uk-button-inverse-default-text": buttonValue("buttonInverseDefaultText", globalText),
+    "--uk-button-inverse-default-hover-background": buttonValue("buttonInverseDefaultHoverBackground", `color-mix(in srgb, ${globalInverse} 95%, #000)`),
+    "--uk-button-inverse-default-hover-text": buttonValue("buttonInverseDefaultHoverText", globalText),
+    "--uk-button-inverse-default-active-background": buttonValue("buttonInverseDefaultActiveBackground", `color-mix(in srgb, ${globalInverse} 90%, #000)`),
+    "--uk-button-inverse-default-active-text": buttonValue("buttonInverseDefaultActiveText", globalText),
+    "--uk-button-inverse-default-border": buttonValue("buttonInverseDefaultBorder", globalInverse),
+    "--uk-button-inverse-default-hover-border": buttonValue("buttonInverseDefaultHoverBorder", globalInverse),
+    "--uk-button-inverse-default-active-border": buttonValue("buttonInverseDefaultActiveBorder", globalInverse),
+    "--uk-button-inverse-default-shadow": buttonValue("buttonInverseDefaultShadow", "none"),
+    "--uk-button-inverse-primary-shadow": buttonValue("buttonInversePrimaryShadow", "none"),
+    "--uk-button-inverse-secondary-background": buttonValue("buttonInverseSecondaryBackground", "transparent"),
+    "--uk-button-inverse-secondary-text": buttonValue("buttonInverseSecondaryText", globalInverse),
+    "--uk-button-inverse-secondary-hover-background": buttonValue("buttonInverseSecondaryHoverBackground", globalInverse),
+    "--uk-button-inverse-secondary-active-background": buttonValue("buttonInverseSecondaryActiveBackground", "rgba(255, 255, 255, 0.8)"),
+    "--uk-button-inverse-secondary-border": buttonValue("buttonInverseSecondaryBorder", globalInverse),
+    "--uk-button-inverse-secondary-hover-text": buttonValue("buttonInverseSecondaryHoverText", globalText),
+    "--uk-button-inverse-secondary-active-text": buttonValue("buttonInverseSecondaryActiveText", globalText),
+    "--uk-button-default-shadow": buttonValue("buttonDefaultShadow", value("shadowLarge", "none")),
+    "--uk-button-default-hover-shadow": buttonValue("buttonDefaultHoverShadow", value("shadowMedium", "none")),
+    "--uk-button-primary-shadow": buttonValue("buttonPrimaryShadow", value("shadowLarge", "none")),
+    "--uk-button-primary-hover-shadow": buttonValue("buttonPrimaryHoverShadow", buttonValue("buttonHoverShadow", "none")),
+    "--uk-button-secondary-shadow": buttonValue("buttonSecondaryShadow", "none"),
+    "--uk-button-secondary-hover-shadow": buttonValue("buttonSecondaryHoverShadow", buttonValue("buttonHoverShadow", "none")),
+    "--uk-button-default-background": buttonValue("buttonDefaultBackground", backgroundDefault),
+    "--uk-button-default-text": buttonValue("buttonDefaultText", globalText),
+    "--uk-button-secondary-background": buttonValue("buttonSecondaryBackground", "#e5e7eb"),
+    "--uk-button-secondary-text": buttonValue("buttonSecondaryText", globalText),
+    "--uk-button-text-color": buttonValue("buttonTextColorSemantic", primary),
     "--uk-global-control-height": value("controlHeightDefault", value("buttonHeight", "48px")),
     "--uk-global-control-height-small": value("controlHeightSmall", "40px"),
     "--uk-global-control-height-large": value("controlHeightLarge", "56px"),

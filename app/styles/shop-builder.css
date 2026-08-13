@@ -3,7 +3,7 @@
   width: 100%;
   padding: 0;
   background: var(--builder-page-bg, transparent);
-  color: var(--builder-text, #111111);
+  color: var(--uk-global-text-color, var(--builder-text, #111111));
   overflow-x: clip;
 }
 
@@ -36,7 +36,7 @@
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  color: var(--builder-section-text, var(--builder-text, #111111));
+  color: var(--builder-section-text, var(--uk-global-text-color, var(--builder-text, #111111)));
   --builder-active-muted: var(--builder-section-muted, var(--builder-muted, #55554f));
   --builder-active-surface: var(--builder-section-surface, var(--builder-surface, #f5f5f3));
   --builder-active-button-bg: var(--button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)));
@@ -232,96 +232,14 @@ body.dark {
 .shop-builder-section--content-none .shop-builder-section-content,
 .shop-builder-section--content-expand .shop-builder-section-content { max-width: none; }
 
-/* Shared YOOtheme General responsive semantics for every element wrapper. */
-@media (min-width: 640px) {
-  .builder-general-maxwidth-small-from-small { max-width: var(--uk-container-small-max-width, 960px); }
-  .builder-general-maxwidth-medium-from-small { max-width: var(--uk-container-default-max-width, 1200px); }
-  .builder-general-maxwidth-large-from-small { max-width: var(--uk-container-large-max-width, 1400px); }
-  .builder-general-maxwidth-xlarge-from-small { max-width: var(--uk-container-xlarge-max-width, 1600px); }
-  .builder-general-maxwidth-2xlarge-from-small { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
-  .builder-general-blockalign-center-from-small { margin-left: auto; margin-right: auto; }
-  .builder-general-blockalign-right-from-small { margin-left: auto; margin-right: 0; }
-  .builder-general-blockalign-left-from-small { margin-left: 0; margin-right: auto; }
-  .builder-general-textalign-left-from-small { text-align: left; }
-  .builder-general-textalign-center-from-small { text-align: center; }
-  .builder-general-textalign-right-from-small { text-align: right; }
-  .builder-general-textalign-justify-from-small { text-align: justify; }
-}
-
-@media (min-width: 960px) {
-  .builder-general-maxwidth-small-from-medium { max-width: var(--uk-container-small-max-width, 960px); }
-  .builder-general-maxwidth-medium-from-medium { max-width: var(--uk-container-default-max-width, 1200px); }
-  .builder-general-maxwidth-large-from-medium { max-width: var(--uk-container-large-max-width, 1400px); }
-  .builder-general-maxwidth-xlarge-from-medium { max-width: var(--uk-container-xlarge-max-width, 1600px); }
-  .builder-general-maxwidth-2xlarge-from-medium { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
-  .builder-general-blockalign-center-from-medium { margin-left: auto; margin-right: auto; }
-  .builder-general-blockalign-right-from-medium { margin-left: auto; margin-right: 0; }
-  .builder-general-blockalign-left-from-medium { margin-left: 0; margin-right: auto; }
-  .builder-general-textalign-left-from-medium { text-align: left; }
-  .builder-general-textalign-center-from-medium { text-align: center; }
-  .builder-general-textalign-right-from-medium { text-align: right; }
-  .builder-general-textalign-justify-from-medium { text-align: justify; }
-}
-
-@media (min-width: 1200px) {
-  .builder-general-maxwidth-small-from-large { max-width: var(--uk-container-small-max-width, 960px); }
-  .builder-general-maxwidth-medium-from-large { max-width: var(--uk-container-default-max-width, 1200px); }
-  .builder-general-maxwidth-large-from-large { max-width: var(--uk-container-large-max-width, 1400px); }
-  .builder-general-maxwidth-xlarge-from-large { max-width: var(--uk-container-xlarge-max-width, 1600px); }
-  .builder-general-maxwidth-2xlarge-from-large { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
-  .builder-general-blockalign-center-from-large { margin-left: auto; margin-right: auto; }
-  .builder-general-blockalign-right-from-large { margin-left: auto; margin-right: 0; }
-  .builder-general-blockalign-left-from-large { margin-left: 0; margin-right: auto; }
-  .builder-general-textalign-left-from-large { text-align: left; }
-  .builder-general-textalign-center-from-large { text-align: center; }
-  .builder-general-textalign-right-from-large { text-align: right; }
-  .builder-general-textalign-justify-from-large { text-align: justify; }
-}
-
-@media (min-width: 1600px) {
-  .builder-general-maxwidth-small-from-xlarge { max-width: var(--uk-container-small-max-width, 960px); }
-  .builder-general-maxwidth-medium-from-xlarge { max-width: var(--uk-container-default-max-width, 1200px); }
-  .builder-general-maxwidth-large-from-xlarge { max-width: var(--uk-container-large-max-width, 1400px); }
-  .builder-general-maxwidth-xlarge-from-xlarge { max-width: var(--uk-container-xlarge-max-width, 1600px); }
-  .builder-general-maxwidth-2xlarge-from-xlarge { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
-  .builder-general-blockalign-center-from-xlarge { margin-left: auto; margin-right: auto; }
-  .builder-general-blockalign-right-from-xlarge { margin-left: auto; margin-right: 0; }
-  .builder-general-blockalign-left-from-xlarge { margin-left: 0; margin-right: auto; }
-  .builder-general-textalign-left-from-xlarge { text-align: left; }
-  .builder-general-textalign-center-from-xlarge { text-align: center; }
-  .builder-general-textalign-right-from-xlarge { text-align: right; }
-  .builder-general-textalign-justify-from-xlarge { text-align: justify; }
-}
+/* Responsive General rules are generated per rendered page from the canonical
+   Global Styles policy; see responsiveBreakpointPolicy.ts. */
 
 .shop-builder-section--expand-left .shop-builder-section-content { margin-left: 0; margin-right: auto; }
 .shop-builder-section--expand-right .shop-builder-section-content { margin-left: auto; margin-right: 0; }
 
 .shop-builder-grid {
   grid-template-columns: var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr)));
-}
-
-@media (min-width: 640px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-phone-landscape, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr))));
-  }
-}
-
-@media (min-width: 960px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-tablet, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-  }
-}
-
-@media (min-width: 1200px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-  }
-}
-
-@media (min-width: 1600px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-xlarge, var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-xlarge, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-  }
 }
 
 .shop-builder-hero .shop-builder-section-content {
@@ -586,33 +504,8 @@ body.dark {
   transform: rotate(180deg);
 }
 
-@media (max-width: 639px) {
-  .shop-builder-section[data-section-title-breakpoint="small"] .shop-builder-section-heading {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-}
-
-@media (max-width: 959px) {
-  .shop-builder-section[data-section-title-breakpoint="medium"] .shop-builder-section-heading {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-}
-
-@media (max-width: 1199px) {
-  .shop-builder-section[data-section-title-breakpoint="large"] .shop-builder-section-heading {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-}
-
-@media (max-width: 1599px) {
-  .shop-builder-section[data-section-title-breakpoint="xlarge"] .shop-builder-section-heading {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-}
+/* Section title breakpoint fallbacks are emitted from the rendered-page
+   responsive policy, so imported semantic tiers follow Global Styles. */
 
 .shop-builder-promo .shop-builder-body {
   color: var(--builder-active-muted, rgba(255, 255, 255, 0.72));
@@ -676,6 +569,29 @@ body.dark {
   width: auto !important;
 }
 
+/* Panel Slider uses the same canonical spacing scale as the other UIkit
+   slidenav adapters. The source margin belongs to the outer slider control,
+   not to each slide or its Panel body. */
+.shop-builder-swiper--panel { --shop-builder-panel-slidenav-inset: 30px; }
+.shop-builder-swiper--panel.shop-builder-panel-slidenav-margin--none { --shop-builder-panel-slidenav-inset: 0px; }
+.shop-builder-swiper--panel.shop-builder-panel-slidenav-margin--small { --shop-builder-panel-slidenav-inset: 10px; }
+.shop-builder-swiper--panel.shop-builder-panel-slidenav-margin--medium { --shop-builder-panel-slidenav-inset: 30px; }
+.shop-builder-swiper--panel.shop-builder-panel-slidenav-margin--large { --shop-builder-panel-slidenav-inset: 40px; }
+
+/* `outside` is a Panel Slider semantic, normalized to the shared `outer`
+   navigation placement. Its controls sit outside the UIkit grid track; they
+   must never consume movement-viewport width, or a set of auto-width panels
+   that fits in YOOtheme is incorrectly classified as overflowing. */
+.shop-builder-swiper--panel.shop-builder-arrow-pos--outer {
+  padding-inline: 0;
+}
+.shop-builder-swiper--panel.shop-builder-arrow-pos--outer .swiper-button-prev {
+  left: calc(-36px - var(--shop-builder-panel-slidenav-inset)) !important;
+}
+.shop-builder-swiper--panel.shop-builder-arrow-pos--outer .swiper-button-next {
+  right: calc(-36px - var(--shop-builder-panel-slidenav-inset)) !important;
+}
+
 .shop-builder-swiper .swiper-button-prev,
 .shop-builder-swiper .swiper-button-next {
   width: 42px;
@@ -707,10 +623,8 @@ body.dark {
 .shop-builder-slidenav-from-large .swiper-button-next,
 .shop-builder-slidenav-from-xlarge .swiper-button-prev,
 .shop-builder-slidenav-from-xlarge .swiper-button-next { display: none; }
-@media (min-width: 640px) { .shop-builder-slidenav-from-small .swiper-button-prev, .shop-builder-slidenav-from-small .swiper-button-next { display: flex; } }
-@media (min-width: 960px) { .shop-builder-slidenav-from-medium .swiper-button-prev, .shop-builder-slidenav-from-medium .swiper-button-next { display: flex; } }
-@media (min-width: 1200px) { .shop-builder-slidenav-from-large .swiper-button-prev, .shop-builder-slidenav-from-large .swiper-button-next { display: flex; } }
-@media (min-width: 1600px) { .shop-builder-slidenav-from-xlarge .swiper-button-prev, .shop-builder-slidenav-from-xlarge .swiper-button-next { display: flex; } }
+/* Responsive slidenav visibility is emitted per rendered page from the
+   canonical Global Styles policy. */
 
 /* Overflow is the authoritative Panel Slider navigation boundary. Keep this
    after breakpoint visibility rules so a locked control cannot be revived by
@@ -737,6 +651,288 @@ body.dark {
   border-radius: 999px;
   background: currentColor;
 }
+
+/* Slideshow uses UIkit navigation primitives over the shared Swiper state
+   engine. The presentation remains isolated from every other carousel type. */
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-prev.uk-slidenav,
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-next.uk-slidenav {
+  width: 48px !important;
+  height: 48px !important;
+  margin-top: 0 !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--global-emphasis-color, #111111) !important;
+  filter: none !important;
+  opacity: 1;
+  z-index: 11;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-prev.uk-slidenav {
+  left: var(--shop-builder-slideshow-slidenav-inset) !important;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-next.uk-slidenav {
+  right: var(--shop-builder-slideshow-slidenav-inset) !important;
+}
+
+/* The YOOtheme position choice owns the paired Slidenav placement. The
+   internal Swiper buttons remain the single navigation runtime. */
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-left .swiper-button-prev.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; left: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-left .swiper-button-next.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; left: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; right: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-right .swiper-button-prev.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; right: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-right .swiper-button-next.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; right: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--center-left .swiper-button-prev.uk-slidenav { top: calc(50% - 48px) !important; left: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--center-left .swiper-button-next.uk-slidenav { top: 50% !important; left: var(--shop-builder-slideshow-slidenav-inset) !important; right: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--center-right .swiper-button-prev.uk-slidenav { top: calc(50% - 48px) !important; right: var(--shop-builder-slideshow-slidenav-inset) !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--center-right .swiper-button-next.uk-slidenav { top: 50% !important; right: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-left .swiper-button-prev.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; left: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-left .swiper-button-next.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; left: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; right: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-center .swiper-button-prev.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; left: calc(50% - 48px) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-center .swiper-button-next.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; right: calc(50% - 48px) !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-right .swiper-button-prev.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; right: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-arrow-pos--bottom-right .swiper-button-next.uk-slidenav { top: auto !important; bottom: var(--shop-builder-slideshow-slidenav-inset) !important; right: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
+
+.shop-builder-swiper--slideshow .swiper-button-prev.uk-slidenav::after,
+.shop-builder-swiper--slideshow .swiper-button-next.uk-slidenav::after {
+  font-size: 20px !important;
+  font-weight: 400 !important;
+}
+
+.shop-builder-swiper--slideshow {
+  --shop-builder-slideshow-nav-inset: 30px;
+  --shop-builder-slideshow-slidenav-inset: 30px;
+  position: relative;
+}
+
+/* Navigation is a frame overlay by default. Keeping this wrapper distinct
+   from the Swiper movement viewport gives Dotnav and Thumbnav the same
+   containing block in Builder and storefront; `nav_below` alone returns it
+   to normal document flow. */
+.shop-builder-swiper--slideshow > .shop-builder-slideshow-navigation-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.shop-builder-swiper--slideshow > .shop-builder-slideshow-navigation-frame .swiper-pagination {
+  pointer-events: auto;
+}
+
+/* A YOOtheme element-level Slideshow link is a sibling overlay, never a
+   wrapper around item actions. This keeps the DOM free of nested anchors. */
+.shop-builder-swiper--slideshow .shop-builder-hero-slide-card,
+.shop-builder-swiper--slideshow .shop-builder-standard-slide-card,
+.shop-builder-swiper--slideshow .shop-builder-image-slide-card { position: relative; }
+.shop-builder-swiper--slideshow .shop-builder-slideshow-element-link { position: absolute; inset: 0; z-index: 1; }
+.shop-builder-swiper--slideshow .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow .shop-builder-slide-content { position: relative; z-index: 2; }
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-margin--none { --shop-builder-slideshow-nav-inset: 0px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-margin--small { --shop-builder-slideshow-nav-inset: 10px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-margin--medium { --shop-builder-slideshow-nav-inset: 30px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-margin--large { --shop-builder-slideshow-nav-inset: 40px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-margin--none { --shop-builder-slideshow-slidenav-inset: 0px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-margin--small { --shop-builder-slideshow-slidenav-inset: 10px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-margin--medium { --shop-builder-slideshow-slidenav-inset: 30px; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-margin--large { --shop-builder-slideshow-slidenav-inset: 40px; }
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav {
+  position: absolute !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: var(--shop-builder-slideshow-nav-inset) !important;
+  left: 50% !important;
+  width: auto !important;
+  height: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  transform: translateX(-50%) !important;
+  z-index: 10;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--top-left .swiper-pagination.uk-dotnav { top: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: var(--shop-builder-slideshow-nav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--top-right .swiper-pagination.uk-dotnav { top: var(--shop-builder-slideshow-nav-inset) !important; right: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--center-left .swiper-pagination.uk-dotnav { top: 50% !important; bottom: auto !important; left: var(--shop-builder-slideshow-nav-inset) !important; transform: translateY(-50%) !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--center-right .swiper-pagination.uk-dotnav { top: 50% !important; right: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: auto !important; transform: translateY(-50%) !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--bottom-left .swiper-pagination.uk-dotnav { left: var(--shop-builder-slideshow-nav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--bottom-right .swiper-pagination.uk-dotnav { right: var(--shop-builder-slideshow-nav-inset) !important; left: auto !important; transform: none !important; }
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-thumbnav {
+  position: absolute !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: var(--shop-builder-slideshow-nav-inset) !important;
+  left: 50% !important;
+  display: flex;
+  width: auto !important;
+  max-width: calc(100% - (2 * var(--shop-builder-slideshow-nav-inset)));
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 12px;
+  flex-wrap: wrap;
+  transform: translateX(-50%) !important;
+  z-index: 10;
+}
+.shop-builder-swiper--slideshow.shop-builder-slideshow-thumbnav-nowrap .swiper-pagination.uk-thumbnav { flex-wrap: nowrap; }
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-thumbnav > li { margin: 0 !important; }
+.shop-builder-swiper--slideshow .shop-builder-slideshow-thumbnav-item {
+  position: relative;
+  display: block;
+  width: var(--shop-builder-thumbnav-width);
+  height: var(--shop-builder-thumbnav-height);
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  background: var(--global-muted-background, #f4f5f7);
+  color: var(--global-emphasis-color, #111);
+  opacity: .72;
+}
+.shop-builder-swiper--slideshow .swiper-pagination.uk-thumbnav > li.uk-active .shop-builder-slideshow-thumbnav-item { opacity: 1; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--top-left .swiper-pagination.uk-thumbnav { top: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: var(--shop-builder-slideshow-nav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--top-right .swiper-pagination.uk-thumbnav { top: var(--shop-builder-slideshow-nav-inset) !important; right: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: auto !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--center-left .swiper-pagination.uk-thumbnav { top: 50% !important; bottom: auto !important; left: var(--shop-builder-slideshow-nav-inset) !important; transform: translateY(-50%) !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--center-right .swiper-pagination.uk-thumbnav { top: 50% !important; right: var(--shop-builder-slideshow-nav-inset) !important; bottom: auto !important; left: auto !important; transform: translateY(-50%) !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--bottom-left .swiper-pagination.uk-thumbnav { left: var(--shop-builder-slideshow-nav-inset) !important; transform: none !important; }
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-pos--bottom-right .swiper-pagination.uk-thumbnav { right: var(--shop-builder-slideshow-nav-inset) !important; left: auto !important; transform: none !important; }
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-below > .shop-builder-slideshow-navigation-frame {
+  position: relative;
+  inset: auto;
+  height: auto;
+  pointer-events: auto;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-below .swiper-pagination.uk-dotnav {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: var(--shop-builder-slideshow-nav-inset) auto 0 !important;
+  transform: none !important;
+}
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-below .swiper-pagination.uk-thumbnav {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: var(--shop-builder-slideshow-nav-inset) auto 0 !important;
+  transform: none !important;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-hover .swiper-pagination.uk-dotnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-hover .swiper-pagination.uk-thumbnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-hover .swiper-button-prev.uk-slidenav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-hover .swiper-button-next.uk-slidenav {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-hover:hover .swiper-pagination.uk-dotnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-hover:hover .swiper-pagination.uk-thumbnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-hover:hover .swiper-button-prev.uk-slidenav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-hover:hover .swiper-button-next.uk-slidenav {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-vertical .swiper-pagination.uk-dotnav {
+  width: 12px !important;
+  height: auto !important;
+  flex-direction: column;
+}
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-vertical .swiper-pagination.uk-thumbnav {
+  width: var(--shop-builder-thumbnav-width) !important;
+  height: auto !important;
+  flex-direction: column;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-vertical .swiper-pagination.uk-dotnav > li {
+  padding-top: 12px;
+  padding-left: 0;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-vertical .swiper-pagination.uk-dotnav > li:first-child {
+  padding-top: 0;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-large .swiper-button-prev.uk-slidenav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-large .swiper-button-next.uk-slidenav {
+  width: 60px !important;
+  height: 60px !important;
+  padding: 18px !important;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-large .swiper-button-prev.uk-slidenav::after,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-slidenav-large .swiper-button-next.uk-slidenav::after {
+  font-size: 24px !important;
+}
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav > li {
+  margin: 0 !important;
+  padding-left: 12px;
+}
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav > li:first-child {
+  padding-left: 0;
+}
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav > li > .swiper-pagination-bullet {
+  appearance: none;
+  box-sizing: content-box;
+  flex: none;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  opacity: 1;
+  transform: none !important;
+  cursor: pointer;
+}
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav > li > .swiper-pagination-bullet {
+  box-sizing: border-box;
+  display: block !important;
+  width: 12px !important;
+  height: 12px !important;
+  overflow: hidden;
+  border: 1px solid var(--global-muted-color, #c9cfe6) !important;
+  border-radius: 50% !important;
+  /* Overrides the generic transparent Swiper bullet rule above. */
+  background-color: var(--global-muted-color, #c9cfe6) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: transparent;
+}
+
+.shop-builder-swiper--slideshow .swiper-pagination.uk-dotnav > li.uk-active > .swiper-pagination-bullet {
+  border-color: var(--global-primary-background, #6f40f1) !important;
+  background-color: var(--global-primary-background, #6f40f1) !important;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-small .swiper-pagination.uk-dotnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-medium .swiper-pagination.uk-dotnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-large .swiper-pagination.uk-dotnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-xlarge .swiper-pagination.uk-dotnav { display: none !important; }
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-small .swiper-pagination.uk-thumbnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-medium .swiper-pagination.uk-thumbnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-large .swiper-pagination.uk-thumbnav,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-xlarge .swiper-pagination.uk-thumbnav { display: none !important; }
 
 .shop-builder-swiper-card {
   min-height: 520px;
@@ -856,6 +1052,14 @@ body.dark {
   color: inherit;
 }
 
+/* A YOOtheme inline SVG with no authored Image dimensions remains an
+   intrinsically sized SVG. Explicit Image width/height still own the framing
+   box above, and all composed media keeps its existing full-size behavior. */
+.shop-builder-stylable-svg-host--intrinsic > svg {
+  width: auto;
+  height: auto;
+}
+
 /* A UIkit Panel Slider item with Panel Style = None is a plain panel, not a
    card. Its compact source content must not inherit uk-card-body padding. */
 .shop-builder-swiper--panel
@@ -919,7 +1123,7 @@ body.dark {
    classes in Builder and storefront; no surface gets its own height logic. */
 .shop-builder-slideshow-height--viewport .shop-builder-hero-slide-card,
 .shop-builder-slideshow-height--viewport .shop-builder-swiper-media {
-  min-height: 100vh;
+  height: var(--shop-builder-slideshow-viewport-height, 100vh);
 }
 
 /* A YOOtheme Slideshow only owns a source min-height when it is authored.
@@ -932,7 +1136,25 @@ body.dark {
 /* Static YOOtheme slideshows use a media-led 16:9 frame unless an explicit
    source height owns the geometry. This is distinct from the Hero minimum. */
 .shop-builder-swiper--slideshow .shop-builder-swiper-media {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--shop-builder-slideshow-aspect-ratio, 16 / 9) !important;
+  max-height: var(--shop-builder-slideshow-max-height, none);
+}
+
+.shop-builder-swiper--slideshow .shop-builder-hero-slide-card {
+  aspect-ratio: var(--shop-builder-slideshow-aspect-ratio, 16 / 9) !important;
+  max-height: var(--shop-builder-slideshow-max-height, none);
+}
+
+/* Viewport height owns the frame, not merely its image child. This gives
+   overlay navigation the same final containing geometry as the media. */
+.shop-builder-slideshow-height--viewport .shop-builder-hero-slide-card {
+  aspect-ratio: auto !important;
+  overflow: hidden;
+}
+
+.shop-builder-slideshow-height--viewport .shop-builder-swiper-media {
+  aspect-ratio: auto !important;
+  max-height: none;
 }
 
 /* Slideshow content is an overlay within its media frame. The Hero selector
@@ -983,6 +1205,20 @@ body.dark {
   padding: 40px;
 }
 
+/* These are the same semantic tiers exposed by UIkit's padding utilities.
+   They belong to the Slideshow content overlay, not to its image frame. */
+.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--none .shop-builder-swiper-content {
+  padding: 0;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--small .shop-builder-swiper-content {
+  padding: 15px;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--large .shop-builder-swiper-content {
+  padding: 40px;
+}
+
 /* Overlay Slider visibility and padding are element semantics, not image
    semantics. Swiper's active class supplies the only runtime state needed. */
 .shop-builder-overlay-display--hover .shop-builder-overlay-slide-content,
@@ -1008,6 +1244,73 @@ body.dark {
   padding: 2.5rem;
 }
 
+/* Overlay Slider has the same shared Swiper movement engine as the other
+   carousel elements, but YOOtheme's overlay navigation is a UIkit dotnav
+   positioned against the media frame — never Swiper's generic bar pagination. */
+.shop-builder-swiper--overlay {
+  position: relative;
+}
+
+.shop-builder-overlay-navigation-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.shop-builder-overlay-dotnav {
+  position: absolute;
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.shop-builder-overlay-dotnav > li {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.shop-builder-overlay-dotnav .swiper-pagination-bullet {
+  display: block !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  border: 1px solid color-mix(in srgb, var(--global-primary-background, #6f40f1) 35%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--global-primary-background, #6f40f1) 20%, transparent) !important;
+  opacity: 1 !important;
+}
+
+.shop-builder-overlay-dotnav .swiper-pagination-bullet-active {
+  border-color: var(--global-primary-background, #6f40f1) !important;
+  background: var(--global-primary-background, #6f40f1) !important;
+}
+
+.shop-builder-swiper--overlay { --shop-builder-overlay-nav-inset: 30px; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-margin--none { --shop-builder-overlay-nav-inset: 0; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-margin--small { --shop-builder-overlay-nav-inset: 15px; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-margin--default { --shop-builder-overlay-nav-inset: 20px; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-margin--large { --shop-builder-overlay-nav-inset: 40px; }
+.shop-builder-swiper--overlay .shop-builder-overlay-dotnav { bottom: var(--shop-builder-overlay-nav-inset); left: 50%; transform: translateX(-50%); }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--top-left .shop-builder-overlay-dotnav { top: var(--shop-builder-overlay-nav-inset); bottom: auto; left: var(--shop-builder-overlay-nav-inset); transform: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--top-right .shop-builder-overlay-dotnav { top: var(--shop-builder-overlay-nav-inset); bottom: auto; right: var(--shop-builder-overlay-nav-inset); left: auto; transform: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--center-left .shop-builder-overlay-dotnav { top: 50%; bottom: auto; left: var(--shop-builder-overlay-nav-inset); transform: translateY(-50%); }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--center-right .shop-builder-overlay-dotnav { top: 50%; bottom: auto; right: var(--shop-builder-overlay-nav-inset); left: auto; transform: translateY(-50%); }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--bottom-left .shop-builder-overlay-dotnav { left: var(--shop-builder-overlay-nav-inset); transform: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-pos--bottom-right .shop-builder-overlay-dotnav { right: var(--shop-builder-overlay-nav-inset); left: auto; transform: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-below .shop-builder-overlay-navigation-frame { position: relative; inset: auto; height: auto; pointer-events: auto; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-below { overflow: visible; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-below .shop-builder-overlay-dotnav { position: relative; top: auto; right: auto; bottom: auto; left: auto; width: fit-content; margin: var(--shop-builder-overlay-nav-inset) auto 0; transform: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-from-small .shop-builder-overlay-navigation-frame,
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-from-medium .shop-builder-overlay-navigation-frame,
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-from-large .shop-builder-overlay-navigation-frame,
+.shop-builder-swiper--overlay.shop-builder-overlay-nav-from-xlarge .shop-builder-overlay-navigation-frame { display: none; }
+/* Overlay Slider navigation visibility is emitted by the same page policy. */
+
 /* Overlay Slider owns an image/overlay item, not the generic carousel-card
    320px frame. This preserves its compact static-item geometry. */
 .shop-builder-overlay-slide-card--natural {
@@ -1017,6 +1320,17 @@ body.dark {
   aspect-ratio: 3 / 2;
   min-height: 0;
 }
+
+/* A missing YOOtheme overlay_style is deliberately transparent. The source
+   controls whether content gets an Overlay or Tile surface; the renderer must
+   not introduce a generic dark gradient as a component default. */
+.shop-builder-swiper--overlay.shop-builder-overlay-style--none .shop-builder-overlay-slide-content { background: transparent; box-shadow: none; }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--default .shop-builder-overlay-slide-content { background: rgba(0, 0, 0, .58); }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--primary .shop-builder-overlay-slide-content { background: var(--global-primary-background, #6f40f1); }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--tile-default .shop-builder-overlay-slide-content { background: var(--global-muted-background, #f5f5f5); }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--tile-muted .shop-builder-overlay-slide-content { background: var(--global-muted-background, #f5f5f5); }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--tile-primary .shop-builder-overlay-slide-content { background: var(--global-primary-background, #6f40f1); }
+.shop-builder-swiper--overlay.shop-builder-overlay-style--tile-secondary .shop-builder-overlay-slide-content { background: var(--global-secondary-background, #1e87f0); }
 
 /* UIkit's caption mode keeps media and content in the same item, but places
    the caption in normal flow below the image rather than covering it. */
@@ -1600,43 +1914,22 @@ body.dark {
   gap: var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px));
 }
 
-/* This block intentionally follows the legacy Grid base rule above. It is the
-   canonical responsive cascade used by both Builder and storefront. */
-@media (min-width: 640px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-phone-landscape, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr))));
-    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%));
-    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto));
-    --shop-builder-grid-display: var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid));
-  }
+/* YOOtheme Grid's “Center columns” is UIkit's `uk-flex-center` on the
+   collection track. It centers incomplete rows; CSS Grid's justify-items
+   would only center content inside fixed tracks. Native WebPages Grids retain
+   their existing grid presentation. */
+.shop-builder-grid--yootheme-column-center {
+  display: flex;
+  justify-content: center;
 }
 
-@media (min-width: 960px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-tablet, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%)));
-    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto)));
-    --shop-builder-grid-display: var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid)));
-  }
+.shop-builder-grid--yootheme-column-center > .shop-builder-grid-card {
+  flex: 0 0 var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
+  width: var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
 }
 
-@media (min-width: 1200px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-desktop, var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%))));
-    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-desktop, var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto))));
-    --shop-builder-grid-display: var(--shop-builder-grid-display-desktop, var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid))));
-  }
-}
-
-@media (min-width: 1600px) {
-  .shop-builder-grid {
-    grid-template-columns: var(--shop-builder-grid-template-xlarge, var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-xlarge, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
-    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-xlarge, var(--shop-builder-grid-image-width-desktop, var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%)))));
-    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-xlarge, var(--shop-builder-grid-card-width-desktop, var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto)))));
-    --shop-builder-grid-display: var(--shop-builder-grid-display-xlarge, var(--shop-builder-grid-display-desktop, var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid)))));
-  }
-}
+/* Grid's responsive cascade is generated per rendered page from the canonical
+   Global Styles policy. */
 
 .shop-builder-grid--gap-none {
   --shop-builder-grid-gap: 0px;
@@ -2744,7 +3037,7 @@ body.dark {
 }
 
 .shop-builder-column-block--icon svg {
-  color: var(--builder-section-text, var(--builder-text, #111111));
+  color: inherit;
 }
 
 .shop-builder-column-block--icon h3,
@@ -2927,6 +3220,14 @@ body.dark {
 .shop-builder-column-block span {
   color: var(--builder-active-muted, #70706a);
   font-size: 12px;
+}
+
+/* The generic Builder copy treatment must not override canonical UIkit icon
+ * color inheritance. Icon color is owned by the parent semantic text class. */
+.shop-builder-column-block .webpages-icon {
+  display: inline-flex;
+  color: inherit;
+  font-size: inherit;
 }
 
 .shop-builder-column-block h3:not([class*="uk-heading-"]):not([class*="uk-h"]) {
@@ -5489,7 +5790,7 @@ body.dark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--uk-accordion-icon-color, currentColor);
+  color: var(--uikit-accordion-icon-color, var(--uk-accordion-icon-color, currentColor));
 }
 .shop-builder-accordion--indicator-none .shop-builder-accordion-indicator {
   display: none;
@@ -5506,9 +5807,9 @@ body.dark {
 .shop-builder-accordion--indicator-chevron .uk-open .shop-builder-accordion-indicator {
   transform: rotate(180deg);
 }
-.shop-builder-accordion--title-muted .uk-accordion-title { color: var(--uk-global-muted-text-color, #6b7280); }
-.shop-builder-accordion--title-emphasis .uk-accordion-title { color: var(--uk-global-emphasis-color, inherit); font-weight: 700; }
-.shop-builder-accordion--style-divided > li + li { border-top: var(--uk-accordion-item-border-width, 1px) solid var(--uk-accordion-item-border, rgba(0,0,0,.12)); }
+.shop-builder-accordion--title-muted .uk-accordion-title { color: var(--uikit-text-muted-color, var(--uk-global-muted-text-color, #6b7280)); }
+.shop-builder-accordion--title-emphasis .uk-accordion-title { color: var(--uikit-text-emphasis-color, var(--uk-global-emphasis-color, inherit)); font-weight: 700; }
+.shop-builder-accordion--style-divided > li + li { border-top: var(--uk-accordion-item-border-width, 1px) solid var(--uikit-accordion-divider-color, var(--uk-accordion-item-border, rgba(0,0,0,.12))); }
 .shop-builder-accordion--style-minimal > li { border: 0; }
 .shop-builder-accordion--items-small > :nth-child(n+2) { margin-top: var(--uk-global-margin-small, 15px); }
 .shop-builder-accordion--items-default > :nth-child(n+2) { margin-top: var(--uk-global-margin, 30px); }
@@ -5528,6 +5829,7 @@ body.dark {
   align-items: center;
   justify-content: flex-start;
   text-align: left;
+  color: var(--uikit-accordion-title-color, var(--context-emphasis, var(--context-text, currentColor)));
   transition: color 160ms ease, background-color 160ms ease;
 }
 .shop-builder-accordion .shop-builder-accordion-title-text {
@@ -5537,7 +5839,7 @@ body.dark {
   text-align: left;
 }
 .shop-builder-accordion .uk-accordion-title:hover {
-  color: var(--uk-accordion-title-hover-color, color-mix(in srgb, currentColor 72%, var(--accent, #1e87f0)));
+  color: var(--uikit-accordion-title-hover-color, var(--uk-accordion-title-hover-color, color-mix(in srgb, currentColor 72%, var(--accent, #1e87f0))));
 }
 .shop-builder-accordion .uk-accordion-title:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #1e87f0) 65%, transparent);
@@ -5547,6 +5849,7 @@ body.dark {
 .shop-builder-accordion .uk-accordion-content {
   margin-top: var(--uk-accordion-content-margin-top, 12px);
   padding-bottom: 4px;
+  color: var(--uikit-accordion-content-color, var(--context-text, currentColor));
   line-height: 1.65;
 }
 @media (max-width: 760px) {
@@ -5582,35 +5885,36 @@ h3.shop-builder-title { font-size: 1.5rem; line-height: 1.4; font-weight: 600; }
 h4.shop-builder-title { font-size: 1.25rem; line-height: 1.4; font-weight: 600; }
 h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
 
-/* YooTheme Pro Element Max-Width Utility Classes */
-.uk-width-small { max-width: 300px !important; width: 100%; box-sizing: border-box; }
-.uk-width-medium { max-width: 450px !important; width: 100%; box-sizing: border-box; }
-.uk-width-large { max-width: 600px !important; width: 100%; box-sizing: border-box; }
-.uk-width-xlarge { max-width: 750px !important; width: 100%; box-sizing: border-box; }
-.uk-width-2xlarge { max-width: 900px !important; width: 100%; box-sizing: border-box; }
+/* UIkit Width utilities. These are the fixed source semantics used by
+   YOOtheme General → Max Width; they are intentionally not container tiers. */
+.uk-width-small { width: 150px !important; box-sizing: border-box; }
+.uk-width-medium { width: 300px !important; box-sizing: border-box; }
+.uk-width-large { width: 450px !important; box-sizing: border-box; }
+.uk-width-xlarge { width: 600px !important; box-sizing: border-box; }
+.uk-width-2xlarge { width: 750px !important; box-sizing: border-box; }
 
 @media (min-width: 640px) {
-  .uk-width-small\@s { max-width: 300px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-medium\@s { max-width: 450px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-large\@s { max-width: 600px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-xlarge\@s { max-width: 750px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-2xlarge\@s { max-width: 900px !important; width: 100%; box-sizing: border-box; }
+  .uk-width-small\@s { width: 150px !important; box-sizing: border-box; }
+  .uk-width-medium\@s { width: 300px !important; box-sizing: border-box; }
+  .uk-width-large\@s { width: 450px !important; box-sizing: border-box; }
+  .uk-width-xlarge\@s { width: 600px !important; box-sizing: border-box; }
+  .uk-width-2xlarge\@s { width: 750px !important; box-sizing: border-box; }
 }
 
 @media (min-width: 960px) {
-  .uk-width-small\@m { max-width: 300px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-medium\@m { max-width: 450px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-large\@m { max-width: 600px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-xlarge\@m { max-width: 750px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-2xlarge\@m { max-width: 900px !important; width: 100%; box-sizing: border-box; }
+  .uk-width-small\@m { width: 150px !important; box-sizing: border-box; }
+  .uk-width-medium\@m { width: 300px !important; box-sizing: border-box; }
+  .uk-width-large\@m { width: 450px !important; box-sizing: border-box; }
+  .uk-width-xlarge\@m { width: 600px !important; box-sizing: border-box; }
+  .uk-width-2xlarge\@m { width: 750px !important; box-sizing: border-box; }
 }
 
 @media (min-width: 1200px) {
-  .uk-width-small\@l { max-width: 300px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-medium\@l { max-width: 450px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-large\@l { max-width: 600px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-xlarge\@l { max-width: 750px !important; width: 100%; box-sizing: border-box; }
-  .uk-width-2xlarge\@l { max-width: 900px !important; width: 100%; box-sizing: border-box; }
+  .uk-width-small\@l { width: 150px !important; box-sizing: border-box; }
+  .uk-width-medium\@l { width: 300px !important; box-sizing: border-box; }
+  .uk-width-large\@l { width: 450px !important; box-sizing: border-box; }
+  .uk-width-xlarge\@l { width: 600px !important; box-sizing: border-box; }
+  .uk-width-2xlarge\@l { width: 750px !important; box-sizing: border-box; }
 }
 h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; }
 
@@ -5632,13 +5936,19 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .uk-heading-line { overflow: hidden !important; display: flex !important; align-items: center !important; }
 .uk-heading-line::before, .uk-heading-line::after { content: "" !important; flex: 1 !important; border-bottom: 1px solid #cbd5e1 !important; margin: 0 12px !important; }
 
-/* UIkit Meta & Content Styles */
-.uk-text-meta { font-size: 0.875rem !important; color: #64748b !important; line-height: 1.4 !important; }
-.shop-builder-card--inverse-meta .uk-text-meta { color: var(--builder-card-meta-color, var(--uk-global-inverse-color, var(--uk-global-color, currentColor))) !important; }
-.uk-text-muted { color: #94a3b8 !important; }
-.uk-text-primary { color: #1e87f0 !important; font-weight: 600 !important; }
-.uk-text-secondary { color: #0f172a !important; font-weight: 600 !important; }
-.uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: #334155 !important; }
+/* UIkit Text utilities inherit their color from the canonical semantic
+   context. Explicit utility colors write a local role token, so they still
+   outrank an inverse surface without reintroducing a fixed light palette. */
+.uk-text-meta { font-size: 0.875rem !important; color: var(--uikit-text-local-color, var(--uikit-text-meta-color, var(--context-muted, var(--uk-global-muted-text-color, currentColor)))) !important; line-height: 1.4 !important; }
+.shop-builder-card--inverse-meta .uk-text-meta { color: var(--builder-card-meta-color, var(--uikit-text-meta-color, var(--uk-global-inverse-color, var(--uk-global-color, currentColor)))) !important; }
+.uk-text-muted { --uikit-text-local-color: var(--uikit-text-muted-color, var(--context-muted, var(--uk-global-muted-text-color, currentColor))); color: var(--uikit-text-local-color) !important; }
+.uk-text-emphasis { --uikit-text-local-color: var(--uikit-text-emphasis-color, var(--context-emphasis, var(--uk-global-emphasis-color, currentColor))); color: var(--uikit-text-local-color) !important; }
+.uk-text-primary { --uikit-text-local-color: var(--uikit-text-primary-color, var(--uk-global-primary-color, #1e87f0)); color: var(--uikit-text-local-color) !important; font-weight: 600 !important; }
+.uk-text-secondary { --uikit-text-local-color: var(--uikit-text-secondary-color, var(--uk-global-emphasis-color, currentColor)); color: var(--uikit-text-local-color) !important; font-weight: 600 !important; }
+.uk-text-success { --uikit-text-local-color: var(--uk-global-success-background, #32d296); color: var(--uikit-text-local-color) !important; }
+.uk-text-warning { --uikit-text-local-color: var(--uk-global-warning-background, #faa05a); color: var(--uikit-text-local-color) !important; }
+.uk-text-danger { --uikit-text-local-color: var(--uk-global-danger-background, #f0506e); color: var(--uikit-text-local-color) !important; }
+.uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: var(--uikit-text-local-color, var(--uikit-text-lead-color, var(--context-text, var(--uk-global-text-color, currentColor)))) !important; }
 .uk-text-small { font-size: 0.875rem !important; line-height: 1.4 !important; }
 .uk-text-large { font-size: 1.35rem !important; line-height: 1.5 !important; }
 
@@ -5750,4 +6060,11 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 }
 .uk-container-expand-right {
   margin-right: calc(-50vw + 50%) !important;
+}
+
+/* UIkit Lightbox is appended to document.body. In Builder its real UIkit
+   panel must sit above the editing chrome so UIkit's own close/navigation
+   controls remain interactive; storefront retains the same UIkit panel. */
+body.is-visual-builder-active .uk-lightbox {
+  z-index: 1000000 !important;
 }

@@ -242,9 +242,9 @@ export default function UikitAccordion({
                   <UikitText content={item.content} variant={contentStyleVal === "inherit" ? "default" : contentStyleVal} />
                 </div>
               )}
-              {canShowLink && (item.buttonUrl || item.buttonLabel || rawBlock.accordionLinkUrl || rawBlock.accordionLinkText) && (
-                <div className="uk-margin-top">
-                  <a href={itemUrl} className={linkStyleClass} {...builderLinkTargetProps(linkTarget)}>{buttonText}</a>
+              {canShowLink && (item.buttonUrl || rawBlock.accordionLinkUrl) && (
+                <div className={getUikitMarginClass(rawBlock.accordionLinkMargin ?? "default", "top")}>
+                  <a href={itemUrl} className={`${linkStyleClass} ${rawBlock.accordionFullWidth ? "uk-width-1-1" : ""}`.trim()} {...builderLinkTargetProps(linkTarget)}>{buttonText}</a>
                 </div>
               )}
             </>

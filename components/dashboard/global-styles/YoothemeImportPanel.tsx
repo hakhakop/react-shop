@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { BuilderDesign } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveYoothemeLess, YOOTHEME_DEVSTACK_PRESETS, type YoothemeDevstackPresetId, type YoothemeImportRow, type YoothemeLessSource, type YoothemeSemanticPreset } from "@/lib/yoothemeLessImporter";
+import type { YoothemeCapabilityStatus } from "@/lib/yoothemeCompatibilityRegistry";
 
 type Props = {
   design: BuilderDesign;
@@ -45,6 +46,10 @@ function StatusBadge({ row }: { row: YoothemeImportRow }) {
   return <span className={`builder-import-status is-${row.status}`}>{row.status}</span>;
 }
 
+function ReportStatusBadge({ status }: { status: YoothemeCapabilityStatus }) {
+  return <span className={`builder-import-status is-${status.toLowerCase()}`}>{status}</span>;
+}
+
 export default function YoothemeImportPanel({ design, shellSettings, updateDesign, updateShellSettings }: Props) {
   const [preset, setPreset] = useState<YoothemeSemanticPreset | null>(null);
   const [presetId, setPresetId] = useState<YoothemeDevstackPresetId>("devstack-light-blue");
@@ -59,7 +64,13 @@ export default function YoothemeImportPanel({ design, shellSettings, updateDesig
       const nextFiles = files ?? [];
       setSelectedFiles(nextFiles);
       const sources = await readSources(nextFiles, selectedPresetId);
-      if (sources.length < 2) throw new Error("Select DevStack.zip or the required LESS layers before previewing.");
+      // `_import.less` is a complete, versioned semantic source for themes
+      // such as DevStack. Requiring an unrelated style layer makes a valid
+      // Global Styles import look successful while preventing its Button
+      // tokens from ever reaching the canonical shell owner.
+      if (!sources.some((source) => source.name.endsWith("_import.less"))) {
+        throw new Error("Select the YOOtheme _import.less file or a DevStack.zip containing it before previewing.");
+      }
       setPreset(resolveYoothemeLess(sources, selectedPresetId));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to read the LESS layers.");
@@ -96,6 +107,7 @@ export default function YoothemeImportPanel({ design, shellSettings, updateDesig
   };
 
   const rows = preset?.rows ?? [];
+  const report = preset?.report;
   return (
     <div className="builder-global-styles-group" data-testid="yootheme-import-panel">
       <div className="builder-card-title"><strong>YOOtheme Global Style Import</strong><span>semantic preview only</span></div>
@@ -107,9 +119,9 @@ export default function YoothemeImportPanel({ design, shellSettings, updateDesig
       {preset ? (
         <>
           <div className="builder-card-title"><strong>{preset.name}</strong><span>{preset.sources.length} layers · {rows.length} mapped</span></div>
-          <div className="builder-import-summary"><span>{rows.filter((row) => row.status === "mapped").length} mapped and rendered</span><span>{preset.conflicts.length} precedence conflicts</span><span>{preset.unsupported.length} intentionally unsupported/report-only</span></div>
+          <div className="builder-import-summary"><span>{report?.byStatus.SUPPORTED.length ?? 0} supported semantics</span><span>{report?.byStatus.DEFERRED.length ?? 0} deferred</span><span>{(report?.byStatus.INTENTIONALLY_UNSUPPORTED.length ?? 0) + (report?.byStatus.UNHANDLED.length ?? 0) + (report?.byStatus.BLOCKED.length ?? 0)} needs attention</span></div>
           <div className="builder-import-table-wrap"><table className="builder-import-table"><thead><tr><th>Source variable</th><th>Resolved value</th><th>WebPages destination</th><th>Status</th></tr></thead><tbody>{rows.slice(0, 40).map((row) => <tr key={`${row.source}-${row.variable}`}><td><code>{row.variable}</code><small>{row.source}</small></td><td>{row.resolvedValue}</td><td>{row.destination}</td><td><StatusBadge row={row} /></td></tr>)}</tbody></table></div>
-          {preset.unsupported.length > 0 ? <details className="builder-collapse"><summary>Unsupported and report-only variables ({preset.unsupported.length})</summary><div className="builder-import-report-list">{preset.unsupported.slice(0, 80).map((row) => <div key={`${row.source}-${row.variable}`}><code>{row.variable}</code><span>{row.note}</span></div>)}</div></details> : null}
+          {report && report.entries.some((entry) => entry.status !== "SUPPORTED") ? <details className="builder-collapse"><summary>Compatibility report ({report.entries.filter((entry) => entry.status !== "SUPPORTED").length})</summary><div className="builder-import-report-list">{report.entries.filter((entry) => entry.status !== "SUPPORTED").slice(0, 80).map((entry) => <div key={`${entry.status}-${entry.capabilityKey}`}><code>{entry.capabilityKey}</code><ReportStatusBadge status={entry.status} /><span>{entry.reason}{entry.occurrenceCount > 1 ? ` (${entry.occurrenceCount} occurrences)` : ""}</span></div>)}</div></details> : null}
           <button type="button" className="builder-global-preset-apply" onClick={apply}>Apply {preset.name}</button>
           {shellSettings.globalStylePresetBackup ? <><p className="builder-shell-note">A semantic rollback snapshot is retained in the Global Styles document.</p><button type="button" className="builder-secondary-button" onClick={restore}>Restore previous WebPages globals</button></> : null}
         </>

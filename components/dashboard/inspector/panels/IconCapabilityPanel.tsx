@@ -11,6 +11,7 @@ import {
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -40,20 +41,21 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
         <InspectorDivision title="LINK">
           <InspectorFieldRow label="Link URL">
             <InspectorTextField
-              value={rawBlock.buttonUrl ?? rawBlock.imageLinkUrl ?? ""}
-              onChange={(v) => update({ buttonUrl: v, imageLinkUrl: v } as any)}
+              value={rawBlock.iconLinkUrl ?? rawBlock.buttonUrl ?? rawBlock.imageLinkUrl ?? ""}
+              onChange={(v) => update({ iconLinkUrl: v } as any)}
               placeholder="Optional link"
               ariaLabel="Icon Link URL"
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Link Target">
             <InspectorSelect
-              value={rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self"}
+              value={rawBlock.iconLinkTarget ?? rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self"}
               options={BUILDER_LINK_TARGET_OPTIONS}
-              onChange={(v) => update({ buttonTarget: v, imageLinkTarget: v } as any)}
+              onChange={(v) => update({ iconLinkTarget: v } as any)}
               ariaLabel="Icon Link Target"
             />
           </InspectorFieldRow>
+          <InspectorFieldRow label="ARIA Label"><InspectorTextField value={rawBlock.iconLinkAriaLabel ?? ""} onChange={(v) => update({ iconLinkAriaLabel: v } as any)} ariaLabel="Icon Link ARIA Label" /></InspectorFieldRow>
         </InspectorDivision>
       </div>
     );
@@ -61,44 +63,7 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="icon-advanced">
-        <InspectorDivision title="ADVANCED">
-          <InspectorFieldRow label="ID">
-            <InspectorTextField
-              value={rawBlock.customId ?? block.id ?? ""}
-              onChange={(v) => update({ customId: v, id: v } as any)}
-              placeholder="e.g. main-icon"
-              ariaLabel="Custom ID"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Class">
-            <InspectorTextField
-              value={rawBlock.customClass ?? ""}
-              onChange={(v) => update({ customClass: v } as any)}
-              placeholder="e.g. my-custom-icon"
-              ariaLabel="Custom Class"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Attributes">
-            <InspectorTextField
-              value={rawBlock.customAttributes ?? ""}
-              onChange={(v) => update({ customAttributes: v } as any)}
-              placeholder='data-custom="value"'
-              ariaLabel="Custom Attributes"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom CSS">
-            <InspectorTextarea
-              value={rawBlock.customCss ?? ""}
-              onChange={(v) => update({ customCss: v } as any)}
-              placeholder="/* CSS rules */"
-              ariaLabel="Custom CSS"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-      </div>
-    );
+    return <ElementAdvancedPanel block={block} update={update} />;
   }
 
   // SETTINGS TAB (Default)
@@ -107,7 +72,7 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
       <InspectorDivision title="ICON">
         <InspectorFieldRow label="Color">
           <InspectorSelect
-            value={rawBlock.iconColorScheme ?? "primary"}
+            value={rawBlock.iconColorScheme ?? "default"}
             options={[
               { value: "default", label: "Default" },
               { value: "muted", label: "Muted" },
@@ -121,7 +86,7 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
             ariaLabel="Icon Color"
           />
         </InspectorFieldRow>
-        <InspectorFieldRow label="Size">
+        <InspectorFieldRow label="Icon Width">
           <InspectorSelect
             value={String(rawBlock.iconSize ?? 32)}
             options={[16, 24, 32, 48, 64, 80, 96].map((size) => ({
@@ -129,8 +94,17 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
               label: `${size}px`,
             }))}
             onChange={(v) => update({ iconSize: Number(v) } as any)}
-            ariaLabel="Icon Size"
+            ariaLabel="Icon Width"
           />
+        </InspectorFieldRow>
+      </InspectorDivision>
+      <InspectorDivision title="LINK">
+        <InspectorFieldRow label="Style">
+          <InspectorSelect value={rawBlock.iconLinkStyle ?? "icon"} options={[
+            { value: "icon", label: "Icon Link" }, { value: "button", label: "Icon Button" },
+            { value: "link", label: "Link" }, { value: "muted", label: "Link Muted" },
+            { value: "text", label: "Link Text" }, { value: "reset", label: "Link Reset" },
+          ]} onChange={(v) => update({ iconLinkStyle: v } as any)} ariaLabel="Icon Link Style" />
         </InspectorFieldRow>
       </InspectorDivision>
     </div>

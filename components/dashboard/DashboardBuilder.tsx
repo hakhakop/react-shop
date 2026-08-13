@@ -66,6 +66,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { GridCardsClient } from "@/components/builder/GridCardsClient";
+import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import { isLocale, localeLabels } from "@/lib/i18n";
 import {
@@ -178,6 +179,15 @@ import {
   UIKIT_LAYOUT_PRESETS,
 } from "@/lib/uikitLayoutEngine";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import {
+  resolveResponsiveBreakpointPolicy,
+  resolveResponsiveBreakpointTier,
+} from "@/lib/responsiveBreakpointPolicy";
+import {
+  getUikitSemanticContextVars,
+  getYoothemeImportGlobalAliases,
+  hasYoothemeImportContract,
+} from "@/lib/uikitSemanticContext";
 import WebPagesFontLoader from "@/components/builder/WebPagesFontLoader";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
@@ -481,7 +491,14 @@ const PreviewSliderBlock = memo(function PreviewSliderBlock({
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
 }) {
-  const carousel = resolveCarouselPresentation(section.carouselSettings, section.slides as any[], shellSettings) as { settings: any; slides: any[] };
+  const carousel = resolveCarouselPresentation({
+    ...(section.carouselSettings ?? {}),
+    // General Text Alignment is owned by the element shell, not an invented
+    // carousel setting. Present it to the shared renderer only when the
+    // semantic adapter has no explicit component value.
+    contentAlign: section.carouselSettings?.contentAlign ?? (section as any).textAlign,
+  }, section.slides as any[], shellSettings) as { settings: any; slides: any[] };
+  const breakpointPolicy = resolveResponsiveBreakpointPolicy(shellSettings);
   const slides = carousel.slides.map(
     (slide, index) =>
       ({
@@ -520,6 +537,7 @@ const PreviewSliderBlock = memo(function PreviewSliderBlock({
       <CarouselBlock
         slides={slides}
         settings={carousel.settings}
+        breakpointPolicy={breakpointPolicy}
         className="builder-preview-carousel"
       />
     </div>
@@ -589,11 +607,13 @@ function RenderDashboardChecklist({
 
 const STORAGE_KEY = "react-shop-visual-builder-v1";
 const STORAGE_BY_KEY = "react-shop-visual-builder-drafts-v2";
+const STORAGE_DRAFT_METADATA = "react-shop-visual-builder-draft-metadata-v1";
 const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
 const SIDEBAR_COLLAPSED_BREAKPOINT = 900;
 type BuilderStorageKeys = {
   state: string;
   drafts: string;
+  draftMetadata: string;
   pages: string;
   sidebarCollapsed: string;
 };
@@ -601,6 +621,7 @@ type BuilderStorageKeys = {
 const defaultBuilderStorageKeys: BuilderStorageKeys = {
   state: STORAGE_KEY,
   drafts: STORAGE_BY_KEY,
+  draftMetadata: STORAGE_DRAFT_METADATA,
   pages: STORAGE_CUSTOM_PAGES,
   sidebarCollapsed: "react-shop-builder-sidebar-collapsed-v1",
 };
@@ -610,9 +631,47 @@ function getBuilderStorageKeys(websiteId?: string): BuilderStorageKeys {
   return {
     state: `${STORAGE_KEY}:${websiteId}`,
     drafts: `${STORAGE_BY_KEY}:${websiteId}`,
+    draftMetadata: `${STORAGE_DRAFT_METADATA}:${websiteId}`,
     pages: `${STORAGE_CUSTOM_PAGES}:${websiteId}`,
     sidebarCollapsed: `react-shop-builder-sidebar-collapsed-v1:${websiteId}`,
   };
+}
+
+type BuilderDraftMetadata = Partial<
+  Record<BuilderLayoutKey, { basePublishedSignature?: string }>
+>;
+
+function loadBuilderDraftMetadata(storageKey: string): BuilderDraftMetadata {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as BuilderDraftMetadata;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function removeBuilderDraft(
+  storageKeys: BuilderStorageKeys,
+  page: BuilderLayoutKey,
+) {
+  try {
+    const rawDrafts = window.localStorage.getItem(storageKeys.drafts);
+    const drafts = rawDrafts
+      ? (JSON.parse(rawDrafts) as Partial<Record<BuilderLayoutKey, BuilderState>>)
+      : {};
+    delete drafts[page];
+    window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+
+    const metadata = loadBuilderDraftMetadata(storageKeys.draftMetadata);
+    delete metadata[page];
+    window.localStorage.setItem(storageKeys.draftMetadata, JSON.stringify(metadata));
+  } catch {
+    // A failed browser-storage cleanup must not block the authoritative
+    // persisted document from being shown.
+  }
 }
 
 function getDefaultSidebarCollapsed() {
@@ -874,50 +933,8 @@ function resolveDesignColors(
 
 function sectionSchemeStyle(section: BuilderSection) {
   const colorScheme = resolveSectionColorScheme(section);
-
-  if (colorScheme === "dark") {
-    return {
-      "--builder-preview-section-text": darkScheme.textColor,
-      "--builder-preview-section-muted": darkScheme.mutedTextColor,
-      "--builder-preview-section-surface": darkScheme.surfaceColor,
-      "--builder-preview-section-button-bg": darkScheme.buttonBackground,
-      "--builder-preview-section-button-text": darkScheme.buttonTextColor,
-      "--builder-section-text": darkScheme.textColor,
-      "--builder-active-muted": darkScheme.mutedTextColor,
-      "--builder-active-surface": darkScheme.surfaceColor,
-      "--builder-active-button-bg": darkScheme.buttonBackground,
-      "--builder-active-button-text": darkScheme.buttonTextColor,
-      // Mirror the storefront's semantic inverse Section action context.
-      // Builder-only chrome decorates this surface; it must not own a second
-      // button palette.
-      "--uk-button-secondary-background": "transparent",
-      "--uk-button-secondary-text": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-border": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-hover-background": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-secondary-hover-text": "var(--uk-global-emphasis-color, #111)",
-      "--uk-button-secondary-hover-border": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-text-color": "var(--uk-global-inverse-color, #fff)",
-      "--uk-button-link-color": "var(--uk-global-inverse-color, #fff)",
-      "--uk-global-link-color": "var(--uk-global-inverse-color, #fff)",
-    } as CSSProperties;
-  }
-
-  if (colorScheme === "light") {
-    return {
-      "--builder-preview-section-text": lightScheme.textColor,
-      "--builder-preview-section-muted": lightScheme.mutedTextColor,
-      "--builder-preview-section-surface": lightScheme.surfaceColor,
-      "--builder-preview-section-button-bg": lightScheme.buttonBackground,
-      "--builder-preview-section-button-text": lightScheme.buttonTextColor,
-      "--builder-section-text": lightScheme.textColor,
-      "--builder-active-muted": lightScheme.mutedTextColor,
-      "--builder-active-surface": lightScheme.surfaceColor,
-      "--builder-active-button-bg": lightScheme.buttonBackground,
-      "--builder-active-button-text": lightScheme.buttonTextColor,
-    } as CSSProperties;
-  }
-
-  return {};
+  const background = resolveSectionBackground(section).override;
+  return getUikitSemanticContextVars(colorScheme, background) as CSSProperties;
 }
 
 function resolveSectionColorScheme(
@@ -1422,15 +1439,14 @@ function loadInitialState(
         return normalizeBuilderState(shopDraft, "shop");
       }
     }
-
-    const stored = window.localStorage.getItem(storageKeys.state);
-    if (!stored) return defaultState;
-    const parsed = JSON.parse(stored) as BuilderState;
-    if (!Array.isArray(parsed.sections)) return defaultState;
-    return normalizeBuilderState(parsed, parsed.page ?? "shop");
   } catch {
-    return defaultState;
+    // A malformed scoped draft must not block the authoritative published
+    // document load below.
   }
+
+  // This site-wide last-rendered snapshot is not a page-scoped draft. It can
+  // be an old import after a persisted document is restored elsewhere.
+  return defaultState;
 }
 
 function normalizeBuilderState(
@@ -1636,10 +1652,16 @@ function normalizeBuilderState(
           : "page",
     template: isTemplate ? (key as BuilderTemplate) : undefined,
     sections,
-    design: {
-      ...defaultDesign,
-      ...(state.design ?? {}),
-    },
+    // A YOOtheme page has no WebPages page-design-preset equivalent. Its
+    // imported sections inherit the canonical website Global Styles owner,
+    // rather than silently receiving the current Princity document defaults.
+    // Native documents retain their existing preset hydration unchanged.
+    design: hasYoothemeImportContract({ sections })
+      ? {}
+      : {
+          ...defaultDesign,
+          ...(state.design ?? {}),
+        },
   };
 }
 
@@ -2041,6 +2063,7 @@ export default function DashboardBuilder({
   const builderStateRef = useRef(builderState);
   builderStateRef.current = builderState;
   const restoredDraftKeysRef = useRef(new Set<BuilderLayoutKey>());
+  const draftMetadataRef = useRef<BuilderDraftMetadata>({});
   // A YOOtheme import replaces a persisted document. Its old local draft must
   // not win on the next Builder load after the imported document is published.
   const pendingYoothemeDraftInvalidationRef = useRef<BuilderLayoutKey | null>(null);
@@ -2129,6 +2152,7 @@ export default function DashboardBuilder({
   const [isResizingDevice, setIsResizingDevice] = useState(false);
   const [copied, setCopied] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
+  const [publishedDocumentReady, setPublishedDocumentReady] = useState(false);
   const [publishStatus, setPublishStatus] = useState("Local draft autosaves");
   const [publishCelebration, setPublishCelebration] = useState(false);
   const [uploadingSlide, setUploadingSlide] = useState<number | null>(null);
@@ -2759,11 +2783,15 @@ export default function DashboardBuilder({
   );
 
   useEffect(() => {
+    setPublishedDocumentReady(false);
     try {
       const storedDrafts = window.localStorage.getItem(storageKeys.drafts);
       const parsedDrafts = storedDrafts
         ? (JSON.parse(storedDrafts) as Partial<Record<BuilderLayoutKey, BuilderState>>)
         : {};
+      draftMetadataRef.current = loadBuilderDraftMetadata(
+        storageKeys.draftMetadata,
+      );
       restoredDraftKeysRef.current = new Set(
         Object.keys(parsedDrafts).filter((key): key is BuilderLayoutKey =>
           Boolean(parsedDrafts[key as BuilderLayoutKey]?.sections),
@@ -2771,6 +2799,7 @@ export default function DashboardBuilder({
       );
     } catch {
       restoredDraftKeysRef.current = new Set();
+      draftMetadataRef.current = {};
     }
     const draft = hydrateDocumentBuilderState(
       resolveBuilderMediaUrls(loadInitialState(storageKeys), wordpressMediaOrigin),
@@ -3067,6 +3096,7 @@ export default function DashboardBuilder({
 
     if (!nextKey || nextKey === builderState.page) return;
 
+    setPublishedDocumentReady(false);
     const nextState = hydrateDocumentBuilderState(
       loadDraftForKey(nextKey, storageKeys),
       shellSettings,
@@ -3131,7 +3161,7 @@ export default function DashboardBuilder({
   }, [builderApiUrl]);
 
   useEffect(() => {
-    if (!draftReady) return;
+    if (!draftReady || !publishedDocumentReady) return;
     // A published document is already the authoritative fallback. Persisting
     // it again as a draft makes a subsequent fresh import vulnerable to an
     // old browser draft winning during hydration.
@@ -3165,11 +3195,24 @@ export default function DashboardBuilder({
     }
     drafts[builderState.page] = builderState;
     window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+    const metadata = loadBuilderDraftMetadata(storageKeys.draftMetadata);
+    metadata[builderState.page] = {
+      ...(committedBuilderStateSignature
+        ? { basePublishedSignature: committedBuilderStateSignature }
+        : {}),
+    };
+    draftMetadataRef.current = metadata;
+    restoredDraftKeysRef.current.add(builderState.page);
+    window.localStorage.setItem(
+      storageKeys.draftMetadata,
+      JSON.stringify(metadata),
+    );
   }, [
     builderState,
     builderStateSignature,
     committedBuilderStateSignature,
     draftReady,
+    publishedDocumentReady,
     storageKeys,
   ]);
 
@@ -6338,7 +6381,7 @@ export default function DashboardBuilder({
     setPublishStatus("Reading published layout...");
     const requestedState = builderStateRef.current;
     const requestedSignature = JSON.stringify(requestedState);
-    const hasRestoredDraft = restoredDraftKeysRef.current.has(requestedState.page);
+    const hasStoredDraft = restoredDraftKeysRef.current.has(requestedState.page);
     const response = await fetch(builderApiUrl("/api/builder-layouts", {
       key: requestedState.page,
     }), {
@@ -6347,6 +6390,7 @@ export default function DashboardBuilder({
 
     if (!response.ok) {
       setPublishStatus("Could not read published layout");
+      setPublishedDocumentReady(true);
       return;
     }
 
@@ -6356,12 +6400,19 @@ export default function DashboardBuilder({
 
     if (JSON.stringify(builderStateRef.current) !== requestedSignature) {
       setPublishStatus("Kept newer local changes");
+      // A response for the previous page must not unlock draft persistence for
+      // the newly selected page. That race created a one-section Enterprise
+      // draft before its persisted document had loaded.
+      if (builderStateRef.current.page === requestedState.page) {
+        setPublishedDocumentReady(true);
+      }
       return;
     }
 
     if (!payload.layout?.sections?.length) {
       setPublishStatus("No published layout yet");
-      setCommittedBuilderStateSignature(hasRestoredDraft ? "" : requestedSignature);
+      setCommittedBuilderStateSignature(hasStoredDraft ? "" : requestedSignature);
+      setPublishedDocumentReady(true);
       return;
     }
 
@@ -6378,18 +6429,33 @@ export default function DashboardBuilder({
       }, requestedState.page);
 
     const nextSignature = JSON.stringify(nextPublishedState);
-    if (hasRestoredDraft) {
+    const draftMetadata = draftMetadataRef.current[requestedState.page];
+    const hasCompatibleRestoredDraft =
+      hasStoredDraft &&
+      draftMetadata?.basePublishedSignature === nextSignature;
+    if (hasCompatibleRestoredDraft) {
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus(
         nextSignature === requestedSignature
           ? "Local draft matches published"
           : "Local draft restored",
       );
+      setPublishedDocumentReady(true);
       return;
+    }
+
+    // A legacy draft has no base-document marker. A marked draft whose base
+    // differs from the persisted document is also stale (for example after a
+    // YOOtheme import or restore). Neither may conceal the persisted page.
+    if (hasStoredDraft) {
+      removeBuilderDraft(storageKeys, requestedState.page);
+      restoredDraftKeysRef.current.delete(requestedState.page);
+      delete draftMetadataRef.current[requestedState.page];
     }
     if (nextSignature === requestedSignature) {
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus("Local draft matches published");
+      setPublishedDocumentReady(true);
       return;
     }
 
@@ -6398,9 +6464,11 @@ export default function DashboardBuilder({
     setBuilderState(nextPublishedState);
     setSelectedId(nextPublishedState.sections[0]?.id ?? "");
     setPublishStatus("Published layout loaded");
+    setPublishedDocumentReady(true);
   }, [
     builderApiUrl,
     builderState.page,
+    storageKeys,
   ]);
 
   useEffect(() => {
@@ -6436,10 +6504,12 @@ export default function DashboardBuilder({
           invalidateImportedBuilderDraft(window.localStorage, {
             draftsKey: storageKeys.drafts,
             stateKey: storageKeys.state,
+            draftMetadataKey: storageKeys.draftMetadata,
             pageKey: builderState.page,
             importedState: builderState,
           });
           restoredDraftKeysRef.current.delete(builderState.page);
+          delete draftMetadataRef.current[builderState.page];
           // The import's setState effect can still be queued when Publish is
           // clicked. Skip precisely that already-persisted state once, rather
           // than allowing it to recreate the invalidated draft.
@@ -7515,7 +7585,9 @@ export default function DashboardBuilder({
       setYoothemeImportPreview({
         fileName: file.name,
         sections: mapping.sections,
-        warnings: mapping.warnings,
+        // Keep the existing string[] preview contract, but derive it from the
+        // canonical Phase 12 report rather than raw importer warning strings.
+        warnings: mapping.reportWarnings,
         globalStylePatch: mapping.globalStylePatch,
       });
       setTemplateStatus("YOOtheme import preview ready");
@@ -7534,6 +7606,10 @@ export default function DashboardBuilder({
 
     const importedState = {
       ...builderStateRef.current,
+      // Import replaces the document layer, not just its sections. Keep
+      // global values in BuilderShellSettings; do not carry over the previous
+      // native WebPages page-design preset as an accidental local override.
+      design: {},
       sections: resolveBuilderMediaUrls(
         yoothemeImportPreview.sections,
         wordpressMediaOrigin,
@@ -7548,10 +7624,12 @@ export default function DashboardBuilder({
       invalidateImportedBuilderDraft(window.localStorage, {
         draftsKey: storageKeys.drafts,
         stateKey: storageKeys.state,
+        draftMetadataKey: storageKeys.draftMetadata,
         pageKey: importedState.page,
         importedState,
       });
       restoredDraftKeysRef.current.delete(importedState.page);
+      delete draftMetadataRef.current[importedState.page];
       skipImportedDraftPersistenceRef.current = {
         page: importedState.page,
         signature: JSON.stringify(importedState),
@@ -10125,6 +10203,7 @@ export default function DashboardBuilder({
             <ProductCategoryFilterProvider key={headerContextState.page}>
               <PreviewCanvas
                 device={device}
+                previewWidth={previewCanvasWidth}
                 interactionScale={device === "desktop" ? 1 : previewScale}
                 continuousGeometryUpdates={isResizingDevice}
                 sections={headerContextSections}
@@ -10464,6 +10543,7 @@ function useStableCallbackObject<T extends StableCallbackRecord>(callbacks: T): 
 
 function PreviewCanvas({
   device,
+  previewWidth,
   interactionScale,
   continuousGeometryUpdates,
   sections,
@@ -10543,6 +10623,7 @@ function PreviewCanvas({
   onApplyLayoutPreset,
 }: {
   device: PreviewDevice;
+  previewWidth: number;
   interactionScale: number;
   continuousGeometryUpdates: boolean;
   sections: BuilderSection[];
@@ -11084,6 +11165,14 @@ function PreviewCanvas({
     () => sections.filter((section) => section.visible),
     [sections],
   );
+  const responsiveBreakpointPolicy = useMemo(
+    () => resolveResponsiveBreakpointPolicy(shellSettings),
+    [shellSettings],
+  );
+  const previewResponsiveTier = useMemo(
+    () => resolveResponsiveBreakpointTier(previewWidth, responsiveBreakpointPolicy),
+    [previewWidth, responsiveBreakpointPolicy],
+  );
   const animationSignature = useMemo(
     () => visibleSections
       .map((section) => {
@@ -11333,6 +11422,7 @@ function PreviewCanvas({
         setActiveDragOver(null);
       }}
     >
+      <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} />
       {visibleSections.length === 0 && (
         <div className="builder-preview-empty">
           <Layers3 size={22} />
@@ -11354,8 +11444,25 @@ function PreviewCanvas({
           design.colorScheme ?? "auto"
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         data-theme={layoutScheme}
-        style={previewDesignStyle(design, layoutScheme)}
+        style={{
+          ...previewDesignStyle(design, layoutScheme),
+          ...(hasYoothemeImportContract({ sections })
+            ? getYoothemeImportGlobalAliases()
+            : {}),
+        }}
         data-builder-page-root
+        data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
+        data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}
+        data-responsive-breakpoint-medium={responsiveBreakpointPolicy.medium}
+        data-responsive-breakpoint-large={responsiveBreakpointPolicy.large}
+        data-responsive-breakpoint-xlarge={responsiveBreakpointPolicy.xlarge}
+        data-responsive-preview-width={previewWidth}
+        // Desktop Builder uses the real rendered-page viewport, exactly like
+        // storefront. Device previews deliberately opt into the simulated
+        // canvas tier below; applying that simulation to desktop caused a
+        // 640px browser viewport to be treated as its sidebar-reduced canvas
+        // width instead of the canonical UIkit Small boundary.
+        data-responsive-preview-tier={device === "desktop" ? undefined : previewResponsiveTier}
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
         data-overlap-header={
@@ -11834,7 +11941,7 @@ function previewDesignStyle(
   const colors = resolveDesignColors(design, layoutScheme);
   return {
     background: colors.pageBackground,
-    color: colors.textColor,
+    color: "var(--uk-global-text-color, #111827)",
     "--builder-page-bg": colors.pageBackground,
     "--builder-preview-text": colors.textColor,
     "--builder-preview-muted": colors.mutedTextColor,
@@ -11842,8 +11949,8 @@ function previewDesignStyle(
     "--builder-preview-surface": colors.surfaceColor,
     "--builder-preview-button-bg": colors.buttonBackground,
     "--builder-preview-button-text": colors.buttonTextColor,
-    "--builder-text": colors.textColor,
-    "--builder-muted": colors.mutedTextColor,
+    "--builder-text": "var(--uk-global-text-color, #111827)",
+    "--builder-muted": "var(--uk-global-muted-text-color, #6b7280)",
     "--builder-accent": colors.accentColor,
     "--builder-surface": colors.surfaceColor,
     "--builder-button-bg": colors.buttonBackground,
@@ -11856,7 +11963,7 @@ function previewDesignStyle(
     "--builder-heading-size": design.headingSize,
     "--builder-heading-weight": design.headingWeight,
     "--builder-heading-line-height": design.headingLineHeight,
-    "--builder-heading-color": design.headingColor,
+    "--builder-heading-color": "var(--builder-active-heading, var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827)))",
     "--builder-card-bg": design.cardBg,
     "--builder-card-radius": design.cardRadius,
     "--builder-card-border": design.cardBorder,
@@ -15015,6 +15122,9 @@ const PreviewSection = memo(function PreviewSection({
                         data-builder-column-key={columnKey}
                         data-builder-block-key={blockKey}
                         data-builder-element-scope={elementAdvancedScope(block)}
+                        data-builder-has-advanced-css={
+                          resolveElementAdvanced(block).customCss ? "true" : undefined
+                        }
                         data-builder-interaction-state={blockInteractionState}
                         data-builder-double-click-inspector="true"
                         draggable={false}

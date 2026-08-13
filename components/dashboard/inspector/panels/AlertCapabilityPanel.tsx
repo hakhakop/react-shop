@@ -9,6 +9,9 @@ import {
   InspectorTextField,
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -33,14 +36,15 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Alert Title"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Body">
-            <InspectorTextarea
+          <InspectorFieldRow label="Content">
+            <RichTextEditor
               value={rawBlock.body ?? rawBlock.content ?? ""}
               onChange={(v) => update({ body: v, content: v } as any)}
               placeholder="Alert message content..."
-              ariaLabel="Alert Content"
             />
           </InspectorFieldRow>
+          <InspectorFieldRow label="Link URL"><InspectorTextField value={rawBlock.alertLinkUrl ?? ""} onChange={(v) => update({ alertLinkUrl: v } as any)} ariaLabel="Alert Link URL" /></InspectorFieldRow>
+          <InspectorFieldRow label="Target"><InspectorSelect value={rawBlock.alertLinkTarget ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(v) => update({ alertLinkTarget: v } as any)} ariaLabel="Alert Link Target" /></InspectorFieldRow>
         </InspectorDivision>
       </div>
     );
@@ -48,73 +52,46 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="alert-advanced">
-        <InspectorDivision title="ADVANCED">
-          <InspectorFieldRow label="ID">
-            <InspectorTextField
-              value={rawBlock.customId ?? block.id ?? ""}
-              onChange={(v) => update({ customId: v, id: v } as any)}
-              placeholder="e.g. site-alert"
-              ariaLabel="Custom ID"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Class">
-            <InspectorTextField
-              value={rawBlock.customClass ?? ""}
-              onChange={(v) => update({ customClass: v } as any)}
-              placeholder="e.g. my-custom-alert"
-              ariaLabel="Custom Class"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Attributes">
-            <InspectorTextField
-              value={rawBlock.customAttributes ?? ""}
-              onChange={(v) => update({ customAttributes: v } as any)}
-              placeholder='data-custom="value"'
-              ariaLabel="Custom Attributes"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom CSS">
-            <InspectorTextarea
-              value={rawBlock.customCss ?? ""}
-              onChange={(v) => update({ customCss: v } as any)}
-              placeholder="/* CSS rules */"
-              ariaLabel="Custom CSS"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-      </div>
-    );
+    return <ElementAdvancedPanel block={block} update={update} />;
   }
 
   // SETTINGS TAB (Default)
   return (
     <div className="builder-inspector-stack" data-uikit-capability="alert-style">
       <InspectorDivision title="ALERT">
-        <InspectorFieldRow label="Style / Status">
+        <InspectorFieldRow label="Style">
           <InspectorSelect
-            value={rawBlock.status ?? rawBlock.alertStyle ?? rawBlock.preset ?? "primary"}
+            value={rawBlock.alertStyle ?? rawBlock.status ?? rawBlock.preset ?? "default"}
             options={[
-              { value: "primary", label: "Primary (Info)" },
+              { value: "default", label: "Default" },
+              { value: "primary", label: "Primary" },
               { value: "success", label: "Success" },
               { value: "warning", label: "Warning" },
               { value: "danger", label: "Danger / Error" },
             ]}
-            onChange={(v) => update({ status: v, alertStyle: v, preset: v } as any)}
-            ariaLabel="Alert style status"
+            onChange={(v) => update({ alertStyle: v } as any)}
+            ariaLabel="Alert style"
           />
         </InspectorFieldRow>
-        <InspectorFieldRow label="Close button">
+        <InspectorFieldRow label="Larger padding">
           <label className="builder-inspector-checkbox-row">
             <input
               type="checkbox"
-              checked={rawBlock.alertClose !== false}
-              onChange={(e) => update({ alertClose: e.target.checked } as any)}
+              checked={rawBlock.alertLarge === true}
+              onChange={(e) => update({ alertLarge: e.target.checked } as any)}
             />
-            <span>Show close icon button</span>
+            <span>Larger padding</span>
           </label>
         </InspectorFieldRow>
+      </InspectorDivision>
+      <InspectorDivision title="TITLE">
+        <InspectorFieldRow label="Style"><InspectorSelect value={rawBlock.alertTitleStyle ?? ""} options={[{ value: "", label: "None" }, ...["text-bold", "small", "h1", "h2", "h3", "h4", "h5", "h6"].map((value) => ({ value, label: value.replace(/-/g, " ") }))]} onChange={(v) => update({ alertTitleStyle: v || undefined } as any)} ariaLabel="Alert title style" /></InspectorFieldRow>
+        <InspectorFieldRow label="HTML Element"><InspectorSelect value={rawBlock.alertTitleElement ?? "h3"} options={["h1", "h2", "h3", "h4", "h5", "h6", "div"].map((value) => ({ value, label: value }))} onChange={(v) => update({ alertTitleElement: v } as any)} ariaLabel="Alert title HTML Element" /></InspectorFieldRow>
+        <InspectorFieldRow label="Inline title"><label className="builder-inspector-checkbox-row"><input type="checkbox" checked={rawBlock.alertTitleInline === true} onChange={(e) => update({ alertTitleInline: e.target.checked } as any)} /><span>Inline title</span></label></InspectorFieldRow>
+      </InspectorDivision>
+      <InspectorDivision title="CONTENT">
+        <InspectorFieldRow label="Style"><InspectorSelect value={rawBlock.alertContentStyle ?? ""} options={[{ value: "", label: "None" }, { value: "lead", label: "Lead" }, { value: "meta", label: "Meta" }]} onChange={(v) => update({ alertContentStyle: v || undefined } as any)} ariaLabel="Alert content style" /></InspectorFieldRow>
+        <InspectorFieldRow label="Margin Top"><InspectorSelect value={rawBlock.alertContentMargin ?? ""} options={[{ value: "", label: "Default" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "none", label: "None" }]} onChange={(v) => update({ alertContentMargin: v || undefined } as any)} ariaLabel="Alert content margin top" /></InspectorFieldRow>
       </InspectorDivision>
     </div>
   );

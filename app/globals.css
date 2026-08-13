@@ -1516,10 +1516,10 @@ a {
   box-shadow: var(--uk-button-default-shadow, none);
 }
 .shop-builder-main .uk-button-default:hover {
-  background-color: var(--uk-button-default-hover-background, var(--uk-button-default-background, transparent));
-  color: var(--uk-button-default-hover-text, var(--uk-button-default-text, #333));
-  border-color: var(--uk-button-default-hover-border, #b2b2b2);
-  box-shadow: var(--uk-button-default-hover-shadow, var(--uk-button-default-shadow, none));
+  background-color: var(--uk-button-default-hover-background, var(--uk-button-default-background, transparent)) !important;
+  color: var(--uk-button-default-hover-text, var(--uk-button-default-text, #333)) !important;
+  border-color: var(--uk-button-default-hover-border, #b2b2b2) !important;
+  box-shadow: var(--uk-button-default-hover-shadow, var(--uk-button-default-shadow, none)) !important;
 }
 
 .shop-builder-main .uk-button-primary {
@@ -1530,11 +1530,11 @@ a {
   box-shadow: var(--uk-button-primary-shadow, none);
 }
 .shop-builder-main .uk-button-primary:hover {
-  background-image: var(--uk-button-primary-hover-gradient, var(--uk-button-primary-gradient, none));
-  background-color: var(--uk-button-primary-hover-background, #0f7ae5);
-  color: var(--uk-button-primary-hover-text, var(--uk-button-primary-text, #fff));
-  border-color: var(--uk-button-primary-hover-border, transparent);
-  box-shadow: var(--uk-button-primary-hover-shadow, var(--uk-button-primary-shadow, none));
+  background-image: var(--uk-button-primary-hover-gradient, var(--uk-button-primary-gradient, none)) !important;
+  background-color: var(--uk-button-primary-hover-background, #0f7ae5) !important;
+  color: var(--uk-button-primary-hover-text, var(--uk-button-primary-text, #fff)) !important;
+  border-color: var(--uk-button-primary-hover-border, transparent) !important;
+  box-shadow: var(--uk-button-primary-hover-shadow, var(--uk-button-primary-shadow, none)) !important;
 }
 
 .shop-builder-main .uk-button-secondary {
@@ -1544,31 +1544,34 @@ a {
   box-shadow: var(--uk-button-secondary-shadow, none);
 }
 .shop-builder-main .uk-button-secondary:hover {
-  background-image: var(--uk-button-secondary-hover-gradient, none);
-  background-color: var(--uk-button-secondary-hover-background, #151515);
-  color: var(--uk-button-secondary-hover-text, var(--uk-button-secondary-text, #fff));
-  border-color: var(--uk-button-secondary-hover-border, var(--uk-button-secondary-border, transparent));
-  box-shadow: var(--uk-button-secondary-hover-shadow, var(--uk-button-secondary-shadow, none));
+  background-image: var(--uk-button-secondary-hover-gradient, none) !important;
+  background-color: var(--uk-button-secondary-hover-background, #151515) !important;
+  color: var(--uk-button-secondary-hover-text, var(--uk-button-secondary-text, #fff)) !important;
+  border-color: var(--uk-button-secondary-hover-border, var(--uk-button-secondary-border, transparent)) !important;
+  box-shadow: var(--uk-button-secondary-hover-shadow, var(--uk-button-secondary-shadow, none)) !important;
 }
-.shop-builder-main .uk-button-default:active {
-  background-color: var(--uk-button-default-active-background, var(--uk-button-default-background, transparent));
-  color: var(--uk-button-default-active-text, var(--uk-button-default-text, #333));
-  border-color: var(--uk-button-default-active-border, var(--uk-button-default-border, transparent));
-  box-shadow: var(--uk-button-default-active-shadow, var(--uk-button-default-shadow, none));
+.shop-builder-main .uk-button-default:active,
+.shop-builder-main .uk-button-default.uk-active {
+  background-color: var(--uk-button-default-active-background, var(--uk-button-default-background, transparent)) !important;
+  color: var(--uk-button-default-active-text, var(--uk-button-default-text, #333)) !important;
+  border-color: var(--uk-button-default-active-border, var(--uk-button-default-border, transparent)) !important;
+  box-shadow: var(--uk-button-default-active-shadow, var(--uk-button-default-shadow, none)) !important;
 }
-.shop-builder-main .uk-button-primary:active {
-  background-image: var(--uk-button-primary-active-gradient, var(--uk-button-primary-gradient, none));
-  background-color: var(--uk-button-primary-active-background, var(--uk-button-primary-background, #1e87f0));
-  color: var(--uk-button-primary-active-text, var(--uk-button-primary-text, #fff));
-  border-color: var(--uk-button-primary-active-border, transparent);
-  box-shadow: var(--uk-button-primary-active-shadow, var(--uk-button-primary-shadow, none));
+.shop-builder-main .uk-button-primary:active,
+.shop-builder-main .uk-button-primary.uk-active {
+  background-image: var(--uk-button-primary-active-gradient, var(--uk-button-primary-gradient, none)) !important;
+  background-color: var(--uk-button-primary-active-background, var(--uk-button-primary-background, #1e87f0)) !important;
+  color: var(--uk-button-primary-active-text, var(--uk-button-primary-text, #fff)) !important;
+  border-color: var(--uk-button-primary-active-border, transparent) !important;
+  box-shadow: var(--uk-button-primary-active-shadow, var(--uk-button-primary-shadow, none)) !important;
 }
-.shop-builder-main .uk-button-secondary:active {
-  background-image: var(--uk-button-secondary-active-gradient, none);
-  background-color: var(--uk-button-secondary-active-background, var(--uk-button-secondary-background, #222));
-  color: var(--uk-button-secondary-active-text, var(--uk-button-secondary-text, #fff));
-  border-color: var(--uk-button-secondary-active-border, var(--uk-button-secondary-border, transparent));
-  box-shadow: var(--uk-button-secondary-active-shadow, var(--uk-button-secondary-shadow, none));
+.shop-builder-main .uk-button-secondary:active,
+.shop-builder-main .uk-button-secondary.uk-active {
+  background-image: var(--uk-button-secondary-active-gradient, none) !important;
+  background-color: var(--uk-button-secondary-active-background, var(--uk-button-secondary-background, #222)) !important;
+  color: var(--uk-button-secondary-active-text, var(--uk-button-secondary-text, #fff)) !important;
+  border-color: var(--uk-button-secondary-active-border, var(--uk-button-secondary-border, transparent)) !important;
+  box-shadow: var(--uk-button-secondary-active-shadow, var(--uk-button-secondary-shadow, none)) !important;
 }
 .shop-builder-main .uk-button-danger {
   background-color: var(--uk-button-danger-background, #f0506e);
@@ -1577,16 +1580,17 @@ a {
   box-shadow: var(--uk-button-danger-shadow, none);
 }
 .shop-builder-main .uk-button-danger:hover {
-  background-color: var(--uk-button-danger-hover-background, var(--uk-button-danger-background, #f0506e));
-  color: var(--uk-button-danger-hover-text, var(--uk-button-danger-text, #fff));
-  border-color: var(--uk-button-danger-hover-border, var(--uk-button-danger-border, transparent));
-  box-shadow: var(--uk-button-danger-hover-shadow, var(--uk-button-danger-shadow, none));
+  background-color: var(--uk-button-danger-hover-background, var(--uk-button-danger-background, #f0506e)) !important;
+  color: var(--uk-button-danger-hover-text, var(--uk-button-danger-text, #fff)) !important;
+  border-color: var(--uk-button-danger-hover-border, var(--uk-button-danger-border, transparent)) !important;
+  box-shadow: var(--uk-button-danger-hover-shadow, var(--uk-button-danger-shadow, none)) !important;
 }
-.shop-builder-main .uk-button-danger:active {
-  background-color: var(--uk-button-danger-active-background, var(--uk-button-danger-background, #f0506e));
-  color: var(--uk-button-danger-active-text, var(--uk-button-danger-text, #fff));
-  border-color: var(--uk-button-danger-active-border, var(--uk-button-danger-border, transparent));
-  box-shadow: var(--uk-button-danger-active-shadow, var(--uk-button-danger-shadow, none));
+.shop-builder-main .uk-button-danger:active,
+.shop-builder-main .uk-button-danger.uk-active {
+  background-color: var(--uk-button-danger-active-background, var(--uk-button-danger-background, #f0506e)) !important;
+  color: var(--uk-button-danger-active-text, var(--uk-button-danger-text, #fff)) !important;
+  border-color: var(--uk-button-danger-active-border, var(--uk-button-danger-border, transparent)) !important;
+  box-shadow: var(--uk-button-danger-active-shadow, var(--uk-button-danger-shadow, none)) !important;
 }
 .shop-builder-main .uk-button:disabled,
 .shop-builder-main .uk-button.uk-disabled {
@@ -1617,14 +1621,40 @@ a {
   right: 0;
 }
 .shop-builder-main .uk-button-text:hover {
-  color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333));
-  border-color: var(--uk-button-text-hover-border, var(--uk-button-text-border, transparent));
+  color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)) !important;
+  border-color: var(--uk-button-text-hover-border, var(--uk-button-text-border, transparent)) !important;
 }
-.shop-builder-main .uk-button-text:active {
-  color: var(--uk-button-text-active-color, var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)));
+.shop-builder-main .uk-button-text:active,
+.shop-builder-main .uk-button-text.uk-active {
+  color: var(--uk-button-text-active-color, var(--uk-button-text-hover-color, var(--uk-button-text-color, #333))) !important;
 }
 .shop-builder-main .uk-button-link { color: var(--uk-button-link-color, var(--uk-button-text-color, #333)); }
 .shop-builder-main .uk-button-link:hover { color: var(--uk-button-link-hover-color, var(--uk-button-link-color, #333)); }
+
+/* Element-local Action/Button colors are canonical UIkit overrides. They are
+   intentionally narrower than the inherited semantic context above: an
+   authored local value wins, while omitted values continue to inherit the
+   normal or inverse UIkit surface tokens. */
+.shop-builder-main .shop-builder-uikit-button--local-background {
+  background-image: none !important;
+  background-color: var(--uikit-button-local-background) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-text {
+  color: var(--uikit-button-local-text) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-border {
+  border-color: var(--uikit-button-local-border) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-hover-background:hover {
+  background-image: none !important;
+  background-color: var(--uikit-button-local-hover-background) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-hover-text:hover {
+  color: var(--uikit-button-local-hover-text) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-hover-border:hover {
+  border-color: var(--uikit-button-local-hover-border) !important;
+}
 
 .shop-builder-main .uk-button-small {
   padding: 0 var(--uk-button-small-padding-x, var(--uk-button-padding-x, 15px));
@@ -1693,26 +1723,27 @@ a {
 /* --- UIkit Alerts --- */
 .shop-builder-main .uk-alert {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: var(--uk-global-margin, 30px);
   padding: 15px 29px 15px 15px;
-  background: #f8f8f8;
-  color: #666;
+  border-radius: var(--uk-alert-border-radius, 0);
+  background: var(--uk-alert-background, var(--uk-global-muted-background, #f8f8f8));
+  color: var(--uk-alert-color, var(--uk-global-text-color, #666));
 }
 .shop-builder-main .uk-alert-primary {
-  background: #d8eafc;
-  color: #1e87f0;
+  background: var(--uk-alert-primary-background, var(--uk-global-primary-color, #1e87f0));
+  color: var(--uk-alert-primary-color, var(--uk-global-inverse-color, #fff));
 }
 .shop-builder-main .uk-alert-success {
-  background: #edfbf6;
-  color: #32d296;
+  background: var(--uk-alert-success-background, var(--uk-global-success-color, #32d296));
+  color: var(--uk-alert-success-color, var(--uk-global-inverse-color, #fff));
 }
 .shop-builder-main .uk-alert-warning {
-  background: #fef5ee;
-  color: #faa05a;
+  background: var(--uk-alert-warning-background, var(--uk-global-warning-color, #faa05a));
+  color: var(--uk-alert-warning-color, var(--uk-global-inverse-color, #fff));
 }
 .shop-builder-main .uk-alert-danger {
-  background: #fef4f6;
-  color: #f0506e;
+  background: var(--uk-alert-danger-background, var(--uk-global-danger-color, #f0506e));
+  color: var(--uk-alert-danger-color, var(--uk-global-inverse-color, #fff));
 }
 
 /* --- UIkit Dividers --- */
@@ -1768,7 +1799,7 @@ a {
 .shop-builder-main h5,
 .shop-builder-main h6 {
   font-weight: normal;
-  color: inherit;
+  color: var(--builder-active-heading, var(--uk-global-emphasis-color, currentColor));
   font-family: var(--uk-heading-font-family, inherit);
 }
 .shop-builder-main h1,
@@ -1812,7 +1843,7 @@ a {
 .shop-builder-main .uk-text-lead {
   font-size: 1.5rem;
   line-height: 1.5;
-  color: #333;
+  color: var(--uk-global-text-color, currentColor);
 }
 
 /* Canonical UIkit Text element columns and drop-cap semantics. */
@@ -1867,7 +1898,7 @@ a {
 .shop-builder-main .uk-text-meta {
   font-size: 12px;
   line-height: 1.4;
-  color: #999;
+  color: var(--uk-global-muted-text-color, currentColor);
 }
 .shop-builder-main .uk-text-center { text-align: center; }
 .shop-builder-main .uk-text-left { text-align: left; }
@@ -1972,7 +2003,7 @@ a {
   color: #e0e0e0;
 }
 [data-theme="dark"] .shop-builder-main .uk-text-lead {
-  color: #d0d0d0;
+  color: var(--uk-global-text-color, #d0d0d0);
 }
 [data-theme="dark"] .shop-builder-main .uk-card-default {
   background: #1e1e1e;
@@ -1981,26 +2012,6 @@ a {
 }
 [data-theme="dark"] .shop-builder-main .uk-card-title {
   color: #f0f0f0;
-}
-[data-theme="dark"] .shop-builder-main .uk-alert {
-  color: #ccc;
-  background: #1a1a1a;
-}
-[data-theme="dark"] .shop-builder-main .uk-alert-primary {
-  background: #0d2d4d;
-  color: #8ec8f6;
-}
-[data-theme="dark"] .shop-builder-main .uk-alert-success {
-  background: #0d3d26;
-  color: #6ee7b0;
-}
-[data-theme="dark"] .shop-builder-main .uk-alert-warning {
-  background: #3d2a0d;
-  color: #fbbf6e;
-}
-[data-theme="dark"] .shop-builder-main .uk-alert-danger {
-  background: #3d0d18;
-  color: #f8889e;
 }
 [data-theme="dark"] .shop-builder-main .uk-hr,
 [data-theme="dark"] .shop-builder-main .uk-divider-small,

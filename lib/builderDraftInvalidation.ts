@@ -8,11 +8,13 @@ export function invalidateImportedBuilderDraft(
   {
     draftsKey,
     stateKey,
+    draftMetadataKey,
     pageKey,
     importedState,
   }: {
     draftsKey: string;
     stateKey: string;
+    draftMetadataKey?: string;
     pageKey: string;
     importedState: unknown;
   },
@@ -24,6 +26,14 @@ export function invalidateImportedBuilderDraft(
 
   delete drafts[pageKey];
   storage.setItem(draftsKey, JSON.stringify(drafts));
+  if (draftMetadataKey) {
+    const rawMetadata = storage.getItem(draftMetadataKey);
+    const metadata = rawMetadata
+      ? (JSON.parse(rawMetadata) as Record<string, unknown>)
+      : {};
+    delete metadata[pageKey];
+    storage.setItem(draftMetadataKey, JSON.stringify(metadata));
+  }
   // DashboardBuilder falls back to this current-state entry when the selected
   // page has no draft. Keep that fallback aligned with the persisted import.
   storage.setItem(stateKey, JSON.stringify(importedState));

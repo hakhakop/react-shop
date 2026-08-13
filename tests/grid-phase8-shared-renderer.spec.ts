@@ -179,11 +179,13 @@ test("WordPress upload URLs resolve once at the shared Builder media boundary", 
 
   expect(resolveBuilderMediaUrls({
     imageUrl: "/wp-content/uploads/yootheme/hero.jpg",
+    thumbnailUrl: "/wp-content/uploads/yootheme/thumb.jpg",
     gridItems: [{ imageUrl: "/wp-content/uploads/yootheme/card.jpg" }],
     customAsset: "/assets/logo.svg",
     text: '<img src="/wp-content/uploads/yootheme/check.svg">',
   }, origin)).toEqual({
     imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/hero.jpg",
+    thumbnailUrl: "https://cms.example.test/wp-content/uploads/yootheme/thumb.jpg",
     gridItems: [{ imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/card.jpg" }],
     customAsset: "/assets/logo.svg",
     text: '<img src="https://cms.example.test/wp-content/uploads/yootheme/check.svg">',
@@ -203,7 +205,8 @@ test("Phase 8 Grid uses one presentation renderer with Builder-only item chrome"
     gridGap: "large",
     gridRowGap: "small",
     showDividers: true,
-    centerRows: true,
+    centerColumns: true,
+    centerRows: false,
     columnsPhonePortrait: "1",
     columnsPhoneLandscape: "2",
     columnsTabletLandscape: "3",

@@ -381,6 +381,41 @@ export function getUikitAccordionItemClass(_style: UikitAccordionStyleInput = "d
 /**
  * Maps WebPages button presets and sizes to canonical UIkit button classes.
  */
+/**
+ * The static YOOtheme Button item vocabulary. These are persisted semantic
+ * values, never UIkit class strings. Native WebPages-only aliases continue to
+ * be handled by the resolver below without becoming YOOtheme import values.
+ */
+export const UIKIT_YOOTHEME_BUTTON_VARIANTS = [
+  "default",
+  "primary",
+  "secondary",
+  "danger",
+  "text",
+  "link",
+  "link-muted",
+  "link-text",
+] as const;
+
+export type UikitYoothemeButtonVariant = (typeof UIKIT_YOOTHEME_BUTTON_VARIANTS)[number];
+
+/** Native aliases remain explicit so imported YOOtheme values are never lossy. */
+export type WebPagesNativeButtonVariantAlias =
+  | "solid"
+  | "dark"
+  | "outline"
+  | "ghost"
+  | "light"
+  | "native-link";
+
+export type CanonicalButtonVariant = UikitYoothemeButtonVariant | WebPagesNativeButtonVariantAlias;
+
+/**
+ * Maps canonical Button semantics and legacy native aliases to UIkit classes.
+ *
+ * YOOtheme's `link` style deliberately has no `uk-button-*` modifier. The
+ * muted/text link styles use UIkit link modifiers rather than button-text.
+ */
 export function getUikitButtonClass(preset?: string, size?: string): string {
   const classes = ["uk-button"];
 
@@ -390,8 +425,16 @@ export function getUikitButtonClass(preset?: string, size?: string): string {
     classes.push("uk-button-primary");
   } else if (p === "secondary" || p === "dark") {
     classes.push("uk-button-secondary");
-  } else if (p === "text" || p === "link") {
+  } else if (p === "danger") {
+    classes.push("uk-button-danger");
+  } else if (p === "text" || p === "native-link") {
     classes.push("uk-button-text");
+  } else if (p === "link-muted") {
+    classes.push("uk-link-muted");
+  } else if (p === "link-text") {
+    classes.push("uk-link-text");
+  } else if (p === "link") {
+    // YOOtheme Link: intentionally bare `uk-button`.
   } else {
     classes.push("uk-button-default");
   }
@@ -404,6 +447,52 @@ export function getUikitButtonClass(preset?: string, size?: string): string {
   }
 
   return classes.join(" ");
+}
+
+type UikitButtonLocalOverrideSource = {
+  buttonBg?: unknown;
+  buttonTextColor?: unknown;
+  buttonBorderColor?: unknown;
+  buttonHoverBg?: unknown;
+  buttonHoverTextColor?: unknown;
+  buttonHoverBorderColor?: unknown;
+};
+
+/**
+ * Maps explicit element-level Button appearance overrides into the canonical
+ * UIkit Button variables. Context variables remain the fallback, so an
+ * inherited inverse surface never overwrites an authored local value.
+ */
+export function getUikitButtonLocalOverride(
+  source: UikitButtonLocalOverrideSource,
+): { className: string; style: Record<string, string> | undefined } {
+  const value = (candidate: unknown) =>
+    typeof candidate === "string" && candidate.trim() ? candidate.trim() : undefined;
+  const background = value(source.buttonBg);
+  const text = value(source.buttonTextColor);
+  const border = value(source.buttonBorderColor);
+  const hoverBackground = value(source.buttonHoverBg);
+  const hoverText = value(source.buttonHoverTextColor);
+  const hoverBorder = value(source.buttonHoverBorderColor);
+  const style: Record<string, string> = {
+    ...(background ? { "--uikit-button-local-background": background } : {}),
+    ...(text ? { "--uikit-button-local-text": text } : {}),
+    ...(border ? { "--uikit-button-local-border": border } : {}),
+    ...(hoverBackground ? { "--uikit-button-local-hover-background": hoverBackground } : {}),
+    ...(hoverText ? { "--uikit-button-local-hover-text": hoverText } : {}),
+    ...(hoverBorder ? { "--uikit-button-local-hover-border": hoverBorder } : {}),
+  };
+  const classes = [
+    "shop-builder-uikit-button",
+    background && "shop-builder-uikit-button--local-background",
+    text && "shop-builder-uikit-button--local-text",
+    border && "shop-builder-uikit-button--local-border",
+    hoverBackground && "shop-builder-uikit-button--local-hover-background",
+    hoverText && "shop-builder-uikit-button--local-hover-text",
+    hoverBorder && "shop-builder-uikit-button--local-hover-border",
+  ].filter(Boolean).join(" ");
+
+  return { className: classes, style: Object.keys(style).length ? style : undefined };
 }
 
 /**
@@ -566,9 +655,11 @@ export function getUikitDividerClass(preset?: string): string {
  */
 export function getUikitAlertClass(status?: string): string {
   const classes = ["uk-alert"];
-  const s = status?.toLowerCase() || "primary";
+  const s = status?.toLowerCase() || "default";
 
-  if (s === "success" || s === "info") {
+  if (s === "default" || s === "none") {
+    // UIkit's base alert has no variant modifier.
+  } else if (s === "success" || s === "info") {
     classes.push("uk-alert-success");
   } else if (s === "warning" || s === "caution") {
     classes.push("uk-alert-warning");
@@ -579,6 +670,30 @@ export function getUikitAlertClass(status?: string): string {
   }
 
   return classes.join(" ");
+}
+
+/**
+ * Resolves Alert presentation from the canonical Global Style token family.
+ * This keeps the UIkit class contract intact while preventing a legacy
+ * dashboard stylesheet from replacing imported Alert semantics in Builder.
+ */
+export function getUikitAlertPresentationStyle(status?: string) {
+  const s = status?.toLowerCase() || "default";
+  const variant = s === "success" || s === "info"
+    ? "success"
+    : s === "warning" || s === "caution"
+      ? "warning"
+      : s === "danger" || s === "error"
+        ? "danger"
+        : s === "default" || s === "none"
+          ? "default"
+          : "primary";
+  const token = variant === "default" ? "--uk-alert" : `--uk-alert-${variant}`;
+  return {
+    background: `var(${token}-background)`,
+    color: `var(${token}-color)`,
+    borderRadius: "var(--uk-alert-border-radius)",
+  };
 }
 
 export type UikitImageSemantics = {
@@ -606,7 +721,24 @@ export type UikitImageDocumentFields = {
   imageSvgInline?: boolean;
   /** Semantic color used when the SVG is rendered as a stylable icon. */
   imageSvgColor?: string;
+  /** UIkit background surface behind the image media. */
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | string;
 };
+
+/**
+ * YOOtheme Image's Inline SVG color vocabulary. `inverse` is a legacy native
+ * WebPages alias, not an option in the YOOtheme Image inspector.
+ */
+export const UIKIT_YOOTHEME_SVG_COLOR_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "muted", label: "Muted" },
+  { value: "emphasis", label: "Emphasis" },
+  { value: "primary", label: "Primary" },
+  { value: "secondary", label: "Secondary" },
+  { value: "success", label: "Success" },
+  { value: "warning", label: "Warning" },
+  { value: "danger", label: "Danger" },
+] as const;
 
 /** Resolves stored Image fields into the shared UIkit Image semantic contract. */
 export function resolveUikitImageSemantics(
@@ -704,21 +836,26 @@ export function getUikitImageAttributes(image: UikitImageSemantics) {
 }
 
 /** Shared renderer semantics for YOOtheme's "Make SVG stylable with CSS" contract. */
-export function getUikitSvgColor(value?: string | null): string {
+export function getUikitSvgColor(value?: string | null): string | undefined {
+  const normalized = String(value ?? "").toLowerCase();
+  if (!normalized || normalized === "none") return undefined;
   return {
     primary: "var(--uk-global-primary-background, currentColor)",
     secondary: "var(--uk-global-secondary-background, currentColor)",
     muted: "var(--uk-global-muted-color, currentColor)",
     emphasis: "var(--uk-global-emphasis-color, currentColor)",
+    success: "var(--uk-global-success-background, currentColor)",
+    warning: "var(--uk-global-warning-background, currentColor)",
+    danger: "var(--uk-global-danger-background, currentColor)",
     inverse: "var(--uk-global-inverse-color, currentColor)",
     default: "var(--uk-global-color, currentColor)",
-  }[String(value ?? "primary").toLowerCase()] ?? String(value ?? "currentColor");
+  }[normalized];
 }
 
 /** YOOtheme applies SVG Style through contextual UIkit text-color classes. */
 export function getUikitSvgColorClass(value?: string | null): string {
   const normalized = String(value ?? "").toLowerCase();
-  return ["primary", "secondary", "muted", "emphasis"].includes(normalized)
+  return ["primary", "secondary", "muted", "emphasis", "success", "warning", "danger"].includes(normalized)
     ? `uk-text-${normalized}`
     : "";
 }

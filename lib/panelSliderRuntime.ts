@@ -20,7 +20,10 @@ const count = (value: number | null | undefined, inherited: number) => {
  * Auto is content-sized, matching UIkit. Fixed consumes the responsive
  * fractions and carries omitted breakpoint values forward.
  */
-export function resolvePanelSliderRuntime(settings: PanelSliderWidthSettings) {
+export function resolvePanelSliderRuntime(
+  settings: PanelSliderWidthSettings,
+  breakpointPolicy: ResponsiveBreakpointPolicy = resolveResponsiveBreakpointPolicy(),
+) {
   const base = count(settings.cardsPerViewPhone, count(settings.cardsPerView, 1));
   const small = count(settings.cardsPerViewSmall, base);
   const medium = count(settings.cardsPerViewMedium, small);
@@ -33,11 +36,15 @@ export function resolvePanelSliderRuntime(settings: PanelSliderWidthSettings) {
     slidesPerView: mode === "auto" ? "auto" as const : base,
     counts: { base, small, medium, large, xlarge },
     breakpoints: mode === "auto" ? undefined : {
-      320: { slidesPerView: base },
-      640: { slidesPerView: small },
-      960: { slidesPerView: medium },
-      1200: { slidesPerView: large },
-      1600: { slidesPerView: xlarge },
+      0: { slidesPerView: base },
+      [breakpointPolicy.small]: { slidesPerView: small },
+      [breakpointPolicy.medium]: { slidesPerView: medium },
+      [breakpointPolicy.large]: { slidesPerView: large },
+      [breakpointPolicy.xlarge]: { slidesPerView: xlarge },
     },
   };
 }
+import {
+  resolveResponsiveBreakpointPolicy,
+  type ResponsiveBreakpointPolicy,
+} from "@/lib/responsiveBreakpointPolicy";

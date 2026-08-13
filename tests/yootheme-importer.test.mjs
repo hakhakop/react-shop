@@ -12,6 +12,10 @@ const layers = [
     @global-secondary-background: #17104E;
     @global-small-box-shadow: 0 1px 2px rgba(0,0,0,.1);
     @button-border-radius: 500px;
+    @breakpoint-small: 640px;
+    @breakpoint-medium: 960px;
+    @breakpoint-large: 1200px;
+    @breakpoint-xlarge: 1600px;
     @global-primary-font-weight: 600;
     @form-background: darken(@global-background, 1%);
   ` },
@@ -37,6 +41,19 @@ test("YOOtheme resolver honors layer precedence and evaluates supported color fu
   assert.match(String(preset.shellSettings.linkHoverColor), /^#/);
   assert.ok(preset.conflicts.some((row) => row.variable === "@global-primary-background"));
   assert.equal(preset.shellSettings.accordionTitleFontSize, "18px");
+  assert.deepEqual(
+    [
+      preset.shellSettings.breakpointSmall,
+      preset.shellSettings.breakpointMedium,
+      preset.shellSettings.breakpointLarge,
+      preset.shellSettings.breakpointXLarge,
+    ],
+    ["640px", "960px", "1200px", "1600px"],
+  );
+  for (const variable of ["@breakpoint-small", "@breakpoint-medium", "@breakpoint-large", "@breakpoint-xlarge"]) {
+    assert.equal(preset.unsupported.some((row) => row.variable === variable), false);
+    assert.equal(preset.rows.find((row) => row.variable === variable)?.status, "mapped");
+  }
   assert.ok(preset.rows.some((row) => row.variable === "@accordion-title-font-size"));
 });
 

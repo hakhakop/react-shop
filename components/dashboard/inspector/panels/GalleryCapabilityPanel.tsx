@@ -24,6 +24,9 @@ import {
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import { Plus, ImagePlus } from "lucide-react";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -47,6 +50,7 @@ export default function GalleryCapabilityPanel({
   openWordPressMediaPicker,
 }: Props) {
   const rawBlock = (block ?? {}) as any;
+  const isImportedYoothemeGallery = rawBlock.spacingContract === "yootheme";
   const items: any[] = rawBlock.galleryItems ?? rawBlock.items ?? [];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -239,6 +243,7 @@ export default function GalleryCapabilityPanel({
                       }
                     />
                   </InspectorFieldRow>
+                  <InspectorFieldRow label="Image alt"><InspectorTextField value={item.imageAlt ?? ""} onChange={(imageAlt) => updateItem({ imageAlt })} placeholder="Image description" /></InspectorFieldRow>
                   <InspectorFieldRow label="Title">
                     <InspectorTextField
                       value={item.title ?? ""}
@@ -254,7 +259,7 @@ export default function GalleryCapabilityPanel({
                     />
                   </InspectorFieldRow>
                   <InspectorFieldRow label="Content">
-                    <InspectorTextarea
+                    <RichTextEditor
                       value={item.content ?? ""}
                       onChange={(content) => updateItem({ content })}
                       placeholder="Item description"
@@ -267,6 +272,9 @@ export default function GalleryCapabilityPanel({
                       placeholder="https://"
                     />
                   </InspectorFieldRow>
+                  <InspectorFieldRow label="Link text"><InspectorTextField value={item.linkLabel ?? ""} onChange={(linkLabel) => updateItem({ linkLabel })} placeholder="Read more" /></InspectorFieldRow>
+                  <InspectorFieldRow label="Link target"><InspectorSelect value={item.linkTarget ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(linkTarget) => updateItem({ linkTarget })} /></InspectorFieldRow>
+                  <InspectorFieldRow label="ARIA label"><InspectorTextField value={item.linkAriaLabel ?? ""} onChange={(linkAriaLabel) => updateItem({ linkAriaLabel })} /></InspectorFieldRow>
                 </div>
               );
             }}
@@ -438,6 +446,23 @@ export default function GalleryCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
+        {isImportedYoothemeGallery && (
+          <InspectorDivision title="ITEM">
+            <InspectorFieldRow
+              label="Link"
+              isOverridden={rawBlock.overlayLink !== undefined}
+              inheritedValueText="Off"
+              onReset={() => update({ overlayLink: undefined } as any)}
+            >
+              <InspectorSwitch
+                checked={rawBlock.overlayLink === true}
+                onChange={(overlayLink) => update({ overlayLink } as any)}
+                label="Link overlay"
+              />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
+
         {/* OVERLAY SECTION */}
         <InspectorDivision title="OVERLAY">
           <InspectorFieldRow
@@ -474,7 +499,16 @@ export default function GalleryCapabilityPanel({
         </InspectorDivision>
 
         {/* SHARED IMAGE SETTINGS GROUP */}
-        <ImageSettingsGroup block={block} update={update} />
+        <ImageSettingsGroup
+          block={block}
+          update={update}
+          // YOOtheme Gallery's Image group is media-generation semantics, not
+          // the generic WebPages frame/focal/alignment surface.
+          showFrameControls={!isImportedYoothemeGallery}
+          showFocalPoint={!isImportedYoothemeGallery}
+          showAlignment={!isImportedYoothemeGallery}
+          showDecoration={!isImportedYoothemeGallery}
+        />
 
         {/* SHARED TITLE SETTINGS GROUP */}
         <TitleSettingsGroup block={block} update={update} />
@@ -495,33 +529,7 @@ export default function GalleryCapabilityPanel({
   // TAB 3: ADVANCED
   // --------------------------------------------------------------------------
   if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="gallery-advanced">
-        <InspectorDivision title="GENERAL">
-          <InspectorFieldRow label="Custom ID">
-            <InspectorTextField
-              value={rawBlock.customId ?? ""}
-              onChange={(customId) => update({ customId } as any)}
-              placeholder="e.g. gallery-1"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom Class">
-            <InspectorTextField
-              value={rawBlock.customClass ?? ""}
-              onChange={(customClass) => update({ customClass } as any)}
-              placeholder="e.g. my-gallery"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Custom CSS">
-            <InspectorTextarea
-              value={rawBlock.customCss ?? ""}
-              onChange={(customCss) => update({ customCss } as any)}
-              placeholder="/* custom CSS rules */"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-      </div>
-    );
+    return <ElementAdvancedPanel block={block} update={update} />;
   }
 
   return null;

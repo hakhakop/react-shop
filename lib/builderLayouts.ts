@@ -8,6 +8,7 @@ import {
   getBuilderTemplatesPath,
 } from "@/lib/websiteBuilderData";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
+import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 export type { BuilderSection };
 
 export type BuilderCustomPageKey = `page:${string}`;
@@ -31,6 +32,7 @@ export type BuilderPanelStyle =
   | "flat-dark"
   | "flat-white"
   | "antigravity";
+export type BuilderButtonStyle = CanonicalButtonVariant;
 
 export type BuilderListItem = {
   id: string;
@@ -144,6 +146,8 @@ export type BuilderLayoutBlock = {
   imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
   imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
+  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
@@ -184,7 +188,7 @@ export type BuilderLayoutBlock = {
   panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
   panelContentWidth?: "auto" | "small" | "medium" | "large" | "full";
   panelActionVisible?: boolean;
-  panelActionStyle?: "default" | "primary" | "secondary" | "text";
+  panelActionStyle?: BuilderButtonStyle;
   panelActionSize?: "small" | "default" | "large";
   panelActionAlign?: "inherit" | "left" | "center" | "right";
   hoverPreset?: string;
@@ -222,7 +226,13 @@ export type BuilderLayoutBlock = {
     badge?: string;
     imageUrl?: string;
     imageAlt?: string;
+    thumbnailUrl?: string;
+    thumbnailPosition?: string;
     imagePadding?: string;
+    textColor?: "none" | "light" | "dark";
+    itemElement?: "div" | "article" | "section" | "li";
+    navigationLabel?: string;
+    buttonAriaLabel?: string;
     buttonLabel?: string;
     buttonUrl?: string;
     items?: string[];
@@ -262,6 +272,22 @@ export type BuilderLayoutBlock = {
     arrowPosition?: string;
     paginationStyle?: string;
     paginationPosition?: string;
+    navigationType?: "none" | "dotnav" | "thumbnav" | string;
+    navigationMargin?: "none" | "small" | "medium" | "large" | string;
+    navigationBreakpoint?: "small" | "medium" | "large" | "xlarge" | string;
+    navigationBelow?: boolean;
+    navigationHoverOnly?: boolean;
+    navigationVertical?: boolean;
+    thumbnavWidth?: number;
+    thumbnavHeight?: number;
+    thumbnavNoWrap?: boolean;
+    showNavigationThumbnail?: boolean;
+    thumbnavInlineSvg?: boolean;
+    thumbnavSvgColor?: string;
+    slidenavHoverOnly?: boolean;
+    slidenavLarger?: boolean;
+    slidenavMargin?: "none" | "small" | "medium" | "large" | string;
+    slidenavOutsideBreakpoint?: "small" | "medium" | "large" | "xlarge" | string;
     kenBurns?: boolean;
     speed?: number;
     slideMode?: string;
@@ -274,9 +300,16 @@ export type BuilderLayoutBlock = {
     overlayDisplay?: "always" | "hover" | "active";
     overlayPadding?: string;
     overlayLink?: boolean;
+    /** Whole-element link; distinct from an individual slide action. */
+    elementLinkUrl?: string;
+    elementLinkTarget?: "_self" | "_blank";
     itemWidthMode?: "fixed" | "auto";
     slideshowHeight?: "auto" | "viewport" | "section";
+    slideshowViewportHeight?: number;
+    slideshowHeightExpand?: boolean;
     slideshowRatio?: string;
+    slideshowMinHeight?: number;
+    slideshowMaxHeight?: number;
   };
   heroHeadingElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   heroHeadingStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "article-title" | "small" | "medium" | "large" | "xlarge";
@@ -370,7 +403,7 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
-    buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "link";
+    buttonStyle?: BuilderButtonStyle;
     buttonTarget?: "_self" | "_blank";
     buttonAlign?: "left" | "center" | "right";
     renderer?: "plain" | "card";
@@ -384,7 +417,7 @@ export type BuilderLayoutBlock = {
     textAlign?: "left" | "center" | "right";
     titleElement?: "h2" | "h3" | "h4" | "div";
     titleStyle?: "inherit" | "h3" | "h4" | "h5";
-    actionStyle?: "default" | "primary" | "secondary" | "text";
+    actionStyle?: BuilderButtonStyle;
     actionSize?: "small" | "default" | "large";
     typography?: Record<string, unknown>;
     items?: string[];

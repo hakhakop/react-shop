@@ -43,6 +43,50 @@ test("Phase 6 normalizes Button and reusable Panel/Grid action semantics", () =>
   );
 });
 
+test("YOOtheme Button variants remain lossless through the shared UIkit resolver", () => {
+  const styles = [
+    ["default", "uk-button uk-button-default"],
+    ["primary", "uk-button uk-button-primary"],
+    ["secondary", "uk-button uk-button-secondary"],
+    ["danger", "uk-button uk-button-danger"],
+    ["text", "uk-button uk-button-text"],
+    ["", "uk-button"],
+    ["link-muted", "uk-button uk-link-muted"],
+    ["link-text", "uk-button uk-link-text"],
+  ];
+
+  const mapping = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "button",
+      props: {},
+      children: styles.map(([button_style], index) => ({
+        type: "button_item",
+        props: { button_style, content: `Action ${index + 1}`, link: `/action-${index + 1}` },
+      })),
+    }] }] }] }],
+  });
+
+  const button = mapping.sections[0].layoutItems[0].blocks[0];
+  assert.deepEqual(button.buttons.map((item) => item.style), [
+    "default",
+    "primary",
+    "secondary",
+    "danger",
+    "text",
+    "link",
+    "link-muted",
+    "link-text",
+  ]);
+  styles.forEach(([sourceStyle, expectedClass], index) => {
+    assert.equal(
+      getUikitButtonClass(button.buttons[index].style),
+      expectedClass,
+      `button_style=${JSON.stringify(sourceStyle)} should retain its YOOtheme UIkit treatment`,
+    );
+  });
+});
+
 test("YOOtheme Button globals preserve derived control geometry", () => {
   const preset = resolveYoothemeLess([
     {
@@ -63,4 +107,30 @@ test("YOOtheme Button globals preserve derived control geometry", () => {
   assert.equal(preset.shellSettings.buttonLargeLineHeight, "52px");
   assert.equal(preset.shellSettings.buttonLargePaddingX, "40px");
   assert.equal(preset.shellSettings.buttonLargeFontSize, "16px");
+});
+
+test("YOOtheme inverse Button tokens preserve their own global semantic owner", () => {
+  const preset = resolveYoothemeLess([
+    {
+      name: "devstack-inverse-button-contract.less",
+      precedence: 1,
+      content: `
+        @inverse-button-default-box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        @inverse-button-primary-box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        @inverse-button-secondary-background: transparent;
+        @inverse-button-secondary-color: #ffffff;
+        @inverse-button-secondary-hover-background: #ffffff;
+        @inverse-button-secondary-active-background: rgba(255, 255, 255, 0.8);
+        @inverse-button-secondary-border: #ffffff;
+      `,
+    },
+  ]);
+
+  assert.equal(preset.shellSettings.buttonInverseDefaultShadow, "0 5px 15px rgba(0, 0, 0, 0.2)");
+  assert.equal(preset.shellSettings.buttonInversePrimaryShadow, "0 5px 15px rgba(0, 0, 0, 0.2)");
+  assert.equal(preset.shellSettings.buttonInverseSecondaryBackground, "transparent");
+  assert.equal(preset.shellSettings.buttonInverseSecondaryText, "#ffffff");
+  assert.equal(preset.shellSettings.buttonInverseSecondaryHoverBackground, "#ffffff");
+  assert.equal(preset.shellSettings.buttonInverseSecondaryActiveBackground, "rgba(255, 255, 255, 0.8)");
+  assert.equal(preset.shellSettings.buttonInverseSecondaryBorder, "#ffffff");
 });

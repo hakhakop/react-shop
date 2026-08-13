@@ -30,6 +30,14 @@ export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
 export type BuilderHeaderBackgroundMode = "default" | "glass" | "accent" | "none";
 export type BuilderHeaderTextMode = "auto" | "light" | "dark";
 
+/**
+ * The four editable UIkit/YOOtheme responsive tiers.  The base (phone
+ * portrait) tier is intentionally implicit: it applies below `small`.
+ *
+ * This is only the canonical policy owner.  Consumers will be moved to this
+ * policy in Phase 10 Batch 2; keeping validation here prevents the Global
+ * Styles UI and importer from defining competing breakpoint rules.
+ */
 export type BuilderMenuPresentation = {
   showHeading: boolean;
   icon: string | null;
@@ -185,6 +193,12 @@ export type BuilderShellSettings = {
   cardSecondaryBackground?: string;
   buttonDefaultBackground?: string;
   buttonDefaultText?: string;
+  /**
+   * Records whether a YOOtheme LESS Button token was explicitly authored or
+   * intentionally inherited. This prevents historic WebPages defaults from
+   * masquerading as a YOOtheme component override after a style import.
+   */
+  buttonTokenInheritance?: Record<string, "authored" | "inherit">;
   buttonTextColorSemantic?: string;
   buttonHoverShadow?: string;
   buttonHoverGradient?: string;
@@ -198,6 +212,18 @@ export type BuilderShellSettings = {
   accordionItemBorderWidth?: string;
   accordionItemBorder?: string;
   accordionItemBoxShadow?: string;
+  /** Canonical UIkit/YOOtheme Alert presentation tokens. */
+  alertBackground?: string;
+  alertColor?: string;
+  alertBorderRadius?: string;
+  alertPrimaryBackground?: string;
+  alertPrimaryColor?: string;
+  alertSuccessBackground?: string;
+  alertSuccessColor?: string;
+  alertWarningBackground?: string;
+  alertWarningColor?: string;
+  alertDangerBackground?: string;
+  alertDangerColor?: string;
   buttonFontSize?: string;
   buttonFontFamily?: string;
   buttonFontStyle?: string;
@@ -250,6 +276,25 @@ export type BuilderShellSettings = {
   buttonSecondaryActiveText?: string;
   buttonSecondaryActiveBorder?: string;
   buttonSecondaryActiveShadow?: string;
+  /** Imported UIkit/YOOtheme Button tokens used only on inverse surfaces. */
+  buttonInverseDefaultShadow?: string;
+  buttonInverseDefaultBackground?: string;
+  buttonInverseDefaultText?: string;
+  buttonInverseDefaultHoverBackground?: string;
+  buttonInverseDefaultHoverText?: string;
+  buttonInverseDefaultActiveBackground?: string;
+  buttonInverseDefaultActiveText?: string;
+  buttonInverseDefaultBorder?: string;
+  buttonInverseDefaultHoverBorder?: string;
+  buttonInverseDefaultActiveBorder?: string;
+  buttonInversePrimaryShadow?: string;
+  buttonInverseSecondaryBackground?: string;
+  buttonInverseSecondaryText?: string;
+  buttonInverseSecondaryHoverBackground?: string;
+  buttonInverseSecondaryActiveBackground?: string;
+  buttonInverseSecondaryBorder?: string;
+  buttonInverseSecondaryHoverText?: string;
+  buttonInverseSecondaryActiveText?: string;
   buttonDangerBackground?: string;
   buttonDangerText?: string;
   buttonDangerBorder?: string;

@@ -1,3 +1,5 @@
+import { UIKIT_YOOTHEME_BUTTON_VARIANTS } from "@/lib/uikitTokens";
+
 /** Canonical UIkit capability contract used by the inspector and renderers. */
 export type InspectorElementKind =
   | "section" | "row" | "column" | "heading" | "button" | "text"
@@ -9,7 +11,7 @@ export const UIKIT_CAPABILITIES = {
   column: { variants: [], sizes: ["full", "half", "third", "quarter"], spacing: [], alignment: ["left", "center", "right"], responsive: ["stack"], typography: [], appearance: [], behavior: [] },
   heading: { variants: [], sizes: ["small", "medium", "large", "xlarge", "2xlarge", "3xlarge", "h1", "h2", "h3", "h4", "h5", "h6"], spacing: [], alignment: ["left", "center", "right"], responsive: [], typography: ["fontFamily", "color", "textAlign"], appearance: [], behavior: [] },
   text: { variants: ["default", "lead", "meta", "small", "large", "muted"], sizes: [], spacing: [], alignment: ["left", "center", "right"], responsive: [], typography: ["fontFamily", "fontWeight", "lineHeight", "letterSpacing", "textTransform", "textDecoration", "color"], appearance: [], behavior: [] },
-  button: { variants: ["default", "primary", "secondary", "text"], sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["url", "target"] },
+  button: { variants: UIKIT_YOOTHEME_BUTTON_VARIANTS, sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["url", "target"] },
   card: { variants: ["default", "primary", "secondary", "blank"], sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["hover"] },
   panel: { variants: ["default", "primary", "secondary", "blank"], sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: ["media"], behavior: ["hover"] },
   divider: { variants: ["default", "small", "icon", "vertical"], sizes: [], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: [] },
@@ -127,7 +129,7 @@ export const UIKIT_LIST_CAPABILITY = {
 
 export const UIKIT_BUTTON_CAPABILITY = {
   properties: {
-    variant: { values: ["primary", "secondary", "default", "text"] as const, owner: "uikit" },
+    variant: { values: UIKIT_YOOTHEME_BUTTON_VARIANTS, owner: "uikit" },
     size: { values: ["small", "default", "large"] as const, owner: "uikit" },
     width: { values: ["auto", "full"] as const, owner: "uikit", supported: false },
     alignment: { values: ["left", "center", "right"] as const, owner: "uikit", supported: false },

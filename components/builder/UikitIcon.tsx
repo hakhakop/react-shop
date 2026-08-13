@@ -13,8 +13,9 @@ export default function UikitIcon({ block }: Props) {
   const iconName = rawBlock.iconName ?? rawBlock.icon ?? "star";
   const iconSize = rawBlock.iconSize ?? 32;
   const colorScheme = rawBlock.iconColorScheme ?? "primary";
-  const linkUrl = rawBlock.buttonUrl ?? rawBlock.imageLinkUrl;
-  const linkTarget = rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self";
+  const linkUrl = rawBlock.iconLinkUrl ?? rawBlock.buttonUrl ?? rawBlock.imageLinkUrl;
+  const linkTarget = rawBlock.iconLinkTarget ?? rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self";
+  const linkStyle = rawBlock.iconLinkStyle ?? "icon";
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
@@ -23,7 +24,7 @@ export default function UikitIcon({ block }: Props) {
 
   const iconContent = (
     <span
-      className={`shop-builder-icon-wrapper uk-text-${colorScheme}`.trim()}
+      className={`shop-builder-icon-wrapper ${colorScheme !== "default" ? `uk-text-${colorScheme}` : ""}`.trim()}
       style={{ display: "inline-flex", alignItems: "center" }}
     >
       <WebPagesIcon name={iconName as any} size={iconSize} />
@@ -37,7 +38,17 @@ export default function UikitIcon({ block }: Props) {
       style={{ textAlign: rawBlock.textAlign ?? "left" }}
     >
       {linkUrl ? (
-        <a href={linkUrl} {...builderLinkTargetProps(linkTarget)}>
+        <a
+          href={linkUrl}
+          aria-label={rawBlock.iconLinkAriaLabel || undefined}
+          className={[
+            linkStyle === "button" ? "uk-icon-button" : "uk-icon-link",
+            linkStyle === "muted" ? "uk-link-muted" : "",
+            linkStyle === "text" ? "uk-link-text" : "",
+            linkStyle === "reset" ? "uk-link-reset" : "",
+          ].filter(Boolean).join(" ")}
+          {...builderLinkTargetProps(linkTarget)}
+        >
           {iconContent}
         </a>
       ) : (

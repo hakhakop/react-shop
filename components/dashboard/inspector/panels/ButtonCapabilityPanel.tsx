@@ -6,8 +6,8 @@ import {
   InspectorDivision,
   InspectorAlignmentControl,
   InspectorFieldRow,
-  InspectorPillGroup,
   InspectorSelect,
+  InspectorSwitch,
   InspectorTextField,
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
@@ -25,13 +25,33 @@ type Props = {
 
 type ButtonItem = NonNullable<BuilderLayoutBlock["buttons"]>[number];
 
+const buttonStyleLabels: Record<string, string> = {
+  default: "Default",
+  primary: "Primary",
+  secondary: "Secondary",
+  danger: "Danger",
+  text: "Text",
+  link: "Link",
+  "link-muted": "Link Muted",
+  "link-text": "Link Text",
+};
+
 const buttonStyleOptions = UIKIT_BUTTON_CAPABILITY.properties.variant.values.map((value) => ({
   value,
-  label: value.replace(/\b\w/g, (letter) => letter.toUpperCase()),
+  label: buttonStyleLabels[value] ?? value,
 }));
+
+const nativeButtonStyleOptions = buttonStyleOptions.filter(({ value }) =>
+  value === "default" || value === "primary" || value === "secondary" || value === "text",
+);
+
+function isImportedYoothemeButton(block: BuilderLayoutBlock) {
+  return block.spacingContract === "yootheme" || block.id?.startsWith("yootheme-");
+}
 
 function ButtonItemsEditor({ block, update }: Pick<Props, "block" | "update">) {
   const items = (block.buttons ?? []) as ButtonItem[];
+  const itemStyleOptions = isImportedYoothemeButton(block) ? buttonStyleOptions : nativeButtonStyleOptions;
   const updateItems = (next: ButtonItem[]) => update({ buttons: next } as Partial<BuilderLayoutBlock>);
   const updateItem = (index: number, patch: Partial<ButtonItem>) =>
     updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
@@ -80,7 +100,12 @@ function ButtonItemsEditor({ block, update }: Pick<Props, "block" | "update">) {
             <InspectorSelect value={item.target ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(target) => updateItem(index, { target })} ariaLabel={`Button item ${index + 1} target`} />
           </InspectorFieldRow>
           <InspectorFieldRow label="Style">
-            <InspectorPillGroup value={item.style ?? "primary"} options={buttonStyleOptions} onChange={(style) => updateItem(index, { style })} ariaLabel={`Button item ${index + 1} style`} />
+            <InspectorSelect
+              value={item.style ?? "primary"}
+              options={itemStyleOptions}
+              onChange={(style) => updateItem(index, { style })}
+              ariaLabel={`Button item ${index + 1} style`}
+            />
           </InspectorFieldRow>
         </>}
       />
@@ -142,15 +167,51 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   }
 
   // SETTINGS TAB (Default)
+  const importedCollectionButton = isImportedYoothemeButton(block) && Array.isArray(block.buttons);
+
   return (
     <div className="builder-inspector-stack" data-uikit-capability="button-style">
-      <ActionSettingsGroup
-        block={block}
-        update={update}
-        title="BUTTON"
-        keys={{ style: "buttonStyle", size: "size" }}
-        showFullWidth
-      />
+      {importedCollectionButton ? (
+        <InspectorDivision title="BUTTON">
+          <InspectorFieldRow
+            label="Button size"
+            isOverridden={(block as any).size !== undefined}
+            inheritedValueText="Default"
+            onReset={() => update({ size: undefined } as Partial<BuilderLayoutBlock>)}
+          >
+            <InspectorSelect
+              value={String((block as any).size ?? "default")}
+              options={[
+                { value: "small", label: "Small" },
+                { value: "default", label: "Default" },
+                { value: "large", label: "Large" },
+              ]}
+              onChange={(size) => update({ size } as Partial<BuilderLayoutBlock>)}
+              ariaLabel="Button size"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow
+            label="Full width"
+            isOverridden={(block as any).fullWidthButton !== undefined}
+            inheritedValueText="Off"
+            onReset={() => update({ fullWidthButton: undefined } as Partial<BuilderLayoutBlock>)}
+          >
+            <InspectorSwitch
+              checked={Boolean((block as any).fullWidthButton)}
+              onChange={(fullWidthButton) => update({ fullWidthButton } as Partial<BuilderLayoutBlock>)}
+              label="Full width"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
+      ) : (
+        <ActionSettingsGroup
+          block={block}
+          update={update}
+          title="BUTTON"
+          keys={{ style: "buttonStyle", size: "size" }}
+          showFullWidth
+        />
+      )}
       <InspectorDivision title="LAYOUT">
         <InspectorFieldRow label="Alignment">
           <InspectorAlignmentControl

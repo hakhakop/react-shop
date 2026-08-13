@@ -1,6 +1,7 @@
 import type { BuilderDesign } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveYoothemeLessCapability } from "@/lib/yoothemeImportContract";
+import { createYoothemeLessImportReport, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
 
 export type YoothemeLessSource = {
   name: string;
@@ -51,8 +52,37 @@ export type YoothemeSemanticPreset = {
   rows: YoothemeImportRow[];
   unsupported: YoothemeImportRow[];
   conflicts: YoothemeImportRow[];
+  /** Registry-backed report; rows remain for the existing Global Styles UI. */
+  report: YoothemeImportReport;
   sources: string[];
 };
+
+/**
+ * A YOOtheme LESS theme often relies on UIkit inheritance rather than
+ * declaring every Button token. Keep that absence explicit: otherwise an
+ * old WebPages component default can be mistaken for a source-authored
+ * YOOtheme value after the new Global Style patch is merged.
+ */
+function resolveButtonTokenInheritance(
+  declarations: Map<string, Declaration>,
+): Record<string, "authored" | "inherit"> {
+  const destinations = new Set<string>();
+  const authored = new Set<string>();
+
+  for (const [source, mapping] of Object.entries(destinationMap)) {
+    if (!mapping.destination.startsWith("shellSettings.button")) continue;
+    const destination = mapping.destination.replace("shellSettings.", "");
+    destinations.add(destination);
+    if (declarations.has(source)) authored.add(destination);
+  }
+
+  return Object.fromEntries(
+    [...destinations].map((destination) => [
+      destination,
+      authored.has(destination) ? "authored" : "inherit",
+    ]),
+  );
+}
 
 type Declaration = {
   source: YoothemeLessSource;
@@ -381,6 +411,17 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "card-transition-duration": { destination: "shellSettings.cardTransitionDuration", domain: "Cards" },
   "card-default-box-shadow": { destination: "shellSettings.cardShadow", domain: "Surfaces" },
   "card-default-hover-box-shadow": { destination: "shellSettings.cardShadowHover", domain: "Surfaces" },
+  "alert-background": { destination: "shellSettings.alertBackground", domain: "Alert" },
+  "alert-color": { destination: "shellSettings.alertColor", domain: "Alert" },
+  "alert-border-radius": { destination: "shellSettings.alertBorderRadius", domain: "Alert" },
+  "alert-primary-background": { destination: "shellSettings.alertPrimaryBackground", domain: "Alert" },
+  "alert-primary-color": { destination: "shellSettings.alertPrimaryColor", domain: "Alert" },
+  "alert-success-background": { destination: "shellSettings.alertSuccessBackground", domain: "Alert" },
+  "alert-success-color": { destination: "shellSettings.alertSuccessColor", domain: "Alert" },
+  "alert-warning-background": { destination: "shellSettings.alertWarningBackground", domain: "Alert" },
+  "alert-warning-color": { destination: "shellSettings.alertWarningColor", domain: "Alert" },
+  "alert-danger-background": { destination: "shellSettings.alertDangerBackground", domain: "Alert" },
+  "alert-danger-color": { destination: "shellSettings.alertDangerColor", domain: "Alert" },
   "button-primary-background": { destination: "shellSettings.buttonPrimaryBackground", domain: "Buttons" },
   "button-primary-color": { destination: "shellSettings.buttonPrimaryText", domain: "Buttons" },
   "button-primary-text": { destination: "shellSettings.buttonPrimaryText", domain: "Buttons" },
@@ -434,6 +475,27 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "button-secondary-active-color": { destination: "shellSettings.buttonSecondaryActiveText", domain: "Buttons" },
   "button-secondary-active-border": { destination: "shellSettings.buttonSecondaryActiveBorder", domain: "Buttons" },
   "button-secondary-active-box-shadow": { destination: "shellSettings.buttonSecondaryActiveShadow", domain: "Buttons" },
+  // UIkit/YOOtheme keeps inverse Button values in the same global Button
+  // domain. Preserve them as semantic tokens rather than folding them into
+  // normal Button styles, which would corrupt light-surface rendering.
+  "inverse-button-default-background": { destination: "shellSettings.buttonInverseDefaultBackground", domain: "Buttons" },
+  "inverse-button-default-color": { destination: "shellSettings.buttonInverseDefaultText", domain: "Buttons" },
+  "inverse-button-default-hover-background": { destination: "shellSettings.buttonInverseDefaultHoverBackground", domain: "Buttons" },
+  "inverse-button-default-hover-color": { destination: "shellSettings.buttonInverseDefaultHoverText", domain: "Buttons" },
+  "inverse-button-default-active-background": { destination: "shellSettings.buttonInverseDefaultActiveBackground", domain: "Buttons" },
+  "inverse-button-default-active-color": { destination: "shellSettings.buttonInverseDefaultActiveText", domain: "Buttons" },
+  "inverse-button-default-border": { destination: "shellSettings.buttonInverseDefaultBorder", domain: "Buttons" },
+  "inverse-button-default-hover-border": { destination: "shellSettings.buttonInverseDefaultHoverBorder", domain: "Buttons" },
+  "inverse-button-default-active-border": { destination: "shellSettings.buttonInverseDefaultActiveBorder", domain: "Buttons" },
+  "inverse-button-default-box-shadow": { destination: "shellSettings.buttonInverseDefaultShadow", domain: "Buttons" },
+  "inverse-button-primary-box-shadow": { destination: "shellSettings.buttonInversePrimaryShadow", domain: "Buttons" },
+  "inverse-button-secondary-background": { destination: "shellSettings.buttonInverseSecondaryBackground", domain: "Buttons" },
+  "inverse-button-secondary-color": { destination: "shellSettings.buttonInverseSecondaryText", domain: "Buttons" },
+  "inverse-button-secondary-hover-background": { destination: "shellSettings.buttonInverseSecondaryHoverBackground", domain: "Buttons" },
+  "inverse-button-secondary-active-background": { destination: "shellSettings.buttonInverseSecondaryActiveBackground", domain: "Buttons" },
+  "inverse-button-secondary-border": { destination: "shellSettings.buttonInverseSecondaryBorder", domain: "Buttons" },
+  "inverse-button-secondary-hover-color": { destination: "shellSettings.buttonInverseSecondaryHoverText", domain: "Buttons" },
+  "inverse-button-secondary-active-color": { destination: "shellSettings.buttonInverseSecondaryActiveText", domain: "Buttons" },
   "button-danger-background": { destination: "shellSettings.buttonDangerBackground", domain: "Buttons" },
   "button-danger-color": { destination: "shellSettings.buttonDangerText", domain: "Buttons" },
   "button-danger-border": { destination: "shellSettings.buttonDangerBorder", domain: "Buttons" },
@@ -576,6 +638,20 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
     }
   }
 
+  // UIkit's default Alert color inherits @global-color. Preserve that source
+  // inheritance in the canonical Alert owner when the theme does not provide
+  // an explicit @alert-color declaration; native WebPages Alert fallbacks
+  // therefore remain independent of an imported theme palette.
+  if (!latest.has("alert-color") && typeof shellSettings.textColor === "string") {
+    shellSettings.alertColor = shellSettings.textColor;
+  }
+
+  // Persist authored-versus-inherited provenance for the complete shared
+  // Button vocabulary. A missing LESS declaration means “inherit the UIkit
+  // semantic token”, not “reuse whichever WebPages Button default happened
+  // to be saved before this import”.
+  shellSettings.buttonTokenInheritance = resolveButtonTokenInheritance(latest);
+
   // UIkit derives button text line-height from the control height and border.
   // Persist that semantic default on every YOOtheme import when the source has
   // not expressly overridden it, so historical WebPages component defaults
@@ -616,6 +692,7 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
   }
 
   const design: Partial<BuilderDesign> = {};
+  const report = createYoothemeLessImportReport([...rows, ...unsupported]);
   return {
     id: presetDefinition.id,
     name: presetDefinition.name,
@@ -625,6 +702,7 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
     rows,
     unsupported,
     conflicts,
+    report,
     sources: ordered.map((source) => source.name),
   };
 }

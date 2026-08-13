@@ -351,6 +351,7 @@ export function MetaSettingsGroup({
 export function ContentSettingsGroup({
   block,
   update,
+  title = "CONTENT",
   showAlignment = true,
   showStyle = false,
   showRole = true,
@@ -364,6 +365,8 @@ export function ContentSettingsGroup({
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
+  /** Compose the same owner under a component-specific semantic group. */
+  title?: string;
   showAlignment?: boolean;
   showStyle?: boolean;
   showRole?: boolean;
@@ -378,7 +381,7 @@ export function ContentSettingsGroup({
   const values = block as any;
   const styleKey = keys.style ?? "contentStyle";
   return (
-    <InspectorDivision title="CONTENT">
+    <InspectorDivision title={title}>
       {showRole && <InspectorFieldRow
         label="Font role"
         isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
@@ -442,6 +445,7 @@ export function ImageSettingsGroup({
   showDecoration = true,
   showSvgControls = false,
   svgColorLabel = "SVG Style",
+  svgColorOptions,
   mediaLayout,
   keys = {
     width: "imageWidth",
@@ -480,6 +484,8 @@ export function ImageSettingsGroup({
   showSvgControls?: boolean;
   /** Components may use YOOtheme's semantic label while sharing the same color owner. */
   svgColorLabel?: string;
+  /** Source-specific vocabulary for the shared SVG color owner. */
+  svgColorOptions?: ReadonlyArray<{ value: string; label: string }>;
   /** Structural Panel media placement remains a Panel owner but is presented in YOOtheme's Image group. */
   mediaLayout?: { placement: string; width: string };
   keys?: {
@@ -615,40 +621,6 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>
 
-      {showSvgControls && <InspectorFieldRow
-        label="Stylable SVG"
-        isOverridden={values[svgInlineKey] !== undefined}
-        inheritedValueText="Off"
-        onReset={() => update({ [svgInlineKey]: undefined })}
-      >
-        <InspectorSwitch
-          checked={values[svgInlineKey] === true}
-          onChange={(checked) => update({ [svgInlineKey]: checked || undefined })}
-          label="Make SVG stylable with CSS"
-        />
-      </InspectorFieldRow>}
-
-      {showSvgControls && values[svgInlineKey] === true && <InspectorFieldRow
-        label={svgColorLabel}
-        isOverridden={values[svgColorKey] !== undefined}
-        inheritedValueText="Primary"
-        onReset={() => update({ [svgColorKey]: undefined })}
-      >
-        <InspectorSelect
-          value={String(values[svgColorKey] ?? "primary")}
-          options={[
-            { value: "primary", label: "Primary" },
-            { value: "secondary", label: "Secondary" },
-            { value: "default", label: "Default" },
-            { value: "muted", label: "Muted" },
-            { value: "emphasis", label: "Emphasis" },
-            { value: "inverse", label: "Inverse" },
-          ]}
-          onChange={(value) => update({ [svgColorKey]: value })}
-          ariaLabel={svgColorLabel}
-        />
-      </InspectorFieldRow>}
-
       {showLinkImage && (
         <InspectorFieldRow
           label="Link"
@@ -716,6 +688,40 @@ export function ImageSettingsGroup({
             { value: "secondary", label: "Secondary" },
           ]}
           onChange={(value) => update({ [decorationKey]: value })}
+        />
+      </InspectorFieldRow>}
+
+      {showSvgControls && <InspectorFieldRow
+        label="Inline SVG"
+        isOverridden={values[svgInlineKey] !== undefined}
+        inheritedValueText="Off"
+        onReset={() => update({ [svgInlineKey]: undefined })}
+      >
+        <InspectorSwitch
+          checked={values[svgInlineKey] === true}
+          onChange={(checked) => update({ [svgInlineKey]: checked || undefined })}
+          label="Make SVG stylable with CSS"
+        />
+      </InspectorFieldRow>}
+
+      {showSvgControls && values[svgInlineKey] === true && <InspectorFieldRow
+        label={svgColorLabel}
+        isOverridden={values[svgColorKey] !== undefined}
+        inheritedValueText={svgColorOptions ? "None" : "Primary"}
+        onReset={() => update({ [svgColorKey]: undefined })}
+      >
+        <InspectorSelect
+          value={String(values[svgColorKey] ?? (svgColorOptions ? "none" : "primary"))}
+          options={svgColorOptions ?? [
+            { value: "primary", label: "Primary" },
+            { value: "secondary", label: "Secondary" },
+            { value: "default", label: "Default" },
+            { value: "muted", label: "Muted" },
+            { value: "emphasis", label: "Emphasis" },
+            { value: "inverse", label: "Inverse" },
+          ]}
+          onChange={(value) => update({ [svgColorKey]: value === "none" ? undefined : value })}
+          ariaLabel={svgColorLabel}
         />
       </InspectorFieldRow>}
 
@@ -848,6 +854,14 @@ export function ActionSettingsGroup({
   showVisibilityToggle = false,
   showFullWidth = false,
   showMargin = false,
+  showLabel = true,
+  showUrl = true,
+  showTarget = true,
+  showAriaLabel = false,
+  targetFirst = false,
+  targetControl = "select",
+  presentationControl = "pills",
+  inheritedValues,
   showPresentation = true,
   terminology = "action",
   keys = {
@@ -866,6 +880,18 @@ export function ActionSettingsGroup({
   showVisibilityToggle?: boolean;
   showFullWidth?: boolean;
   showMargin?: boolean;
+  showLabel?: boolean;
+  showUrl?: boolean;
+  showTarget?: boolean;
+  showAriaLabel?: boolean;
+  /** Match component contracts that place target before the visible link text. */
+  targetFirst?: boolean;
+  /** A new-window switch is the same canonical target owner as the select. */
+  targetControl?: "select" | "new-window-switch";
+  /** Components may compose the shared variants as selects rather than pills. */
+  presentationControl?: "pills" | "select";
+  /** Element-level defaults presented by an item without turning them into local overrides. */
+  inheritedValues?: Record<string, unknown>;
   /** Content tabs use the same action contract without repeating style controls. */
   showPresentation?: boolean;
   /** Grid uses YOOtheme's Link vocabulary while keeping the same owner. */
@@ -875,6 +901,7 @@ export function ActionSettingsGroup({
     label?: string;
     url?: string;
     target?: string;
+    aria?: string;
     style?: string;
     size?: string;
     width?: string;
@@ -887,12 +914,45 @@ export function ActionSettingsGroup({
   const labelKey = keys.label;
   const urlKey = keys.url;
   const targetKey = keys.target;
+  const ariaKey = keys.aria;
   const visibleKey = keys.visible;
   const widthKey = keys.width;
   const marginKey = keys.margin;
-  const labelLabel = terminology === "link" ? "Link text" : "Action label";
-  const urlLabel = terminology === "link" ? "Link URL" : "Action URL";
-  const targetLabel = terminology === "link" ? "Link target" : "Action target";
+  const labelLabel = terminology === "link" ? "Text" : "Action label";
+  const urlLabel = terminology === "link" ? "URL" : "Action URL";
+  const targetLabel = terminology === "link" ? "Target" : "Action target";
+  const inherited = inheritedValues ?? {};
+  const resolvedStyle = values[styleKey] ?? inherited[styleKey] ?? "primary";
+  const resolvedSize = values[sizeKey] ?? inherited[sizeKey] ?? "default";
+  const resolvedFullWidth = values[widthKey ?? ""] ?? inherited[widthKey ?? ""] ?? false;
+  const resolvedMargin = values[marginKey ?? ""] ?? inherited[marginKey ?? ""] ?? "none";
+  const styleOptions = labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values).map((option) => (
+    terminology === "link" ? { ...option, label: `Button ${option.label}` } : option
+  ));
+
+  const targetField = showTarget && targetKey ? (
+    <InspectorFieldRow
+      label={targetLabel}
+      isOverridden={values[targetKey] !== undefined}
+      inheritedValueText="Same window"
+      onReset={() => update({ [targetKey]: undefined })}
+    >
+      {targetControl === "new-window-switch" ? (
+        <InspectorSwitch
+          checked={values[targetKey] === "_blank"}
+          onChange={(checked) => update({ [targetKey]: checked ? "_blank" : undefined })}
+          label="Open in a new window"
+        />
+      ) : (
+        <InspectorSelect
+          value={String(values[targetKey] ?? "_self")}
+          options={BUILDER_LINK_TARGET_OPTIONS}
+          onChange={(val) => update({ [targetKey]: val })}
+          ariaLabel={targetLabel}
+        />
+      )}
+    </InspectorFieldRow>
+  ) : null;
 
   return (
     <InspectorDivision title={title}>
@@ -911,7 +971,9 @@ export function ActionSettingsGroup({
         </InspectorFieldRow>
       )}
 
-      {labelKey && (
+      {targetFirst && targetField}
+
+      {showLabel && labelKey && (
         <InspectorFieldRow
           label={labelLabel}
           isOverridden={values[labelKey] !== undefined}
@@ -926,7 +988,7 @@ export function ActionSettingsGroup({
         </InspectorFieldRow>
       )}
 
-      {urlKey && (
+      {showUrl && urlKey && (
         <InspectorFieldRow
           label={urlLabel}
           isOverridden={values[urlKey] !== undefined}
@@ -941,18 +1003,14 @@ export function ActionSettingsGroup({
         </InspectorFieldRow>
       )}
 
-      {targetKey && (
-        <InspectorFieldRow
-          label={targetLabel}
-          isOverridden={values[targetKey] !== undefined}
-          inheritedValueText="Same window"
-          onReset={() => update({ [targetKey]: undefined })}
-        >
-          <InspectorSelect
-            value={String(values[targetKey] ?? "_self")}
-            options={BUILDER_LINK_TARGET_OPTIONS}
-            onChange={(val) => update({ [targetKey]: val })}
-            ariaLabel={targetLabel}
+      {!targetFirst && targetField}
+
+      {showAriaLabel && ariaKey && (
+        <InspectorFieldRow label="ARIA Label">
+          <InspectorTextField
+            value={String(values[ariaKey] ?? "")}
+            onChange={(val) => update({ [ariaKey]: val || undefined })}
+            ariaLabel="ARIA label"
           />
         </InspectorFieldRow>
       )}
@@ -961,15 +1019,24 @@ export function ActionSettingsGroup({
         <InspectorFieldRow
           label="Style"
           isOverridden={values[styleKey] !== undefined}
-          inheritedValueText="Primary"
+          inheritedValueText={String(inherited[styleKey] ?? "Primary")}
           onReset={() => update({ [styleKey]: undefined })}
         >
-          <InspectorPillGroup
-            value={String(values[styleKey] ?? "primary")}
-            options={labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values)}
-            onChange={(value) => update({ [styleKey]: value })}
-            ariaLabel="Button variant"
-          />
+          {presentationControl === "select" ? (
+            <InspectorSelect
+              value={String(resolvedStyle)}
+              options={styleOptions}
+              onChange={(value) => update({ [styleKey]: value })}
+              ariaLabel="Button variant"
+            />
+          ) : (
+            <InspectorPillGroup
+              value={String(resolvedStyle)}
+              options={styleOptions}
+              onChange={(value) => update({ [styleKey]: value })}
+              ariaLabel="Button variant"
+            />
+          )}
         </InspectorFieldRow>
 
         <InspectorFieldRow
@@ -978,24 +1045,33 @@ export function ActionSettingsGroup({
           inheritedValueText="Default"
           onReset={() => update({ [sizeKey]: undefined })}
         >
-          <InspectorPillGroup
-            value={String(values[sizeKey] ?? "default")}
-            options={labels(UIKIT_BUTTON_CAPABILITY.properties.size.values)}
-            onChange={(value) => update({ [sizeKey]: value })}
-            ariaLabel="Button size"
-          />
+          {presentationControl === "select" ? (
+            <InspectorSelect
+              value={String(resolvedSize)}
+              options={labels(UIKIT_BUTTON_CAPABILITY.properties.size.values)}
+              onChange={(value) => update({ [sizeKey]: value })}
+              ariaLabel="Button size"
+            />
+          ) : (
+            <InspectorPillGroup
+              value={String(resolvedSize)}
+              options={labels(UIKIT_BUTTON_CAPABILITY.properties.size.values)}
+              onChange={(value) => update({ [sizeKey]: value })}
+              ariaLabel="Button size"
+            />
+          )}
         </InspectorFieldRow>
       </>}
 
       {showFullWidth && widthKey && (
         <InspectorFieldRow
-          label="Full width"
+          label={terminology === "link" ? "Full width button" : "Full width"}
           isOverridden={values[widthKey] !== undefined}
           inheritedValueText="Off"
           onReset={() => update({ [widthKey]: undefined })}
         >
           <InspectorSwitch
-            checked={Boolean(values[widthKey])}
+            checked={Boolean(resolvedFullWidth)}
             onChange={(checked) => update({ [widthKey]: checked })}
             label="Full width button"
           />
@@ -1003,9 +1079,9 @@ export function ActionSettingsGroup({
       )}
 
       {showMargin && marginKey && (
-        <InspectorFieldRow label="Link margin">
+        <InspectorFieldRow label={terminology === "link" ? "Margin Top" : "Action margin"}>
           <InspectorSelect
-            value={String(values[marginKey] ?? "none")}
+            value={String(resolvedMargin)}
             options={[
               { value: "none", label: "None" },
               { value: "small", label: "Small" },
@@ -1014,7 +1090,7 @@ export function ActionSettingsGroup({
               { value: "xlarge", label: "X-Large" },
             ]}
             onChange={(value) => update({ [marginKey]: value === "none" ? undefined : value })}
-            ariaLabel="Link margin"
+            ariaLabel={terminology === "link" ? "Margin top" : "Action margin"}
           />
         </InspectorFieldRow>
       )}

@@ -475,7 +475,7 @@ export function YoothemeLessImportModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (patch: Partial<BuilderShellSettings>) => void;
+  onImport: (patch: Partial<BuilderShellSettings>) => string | void;
 }) {
   const [lessText, setLessText] = useState("");
   const [sourceName, setSourceName] = useState("pasted.less");
@@ -501,7 +501,11 @@ export function YoothemeLessImportModal({
       setError("No supported YOOtheme variables were found in this LESS source.");
       return;
     }
-    onImport(resolved.shellSettings);
+    const rejection = onImport(resolved.shellSettings);
+    if (rejection) {
+      setError(rejection);
+      return;
+    }
     onClose();
   };
 

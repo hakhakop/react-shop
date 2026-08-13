@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import {
@@ -15,6 +15,9 @@ import {
 } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { sanitizeHtml, isRichText } from "@/lib/safeHtml";
+import { useUikitGridRuntime } from "@/components/builder/useUikitGridRuntime";
+import { useUikitLightboxRuntime } from "@/components/builder/useUikitLightboxRuntime";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -48,8 +51,19 @@ const DEFAULT_GALLERY_ITEMS = [
   },
 ];
 
+const escapeCaptionText = (value: string) => value
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/\"/g, "&quot;")
+  .replace(/'/g, "&#39;");
+
 export default function UikitGallery({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
+  // Imported YOOtheme Galleries retain their own UIkit presentation contract.
+  // Native WebPages Galleries continue through the Card/modal presentation.
+  const isYoothemeGallery = rawBlock.spacingContract === "yootheme";
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const rawItems = rawBlock.galleryItems?.length
     ? rawBlock.galleryItems
@@ -60,17 +74,22 @@ export default function UikitGallery({ block }: Props) {
   const items = rawItems.map((item: any, idx: number) => ({
     id: item.id || String(idx),
     imageUrl: item.imageUrl || item.image || DEFAULT_GALLERY_ITEMS[idx % 3].imageUrl,
-    title: item.title || `Gallery Item ${idx + 1}`,
+    imageAlt: item.imageAlt || item.alt || item.title || "",
+    title: item.title || "",
     meta: item.meta || "",
     content: item.content || item.description || "",
-    linkUrl: item.linkUrl || item.url || "#",
+    linkUrl: item.linkUrl || item.url || "",
     linkTarget: item.linkTarget || "_self",
+    linkLabel: item.linkLabel || item.buttonLabel || "",
+    linkAriaLabel: item.linkAriaLabel || "",
   }));
 
   const columns = Number(rawBlock.columns) || 3;
   const gap = rawBlock.gridGap ?? "medium";
   const rowGap = rawBlock.gridRowGap ?? gap;
-  const isLightbox = rawBlock.enableLightbox !== false;
+  const isLightbox = !isYoothemeGallery && rawBlock.enableLightbox !== false;
+  const usesYoothemeLightbox = isYoothemeGallery && rawBlock.enableLightbox === true;
+  const usesYoothemeOverlayLink = isYoothemeGallery && rawBlock.overlayLink === true;
   const overlayMode = rawBlock.overlayMode ?? "cover"; // 'cover' | 'caption'
 
   // Visibility switches
@@ -117,7 +136,13 @@ export default function UikitGallery({ block }: Props) {
     .filter(Boolean)
     .join(" ");
 
-  const columnWidthClass = `uk-width-1-${columns}@m uk-width-1-2@s`;
+  const importedWidth = (value: unknown, suffix = "") => {
+    const count = Number(value);
+    return Number.isFinite(count) && count >= 1 && count <= 6 ? `uk-width-1-${count}${suffix}` : "";
+  };
+  const columnWidthClass = isYoothemeGallery
+    ? `${importedWidth(rawBlock.columnsPhonePortrait)} ${importedWidth(rawBlock.columnsTabletLandscape, "@m")}`.trim() || "uk-width-1-1 uk-width-1-3@m"
+    : `uk-width-1-${columns}@m uk-width-1-2@s`;
   const imageSemantics = resolveUikitImageSemantics(rawBlock);
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
@@ -131,55 +156,89 @@ export default function UikitGallery({ block }: Props) {
       ? `${rawBlock.imageHeight}px`
       : String(rawBlock.imageHeight)
     : undefined;
+  const importedImageWidth = isYoothemeGallery ? imageStyle.width : undefined;
+  const importedImageHeight = isYoothemeGallery ? imageStyle.height : undefined;
+  const importedHasBothDimensions = Boolean(importedImageWidth && importedImageHeight);
+  const importedMediaWrapperStyle = isYoothemeGallery
+    ? {
+      width: importedImageWidth ?? "100%",
+      maxWidth: "100%",
+      display: "block",
+      ...(importedHasBothDimensions ? { aspectRatio: `${importedImageWidth} / ${importedImageHeight}`, position: "relative" as const } : {}),
+    }
+    : undefined;
   const TitleTag = (rawBlock.headingLevel ?? "h2") as React.ElementType;
   const titleClass = getUikitHeadingClass(rawBlock.headingLevel ?? "h2", rawBlock.headingSize);
   const metaClass = getUikitTextClass(rawBlock.metaStyle ?? "text-meta");
   const contentClass = getUikitTextClass(rawBlock.contentStyle);
   const buttonClass = getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size ?? "default");
+  const renderRichContent = (value: string) => {
+    const safe = sanitizeHtml(value ?? "");
+    return isRichText(safe) ? <span dangerouslySetInnerHTML={{ __html: safe }} /> : safe;
+  };
+
+  useUikitGridRuntime(gridRef, {
+    enabled: isYoothemeGallery && rawBlock.masonry === "pack",
+    masonry: rawBlock.masonry === "pack" ? "pack" : false,
+    revision: items.map((item: any) => `${item.id}:${item.imageUrl}`).join("|"),
+  });
+  useUikitLightboxRuntime(gridRef, {
+    enabled: usesYoothemeLightbox,
+    toggle: "a[data-type]",
+    revision: items.map((item: any) => `${item.id}:${item.linkUrl || item.imageUrl}:${item.title}:${item.content}`).join("|"),
+  });
 
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--gallery ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
-      <div className={gridClass} data-uk-grid={rawBlock.masonry && rawBlock.masonry !== "none" ? `masonry: ${rawBlock.masonry}` : ""}>
+      <div
+        ref={gridRef}
+        className={gridClass}
+        data-uk-grid={rawBlock.masonry && rawBlock.masonry !== "none" ? `masonry: ${rawBlock.masonry}` : ""}
+        data-uk-lightbox={usesYoothemeLightbox ? "toggle: a[data-type];" : undefined}
+      >
         {items.map((item: any, index: number) => {
           const titleAlign = rawBlock.headingAlign ?? rawBlock.alignment ?? "left";
           const metaAlign = rawBlock.metaAlign ?? titleAlign;
           const contentAlign = rawBlock.contentAlign ?? titleAlign;
-          const itemUrl = item.linkUrl || "#";
-          const actionLabel = item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || "Read more";
-          const hasAction = Boolean(
-            item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || rawBlock.buttonStyle || rawBlock.size || (itemUrl && itemUrl !== "#"),
-          );
+          const itemUrl = item.linkUrl;
+          const actionLabel = item.linkLabel || rawBlock.linkText || rawBlock.buttonLabel || "";
+          const hasAction = Boolean(itemUrl && actionLabel);
+          // YOOtheme Lightbox upgrades the existing item link into a UIkit
+          // media trigger. If no item link was authored it falls back to the
+          // item image; normal links remain normal only when Lightbox is off.
+          const lightboxUrl = itemUrl || item.imageUrl;
+          const lightboxCaption = sanitizeHtml([
+            item.title ? `<h4 class="uk-margin-remove">${escapeCaptionText(item.title)}</h4>` : "",
+            item.content || "",
+          ].filter(Boolean).join(""));
+          const hasLightboxAction = usesYoothemeLightbox && Boolean(lightboxUrl && actionLabel);
+          // `overlay_link` is an element-level YOOtheme semantic. Its link is
+          // a sibling media surface, never a wrapper around a visible action,
+          // so both remain valid, keyboard-accessible anchors.
+          const overlayLinkUrl = usesYoothemeLightbox ? lightboxUrl : itemUrl;
+          const hasOverlayLink = usesYoothemeOverlayLink && Boolean(overlayLinkUrl);
+          const overlayLinkLabel = item.linkAriaLabel || item.title || actionLabel || (usesYoothemeLightbox ? "Open image" : "Open link");
           return (
             <div key={item.id} className={columnWidthClass}>
               <div
-                className="uk-card uk-card-default uk-overflow-hidden"
+                className={isYoothemeGallery ? "el-item uk-light uk-transition-toggle uk-inline-clip" : "uk-card uk-card-default uk-overflow-hidden"}
                 style={{
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
                   position: "relative",
                   overflow: "hidden",
-                  width: imageStyle.width,
-                  maxWidth: imageStyle.maxWidth,
-                  marginInline:
-                    imageSemantics.alignment === "left"
-                      ? "0 auto"
-                      : imageSemantics.alignment === "right"
-                      ? "0 0 0 auto"
-                      : "auto",
+                  ...(isYoothemeGallery ? {} : { borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)", width: imageStyle.width, maxWidth: imageStyle.maxWidth, marginInline: imageSemantics.alignment === "left" ? "0 auto" : imageSemantics.alignment === "right" ? "0 0 0 auto" : "auto" }),
                 }}
               >
                 <div
-                  className={`uk-inline-clip uk-transition-toggle ${imageWrapperClass} ${imageDecorationClass}`.trim()}
+                  className={`uk-inline-clip uk-transition-toggle ${isYoothemeGallery ? "" : imageWrapperClass} ${isYoothemeGallery ? "" : imageDecorationClass}`.trim()}
                   style={{
-                    width: "100%",
-                    display: "block",
+                    ...(importedMediaWrapperStyle ?? { width: "100%", display: "block" }),
                     cursor: isLightbox ? "pointer" : "default",
-                    aspectRatio: imageStyle.aspectRatio,
-                    height: imageStyle.aspectRatio ? undefined : imageHeight,
-                    position: imageStyle.aspectRatio ? "relative" : undefined,
+                    aspectRatio: isYoothemeGallery ? undefined : imageStyle.aspectRatio,
+                    height: isYoothemeGallery ? undefined : imageStyle.aspectRatio ? undefined : imageHeight,
+                    position: isYoothemeGallery ? importedMediaWrapperStyle?.position : imageStyle.aspectRatio ? "relative" : undefined,
                   }}
                   onClick={(e) => {
                     if (isLightbox) {
@@ -191,16 +250,25 @@ export default function UikitGallery({ block }: Props) {
                 >
                   <img
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt={item.imageAlt}
                     className={`${imageClass} uk-transition-scale-up uk-transition-opaque`}
                     loading={rawBlock.imageLoading ?? "lazy"}
                     {...imageAttributes}
                     style={{
-                      width: "100%",
-                      height: imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
-                      objectFit: imageStyle.objectFit,
+                      width: isYoothemeGallery
+                        ? importedHasBothDimensions ? "100%" : importedImageWidth ?? (importedImageHeight ? "auto" : "100%")
+                        : "100%",
+                      maxWidth: isYoothemeGallery ? "100%" : undefined,
+                      height: isYoothemeGallery
+                        ? importedHasBothDimensions ? "100%" : importedImageHeight ?? "auto"
+                        : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
+                      objectFit: isYoothemeGallery
+                        ? importedHasBothDimensions ? "cover" : imageStyle.objectFit
+                        : imageStyle.objectFit,
                       display: "block",
-                      ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
+                      ...(isYoothemeGallery
+                        ? importedHasBothDimensions ? { position: "absolute" as const, inset: 0 } : {}
+                        : imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
                     }}
                     onError={(e) => {
                       // Fallback to high res gradient placeholder if network image fails
@@ -208,23 +276,39 @@ export default function UikitGallery({ block }: Props) {
                     }}
                   />
 
+                  {hasOverlayLink && (
+                    <a
+                      href={overlayLinkUrl}
+                      className="el-overlay-link uk-position-cover"
+                      aria-label={overlayLinkLabel}
+                      {...(usesYoothemeLightbox
+                        ? {
+                          "data-type": "image",
+                          "data-caption": lightboxCaption || undefined,
+                          "data-alt": item.imageAlt || undefined,
+                        }
+                        : builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget))}
+                      style={{ zIndex: 2 }}
+                    />
+                  )}
+
                   {/* OVERLAY COVER MODE */}
                   {overlayMode === "cover" && (
                     <div
-                      className="uk-transition-fade"
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: "linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)",
+                        background: isYoothemeGallery ? undefined : "linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)",
                         display: "flex",
                         flexDirection: "column",
-                        justifyContent: "flex-end",
-                        padding: "20px",
+                        justifyContent: isYoothemeGallery ? "center" : "flex-end",
+                        padding: isYoothemeGallery ? "20px" : "20px",
                         color: "#ffffff",
-                        borderRadius: "12px",
+                        borderRadius: isYoothemeGallery ? undefined : "12px",
                         textAlign: titleAlign,
+                        ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" } : {}),
                       }}
-                    >
+                    className={isYoothemeGallery ? `${rawBlock.overlayStyle === "overlay-primary" ? "uk-overlay-primary" : "uk-overlay"} uk-transition-${rawBlock.overlayTransition || "fade"} uk-position-cover` : "uk-transition-fade"}>
                       {showMeta && item.meta && (
                         <div
                           className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
@@ -256,14 +340,29 @@ export default function UikitGallery({ block }: Props) {
                             textAlign: contentAlign,
                           }}
                         >
-                          {item.content}
+                          {renderRichContent(item.content)}
                         </div>
                       )}
-                      {showLink && hasAction && (
-                        <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
+                      {showLink && hasLightboxAction && (
+                        <div className="uk-margin-small-top" style={{ textAlign: contentAlign, pointerEvents: "auto" }}>
+                          <a
+                            href={lightboxUrl}
+                            data-type="image"
+                            data-caption={lightboxCaption || undefined}
+                            data-alt={item.imageAlt || undefined}
+                            className={buttonClass}
+                            aria-label={item.linkAriaLabel || undefined}
+                          >
+                            {actionLabel}
+                          </a>
+                        </div>
+                      )}
+                      {showLink && !usesYoothemeLightbox && hasAction && (
+                        <div className="uk-margin-small-top" style={{ textAlign: contentAlign, pointerEvents: "auto" }}>
                           <a
                             href={itemUrl}
                             className={buttonClass}
+                            aria-label={item.linkAriaLabel || undefined}
                             {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}
                             onClick={(event) => event.stopPropagation()}
                           >
@@ -306,12 +405,19 @@ export default function UikitGallery({ block }: Props) {
                           textAlign: contentAlign,
                         }}
                       >
-                        {item.content}
+                          {renderRichContent(item.content)}
                       </div>
                     )}
-                    {showLink && hasAction && (
+                    {showLink && hasLightboxAction && (
                       <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
-                        <a href={itemUrl} className={buttonClass} {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}>
+                        <a href={lightboxUrl} data-type="image" data-caption={lightboxCaption || undefined} data-alt={item.imageAlt || undefined} className={buttonClass} aria-label={item.linkAriaLabel || undefined}>
+                          {actionLabel}
+                        </a>
+                      </div>
+                    )}
+                    {showLink && !usesYoothemeLightbox && hasAction && (
+                      <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
+                        <a href={itemUrl} className={buttonClass} aria-label={item.linkAriaLabel || undefined} {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}>
                           {actionLabel}
                         </a>
                       </div>

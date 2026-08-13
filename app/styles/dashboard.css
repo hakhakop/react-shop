@@ -14112,7 +14112,8 @@ article.is-selected-column > .builder-preview-box-spacing,
 /* Canonical canvas chrome contract.
    State comes from builderInteraction.ts; native nested :hover is intentionally
    neutralized so only the directly resolved object can own visible chrome. */
-.builder-preview-canvas .builder-interaction-object {
+.builder-preview-canvas
+  .builder-interaction-object:not([data-builder-has-advanced-css]) {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -16759,7 +16760,6 @@ body:has(.builder-dashboard.is-inspector-docked)
 .builder-design-preview-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
 .builder-design-preview-row > * { max-width: 100%; }
 .builder-design-preview .uk-card { min-width: 180px; flex: 1 1 180px; }
-.builder-design-preview .uk-alert-primary { padding: 12px; border-radius: var(--uk-global-border-radius, 8px); background: var(--uk-global-muted-background, #eef5ff); color: var(--uk-global-primary-color, #2563eb); }
 .builder-design-preview .uk-input { max-width: 180px; }
 
 /* Dashboard visual system refinement: quiet chrome, dense scanning, and one control language. */
@@ -17704,13 +17704,23 @@ body:has(.builder-dashboard.is-inspector-docked)
   align-items: center;
   justify-content: center;
   vertical-align: middle;
-  color: currentColor;
 }
 
 .webpages-icon > svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* UIkit's generated SVG markup carries presentation attributes such as
+ * stroke="#000". Keep the shared icon renderer semantic-color aware instead
+ * of letting those source attributes bypass its inherited text color. */
+.webpages-icon.uk-icon:not(.uk-preserve) > svg [stroke]:not([stroke="none"]) {
+  stroke: currentColor;
+}
+
+.webpages-icon.uk-icon:not(.uk-preserve) > svg [fill]:not([fill="none"]) {
+  fill: currentColor;
 }
 
 .webpages-icon-picker {
@@ -17995,8 +18005,19 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 /* UIkit Meta & Content Styles */
 .uk-text-meta { font-size: 0.875rem !important; color: #64748b !important; line-height: 1.4 !important; }
 .uk-text-muted { color: #94a3b8 !important; }
+/* Builder content uses the same inherited UIkit semantic context as the
+   storefront. In particular, an imported YOOtheme SVG with SVG Color =
+   Emphasis becomes inverse/white on a dark section instead of retaining the
+   Dashboard's former fixed slate color. */
+.uk-text-emphasis {
+  --uikit-text-local-color: var(--uikit-text-emphasis-color, var(--context-emphasis, var(--uk-global-emphasis-color, currentColor)));
+  color: var(--uikit-text-local-color) !important;
+}
 .uk-text-primary { color: #1e87f0 !important; font-weight: 600 !important; }
 .uk-text-secondary { color: #0f172a !important; font-weight: 600 !important; }
+.uk-text-success { color: #32d296 !important; }
+.uk-text-warning { color: #faa05a !important; }
+.uk-text-danger { color: #f0506e !important; }
 .uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: #334155 !important; }
 .uk-text-small { font-size: 0.875rem !important; line-height: 1.4 !important; }
 .uk-text-large { font-size: 1.35rem !important; line-height: 1.5 !important; }
