@@ -550,6 +550,7 @@ type DashboardInspectorProps = {
   setOpenSlideId: Dispatch<SetStateAction<string | null>>;
   setSectionSettingsOpen: Dispatch<SetStateAction<boolean>>;
   setSelectedLayoutBlockKey: Dispatch<SetStateAction<string | null>>;
+  setSelectedLayoutColumnKey: Dispatch<SetStateAction<string | null>>;
   setSelectedLayoutRowIndex?: Dispatch<SetStateAction<number | null>>;
   onUpdateRowLayout?: LooseHandler;
   onUpdateRowStyle?: LooseHandler;
@@ -1050,6 +1051,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedLayoutBlockKey,
     selectedLayoutColumnKey,
     selectedLayoutRowIndex,
+    setSelectedLayoutRowIndex,
     selectedSection,
     anchorIdEntries = [],
     selectedSectionIsFirstVisible = false,
@@ -1084,7 +1086,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     setOpenSlideId,
     setSpacingOverlayEnabled = () => undefined,
     setSectionSettingsOpen,
-    setSelectedLayoutBlockKey,
+  setSelectedLayoutBlockKey,
+  setSelectedLayoutColumnKey,
     updateSelected,
     updateSelectedBadge,
     updateSelectedLayoutBlock,
@@ -1214,11 +1217,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? canonicalBlockTabs
-    : selectedLayoutRow
-      ? [
-          ["layout", t("builder.inspector.layout")],
-          ["spacing", t("builder.inspector.spacing")],
-          ["style", t("builder.inspector.styling")],
+      : selectedLayoutRow
+        ? [
+          ["settings", "Settings"],
           ["advanced", t("builder.inspector.advanced")],
         ]
       : isCanonicalColumnSelection
@@ -1352,8 +1353,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       return;
     }
     if (selectedLayoutRow) {
-      if (inspectorTab === "content" || inspectorTab === "typography") {
-        setInspectorTab("layout");
+      if (inspectorTab !== "settings" && inspectorTab !== "advanced") {
+        setInspectorTab("settings");
       }
       return;
     }
@@ -1775,7 +1776,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const updateSelectedLayoutBlockByKey = (
     patch: Partial<BuilderLayoutBlock>,
   ) => {
-    if (!selectedLayoutBlockKey || !selectedSection?.layoutItems) return;
+    if (!selectedLayoutBlockKey) return;
     if (selectedLayoutColumnKey) {
       updateLayoutBlockByKey(
         selectedSection.id,
@@ -1785,6 +1786,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       );
       return;
     }
+    if (!selectedSection?.layoutItems) return;
     for (
       let itemIndex = 0;
       itemIndex < selectedSection.layoutItems.length;
@@ -1841,13 +1843,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             : inspectorTab === "style"
               ? "Column Styling"
               : "Column Advanced"
-        : inspectorTab === "layout"
-          ? "Row Layout"
-          : inspectorTab === "spacing"
-            ? "Row Spacing"
-            : inspectorTab === "style"
-              ? "Row Styling"
-              : "Row Advanced"
+        : inspectorTab === "settings"
+          ? "Row Settings"
+          : "Row Advanced"
       : isCanonicalSectionSelection
         ? inspectorTab === "content"
           ? "Section Content"
@@ -1870,7 +1868,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const showLegacySectionContentControls: boolean = false;
   return (
     <aside
-      className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}${isCanonicalSectionSelection ? " is-section-inspector" : ""}${isCanonicalRowSelection ? " is-row-inspector" : ""}`}
+      className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}
     >
       {!selectedSection ? (
         <div className="builder-inspector-header-consolidated">
@@ -1895,20 +1893,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         </div>
       ) : (
         <>
-          {isCanonicalSectionSelection && (
-            <div className="builder-section-yootheme-header">
-              <button type="button" className="builder-section-yootheme-close" onClick={onCloseInspector}>CLOSE</button>
-              <button type="button" className="builder-section-yootheme-back" onClick={onCloseInspector}>← BUILDER</button>
-              <strong>SECTION</strong>
-            </div>
-          )}
-          {isCanonicalRowSelection && (
-            <div className="builder-section-yootheme-header builder-row-yootheme-header">
-              <button type="button" className="builder-section-yootheme-close" onClick={onCloseInspector}>CLOSE</button>
-              <button type="button" className="builder-section-yootheme-back" onClick={onCloseInspector}>← BUILDER</button>
-              <strong>ROW</strong>
-            </div>
-          )}
           <div className="builder-inspector-header-consolidated">
             <div className="builder-inspector-header-row">
               <div className="builder-inspector-header-title-wrap">
@@ -2473,6 +2457,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               tab={inspectorTab}
               update={onUpdateRowStyle}
               applyLayoutPreset={applySelectedRowLayoutPreset}
+              onEditColumn={(columnId) => {
+                setSelectedLayoutRowIndex?.(null);
+                setSelectedLayoutColumnKey(columnId);
+                setInspectorTab("layout");
+              }}
             />
           )}
 

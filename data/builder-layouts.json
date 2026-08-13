@@ -7173,7 +7173,8 @@
         "rows": [
           {
             "id": "yootheme-section-1-row-1",
-            "layout": "2-col-equal",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "large",
             "columns": [
               {
@@ -7400,10 +7401,6 @@
                     }
                   }
                 ]
-              },
-              {
-                "id": "yootheme-section-1-row-1-column-2",
-                "elements": []
               }
             ]
           }
@@ -7465,6 +7462,7 @@
                 }
               ]
             },
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-2-row-1-column-1",
@@ -7668,6 +7666,7 @@
           {
             "id": "yootheme-section-3-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-3-row-1-column-1",
@@ -7860,6 +7859,7 @@
           {
             "id": "yootheme-section-4-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-4-row-1-column-1",
@@ -8016,6 +8016,7 @@
           {
             "id": "yootheme-section-5-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-5-row-1-column-1",
@@ -8269,6 +8270,7 @@
           {
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "large",
             "columns": [
               {
@@ -8365,6 +8367,7 @@
             },
             "columnGap": "small",
             "rowGap": "large",
+            "spacingContract": "yootheme",
             "topMargin": "none",
             "columns": [
               {
@@ -8669,6 +8672,7 @@
                 }
               ]
             },
+            "spacingContract": "yootheme",
             "topMargin": "40px",
             "columns": [
               {
@@ -8845,6 +8849,7 @@
           {
             "id": "yootheme-section-7-row-2",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "40px",
             "columns": [
               {
@@ -9066,6 +9071,7 @@
             "id": "yootheme-section-8-row-1",
             "layout": "1-col",
             "maxWidth": "default",
+            "spacingContract": "yootheme",
             "topMargin": "xlarge",
             "columns": [
               {
@@ -9130,6 +9136,7 @@
           {
             "id": "yootheme-section-8-row-2",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "none",
             "columns": [
               {
@@ -9218,6 +9225,7 @@
             "id": "yootheme-section-8-row-3",
             "layout": "1-col",
             "maxWidth": "default",
+            "spacingContract": "yootheme",
             "topMargin": "none",
             "columns": [
               {
@@ -9398,6 +9406,7 @@
           {
             "id": "yootheme-section-9-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-9-row-1-column-1",
@@ -9476,6 +9485,7 @@
             },
             "columnGap": "small",
             "rowGap": "large",
+            "spacingContract": "yootheme",
             "topMargin": "40px",
             "columns": [
               {
@@ -9763,6 +9773,7 @@
             "id": "yootheme-section-10-row-1",
             "layout": "1-col",
             "maxWidth": "default",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-10-row-1-column-1",
@@ -9827,6 +9838,7 @@
           {
             "id": "yootheme-section-10-row-2",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "large",
             "bottomMargin": "none",
             "columns": [
@@ -9879,6 +9891,7 @@
           {
             "id": "yootheme-section-11-row-1",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-11-row-1-column-1",
@@ -10063,6 +10076,7 @@
           {
             "id": "yootheme-section-11-row-2",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "40px",
             "columns": [
               {
@@ -10162,6 +10176,7 @@
             },
             "columnGap": "large",
             "rowGap": "large",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-12-row-1-column-1",
@@ -10360,6 +10375,7 @@
           {
             "id": "yootheme-section-12-row-2",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "none",
             "bottomMargin": "none",
             "columns": [
@@ -10467,6 +10483,7 @@
             "id": "yootheme-section-13-row-1",
             "layout": "1-col",
             "maxWidth": "default",
+            "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-13-row-1-column-1",
@@ -10529,6 +10546,7 @@
             "id": "yootheme-section-13-row-2",
             "layout": "1-col",
             "maxWidth": "small",
+            "spacingContract": "yootheme",
             "topMargin": "40px",
             "columns": [
               {
@@ -10635,6 +10653,7 @@
           {
             "id": "yootheme-section-13-row-3",
             "layout": "1-col",
+            "spacingContract": "yootheme",
             "topMargin": "large",
             "bottomMargin": "none",
             "columns": [
@@ -10681,7 +10700,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-13T16:38:47.647Z"
+    "updatedAt": "2026-08-13T18:49:36.050Z"
   },
   "page:clean": {
     "version": 1,

@@ -379,6 +379,8 @@ export type BuilderRowColumnParallaxSettings = {
 export type BuilderRow = {
   id: string;
   layout: string;
+  /** Provenance for source-specific structural spacing semantics. */
+  spacingContract?: "yootheme";
   customLayout?: BuilderRowCustomLayout;
   columnGap?: SectionSpacing;
   rowGap?: SectionSpacing;

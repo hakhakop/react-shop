@@ -8096,6 +8096,8 @@ export default function DashboardBuilder({
       setOpenSlideId={setOpenSlideId}
       setSectionSettingsOpen={setSectionSettingsOpen}
       setSelectedLayoutBlockKey={setSelectedLayoutBlockKey}
+      setSelectedLayoutColumnKey={setSelectedLayoutColumnKey}
+      setSelectedLayoutRowIndex={setSelectedLayoutRowIndex}
       updateSelected={updateSelected}
       updateSelectedBadge={updateSelectedBadge}
       updateSelectedLayoutBlock={updateSelectedLayoutBlock}

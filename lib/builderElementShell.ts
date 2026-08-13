@@ -60,7 +60,10 @@ function getYoothemeMarginClass(value?: string) {
   if (margin === "remove-vertical" || margin === "none") return "uk-margin-remove";
   if (margin === "default") return "uk-margin";
   if (["small", "medium", "large", "xlarge"].includes(margin)) {
-    return `uk-margin-${margin}`;
+    // Imported YOOtheme spacing is a grid-item boundary. Keep the
+    // preceding gap via the top utility; a trailing bottom margin on the
+    // final imported block would incorrectly enlarge the WebPages column.
+    return `uk-margin-${margin}-top`;
   }
   return getUikitMarginClass(margin);
 }

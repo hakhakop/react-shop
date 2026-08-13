@@ -13,6 +13,7 @@ import {
   InspectorFieldRow,
   InspectorPillGroup,
   InspectorSelect,
+  InspectorSwitch,
   InspectorTextarea,
   InspectorTextField,
 } from "@/components/dashboard/inspector/InspectorControls";
@@ -22,6 +23,7 @@ type Props = {
   tab: InspectorTab;
   update: (patch: Partial<BuilderRow>) => void;
   applyLayoutPreset: (key: string) => void;
+  onEditColumn: (columnId: string) => void;
 };
 
 const spacingOptions = [
@@ -52,13 +54,7 @@ function advancedAttributesValue(
 }
 
 function RowCheck({ checked, onChange, label }: { checked: boolean; onChange: (checked: boolean) => void; label: string }) {
-  return (
-    <label className="builder-section-quiet-check">
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-      <span className="builder-section-quiet-checkmark" aria-hidden="true" />
-      <span>{label}</span>
-    </label>
-  );
+  return <InspectorSwitch checked={checked} onChange={onChange} label={label} />;
 }
 
 export default function RowCapabilityPanel({
@@ -66,6 +62,7 @@ export default function RowCapabilityPanel({
   tab,
   update,
   applyLayoutPreset,
+  onEditColumn,
 }: Props) {
   const updateColumn = (
     columnIndex: number,
@@ -81,9 +78,11 @@ export default function RowCapabilityPanel({
   const updateAdvanced = (patch: Partial<BuilderLayoutAdvancedSettings>) =>
     update({ advanced: { ...(row.advanced ?? {}), ...patch } });
 
-  if (tab === "layout") {
+  if (tab === "settings") {
     return (
       <div className="builder-inspector-stack" data-canonical-owner="BuilderRow">
+        <div className="builder-field-header"><strong>Layout</strong></div>
+        <div className="builder-field-header"><strong>Current layout</strong><small>{builderRowLayoutPresets.find((preset) => preset.key === row.layout)?.label ?? row.layout}</small></div>
         <InspectorFieldRow label="Edit Layout">
           <InspectorSelect
             value={row.layout}
@@ -139,16 +138,25 @@ export default function RowCapabilityPanel({
           ))}
         </div>
 
+        <section className="builder-inspector-section">
+          <h3>Columns</h3>
+          {row.columns.map((column, index) => (
+            <button type="button" className="builder-secondary-button builder-full-button" key={column.id} onClick={() => onEditColumn(column.id)}>
+              Edit Column {index + 1}
+            </button>
+          ))}
+        </section>
+
         <InspectorFieldRow label="Column Gap">
           <InspectorSelect value={row.columnGap ?? "inherit"} options={spacingOptions} onChange={(columnGap) => update({ columnGap })} ariaLabel="Row Column Gap" />
         </InspectorFieldRow>
         <InspectorFieldRow label="Row Gap">
           <InspectorSelect value={row.rowGap ?? "inherit"} options={spacingOptions} onChange={(rowGap) => update({ rowGap })} ariaLabel="Row Gap" />
         </InspectorFieldRow>
-        <InspectorFieldRow label="Column Divider" description="Canonical storage exists; visual projection is deferred.">
+        <InspectorFieldRow label="Divider" description="Canonical storage exists; visual projection is deferred.">
           <RowCheck checked={row.divider === true} onChange={(divider) => update({ divider })} label="Show column divider" />
         </InspectorFieldRow>
-        <InspectorFieldRow label="Horizontal Distribution">
+        <InspectorFieldRow label="Alignment">
           <InspectorPillGroup
             value={row.horizontalDistribution ?? "justify"}
             options={[
@@ -171,7 +179,7 @@ export default function RowCapabilityPanel({
         <InspectorFieldRow label="Remove Horizontal Padding" description="Canonical storage exists; row container projection is deferred.">
           <RowCheck checked={row.removeHorizontalPadding === true} onChange={(removeHorizontalPadding) => update({ removeHorizontalPadding })} label="Remove left and right padding" />
         </InspectorFieldRow>
-        <InspectorFieldRow label="One-sided Expansion" description="Canonical storage exists; row container projection is deferred.">
+        <InspectorFieldRow label="Expand One Side" description="Canonical storage exists; row container projection is deferred.">
           <InspectorSelect
             value={row.expandOneSide ?? "none"}
             options={[{ value: "none", label: "None" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]}
@@ -180,7 +188,7 @@ export default function RowCapabilityPanel({
           />
         </InspectorFieldRow>
 
-        <InspectorFieldRow label="Height" description="Canonical storage exists; height projection is deferred.">
+        <InspectorFieldRow label="Column Height" description="Canonical storage exists; height projection is deferred.">
           <InspectorSelect
             value={row.height?.mode ?? "none"}
             options={[{ value: "none", label: "Auto" }, { value: "pixels", label: "Pixels" }, { value: "viewport", label: "Viewport" }]}
@@ -194,22 +202,33 @@ export default function RowCapabilityPanel({
             <InspectorFieldRow label="Viewport Offset"><InspectorTextField value={row.height.offset ?? ""} onChange={(offset) => update({ height: { ...(row.height ?? {}), offset: offset || undefined } })} ariaLabel="Row height offset" /></InspectorFieldRow>
           </div>
         ) : null}
-        <InspectorFieldRow label="Subtract Height Above" description="Canonical storage exists; height projection is deferred.">
+        <InspectorFieldRow label="Subtract Height Above Row" description="Canonical storage exists; height projection is deferred.">
           <RowCheck checked={row.height?.subtractHeightAbove === true} onChange={(subtractHeightAbove) => update({ height: { ...(row.height ?? {}), subtractHeightAbove } })} label="Subtract preceding layout height" />
         </InspectorFieldRow>
-      </div>
-    );
-  }
-
-  if (tab === "spacing") {
-    return (
-      <div className="builder-inspector-stack" data-canonical-owner="BuilderRow">
+        <div className="builder-field-header"><strong>Margin</strong></div>
         <InspectorFieldRow label="Top Margin">
           <InspectorTextField value={row.topMargin ?? ""} placeholder="inherit, medium, 40px" onChange={(topMargin) => update({ topMargin: topMargin || undefined })} ariaLabel="Row Top Margin" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Remove Top Margin">
+          <RowCheck checked={row.topMargin === "none"} onChange={(remove) => update({ topMargin: remove ? "none" : undefined })} label="Remove top margin" />
         </InspectorFieldRow>
         <InspectorFieldRow label="Bottom Margin">
           <InspectorTextField value={row.bottomMargin ?? ""} placeholder="inherit, medium, 40px" onChange={(bottomMargin) => update({ bottomMargin: bottomMargin || undefined })} ariaLabel="Row Bottom Margin" />
         </InspectorFieldRow>
+        <InspectorFieldRow label="Remove Bottom Margin">
+          <RowCheck checked={row.bottomMargin === "none"} onChange={(remove) => update({ bottomMargin: remove ? "none" : undefined })} label="Remove bottom margin" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="HTML Element">
+          <InspectorSelect value={row.htmlElement ?? "div"} options={["div", "address", "article", "aside", "footer", "header", "hgroup", "main", "nav", "section"].map((value) => ({ value, label: value }))} onChange={(htmlElement) => update({ htmlElement: htmlElement as BuilderLayoutHtmlElement })} ariaLabel="Row HTML Element" />
+        </InspectorFieldRow>
+        <div className="builder-inspector-section">
+          <h3>Column Parallax</h3>
+          <InspectorFieldRow label="Justify Columns at the Bottom"><RowCheck checked={row.columnParallax?.justifyAtBottom === true} onChange={(justifyAtBottom) => update({ columnParallax: { ...(row.columnParallax ?? {}), justifyAtBottom } })} label="Justify columns at bottom" /></InspectorFieldRow>
+          <div className="builder-two-column">
+            <InspectorFieldRow label="Start"><InspectorTextField value={row.columnParallax?.start ?? ""} onChange={(start) => update({ columnParallax: { ...(row.columnParallax ?? {}), start: start || undefined } })} ariaLabel="Column parallax start" /></InspectorFieldRow>
+            <InspectorFieldRow label="End"><InspectorTextField value={row.columnParallax?.end ?? ""} onChange={(end) => update({ columnParallax: { ...(row.columnParallax ?? {}), end: end || undefined } })} ariaLabel="Column parallax end" /></InspectorFieldRow>
+          </div>
+        </div>
       </div>
     );
   }
@@ -217,25 +236,6 @@ export default function RowCapabilityPanel({
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-canonical-owner="BuilderRow">
-        <InspectorFieldRow label="HTML Element" description="Canonical storage exists; semantic tag projection is deferred.">
-          <InspectorSelect
-            value={row.htmlElement ?? "div"}
-            options={["div", "address", "article", "aside", "footer", "header", "hgroup", "main", "nav", "section"].map((value) => ({ value, label: value }))}
-            onChange={(htmlElement) => update({ htmlElement: htmlElement as BuilderLayoutHtmlElement })}
-            ariaLabel="Row HTML Element"
-          />
-        </InspectorFieldRow>
-
-        <div className="builder-inspector-section">
-          <div className="builder-field-header"><strong>Column Parallax</strong></div>
-          <InspectorFieldRow label="Enable"><RowCheck checked={row.columnParallax?.enabled === true} onChange={(enabled) => update({ columnParallax: { ...(row.columnParallax ?? {}), enabled } })} label="Enable column parallax" /></InspectorFieldRow>
-          <InspectorFieldRow label="Justify at Bottom"><RowCheck checked={row.columnParallax?.justifyAtBottom === true} onChange={(justifyAtBottom) => update({ columnParallax: { ...(row.columnParallax ?? {}), justifyAtBottom } })} label="Justify columns at bottom" /></InspectorFieldRow>
-          <div className="builder-two-column">
-            <InspectorFieldRow label="Start"><InspectorTextField value={row.columnParallax?.start ?? ""} onChange={(start) => update({ columnParallax: { ...(row.columnParallax ?? {}), start: start || undefined } })} ariaLabel="Column parallax start" /></InspectorFieldRow>
-            <InspectorFieldRow label="End"><InspectorTextField value={row.columnParallax?.end ?? ""} onChange={(end) => update({ columnParallax: { ...(row.columnParallax ?? {}), end: end || undefined } })} ariaLabel="Column parallax end" /></InspectorFieldRow>
-          </div>
-        </div>
-
         <InspectorFieldRow label="ID"><InspectorTextField value={row.advanced?.htmlId ?? ""} onChange={(htmlId) => updateAdvanced({ htmlId: htmlId || undefined })} ariaLabel="Row Advanced ID" /></InspectorFieldRow>
         <InspectorFieldRow label="Class"><InspectorTextField value={row.advanced?.className ?? ""} onChange={(className) => updateAdvanced({ className: className || undefined })} ariaLabel="Row Advanced Class" /></InspectorFieldRow>
         <InspectorFieldRow label="Attributes"><InspectorTextarea value={advancedAttributesValue(row.advanced?.attributes)} onChange={(attributes) => updateAdvanced({ attributes: attributes || undefined })} ariaLabel="Row Advanced Attributes" /></InspectorFieldRow>

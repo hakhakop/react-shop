@@ -4,6 +4,7 @@ import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { visualStyleToCss } from "@/lib/builderVisualStyle";
 
 export type BuilderRowStyleInput = {
+  spacingContract?: "yootheme";
   rowBackground?: string;
   rowTopSpacing?: string;
   rowBottomSpacing?: string;
@@ -41,8 +42,14 @@ function inheritedSpacing(
 function explicitSpacing(
   value: string | undefined,
   context: "rowPadding" | "rowMargin",
+  spacingContract?: "yootheme",
 ) {
   if (!value || value === "inherit") return "0px";
+  // YOOtheme's `large` row margin is @global-large-margin (70px),
+  // distinct from the generic WebPages xl token (96px).
+  if (spacingContract === "yootheme" && context === "rowMargin" && value.trim().toLowerCase() === "large") {
+    return "70px";
+  }
   return resolveBuilderSpacing(value, context).css;
 }
 
@@ -71,8 +78,8 @@ export function resolveBuilderRowStyle(
       : "0px",
     // Global row margins are intentionally not inherited. Row siblings use
     // rowGap; an explicit local margin replaces that boundary's gap.
-    marginTop: explicitSpacing(row?.rowTopMargin, "rowMargin"),
-    marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin"),
+    marginTop: explicitSpacing(row?.rowTopMargin, "rowMargin", row?.spacingContract),
+    marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
     borderRadius:
       row?.rowBorderRadius !== undefined &&
       Boolean(row.rowBackground || row.rowVisualStyle?.background)

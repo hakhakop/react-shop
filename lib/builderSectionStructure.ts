@@ -189,6 +189,7 @@ function rowStyleInput(
 ): BuilderRowStyleInput {
   return {
     ...legacyItem,
+    spacingContract: row.spacingContract,
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,
     rowBottomMargin: row.bottomMargin ?? legacyItem?.rowBottomMargin,
     rowGap: row.rowGap ?? legacyItem?.rowGap,

@@ -2197,7 +2197,7 @@ const sourceBuilderColumn = (
 const sourceRowMargin = (
   props: Record<string, unknown>,
   rowIndex: number,
-): Pick<BuilderRow, "topMargin" | "bottomMargin"> => {
+): Pick<BuilderRow, "spacingContract" | "topMargin" | "bottomMargin"> => {
   const margin = sourceStructuralSpacing(props.margin);
   const removeTop = sourceBoolean(props.margin_remove_top) === true;
   const removeBottom = sourceBoolean(props.margin_remove_bottom) === true;
@@ -2210,6 +2210,7 @@ const sourceRowMargin = (
     ? "none"
     : undefined;
   return {
+    spacingContract: "yootheme",
     ...(topMargin ? { topMargin } : {}),
     ...(bottomMargin ? { bottomMargin } : {}),
   };
