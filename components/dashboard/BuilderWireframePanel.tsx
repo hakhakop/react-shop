@@ -8,8 +8,9 @@ import {
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BuilderLayoutBlock, BuilderLayoutKey, BuilderSection, LayoutBlockKind } from "@/components/dashboard/builderTypes";
 import { layoutBlockLabels, sectionLabels } from "@/components/dashboard/builderRegistry";
-import { getBuilderLayoutRows, getBuilderRowLayoutPreset, type BuilderLayoutRow, type LayoutItem } from "@/components/dashboard/builderLayoutPresets";
+import { getBuilderLayoutRows, getBuilderRowLayoutPreset, type BuilderLayoutRow } from "@/components/dashboard/builderLayoutPresets";
 import { layoutColumnHasContent } from "@/lib/builderNestedLayout";
+import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import type { BuilderInteractionTarget } from "@/components/dashboard/builderInteraction";
 
 export type BuilderHoverTarget = BuilderInteractionTarget;
@@ -45,6 +46,24 @@ type Props = {
   actions: BuilderWireframeActions;
   renameSectionId?: string | null;
 };
+
+function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
+  const normalized = normalizeBuilderSectionLayout(section);
+  if (normalized.source === "canonical") {
+    return normalized.rows.map((row) => ({
+      id: row.id,
+      layoutKey: row.layout,
+      startIndex: 0,
+      items: row.columns.map((column) => ({
+        id: column.id,
+        rowId: row.id,
+        rowLayout: row.layout,
+        blocks: column.elements,
+      })),
+    }));
+  }
+  return getBuilderLayoutRows(section, section.layoutItems ?? []);
+}
 
 function structureKey(target: BuilderHoverTarget | null | undefined) {
   if (!target) return null;
@@ -168,7 +187,7 @@ function targetRowIndex(section: BuilderSection, target: BuilderInteractionTarge
   if (!target || target.sectionId !== section.id) return null;
   if (target.type === "row") return target.rowIndex;
   if (target.type === "section") return null;
-  return getBuilderLayoutRows(section, section.layoutItems ?? []).findIndex((row) => row.items.some((item) => {
+  return getWireframeRows(section).findIndex((row) => row.items.some((item) => {
     const column = item as NonNullable<BuilderSection["layoutItems"]>[number];
     return column.id === target.columnKey || Boolean(
       column.nestedLayout?.rows.some((nested) =>
@@ -182,7 +201,7 @@ const WireframeSection = memo(function WireframeSection({ section, index, total,
   section: BuilderSection; index: number; total: number; collapsed: boolean; selected: boolean; hovered: boolean; hasSelectedDescendant: boolean; hasHoveredDescendant: boolean; selectedTarget: BuilderInteractionTarget | null; hoveredTarget: BuilderInteractionTarget | null;
   editing: boolean; renameDraft: string; onRenameDraft: (value: string) => void; onStartRename: (section: BuilderSection) => void; onFinishRename: (sectionId: string, commit: boolean) => void; onToggle: (sectionId: string) => void; actions: BuilderWireframeActions; header: boolean;
 }) {
-  const rows = useMemo(() => getBuilderLayoutRows(section, section.layoutItems ?? []), [section]);
+  const rows = useMemo(() => getWireframeRows(section), [section]);
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(() => new Set());
   const selectedRow = targetRowIndex(section, selectedTarget); const hoveredRow = targetRowIndex(section, hoveredTarget);
   useEffect(() => { if (selectedRow === null) return; const key = `${section.id}:${selectedRow}`; setCollapsedRows((current) => current.has(key) ? new Set([...current].filter((entry) => entry !== key)) : current); }, [section.id, selectedRow]);
@@ -214,6 +233,6 @@ export default function BuilderWireframePanel({ page, pageLabel, sections, selec
   const finishRename = useCallback((sectionId: string, commit: boolean) => { if (commit && renameDraftRef.current.trim()) actions.renameSection?.(sectionId, renameDraftRef.current.trim()); setEditingSectionId(null); renameDraftRef.current = ""; setRenameDraft(""); actions.renameComplete?.(); }, [actions]);
   const beginRename = useCallback((section: BuilderSection) => { setEditingSectionId(section.id); renameDraftRef.current = section.name ?? ""; setRenameDraft(section.name ?? ""); }, []);
   const toggle = useCallback((id: string) => setCollapsedSections((current) => { const next = new Set(current); next.has(id) ? next.delete(id) : next.add(id); return next; }), []);
-  const headerRows = header ? sections.reduce((count, section) => count + getBuilderLayoutRows(section, section.layoutItems ?? []).length, 0) : 0;
+  const headerRows = header ? sections.reduce((count, section) => count + getWireframeRows(section).length, 0) : 0;
   return <div className="builder-sidebar-panel builder-wireframe-panel"><div className="builder-wireframe-header-consolidated"><div className="builder-wireframe-header-row"><div className="builder-wireframe-header-title-wrap"><FileText size={13} className="builder-wireframe-icon builder-wireframe-icon--page" /><strong>{pageLabel}</strong></div><span className="builder-wireframe-badge builder-wireframe-badge--page">PAGE</span></div><div className="builder-wireframe-header-row builder-wireframe-header-row--sub"><span>{header ? "Header structure" : "Current page structure"}</span><small>{header ? `${headerRows} ${headerRows === 1 ? "row" : "rows"}` : `${sections.length} ${sections.length === 1 ? "section" : "sections"}`}</small></div></div><div ref={treeRef} className="builder-wireframe-tree" role="tree" aria-label="Page structure">{sections.length === 0 ? <div className="builder-wireframe-empty"><Layers3 size={16} /><strong>No sections</strong><span>Add a section to start building this page.</span></div> : sections.map((section, index) => { const sectionSelectedKey = `section:${section.id}`; const sectionHoveredKey = sectionSelectedKey; const selectedTarget = selectedSectionId === section.id ? (selectedLayoutBlockKey ? { type: "block" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey!, blockKey: selectedLayoutBlockKey } : selectedLayoutColumnKey ? { type: "column" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey } : selectedLayoutRowIndex !== null ? { type: "row" as const, sectionId: selectedSectionId, rowIndex: selectedLayoutRowIndex } : { type: "section" as const, sectionId: selectedSectionId }) : null; return <WireframeSection key={section.id} section={section} index={index} total={sections.length} collapsed={collapsedSections.has(section.id)} selected={selected === sectionSelectedKey} hovered={hovered === sectionHoveredKey} hasSelectedDescendant={isDescendant(sectionSelectedKey, selected)} hasHoveredDescendant={isDescendant(sectionHoveredKey, hovered)} selectedTarget={selectedTarget} hoveredTarget={hoveredTarget?.sectionId === section.id ? hoveredTarget : null} editing={editingSectionId === section.id} renameDraft={editingSectionId === section.id ? renameDraft : ""} onRenameDraft={setRenameValue} onStartRename={beginRename} onFinishRename={finishRename} onToggle={toggle} actions={actions} header={header} />; })}</div></div>;
 }

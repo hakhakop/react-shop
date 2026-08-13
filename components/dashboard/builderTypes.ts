@@ -131,7 +131,31 @@ export type BuilderAnimationPreset =
   | "progress-line"
   | "scroll-progress-horizontal"
   | "scroll-progress-vertical"
+  | "parallax"
   | "princity-gradient";
+export type BuilderParallaxStop = {
+  value: string;
+  position?: number;
+};
+export type BuilderParallaxTransformOrigin =
+  | "top-left" | "top-center" | "top-right"
+  | "center-left" | "center-center" | "center-right"
+  | "bottom-left" | "bottom-center" | "bottom-right";
+export type BuilderParallaxSettings = {
+  x?: BuilderParallaxStop[];
+  y?: BuilderParallaxStop[];
+  scale?: BuilderParallaxStop[];
+  rotate?: BuilderParallaxStop[];
+  opacity?: BuilderParallaxStop[];
+  blur?: BuilderParallaxStop[];
+  transformOrigin?: BuilderParallaxTransformOrigin;
+  easing?: number;
+  target?: string;
+  start?: string;
+  end?: string;
+  zIndex?: boolean;
+  breakpoint?: "s" | "m" | "l" | "xl" | "";
+};
 export type BuilderAnimationSettings = {
   preset?: BuilderAnimationPreset;
   delayMs?: number;
@@ -145,6 +169,11 @@ export type BuilderAnimationSettings = {
   once?: boolean;
   pauseUntilComplete?: boolean;
   progressDirection?: "horizontal" | "vertical";
+  parallax?: BuilderParallaxSettings;
+  /** YOOtheme compound parallax range, in source order (start,end). */
+  parallaxY?: [number, number];
+  /** YOOtheme parallax easing coefficient. */
+  parallaxEasing?: number;
 };
 export type LayoutBlockKind =
   | "hero"
@@ -246,6 +275,126 @@ import type {
   TypographyGroup,
   TypographySettings,
 } from "@/lib/builderTypography";
+
+export type BuilderLayoutHtmlElement =
+  | "div"
+  | "address"
+  | "article"
+  | "aside"
+  | "footer"
+  | "header"
+  | "hgroup"
+  | "main"
+  | "nav"
+  | "section";
+
+export type BuilderLayoutAdvancedSettings = {
+  status?: "published" | "disabled" | "draft" | (string & {});
+  htmlId?: string;
+  className?: string;
+  attributes?: Record<string, string> | string;
+  css?: string;
+  dynamicSource?: unknown;
+};
+
+export type BuilderResponsiveColumnWidths = {
+  default?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
+  xlarge?: string;
+};
+
+export type BuilderResponsiveColumnOrder = {
+  default?: number | "first" | "last";
+  small?: number | "first" | "last";
+  medium?: number | "first" | "last";
+  large?: number | "first" | "last";
+  xlarge?: number | "first" | "last";
+};
+
+export type BuilderColumnBackground = {
+  color?: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  position?: string;
+  size?: "auto" | "cover" | "contain" | (string & {});
+  repeat?: string;
+  gradient?: string;
+  parallax?: BuilderParallaxSettings;
+};
+
+export type BuilderColumnStickySettings = {
+  mode?:
+    | "none"
+    | "elements-within-column"
+    | "column-within-row"
+    | "column-within-section"
+    | "always";
+  topOffset?: string;
+  bottomOffset?: string;
+  breakpoint?: "s" | "m" | "l" | "xl" | "";
+};
+
+export type BuilderColumn = {
+  id: string;
+  responsiveWidths?: BuilderResponsiveColumnWidths;
+  order?: BuilderResponsiveColumnOrder;
+  verticalAlign?: "top" | "middle" | "bottom";
+  background?: BuilderColumnBackground;
+  style?: string;
+  textColor?: "none" | "light" | "dark";
+  preserveColor?: boolean;
+  padding?: SectionSpacing;
+  htmlElement?: BuilderLayoutHtmlElement;
+  sticky?: BuilderColumnStickySettings;
+  keepEmpty?: boolean;
+  advanced?: BuilderLayoutAdvancedSettings;
+  elements: BuilderLayoutBlock[];
+};
+
+export type BuilderRowCustomLayout = {
+  template?: string;
+  columns?: Array<{
+    columnId: string;
+    widths?: BuilderResponsiveColumnWidths;
+    order?: BuilderResponsiveColumnOrder;
+  }>;
+};
+
+export type BuilderRowHeightSettings = {
+  mode?: "none" | "pixels" | "viewport";
+  value?: string;
+  offset?: string;
+  subtractHeightAbove?: boolean;
+};
+
+export type BuilderRowColumnParallaxSettings = {
+  enabled?: boolean;
+  justifyAtBottom?: boolean;
+  start?: string;
+  end?: string;
+};
+
+export type BuilderRow = {
+  id: string;
+  layout: string;
+  customLayout?: BuilderRowCustomLayout;
+  columnGap?: SectionSpacing;
+  rowGap?: SectionSpacing;
+  divider?: boolean;
+  horizontalDistribution?: "justify" | "left" | "center";
+  maxWidth?: SectionContentMode;
+  removeHorizontalPadding?: boolean;
+  expandOneSide?: "none" | "left" | "right";
+  height?: BuilderRowHeightSettings;
+  topMargin?: SectionSpacing;
+  bottomMargin?: SectionSpacing;
+  htmlElement?: BuilderLayoutHtmlElement;
+  columnParallax?: BuilderRowColumnParallaxSettings;
+  advanced?: BuilderLayoutAdvancedSettings;
+  columns: BuilderColumn[];
+};
 
 
 export type BuilderLayoutBlock = {
@@ -473,6 +622,20 @@ export type BuilderLayoutBlock = {
   tableColumnFields?: ("image" | "title" | "meta" | "content" | "link")[];
   tableShowImage?: boolean;
   tableShowLink?: boolean;
+  tableShowTitle?: boolean;
+  tableShowMeta?: boolean;
+  tableShowContent?: boolean;
+  tableHeadTitle?: string;
+  tableHeadMeta?: string;
+  tableHeadContent?: string;
+  tableHeadImage?: string;
+  tableHeadLink?: string;
+  tableTitleStyle?: string;
+  tableTitleFontFamily?: "default" | "primary" | "secondary" | "tertiary";
+  tableTitleColor?: string;
+  tableMetaStyle?: string;
+  tableMetaColor?: string;
+  tableContentStyle?: string;
   tableImageWidth?: string | number;
   tableImageHeight?: string | number;
   tableImageLoading?: "lazy" | "eager";
@@ -485,6 +648,12 @@ export type BuilderLayoutBlock = {
   tableLinkFullWidth?: boolean;
   tableLinkTarget?: "_self" | "_blank";
   tableStyle?: "striped" | "bordered" | "plain";
+  tableHover?: boolean;
+  tableJustify?: boolean;
+  tableOrder?: "1" | "2" | "3" | "4" | "5" | "6";
+  tableWidthTitle?: "expand" | "shrink" | "small" | "medium";
+  tableWidthMeta?: "expand" | "shrink" | "small" | "medium";
+  tableWidthContent?: "expand" | "shrink" | "small" | "medium";
   gridSource?: "static" | "products";
   gridRows?: number;
   gridGap?: "none" | "small" | "medium" | "large" | "max" | string;
@@ -765,6 +934,8 @@ export type BuilderSection = {
   embedHeight?: number;
   layoutColumns?: number;
   layoutRows?: number;
+  /** Canonical Section -> Row -> Column structure. Legacy documents continue to use layoutItems. */
+  rows?: BuilderRow[];
   layoutItems?: {
     id?: string;
     rowId?: string;

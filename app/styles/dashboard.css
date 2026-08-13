@@ -18036,3 +18036,384 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 .uk-transition-scale-down { transition: transform 300ms ease-in-out !important; }
 .uk-transition-scale-down:hover, .shop-builder-grid-image:hover .uk-transition-scale-down { transform: scale(0.94) !important; }
+
+/* Section inspector presentation only. Ownership and control order remain
+   canonical; this gives the Section form a calmer, readable visual rhythm
+   without changing the rest of the Builder inspector. */
+.builder-inspector:has(.builder-section-inspector) .builder-inspector-tabs button {
+  min-height: 32px;
+  padding-inline: 12px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.builder-section-inspector {
+  color: var(--builder-ui-text, #1f2937);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.builder-section-inspector-group {
+  margin: 0;
+  padding: 0 0 8px;
+}
+.builder-section-inspector-group + .builder-section-inspector-group {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--builder-ui-border, #cbd5e1) 38%, transparent);
+}
+.builder-section-inspector .inspector-field-row {
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 34px;
+  padding: 4px 0;
+  margin: 0;
+}
+.builder-section-inspector .inspector-field-row-label {
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.builder-section-inspector .inspector-field-title-text {
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.builder-section-inspector .builder-inspector-row-desc,
+.builder-section-inspector .inspector-help-text {
+  max-width: 34ch;
+  color: var(--builder-ui-muted, #64748b);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.builder-section-inspector .inspector-control {
+  height: 32px;
+  min-height: 32px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.builder-section-inspector .inspector-select {
+  padding-inline: 8px 24px;
+  background-position: calc(100% - 14px) 12px, calc(100% - 9px) 12px;
+}
+.builder-section-inspector .inspector-textarea {
+  min-height: 88px;
+}
+.builder-section-inspector .inspector-switch {
+  min-height: 36px;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.builder-section-inspector .inspector-switch-track {
+  width: 34px;
+  height: 20px;
+}
+.builder-section-inspector .inspector-switch-track span {
+  width: 14px;
+  height: 14px;
+}
+.builder-section-inspector .inspector-switch input:checked + .inspector-switch-track span {
+  transform: translateX(14px);
+}
+.builder-section-quiet-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 28px;
+  color: var(--builder-ui-text, #1f2937);
+  font-size: 12px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+.builder-section-quiet-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.builder-section-quiet-checkmark {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid var(--builder-ui-border, #cbd5e1);
+  border-radius: 50%;
+  background: var(--builder-ui-surface, #ffffff);
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.builder-section-quiet-checkmark::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.builder-section-quiet-check input:checked + .builder-section-quiet-checkmark {
+  border-color: #3d98f0;
+  background: #3d98f0;
+}
+.builder-section-quiet-check input:checked + .builder-section-quiet-checkmark::after {
+  border-color: #fff;
+}
+.builder-section-quiet-check input:focus-visible + .builder-section-quiet-checkmark {
+  outline: 2px solid color-mix(in srgb, var(--builder-ui-accent, #6366f1) 35%, transparent);
+  outline-offset: 2px;
+}
+@media (max-width: 520px) {
+  .builder-section-inspector .inspector-field-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 10px 0;
+  }
+}
+
+/* Literal YOOtheme-like Section surface. This is intentionally scoped to
+   canonical Section selection; other inspector surfaces keep their chrome. */
+.builder-inspector.is-section-inspector {
+  background: #fff;
+  color: #4b4b4b;
+  border-left: 1px solid #e5e5e5;
+}
+.builder-inspector.is-section-inspector .builder-inspector-header-consolidated,
+.builder-inspector.is-section-inspector .builder-actions-row,
+.builder-inspector.is-section-inspector .builder-inspector-spacing-legend {
+  display: none !important;
+}
+.builder-section-yootheme-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 24px 28px 18px;
+  color: #444;
+  background: #fff;
+}
+.builder-section-yootheme-close,
+.builder-section-yootheme-back {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #444;
+  font: inherit;
+  cursor: pointer;
+}
+.builder-section-yootheme-close {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.builder-section-yootheme-back {
+  font-size: 15px;
+  font-weight: 600;
+}
+.builder-section-yootheme-header > strong {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.builder-inspector.is-section-inspector .builder-inspector-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 28px;
+  padding: 0 28px;
+  border-bottom: 1px solid #e4e4e4;
+  background: #fff;
+}
+.builder-inspector.is-section-inspector .builder-inspector-tabs button {
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #777;
+  font-size: 15px;
+  font-weight: 400;
+}
+.builder-inspector.is-section-inspector .builder-inspector-tabs button.is-active {
+  border-bottom-color: #555;
+  color: #444;
+  font-weight: 600;
+}
+.builder-inspector.is-section-inspector .builder-section-inspector {
+  padding: 18px 28px 36px;
+  background: #fff;
+  color: #4b4b4b;
+}
+.builder-inspector.is-section-inspector .builder-section-inspector-group {
+  padding: 0 0 22px;
+}
+.builder-inspector.is-section-inspector .builder-section-inspector-group + .builder-section-inspector-group {
+  margin-top: 2px;
+  padding-top: 22px;
+  border-top: 1px solid #e8e8e8;
+}
+.builder-inspector.is-section-inspector .inspector-field-row {
+  display: block;
+  min-height: 0;
+  padding: 0 0 18px;
+}
+.builder-inspector.is-section-inspector .inspector-field-row-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #454545;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.builder-inspector.is-section-inspector .inspector-field-title-text {
+  color: #454545;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+.builder-inspector.is-section-inspector .inspector-field-row-control {
+  display: block;
+}
+.builder-inspector.is-section-inspector .inspector-control {
+  height: 40px;
+  min-height: 40px;
+  border: 1px solid #dedede;
+  border-radius: 0;
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+}
+.builder-inspector.is-section-inspector .inspector-select {
+  padding: 8px 34px 8px 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23a6a6a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 16px center;
+  background-size: 14px 8px;
+  background-repeat: no-repeat;
+}
+.builder-inspector.is-section-inspector .builder-section-quiet-check {
+  min-height: 30px;
+  color: #777;
+  font-size: 14px;
+}
+.builder-inspector.is-section-inspector .builder-inspector-row-desc,
+.builder-inspector.is-section-inspector .inspector-help-text {
+  max-width: none;
+  margin-top: 8px;
+  color: #a0a0a0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Row uses the same YOOtheme inspector grammar as Section. */
+.builder-inspector.is-row-inspector {
+  background: #fff;
+  color: #4b4b4b;
+  border-left: 1px solid #e5e5e5;
+}
+.builder-inspector.is-row-inspector .builder-inspector-header-consolidated,
+.builder-inspector.is-row-inspector .builder-actions-row,
+.builder-inspector.is-row-inspector .builder-inspector-spacing-legend {
+  display: none !important;
+}
+.builder-inspector.is-row-inspector .builder-inspector-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 28px;
+  padding: 0 28px;
+  border-bottom: 1px solid #e4e4e4;
+  background: #fff;
+}
+.builder-inspector.is-row-inspector .builder-inspector-tabs button {
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #777;
+  font-size: 15px;
+  font-weight: 400;
+}
+.builder-inspector.is-row-inspector .builder-inspector-tabs button.is-active {
+  border-bottom-color: #555;
+  color: #444;
+  font-weight: 600;
+}
+.builder-inspector.is-row-inspector [data-canonical-owner="BuilderRow"] {
+  padding: 18px 28px 36px;
+  background: #fff;
+  color: #4b4b4b;
+}
+.builder-inspector.is-row-inspector .inspector-field-row {
+  display: block;
+  min-height: 0;
+  padding: 0 0 18px;
+}
+.builder-inspector.is-row-inspector .inspector-field-row-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #454545;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.builder-inspector.is-row-inspector .inspector-field-title-text,
+.builder-inspector.is-row-inspector .builder-field-header strong {
+  color: #454545;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+.builder-inspector.is-row-inspector .inspector-field-row-control {
+  display: block;
+}
+.builder-inspector.is-row-inspector .inspector-control {
+  height: 40px;
+  min-height: 40px;
+  border: 1px solid #dedede;
+  border-radius: 0;
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+}
+.builder-inspector.is-row-inspector .inspector-select {
+  padding: 8px 34px 8px 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23a6a6a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 16px center;
+  background-size: 14px 8px;
+  background-repeat: no-repeat;
+}
+.builder-inspector.is-row-inspector .builder-section-quiet-check {
+  min-height: 30px;
+  color: #777;
+  font-size: 14px;
+}
+.builder-inspector.is-row-inspector .builder-inspector-row-desc,
+.builder-inspector.is-row-inspector .inspector-help-text {
+  max-width: none;
+  margin-top: 8px;
+  color: #a0a0a0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.builder-inspector.is-row-inspector .builder-element-inspector-note,
+.builder-inspector.is-row-inspector .builder-field-header small {
+  display: none;
+}
+.builder-inspector.is-row-inspector .builder-collapse {
+  margin: 0 0 18px;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 0;
+}
+.builder-inspector.is-row-inspector .builder-collapse summary {
+  padding: 12px 0;
+  color: #454545;
+  font-size: 13px;
+  font-weight: 600;
+}
+.builder-inspector.is-row-inspector .builder-inspector-section {
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+.builder-inspector.is-row-inspector .builder-two-column {
+  gap: 12px;
+}

@@ -1,7 +1,9 @@
 import type {
+  BuilderColumn,
   BuilderLayoutBlock,
   BuilderSection,
 } from "@/components/dashboard/builderTypes";
+import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 
 export type BuilderLayoutColumn =
   NonNullable<BuilderSection["layoutItems"]>[number];
@@ -62,6 +64,19 @@ export function findLayoutColumn(
   section: BuilderSection,
   columnKey: string,
 ): BuilderLayoutColumn | BuilderNestedColumn | null {
+  if (section.rows !== undefined) {
+    for (const row of normalizeBuilderSectionLayout(section).rows) {
+      const column = row.columns.find((candidate) => candidate.id === columnKey);
+      if (column) {
+        return {
+          ...column,
+          rowId: row.id,
+          rowLayout: row.layout,
+          blocks: column.elements,
+        } as BuilderLayoutColumn;
+      }
+    }
+  }
   for (const column of section.layoutItems ?? []) {
     if (column.id === columnKey) return column;
     for (const nestedColumn of nestedLayoutItems(column)) {
@@ -94,6 +109,18 @@ export function findLayoutBlock(
     if (preferredBlock) return preferredBlock;
   }
 
+  if (section.rows !== undefined) {
+    for (const row of normalizeBuilderSectionLayout(section).rows) {
+      for (const column of row.columns) {
+        const block = (column.elements ?? []).find(
+          (candidate, index) =>
+            (candidate.id ?? `${column.id}-block-${index}`) === blockKey,
+        );
+        if (block) return block;
+      }
+    }
+  }
+
   for (const outerColumn of section.layoutItems ?? []) {
     const outerBlock = findInColumn(outerColumn);
     if (outerBlock) return outerBlock;
@@ -112,6 +139,26 @@ export function mapLayoutColumns(
     nested: boolean,
   ) => BuilderLayoutColumn | BuilderNestedColumn,
 ): BuilderSection {
+  if (section.rows !== undefined) {
+    return {
+      ...section,
+      rows: section.rows.map((row) => ({
+        ...row,
+        columns: row.columns.map((column) => {
+          const adapted = {
+            ...column,
+            blocks: column.elements,
+          } as BuilderColumn & BuilderLayoutColumn;
+          if (!column.id) return column;
+          const mapped = mapper(adapted, false) as BuilderLayoutColumn;
+          return {
+            ...column,
+            elements: mapped.blocks ?? column.elements,
+          };
+        }),
+      })),
+    };
+  }
   return {
     ...section,
     layoutItems: (section.layoutItems ?? []).map((column) => {
@@ -175,5 +222,28 @@ export function updateBlockInLayoutColumn(
         ? updater(block)
         : block,
     ),
+  }));
+}
+
+export function removeBlockInLayoutColumn(
+  section: BuilderSection,
+  columnKey: string,
+  blockKey: string,
+): BuilderSection {
+  if (section.rows !== undefined) {
+    return {
+      ...section,
+      rows: section.rows.map((row) => ({
+        ...row,
+        columns: row.columns.map((column) => column.id !== columnKey ? column : {
+          ...column,
+          elements: column.elements.filter((block, index) => (block.id ?? `${columnKey}-block-${index}`) !== blockKey),
+        }),
+      })),
+    };
+  }
+  return updateLayoutColumn(section, columnKey, (column) => ({
+    ...column,
+    blocks: (column.blocks ?? []).filter((block, index) => (block.id ?? `${columnKey}-block-${index}`) !== blockKey),
   }));
 }

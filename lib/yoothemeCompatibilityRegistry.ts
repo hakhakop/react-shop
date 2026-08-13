@@ -259,16 +259,16 @@ export const YOOTHEME_SEMANTIC_CAPABILITY_REGISTRY: readonly YoothemeSemanticCap
     key: "element.animation",
     sourceType: "element",
     sourceField: "animation",
-    semanticMeaning: "Compound UIkit parallax animation (coordinates, easing, target, range, and breakpoint)",
+    semanticMeaning: "Compound UIkit parallax animation with a Y-axis range and easing",
     capabilityFamily: "Animation / Parallax",
-    canonicalOwner: null,
+    canonicalOwner: "BuilderLayoutBlock.animation.parallaxY / parallaxEasing",
     normalizer: "mapYoothemeStaticContent",
-    persistedDestination: null,
+    persistedDestination: "BuilderLayoutBlock.animation",
     inspectorLocation: null,
-    runtimeConsumer: null,
-    status: "DEFERRED",
-    statusReason: "WebPages has no canonical compound UIkit parallax runtime; a generic animation preset would be inert and misleading.",
-    futureOwnerOrPhase: "Future canonical Parallax / Animation runtime",
+    runtimeConsumer: "builderAnimationDataAttributes → BuilderScrollAnimations",
+    status: "SUPPORTED",
+    statusReason: "Shared builder/storefront runtime consumes the imported Y-axis range and easing using the canonical scroll trajectory.",
+    futureOwnerOrPhase: null,
     fixtureIds: ["enterprise8"],
   },
   supported({ key: "panel-slider.slider_divider", sourceType: "panel-slider", sourceField: "slider_divider", semanticMeaning: "UIkit Grid divider track", capabilityFamily: "Panel Slider layout", canonicalOwner: "carouselSettings.divider", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.carouselSettings.divider", inspectorLocation: "Panel Slider › Settings › Slider", runtimeConsumer: "UikitSlider → CarouselBlock", statusReason: "Synchronized Enterprise3 divider contract passes.", fixtureIds: ["enterprise3"] }),
@@ -315,15 +315,15 @@ const ENTERPRISE8_SUPPORTED_FIELDS: Readonly<Record<string, readonly string[]>> 
   alert: ["content", "link", "title", "title_element"],
   button_item: ["button_style", "content", "link"],
   button: ["animation", "button_size", "margin", "margin_remove_bottom", "text_align", "text_align_breakpoint", "text_align_fallback"],
-  column: ["image_position", "order_first", "padding", "position_sticky_breakpoint", "vertical_align", "width_large", "width_medium", "width_small"],
+  column: ["order_first", "vertical_align", "width_large", "width_medium", "width_small"],
   divider: ["animation", "divider_element", "margin"],
   gallery_item: ["content", "image", "title"],
   gallery: ["grid_column_gap", "grid_default", "grid_medium", "grid_row_gap", "link_style", "link_text", "margin", "meta_align", "meta_element", "meta_style", "overlay_hover", "overlay_mode", "overlay_position", "overlay_style", "overlay_transition", "show_content", "show_link", "show_meta", "show_title", "text_align", "text_color", "title_element", "title_hover_style"],
   grid_item: ["content", "image", "link", "link_text", "meta", "panel_style", "title"],
-  grid: ["animation", "block_align", "block_align_breakpoint", "block_align_fallback", "content_column_breakpoint", "content_margin", "grid_column_align", "grid_column_gap", "grid_default", "grid_medium", "grid_row_align", "grid_row_gap", "grid_small", "icon_width", "image_align", "image_grid_breakpoint", "image_grid_width", "image_svg_color", "image_svg_inline", "image_width", "link_fullwidth", "link_margin", "link_size", "link_style", "link_text", "margin", "margin_remove_bottom", "maxwidth", "maxwidth_breakpoint", "meta_align", "meta_element", "meta_style", "panel_link", "panel_link_hover", "panel_padding", "panel_style", "position", "position_z_index", "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "text_align_breakpoint", "text_align_fallback", "title_align", "title_element", "title_grid_breakpoint", "title_grid_width", "title_margin", "title_style"],
+  grid: ["animation", "parallax_easing", "parallax_y", "block_align", "block_align_breakpoint", "block_align_fallback", "content_column_breakpoint", "content_margin", "grid_column_align", "grid_column_gap", "grid_default", "grid_medium", "grid_row_align", "grid_row_gap", "grid_small", "icon_width", "image_align", "image_grid_breakpoint", "image_grid_width", "image_svg_color", "image_svg_inline", "image_width", "link_fullwidth", "link_margin", "link_size", "link_style", "link_text", "margin", "margin_remove_bottom", "maxwidth", "maxwidth_breakpoint", "meta_align", "meta_element", "meta_style", "panel_link", "panel_link_hover", "panel_padding", "panel_style", "position", "position_z_index", "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "text_align_breakpoint", "text_align_fallback", "title_align", "title_element", "title_grid_breakpoint", "title_grid_width", "title_margin", "title_style"],
   headline: ["animation", "block_align_breakpoint", "block_align_fallback", "content", "margin", "maxwidth", "position", "position_z_index", "text_align", "text_align_breakpoint", "text_align_fallback", "title_element", "title_style"],
   icon: ["icon", "icon_width", "margin"],
-  image: ["animation", "css", "image", "image_border", "image_svg_color", "image_svg_inline", "image_width", "margin", "margin_remove_top", "position", "position_left", "position_right", "position_top", "position_z_index", "text_align", "visibility"],
+  image: ["animation", "parallax_easing", "parallax_y", "css", "image", "image_border", "image_svg_color", "image_svg_inline", "image_width", "margin", "margin_remove_top", "position", "position_left", "position_right", "position_top", "position_z_index", "text_align", "visibility"],
   list_item: ["content", "icon", "link"],
   list: ["list_element", "list_horizontal_separator", "show_image", "show_link"],
   "overlay-slider_item": ["image", "item_element", "text_color", "title"],
@@ -331,12 +331,12 @@ const ENTERPRISE8_SUPPORTED_FIELDS: Readonly<Record<string, readonly string[]>> 
   "panel-slider_item": ["image", "link", "title"],
   "panel-slider": ["block_align", "css", "image_loading", "image_svg_color", "image_svg_inline", "link_style", "margin", "meta_align", "meta_element", "meta_style", "nav_align", "panel_link", "show_content", "show_image", "show_link", "show_meta", "show_title", "slidenav_breakpoint", "slidenav_margin", "slider_autoplay_pause", "slider_center", "slider_finite", "title_element"],
   panel: ["animation", "content", "content_align", "icon_width", "image_align", "image_svg_color", "image_width", "link", "link_margin", "link_style", "link_text", "margin", "margin_remove_top", "meta_align", "meta_element", "meta_style", "panel_padding", "text_align", "title", "title_align", "title_element", "title_grid_breakpoint", "title_grid_width", "title_margin", "title_style"],
-  row: ["column_gap", "layout", "margin", "margin_remove_bottom", "margin_remove_top", "row_gap", "width"],
+  row: ["column_gap", "layout", "margin", "margin_remove_bottom", "margin_remove_top", "row_gap"],
   section: ["animation", "animation_delay", "id", "image", "image_position", "media_visibility", "overlap", "padding", "padding_remove_bottom", "padding_remove_top", "style", "title_breakpoint", "title_position", "title_rotation", "vertical_align", "width"],
   slideshow_item: ["content", "image", "link", "link_text", "meta", "text_color", "title"],
   slideshow: ["link_style", "link_text", "margin", "meta_align", "meta_element", "meta_style", "nav_align", "nav_breakpoint", "nav_position", "nav_position_margin", "show_content", "show_link", "show_meta", "show_thumbnail", "show_title", "slidenav", "slidenav_breakpoint", "slidenav_margin", "slidenav_outside_breakpoint", "slideshow_autoplay_pause", "slideshow_min_height", "thumbnav_height", "thumbnav_svg_color", "thumbnav_width", "title_hover_style"],
   table_item: ["content", "image", "link", "meta", "title"],
-  table: ["image_svg_color", "link_style", "link_text", "show_content", "show_meta", "show_title", "table_order", "table_responsive", "table_width_meta", "table_width_title"],
+  table: ["content_style", "image_svg_color", "link_style", "link_text", "meta_color", "meta_style", "show_content", "show_meta", "show_title", "table_hover", "table_justify", "table_order", "table_responsive", "table_width_content", "table_width_meta", "table_width_title", "title_color", "title_font_family", "title_style"],
   text: ["animation", "block_align", "block_align_breakpoint", "block_align_fallback", "column_breakpoint", "content", "margin", "margin_remove_bottom", "maxwidth", "position", "position_z_index", "text_align", "text_align_breakpoint", "text_align_fallback", "text_style"],
 };
 
@@ -344,13 +344,15 @@ const ENTERPRISE8_DEFERRED_FIELDS: Readonly<Record<string, readonly string[]>> =
   accordion: ["content_column_breakpoint", "image_grid_breakpoint", "image_grid_width", "image_svg_color"],
   button_item: ["icon_align"],
   button: ["grid_column_gap", "grid_row_gap"],
+  column: ["image_position", "padding", "position_sticky_breakpoint"],
   gallery: ["filter_align", "filter_all", "filter_grid_breakpoint", "filter_grid_width", "filter_position", "filter_style", "item_animation", "lightbox_bg_close", "show_hover_image", "show_hover_video"],
-  grid: ["filter_align", "filter_all", "filter_grid_breakpoint", "filter_grid_width", "filter_position", "filter_style", "image_svg_animate", "item_animation", "item_maxwidth", "lightbox_bg_close", "panel_expand", "panel_image_no_padding", "parallax_easing", "show_hover_image", "show_hover_video", "show_video", "title_hover_style"],
-  image: ["image_svg_animate", "parallax_easing", "parallax_scale", "parallax_target", "parallax_y"],
+  grid: ["filter_align", "filter_all", "filter_grid_breakpoint", "filter_grid_width", "filter_position", "filter_style", "image_svg_animate", "item_animation", "item_maxwidth", "lightbox_bg_close", "panel_expand", "panel_image_no_padding", "show_hover_image", "show_hover_video", "show_video", "title_hover_style"],
+  image: ["image_svg_animate", "parallax_scale", "parallax_target"],
   list: ["column_breakpoint", "image_align", "image_svg_color", "image_vertical_align"],
   "overlay-slider": ["show_hover_image", "show_hover_video"],
   "panel-slider": ["content_column_breakpoint", "image_grid_breakpoint", "image_grid_width", "icon_width", "panel_match", "nav_breakpoint", "slidenav_outside_breakpoint", "show_hover_image", "show_hover_video", "show_video", "slider_sets", "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style"],
   panel: ["content_column_breakpoint", "image_grid_breakpoint", "image_grid_width", "title_hover_style"],
+  row: ["width"],
   section: ["header_transparent", "header_transparent_noplaceholder", "header_transparent_text_color", "image_effect", "image_parallax_bgy", "image_parallax_easing"],
   slideshow: ["overlay_animation"],
   table: ["meta_style"],
@@ -377,6 +379,33 @@ function enterprise8BackfillCapability(key: string): YoothemeSemanticCapabilityR
   if (!status) return undefined;
   const semanticMeaning = `Enterprise8 ${sourceType} ${sourceField} source semantic`;
   const family = sourceType.replace(/_item$/, "").replace(/-/g, " ");
+  if (sourceType === "row" || sourceType === "column") {
+    const canonicalOwner = sourceType === "row" ? "BuilderRow" : "BuilderColumn";
+    const persistedDestination = sourceType === "row"
+      ? "BuilderSection.rows[]"
+      : "BuilderSection.rows[].columns[]";
+    const hasRuntime = status === "SUPPORTED";
+    return {
+      key,
+      sourceType,
+      sourceField,
+      semanticMeaning,
+      capabilityFamily: `Canonical ${sourceType} structure`,
+      canonicalOwner,
+      normalizer: "mapYoothemeStaticContent",
+      persistedDestination,
+      inspectorLocation: null,
+      runtimeConsumer: hasRuntime
+        ? "normalizeBuilderSectionLayout → resolveBuilderSectionStructure → shared Builder/storefront renderer"
+        : null,
+      status,
+      statusReason: hasRuntime
+        ? `Fresh imports persist ${sourceField} on ${canonicalOwner}; the shared structural renderer consumes that canonical owner.`
+        : `Fresh imports persist ${sourceField} on ${canonicalOwner}, but Batch 2 intentionally did not add its presentation/runtime projection, so it is not advertised as fully supported.`,
+      futureOwnerOrPhase: hasRuntime ? null : "Canonical Row/Column presentation renderer batch",
+      fixtureIds: ["enterprise8"],
+    };
+  }
   if (status === "SUPPORTED") {
     return {
       key, sourceType, sourceField, semanticMeaning,

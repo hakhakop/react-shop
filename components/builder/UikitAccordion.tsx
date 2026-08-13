@@ -258,7 +258,7 @@ export default function UikitAccordion({
               className={`${getUikitAccordionItemClass(style as any)} ${item.customClass ?? ""}`.trim()}
             >
               <a className="uk-accordion-title" href="#" onClick={(e) => e.preventDefault()}>
-                {indicator === "plus-minus" && (
+                {(indicator === "default" || indicator === "plus-minus") && (
                   <>
                     <span
                       className="shop-builder-accordion-indicator shop-builder-accordion-indicator--plus"
@@ -272,7 +272,7 @@ export default function UikitAccordion({
                     />
                   </>
                 )}
-                {(indicator === "default" || indicator === "chevron") && (
+                {indicator === "chevron" && (
                   <span
                     className="shop-builder-accordion-indicator"
                     uk-icon="icon: chevron-down"

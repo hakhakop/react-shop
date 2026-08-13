@@ -9,12 +9,36 @@ import { getUikitMarginClass } from "@/lib/uikitTokens";
 
 type GeneralElementShellBlock = {
   visualStyle?: BuilderVisualStyle;
+  textAlign?: string;
+  headingAlign?: string;
+  textAlignment?: string;
+  gridItemAlign?: string;
+  buttonAlign?: string;
+  panelTextAlign?: string;
   elementPadding?: string;
   elementMargin?: string;
   gridMargin?: string;
   spacingContract?: "yootheme";
   id?: string;
 };
+
+export type GeneralTextAlignment = "left" | "center" | "right" | "justify";
+
+/** Resolve universal General alignment; layout is canonical and aliases are read fallbacks. */
+export function resolveGeneralTextAlignment(block: GeneralElementShellBlock): GeneralTextAlignment | undefined {
+  const candidates = [
+    block.visualStyle?.layout?.textAlign,
+    block.textAlign,
+    block.headingAlign,
+    block.textAlignment,
+    block.gridItemAlign,
+    block.buttonAlign,
+    block.panelTextAlign,
+  ];
+  return candidates.find((value): value is GeneralTextAlignment =>
+    value === "left" || value === "center" || value === "right" || value === "justify",
+  );
+}
 
 function usesYoothemeSpacingContract(block: GeneralElementShellBlock) {
   // `yootheme-*` is the established persisted import identity. Keep it as a
@@ -143,5 +167,10 @@ export function getGeneralElementShellStyle(
     }
   }
 
-  return { ...style, ...visualStyleToCss(visual) };
+  const textAlign = resolveGeneralTextAlignment(block);
+  return {
+    ...style,
+    ...visualStyleToCss(visual),
+    ...(textAlign ? { textAlign } : {}),
+  };
 }

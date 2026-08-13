@@ -16,7 +16,6 @@ import {
   ActionSettingsGroup,
   CardSettingsGroup,
   ContentSettingsGroup,
-  ImageSettingsGroup,
   MetaSettingsGroup,
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
@@ -31,6 +30,7 @@ import {
   InspectorDivision,
 } from "@/components/dashboard/inspector/InspectorControls";
 import { sanitizeHtml } from "@/lib/safeHtml";
+import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -67,6 +67,73 @@ const gapOptions = [
 ];
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
+
+/**
+ * Grid owns media composition. It deliberately reuses only the canonical
+ * Image primitives that YOOtheme exposes for Grid, rather than inheriting the
+ * standalone Image element's framing and alignment controls.
+ */
+function GridMediaSettingsGroup({ block, update }: Pick<Props, "block" | "update">) {
+  const values = block as any;
+  const imageShape = values.imageShape ?? values.imageBorder ?? "none";
+  const imageShadow = values.imageShadow ?? values.imageBoxShadow ?? "none";
+
+  return (
+    <InspectorDivision title="IMAGE">
+      <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+        <InspectorFieldRow label="Width" isOverridden={values.imageWidth !== undefined} inheritedValueText="auto" onReset={() => update({ imageWidth: undefined })}>
+          <InspectorTextField value={String(values.imageWidth ?? "")} placeholder="auto" onChange={(value) => update({ imageWidth: value || undefined })} />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="auto" onReset={() => update({ imageHeight: undefined })}>
+          <InspectorTextField value={String(values.imageHeight ?? "")} placeholder="auto" onChange={(value) => update({ imageHeight: value || undefined })} />
+        </InspectorFieldRow>
+      </div>
+
+      <InspectorFieldRow label="Loading" isOverridden={values.imageLoading !== undefined} inheritedValueText="Lazy" onReset={() => update({ imageLoading: undefined })}>
+        <InspectorSelect
+          value={values.imageLoading === "eager" || values.imageLoading === true ? "eager" : "lazy"}
+          options={[{ value: "lazy", label: "Lazy (Default)" }, { value: "eager", label: "Eager (Immediate)" }]}
+          onChange={(value) => update({ imageLoading: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow label="Link" isOverridden={values.linkImage !== undefined} inheritedValueText="Off" onReset={() => update({ linkImage: undefined })}>
+        <InspectorSwitch checked={Boolean(values.linkImage)} onChange={(checked) => update({ linkImage: checked })} label="Link image" />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow label="Border" isOverridden={values.imageShape !== undefined} inheritedValueText="None" onReset={() => update({ imageShape: undefined })}>
+        <InspectorSelect
+          value={String(imageShape)}
+          options={[{ value: "none", label: "None" }, { value: "rounded", label: "Rounded" }, { value: "circle", label: "Circle" }, { value: "pill", label: "Pill" }]}
+          onChange={(value) => update({ imageShape: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow label="Box Shadow" isOverridden={values.imageShadow !== undefined} inheritedValueText="None" onReset={() => update({ imageShadow: undefined })}>
+        <InspectorSelect
+          value={String(imageShadow)}
+          options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]}
+          onChange={(value) => update({ imageShadow: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow label="Inline SVG" isOverridden={values.imageSvgInline !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgInline: undefined })}>
+        <InspectorSwitch checked={values.imageSvgInline === true} onChange={(checked) => update({ imageSvgInline: checked || undefined })} label="Make SVG stylable with CSS" />
+      </InspectorFieldRow>
+
+      {values.imageSvgInline === true && (
+        <InspectorFieldRow label="SVG Color" isOverridden={values.imageSvgColor !== undefined} inheritedValueText="None" onReset={() => update({ imageSvgColor: undefined })}>
+          <InspectorSelect
+            value={String(values.imageSvgColor ?? "none")}
+            options={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}
+            onChange={(value) => update({ imageSvgColor: value === "none" ? undefined : value })}
+            ariaLabel="SVG Color"
+          />
+        </InspectorFieldRow>
+      )}
+    </InspectorDivision>
+  );
+}
 
 const itemPanelStyleOptions = [
   { value: "inherit", label: "Inherit Grid Style" },
@@ -693,7 +760,7 @@ export default function GridCapabilityPanel({
           keys={{ role: "contentTypographyRole", align: "textAlignment", style: "contentStyle" }}
         />
 
-        <ImageSettingsGroup block={block} update={update} showFrameless showLinkImage />
+        <GridMediaSettingsGroup block={block} update={update} />
 
         <ActionSettingsGroup
           block={block}

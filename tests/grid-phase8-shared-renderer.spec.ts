@@ -35,6 +35,15 @@ const fixture = {
             panel_padding: "large",
             image_align: "top",
             image_grid_width: "1-2",
+            image_width: "80",
+            image_height: "60",
+            image_loading: true,
+            image_border: "rounded",
+            image_box_shadow: "medium",
+            image_link: true,
+            image_svg_inline: true,
+            image_svg_color: "emphasis",
+            text_align: "center",
             link_style: "secondary",
             link_text: "Open item",
             link_target: "blank",
@@ -125,6 +134,23 @@ test("Grid item content normalizes rich HTML, tags, and explicit Card style", ()
   });
   expect(platform.title).toBe("Platform <em>Pro</em>");
   expect(automation.cardVariant).toBeUndefined();
+  expect(grid).toMatchObject({
+    textAlign: "center",
+    gridItemAlign: "center",
+    imageWidth: "80",
+    imageHeight: "60",
+    imageLoading: "eager",
+    imageShape: "rounded",
+    imageShadow: "medium",
+    linkImage: true,
+    imageSvgInline: true,
+    imageSvgColor: "emphasis",
+  });
+  expect(grid).not.toHaveProperty("imageBorder");
+  expect(grid).not.toHaveProperty("imageBoxShadow");
+  expect(grid.gridItems).not.toEqual(expect.arrayContaining([
+    expect.objectContaining({ textAlign: expect.anything() }),
+  ]));
 });
 
 test("colored Panel/Card roles use global inverse semantics while local colors remain explicit", () => {

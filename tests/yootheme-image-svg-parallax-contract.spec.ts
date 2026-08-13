@@ -12,6 +12,7 @@ import {
   runRegisteredYoothemeFreshImportAcceptance,
   type FreshImportCheck,
 } from "@/tests/support/yoothemeFreshImportAcceptance";
+import { extractSafeSvgDropShadow } from "@/components/builder/UikitStylableSvg";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -59,6 +60,14 @@ test("YOOtheme Image keeps its SVG vocabulary and canonical media presentation v
   expect(getUikitSvgColor("danger")).toContain("--uk-global-danger-background");
 });
 
+test("YOOtheme inline SVG accepts only asset-authored drop-shadow filters", () => {
+  const source = `<svg><style>img + svg { filter: drop-shadow(20px 20px 20px rgba(60, 65, 124, 0.12)) drop-shadow(-20px -20px 20px rgba(255, 255, 255, 0.9)); }</style></svg>`;
+  expect(extractSafeSvgDropShadow(source)).toBe(
+    "drop-shadow(20px 20px 20px rgba(60, 65, 124, 0.12)) drop-shadow(-20px -20px 20px rgba(255, 255, 255, 0.9))",
+  );
+  expect(extractSafeSvgDropShadow(`<svg><style>svg { filter: url(https://example.test/filter); }</style></svg>`)).toBeUndefined();
+});
+
 async function signIn(page: Page) {
   await page.goto("/login");
   await page.getByLabel("Email", { exact: true }).fill(email);
@@ -96,7 +105,7 @@ test("Enterprise8 parallax is deferred instead of persisted as a generic animati
 
 type SvgProbe = {
   intrinsic: { sourceWidth: number; sourceHeight: number; width: number; height: number; parentWidth: number } | null;
-  explicit: { width: number; hostWidth: number; declaredWidth: string | null } | null;
+  explicit: { width: number; hostWidth: number; declaredWidth: string | null; preservedFill: string | null } | null;
   targets: { intrinsic: string; explicit: string };
 };
 
@@ -165,6 +174,7 @@ async function probeSvgGeometry(page: Page, intrinsicBlockId: string, explicitBl
         width: figure.getBoundingClientRect().width,
         hostWidth: host.getBoundingClientRect().width,
         declaredWidth: svg?.getAttribute("width") ?? null,
+        preservedFill: svg?.querySelector(".uk-preserve")?.getAttribute("fill") ?? null,
       };
     };
     const describe = (blockId: string) => {
@@ -217,6 +227,7 @@ test("Enterprise8 inline SVG preserves source geometry when un-sized while expli
         && Math.abs(probe.explicit.width - 370) <= 1
         && Math.abs(probe.explicit.hostWidth - 370) <= 1,
       );
+      const preservesAuthoredSvgPaint = (probe: SvgProbe) => probe.explicit?.preservedFill === "#f7f8fc";
       const checks: FreshImportCheck[] = [
         {
           capability: "image.svg-intrinsic-size",
@@ -229,6 +240,12 @@ test("Enterprise8 inline SVG preserves source geometry when un-sized while expli
           outcome: explicitWidthWins(builderProbe) && explicitWidthWins(storefrontProbe) ? "PASS" : "FAIL",
           expected: "authored Enterprise8 image_width=370 remains the explicit media width",
           actual: `Builder=${JSON.stringify(builderProbe.explicit)} (${JSON.stringify(builderProbe.targets.explicit)}); storefront=${JSON.stringify(storefrontProbe.explicit)} (${JSON.stringify(storefrontProbe.targets.explicit)})`,
+        },
+        {
+          capability: "image.svg-preserved-paint",
+          outcome: preservesAuthoredSvgPaint(builderProbe) && preservesAuthoredSvgPaint(storefrontProbe) ? "PASS" : "FAIL",
+          expected: "UIkit .uk-preserve artwork retains the source #f7f8fc fill while SVG Color = Emphasis colors only non-preserved shapes",
+          actual: `Builder=${builderProbe.explicit?.preservedFill ?? "missing"}; storefront=${storefrontProbe.explicit?.preservedFill ?? "missing"}`,
         },
       ];
       return checks;

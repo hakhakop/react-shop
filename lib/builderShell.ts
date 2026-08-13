@@ -126,6 +126,11 @@ export type BuilderShellSettings = {
   backgroundMuted?: string;
   backgroundPrimary?: string;
   backgroundSecondary?: string;
+  /** Optional semantic section background image/gradient layers. */
+  backgroundDefaultImage?: string;
+  backgroundMutedImage?: string;
+  backgroundPrimaryImage?: string;
+  backgroundSecondaryImage?: string;
   /** Legacy aliases retained only for document migration. */
   backgroundColor?: string;
   fontFamilyBody?: string;
@@ -796,6 +801,10 @@ export function normalizeBuilderShellSettings(
     backgroundMuted: normalizeOptionalString(value?.backgroundMuted) ?? normalizeOptionalString(value?.mutedBackgroundColor) ?? defaultBuilderShellSettings.backgroundMuted,
     backgroundPrimary: normalizeOptionalString(value?.backgroundPrimary) ?? normalizeOptionalString(value?.primaryColor) ?? defaultBuilderShellSettings.backgroundPrimary,
     backgroundSecondary: normalizeOptionalString(value?.backgroundSecondary) ?? normalizeOptionalString(value?.secondaryColor) ?? defaultBuilderShellSettings.backgroundSecondary,
+    backgroundDefaultImage: normalizeOptionalString(value?.backgroundDefaultImage),
+    backgroundMutedImage: normalizeOptionalString(value?.backgroundMutedImage),
+    backgroundPrimaryImage: normalizeOptionalString(value?.backgroundPrimaryImage),
+    backgroundSecondaryImage: normalizeOptionalString(value?.backgroundSecondaryImage),
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible

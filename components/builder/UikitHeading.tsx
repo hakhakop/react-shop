@@ -28,10 +28,6 @@ export default function UikitHeading({ block }: Props) {
 
   const decorationClass = rawBlock.titleDecoration ? `uk-heading-${rawBlock.titleDecoration}` : "";
 
-  // Alignment
-  const textAlignVal = rawBlock.layout?.textAlign ?? rawBlock.textAlign ?? rawBlock.headingAlign;
-  const alignClass = textAlignVal ? `uk-text-${textAlignVal}` : "";
-
   // Color
   const headingColorVal = rawBlock.headingColor ?? rawBlock.color;
   const colorClass =
@@ -104,7 +100,6 @@ export default function UikitHeading({ block }: Props) {
     decorationClass,
     roleClass,
     localTypography.className,
-    alignClass,
     colorClass,
     isGradient ? `uikit-text-gradient uikit-text-gradient--${rawBlock.textGradientPreset}` : "",
     rawBlock.showHoverEffect ? "uk-link-heading" : "",

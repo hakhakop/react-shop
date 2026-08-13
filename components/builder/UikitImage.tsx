@@ -8,7 +8,6 @@ import {
   getUikitImageStyle,
   getUikitImageAttributes,
   getUikitImageClass,
-  getUikitImageWrapperClass,
   getUikitSvgColor,
   getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
@@ -42,15 +41,6 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
       : ["rounded", "circle", "pill"].includes(rawBlock.imageBorder)
         ? rawBlock.imageBorder
         : undefined;
-  const layout = rawBlock.visualStyle?.layout ?? {};
-  const positionedMediaAnchor =
-    layout.position === "absolute"
-      ? layout.right !== undefined
-        ? "right"
-        : layout.left !== undefined
-          ? "left"
-          : undefined
-      : undefined;
   // Pre-Phase-5 imports wrote numeric YOOtheme image_width only to the
   // legacy max-width alias and stored `auto` here. Promote that value at the
   // canonical media boundary so the media composition box, not just its img,
@@ -68,22 +58,14 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
     imageShape: resolveString(localImageShape, shellSettings?.imageDefaultBorder, "none"),
     imageShadow: resolveString(rawBlock.imageShadow, shellSettings?.imageDefaultShadow, "none"),
     imageWidth: canonicalImageWidth,
-    imageAlignment: resolveString(rawBlock.imageAlignment ?? positionedMediaAnchor, shellSettings?.imageDefaultAlignment, "center"),
     imageLoading: resolveString(rawBlock.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
   };
   const imageSemantics = resolveUikitImageSemantics(resolvedImageBlock);
-  const imageAlignment =
-    imageSemantics.alignment === "left" ||
-    imageSemantics.alignment === "right" ||
-    imageSemantics.alignment === "center"
-      ? imageSemantics.alignment
-      : "center";
   const imageLoading =
     resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
   const imageClass = `${getUikitImageClass(imageSemantics)} el-image`.trim();
-  const figureClass = getUikitImageWrapperClass(imageSemantics);
   const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
     ? `uk-background-${rawBlock.imageBoxDecoration}`
     : "";
@@ -97,6 +79,8 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   // Next Image's fixed 1200×800 placeholder dimensions creates a synthetic
   // 3:2 ratio before the real asset can define its natural geometry.
   const usesIntrinsicGeometry = !imageStyle.aspectRatio && !imageStyle.height;
+  const preserveIntrinsicImageSize =
+    !imageStyle.width && !imageStyle.height && !imageStyle.aspectRatio;
   const isStylableSvg = rawBlock.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(rawBlock.imageUrl ?? "");
   // YOOtheme only turns Image sizing into a frame when width, height, or
   // ratio is authored. A site-level Image-fit default must not turn an
@@ -110,7 +94,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
   const usesContextualSvgColor = Boolean(svgColorClass);
   const fallbackImage = usesIntrinsicGeometry ? (
-    <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
+    <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: preserveIntrinsicImageSize ? "auto" : "100%", maxWidth: preserveIntrinsicImageSize ? "100%" : undefined, height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
   ) : (
     <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
   );
@@ -139,7 +123,6 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   ) : fallbackImage;
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
-  const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
 
@@ -150,21 +133,16 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
-      className={`shop-builder-column-block shop-builder-column-block--image ${marginClass} ${textAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      className={`shop-builder-column-block shop-builder-column-block--image ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      style={{ display: "block" }}
     >
       <figure
-        className={`shop-builder-image-figure ${figureClass}`}
+        className="shop-builder-image-figure"
         style={{
-          textAlign: imageAlignment,
+          display: "inline-block",
           maxWidth: imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined),
-          width: imageStyle.width,
+          width: imageStyle.width ?? (!imageStyle.aspectRatio ? "fit-content" : undefined),
           height: imageStyle.height,
-          marginInline:
-            imageAlignment === "left"
-              ? "0 auto"
-              : imageAlignment === "right"
-              ? "0 0 0 auto"
-              : "auto",
         }}
       >
         <div

@@ -10,3 +10,12 @@ export function proxy(request: NextRequest) {
     },
   });
 }
+
+// The layout consumes x-current-path only for document requests. Keeping the
+// proxy off Next internals, API handlers, and file-like resources prevents
+// HMR/static requests from re-entering the document graph.
+export const config = {
+  matcher: [
+    "/((?!api(?:/|$)|_next(?:/|$)|favicon\\.ico$|robots\\.txt$|sitemap(?:\\.[^/]+)?$|.*\\.[^/]+$).*)",
+  ],
+};

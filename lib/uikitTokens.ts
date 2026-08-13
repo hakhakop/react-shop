@@ -205,7 +205,8 @@ export function getUikitColumnClass(options?: {
   const vertical = options?.verticalAlign;
   const hasFlexAlignment = horizontal === "center" || horizontal === "right" || vertical === "center" || vertical === "bottom";
 
-  if (hasFlexAlignment || options?.flex === "expand") classes.push("uk-flex", "uk-flex-column");
+  if (hasFlexAlignment) classes.push("uk-flex");
+  if (options?.flex === "expand") classes.push("uk-flex", "uk-flex-column");
   if (horizontal === "center") classes.push("uk-flex-center");
   if (horizontal === "right") classes.push("uk-flex-right");
   if (vertical === "center") classes.push("uk-flex-middle");
@@ -217,7 +218,9 @@ export function getUikitColumnClass(options?: {
 }
 
 export function getUikitTableClass(style?: string, size?: string, hover?: boolean, striping?: boolean) {
-  const classes = ["uk-table"];
+  // UIkit's table contract fills the containing element; column-level
+  // `table_width_*` settings control distribution inside that width.
+  const classes = ["uk-table", "uk-width-1-1"];
   if (style === "divider") classes.push("uk-table-divider");
   else if (style === "striped" || striping) classes.push("uk-table-striped");
   if (size === "small") classes.push("uk-table-small");
@@ -366,7 +369,10 @@ export function getUikitAccordionClass(options: {
 } = {}): string {
   // Older documents may still contain "boxed"; render that legacy value using the new native UIkit treatment.
   const style = options.style === "boxed" ? "striped" : options.style ?? "default";
-  const indicator = options.indicator ?? "default";
+  // YOOtheme's unconfigured Accordion indicator is its native plus/minus
+  // treatment. Keep `default` as the document-facing value, but resolve it
+  // to the canonical visual variant before emitting modifier classes.
+  const indicator = options.indicator === "default" ? "plus-minus" : options.indicator ?? "default";
   const classes = ["uk-accordion", "uk-accordion-default", ...(style === "striped" ? ["uk-list-striped"] : []), `shop-builder-accordion--style-${style}`, `shop-builder-accordion--indicator-${indicator}`, `shop-builder-accordion--indicator-${options.indicatorPosition ?? "end"}`, `shop-builder-accordion--title-${options.titleEmphasis ?? "inherit"}`, `shop-builder-accordion--items-${options.itemSpacing ?? "inherit"}`, `shop-builder-accordion--content-${options.contentSpacing ?? "inherit"}`];
   if (options.divider !== false) classes.push("shop-builder-accordion--divider");
   return classes.join(" ");

@@ -3,6 +3,7 @@
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { getUikitButtonClass, getUikitButtonLocalOverride } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 
 type Props = {
   block: any;
@@ -11,16 +12,18 @@ type Props = {
 export default function UikitButton({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
-  const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
+  const generalTextAlign = resolveGeneralTextAlignment(rawBlock);
+  const alignmentToFlex = (alignment: string | undefined) => alignment === "center" ? "center" : alignment === "right" ? "right" : "left";
+  const textAlignBreakpoint = rawBlock.visualStyle?.layout?.textAlignBreakpoint;
+  const textAlignFallback = rawBlock.visualStyle?.layout?.textAlignFallback;
+  const breakpointSuffix = ({ small: "s", medium: "m", large: "l", xlarge: "xl" } as Record<string, string>)[textAlignBreakpoint ?? ""];
+  const flexAlignment = alignmentToFlex(generalTextAlign);
 
-  const alignFlexClass =
-    rawBlock.buttonAlign === "center" || rawBlock.textAlign === "center"
-      ? "uk-flex-center"
-      : rawBlock.buttonAlign === "right" || rawBlock.textAlign === "right"
-      ? "uk-flex-right"
-      : "uk-flex-left";
+  const alignFlexClass = breakpointSuffix && generalTextAlign && generalTextAlign !== "justify"
+    ? `uk-flex-${flexAlignment}@${breakpointSuffix}${textAlignFallback && textAlignFallback !== "none" ? ` uk-flex-${alignmentToFlex(textAlignFallback)}` : ""}`
+    : `uk-flex-${flexAlignment}`;
 
   const isStacked = rawBlock.buttonsLayout === "stacked";
   const isFullWidth = Boolean(rawBlock.fullWidthButton);
@@ -44,7 +47,7 @@ export default function UikitButton({ block }: Props) {
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
-      className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${textAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
       <div
         className={`uk-flex uk-flex-wrap ${alignFlexClass} ${isStacked ? "uk-flex-column" : "uk-flex-middle"} ${isFullWidth ? "uk-child-width-1-1" : ""}`.trim()}

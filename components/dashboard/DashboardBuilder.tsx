@@ -148,7 +148,6 @@ import {
   getUikitMarginClass,
   getUikitSectionPaddingClass,
   getUikitContainerClass,
-  getUikitGridClass,
   getUikitWidthClass,
   getUikitCardClass,
   getUikitButtonClass,
@@ -156,7 +155,6 @@ import {
   getUikitTextClass,
   getUikitDividerClass,
   getUikitAlertClass,
-  getUikitColumnClass,
   getUikitImageClass,
   getUikitImageWrapperClass,
   getUikitImageStyle,
@@ -174,7 +172,6 @@ import { resolvePanelPresentation } from "@/lib/panelPresentation";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
-  getUikitColumnWidthClass,
   normalizeLayoutToUikitPreset,
   UIKIT_LAYOUT_PRESETS,
 } from "@/lib/uikitLayoutEngine";
@@ -226,11 +223,13 @@ import type {
   BuilderCustomPage,
   BuilderCustomPageKey,
   BuilderColorScheme,
+  BuilderColumn,
   BuilderDesign,
   BuilderHeaderIconId,
   BuilderLayoutBlock,
   BuilderListItem,
   BuilderLayoutKey,
+  BuilderRow,
   BuilderSavedTemplate,
   BuilderSection,
   BuilderShellSettings,
@@ -246,6 +245,11 @@ import type {
   SidebarTab,
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
+import {
+  applyCanonicalBuilderRowLayout,
+  updateCanonicalBuilderRow,
+} from "@/lib/builderRowEditing";
+import { updateCanonicalBuilderColumn } from "@/lib/builderColumnEditing";
 import {
   builderLayoutKeys,
   getLayoutBlockKindsForState,
@@ -284,6 +288,7 @@ import {
   findLayoutBlock,
   findLayoutColumn,
   layoutColumnHasContent,
+  removeBlockInLayoutColumn,
   updateBlockInLayoutColumn,
   updateLayoutColumn,
 } from "@/lib/builderNestedLayout";
@@ -297,8 +302,9 @@ import CanonicalGlobalStylesPanel from "@/components/dashboard/global-styles/Can
 import { typographyRoleClass, type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
-  resolveBuilderRowStyle,
 } from "@/lib/builderRowStyles";
+import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
+import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import {
   createUniqueBuilderAnchorId,
 } from "@/lib/builderAnchors";
@@ -1521,7 +1527,6 @@ function normalizeBuilderState(
               panelMediaFit: block.imageFit ?? block.panelMediaFit,
               panelMediaWidth: block.panelMediaWidth === "small" || block.panelMediaWidth === "large" ? block.panelMediaWidth : "medium",
               panelMediaAlignment: (block.imageAlignment ?? block.panelMediaAlignment) === "left" || (block.imageAlignment ?? block.panelMediaAlignment) === "right" ? (block.imageAlignment ?? block.panelMediaAlignment) : "center",
-              panelTextAlign: block.panelTextAlign === "center" || block.panelTextAlign === "right" ? block.panelTextAlign : "left",
               panelVerticalAlign: block.panelVerticalAlign === "center" || block.panelVerticalAlign === "bottom" ? block.panelVerticalAlign : "top",
               panelTitleElement: block.panelTitleElement === "h2" || block.panelTitleElement === "h4" || block.panelTitleElement === "div" ? block.panelTitleElement : "h3",
               panelTitleStyle: block.panelTitleStyle === "h3" || block.panelTitleStyle === "h4" || block.panelTitleStyle === "h5" ? block.panelTitleStyle : "inherit",
@@ -3494,10 +3499,18 @@ export default function DashboardBuilder({
     itemIndex: number,
     patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => {
+    const mutateCanonical = (section: BuilderSection) => section.rows !== undefined;
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (mutateCanonical(section)) {
+          return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+            const gridItems = [...(block.gridItems ?? [])];
+            gridItems[itemIndex] = applyContentPatch(gridItems[itemIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
+            return { ...block, gridItems };
+          });
+        }
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3535,6 +3548,7 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => ({ ...block, gridItems: (block.gridItems ?? []).filter((_, index) => index !== itemIndex) }));
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3570,6 +3584,13 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const gridItems = [...(block.gridItems ?? [])];
+          const source = gridItems[itemIndex];
+          if (!source) return block;
+          gridItems.splice(itemIndex + 1, 0, { ...source, id: `grid-${Date.now().toString(36)}` });
+          return { ...block, gridItems };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3607,6 +3628,7 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => ({ ...block, badges: (block.badges ?? []).filter((_, index) => index !== badgeIndex) }));
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3642,6 +3664,13 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const badges = [...(block.badges ?? [])];
+          const source = badges[badgeIndex];
+          if (!source) return block;
+          badges.splice(badgeIndex + 1, 0, { ...source, id: `badge-${Date.now().toString(36)}` });
+          return { ...block, badges };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3681,6 +3710,12 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const gridItems = [...(block.gridItems ?? [])];
+          const [moved] = gridItems.splice(fromIndex, 1);
+          gridItems.splice(toIndex, 0, moved);
+          return { ...block, gridItems };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3716,6 +3751,12 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const badges = [...(block.badges ?? [])];
+          const [moved] = badges.splice(fromIndex, 1);
+          badges.splice(toIndex, 0, moved);
+          return { ...block, badges };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3751,6 +3792,12 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const buttons = [...(block.buttons ?? [])];
+          const [moved] = buttons.splice(fromIndex, 1);
+          buttons.splice(toIndex, 0, moved);
+          return { ...block, buttons };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3786,6 +3833,13 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const items = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? blockKey}-item-${index}`, text }));
+          const next = [...items];
+          const [moved] = next.splice(fromIndex, 1);
+          next.splice(toIndex, 0, moved);
+          return { ...block, listItems: next };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3821,6 +3875,7 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => ({ ...block, buttons: (block.buttons ?? []).filter((_, index) => index !== buttonIndex) }));
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3856,6 +3911,13 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const buttons = [...(block.buttons ?? [])];
+          const source = buttons[buttonIndex];
+          if (!source) return block;
+          buttons.splice(buttonIndex + 1, 0, { ...source, id: `button-${Date.now().toString(36)}` });
+          return { ...block, buttons };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3893,6 +3955,10 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const items = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? blockKey}-item-${index}`, text }));
+          return { ...block, listItems: items.filter((_, index) => index !== itemIndex) };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -3924,6 +3990,13 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
+        if (section.rows !== undefined) return updateBlockInLayoutColumn(section, columnKey, blockKey, (block) => {
+          const items = [...(block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? blockKey}-item-${index}`, text })))];
+          const source = items[itemIndex];
+          if (!source) return block;
+          items.splice(itemIndex + 1, 0, { ...source, id: `${source.id}-copy-${Date.now().toString(36)}` });
+          return { ...block, listItems: items };
+        });
         return {
           ...section,
           layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
@@ -4065,6 +4138,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
+    openInspectorPanel();
     revealCanvasTarget(sectionId);
   };
 
@@ -4076,6 +4150,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(columnKey);
     setInspectorTab("layout");
+    openInspectorPanel();
     revealCanvasTarget(columnKey);
   };
 
@@ -4110,9 +4185,10 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
+    openInspectorPanel();
     const section = builderState.sections.find((item) => item.id === sectionId);
     const row = section
-      ? getPreviewLayoutRows(section, section.layoutItems ?? [])[rowIndex]
+      ? normalizeBuilderSectionLayout(section).rows[rowIndex]
       : null;
     revealCanvasTarget(row?.id);
   };
@@ -4597,6 +4673,14 @@ export default function DashboardBuilder({
     patch: NonNullable<BuilderLayoutBlock["slides"]>[number],
   ) => {
     if (!rawSelectedSection) return;
+    if (rawSelectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(rawSelectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => {
+        const slides = [...(block.slides ?? [])];
+        slides[slideIndex] = applyContentPatch(slides[slideIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
+        return { ...block, slides };
+      }));
+      return;
+    }
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4613,6 +4697,12 @@ export default function DashboardBuilder({
     blockIndex: number,
   ) => {
     if (!rawSelectedSection) return;
+    if (rawSelectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      const nextSlide = { id: `nested-slide-${Date.now().toString(36)}`, badge: "01", title: "Slide 1", text: "Edit this nested slider slide.", imagePadding: "medium" } as NonNullable<BuilderLayoutBlock["slides"]>[number];
+      updateSelected(updateBlockInLayoutColumn(rawSelectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, slides: [...(block.slides ?? []), { ...nextSlide, badge: String((block.slides?.length ?? 0) + 1).padStart(2, "0"), title: `Slide ${(block.slides?.length ?? 0) + 1}` }] })));
+      setOpenSlideId(nextSlide.id ?? null);
+      return;
+    }
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4645,6 +4735,11 @@ export default function DashboardBuilder({
     slideIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, slides: (block.slides ?? []).filter((_, index) => index !== slideIndex) })));
+      if (selectedSection.rows && openSlideId && (selectedSection.rows.flatMap((row) => row.columns).find((column) => column.id === selectedLayoutColumnKey)?.elements.find((block) => block.id === selectedLayoutBlockKey)?.slides?.[slideIndex]?.id === openSlideId)) setOpenSlideId(null);
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4670,6 +4765,14 @@ export default function DashboardBuilder({
     patch: NonNullable<BuilderLayoutBlock["badges"]>[number],
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => {
+        const badges = [...(block.badges ?? [])];
+        badges[badgeIndex] = applyContentPatch(badges[badgeIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
+        return { ...block, badges };
+      }));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4686,6 +4789,10 @@ export default function DashboardBuilder({
     blockIndex: number,
   ) => {
     if (!rawSelectedSection) return;
+    if (rawSelectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(rawSelectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, badges: [...(block.badges ?? []), { id: `nested-badge-${Date.now().toString(36)}`, label: String((block.badges?.length ?? 0) + 1).padStart(2, "0"), title: `Badge ${(block.badges?.length ?? 0) + 1}`, body: "Edit this badge." }] })));
+      return;
+    }
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4715,6 +4822,10 @@ export default function DashboardBuilder({
     badgeIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, badges: (block.badges ?? []).filter((_, index) => index !== badgeIndex) })));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4734,6 +4845,14 @@ export default function DashboardBuilder({
     patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => {
+        const gridItems = [...(block.gridItems ?? [])];
+        gridItems[itemIndex] = applyContentPatch(gridItems[itemIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
+        return { ...block, gridItems };
+      }));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4750,6 +4869,10 @@ export default function DashboardBuilder({
     blockIndex: number,
   ) => {
     if (!rawSelectedSection) return;
+    if (rawSelectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(rawSelectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, gridItems: [...(block.gridItems ?? []), { id: `grid-item-${Date.now().toString(36)}`, eyebrow: String((block.gridItems?.length ?? 0) + 1).padStart(2, "0"), title: `Grid item ${(block.gridItems?.length ?? 0) + 1}`, meta: "Meta", text: "Edit this grid item.", buttonLabel: "Learn more", buttonUrl: "/" }] })));
+      return;
+    }
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4781,6 +4904,10 @@ export default function DashboardBuilder({
     itemIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, gridItems: (block.gridItems ?? []).filter((_, index) => index !== itemIndex) })));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4800,6 +4927,10 @@ export default function DashboardBuilder({
     blockIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, buttons: [...(block.buttons ?? []), { id: `btn-${Date.now().toString(36)}-${block.buttons?.length ?? 0}`, label: "New Button", url: "/", target: "_self", style: "primary" }] })));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4829,6 +4960,14 @@ export default function DashboardBuilder({
     patch: NonNullable<BuilderLayoutBlock["buttons"]>[number],
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => {
+        const buttons = [...(block.buttons ?? [])];
+        buttons[buttonIndex] = applyContentPatch(buttons[buttonIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
+        return { ...block, buttons };
+      }));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4846,6 +4985,10 @@ export default function DashboardBuilder({
     buttonIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(updateBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey, (block) => ({ ...block, buttons: (block.buttons ?? []).filter((_, index) => index !== buttonIndex) })));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
@@ -4865,6 +5008,10 @@ export default function DashboardBuilder({
     blockIndex: number,
   ) => {
     if (!selectedSection) return;
+    if (selectedSection.rows !== undefined && selectedLayoutColumnKey && selectedLayoutBlockKey) {
+      updateSelected(removeBlockInLayoutColumn(selectedSection, selectedLayoutColumnKey, selectedLayoutBlockKey));
+      return;
+    }
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     layoutItems[columnIndex] = {
@@ -6054,6 +6201,25 @@ export default function DashboardBuilder({
 
   const applySelectedRowLayoutPreset = (presetKey: string) => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
+    if (selectedSection.id !== "header-document") {
+      const preset = getBuilderRowLayoutPreset(presetKey);
+      if (!preset) return;
+      setBuilderState((current) => ({
+        ...current,
+        sections: current.sections.map((section) =>
+          section.id === selectedSection.id && isLayoutContainerSection(section)
+            ? applyCanonicalBuilderRowLayout(
+                section,
+                selectedLayoutRowIndex,
+                preset.key,
+                preset.ratios.length,
+              )
+            : section,
+        ),
+      }));
+      setPublishStatus("Row layout updated");
+      return;
+    }
     applyContentRowLayoutPreset(
       selectedSection.id,
       selectedLayoutRowIndex,
@@ -6062,7 +6228,7 @@ export default function DashboardBuilder({
   };
 
   const updateSelectedRowStyle = (
-    patch: Partial<NonNullable<BuilderSection["layoutItems"]>[number]>,
+    patch: Partial<BuilderRow>,
   ) => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
     setBuilderState((current) => ({
@@ -6075,25 +6241,14 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = section.layoutItems ?? [];
-        const layoutRows = getPreviewLayoutRows(section, layoutItems);
-        const targetRow = layoutRows[selectedLayoutRowIndex];
-        if (!targetRow) return section;
-        const targetItems = new Set(targetRow.items);
-
-        return {
-          ...section,
-          layoutItems: layoutItems.map((item) =>
-            targetItems.has(item) ? { ...item, ...patch } : item,
-          ),
-        };
+        return updateCanonicalBuilderRow(section, selectedLayoutRowIndex, patch);
       }),
     }));
-    setPublishStatus("Row spacing updated");
+    setPublishStatus("Row settings updated");
   };
 
   const updateSelectedColumnStyle = (
-    patch: Partial<NonNullable<BuilderSection["layoutItems"]>[number]>,
+    patch: Partial<BuilderColumn>,
   ) => {
     if (!selectedSection || !selectedLayoutColumnKey) return;
     setBuilderState((current) => ({
@@ -6102,13 +6257,10 @@ export default function DashboardBuilder({
         if (section.id !== selectedSection.id || !isLayoutContainerSection(section)) {
           return section;
         }
-        return updateLayoutColumn(section, selectedLayoutColumnKey, (column) => ({
-          ...column,
-          ...patch,
-        }));
+        return updateCanonicalBuilderColumn(section, selectedLayoutColumnKey, patch);
       }),
     }));
-    setPublishStatus("Column alignment updated");
+    setPublishStatus("Column settings updated");
   };
 
   const duplicateSelectedRow = () => {
@@ -12208,32 +12360,6 @@ function getStorefrontPreviewClass(section: BuilderSection) {
   return kindClass;
 }
 
-function getPreviewLayoutBlocks(
-  item: NonNullable<BuilderSection["layoutItems"]>[number],
-) {
-  if (item.blocks?.length) return item.blocks;
-  if (
-    item.title ||
-    item.body ||
-    item.eyebrow ||
-    item.buttonLabel ||
-    item.buttonUrl
-  ) {
-    return [
-      {
-        id: `${item.id ?? "legacy"}-text`,
-        kind: "text" as LayoutBlockKind,
-        eyebrow: item.eyebrow,
-        title: item.title,
-        body: item.body,
-        buttonLabel: item.buttonLabel,
-        buttonUrl: item.buttonUrl,
-      },
-    ];
-  }
-  return [];
-}
-
 type PreviewLayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
 
 function getPreviewGoodieIcon(block: BuilderLayoutBlock) {
@@ -14231,7 +14357,10 @@ const PreviewSection = memo(function PreviewSection({
     </div>
   ) : null;
 
-  if (isLayoutContainerSection(section) && !section.layoutItems?.length) {
+  if (
+    isLayoutContainerSection(section) &&
+    normalizeBuilderSectionLayout(section).rows.length === 0
+  ) {
     return (
       <>
         <div className="shop-builder-section-content builder-preview-empty-section">
@@ -14536,17 +14665,21 @@ const PreviewSection = memo(function PreviewSection({
 
   if (isLayoutContainerSection(section)) {
     const previewProduct = getPreviewProductModel(previewProducts);
-    const items = section.layoutItems?.length
-      ? section.layoutItems
-      : [
-          {
-            id: "layout-item-fallback",
-            eyebrow: "01",
-            title: "Flexible content",
-            body: "Choose one, two, or three columns from the dashboard.",
-          },
-        ];
-    const layoutRows = getPreviewLayoutRows(section, items);
+    const structure = resolveBuilderSectionStructure(section, {
+      fallbackLayoutItems: [{
+        id: "layout-item-fallback",
+        eyebrow: "01",
+        title: "Flexible content",
+        body: "Choose one, two, or three columns from the dashboard.",
+      }],
+      globalRowGap: shellSettings.rowGap,
+      rowGlobalSpacing: {
+        rowPaddingTop: shellSettings.rowPaddingTop,
+        rowPaddingBottom: shellSettings.rowPaddingBottom,
+        rowMarginTop: shellSettings.rowMarginTop,
+        rowMarginBottom: shellSettings.rowMarginBottom,
+      },
+    });
     const rowMetaByColumnKey = new Map<
       string,
       {
@@ -14557,33 +14690,15 @@ const PreviewSection = memo(function PreviewSection({
         span: number;
       }
     >();
-    layoutRows.forEach((row, rowIndex) => {
-      const preset = getBuilderRowLayoutPreset(row.layoutKey);
-      const ratios =
-        preset?.ratios.length === row.items.length
-          ? preset.ratios
-          : row.items.map(() => 1);
-      const total = ratios.reduce((sum, ratio) => sum + ratio, 0) || 1;
-      let usedSpan = 0;
-
-      row.items.forEach((item, columnIndex) => {
-        const flatIndex = row.startIndex + columnIndex;
-        const columnKey = item.id ?? `layout-item-${flatIndex}`;
-        const remainingColumns = row.items.length - columnIndex - 1;
-        const span =
-          columnIndex === row.items.length - 1
-            ? Math.max(1, 12 - usedSpan)
-            : Math.min(
-                Math.max(1, Math.round((ratios[columnIndex] / total) * 12)),
-                12 - usedSpan - remainingColumns,
-              );
-        usedSpan += span;
+    structure.rows.forEach((structuralRow, rowIndex) => {
+      structuralRow.columns.forEach((structuralColumn, columnIndex) => {
+        const columnKey = structuralColumn.column.id;
         rowMetaByColumnKey.set(columnKey, {
           rowIndex,
           columnIndex,
           isRowStart: columnIndex === 0,
-          isRowEnd: columnIndex === row.items.length - 1,
-          span,
+          isRowEnd: columnIndex === structuralRow.columns.length - 1,
+          span: structuralColumn.span,
         });
       });
     });
@@ -14605,8 +14720,8 @@ const PreviewSection = memo(function PreviewSection({
             } as CSSProperties
           }
         >
-          {layoutRows.map((layoutRow, layoutRowIndex) => {
-            const rowItem = layoutRow.items[0];
+          {structure.rows.map((structuralRow, layoutRowIndex) => {
+            const rowItem = structuralRow.legacyItem ?? {};
             const rowTarget: BuilderInteractionTarget = {
               type: "row",
               sectionId: section.id,
@@ -14630,7 +14745,7 @@ const PreviewSection = memo(function PreviewSection({
                 hoverToolbarTarget,
               ),
             });
-            const rowLayoutPreset = getBuilderRowLayoutPreset(layoutRow.layoutKey);
+            const rowLayoutPreset = getBuilderRowLayoutPreset(structuralRow.row.layout);
             const rowLayoutLabel = rowLayoutPreset?.label
               ? `Layout · ${rowLayoutPreset.label}`
               : "Layout";
@@ -14646,29 +14761,12 @@ const PreviewSection = memo(function PreviewSection({
               !hasActiveDescendant &&
               !editingTarget;
 
-            const isEmptyRow = layoutRow.items.every(
-              (item) =>
-                !layoutColumnHasContent(item as PreviewLayoutItem),
-            );
-            const rowGap = resolveBuilderRowGap(
-              rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
-              shellSettings.rowGap,
-              layoutRows[layoutRowIndex - 1]?.items[0] as
-                | NonNullable<BuilderSection["layoutItems"]>[number]
-                | undefined,
-            ).css;
-            const rowStyle = resolveBuilderRowStyle(
-              rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
-              {
-                rowPaddingTop: shellSettings.rowPaddingTop,
-                rowPaddingBottom: shellSettings.rowPaddingBottom,
-                rowMarginTop: shellSettings.rowMarginTop,
-                rowMarginBottom: shellSettings.rowMarginBottom,
-              },
+            const isEmptyRow = structuralRow.columns.every(
+              ({ column }) => column.elements.length === 0,
             );
             return (
               <div
-                key={layoutRow.id}
+                key={structuralRow.row.id}
                 className={`${builderInteractionFrameClassName(rowTarget)} ${
                   nestingDepth === 0
                     ? "builder-main-row-frame"
@@ -14699,11 +14797,13 @@ const PreviewSection = memo(function PreviewSection({
                 }}
                 style={{
                   paddingTop:
-                    nestingDepth === 0 && layoutRowIndex > 0 ? rowGap : 0,
+                    nestingDepth === 0 && layoutRowIndex > 0
+                      ? structuralRow.precedingGap
+                      : 0,
                 }}
               >
                 <div
-                  className={`${getUikitGridClass({ gutter: rowItem?.rowGap, matchHeight: rowItem?.rowMatchHeight !== false, alignItems: rowItem?.rowAlignment, justifyContent: rowItem?.rowJustify })} shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
+                  className={`${structuralRow.className} shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
                     rowTarget,
                     rowInteractionState,
                   )}`}
@@ -14713,7 +14813,7 @@ const PreviewSection = memo(function PreviewSection({
                   data-builder-interaction-state={rowInteractionState}
                   data-builder-double-click-inspector={nestingDepth === 0 ? "true" : undefined}
                   style={{
-                    ...rowStyle,
+                    ...structuralRow.style,
                   }}
                 >
                   {rowChrome.showSpacing && (
@@ -14734,17 +14834,20 @@ const PreviewSection = memo(function PreviewSection({
                     >
                       <span>Row {layoutRowIndex + 1}</span>
                       <small>
-                        {layoutRow.items.length}{" "}
-                        {layoutRow.items.length === 1 ? "column" : "columns"}
+                        {structuralRow.columns.length}{" "}
+                        {structuralRow.columns.length === 1 ? "column" : "columns"}
                       </small>
                     </div>
                   )}
-                  {layoutRow.items.map((item, columnIndex) => {
-            const index = layoutRow.startIndex + columnIndex;
-            const typedItem = item as PreviewLayoutItem;
-            const columnKey = item.id ?? `layout-item-${index}`;
+                  {structuralRow.columns.map((structuralColumn, columnIndex) => {
+            const index = structuralColumn.flatIndex;
+            const typedItem = (structuralColumn.legacyItem ?? {
+              id: structuralColumn.column.id,
+              blocks: structuralColumn.column.elements,
+            }) as PreviewLayoutItem;
+            const columnKey = structuralColumn.column.id;
             const rowMeta = rowMetaByColumnKey.get(columnKey);
-            const blocks = getPreviewLayoutBlocks(item);
+            const blocks = structuralColumn.column.elements;
             const cardStyle =
               blocks.find(
                 (block) => block.panelStyle && block.panelStyle !== "default",
@@ -14783,6 +14886,7 @@ const PreviewSection = memo(function PreviewSection({
             if (typedItem.nestedLayout) {
               const nestedSection: BuilderSection = {
                 ...section,
+                rows: undefined,
                 layout: undefined,
                 layoutColumns: 1,
                 layoutRows: typedItem.nestedLayout.rows.length,
@@ -14804,11 +14908,12 @@ const PreviewSection = memo(function PreviewSection({
                   data-builder-row-index={rowMeta?.rowIndex}
                   data-builder-column-key={columnKey}
                   data-builder-interaction-state={columnInteractionState}
-                  className={`${getUikitColumnClass({ horizontalAlign: typedItem.columnHorizontalAlign, verticalAlign: typedItem.columnVerticalAlign, flex: typedItem.columnFlex, responsiveWidth: typedItem.columnResponsiveWidth })} ${builderInteractionClassName(
+                  className={`${structuralColumn.className} ${builderInteractionClassName(
                     columnTarget,
                     columnInteractionState,
                   )} shop-builder-content-layout-card builder-nested-layout-container`}
                   style={{
+                    ...structuralColumn.style,
                     gridColumn:
                       device === "mobile"
                         ? "1 / -1"
@@ -14903,7 +15008,7 @@ const PreviewSection = memo(function PreviewSection({
                   data-builder-column-empty={blocks.length === 0 ? "true" : undefined}
                   data-builder-interaction-state={columnInteractionState}
                   data-builder-double-click-inspector="true"
-                  className={`${getUikitColumnWidthClass(layoutRow.layoutKey, index)} ${getUikitColumnClass({ horizontalAlign: typedItem.columnHorizontalAlign, verticalAlign: typedItem.columnVerticalAlign, flex: typedItem.columnFlex, responsiveWidth: typedItem.columnResponsiveWidth })} ${builderInteractionClassName(
+                  className={`${structuralColumn.className} ${builderInteractionClassName(
                     columnTarget,
                     columnInteractionState,
                   )} ${
@@ -14955,6 +15060,7 @@ const PreviewSection = memo(function PreviewSection({
                             : ""
                         }`
                   }`}
+                  style={structuralColumn.style}
                   onDragOver={(event) => {
                     const types = Array.from(event.dataTransfer.types);
                     const isElementDrag =
@@ -15052,27 +15158,28 @@ const PreviewSection = memo(function PreviewSection({
                     />
                   )}
 
-                  {blocks.length === 0 && (
-                    <div
-                      className="builder-preview-drop-zone"
-                      aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onSelectColumn(section.id, columnKey);
-                        onOpenElementsPanel();
-                      }}
-                    >
-                      <span className="builder-structural-placeholder-mark">
-                        <Plus size={14} />
-                      </span>
-                      <span className="builder-structural-placeholder-copy">
-                        <strong>
-                          Column {(rowMeta?.columnIndex ?? index) + 1}
-                        </strong>
-                        <small>Add element</small>
-                      </span>
-                    </div>
-                  )}
+                  <div className="shop-builder-column-content">
+                    {blocks.length === 0 && (
+                      <div
+                        className="builder-preview-drop-zone"
+                        aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectColumn(section.id, columnKey);
+                          onOpenElementsPanel();
+                        }}
+                      >
+                        <span className="builder-structural-placeholder-mark">
+                          <Plus size={14} />
+                        </span>
+                        <span className="builder-structural-placeholder-copy">
+                          <strong>
+                            Column {(rowMeta?.columnIndex ?? index) + 1}
+                          </strong>
+                          <small>Add element</small>
+                        </span>
+                      </div>
+                    )}
 
                   <ContentPositioningGroup blocks={blocks}>
                     {blocks.map((block, blockIndex) => {
@@ -15382,7 +15489,6 @@ const PreviewSection = memo(function PreviewSection({
                             title={block.title}
                             content={block.body}
                             variant={block.textVariant}
-                            align={block.textAlign}
                             typography={block.typography}
                             typographyRole={block.textTypographyRole}
                             textColor={block.textColor}
@@ -15714,7 +15820,7 @@ const PreviewSection = memo(function PreviewSection({
                             ) : null;
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left", ...panelPresentation.colorStyle }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ ...panelPresentation.colorStyle }}>
                                 {panelPresentation.linked && (
                                   <a
                                     className="shop-builder-panel-link-overlay"
@@ -15806,7 +15912,7 @@ const PreviewSection = memo(function PreviewSection({
                             )}
                                 </div>
                                 )}
-                                <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: block.panelTextAlign ?? "left", alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
+                                <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
                                   {panelPresentation.metaPosition === "above-title" && panelMeta}
                                   {block.title &&
                                     (block.typewriterEnabled ? (
@@ -16242,6 +16348,7 @@ const PreviewSection = memo(function PreviewSection({
                     );
                     })}
                   </ContentPositioningGroup>
+                  </div>
                 </article>
               </Fragment>
             );

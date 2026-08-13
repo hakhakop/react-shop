@@ -10,7 +10,10 @@ import {
   getUikitSvgColorClass,
   getUikitTableClass,
   resolveUikitImageSemantics,
+  getUikitHeadingClass,
+  getUikitTextClass,
 } from "@/lib/uikitTokens";
+import { typographyRoleClass } from "@/lib/builderTypography";
 import { sanitizeHtml, isRichText } from "@/lib/safeHtml";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 
@@ -25,7 +28,10 @@ export default function UikitTable({ block }: Props) {
     ["Item A", "Description A", "$10.00"],
     ["Item B", "Description B", "$20.00"],
   ];
-  const columnFields: string[] = rawBlock.tableColumnFields ?? headings.map((_, index) => `column-${index}`);
+  const orderFields = ({ "1": ["meta", "image", "title", "content", "link"], "2": ["title", "image", "meta", "content", "link"], "3": ["image", "title", "content", "meta", "link"], "4": ["image", "title", "meta", "content", "link"], "5": ["title", "meta", "content", "link", "image"], "6": ["meta", "title", "content", "link", "image"] } as Record<string, string[]>)[String(rawBlock.tableOrder ?? "1")] ?? rawBlock.tableColumnFields ?? [];
+  const hasVisibility = ["Title", "Meta", "Content", "Image", "Link"].some((field) => rawBlock[`tableShow${field}`] !== undefined);
+  const visibleFields = orderFields.filter((field) => rawBlock[`tableShow${field[0].toUpperCase()}${field.slice(1)}`] !== false);
+  const columnFields: string[] = hasVisibility ? visibleFields : (rawBlock.tableColumnFields ?? headings.map((_, index) => `column-${index}`));
   const items: any[] = rawBlock.tableItems ?? [];
 
   const tableClass = getUikitTableClass(
@@ -36,7 +42,6 @@ export default function UikitTable({ block }: Props) {
   );
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
-  const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
 
@@ -56,15 +61,16 @@ export default function UikitTable({ block }: Props) {
     imageBoxShadow: rawBlock.tableImageShadow,
   });
   const imageStyle = getUikitImageStyle(imageSemantics);
+  const hasAuthoredImageSize = rawBlock.tableImageWidth !== undefined || rawBlock.tableImageHeight !== undefined;
   const imageClass = `${getUikitImageClass(imageSemantics)} el-image uk-preserve-width`.trim();
   const isStylableSvg = rawBlock.tableImageSvgInline === true;
   const svgColorClass = getUikitSvgColorClass(rawBlock.tableImageSvgColor);
   const renderMedia = (item: any) => {
     if (rawBlock.tableShowImage === false || !item.imageUrl) return null;
     const sharedStyle = {
-      width: imageStyle.width,
-      height: imageStyle.height,
-      maxWidth: "100%",
+      width: hasAuthoredImageSize ? imageStyle.width : "auto",
+      height: hasAuthoredImageSize ? imageStyle.height : "auto",
+      maxWidth: hasAuthoredImageSize ? "100%" : "none",
       objectFit: imageStyle.objectFit,
     } as const;
     if (isStylableSvg && /\.svg(?:[?#].*)?$/i.test(item.imageUrl)) {
@@ -103,20 +109,39 @@ export default function UikitTable({ block }: Props) {
   const renderStructuredCell = (item: any, field: string) => {
     if (field === "image") return renderMedia(item);
     if (field === "link") return renderAction(item);
-    return renderCell(item[field] ?? "");
+    const value = renderCell(item[field] ?? "");
+    const style = field === "title" ? rawBlock.tableTitleStyle : field === "meta" ? rawBlock.tableMetaStyle : rawBlock.tableContentStyle;
+    const color = field === "title" ? rawBlock.tableTitleColor : field === "meta" ? rawBlock.tableMetaColor : undefined;
+    const font = field === "title" ? rawBlock.tableTitleFontFamily : undefined;
+    const styleClass = field === "title" ? getUikitHeadingClass(style, style) : getUikitTextClass(style);
+    const colorClass = color ? (color === "background" ? "uk-text-background" : `uk-text-${color}`) : "";
+    return <span className={[styleClass, colorClass, typographyRoleClass(font)].filter(Boolean).join(" ")}>{value}</span>;
   };
   const renderedRows = items.length > 0
     ? items.map((item) => columnFields.map((field) => renderStructuredCell(item, field)))
     : rows.map((row) => row.map((value) => renderCell(value)));
   const renderedColumnCount = Math.max(headings.length, columnFields.length, ...renderedRows.map((row) => row.length), 0);
+  const widthForField = (field: string) => field === "title" ? rawBlock.tableWidthTitle : field === "meta" ? rawBlock.tableWidthMeta : field === "content" ? rawBlock.tableWidthContent : undefined;
+  const cellClass = (field: string) => {
+    const width = widthForField(field);
+    return [
+      field === "image" || field === "link" ? "uk-table-shrink" : "",
+      field === "link" || width === "shrink" ? "uk-text-nowrap" : "",
+      width === "shrink" ? "uk-table-shrink" : "",
+      width === "small" ? "uk-width-small" : "",
+      width === "medium" ? "uk-width-medium" : "",
+    ].filter(Boolean).join(" ");
+  };
+  const hasTableHead = columnFields.some((field) => Boolean(rawBlock[`tableHead${field[0].toUpperCase()}${field.slice(1)}`] ?? headings[columnFields.indexOf(field)]));
   const table = (
     <table className={`${tableClass} ${responsiveClass} ${justifyClass} ${verticalClass}`.trim()}>
-      {headings.length > 0 && (
+      {hasTableHead && (
         <thead>
           <tr>
-            {headings.map((heading, hIdx) => (
-              <th key={hIdx}>{renderCell(heading)}</th>
-            ))}
+            {columnFields.map((field, hIdx) => {
+              const heading = rawBlock[`tableHead${field[0].toUpperCase()}${field.slice(1)}`] ?? headings[hIdx] ?? "";
+              return <th key={hIdx} className={cellClass(field)}>{renderCell(heading)}</th>;
+            })}
           </tr>
         </thead>
       )}
@@ -126,7 +151,7 @@ export default function UikitTable({ block }: Props) {
             {Array.from(
               { length: renderedColumnCount },
               (_, cIdx) => (
-                <td key={cIdx} className={rawBlock.tableLastAlign && cIdx === renderedColumnCount - 1 ? `uk-text-${rawBlock.tableLastAlign}` : ""}>{row[cIdx] ?? null}</td>
+                <td key={cIdx} className={[cellClass(columnFields[cIdx] ?? ""), rawBlock.tableLastAlign && cIdx === renderedColumnCount - 1 ? `uk-text-${rawBlock.tableLastAlign}` : ""].filter(Boolean).join(" ")}>{row[cIdx] ?? null}</td>
               )
             )}
           </tr>
@@ -138,7 +163,7 @@ export default function UikitTable({ block }: Props) {
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
-      className={`shop-builder-column-block shop-builder-column-block--table ${marginClass} ${textAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      className={`shop-builder-column-block shop-builder-column-block--table ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
       {rawBlock.tableResponsive === "overflow" ? <div className="uk-overflow-auto">{table}</div> : table}
     </div>

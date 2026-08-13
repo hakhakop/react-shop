@@ -86,10 +86,7 @@ import type {
   BuilderSection,
 } from "@/lib/builderLayouts";
 import { typographyProps, getHeadingTypographyStyles, typographyRoleClass, type TypographyArea } from "@/lib/builderTypography";
-import {
-  resolveBuilderRowGap,
-  resolveBuilderRowStyle,
-} from "@/lib/builderRowStyles";
+import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import {
   hasBuilderVisualSpacing,
@@ -97,14 +94,9 @@ import {
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
 import {
-  getBuilderLayoutRows,
-  getBuilderRowLayoutPreset,
-} from "@/components/dashboard/builderLayoutPresets";
-import {
   getUikitMarginClass,
   getUikitSectionPaddingClass,
   getUikitContainerClass,
-  getUikitGridClass,
   getUikitWidthClass,
   getUikitCardClass,
   getUikitButtonClass,
@@ -113,7 +105,6 @@ import {
   getUikitBadgeClass,
   getUikitDividerClass,
   getUikitAlertClass,
-  getUikitColumnClass,
   getUikitImageClass,
   getUikitImageWrapperClass,
   getUikitImageStyle,
@@ -125,7 +116,6 @@ import {
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
-import { getUikitColumnWidthClass } from "@/lib/uikitLayoutEngine";
 import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
@@ -1010,32 +1000,6 @@ function BadgeGridSection({
   );
 }
 
-function getContentLayoutBlocks(
-  item: NonNullable<BuilderSection["layoutItems"]>[number],
-): BuilderLayoutBlock[] {
-  if (item.blocks?.length) return item.blocks;
-  if (
-    item.title ||
-    item.body ||
-    item.eyebrow ||
-    item.buttonLabel ||
-    item.buttonUrl
-  ) {
-    return [
-      {
-        id: `${item.id ?? "legacy"}-text`,
-        kind: "text",
-        eyebrow: item.eyebrow,
-        title: item.title,
-        body: item.body,
-        buttonLabel: item.buttonLabel,
-        buttonUrl: item.buttonUrl,
-      },
-    ];
-  }
-  return [];
-}
-
 function getBlockButtonItems(block: BuilderLayoutBlock) {
   const items: {
     key: string;
@@ -1669,7 +1633,6 @@ export function ContentLayoutBlock({
         title={block.title}
         content={block.body}
         variant={block.textVariant}
-        align={block.textAlign}
           typography={block.typography}
           typographyRole={block.textTypographyRole}
           textColor={block.textColor}
@@ -2117,7 +2080,6 @@ export function ContentLayoutBlock({
     ].filter(Boolean).join(" ");
     const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
     const panelShowMedia = block.panelShowMedia !== false;
-    const panelTextAlign = block.panelTextAlign ?? "left";
     const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
     const panelMeta = block.eyebrow ? (
       <Typog
@@ -2132,7 +2094,7 @@ export function ContentLayoutBlock({
     ) : null;
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ textAlign: panelTextAlign, ...panelPresentation.colorStyle }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ ...panelPresentation.colorStyle }}>
         {panelPresentation.linked && (
           <a
             className="shop-builder-panel-link-overlay"
@@ -2160,7 +2122,7 @@ export function ContentLayoutBlock({
             }}
           />
         )}
-        <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: panelTextAlign, alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
+        <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
           {panelPresentation.metaPosition === "above-title" && panelMeta}
           {block.title && (
             <Typog
@@ -2494,16 +2456,11 @@ function inferTypographyArea(
   return "body";
 }
 
-function rowStyle(
+function rowContextStyle(
   rowItem: any,
   parentScheme: "light" | "dark" | "auto" = "light",
 ): CSSProperties {
-  const styleObj = resolveBuilderRowStyle(rowItem, {
-    rowPaddingTop: "var(--builder-global-row-padding-top, 0px)",
-    rowPaddingBottom: "var(--builder-global-row-padding-bottom, 0px)",
-    rowMarginTop: "var(--builder-global-row-margin-top, 0px)",
-    rowMarginBottom: "var(--builder-global-row-margin-bottom, 0px)",
-  }) as CSSProperties & Record<string, string | undefined>;
+  const styleObj = {} as CSSProperties & Record<string, string | undefined>;
   if (rowItem?.rowBorderRadius !== undefined) {
     styleObj["--builder-radius"] = `${rowItem.rowBorderRadius}px`;
     styleObj["--builder-card-radius"] = `${rowItem.rowBorderRadius}px`;
@@ -2541,48 +2498,20 @@ function ContentLayoutSection({
   shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
-  const items = section.layoutItems?.length
-    ? section.layoutItems
-    : [
-        {
-          id: "one",
-          eyebrow: "01",
-          title: "Flexible layout",
-          body: "Choose a full, two-column, or three-column section from the dashboard.",
-        },
-      ];
-
-  const layoutRows = getBuilderLayoutRows(section, items);
-  const rowMetaByColumnKey = new Map<
-    string,
-    {
-      span: number;
-    }
-  >();
-
-  layoutRows.forEach((row) => {
-    const preset = getBuilderRowLayoutPreset(row.layoutKey);
-    const ratios =
-      preset?.ratios.length === row.items.length
-        ? preset.ratios
-        : row.items.map(() => 1);
-    const total = ratios.reduce((sum, ratio) => sum + ratio, 0) || 1;
-    let usedSpan = 0;
-
-    row.items.forEach((item, columnIndex) => {
-      const flatIndex = row.startIndex + columnIndex;
-      const columnKey = item.id ?? `layout-item-${flatIndex}`;
-      const remainingColumns = row.items.length - columnIndex - 1;
-      const span =
-        columnIndex === row.items.length - 1
-          ? Math.max(1, 12 - usedSpan)
-          : Math.min(
-              Math.max(1, Math.round((ratios[columnIndex] / total) * 12)),
-              12 - usedSpan - remainingColumns,
-            );
-      usedSpan += span;
-      rowMetaByColumnKey.set(columnKey, { span });
-    });
+  const structure = resolveBuilderSectionStructure(section, {
+    fallbackLayoutItems: [{
+      id: "one",
+      eyebrow: "01",
+      title: "Flexible layout",
+      body: "Choose a full, two-column, or three-column section from the dashboard.",
+    }],
+    globalRowGap: "var(--builder-global-row-gap, 32px)",
+    rowGlobalSpacing: {
+      rowPaddingTop: "var(--builder-global-row-padding-top, 0px)",
+      rowPaddingBottom: "var(--builder-global-row-padding-bottom, 0px)",
+      rowMarginTop: "var(--builder-global-row-margin-top, 0px)",
+      rowMarginBottom: "var(--builder-global-row-margin-bottom, 0px)",
+    },
   });
 
   const sectionColorScheme = resolveSectionColorScheme(section, layoutScheme);
@@ -2601,8 +2530,8 @@ function ContentLayoutSection({
           gap: 0,
         }}
       >
-        {layoutRows.map((row, rowIndex) => {
-          const rowItem = row.items[0];
+        {structure.rows.map((structuralRow, rowIndex) => {
+          const rowItem: any = structuralRow.legacyItem ?? {};
           const isRowAnimatedBg =
             rowItem?.rowBackgroundEffect === "antigravity" ||
             rowItem?.rowBackgroundEffect === "antigravity2" ||
@@ -2628,20 +2557,10 @@ function ContentLayoutSection({
             sectionColorScheme === "auto" ? "light" : sectionColorScheme,
           );
 
-          const typedRowItem = rowItem as
-            | NonNullable<BuilderSection["layoutItems"]>[number]
-            | undefined;
-          const rowGap = resolveBuilderRowGap(
-            typedRowItem,
-            "var(--builder-global-row-gap, 32px)",
-            layoutRows[rowIndex - 1]?.items[0] as
-              | NonNullable<BuilderSection["layoutItems"]>[number]
-              | undefined,
-          ).css;
           return (
-            <div key={row.id} style={{ paddingTop: rowIndex > 0 ? rowGap : 0 }}>
+            <div key={structuralRow.row.id} style={{ paddingTop: rowIndex > 0 ? structuralRow.precedingGap : 0 }}>
               <div
-              className={`${getUikitGridClass({ gutter: typedRowItem?.rowGap, matchHeight: typedRowItem?.rowMatchHeight !== false, alignItems: typedRowItem?.rowAlignment, justifyContent: typedRowItem?.rowJustify })} shop-builder-content-row ${
+              className={`${structuralRow.className} shop-builder-content-row ${
                 isFullRowTheme
                   ? "shop-builder-section--effect-antigravity"
                   : isRowAnimatedBg
@@ -2649,7 +2568,8 @@ function ContentLayoutSection({
                     : ""
               }`}
               style={{
-                ...rowStyle(rowItem, sectionColorScheme),
+                ...structuralRow.style,
+                ...rowContextStyle(rowItem, sectionColorScheme),
                 ...rowAnimationAttrs.style,
               }}
               {...rowAnimationAttrs.data}
@@ -2695,13 +2615,10 @@ function ContentLayoutSection({
                     )}
                 </>
               )}
-              {row.items.map((item, index) => {
-                const columnKey =
-                  item.id ?? `layout-item-${row.startIndex + index}`;
-                const rowMeta = rowMetaByColumnKey.get(columnKey);
-                const span = rowMeta?.span ?? 12;
-
-                const blocks = getContentLayoutBlocks(item);
+              {structuralRow.columns.map((structuralColumn) => {
+                const item = structuralColumn.legacyItem;
+                const columnKey = structuralColumn.column.id;
+                const blocks = structuralColumn.column.elements;
                 const cardStyle =
                   blocks.find(
                     (block) =>
@@ -2770,22 +2687,18 @@ function ContentLayoutSection({
                       </div>
                     );
                   });
-                const nestedLayout =
-                  (
-                    item as NonNullable<
-                      BuilderSection["layoutItems"]
-                    >[number]
-                  ).nestedLayout ?? null;
+                const nestedLayout = item?.nestedLayout ?? null;
                 return (
                   <article
                     key={columnKey}
                     data-builder-object-type="column"
                     data-builder-column-key={columnKey}
-                    className={`${getUikitColumnWidthClass(row.layoutKey, index)} ${getUikitColumnClass({ horizontalAlign: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnHorizontalAlign, verticalAlign: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnVerticalAlign, flex: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnFlex, responsiveWidth: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnResponsiveWidth })} ${nestedLayout ? "builder-nested-layout-container " : ""}${
+                    className={`${structuralColumn.className} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
                         ? "w-full"
                         : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`
                     }`}
+                    style={structuralColumn.style}
                   >
                     {nestedLayout ? (
                       <div
@@ -2817,9 +2730,11 @@ function ContentLayoutSection({
                         ))}
                       </div>
                     ) : (
-                      <ContentPositioningGroup blocks={blocks}>
-                        {renderColumnBlocks(blocks)}
-                      </ContentPositioningGroup>
+                      <div className="shop-builder-column-content">
+                        <ContentPositioningGroup blocks={blocks}>
+                          {renderColumnBlocks(blocks)}
+                        </ContentPositioningGroup>
+                      </div>
                     )}
                   </article>
                 );

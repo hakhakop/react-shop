@@ -30,6 +30,16 @@ const safeClass = (attrs: string) => {
   return value && /^[a-z0-9_\-\s]{1,250}$/i.test(value) ? ` class="${value}"` : "";
 };
 
+const safeResponsiveBreakClass = (attrs: string) => {
+  const match = attribute(attrs, "class");
+  const value = match?.[2] ?? match?.[1];
+  if (!value) return "";
+  const classes = value
+    .split(/\s+/)
+    .filter((token) => /^uk-(?:hidden|visible)@[smlx]$/i.test(token));
+  return classes.length ? ` class="${classes.join(" ")}"` : "";
+};
+
 /**
  * Server-safe, deliberately small fallback for the shared rich-text contract.
  * DOMPurify's package entry is a factory during SSR (there is no browser
@@ -56,7 +66,7 @@ function sanitizeServerHtml(html: string): string {
     const tag = rawTag.toLowerCase();
     if (!RICH_TEXT_TAGS.has(tag)) return "";
     if (closing) return tag === "br" ? "" : `</${tag}>`;
-    if (tag === "br") return "<br>";
+    if (tag === "br") return `<br${safeResponsiveBreakClass(attrs)}>`;
     if (tag === "a") {
       const hrefMatch = attribute(attrs, "href");
       const href = hrefMatch ? safeUrl(hrefMatch[2] ?? hrefMatch[1]) : undefined;

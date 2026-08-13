@@ -318,7 +318,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-13T00:43:15.273Z",
+  "updatedAt": "2026-08-13T16:38:47.705Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",
@@ -1221,5 +1221,9 @@
   "alertDangerBackground": "#FF4151",
   "alertDangerColor": "#FFF",
   "alertBorderRadius": "4px",
-  "alertColor": "#555371"
+  "alertColor": "#555371",
+  "backgroundDefaultImage": null,
+  "backgroundMutedImage": null,
+  "backgroundPrimaryImage": null,
+  "backgroundSecondaryImage": null
 }

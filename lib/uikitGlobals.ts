@@ -10,6 +10,9 @@ import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 import { fontFamilyStack } from "@/lib/webFonts";
 import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 
+const YOOTHEME_PRIMARY_SECTION_GRADIENT =
+  "linear-gradient(40deg, #7141f1 0%, #4d6bd8 70%, #3183e2 100%)";
+
 export type UikitGlobalsConfig = {
   // Spacing Scale
   marginSmall?: string;
@@ -105,6 +108,14 @@ export function getUikitGlobalsCssVars(
   const backgroundMuted = resolveBackgroundPaint(value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")), "#f8fafc");
   const backgroundPrimary = resolveBackgroundPaint(value("backgroundPrimary", primary), primary);
   const backgroundSecondary = resolveBackgroundPaint(value("backgroundSecondary", value("secondaryColor", "#64748b")), "#64748b");
+  const hasPrimaryImage = typeof shellSettings?.backgroundPrimaryImage === "string";
+  const backgroundDefaultImage = resolveBackgroundPaint(shellSettings?.backgroundDefaultImage, "none");
+  const backgroundMutedImage = resolveBackgroundPaint(shellSettings?.backgroundMutedImage, "none");
+  const backgroundPrimaryImage = resolveBackgroundPaint(
+    hasPrimaryImage ? shellSettings?.backgroundPrimaryImage : YOOTHEME_PRIMARY_SECTION_GRADIENT,
+    "none",
+  );
+  const backgroundSecondaryImage = resolveBackgroundPaint(shellSettings?.backgroundSecondaryImage, "none");
   const globalText = value("textColor", "#111827");
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
@@ -179,6 +190,14 @@ export function getUikitGlobalsCssVars(
     "--uikit-section-muted-bg": backgroundMuted,
     "--uikit-section-primary-bg": backgroundPrimary,
     "--uikit-section-secondary-bg": backgroundSecondary,
+    "--webpages-background-default-image": backgroundDefaultImage,
+    "--webpages-background-muted-image": backgroundMutedImage,
+    "--webpages-background-primary-image": backgroundPrimaryImage,
+    "--webpages-background-secondary-image": backgroundSecondaryImage,
+    "--uikit-section-default-bg-image": backgroundDefaultImage,
+    "--uikit-section-muted-bg-image": backgroundMutedImage,
+    "--uikit-section-primary-bg-image": backgroundPrimaryImage,
+    "--uikit-section-secondary-bg-image": backgroundSecondaryImage,
     "--uk-global-font-family": fontFamilyStack(bodyFamily, "system-ui, sans-serif"),
     "--uk-heading-font-family": fontFamilyStack(headingFamily, "system-ui, sans-serif"),
     "--webpages-font-primary": fontFamilyStack(primaryFamily, "system-ui, sans-serif"),
@@ -199,6 +218,9 @@ export function getUikitGlobalsCssVars(
     "--uk-base-font-size": value("baseFontSize", "16px"),
     "--uk-base-line-height": value("baseLineHeight", "1.5"),
     "--uk-heading-font-weight": value("headingFontWeight", "700"),
+    // YOOtheme's h1 preset is a distinct semantic heading contract.
+    "--uk-heading-h1-font-size": value("headingH1FontSize", "44px"),
+    "--uk-heading-h1-font-weight": value("headingH1FontWeight", "600"),
     "--uk-heading-small-font-size": value("headingSmallFontSize", "30px"),
     "--uk-heading-medium-font-size": value("headingMediumFontSize", "34px"),
     "--uk-heading-large-font-size": value("headingLargeFontSize", "38px"),
@@ -314,8 +336,8 @@ export function getUikitGlobalsCssVars(
     "--uk-button-letter-spacing": value("buttonLetterSpacing", "0px"),
     "--uk-button-default-hover-background": buttonValue("buttonDefaultHoverBackground", buttonValue("buttonDefaultBackground", backgroundDefault)),
     "--uk-button-default-hover-text": buttonValue("buttonDefaultHoverText", buttonValue("buttonDefaultText", globalText)),
-    "--uk-button-default-border": buttonValue("buttonDefaultBorder", globalBorder),
-    "--uk-button-default-hover-border": buttonValue("buttonDefaultHoverBorder", buttonValue("buttonDefaultBorder", globalBorder)),
+    "--uk-button-default-border": buttonValue("buttonDefaultBorder", "transparent"),
+    "--uk-button-default-hover-border": buttonValue("buttonDefaultHoverBorder", "transparent"),
     "--uk-button-default-active-background": buttonValue("buttonDefaultActiveBackground", buttonValue("buttonDefaultBackground", backgroundDefault)),
     "--uk-button-default-active-text": buttonValue("buttonDefaultActiveText", buttonValue("buttonDefaultText", globalText)),
     "--uk-button-default-active-border": buttonValue("buttonDefaultActiveBorder", buttonValue("buttonDefaultBorder", globalBorder)),
@@ -397,7 +419,7 @@ export function getUikitGlobalsCssVars(
     "--uk-button-secondary-shadow": buttonValue("buttonSecondaryShadow", "none"),
     "--uk-button-secondary-hover-shadow": buttonValue("buttonSecondaryHoverShadow", buttonValue("buttonHoverShadow", "none")),
     "--uk-button-default-background": buttonValue("buttonDefaultBackground", backgroundDefault),
-    "--uk-button-default-text": buttonValue("buttonDefaultText", globalText),
+    "--uk-button-default-text": buttonValue("buttonDefaultText", value("emphasisColor", globalText)),
     "--uk-button-secondary-background": buttonValue("buttonSecondaryBackground", "#e5e7eb"),
     "--uk-button-secondary-text": buttonValue("buttonSecondaryText", globalText),
     "--uk-button-text-color": buttonValue("buttonTextColorSemantic", primary),

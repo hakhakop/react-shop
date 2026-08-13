@@ -11,12 +11,21 @@ const colorablePaint = (value: string | null) => {
   return Boolean(normalized && normalized !== "none" && normalized !== "transparent" && !normalized.startsWith("url("));
 };
 
+/** Preserve YOOtheme asset-authored shadows without allowing arbitrary embedded SVG CSS. */
+export function extractSafeSvgDropShadow(source: string) {
+  const value = source.match(/\bfilter\s*:\s*([^;}{]+)\s*;/i)?.[1]?.trim();
+  if (!value) return undefined;
+  const dropShadow = String.raw`drop-shadow\(\s*-?[\d.]+(?:px)?\s+-?[\d.]+(?:px)?\s+(?:-?[\d.]+(?:px)?\s+)?(?:#[\da-f]{3,8}|rgba?\(\s*[\d.%]+\s*,\s*[\d.%]+\s*,\s*[\d.%]+(?:\s*,\s*[\d.%]+)?\s*\))\s*\)`;
+  return new RegExp(`^${dropShadow}(?:\\s+${dropShadow})*$`, "i").test(value) ? value : undefined;
+}
+
 export function sanitizeStylableSvg(
   source: string,
   fit: "contain" | "cover" | "fill" = "contain",
   svgClassName = "",
   preserveIntrinsicSize = false,
 ) {
+  const safeDropShadow = extractSafeSvgDropShadow(source);
   const clean = DOMPurify.sanitize(source, {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ["script", "style", "foreignObject", "iframe", "object", "embed", "animate", "set"],
@@ -34,8 +43,10 @@ export function sanitizeStylableSvg(
       if (reference && !/^#[a-z0-9_.:-]+$/i.test(reference)) element.removeAttribute(name);
     }
     // Paint inside definitions/masks is structural (for example white mask
-    // strokes) and must not inherit the presentation color.
-    if (element.closest("defs, mask, clipPath, linearGradient, radialGradient, pattern, marker")) return;
+    // strokes) and must not inherit the presentation color. UIkit's `uk-svg`
+    // contract likewise keeps authored paint on `.uk-preserve` artwork (and
+    // its descendants) while the remaining shapes inherit the SVG Color.
+    if (element.closest("defs, mask, clipPath, linearGradient, radialGradient, pattern, marker, .uk-preserve")) return;
     if (colorablePaint(element.getAttribute("fill"))) element.setAttribute("fill", "currentColor");
     if (colorablePaint(element.getAttribute("stroke"))) element.setAttribute("stroke", "currentColor");
   });
@@ -69,6 +80,7 @@ export function sanitizeStylableSvg(
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("preserveAspectRatio", fit === "fill" ? "none" : fit === "cover" ? "xMidYMid slice" : "xMidYMid meet");
   svg.setAttribute("class", [svg.getAttribute("class"), svgClassName, "uk-svg"].filter(Boolean).join(" "));
+  if (safeDropShadow) svg.style.setProperty("filter", safeDropShadow);
   return new XMLSerializer().serializeToString(svg);
 }
 

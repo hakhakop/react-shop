@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
@@ -10,7 +12,7 @@ import {
   InspectorTextField,
   InspectorDivision,
 } from "@/components/dashboard/inspector/InspectorControls";
-import { ChevronRight } from "lucide-react";
+import ParallaxEditor from "@/components/dashboard/inspector/panels/ParallaxEditor";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -21,6 +23,7 @@ type Props = {
 };
 
 export default function GeneralSettingsPanel({ block, shellSettings, tab, update, showAnimation = false }: Props) {
+  const [isParallaxEditorOpen, setParallaxEditorOpen] = useState(false);
   if (tab !== "style") return null;
 
   const visual = (block.visualStyle as BuilderVisualStyle | undefined) ?? {};
@@ -289,53 +292,94 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
             />
           </InspectorFieldRow>
 
-          {/* Animation */}
-          <InspectorFieldRow label="Animation">
-            <InspectorSelect
-              value={typeof block.animation === "string" ? block.animation : (block.animation?.preset ?? "inherit")}
-              options={[
-                { value: "inherit", label: "Inherit" },
-                { value: "none", label: "None" },
-                { value: "fade", label: "Fade" },
-                { value: "scale-up", label: "Scale Up" },
-                { value: "scale-down", label: "Scale Down" },
-                { value: "slide-top", label: "Slide Top" },
-                { value: "slide-bottom", label: "Slide Bottom" },
-                { value: "slide-left", label: "Slide Left" },
-                { value: "slide-right", label: "Slide Right" },
-              ]}
-              onChange={(value) => update({ animation: { preset: value as any } })}
-              ariaLabel="Animation"
-            />
-          </InspectorFieldRow>
+          {showAnimation && (() => {
+            const animation = typeof block.animation === "object" && block.animation ? block.animation : {};
+            const animationMode = typeof block.animation === "string" ? block.animation : (block.animation?.preset ?? "inherit");
+            return (
+              <>
+                <InspectorFieldRow label="Animation">
+                  <InspectorSelect
+                    value={animationMode}
+                    options={[
+                      { value: "inherit", label: "Inherit" },
+                      { value: "none", label: "None" },
+                      { value: "parallax", label: "Parallax" },
+                      { value: "fade", label: "Fade" },
+                      { value: "scale-up", label: "Scale Up" },
+                      { value: "scale-down", label: "Scale Down" },
+                      { value: "slide-top", label: "Slide Top" },
+                      { value: "slide-bottom", label: "Slide Bottom" },
+                      { value: "slide-left", label: "Slide Left" },
+                      { value: "slide-right", label: "Slide Right" },
+                    ]}
+                    onChange={(preset) => {
+                      update({ animation: { ...animation, preset: preset as any } });
+                      if (preset !== "parallax") setParallaxEditorOpen(false);
+                    }}
+                    ariaLabel="Animation"
+                  />
+                </InspectorFieldRow>
 
-          {/* Edit Parallax button */}
-          <InspectorFieldRow>
-            <button
-              type="button"
-              className="builder-button-full"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "8px 12px",
-                width: "100%",
-                background: "var(--builder-ui-surface-strong, #e5e7eb)",
-                border: "1px solid var(--builder-ui-border, #d1d5db)",
-                borderRadius: "4px",
-                fontWeight: 600,
-                fontSize: "11px",
-                color: "var(--builder-ui-text, #374151)",
-                cursor: "pointer",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-              onClick={() => alert("Parallax settings modal")}
-            >
-              <span>Edit Parallax</span>
-              <ChevronRight size={14} />
-            </button>
-          </InspectorFieldRow>
+                {animationMode === "parallax" && (
+                  <InspectorFieldRow>
+                    <button
+                      type="button"
+                      className="builder-button-full"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: "8px 12px",
+                        width: "100%",
+                        background: "var(--builder-ui-surface-strong, #e5e7eb)",
+                        border: "1px solid var(--builder-ui-border, #d1d5db)",
+                        borderRadius: "4px",
+                        fontWeight: 600,
+                        fontSize: "11px",
+                        color: "var(--builder-ui-text, #374151)",
+                        cursor: "pointer",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                      }}
+                      onClick={() => setParallaxEditorOpen(true)}
+                    >
+                      Edit Parallax
+                    </button>
+                  </InspectorFieldRow>
+                )}
+
+                {animationMode === "parallax" && isParallaxEditorOpen && (
+                  <div
+                    role="dialog"
+                    aria-label="Edit Parallax"
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      zIndex: 1000,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "24px",
+                      background: "rgba(15, 23, 42, 0.35)",
+                    }}
+                    onMouseDown={(event) => {
+                      if (event.target === event.currentTarget) setParallaxEditorOpen(false);
+                    }}
+                  >
+                    <div style={{ width: "min(520px, 100%)", maxHeight: "min(760px, 90vh)", overflowY: "auto", background: "var(--builder-ui-surface, #fff)", borderRadius: "6px", boxShadow: "0 12px 40px rgba(15, 23, 42, 0.28)" }}>
+                      <div style={{ display: "flex", justifyContent: "flex-end", padding: "10px 12px 0" }}>
+                        <button type="button" className="inspector-control" onClick={() => setParallaxEditorOpen(false)} aria-label="Close Parallax editor">Close</button>
+                      </div>
+                      <ParallaxEditor
+                        value={animation.parallax}
+                        onChange={(parallax) => update({ animation: { ...animation, preset: "parallax", parallax } })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {/* Visibility */}
           <InspectorFieldRow label="Visibility">

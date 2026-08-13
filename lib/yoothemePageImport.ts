@@ -1,6 +1,12 @@
 import type {
+  BuilderColumn,
   BuilderLayoutBlock,
+  BuilderLayoutHtmlElement,
+  BuilderResponsiveColumnOrder,
+  BuilderResponsiveColumnWidths,
+  BuilderRow,
   BuilderSection,
+  SectionSpacing,
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
@@ -148,8 +154,30 @@ const LAYOUT_BY_COLUMN_COUNT: Record<number, string> = {
   6: "6-col-equal",
 };
 
+/** Preserve the weighted two-column layouts that YOOtheme authors explicitly.
+ * Equal two-column rows continue to use the existing count-based fallback. */
+const sourceRowLayout = (
+  rowNode: YoothemeSourceNode,
+  columns: YoothemeSourceNode[],
+): string | undefined => {
+  const sourceLayout = asString(sourceProps(rowNode).layout)?.replace(/\s+/g, "");
+  if (columns.length === 2 && sourceLayout === "1-3,2-3") {
+    return "thirds-1-2";
+  }
+  return LAYOUT_BY_COLUMN_COUNT[columns.length];
+};
+
 const asString = (value: unknown): string | null =>
   typeof value === "string" && value.length > 0 ? value : null;
+
+/** YOOtheme treats unitless General position values as pixels. */
+const sourcePositionValue = (value: unknown): string | undefined => {
+  const normalized = asString(value);
+  if (!normalized) return undefined;
+  return /^-?\d+(?:\.\d+)?$/.test(normalized)
+    ? `${normalized}px`
+    : normalized;
+};
 
 const sourceAssetBaseUrl = (): string => {
   const configured = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL?.trim();
@@ -222,26 +250,6 @@ const sourcePathId = (path: string, kind: string): string =>
 const sourceAlignment = (value: unknown): "left" | "center" | "right" | undefined =>
   value === "left" || value === "center" || value === "right" ? value : undefined;
 
-/**
- * An absolutely positioned YOOtheme image is offset as an image-sized box.
- * WebPages keeps Position/Offsets on the Phase 3 shell, so its media child
- * must use the corresponding edge as its anchor when no explicit alignment
- * was authored. This avoids centering a 600px decoration inside a full-width
- * positioned shell.
- */
-const sourceImageAlignment = (
-  props: Record<string, unknown>,
-  fallback?: unknown,
-): "left" | "center" | "right" | undefined => {
-  const explicit = sourceAlignment(props.text_align);
-  if (explicit) return explicit;
-  if (sourcePosition(props.position) === "absolute") {
-    if (asString(props.position_right) !== null) return "right";
-    if (asString(props.position_left) !== null) return "left";
-  }
-  return sourceAlignment(fallback);
-};
-
 /** The shared Image border/shape owner accepts the same UIkit border tokens. */
 const sourceImageBorder = (
   value: unknown,
@@ -283,6 +291,80 @@ const sourceMargin = (value: unknown): string | undefined => {
   return undefined;
 };
 
+const sourceBoolean = (value: unknown): boolean | undefined => {
+  if (value === true || value === "true" || value === 1 || value === "1") return true;
+  if (value === false || value === "false" || value === 0 || value === "0") return false;
+  return undefined;
+};
+
+const sourceLayoutHtmlElement = (
+  value: unknown,
+): BuilderLayoutHtmlElement | undefined => {
+  const normalized = asString(value)?.toLowerCase();
+  return normalized && [
+    "div",
+    "address",
+    "article",
+    "aside",
+    "footer",
+    "header",
+    "hgroup",
+    "main",
+    "nav",
+    "section",
+  ].includes(normalized)
+    ? normalized as BuilderLayoutHtmlElement
+    : undefined;
+};
+
+const sourceStructuralBreakpoint = (
+  value: unknown,
+): "s" | "m" | "l" | "xl" | "" | undefined => {
+  const normalized = asString(value)?.toLowerCase();
+  if (!normalized) return undefined;
+  if (normalized === "small") return "s";
+  if (normalized === "medium") return "m";
+  if (normalized === "large") return "l";
+  if (normalized === "xlarge") return "xl";
+  return ["s", "m", "l", "xl"].includes(normalized)
+    ? normalized as "s" | "m" | "l" | "xl"
+    : undefined;
+};
+
+const sourceStructuralSpacing = (value: unknown): SectionSpacing | undefined => {
+  const normalized = asString(value)?.toLowerCase();
+  if (!normalized) return undefined;
+  if (normalized === "collapse" || normalized === "remove-vertical" || normalized === "none") return "none";
+  if (normalized === "xsmall") return "small";
+  return ["small", "default", "medium", "large", "xlarge", "inherit"].includes(normalized)
+    ? normalized as SectionSpacing
+    : undefined;
+};
+
+const sourceAdvancedSettings = (
+  node: YoothemeSourceNode,
+  props: Record<string, unknown>,
+) => {
+  const attributes = typeof props.attributes === "string"
+    ? props.attributes
+    : props.attributes && typeof props.attributes === "object" && !Array.isArray(props.attributes)
+      ? Object.fromEntries(
+          Object.entries(props.attributes as Record<string, unknown>)
+            .filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+        )
+      : undefined;
+  const dynamicSource = node.source;
+  const advanced = {
+    ...(asString(props.status) ? { status: asString(props.status)! } : {}),
+    ...(asString(props.id) ? { htmlId: asString(props.id)! } : {}),
+    ...(asString(props.class) ? { className: asString(props.class)! } : {}),
+    ...(attributes && (typeof attributes === "string" || Object.keys(attributes).length) ? { attributes } : {}),
+    ...(asString(props.css) ? { css: asString(props.css)! } : {}),
+    ...(dynamicSource !== undefined ? { dynamicSource } : {}),
+  };
+  return Object.keys(advanced).length ? advanced : undefined;
+};
+
 const sourceVisibility = (value: unknown): string | undefined => {
   const normalized = String(value ?? "").toLowerCase();
   return ["s", "m", "l", "xl", "visible-s", "visible-m", "visible-l", "visible-xl", "hidden-s", "hidden-m", "hidden-l", "hidden-xl"].includes(normalized)
@@ -294,11 +376,54 @@ const sourceAnimation = (value: unknown): string | undefined => {
   const normalized = String(value ?? "").toLowerCase();
   // YOOtheme's parallax is a compound UIkit runtime (`uk-parallax`) with
   // coordinate/easing/target fields, not a one-shot CSS animation preset.
-  // Do not persist an inert `uk-animation-parallax` approximation.
-  if (!normalized || normalized === "none" || normalized === "parallax") return undefined;
+  // Persist the supported compound fields for the shared runtime below.
+  if (!normalized || normalized === "none") return undefined;
+  if (normalized === "parallax") return "parallax";
   return ["fade", "scale-up", "scale-down", "slide-top-small", "slide-bottom-small", "slide-left-small", "slide-right-small", "slide-top-medium", "slide-bottom-medium", "slide-left-medium", "slide-right-medium", "slide-top", "slide-bottom", "slide-left", "slide-right"].includes(normalized)
     ? normalized
     : undefined;
+};
+
+const sourceParallaxStops = (value: unknown): { value: string; position?: number }[] | undefined => {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const stops = value.split(",").flatMap((part) => {
+    const raw = part.trim();
+    if (!raw) return [];
+    const positioned = raw.match(/^(.*?)\s+(-?\d+(?:\.\d+)?)%$/);
+    if (!positioned) return [{ value: raw }];
+    const position = Number(positioned[2]);
+    return Number.isFinite(position)
+      ? [{ value: positioned[1].trim(), position: Math.max(0, Math.min(100, position)) }]
+      : [{ value: raw }];
+  });
+  return stops.length ? stops : undefined;
+};
+
+const sourceParallaxEasing = (value: unknown): number | undefined => {
+  const parsed = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const sourceParallaxSettings = (props: Record<string, unknown>) => {
+  const origin = asString(props.parallax_transform_origin);
+  const breakpoint = asString(props.parallax_breakpoint);
+  const easing = sourceParallaxEasing(props.parallax_easing);
+  const settings = {
+    ...(sourceParallaxStops(props.parallax_x) ? { x: sourceParallaxStops(props.parallax_x) } : {}),
+    ...(sourceParallaxStops(props.parallax_y) ? { y: sourceParallaxStops(props.parallax_y) } : {}),
+    ...(sourceParallaxStops(props.parallax_scale) ? { scale: sourceParallaxStops(props.parallax_scale) } : {}),
+    ...(sourceParallaxStops(props.parallax_rotate) ? { rotate: sourceParallaxStops(props.parallax_rotate) } : {}),
+    ...(sourceParallaxStops(props.parallax_opacity) ? { opacity: sourceParallaxStops(props.parallax_opacity) } : {}),
+    ...(sourceParallaxStops(props.parallax_blur) ? { blur: sourceParallaxStops(props.parallax_blur) } : {}),
+    ...(origin ? { transformOrigin: origin } : {}),
+    ...(easing !== undefined ? { easing } : {}),
+    ...(asString(props.parallax_target) ? { target: asString(props.parallax_target) } : {}),
+    ...(asString(props.parallax_start) ? { start: asString(props.parallax_start) } : {}),
+    ...(asString(props.parallax_end) ? { end: asString(props.parallax_end) } : {}),
+    ...(props.parallax_zindex === true || props.parallax_zindex === "true" ? { zIndex: true } : {}),
+    ...(breakpoint ? { breakpoint } : {}),
+  };
+  return Object.keys(settings).length ? settings : undefined;
 };
 
 const sourceZIndex = (value: unknown): number | undefined => {
@@ -318,10 +443,10 @@ const sourceGeneralVisualStyle = (
   props: Record<string, unknown>,
 ): BuilderLayoutBlock["visualStyle"] | undefined => {
   const position = sourcePosition(props.position);
-  const top = asString(props.position_top);
-  const right = asString(props.position_right);
-  const bottom = asString(props.position_bottom);
-  const left = asString(props.position_left);
+  const top = sourcePositionValue(props.position_top);
+  const right = sourcePositionValue(props.position_right);
+  const bottom = sourcePositionValue(props.position_bottom);
+  const left = sourcePositionValue(props.position_left);
   const zIndex = sourceZIndex(props.position_z_index);
   const marginMode = sourceMargin(props.margin);
   const maxWidth = asString(props.maxwidth);
@@ -374,6 +499,7 @@ const sourceGeneralVisualStyle = (
 const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
   block: T,
   props: Record<string, unknown>,
+  options: { preserveLegacyAlignmentAliases?: boolean } = {},
 ): T => {
   const visualStyle = sourceGeneralVisualStyle(props);
   if (!visualStyle) return block;
@@ -382,11 +508,22 @@ const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
     ...(layout.maxWidth ? { maxWidth: layout.maxWidth } : {}),
     ...(layout.maxWidthBreakpoint ? { maxWidthBreakpoint: layout.maxWidthBreakpoint } : {}),
     ...(layout.blockAlign && layout.blockAlign !== "none" ? { elementAlign: layout.blockAlign } : {}),
-    ...(layout.textAlign ? { textAlign: layout.textAlign as any, headingAlign: layout.textAlign as any } : {}),
+    ...(options.preserveLegacyAlignmentAliases !== false && layout.textAlign
+      ? { textAlign: layout.textAlign as any, headingAlign: layout.textAlign as any }
+      : {}),
     ...(layout.removeTopMargin ? { removeTopMargin: true } : {}),
     ...(layout.removeBottomMargin ? { removeBottomMargin: true } : {}),
     ...(layout.visibilityMode ? { visibility: layout.visibilityMode, visibilityMode: layout.visibilityMode } : {}),
-    ...(sourceAnimation(props.animation) ? { animation: { preset: sourceAnimation(props.animation) as any } } : {}),
+    ...(sourceAnimation(props.animation)
+      ? {
+          animation: {
+            preset: sourceAnimation(props.animation) as any,
+            ...(sourceAnimation(props.animation) === "parallax" && sourceParallaxSettings(props)
+              ? { parallax: sourceParallaxSettings(props) }
+              : {}),
+          },
+        }
+      : {}),
   };
   return {
     ...block,
@@ -742,7 +879,6 @@ const sourceGridItem = (
     mediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
     mediaFit: media.imageFit ?? "natural",
     imagePosition: media.imagePosition,
-    textAlign: sourceAlignment(props.text_align ?? parentProps.text_align),
     titleElement: sourceHeadingLevel(props.title_element ?? parentProps.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
     titleStyle: sourceHeadingSize(props.title_style ?? parentProps.title_style) as "inherit" | "h3" | "h4" | "h5" | undefined,
   };
@@ -1083,7 +1219,6 @@ const mapStaticElement = (
       kind: "text",
       body: asString(props.content) ?? "",
       textVariant: sourceTextVariant(props.text_style) ?? "default",
-      textAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
       ...normalizeYoothemeTextPresentation(props),
       ...normalizeYoothemeTypography(props),
@@ -1116,7 +1251,6 @@ const mapStaticElement = (
       buttons: items,
       size: sourceButtonSize(props.button_size),
       fullWidthButton: props.fullwidth === true || props.fullwidth === "true",
-      textAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
     }, props);
   }
@@ -1133,6 +1267,9 @@ const mapStaticElement = (
       warnings.push(`${path}.link_target: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — image modal links have no canonical WebPages image control; the ordinary link URL is retained without modal behavior.`);
     }
     const media = normalizeYoothemeMedia(props);
+    // Standalone YOOtheme Image has no structural image_align control;
+    // universal text_align remains owned by the shared General shell.
+    const { imageAlignment: _structuralImageAlignment, ...imageMedia } = media;
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "image"),
       kind: "image",
@@ -1141,7 +1278,7 @@ const mapStaticElement = (
       // Retained only as a read-compatible alias for documents that predate
       // canonical imageWidth. The resolver prefers imageWidth.
       imageMaxWidth: sourceImageMaxWidth(props),
-      ...media,
+      ...imageMedia,
       // YOOtheme's Image template only creates its cover frame when
       // `image_ratio` is authored. An omitted source ratio is therefore an
       // explicit natural-media instruction for an imported Image, not an
@@ -1161,7 +1298,6 @@ const mapStaticElement = (
       ...(["none", "default", "primary", "secondary"].includes(asString(props.image_box_decoration) ?? "")
         ? { imageBoxDecoration: asString(props.image_box_decoration) as "none" | "default" | "primary" | "secondary" }
         : {}),
-      imageAlignment: sourceImageAlignment(props, media.imageAlignment),
     }, props);
   }
 
@@ -1204,7 +1340,6 @@ const mapStaticElement = (
       gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
       gridCardHover: props.panel_style === "card-hover",
       gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
-      gridItemAlign: sourceAlignment(props.text_align),
       gridGap: typeof props.grid_column_gap === "string" ? props.grid_column_gap : undefined,
       gridRowGap: ["none", "small", "medium", "large"].includes(String(props.grid_row_gap))
         ? (props.grid_row_gap as "none" | "small" | "medium" | "large")
@@ -1224,20 +1359,21 @@ const mapStaticElement = (
       gridMediaWidth: props.image_grid_width === "1-3" ? "small" : props.image_grid_width === "1-2" ? "medium" : "large",
       ...normalizeYoothemeMedia(props),
       imageMaxWidth: sourceImageMaxWidth(props),
-      imageBorder: asString(props.image_border) ?? "none",
-      imageBoxShadow: asString(props.image_box_shadow) ?? "none",
+      imageShape: sourceImageBorder(props.image_border) ?? "none",
+      ...(["none", "small", "medium", "large", "xlarge"].includes(asString(props.image_box_shadow) ?? "")
+        ? { imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" }
+        : {}),
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
       imageHoverTransition: asString(props.image_transition) ?? "none",
-      linkImage: Boolean(props.link_image),
+      linkImage: Boolean(props.image_link),
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
       buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
       size: sourceButtonSize(props.link_size),
       fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
       linkMarginTop: sourceMargin(props.link_margin),
-      textAlign: sourceAlignment(props.text_align),
       ...normalizeYoothemeGridPanelPresentation(props),
-    }, props);
+    }, props, { preserveLegacyAlignmentAliases: false });
   }
 
   if (type === "panel") {
@@ -1293,7 +1429,6 @@ const mapStaticElement = (
       panelShowMedia: Boolean(props.image),
       panelMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
       panelMediaWidth: props.image_grid_width === "1-2" ? "medium" : "large",
-      panelTextAlign: sourceAlignment(props.text_align),
       panelTitleElement: sourceHeadingLevel(props.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
       ...normalizeYoothemeGridPanelPresentation(props),
     }, props);
@@ -1469,11 +1604,11 @@ const mapStaticElement = (
     const hasValue = (field: string) => children.some((child) => Boolean(asString(sourceProps(child)[field])));
     const fields = order.filter((field) => show(field) && hasValue(field));
     const hasAuthoredHeadings = fields.some((field) => Boolean(asString(props[`table_head_${field}`])));
-    ["title_style", "title_font_family", "title_color", "meta_style", "meta_color", "content_style", "image_svg_animate"].forEach((key) => {
+    ["image_svg_animate"].forEach((key) => {
       if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Table cell typography/media/action has no exact canonical table-cell consumer yet.");
     });
     warnUnsupported(path, props, [
-      "content", "show_title", "show_meta", "show_content", "show_image", "show_link", "table_style", "table_hover", "table_justify", "table_size", "table_order", "table_vertical_align", "table_responsive", "table_last_align", "table_width_title", "table_width_meta", "table_width_content", "table_head_title", "table_head_meta", "table_head_content", "table_head_image", "table_head_link",
+      "content", "show_title", "show_meta", "show_content", "show_image", "show_link", "table_style", "table_hover", "table_justify", "table_size", "table_order", "table_vertical_align", "table_responsive", "table_last_align", "table_width_title", "table_width_meta", "table_width_content", "table_head_title", "table_head_meta", "table_head_content", "table_head_image", "table_head_link", "title_style", "title_font_family", "title_color", "meta_style", "meta_color", "content_style",
       "image_width", "image_height", "image_loading", "image_border", "image_box_shadow", "image_svg_inline", "image_svg_color",
       "link_text", "link_target", "link_style", "link_size", "link_fullwidth",
       ...GENERAL_POSITION_KEYS,
@@ -1513,7 +1648,25 @@ const mapStaticElement = (
         };
       }),
       tableColumnFields: fields as any,
+      tableShowTitle: show("title"), tableShowMeta: show("meta"), tableShowContent: show("content"),
       tableShowImage: show("image"), tableShowLink: show("link"),
+      tableHeadTitle: asString(props.table_head_title) ?? "",
+      tableHeadMeta: asString(props.table_head_meta) ?? "",
+      tableHeadContent: asString(props.table_head_content) ?? "",
+      tableHeadImage: asString(props.table_head_image) ?? "",
+      tableHeadLink: asString(props.table_head_link) ?? "",
+      tableTitleStyle: sourceHeadingSize(props.title_style) ?? "",
+      tableTitleFontFamily: (["default", "primary", "secondary", "tertiary"].includes(asString(props.title_font_family) ?? "") ? asString(props.title_font_family) : "default") as any,
+      tableTitleColor: asString(props.title_color) ?? "",
+      tableMetaStyle: sourceTextVariant(props.meta_style) ?? "",
+      tableMetaColor: asString(props.meta_color) ?? "",
+      tableContentStyle: sourceTextVariant(props.content_style) ?? "",
+      tableHover: props.table_hover === true || props.table_hover === "true",
+      tableJustify: props.table_justify === true || props.table_justify === "true",
+      tableOrder: (["1", "2", "3", "4", "5", "6"].includes(asString(props.table_order) ?? "") ? asString(props.table_order) : "1") as any,
+      tableWidthTitle: (["shrink", "small", "medium"].includes(asString(props.table_width_title) ?? "") ? asString(props.table_width_title) : "expand") as any,
+      tableWidthMeta: (["shrink", "small", "medium"].includes(asString(props.table_width_meta) ?? "") ? asString(props.table_width_meta) : "expand") as any,
+      tableWidthContent: (["shrink", "small", "medium"].includes(asString(props.table_width_content) ?? "") ? asString(props.table_width_content) : "expand") as any,
       tableImageWidth: typeof props.image_width === "number" ? props.image_width : asString(props.image_width) ?? undefined,
       tableImageHeight: typeof props.image_height === "number" ? props.image_height : asString(props.image_height) ?? undefined,
       tableImageLoading: props.image_loading === true || props.image_loading === "true" ? "eager" : "lazy",
@@ -1521,13 +1674,13 @@ const mapStaticElement = (
       tableImageShadow: asString(props.image_box_shadow) || "none",
       tableImageSvgInline: props.image_svg_inline === true || props.image_svg_inline === "true",
       tableImageSvgColor: asString(props.image_svg_color) || undefined,
-      tableLinkStyle: asString(props.link_style) || "default",
+      tableLinkStyle: sourceButtonStyle(props.link_style),
       tableLinkSize: sourceButtonSize(props.link_size) ?? "default",
       tableLinkFullWidth: props.link_fullwidth === true || props.link_fullwidth === "true",
       tableLinkTarget: props.link_target === true || props.link_target === "true" || props.link_target === "blank" ? "_blank" : "_self",
       tableStyle: asString(props.table_style) === "divider" ? "divider" : asString(props.table_style) === "striped" ? "striped" : "default",
-      tableSize: asString(props.table_size) || "default", tableHover: props.table_hover === true || props.table_hover === "true",
-      tableJustify: props.table_justify === true || props.table_justify === "true", tableVerticalAlign: props.table_vertical_align === true || props.table_vertical_align === "true",
+      tableSize: asString(props.table_size) || "default",
+      tableVerticalAlign: props.table_vertical_align === true || props.table_vertical_align === "true",
       tableResponsive: asString(props.table_responsive) === "responsive" ? "responsive" : "overflow",
       tableLastAlign: ["left", "center", "right"].includes(asString(props.table_last_align) ?? "") ? asString(props.table_last_align) : undefined,
     } as any, props);
@@ -1868,7 +2021,7 @@ export const mapYoothemeStructure = (
         (node) => node.type === "column",
       );
       const rowId = `yootheme-section-${sectionIndex + 1}-row-${rowIndex + 1}`;
-      const rowLayout = LAYOUT_BY_COLUMN_COUNT[columns.length];
+      const rowLayout = sourceRowLayout(rowNode, columns);
 
       if (!rowLayout) {
         warnings.push(
@@ -1917,6 +2070,226 @@ export const mapYoothemeStructure = (
   return { sections, warnings };
 };
 
+const sourceResponsiveColumnWidths = (
+  props: Record<string, unknown>,
+): BuilderResponsiveColumnWidths | undefined => {
+  const widths: BuilderResponsiveColumnWidths = {
+    default: asString(props.width_default) ?? asString(props.width) ?? undefined,
+    small: asString(props.width_small) ?? undefined,
+    medium: asString(props.width_medium) ?? undefined,
+    large: asString(props.width_large) ?? undefined,
+    xlarge: asString(props.width_xlarge) ?? undefined,
+  };
+  return Object.values(widths).some(Boolean) ? widths : undefined;
+};
+
+const sourceResponsiveColumnOrder = (
+  props: Record<string, unknown>,
+): BuilderResponsiveColumnOrder | undefined => {
+  const order: BuilderResponsiveColumnOrder = {};
+  const directOrder = props.order;
+  if (directOrder === "first" || directOrder === "last") {
+    order.default = directOrder;
+  } else if (typeof directOrder === "number" && Number.isFinite(directOrder)) {
+    order.default = directOrder;
+  }
+
+  const firstAt = asString(props.order_first)?.toLowerCase();
+  if (firstAt === "xs" || firstAt === "default" || sourceBoolean(props.order_first) === true) order.default = "first";
+  if (firstAt === "s") order.small = "first";
+  if (firstAt === "m") order.medium = "first";
+  if (firstAt === "l") order.large = "first";
+  if (firstAt === "xl") order.xlarge = "first";
+
+  return Object.keys(order).length ? order : undefined;
+};
+
+const sourceColumnVerticalAlign = (
+  props: Record<string, unknown>,
+): BuilderColumn["verticalAlign"] => {
+  const value = asString(props.vertical_align)?.toLowerCase();
+  return value === "top" || value === "middle" || value === "bottom"
+    ? value
+    : undefined;
+};
+
+const sourceColumnBackground = (
+  props: Record<string, unknown>,
+): BuilderColumn["background"] => {
+  const backgroundParallax = sourceParallaxSettings({
+    parallax_y: props.image_parallax_bgy,
+    parallax_easing: props.image_parallax_easing,
+  });
+  const background: NonNullable<BuilderColumn["background"]> = {
+    ...(asString(props.background_color) ?? asString(props.color)
+      ? { color: (asString(props.background_color) ?? asString(props.color))! }
+      : {}),
+    ...(asString(props.image) ? { imageUrl: resolveYoothemeAssetUrl(props.image) } : {}),
+    ...(asString(props.video) ? { videoUrl: resolveYoothemeAssetUrl(props.video) } : {}),
+    ...(asString(props.image_position) ? { position: asString(props.image_position)! } : {}),
+    ...(asString(props.image_size) ? { size: asString(props.image_size)! } : {}),
+    ...(asString(props.image_repeat) ? { repeat: asString(props.image_repeat)! } : {}),
+    ...(asString(props.background_gradient) ? { gradient: asString(props.background_gradient)! } : {}),
+    ...(backgroundParallax ? { parallax: backgroundParallax as NonNullable<BuilderColumn["background"]>["parallax"] } : {}),
+  };
+  return Object.keys(background).length ? background : undefined;
+};
+
+const sourceColumnSticky = (
+  props: Record<string, unknown>,
+): BuilderColumn["sticky"] => {
+  const rawMode = asString(props.position_sticky)?.toLowerCase();
+  const mode: NonNullable<BuilderColumn["sticky"]>["mode"] =
+    rawMode === "elements" || rawMode === "elements-within-column"
+      ? "elements-within-column"
+      : rawMode === "column" || rawMode === "column-within-row"
+        ? "column-within-row"
+        : rawMode === "section" || rawMode === "column-within-section"
+          ? "column-within-section"
+          : rawMode === "always"
+            ? "always"
+            : rawMode === "none"
+              ? "none"
+              : undefined;
+  const sticky: NonNullable<BuilderColumn["sticky"]> = {
+    ...(mode ? { mode } : {}),
+    ...(sourcePositionValue(props.position_sticky_offset) ? { topOffset: sourcePositionValue(props.position_sticky_offset) } : {}),
+    ...(sourcePositionValue(props.position_sticky_offset_bottom) ? { bottomOffset: sourcePositionValue(props.position_sticky_offset_bottom) } : {}),
+    ...(sourceStructuralBreakpoint(props.position_sticky_breakpoint) ? { breakpoint: sourceStructuralBreakpoint(props.position_sticky_breakpoint) } : {}),
+  };
+  return Object.keys(sticky).length ? sticky : undefined;
+};
+
+const sourceBuilderColumn = (
+  columnNode: YoothemeSourceNode,
+  id: string,
+  elements: BuilderLayoutBlock[],
+): BuilderColumn => {
+  const props = sourceProps(columnNode);
+  const responsiveWidths = sourceResponsiveColumnWidths(props);
+  const order = sourceResponsiveColumnOrder(props);
+  const verticalAlign = sourceColumnVerticalAlign(props);
+  const background = sourceColumnBackground(props);
+  const sticky = sourceColumnSticky(props);
+  const textColor = props.text_color === "light" || props.text_color === "dark"
+    ? props.text_color
+    : undefined;
+  const keepEmpty = sourceBoolean(props.keep_empty ?? props.empty_content);
+  const advanced = sourceAdvancedSettings(columnNode, props);
+  return {
+    id,
+    ...(responsiveWidths ? { responsiveWidths } : {}),
+    ...(order ? { order } : {}),
+    ...(verticalAlign ? { verticalAlign } : {}),
+    ...(background ? { background } : {}),
+    ...(asString(props.style) ? { style: asString(props.style)! } : {}),
+    ...(textColor ? { textColor } : {}),
+    ...(sourceBoolean(props.preserve_color) !== undefined ? { preserveColor: sourceBoolean(props.preserve_color) } : {}),
+    ...(sourceStructuralSpacing(props.padding) ? { padding: sourceStructuralSpacing(props.padding) } : {}),
+    ...(sourceLayoutHtmlElement(props.html_element) ? { htmlElement: sourceLayoutHtmlElement(props.html_element) } : {}),
+    ...(sticky ? { sticky } : {}),
+    ...(keepEmpty !== undefined ? { keepEmpty } : {}),
+    ...(advanced ? { advanced } : {}),
+    elements,
+  };
+};
+
+const sourceRowMargin = (
+  props: Record<string, unknown>,
+  rowIndex: number,
+): Pick<BuilderRow, "topMargin" | "bottomMargin"> => {
+  const margin = sourceStructuralSpacing(props.margin);
+  const removeTop = sourceBoolean(props.margin_remove_top) === true;
+  const removeBottom = sourceBoolean(props.margin_remove_bottom) === true;
+  const topMargin = removeTop
+    ? "none"
+    : margin === "medium"
+      ? "40px"
+      : margin ?? (rowIndex > 0 ? "40px" : undefined);
+  const bottomMargin = removeBottom || asString(props.margin)?.toLowerCase() === "remove-vertical"
+    ? "none"
+    : undefined;
+  return {
+    ...(topMargin ? { topMargin } : {}),
+    ...(bottomMargin ? { bottomMargin } : {}),
+  };
+};
+
+const sourceBuilderRow = (
+  rowNode: YoothemeSourceNode,
+  id: string,
+  rowIndex: number,
+  columns: BuilderColumn[],
+): BuilderRow => {
+  const props = sourceProps(rowNode);
+  const layout = sourceRowLayout(rowNode, sourceChildren(rowNode).filter((node) => node.type === "column")) ?? "1-col";
+  const sourceLayout = asString(props.layout) ?? undefined;
+  const horizontalDistribution = props.alignment === "justify" || props.align === "justify"
+    ? "justify"
+    : props.alignment === "left" || props.align === "left"
+      ? "left"
+      : props.alignment === "center" || props.align === "center"
+        ? "center"
+        : undefined;
+  const heightValue = asString(props.height_value) ?? asString(props.height_pixels) ?? undefined;
+  const heightMode = props.height === "viewport"
+    ? "viewport"
+    : heightValue || /^\d+(?:\.\d+)?$/.test(asString(props.height) ?? "")
+      ? "pixels"
+      : undefined;
+  const height = {
+    ...(heightMode ? { mode: heightMode } : {}),
+    ...(heightValue ? { value: sourcePositionValue(heightValue) } : {}),
+    ...(sourcePositionValue(props.height_offset ?? props.height_viewport_offset) ? { offset: sourcePositionValue(props.height_offset ?? props.height_viewport_offset) } : {}),
+    ...(sourceBoolean(props.height_subtract ?? props.height_subtract_above) !== undefined
+      ? { subtractHeightAbove: sourceBoolean(props.height_subtract ?? props.height_subtract_above) }
+      : {}),
+  } satisfies NonNullable<BuilderRow["height"]>;
+  const columnParallax = {
+    ...(sourceBoolean(props.column_parallax ?? props.parallax) !== undefined
+      ? { enabled: sourceBoolean(props.column_parallax ?? props.parallax) }
+      : {}),
+    ...(sourceBoolean(props.column_parallax_justify ?? props.parallax_justify) !== undefined
+      ? { justifyAtBottom: sourceBoolean(props.column_parallax_justify ?? props.parallax_justify) }
+      : {}),
+    ...(asString(props.column_parallax_start ?? props.parallax_start)
+      ? { start: asString(props.column_parallax_start ?? props.parallax_start)! }
+      : {}),
+    ...(asString(props.column_parallax_end ?? props.parallax_end)
+      ? { end: asString(props.column_parallax_end ?? props.parallax_end)! }
+      : {}),
+  } satisfies NonNullable<BuilderRow["columnParallax"]>;
+  const advanced = sourceAdvancedSettings(rowNode, props);
+  const customLayout = sourceLayout
+    ? {
+        template: sourceLayout,
+        columns: columns.map((column) => ({
+          columnId: column.id,
+          ...(column.responsiveWidths ? { widths: column.responsiveWidths } : {}),
+          ...(column.order ? { order: column.order } : {}),
+        })),
+      }
+    : undefined;
+  return {
+    id,
+    layout,
+    ...(customLayout ? { customLayout } : {}),
+    ...(sourceStructuralSpacing(props.column_gap) ? { columnGap: sourceStructuralSpacing(props.column_gap) } : {}),
+    ...(sourceStructuralSpacing(props.row_gap) ? { rowGap: sourceStructuralSpacing(props.row_gap) } : {}),
+    ...(sourceBoolean(props.divider ?? props.column_divider) !== undefined ? { divider: sourceBoolean(props.divider ?? props.column_divider) } : {}),
+    ...(horizontalDistribution ? { horizontalDistribution } : {}),
+    ...(asString(props.width) ? { maxWidth: asString(props.width)! } : {}),
+    ...(sourceBoolean(props.padding_remove_horizontal) !== undefined ? { removeHorizontalPadding: sourceBoolean(props.padding_remove_horizontal) } : {}),
+    ...(props.expand === "left" || props.expand === "right" ? { expandOneSide: props.expand } : {}),
+    ...(Object.keys(height).length ? { height } : {}),
+    ...sourceRowMargin(props, rowIndex),
+    ...(sourceLayoutHtmlElement(props.html_element) ? { htmlElement: sourceLayoutHtmlElement(props.html_element) } : {}),
+    ...(Object.keys(columnParallax).length ? { columnParallax } : {}),
+    ...(advanced ? { advanced } : {}),
+    columns,
+  };
+};
+
 /**
  * Maps static source elements onto existing shared consumer paths and the
  * WebPages document shape. This is intentionally a pure mapper: callers still
@@ -1944,8 +2317,8 @@ export const mapYoothemeStaticContent = (
     const structureSection = structure.sections[sectionIndex];
     if (!structureSection) return;
 
-    const layoutItems: NonNullable<BuilderSection["layoutItems"]> = [];
-    let layoutItemIndex = 0;
+    const rows: BuilderRow[] = [];
+    let importedColumnCount = 0;
     sourceChildren(sectionNode)
       .filter((node) => node.type === "row")
       .forEach((rowNode, rowIndex) => {
@@ -1953,9 +2326,7 @@ export const mapYoothemeStaticContent = (
           (node) => node.type === "column",
         );
         const rowId = `yootheme-section-${sectionIndex + 1}-row-${rowIndex + 1}`;
-        const rowLayout = LAYOUT_BY_COLUMN_COUNT[columns.length] ?? "1-col";
-
-        columns.forEach((columnNode, columnIndex) => {
+        const builderColumns = columns.map((columnNode, columnIndex) => {
           const blocks = sourceChildren(columnNode)
             .map((node, childIndex) =>
               mapStaticElement(
@@ -1965,17 +2336,17 @@ export const mapYoothemeStaticContent = (
               ),
             )
             .filter((block): block is BuilderLayoutBlock => Boolean(block));
-          layoutItems.push({
-            id: `${rowId}-column-${columnIndex + 1}`,
-            rowId,
-            rowLayout,
+          importedColumnCount += 1;
+          return sourceBuilderColumn(
+            columnNode,
+            `${rowId}-column-${columnIndex + 1}`,
             blocks,
-          });
-          layoutItemIndex += 1;
+          );
         });
+        rows.push(sourceBuilderRow(rowNode, rowId, rowIndex, builderColumns));
       });
 
-    if (layoutItemIndex === 0) {
+    if (importedColumnCount === 0) {
       warnings.push(`Section ${sectionIndex + 1} has no importable columns.`);
     }
 
@@ -2015,12 +2386,12 @@ export const mapYoothemeStaticContent = (
       sectionTitleRotation: sectionProps.title_rotation === "left" || sectionProps.title_rotation === "right" ? sectionProps.title_rotation : "none",
       sectionTitleBreakpoint: typeof sectionProps.title_breakpoint === "string" ? sectionProps.title_breakpoint : undefined,
       visible: true,
-      layout: structureSection.layout ?? layoutItems[0]?.rowLayout,
+      layout: structureSection.layout ?? rows[0]?.layout,
       layoutColumns:
         structureSection.layoutColumns ||
-        layoutItems.filter((item) => item.rowId === layoutItems[0]?.rowId).length,
+        rows[0]?.columns.length || 0,
       layoutRows: structureSection.layoutRows,
-      layoutItems,
+      rows,
     });
   });
 

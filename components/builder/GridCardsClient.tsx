@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { CSSProperties } from "react";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { RenderChecklist, Typog, blockLegacyGridMargin } from "@/components/builder/BuilderRenderHelpers";
 import {
@@ -13,12 +14,15 @@ import {
   getUikitPanelMediaClass,
   getUikitPanelMediaStyle,
   getUikitTextClass,
+  getUikitSvgColor,
+  getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
 import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
+import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 
 function getUikitMarginClass(val?: string) {
   if (!val || val === "default" || val === "none") return "";
@@ -61,20 +65,6 @@ function getUikitLinkStyleClass(val?: string, size?: string, fullWidth?: boolean
   return `${getUikitButtonClass(normalized, size)} ${fullWidth ? "uk-width-1-1" : ""}`.trim();
 }
 
-function getUikitGeneralClass(rawBlock: any) {
-  const classes: string[] = [];
-  if (rawBlock.position && rawBlock.position !== "static") classes.push(`uk-position-${rawBlock.position}`);
-  if (rawBlock.margin && rawBlock.margin !== "default" && rawBlock.margin !== "none") classes.push(`uk-margin-${rawBlock.margin}`);
-  if (rawBlock.maxWidth && rawBlock.maxWidth !== "none") classes.push(`uk-width-max-${rawBlock.maxWidth}`);
-  if (rawBlock.textAlignment && rawBlock.textAlignment !== "left") classes.push(`uk-text-${rawBlock.textAlignment}`);
-  if (rawBlock.animation && rawBlock.animation !== "inherit" && rawBlock.animation !== "none") classes.push(`uk-animation-${rawBlock.animation}`);
-  if (rawBlock.visibility && rawBlock.visibility !== "always") {
-    if (rawBlock.visibility.startsWith("visible-")) classes.push(`uk-visible@${rawBlock.visibility.replace("visible-", "")}`);
-    if (rawBlock.visibility.startsWith("hidden-")) classes.push(`uk-hidden@${rawBlock.visibility.replace("hidden-", "")}`);
-  }
-  return classes.join(" ");
-}
-
 export function GridCardsClient({
   block,
   items,
@@ -106,6 +96,10 @@ export function GridCardsClient({
 }) {
   const rawBlock = block as any;
   const sharedCard = rawBlock.visualStyle?.card ?? {};
+  // YOOtheme Grid owns one General alignment value for the complete item
+  // contract. The shared resolver keeps legacy aliases read-compatible while
+  // preventing Grid from creating a second precedence chain.
+  const itemContentAlignment = resolveGeneralTextAlignment(rawBlock) ?? "left";
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Grid breakpoints are semantic values. In particular YOOtheme `auto` is a
@@ -153,11 +147,11 @@ export function GridCardsClient({
   const canShowLink = (rawBlock.gridShowButton ?? rawBlock.showLink ?? true) !== false;
 
   const parseGapPx = (val?: string) => {
-    if (val === "small") return "15px";
-    if (val === "medium" || val === "default") return "30px";
-    if (val === "large") return "40px";
+    if (val === "small") return "var(--uk-grid-gutter-small, 15px)";
+    if (val === "medium" || val === "default") return "var(--uk-grid-gutter-medium, 40px)";
+    if (val === "large") return "var(--uk-grid-gutter-large, 70px)";
     if (val === "collapse" || val === "none") return "0px";
-    return "30px";
+    return "var(--uk-grid-gutter-medium, 40px)";
   };
 
   const columnGapCss = parseGapPx(colGapValue);
@@ -319,10 +313,14 @@ export function GridCardsClient({
             // Content styling
             const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
             const contentMarginTopClass = getUikitMarginClass(rawBlock.contentMarginTop);
+            const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
 
             // Image styling
-            const imageBorderClass = getUikitImageBorderClass(rawBlock.imageBorder);
-            const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageBoxShadow);
+            // `imageShape` and `imageShadow` are the canonical shared Image
+            // owners. Older Grid documents may retain the previous aliases,
+            // but those are read fallbacks only.
+            const imageBorderClass = getUikitImageBorderClass(rawBlock.imageShape ?? rawBlock.imageBorder);
+            const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageShadow ?? rawBlock.imageBoxShadow);
             const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
             const isFrameless = (rawBlock as any).alignImageWithoutPadding === true || imagePaddingClass === "frameless";
@@ -344,7 +342,10 @@ export function GridCardsClient({
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
             const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "medium";
-            const mediaAlignment = (item as any).mediaAlignment ?? (block as any).imageAlignment ?? (block as any).gridMediaAlignment ?? "center";
+            // Explicit media alignment has higher precedence than Grid text
+            // alignment. Without one, media participates in the same item
+            // alignment contract as YOOtheme's inline Grid image.
+            const mediaAlignment = (item as any).mediaAlignment ?? itemContentAlignment;
             const mediaStyle = getUikitPanelMediaStyle({
               ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
               fit: item.mediaFit ?? block.imageFit,
@@ -379,12 +380,12 @@ export function GridCardsClient({
               canShowTitle && safeTitle ? (
                 <Typog
                   as={TitleTag}
-                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass} ${typographyRoleClass(
+                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "uk-margin-remove-bottom" : ""} ${typographyRoleClass(
                     rawBlock.titleTypographyRole ?? block.titleTypographyRole,
                   )}`.trim()}
                   typography={item.typography ?? block.typography}
                   area="title"
-                  style={{ ...gridTitleStyle, textAlign: sharedCard.titleAlign ?? gridTitleStyle.textAlign, margin: sharedCard.titleMargin ?? gridTitleStyle.margin }}
+                  style={{ ...gridTitleStyle, textAlign: sharedCard.titleAlign ?? gridTitleStyle.textAlign, margin: isYoothemeGrid ? undefined : sharedCard.titleMargin ?? gridTitleStyle.margin }}
                 >
                   {rawBlock.linkTitle || rawBlock.linkPanel ? (
                     <a href={itemUrl} {...builderLinkTargetProps(linkTarget)}>
@@ -401,7 +402,7 @@ export function GridCardsClient({
               canShowContent && safeContent ? (
                 <Typog
                   as="div"
-                  className={`${contentStyleClass} ${contentMarginTopClass} ${typographyRoleClass(
+                  className={`${contentStyleClass} ${contentMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${typographyRoleClass(
                     block.contentTypographyRole,
                   )}`.trim()}
                   typography={item.typography ?? block.typography}
@@ -416,31 +417,55 @@ export function GridCardsClient({
               if (!canShowImage || !item.imageUrl) return null;
               const placement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
               const mediaClass = isFrameless ? (placement === "left" || placement === "right" ? `uk-card-media-${placement}` : "uk-card-media-top") : "";
-              const imageEl = (
+              const imageElementStyle = {
+                // `Auto` columns use UIkit's natural-width semantics.
+                // Numeric tiers continue to stretch media within a track.
+                width: imageWidth ?? "var(--shop-builder-grid-image-width, var(--shop-builder-grid-image-width-base, 100%))",
+                height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
+                maxWidth: "100%",
+                objectFit: mediaStyle.objectFit,
+                objectPosition: mediaStyle.backgroundPosition,
+                borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
+              } as CSSProperties;
+              const fallbackImage = (
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   className={imageHoverTransitionClass}
-                  style={{
-                    // `Auto` columns use UIkit's natural-width semantics.
-                    // Numeric tiers continue to stretch media within a track.
-                    width: imageWidth ?? "var(--shop-builder-grid-image-width, var(--shop-builder-grid-image-width-base, 100%))",
-                    height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
-                    maxWidth: "100%",
-                    objectFit: mediaStyle.objectFit,
-                    objectPosition: mediaStyle.backgroundPosition,
-                    borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
-                  }}
+                  style={imageElementStyle}
                 />
               );
+              const isStylableSvg = rawBlock.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(item.imageUrl);
+              const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
+              const preserveIntrinsicSvgSize = isStylableSvg && !imageWidth && !imageHeight && !hasCropFrame;
+              const imageEl = isStylableSvg ? (
+                <UikitStylableSvg
+                  src={item.imageUrl}
+                  alt={item.imageAlt || item.title || ""}
+                  className={`${imageHoverTransitionClass} ${svgColorClass} el-image`.trim()}
+                  color={svgColorClass ? undefined : getUikitSvgColor(rawBlock.imageSvgColor)}
+                  fit={mediaStyle.objectFit === "cover" ? "cover" : "contain"}
+                  loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
+                  preserveIntrinsicSize={preserveIntrinsicSvgSize}
+                  fallback={fallbackImage}
+                  style={preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle}
+                />
+              ) : fallbackImage;
 
               return (
                 <div
                   className={`${mediaClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
+                  data-image-ratio={hasCropFrame ? "true" : undefined}
                   style={{
                     maxWidth: imageMaxWidth,
                     aspectRatio: hasCropFrame ? mediaStyle.aspectRatio : "auto",
+                    justifyContent: mediaAlignment === "right" ? "flex-end" : mediaAlignment === "center" ? "center" : "flex-start",
+                    // The Grid content body is a column flex container. Its
+                    // intrinsic-width media wrapper therefore needs an
+                    // explicit cross-axis position; justify-content only
+                    // aligns the SVG inside that wrapper.
+                    alignSelf: mediaAlignment === "right" ? "flex-end" : mediaAlignment === "center" ? "center" : "flex-start",
                   } as CSSProperties}
                 >
                   {rawBlock.enableLightbox ? (
@@ -473,7 +498,7 @@ export function GridCardsClient({
                 } ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
-                    textAlign: item.textAlign ?? rawBlock.textAlignment ?? "left",
+                    textAlign: itemContentAlignment,
                     ...colorSemantics.style,
                     ...(imagePaddingCustom ? { "--shop-builder-grid-image-padding": imagePaddingCustom } : {}),
                     ...(contentPaddingCustom ? { "--shop-builder-grid-content-padding": contentPaddingCustom } : {}),

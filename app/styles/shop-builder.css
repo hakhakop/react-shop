@@ -2194,8 +2194,13 @@ body.dark {
 
 .shop-builder-grid-card .shop-builder-grid-image {
   position: relative;
-  aspect-ratio: var(--builder-card-image-ratio, 1 / 1);
+  aspect-ratio: var(--builder-card-image-ratio, auto);
   border-radius: var(--builder-card-image-radius, inherit);
+  overflow: visible;
+}
+
+.shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
+.shop-builder-grid-card .shop-builder-grid-image[data-image-ratio="true"] {
   overflow: hidden;
 }
 
@@ -2814,8 +2819,15 @@ body.dark {
 .shop-builder-grid-image--align-right { margin-left: auto !important; }
 
 .shop-builder-grid-card {
-  overflow: hidden !important;
+  overflow: visible !important;
   padding: 0 !important;
+}
+
+/* YOOtheme clips only flush card media to the card radius. Padded/natural
+   Grid media must remain visible so intrinsic SVG shadows can paint outside
+   their source bounds. */
+.shop-builder-grid-card.is-image-frameless {
+  overflow: hidden !important;
 }
 
 .shop-builder-panel-padding-small {
@@ -3015,8 +3027,14 @@ body.dark {
 
 .shop-builder-image-media {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
   background: transparent;
+}
+
+/* Only an authored ratio creates a clipping media frame. Natural YOOtheme
+   inline SVGs may paint asset-authored shadows beyond their source bounds. */
+.shop-builder-image-media[data-image-ratio="true"] {
+  overflow: hidden;
 }
 
 /* Element Advanced CSS is explicitly allowed to position an image outside its
@@ -5809,7 +5827,13 @@ body.dark {
 }
 .shop-builder-accordion--title-muted .uk-accordion-title { color: var(--uikit-text-muted-color, var(--uk-global-muted-text-color, #6b7280)); }
 .shop-builder-accordion--title-emphasis .uk-accordion-title { color: var(--uikit-text-emphasis-color, var(--uk-global-emphasis-color, inherit)); font-weight: 700; }
-.shop-builder-accordion--style-divided > li + li { border-top: var(--uk-accordion-item-border-width, 1px) solid var(--uikit-accordion-divider-color, var(--uk-accordion-item-border, rgba(0,0,0,.12))); }
+.shop-builder-accordion--style-default > li + li,
+.shop-builder-accordion--style-divided > li + li {
+  padding-top: var(--uk-global-margin-small, 15px);
+  border-top: var(--uk-accordion-item-border-width, 1px) solid var(--uikit-accordion-divider-color, var(--uk-accordion-item-border, rgba(0,0,0,.12)));
+  margin-top: var(--uk-global-margin-small, 15px);
+  box-shadow: var(--uk-accordion-item-box-shadow, none);
+}
 .shop-builder-accordion--style-minimal > li { border: 0; }
 .shop-builder-accordion--items-small > :nth-child(n+2) { margin-top: var(--uk-global-margin-small, 15px); }
 .shop-builder-accordion--items-default > :nth-child(n+2) { margin-top: var(--uk-global-margin, 30px); }
@@ -5817,7 +5841,12 @@ body.dark {
 .shop-builder-accordion--content-small .uk-accordion-content { margin-top: var(--uk-global-margin-small, 15px); }
 .shop-builder-accordion--content-default .uk-accordion-content { margin-top: var(--uk-accordion-content-margin-top, 12px); }
 .shop-builder-accordion--content-large .uk-accordion-content { margin-top: var(--uk-global-margin-medium, 40px); }
-.shop-builder-accordion:not(.shop-builder-accordion--divider) > li { border: 0; }
+.shop-builder-accordion:not(.shop-builder-accordion--divider) > li + li {
+  padding-top: 0;
+  border: 0;
+  margin-top: 0;
+  box-shadow: none;
+}
 .shop-builder-accordion .uk-accordion-title {
   min-height: 44px;
   padding: var(--uk-accordion-title-padding-vertical, 10px) 0;
@@ -5919,7 +5948,6 @@ h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
 h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; }
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h1 { font-size: 2.5rem !important; line-height: 1.2 !important; font-weight: 700 !important; }
 .shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
@@ -5970,18 +5998,22 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 /* UIkit Canonical Section Variants & Modifiers */
 .uk-section-default {
   background: var(--uikit-section-default-bg, transparent);
+  background-image: var(--uikit-section-default-bg-image, none);
   color: var(--uikit-section-default-color, inherit);
 }
 .uk-section-muted {
   background: var(--uikit-section-muted-bg, #f8fafc) !important;
+  background-image: var(--uikit-section-muted-bg-image, none) !important;
   color: var(--uikit-section-muted-color, #1e293b);
 }
 .uk-section-primary {
   background: var(--uikit-section-primary-bg, #0f172a) !important;
+  background-image: var(--uikit-section-primary-bg-image, none) !important;
   color: var(--uikit-section-primary-color, #ffffff) !important;
 }
 .uk-section-secondary {
   background: var(--uikit-section-secondary-bg, #1e1b4b) !important;
+  background-image: var(--uikit-section-secondary-bg-image, none) !important;
   color: var(--uikit-section-secondary-color, #ffffff) !important;
 }
 .uk-section-image {
