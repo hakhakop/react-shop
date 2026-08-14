@@ -76,6 +76,58 @@ test("Phase 12 runner measures a registered geometry-sensitive Panel Slider only
   expect(result.outcome, formatFreshImportAcceptanceResult(result)).toBe("PASS");
 });
 
+test("fresh Enterprise import keeps one authored Dynamic Overlay Slider template and resolves the same collection on both surfaces", async ({ page }) => {
+  const result = await runFreshImport(page, "enterprise3", async ({ persisted, builder, storefront }) => {
+    const blocks: any[] = [];
+    const visit = (value: unknown) => {
+      if (!value || typeof value !== "object") return;
+      const record = value as Record<string, unknown>;
+      if (record.kind) blocks.push(record);
+      Object.values(record).forEach((child) => {
+        if (Array.isArray(child)) child.forEach(visit);
+      });
+    };
+    persisted.sections?.forEach(visit);
+    const overlay = blocks.find((block) =>
+      block.kind === "overlaySlider" && block.slides?.some((slide: any) => slide.dynamicContext),
+    );
+    const authoredSlides = overlay?.slides ?? [];
+    const template = authoredSlides[0];
+    const blockId = overlay?.id;
+    const media = async (target: Page, attribute: "data-builder-block-key" | "data-builder-block-id") =>
+      {
+        const images = target.locator(`[${attribute}="${blockId}"] img`);
+        await images.first().waitFor({ state: "attached", timeout: 12_000 });
+        return images.evaluateAll((nodes) => nodes
+          .map((image) => image.getAttribute("src"))
+          .filter((src): src is string => Boolean(src))
+          .sort());
+      };
+    const builderMedia = blockId ? await media(builder, "data-builder-block-key") : [];
+    const storefrontMedia = blockId ? await media(storefront, "data-builder-block-id") : [];
+
+    return [
+      passOrFail("overlay-slider.authored-template", authoredSlides.length === 1, "one authored template slide", `${authoredSlides.length} authored slides`),
+      passOrFail(
+        "overlay-slider.dynamic-context",
+        template?.dynamicContext?.provider === "wordpress" && template?.dynamicContext?.source === "post" && template?.dynamicContext?.mode === "collection" && template?.dynamicContext?.query?.quantity === 6,
+        "canonical WordPress post collection with quantity 6",
+        JSON.stringify(template?.dynamicContext ?? null),
+      ),
+      passOrFail(
+        "overlay-slider.dynamic-bindings",
+        template?.dynamicBindings?.imageUrl?.path === "acf.teaser_image.url" && template?.dynamicBindings?.imageAlt?.path === "acf.teaser_image.alt" && template?.dynamicBindings?.buttonUrl?.path === "link",
+        "teaser image URL/alt and link bindings",
+        JSON.stringify(template?.dynamicBindings ?? null),
+      ),
+      passOrFail("overlay-slider.builder-resolution", builderMedia.length === 6, "6 transient Builder images", `${builderMedia.length} images`),
+      passOrFail("overlay-slider.storefront-parity", JSON.stringify(storefrontMedia) === JSON.stringify(builderMedia), "identical Builder/storefront image collection", `Builder=${JSON.stringify(builderMedia)}; storefront=${JSON.stringify(storefrontMedia)}`),
+    ];
+  });
+  expect(result.outcome, formatFreshImportAcceptanceResult(result)).toBe("PASS");
+  expect(result.restoration.outcome, formatFreshImportAcceptanceResult(result)).toBe("PASS");
+});
+
 test("Phase 12 runner waits for registered UIkit Grid and Lightbox runtime before Gallery probes", async ({ page }) => {
   const result = await runFreshImport(page, "enterprise6", async ({ builder, storefront }) => {
     const probe = async (target: Page) => target.locator(".uk-grid-masonry[data-uk-grid]").first().evaluate((grid) => ({

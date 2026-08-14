@@ -1,6 +1,8 @@
 import type { BuilderLayout, BuilderLayoutBlock, BuilderSection } from "@/lib/builderLayouts";
 import {
   resolveDynamicItem,
+  type DynamicContentContextDescriptor,
+  type DynamicFieldBindings,
   type DynamicItemContext,
 } from "@/lib/dynamicContent";
 import {
@@ -11,6 +13,8 @@ import type { SaaSWebsite } from "@/lib/websites";
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
 type PanelSliderSlide = NonNullable<BuilderLayoutBlock["slides"]>[number];
+type ListItem = NonNullable<BuilderLayoutBlock["listItems"]>[number];
+type ButtonItem = NonNullable<BuilderLayoutBlock["buttons"]>[number];
 
 export type DynamicContentMaterializationDiagnostic = {
   status: "materialized" | "fallback";
@@ -40,6 +44,21 @@ export type DynamicContentContextResolver = (
 ) => Promise<DynamicItemContext[]>;
 
 type BlockLocation = MaterializedGridBlock;
+
+async function resolveInheritedContext(
+  descriptor: DynamicContentContextDescriptor | undefined,
+  inheritedContext: DynamicItemContext | undefined,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+) {
+  if (!descriptor) return inheritedContext;
+  const contexts = await resolveContexts({ website, descriptor });
+  return contexts[0];
+}
+
+const DYNAMIC_SINGLE_ELEMENT_KINDS = new Set([
+  "heading", "image", "text", "button", "panel", "alert",
+]);
 
 const safeErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Dynamic Content resolution failed.";
@@ -73,6 +92,45 @@ export function dynamicPanelSliderRenderItemId(
   return dynamicGridRenderItemId(templateItemId, contextId);
 }
 
+/** Structural templates use the same deterministic authored/context identity. */
+export function dynamicStructureRenderId(
+  templateId: string,
+  contextId: string | number,
+) {
+  return dynamicGridRenderItemId(templateId, contextId);
+}
+
+type StructuralNode = {
+  id: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+};
+
+async function expandStructuralNode<Node extends StructuralNode>(
+  node: Node,
+  inheritedContext: DynamicItemContext | undefined,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+): Promise<Array<{ node: Node; context?: DynamicItemContext }>> {
+  const descriptor = node.dynamicContext;
+  if (!descriptor) return [{ node, context: inheritedContext }];
+  const contexts = await resolveContexts({ website, descriptor });
+  if (descriptor.mode !== "collection") {
+    const projected = { ...node };
+    delete projected.dynamicContext;
+    return [{ node: projected, context: contexts[0] }];
+  }
+  const identified = contexts.filter((context): context is DynamicItemContext & { id: string | number } =>
+    (typeof context.id === "string" && context.id.length > 0) ||
+    (typeof context.id === "number" && Number.isFinite(context.id)),
+  );
+  if (identified.length === 0) return [{ node, context: inheritedContext }];
+  return identified.map((context) => {
+    const projected = { ...node, id: dynamicStructureRenderId(node.id, context.id) };
+    delete projected.dynamicContext;
+    return { node: projected, context };
+  });
+}
+
 const staticGridTemplate = (item: GridItem): GridItem => {
   const projected = { ...item };
   delete projected.dynamicContext;
@@ -87,6 +145,144 @@ const staticPanelSliderTemplate = (slide: PanelSliderSlide): PanelSliderSlide =>
   return projected;
 };
 
+const staticElementTemplate = (block: BuilderLayoutBlock): BuilderLayoutBlock => {
+  const projected = { ...block };
+  delete projected.dynamicContext;
+  delete projected.dynamicBindings;
+  return projected;
+};
+
+const staticListItemTemplate = (item: ListItem): ListItem => {
+  const projected = { ...item };
+  delete projected.dynamicContext;
+  delete projected.dynamicBindings;
+  return projected;
+};
+
+const staticButtonItemTemplate = (item: ButtonItem): ButtonItem => {
+  const projected = { ...item };
+  delete projected.dynamicContext;
+  delete projected.dynamicBindings;
+  return projected;
+};
+
+type RepeatableItem = {
+  id?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings;
+} & Record<string, unknown>;
+
+async function materializeRepeatableItems<Item extends RepeatableItem>(
+  items: Item[],
+  kind: "list" | "button",
+  location: BlockLocation,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+  diagnostics: DynamicContentMaterializationDiagnostic[],
+  inheritedContext?: DynamicItemContext,
+): Promise<Item[]> {
+  const output: Item[] = [];
+  let expanded = false;
+  for (const item of items) {
+    const descriptor = item.dynamicContext as DynamicContentContextDescriptor | undefined;
+    if (!descriptor) {
+      output.push(inheritedContext && item.dynamicBindings
+        ? resolveDynamicItem(item, inheritedContext, item.dynamicBindings) as Item
+        : item);
+      if (inheritedContext && item.dynamicBindings) expanded = true;
+      continue;
+    }
+    if (descriptor.mode !== "collection" || !item.id) {
+      diagnostics.push({
+        status: "fallback",
+        ...location,
+        templateItemId: item.id,
+        message: descriptor.mode !== "collection"
+          ? `Unsupported ${kind} Dynamic Content mode: ${descriptor.mode}.`
+          : `A collection ${kind} template requires a stable authored item ID.`,
+      });
+      output.push(item);
+      continue;
+    }
+    try {
+      const contexts = await resolveContexts({ website, descriptor });
+      const identified = contexts.filter((context): context is DynamicItemContext & { id: string | number } =>
+        (typeof context.id === "string" && context.id.length > 0) ||
+        (typeof context.id === "number" && Number.isFinite(context.id)),
+      );
+      if (identified.length === 0) {
+        diagnostics.push({ status: "fallback", ...location, templateItemId: item.id, contextCount: contexts.length, message: "The provider returned no identified repeatable items." });
+        output.push(item);
+        continue;
+      }
+      const template = kind === "list"
+        ? staticListItemTemplate(item as unknown as ListItem)
+        : staticButtonItemTemplate(item as unknown as ButtonItem);
+      output.push(...identified.map((context) => ({
+        ...resolveDynamicItem(template, context, item.dynamicBindings as DynamicFieldBindings),
+        id: dynamicGridRenderItemId(String(item.id), context.id),
+      } as unknown as Item)));
+      expanded = true;
+      diagnostics.push({ status: "materialized", ...location, templateItemId: item.id, contextCount: identified.length });
+    } catch (error) {
+      diagnostics.push({ status: "fallback", ...location, templateItemId: item.id, message: safeErrorMessage(error) });
+      output.push(item);
+    }
+  }
+  return expanded ? output : items;
+}
+
+async function materializeRepeatableElement(
+  block: BuilderLayoutBlock,
+  location: BlockLocation,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+  diagnostics: DynamicContentMaterializationDiagnostic[],
+  inheritedContext?: DynamicItemContext,
+): Promise<BuilderLayoutBlock> {
+  if (block.kind === "list" && block.listItems?.length) {
+    const listItems = await materializeRepeatableItems(block.listItems, "list", location, website, resolveContexts, diagnostics, inheritedContext);
+    return listItems === block.listItems ? block : { ...block, listItems };
+  }
+  if (block.kind === "button" && block.buttons?.length) {
+    const buttons = await materializeRepeatableItems(block.buttons, "button", location, website, resolveContexts, diagnostics, inheritedContext);
+    return buttons === block.buttons ? block : { ...block, buttons };
+  }
+  return block;
+}
+
+async function materializeElementBlock(
+  block: BuilderLayoutBlock,
+  location: BlockLocation,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+  diagnostics: DynamicContentMaterializationDiagnostic[],
+  inheritedContext?: DynamicItemContext,
+): Promise<BuilderLayoutBlock> {
+  if (!DYNAMIC_SINGLE_ELEMENT_KINDS.has(String(block.kind))) return block;
+
+  if (!block.dynamicContext) {
+    if (!inheritedContext || !block.dynamicBindings) return block;
+    return resolveDynamicItem(staticElementTemplate(block), inheritedContext, block.dynamicBindings);
+  }
+
+  try {
+    const contexts = await resolveContexts({ website, descriptor: block.dynamicContext });
+    const context = contexts[0];
+    if (!context) {
+      diagnostics.push({ status: "fallback", ...location, message: "The provider returned no item for the element context." });
+      return block;
+    }
+    const template = staticElementTemplate(block);
+    const resolved = resolveDynamicItem(template, context, block.dynamicBindings);
+    diagnostics.push({ status: "materialized", ...location, contextCount: contexts.length });
+    return resolved;
+  } catch (error) {
+    diagnostics.push({ status: "fallback", ...location, message: safeErrorMessage(error) });
+    return block;
+  }
+}
+
 async function materializeGridBlock(
   block: BuilderLayoutBlock,
   location: BlockLocation,
@@ -94,6 +290,7 @@ async function materializeGridBlock(
   resolveContexts: DynamicContentContextResolver,
   diagnostics: DynamicContentMaterializationDiagnostic[],
   materializedGridBlocks: MaterializedGridBlock[],
+  inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
   if (block.kind !== "grid" || !block.gridItems?.length) return block;
 
@@ -104,7 +301,10 @@ async function materializeGridBlock(
   for (const item of block.gridItems) {
     const descriptor = item.dynamicContext;
     if (!descriptor) {
-      renderItems.push(item);
+      if (inheritedContext && item.dynamicBindings) {
+        renderItems.push(resolveDynamicItem(staticGridTemplate(item), inheritedContext, item.dynamicBindings));
+        changed = true;
+      } else renderItems.push(item);
       continue;
     }
     if (descriptor.mode !== "collection") {
@@ -188,14 +388,15 @@ async function materializeGridBlock(
   return changed ? { ...block, gridItems: renderItems } : block;
 }
 
-async function materializePanelSliderBlock(
+async function materializeCarouselCollectionBlock(
   block: BuilderLayoutBlock,
   location: BlockLocation,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
   diagnostics: DynamicContentMaterializationDiagnostic[],
+  inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
-  if (block.kind !== "panelSlider" || !block.slides?.length) return block;
+  if (!(block.kind === "panelSlider" || block.kind === "slideshow" || block.kind === "overlaySlider" || block.kind === "slider") || !block.slides?.length) return block;
 
   let changed = false;
   const renderSlides: PanelSliderSlide[] = [];
@@ -203,7 +404,10 @@ async function materializePanelSliderBlock(
   for (const slide of block.slides) {
     const descriptor = slide.dynamicContext;
     if (!descriptor) {
-      renderSlides.push(slide);
+      if (inheritedContext && slide.dynamicBindings) {
+        renderSlides.push(resolveDynamicItem(staticPanelSliderTemplate(slide), inheritedContext, slide.dynamicBindings));
+        changed = true;
+      } else renderSlides.push(slide);
       continue;
     }
     if (descriptor.mode !== "collection") {
@@ -211,7 +415,7 @@ async function materializePanelSliderBlock(
         status: "fallback",
         ...location,
         templateItemId: slide.id,
-        message: `Unsupported Panel Slider Dynamic Content mode: ${descriptor.mode}.`,
+          message: `Unsupported ${block.kind} Dynamic Content mode: ${descriptor.mode}.`,
       });
       renderSlides.push(slide);
       continue;
@@ -222,7 +426,7 @@ async function materializePanelSliderBlock(
       diagnostics.push({
         status: "fallback",
         ...location,
-        message: "A collection Panel Slider template requires a stable authored slide ID.",
+        message: `A collection ${block.kind} template requires a stable authored slide ID.`,
       });
       renderSlides.push(slide);
       continue;
@@ -293,6 +497,7 @@ async function materializeBlocks(
   resolveContexts: DynamicContentContextResolver,
   diagnostics: DynamicContentMaterializationDiagnostic[],
   materializedGridBlocks: MaterializedGridBlock[],
+  inheritedContext?: DynamicItemContext,
 ) {
   let changed = false;
   const renderBlocks = await Promise.all(blocks.map(async (block, index) => {
@@ -306,34 +511,60 @@ async function materializeBlocks(
           resolveContexts,
           diagnostics,
           materializedGridBlocks,
+          inheritedContext,
         )
-      : block.kind === "panelSlider"
-        ? await materializePanelSliderBlock(
+      : (block.kind === "panelSlider" || block.kind === "slideshow" || block.kind === "overlaySlider" || block.kind === "slider")
+        ? await materializeCarouselCollectionBlock(
             block,
             location,
             website,
             resolveContexts,
             diagnostics,
+            inheritedContext,
           )
-        : block;
+        : ((block.kind === "list" && Boolean(block.listItems?.length)) ||
+          (block.kind === "button" && Boolean(block.buttons?.length)))
+          ? await materializeRepeatableElement(
+              block,
+              location,
+              website,
+              resolveContexts,
+              diagnostics,
+              inheritedContext,
+            )
+          : await materializeElementBlock(
+            block,
+            location,
+            website,
+            resolveContexts,
+            diagnostics,
+            inheritedContext,
+          );
     if (renderBlock !== block) changed = true;
     return renderBlock;
   }));
   return changed ? renderBlocks : blocks;
 }
 
-async function materializeSection(
+async function materializeSectionInstance(
   section: BuilderSection,
+  inheritedContext: DynamicItemContext | undefined,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
   diagnostics: DynamicContentMaterializationDiagnostic[],
   materializedGridBlocks: MaterializedGridBlock[],
 ): Promise<BuilderSection> {
+  const sectionContext = inheritedContext;
   if (section.rows !== undefined) {
     let changed = false;
-    const rows = await Promise.all(section.rows.map(async (row) => {
+    const rowGroups = await Promise.all(section.rows.map(async (authoredRow) => {
+      const projections = await expandStructuralNode(authoredRow, sectionContext, website, resolveContexts);
+      return Promise.all(projections.map(async ({ node: row, context: rowContext }) => {
       let rowChanged = false;
-      const columns = await Promise.all(row.columns.map(async (column) => {
+      const columnGroups = await Promise.all(row.columns.map(async (authoredColumn) => {
+        const columnProjections = await expandStructuralNode(authoredColumn, rowContext, website, resolveContexts);
+        if (columnProjections.length !== 1 || columnProjections[0]?.node !== authoredColumn) rowChanged = true;
+        return Promise.all(columnProjections.map(async ({ node: column, context: columnContext }) => {
         const elements = await materializeBlocks(
           column.elements,
           section.id,
@@ -342,21 +573,28 @@ async function materializeSection(
           resolveContexts,
           diagnostics,
           materializedGridBlocks,
+          columnContext,
         );
         if (elements === column.elements) return column;
         rowChanged = true;
         return { ...column, elements };
+        }));
       }));
-      if (!rowChanged) return row;
+      const columns = columnGroups.flat();
+      if (!rowChanged && columns.length === row.columns.length) return row;
       changed = true;
       return { ...row, columns };
+      }));
     }));
-    return changed ? { ...section, rows } : section;
+    const rows = rowGroups.flat();
+    if (rows.length !== section.rows.length) changed = true;
+    return changed ? { ...section, rows } as unknown as BuilderSection : section;
   }
 
   let changed = false;
   const layoutItems = await Promise.all((section.layoutItems ?? []).map(async (column, columnIndex) => {
     const columnKey = column.id ?? `${section.id}-column-${columnIndex}`;
+    const columnContext = await resolveInheritedContext(column.dynamicContext, sectionContext, website, resolveContexts);
     const blocks = await materializeBlocks(
       column.blocks ?? [],
       section.id,
@@ -365,12 +603,15 @@ async function materializeSection(
       resolveContexts,
       diagnostics,
       materializedGridBlocks,
+      columnContext,
     );
     let nestedChanged = false;
     const nestedRows = column.nestedLayout
       ? await Promise.all(column.nestedLayout.rows.map(async (row) => {
+          const rowContext = await resolveInheritedContext(row.dynamicContext, columnContext, website, resolveContexts);
           let rowChanged = false;
           const columns = await Promise.all(row.columns.map(async (nestedColumn) => {
+            const nestedColumnContext = await resolveInheritedContext(nestedColumn.dynamicContext, rowContext, website, resolveContexts);
             const nestedBlocks = await materializeBlocks(
               nestedColumn.blocks,
               section.id,
@@ -379,6 +620,7 @@ async function materializeSection(
               resolveContexts,
               diagnostics,
               materializedGridBlocks,
+              nestedColumnContext,
             );
             if (nestedBlocks === nestedColumn.blocks) return nestedColumn;
             rowChanged = true;
@@ -399,7 +641,25 @@ async function materializeSection(
         : {}),
     };
   }));
-  return changed ? { ...section, layoutItems } : section;
+  return changed ? { ...section, layoutItems } as unknown as BuilderSection : section;
+}
+
+async function materializeSection(
+  section: BuilderSection,
+  website: SaaSWebsite | null | undefined,
+  resolveContexts: DynamicContentContextResolver,
+  diagnostics: DynamicContentMaterializationDiagnostic[],
+  materializedGridBlocks: MaterializedGridBlock[],
+): Promise<BuilderSection[]> {
+  const projections = await expandStructuralNode(section, undefined, website, resolveContexts);
+  return Promise.all(projections.map(({ node, context }) => materializeSectionInstance(
+    node,
+    context,
+    website,
+    resolveContexts,
+    diagnostics,
+    materializedGridBlocks,
+  )));
 }
 
 /**
@@ -417,17 +677,18 @@ export async function materializeBuilderDynamicContent(
   const materializedGridBlocks: MaterializedGridBlock[] = [];
   const resolveContexts = options.resolveContexts ?? resolveDynamicContentContexts;
   let changed = false;
-  const sections = await Promise.all(authoredLayout.sections.map(async (section) => {
-    const renderSection = await materializeSection(
+  const sectionGroups = await Promise.all(authoredLayout.sections.map(async (section) => {
+    const renderSections = await materializeSection(
       section,
       options.website,
       resolveContexts,
       diagnostics,
       materializedGridBlocks,
     );
-    if (renderSection !== section) changed = true;
-    return renderSection;
+    if (renderSections.length !== 1 || renderSections[0] !== section) changed = true;
+    return renderSections;
   }));
+  const sections = sectionGroups.flat();
 
   return {
     renderLayout: changed ? { ...authoredLayout, sections } : authoredLayout,

@@ -7,11 +7,12 @@ import {
   InspectorFieldRow,
   InspectorSelect,
   InspectorTextField,
-  InspectorTextarea,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -28,7 +29,7 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
     return (
       <div className="builder-inspector-stack" data-uikit-capability="alert-content">
         <InspectorDivision title="ALERT CONTENT">
-          <InspectorFieldRow label="Title">
+          <InspectorFieldRow label="Title" dynamicBinding={inspectorDynamicBinding(block, update, "title")}>
             <InspectorTextField
               value={rawBlock.title ?? ""}
               onChange={(v) => update({ title: v } as any)}
@@ -36,14 +37,14 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Alert Title"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Content">
+          <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}>
             <RichTextEditor
               value={rawBlock.body ?? rawBlock.content ?? ""}
               onChange={(v) => update({ body: v, content: v } as any)}
               placeholder="Alert message content..."
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Link URL"><InspectorTextField value={rawBlock.alertLinkUrl ?? ""} onChange={(v) => update({ alertLinkUrl: v } as any)} ariaLabel="Alert Link URL" /></InspectorFieldRow>
+          <InspectorFieldRow label="Link URL" dynamicBinding={inspectorDynamicBinding(block, update, "alertLinkUrl")}><InspectorTextField value={rawBlock.alertLinkUrl ?? ""} onChange={(v) => update({ alertLinkUrl: v } as any)} ariaLabel="Alert Link URL" /></InspectorFieldRow>
           <InspectorFieldRow label="Target"><InspectorSelect value={rawBlock.alertLinkTarget ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(v) => update({ alertLinkTarget: v } as any)} ariaLabel="Alert Link Target" /></InspectorFieldRow>
         </InspectorDivision>
       </div>
@@ -52,7 +53,7 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return <ElementAdvancedPanel block={block} update={update} />;
+    return <div className="builder-inspector-stack" data-uikit-capability="alert-advanced"><DynamicContentInspectorGroup item={block} update={update} /><ElementAdvancedPanel block={block} update={update} /></div>;
   }
 
   // SETTINGS TAB (Default)

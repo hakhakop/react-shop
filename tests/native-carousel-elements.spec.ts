@@ -23,7 +23,7 @@ test("Slideshow and Overlay Slider are first-class elements on the shared carous
   expect(mapYoothemeElementType("panel-slider")).toBe("panelSlider");
 });
 
-test("dynamic-only overlay slides are deferred instead of becoming empty static slides", () => {
+test("dynamic-only overlay slides remain authored templates", () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout",
     children: [{
@@ -37,7 +37,10 @@ test("dynamic-only overlay slides are deferred instead of becoming empty static 
             children: [{
               type: "overlay-slider_item",
               props: { title: "", content: "" },
-              source: { query: { name: "posts.customPosts" } },
+              source: {
+                query: { name: "posts.customPosts", arguments: { offset: 0, limit: 3, order: "date", order_direction: "DESC" } },
+                props: { title: { name: "title" }, image: { name: "field.intro_image.url" } },
+              },
             }],
           }],
         }],
@@ -46,12 +49,18 @@ test("dynamic-only overlay slides are deferred instead of becoming empty static 
   });
 
   const blocks = mapped.sections.flatMap((section) =>
+    section.rows?.flatMap((row) => row.columns.flatMap((column) => column.elements)) ??
     section.layoutItems?.flatMap((item) => item.blocks ?? []) ?? [],
   );
-  expect(blocks).not.toEqual(expect.arrayContaining([
-    expect.objectContaining({ kind: "overlaySlider" }),
+  expect(blocks).toEqual(expect.arrayContaining([
+    expect.objectContaining({
+      kind: "overlaySlider",
+      slides: [expect.objectContaining({
+        dynamicContext: expect.objectContaining({ provider: "wordpress", source: "post", mode: "collection" }),
+        dynamicBindings: expect.objectContaining({ title: { path: "title", valueType: "string" } }),
+      })],
+    }),
   ]));
-  expect(mapped.warnings.join("\n")).toContain("DYNAMIC CONTENT UNSUPPORTED FOR NOW");
 });
 
 test("Panel Slider preserves a whole-panel link without inventing an action label", () => {

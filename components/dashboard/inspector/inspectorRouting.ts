@@ -86,6 +86,8 @@ export type InspectorElementCapabilityDeclaration = {
   settingsSources?: readonly Extract<InspectorTab, "layout" | "style" | "behavior">[];
   settingsLabel?: "Settings" | "Styling";
   available?: (sectionId?: string) => boolean;
+  /** Canonical destination fields that may receive provider-independent bindings. */
+  dynamicFields?: Readonly<Record<string, { label: string; destination: string }>>;
 };
 
 const normalImageAvailability = (sectionId?: string) => sectionId !== "header-document";
@@ -103,6 +105,10 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: ButtonCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: {
+      label: { label: "Action label", destination: "buttonLabel" },
+      url: { label: "Action URL", destination: "buttonUrl" },
+    },
   },
   panel: {
     capabilities: ["content", "style", "advanced"],
@@ -113,6 +119,15 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: PanelCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: {
+      image: { label: "Image source", destination: "imageUrl" },
+      imageAlt: { label: "Alt text", destination: "imageAlt" },
+      meta: { label: "Meta", destination: "eyebrow" },
+      title: { label: "Title", destination: "title" },
+      content: { label: "Content", destination: "body" },
+      actionLabel: { label: "Text", destination: "buttonLabel" },
+      actionUrl: { label: "URL", destination: "buttonUrl" },
+    },
   },
   heading: {
     capabilities: ["content", "style", "advanced"],
@@ -120,6 +135,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: HeadingCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: { content: { label: "Content", destination: "headingText" } },
   },
   text: {
     capabilities: ["content", "style", "advanced"],
@@ -127,6 +143,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: TextCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: { content: { label: "Content", destination: "body" } },
   },
   list: {
     capabilities: ["content", "style", "advanced"],
@@ -134,6 +151,10 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: ListCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: {
+      text: { label: "Content", destination: "text" },
+      url: { label: "Link URL", destination: "url" },
+    },
   },
   accordion: {
     capabilities: ["content", "style", "advanced"],
@@ -149,6 +170,10 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     panel: ImageCapabilityPanel,
     settingsLabel: "Settings",
     available: normalImageAvailability,
+    dynamicFields: {
+      source: { label: "Image source", destination: "imageUrl" },
+      alt: { label: "Alt text", destination: "imageAlt" },
+    },
   },
   hero: {
     capabilities: ["content", "style", "advanced"],
@@ -254,6 +279,11 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: AlertCapabilityPanel,
     settingsLabel: "Settings",
+    dynamicFields: {
+      title: { label: "Title", destination: "title" },
+      content: { label: "Content", destination: "body" },
+      link: { label: "Link URL", destination: "alertLinkUrl" },
+    },
   },
   breadcrumbs: {
     capabilities: ["content", "style", "advanced"],

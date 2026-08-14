@@ -4,7 +4,7 @@ import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/com
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import { InspectorFieldRow, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorTextField, InspectorTextarea, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import {
   ImageSettingsGroup,
   CardSettingsGroup,
@@ -13,6 +13,7 @@ import {
   MetaSettingsGroup,
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -51,7 +52,7 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
         <section className="builder-inspector-section">
           <h3>Content</h3>
           <p className="builder-inspector-help">Content belongs to this Panel instance. Visual surface styling comes from Global Card styles.</p>
-          <InspectorFieldRow label="Image source">
+          <InspectorFieldRow label="Image source" dynamicBinding={inspectorDynamicBinding(block, update, "imageUrl")}>
             <BuilderImageUrlControl
               value={block.imageUrl ?? ""}
               onChange={(event) => updateSemantic({ imageUrl: event.target.value })}
@@ -65,10 +66,10 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
               })}
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Alt text"><InspectorTextField value={block.imageAlt ?? ""} onChange={(value) => updateSemantic({ imageAlt: value })} ariaLabel="Panel image alt text" /></InspectorFieldRow>
-          <InspectorFieldRow label="Eyebrow"><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => updateSemantic({ eyebrow: value })} ariaLabel="Panel eyebrow" /></InspectorFieldRow>
-          <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
-          <InspectorFieldRow label="Body"><InspectorTextarea value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} ariaLabel="Panel body" /></InspectorFieldRow>
+          <InspectorFieldRow label="Alt text" dynamicBinding={inspectorDynamicBinding(block, update, "imageAlt")}><InspectorTextField value={block.imageAlt ?? ""} onChange={(value) => updateSemantic({ imageAlt: value })} ariaLabel="Panel image alt text" /></InspectorFieldRow>
+          <InspectorFieldRow label="Meta" dynamicBinding={inspectorDynamicBinding(block, update, "eyebrow")}><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => updateSemantic({ eyebrow: value })} ariaLabel="Panel meta" /></InspectorFieldRow>
+          <InspectorFieldRow label="Title" dynamicBinding={inspectorDynamicBinding(block, update, "title")}><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
+          <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}><InspectorTextarea value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} ariaLabel="Panel content" /></InspectorFieldRow>
         </section>
       </div>
     );
@@ -159,12 +160,15 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             width: "fullWidthButton",
             margin: "linkMarginTop",
           }}
+          dynamicContext={block.dynamicContext}
+          dynamicBindings={block.dynamicBindings}
+          onDynamicBindingChange={inspectorDynamicBinding(block, update, "buttonLabel").onChange}
         />
       </div>
     );
   }
 
-  if (tab === "advanced") return null;
+  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="panel-advanced"><DynamicContentInspectorGroup item={block} update={update} /></div>;
 
   return null;
 }

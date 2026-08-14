@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { Plus, ImagePlus } from "lucide-react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import type { DynamicFieldBinding } from "@/lib/dynamicContent";
+import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { sanitizeHtml } from "@/lib/safeHtml";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
@@ -21,7 +22,6 @@ import {
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
-import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 import {
   InspectorDivision,
   InspectorFieldRow,
@@ -394,18 +394,12 @@ export default function SliderCapabilityPanel({
                   dynamicBindings: Object.keys(nextBindings).length > 0 ? nextBindings : undefined,
                 });
               };
-              const bindingControl = (
-                destination: string,
-                label: string,
-              ) => (
-                <DynamicFieldBindingControl
-                  destination={destination as "title" | "meta" | "text" | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl"}
-                  label={label}
-                  descriptor={slide.dynamicContext}
-                  binding={slide.dynamicBindings?.[destination]}
-                  onChange={(binding) => updateDynamicBinding(destination, binding)}
-                />
-              );
+              const dynamicBinding = (destination: DynamicBindingDestination) => ({
+                destination,
+                descriptor: slide.dynamicContext,
+                bindings: slide.dynamicBindings,
+                onChange: updateDynamicBinding,
+              });
 
               const itemKey = String(slide.id ?? index);
               const activeTab = activeItemTabs[itemKey] ?? "content";
@@ -417,7 +411,7 @@ export default function SliderCapabilityPanel({
 
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {!isOverlaySlider && <InspectorPillGroup
+                  <InspectorPillGroup
                     value={activeTab}
                     options={[
                       { value: "content", label: "Content" },
@@ -426,12 +420,12 @@ export default function SliderCapabilityPanel({
                     ]}
                     onChange={updateItemTab}
                     ariaLabel={`${itemLabel} ${index + 1} tab`}
-                  />}
+                  />
 
                   {activeTab === "content" ? (
                     <>
                       {isSlideshow && <>
-                        <InspectorFieldRow label="Image">
+                        <InspectorFieldRow label="Image" dynamicBinding={dynamicBinding("imageUrl")}>
                           <BuilderImageUrlControl
                             value={slide.imageUrl ?? ""}
                             onChange={(event) => updateSlide({ imageUrl: event.target.value })}
@@ -441,11 +435,11 @@ export default function SliderCapabilityPanel({
                             })}
                           />
                         </InspectorFieldRow>
-                        <InspectorFieldRow label="Image Alt">
+                        <InspectorFieldRow label="Image Alt" dynamicBinding={dynamicBinding("imageAlt")}>
                           <InspectorTextField value={slide.imageAlt ?? ""} onChange={(value: string) => updateSlide({ imageAlt: value })} />
                         </InspectorFieldRow>
                       </>}
-                      <InspectorFieldRow label="Title" labelAccessory={isPanelSlider ? bindingControl("title", "Title") : undefined}>
+                      <InspectorFieldRow label="Title" dynamicBinding={dynamicBinding("title")}>
                         <>
                           <InspectorTextarea
                             value={slide.title ?? ""}
@@ -456,7 +450,7 @@ export default function SliderCapabilityPanel({
                         </>
                       </InspectorFieldRow>
 
-                      <InspectorFieldRow label="Meta" labelAccessory={isPanelSlider ? bindingControl("meta", "Meta") : undefined}>
+                      <InspectorFieldRow label="Meta" dynamicBinding={dynamicBinding("meta")}>
                         <>
                           <InspectorTextField
                             value={slide.meta ?? slide.subtitle ?? ""}
@@ -467,7 +461,7 @@ export default function SliderCapabilityPanel({
                         </>
                       </InspectorFieldRow>
 
-                      <InspectorFieldRow label="Content" labelAccessory={isPanelSlider ? bindingControl("text", "Content") : undefined}>
+                      <InspectorFieldRow label="Content" dynamicBinding={dynamicBinding("text")}>
                         <>
                           <RichTextEditor
                             value={slide.text ?? ""}
@@ -478,7 +472,7 @@ export default function SliderCapabilityPanel({
                         </>
                       </InspectorFieldRow>
 
-                      {!isSlideshow && <InspectorFieldRow label="Image" labelAccessory={isPanelSlider ? bindingControl("imageUrl", "Image") : undefined}>
+                      {!isSlideshow && <InspectorFieldRow label="Image" dynamicBinding={dynamicBinding("imageUrl")}>
                         <>
                           <BuilderImageUrlControl
                             value={slide.imageUrl ?? ""}
@@ -498,7 +492,7 @@ export default function SliderCapabilityPanel({
                         </>
                       </InspectorFieldRow>}
 
-                      {isPanelSlider && <InspectorFieldRow label="Image Alt" labelAccessory={bindingControl("imageAlt", "Image Alt")}>
+                      {!isSlideshow && <InspectorFieldRow label="Image Alt" dynamicBinding={dynamicBinding("imageAlt")}>
                         <>
                           <InspectorTextField
                             value={slide.imageAlt ?? ""}
@@ -538,7 +532,7 @@ export default function SliderCapabilityPanel({
                           onDynamicBindingChange={isPanelSlider ? updateDynamicBinding : undefined}
                         />
                       </> : <>
-                        <InspectorFieldRow label="Link">
+                        <InspectorFieldRow label="Link" dynamicBinding={dynamicBinding("buttonUrl")}>
                           <InspectorTextField
                             value={slide.buttonUrl ?? ""}
                             onChange={(value: string) => updateSlide({ buttonUrl: value })}
@@ -588,6 +582,27 @@ export default function SliderCapabilityPanel({
                           <InspectorSelect value={slide.thumbnailPosition ?? "center"} onChange={(value: string) => updateSlide({ thumbnailPosition: value })} options={focalPointOptions} />
                         </InspectorFieldRow>
                       </InspectorDivision>}
+                    </>
+                  ) : isOverlaySlider ? (
+                    <>
+                      <InspectorDivision title="ITEM">
+                        <InspectorFieldRow label="Text Color">
+                          <InspectorSelect value={slide.textColor ?? "none"} onChange={(value: string) => updateSlide({ textColor: value === "none" ? undefined : value })} options={[{ value: "none", label: "None" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} />
+                        </InspectorFieldRow>
+                        <InspectorFieldRow label="HTML Element">
+                          <InspectorSelect value={slide.itemElement ?? "div"} onChange={(value: string) => updateSlide({ itemElement: value })} options={[{ value: "div", label: "div" }, { value: "article", label: "article" }, { value: "section", label: "section" }, { value: "li", label: "li" }]} />
+                        </InspectorFieldRow>
+                      </InspectorDivision>
+                      <ImageSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        showDimensions={false}
+                        showFrameControls={false}
+                        showAlignment={false}
+                        showFocalPoint
+                        showShadow={false}
+                        showDecoration={false}
+                      />
                     </>
                   ) : !isPanelSlider ? (
                     <>
@@ -940,6 +955,18 @@ export default function SliderCapabilityPanel({
             <InspectorFieldRow label="Style"><InspectorSelect value={carouselSettings.overlayStyle ?? "none"} onChange={(value: string) => updateCarousel({ overlayStyle: value })} options={[{ value: "none", label: "None" }, { value: "default", label: "Overlay Default" }, { value: "primary", label: "Overlay Primary" }, { value: "tile-default", label: "Tile Default" }, { value: "tile-muted", label: "Tile Muted" }, { value: "tile-primary", label: "Tile Primary" }, { value: "tile-secondary", label: "Tile Secondary" }]} /></InspectorFieldRow>
           </InspectorDivision>
 
+          <ImageSettingsGroup
+            block={sharedSettingsBlock}
+            update={updateCarousel}
+            showDimensions
+            showFrameControls={false}
+            showAlignment={false}
+            showFocalPoint={false}
+            showShadow={false}
+            showDecoration={false}
+            showTransition
+            showBorder={false}
+          />
           <TitleSettingsGroup block={sharedSettingsBlock} update={updateCarousel} showFontRole={false} defaultSize="inherit" defaultLevel="h3" />
           <MetaSettingsGroup block={sharedSettingsBlock} update={updateCarousel} showAlignment={false} showStyle showPosition showHtmlElement keys={{ role: "metaTypographyRole", align: "metaAlign", level: "metaHtmlElement", style: "metaStyle", color: "metaColor", position: "metaPosition" }} />
           <ContentSettingsGroup block={sharedSettingsBlock} update={updateCarousel} showStyle />

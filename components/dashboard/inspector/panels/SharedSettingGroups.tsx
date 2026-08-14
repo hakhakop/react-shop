@@ -448,6 +448,8 @@ export function ImageSettingsGroup({
   showFrameControls = true,
   showAlignment = true,
   showFocalPoint = true,
+  showTransition = false,
+  showBorder = true,
   showShadow = true,
   showDecoration = true,
   showSvgControls = false,
@@ -483,6 +485,10 @@ export function ImageSettingsGroup({
   showAlignment?: boolean;
   /** Focal positioning only belongs where the composed media runtime consumes it. */
   showFocalPoint?: boolean;
+  /** Image hover transition used by YOOtheme slider/media compositions. */
+  showTransition?: boolean;
+  /** Border is not part of every YOOtheme media composition (for example sliders). */
+  showBorder?: boolean;
   /** Keep shared shadow semantics available without forcing them into every composition. */
   showShadow?: boolean;
   /** Keep shared decoration semantics available without forcing them into every composition. */
@@ -520,6 +526,11 @@ export function ImageSettingsGroup({
   const svgInlineKey = keys.svgInline ?? "imageSvgInline";
   const svgColorKey = keys.svgColor ?? "imageSvgColor";
   const decorationVal = values[decorationKey] ?? "none";
+  const normalizeDimensionInput = (value: string) => {
+    const normalized = value.trim();
+    if (!normalized || normalized === "auto") return normalized;
+    return /^\d+(?:\.\d+)?$/.test(normalized) ? `${normalized}px` : normalized;
+  };
 
   return (
     <InspectorDivision title="IMAGE">
@@ -533,7 +544,7 @@ export function ImageSettingsGroup({
           <InspectorTextField
             value={String(values[keys.width] ?? "")}
             placeholder="auto"
-            onChange={(val) => update({ [keys.width]: val || undefined })}
+            onChange={(val) => update({ [keys.width]: normalizeDimensionInput(val) || undefined })}
           />
         </InspectorFieldRow>
         <InspectorFieldRow
@@ -545,7 +556,7 @@ export function ImageSettingsGroup({
           <InspectorTextField
             value={String(values[keys.height] ?? "")}
             placeholder="auto"
-            onChange={(val) => update({ [keys.height]: val || undefined })}
+            onChange={(val) => update({ [keys.height]: normalizeDimensionInput(val) || undefined })}
           />
         </InspectorFieldRow>
       </div>}
@@ -628,6 +639,23 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>
 
+      {showTransition && <InspectorFieldRow
+        label="Transition"
+        isOverridden={values.imageHoverTransition !== undefined}
+        inheritedValueText="None"
+        onReset={() => update({ imageHoverTransition: undefined })}
+      >
+        <InspectorSelect
+          value={String(values.imageHoverTransition ?? "none")}
+          options={[
+            { value: "none", label: "None" },
+            { value: "scale-up", label: "Scale Up" },
+            { value: "scale-down", label: "Scale Down" },
+          ]}
+          onChange={(value) => update({ imageHoverTransition: value === "none" ? undefined : value })}
+        />
+      </InspectorFieldRow>}
+
       {showLinkImage && (
         <InspectorFieldRow
           label="Link"
@@ -643,7 +671,7 @@ export function ImageSettingsGroup({
         </InspectorFieldRow>
       )}
 
-      <InspectorFieldRow
+      {showBorder && <InspectorFieldRow
         label="Border"
         isOverridden={values[keys.shape] !== undefined || values.imageBorder !== undefined}
         inheritedValueText="None"
@@ -659,7 +687,7 @@ export function ImageSettingsGroup({
           ]}
           onChange={(value) => update({ [keys.shape]: value, imageBorder: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
       {showShadow && <InspectorFieldRow
         label="Box Shadow"

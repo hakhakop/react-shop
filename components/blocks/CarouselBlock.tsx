@@ -99,6 +99,7 @@ export type CarouselSlide = {
   navigationLabel?: string | null;
   buttonAriaLabel?: string | null;
   imageLoading?: "lazy" | "eager" | string | null;
+  imageHoverTransition?: "none" | "scale-up" | "scale-down" | string | null;
   imageWidth?: string | null;
   imageHeight?: string | number | null;
   imageBorder?: string | null;
@@ -225,6 +226,7 @@ export type CarouselSettings = {
   imageShape?: string | null;
   imageShadow?: string | null;
   imageLoading?: string | null;
+  imageHoverTransition?: "none" | "scale-up" | "scale-down" | string | null;
   imageAlignment?: string | null;
   imageBoxDecoration?: string | null;
   alignImageWithoutPadding?: boolean | null;
@@ -263,9 +265,17 @@ function toCssObjectPosition(value?: string | null): string | undefined {
     : undefined;
 }
 
+function resolveOverlayImageTransition(value?: string | null): string {
+  if (value === "scale-up") return "group-hover:scale-105";
+  if (value === "scale-down") return "group-hover:scale-95";
+  return "";
+}
+
 /** Accept YOOtheme's authoring form (for example `1600:900`) without
  * allowing arbitrary persisted CSS into the carousel frame. */
 function toCssAspectRatio(value?: string | null): string | undefined {
+  if (value === "square" || value === "1:1") return "1 / 1";
+  if (value === "portrait") return "3 / 4";
   const match = value?.trim().match(/^(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)$/);
   if (!match || Number(match[1]) <= 0 || Number(match[2]) <= 0) return undefined;
   return `${match[1]} / ${match[2]}`;
@@ -1174,16 +1184,27 @@ export default function CarouselBlock({
 
             return (
               <SwiperSlide key={slide.id || idx}>
-                <article className={`shop-builder-overlay-slide-card group relative w-full ${settings?.aspectRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden rounded-2xl`}>
+                <article
+                  className={`shop-builder-overlay-slide-card group relative w-full ${settings?.aspectRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden rounded-2xl`}
+                  style={(() => {
+                    const ratio = toCssAspectRatio(settings?.aspectRatio) ?? toCssAspectRatio(slide.imageRatio);
+                    return ratio ? { aspectRatio: ratio } : undefined;
+                  })()}
+                >
                   {hasRealImage ? (
                     <>
-                      <Image
+                      <img
                         src={slide.imageUrl!}
                         alt={slide.imageAlt ?? slide.title ?? ""}
-                        fill
-                        className={`object-cover transition-transform duration-700 group-hover:scale-105 ${isKenBurns ? "is-ken-burns" : ""}`}
+                        className={`block w-full ${slide.imageHeight || settings?.aspectRatio || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
+                        style={{
+                          width: toCssDimension(slide.imageWidth) ?? "100%",
+                          maxWidth: "100%",
+                          objectPosition: toCssObjectPosition(slide.imagePosition),
+                          ...(slide.imageHeight && !settings?.aspectRatio ? { height: toCssDimension(slide.imageHeight), objectFit: "cover" as const } : {}),
+                        }}
                         sizes="(min-width: 1180px) 50vw, 100vw"
-                        priority={idx === 0}
+                        loading={resolveImageLoading(slide.imageLoading ?? settings?.imageLoading, idx === 0 ? "eager" : "lazy")}
                       />
                       {onUploadSlideImage && (
                         <button

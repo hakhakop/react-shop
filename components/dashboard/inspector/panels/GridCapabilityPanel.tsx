@@ -34,7 +34,6 @@ import {
 import { sanitizeHtml } from "@/lib/safeHtml";
 import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
-import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -248,18 +247,13 @@ export default function GridCapabilityPanel({
                   }),
                 );
               };
-              const bindingControl = (
-                destination: Extract<keyof NonNullable<GridItem["dynamicBindings"]>, DynamicBindingDestination>,
-                label: string,
-              ) => (
-                <DynamicFieldBindingControl
-                  destination={destination}
-                  label={label}
-                  descriptor={item.dynamicContext}
-                  binding={item.dynamicBindings?.[destination]}
-                  onChange={(binding) => updateDynamicBinding(destination, binding)}
-                />
-              );
+              const dynamicBinding = (destination: DynamicBindingDestination) => ({
+                destination,
+                descriptor: item.dynamicContext,
+                bindings: item.dynamicBindings,
+                onChange: (field: string, binding: DynamicFieldBinding | undefined) =>
+                  updateDynamicBinding(field as keyof NonNullable<GridItem["dynamicBindings"]>, binding),
+              });
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
                   <InspectorPillGroup
@@ -278,7 +272,7 @@ export default function GridCapabilityPanel({
 
                   {activeTab === "content" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
-                      <InspectorFieldRow label="Title" labelAccessory={bindingControl("title", "Title")}>
+                      <InspectorFieldRow label="Title" dynamicBinding={dynamicBinding("title")}>
                         <>
                           <InspectorTextarea
                             value={item.title ?? ""}
@@ -292,7 +286,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Meta" labelAccessory={bindingControl("meta", "Meta")}>
+                      <InspectorFieldRow label="Meta" dynamicBinding={dynamicBinding("meta")}>
                         <>
                           <InspectorTextField
                             value={item.meta ?? ""}
@@ -305,7 +299,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Content" labelAccessory={bindingControl("text", "Content")}>
+                      <InspectorFieldRow label="Content" dynamicBinding={dynamicBinding("text")}>
                         <>
                           <RichTextEditor
                             value={item.text ?? ""}
@@ -319,7 +313,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Image" labelAccessory={bindingControl("imageUrl", "Image")}>
+                      <InspectorFieldRow label="Image" dynamicBinding={dynamicBinding("imageUrl")}>
                         <>
                           <BuilderImageUrlControl
                             value={item.imageUrl ?? ""}
@@ -343,7 +337,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Image Alt" labelAccessory={bindingControl("imageAlt", "Image Alt")}>
+                      <InspectorFieldRow label="Image Alt" dynamicBinding={dynamicBinding("imageAlt")}>
                         <>
                           <InspectorTextField
                             value={item.imageAlt ?? ""}
@@ -356,7 +350,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Link" labelAccessory={bindingControl("buttonUrl", "Link")}>
+                      <InspectorFieldRow label="Link" dynamicBinding={dynamicBinding("buttonUrl")}>
                         <>
                           <InspectorTextField
                             value={item.buttonUrl ?? ""}
@@ -370,7 +364,7 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Link Text" labelAccessory={bindingControl("buttonLabel", "Link Text")}>
+                      <InspectorFieldRow label="Link Text" dynamicBinding={dynamicBinding("buttonLabel")}>
                         <>
                           <InspectorTextField
                             value={item.buttonLabel ?? ""}

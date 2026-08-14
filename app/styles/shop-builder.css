@@ -1314,10 +1314,9 @@ body.dark {
 /* Overlay Slider owns an image/overlay item, not the generic carousel-card
    320px frame. This preserves its compact static-item geometry. */
 .shop-builder-overlay-slide-card--natural {
-  /* Overlay Slider items are compact media items, not generic 320px cards.
-     Their default source presentation is a 3:2 frame until a canonical
-     explicit ratio overrides it. */
-  aspect-ratio: 3 / 2;
+  /* Natural YOOtheme media determines the item height. Do not impose the
+     legacy 3:2 frame: an authored image width/height or the intrinsic image
+     ratio is the canonical sizing source. */
   min-height: 0;
 }
 

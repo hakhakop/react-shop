@@ -76,6 +76,8 @@ export type BuilderListItem = {
   target?: "_self" | "_blank";
   iconName?: string;
   iconSize?: number;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
 export type InspectorTab =
   | "content"
@@ -347,6 +349,7 @@ export type BuilderColumnStickySettings = {
 
 export type BuilderColumn = {
   id: string;
+  dynamicContext?: DynamicContentContextDescriptor;
   responsiveWidths?: BuilderResponsiveColumnWidths;
   order?: BuilderResponsiveColumnOrder;
   verticalAlign?: "top" | "middle" | "bottom";
@@ -387,6 +390,7 @@ export type BuilderRowColumnParallaxSettings = {
 
 export type BuilderRow = {
   id: string;
+  dynamicContext?: DynamicContentContextDescriptor;
   layout: string;
   /** Provenance for source-specific structural spacing semantics. */
   spacingContract?: "yootheme";
@@ -417,6 +421,11 @@ export type BuilderLayoutBlock = {
   customAttributes?: string;
   customCss?: string;
   kind?: LayoutBlockKind;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<
+    | "headingText" | "body" | "eyebrow" | "title"
+    | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
+  >;
   loggedOutLabel?: string;
   loggedInLabel?: string;
   loggedOutUrl?: string;
@@ -446,6 +455,8 @@ export type BuilderLayoutBlock = {
     url?: string;
     target?: "_self" | "_blank";
     style?: BuilderButtonStyle;
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<"label" | "url">;
   }[];
   buttonBg?: string;
   buttonTextColor?: string;
@@ -855,6 +866,7 @@ export type BuilderSection = {
   contentTranslations?: BuilderContentTranslations;
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
+  dynamicContext?: DynamicContentContextDescriptor;
   /** User-facing label in Builder navigation. */
   name?: string;
   /** Optional public HTML anchor; internal Builder identity remains `id`. */
@@ -960,6 +972,7 @@ export type BuilderSection = {
   rows?: BuilderRow[];
   layoutItems?: {
     id?: string;
+    dynamicContext?: DynamicContentContextDescriptor;
     rowId?: string;
     rowLayout?: string;
     eyebrow?: string;
@@ -975,10 +988,12 @@ export type BuilderSection = {
       gap?: SectionSpacing;
       rows: {
         id: string;
+        dynamicContext?: DynamicContentContextDescriptor;
         weight: number;
         layout: "whole";
         columns: {
           id: string;
+          dynamicContext?: DynamicContentContextDescriptor;
           rowId: string;
           rowLayout: "whole";
           blocks: BuilderLayoutBlock[];
@@ -1056,6 +1071,7 @@ export type BuilderSection = {
     imageWidth?: string;
     imageHeight?: string | number;
     imageLoading?: "lazy" | "eager";
+    imageHoverTransition?: "none" | "scale-up" | "scale-down" | string;
     imageSvgInline?: boolean;
     imageSvgColor?: string;
     imageBorder?: string;
@@ -1146,6 +1162,7 @@ export type BuilderSection = {
     imageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
     imagePosition?: BuilderCarouselImagePosition;
     imageLoading?: "lazy" | "eager";
+    imageHoverTransition?: "none" | "scale-up" | "scale-down" | string;
     imageSvgInline?: boolean;
     imageSvgColor?: string;
     headingLevel?: BuilderLayoutBlock["headingLevel"];

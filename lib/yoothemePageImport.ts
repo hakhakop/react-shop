@@ -579,6 +579,13 @@ const sourceImageMaxWidth = (props: Record<string, unknown>): number | undefined
   return undefined;
 };
 
+const sourceCssDimension = (value: unknown): string | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) return `${value}px`;
+  const normalized = asString(value);
+  if (!normalized || normalized === "auto") return normalized ?? undefined;
+  return /^\d+(?:\.\d+)?$/.test(normalized) ? `${normalized}px` : normalized;
+};
+
 const sourceSectionVariant = (
   value: unknown,
 ): BuilderSection["sectionVariant"] =>
@@ -933,6 +940,9 @@ const sourceDynamicFieldPath = (
   if (name === "field.intro_image.url") return { path: "acf.intro_image.url", filters: descriptor.filters };
   if (name === "field.intro_image.alt") return { path: "acf.intro_image.alt", filters: descriptor.filters };
   if (name === "field.intro_image.caption") return { path: "acf.intro_image.caption", filters: descriptor.filters };
+  if (name === "field.teaser_image.url") return { path: "acf.teaser_image.url", filters: descriptor.filters };
+  if (name === "field.teaser_image.alt") return { path: "acf.teaser_image.alt", filters: descriptor.filters };
+  if (name === "field.teaser_image.caption") return { path: "acf.teaser_image.caption", filters: descriptor.filters };
   return { path: name, filters: descriptor.filters };
 };
 
@@ -1204,8 +1214,8 @@ const sourceSliderItem = (
     // Width and Height are Panel Slider element media defaults. Retain these
     // on an item only when the source item explicitly authored its own value;
     // copying a parent value here would mask later element-level edits.
-    ...(asString(itemProps.image_width) ? { imageWidth: asString(itemProps.image_width)! } : {}),
-    ...(asString(itemProps.image_height) ? { imageHeight: asString(itemProps.image_height)! } : {}),
+    ...(sourceCssDimension(itemProps.image_width) ? { imageWidth: sourceCssDimension(itemProps.image_width)! } : {}),
+    ...(sourceCssDimension(itemProps.image_height) ? { imageHeight: sourceCssDimension(itemProps.image_height)! } : {}),
     ...(Object.prototype.hasOwnProperty.call(itemProps, "image_border")
       ? { imageShape: sourceImageBorder(itemProps.image_border) ?? "none" }
       : {}),
@@ -1303,7 +1313,10 @@ const sourceStaticSliderItems = (
   const hasDynamicItemSource = items.some(hasDynamicSourceBinding);
   const hasUnsupportedDynamicSource = dynamicSourceIsUnsupported(node) || items.some(dynamicSourceIsUnsupported);
   const slides = items
-    .filter((child) => !hasDynamicSourceBinding(child) || hasStaticSliderFallback(child))
+    // A supported dynamic item is itself the authored template. It must be
+    // retained even when it has no static props; otherwise Overlay Slider
+    // imports lose the original YOOtheme dynamic source entirely.
+    .filter((child) => !hasDynamicSourceBinding(child) || hasStaticSliderFallback(child) || !dynamicSourceIsUnsupported(child))
     .map((child, index) => {
       const itemPath = `${path}.${index}`;
       if (itemType === "panel-slider_item" && warnings) {
@@ -2276,6 +2289,15 @@ const mapStaticElement = (
           ? asString(props.overlay_style)
           : "none",
         overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
+        // Element-level YOOtheme Image settings are shared by every overlay
+        // item. Keep them on the canonical carousel settings so imported
+        // values and inspector edits follow the same runtime path.
+        imageWidth: sourceCssDimension(props.image_width),
+        imageHeight: sourceCssDimension(props.image_height),
+        imageLoading: props.image_loading === undefined
+          ? undefined
+          : (props.image_loading === true || props.image_loading === "true" ? "eager" : "lazy"),
+        imageHoverTransition: asString(props.image_transition) ?? undefined,
       },
     }, props);
   }

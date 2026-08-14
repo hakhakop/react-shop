@@ -1599,7 +1599,9 @@
                       "overlayDisplay": "hover",
                       "overlayPosition": "bottom-center",
                       "overlayPadding": "large",
-                      "overlayStyle": "none"
+                      "overlayStyle": "none",
+                      "imageWidth": "800",
+                      "imageLoading": "lazy"
                     },
                     "textAlign": "center",
                     "headingAlign": "center",
@@ -2135,7 +2137,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-14T15:27:06.764Z"
+    "updatedAt": "2026-08-14T17:29:52.907Z"
   },
   "shop": {
     "version": 1,
@@ -7658,7 +7660,7 @@
                         "title": "Powerful API",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-powerful-api.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-powerful-api.svg",
                         "imageAlt": "Powerful API",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7670,7 +7672,7 @@
                         "title": "Efficient Workflow",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-efficient-workflow.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-efficient-workflow.svg",
                         "imageAlt": "Efficient Workflow",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7682,7 +7684,7 @@
                         "title": "Project Management",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-project-management.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-project-management.svg",
                         "imageAlt": "Project Management",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7694,7 +7696,7 @@
                         "title": "Collaboration",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-collaboration.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-collaboration.svg",
                         "imageAlt": "Collaboration",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7706,7 +7708,7 @@
                         "title": "Customer Stories",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-client-stories.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-client-stories.svg",
                         "imageAlt": "Customer Stories",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7718,7 +7720,7 @@
                         "title": "Community",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-community.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-community.svg",
                         "imageAlt": "Community",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
@@ -7730,7 +7732,7 @@
                       "presentation": "panel-slider",
                       "variant": "panel",
                       "slideMode": "panel",
-                      "imageWidth": "58",
+                      "imageWidth": "58px",
                       "imageSvgInline": true,
                       "imageSvgColor": "emphasis",
                       "imageLoading": "eager",
@@ -7875,7 +7877,7 @@
                         "id": "yootheme-accordion-item-1-0-0-0-0",
                         "title": "1eeeeee",
                         "content": "<p>2</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
                         "buttonUrl": "#",
                         "buttonLabel": "eeee",
                         "buttonTarget": "_self"
@@ -7884,7 +7886,7 @@
                         "id": "yootheme-accordion-item-1-0-0-0-1",
                         "title": "1eeeeee",
                         "content": "<p>2</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
                         "buttonUrl": "#",
                         "buttonLabel": "eeee",
                         "buttonTarget": "_self"
@@ -7893,7 +7895,7 @@
                         "id": "yootheme-accordion-item-1-0-0-0-2",
                         "title": "1eeeeee",
                         "content": "<p>2</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
                         "buttonUrl": "#",
                         "buttonLabel": "eeee",
                         "buttonTarget": "_self"
@@ -7902,7 +7904,7 @@
                         "id": "yootheme-accordion-item-1-0-0-0-3",
                         "title": "1eeeeee",
                         "content": "<p>2</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack-teaser.jpg",
                         "buttonUrl": "#",
                         "buttonLabel": "eeee",
                         "buttonTarget": "_self"
@@ -8123,7 +8125,7 @@
                         "title": "111111",
                         "meta": "222222",
                         "content": "<p>3333333</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
                         "imageAlt": "111111",
                         "linkUrl": "#",
                         "linkLabel": "Read more",
@@ -8134,7 +8136,7 @@
                         "title": "111111",
                         "meta": "222222",
                         "content": "<p>3333333</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
                         "imageAlt": "111111",
                         "linkUrl": "#",
                         "linkLabel": "Read more",
@@ -8145,7 +8147,7 @@
                         "title": "111111",
                         "meta": "222222",
                         "content": "<p>3333333</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
                         "imageAlt": "111111",
                         "linkUrl": "#",
                         "linkLabel": "Read more",
@@ -8156,7 +8158,7 @@
                         "title": "111111",
                         "meta": "222222",
                         "content": "<p>3333333</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
                         "imageAlt": "111111",
                         "linkUrl": "#",
                         "linkLabel": "Read more",
@@ -8167,7 +8169,7 @@
                         "title": "111111",
                         "meta": "222222",
                         "content": "<p>3333333</p>",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-configurations.svg",
                         "imageAlt": "111111",
                         "linkUrl": "#",
                         "linkLabel": "Read more",
@@ -8279,7 +8281,7 @@
                     "galleryItems": [
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-0",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-6-ways-coronavirus-changed-the-it-industry-forever.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-6-ways-coronavirus-changed-the-it-industry-forever.jpg",
                         "title": "Blog Post 6 Ways Coronavirus Changed The It Industry Forever",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8287,7 +8289,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-1",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-gravy.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-gravy.jpg",
                         "title": "Blog Post Customer Stories Gravy",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8295,7 +8297,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-2",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/our-story-hero.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/our-story-hero.jpg",
                         "title": "Our Story Hero",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8303,7 +8305,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-3",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-sway.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-sway.jpg",
                         "title": "Blog Post Customer Stories Sway",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8311,7 +8313,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-4",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/job-description-contact.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/job-description-contact.jpg",
                         "title": "Job Description Contact",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8319,7 +8321,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-5",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-ambitech-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-ambitech-teaser.jpg",
                         "title": "Blog Post Customer Stories Ambitech Teaser",
                         "meta": "",
                         "content": "",
@@ -8327,7 +8329,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-6",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-monday-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-monday-teaser.jpg",
                         "title": "Blog Post Customer Stories Monday Teaser",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8335,7 +8337,7 @@
                       },
                       {
                         "id": "yootheme-gallery-item-3-0-0-0-7",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-6-routines-every-saas-product-marketer-should-know-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-6-routines-every-saas-product-marketer-should-know-intro.jpg",
                         "title": "Blog Post 6 Routines Every Saas Product Marketer Should Know Intro",
                         "meta": "",
                         "content": "<p>Content comes here</p>",
@@ -8445,9 +8447,9 @@
                         "title": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro",
                         "meta": "Meta 1",
                         "text": "Content 1",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
                         "imageAlt": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro",
-                        "thumbnailUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack.jpg",
+                        "thumbnailUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-fullstack.jpg",
                         "showAction": true,
                         "buttonLabel": "link to live project ",
                         "buttonUrl": "https://react.webpages.am",
@@ -8458,9 +8460,9 @@
                         "title": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
                         "meta": "Meta 2 ",
                         "text": "Content 2 ",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                         "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                        "thumbnailUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-scale-security-and-productivity-with-this-new-feature-intro.jpg",
+                        "thumbnailUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-scale-security-and-productivity-with-this-new-feature-intro.jpg",
                         "showAction": true,
                         "buttonLabel": "Link 2",
                         "buttonUrl": "https://react.webpages.am",
@@ -8471,7 +8473,7 @@
                         "title": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-5-incredible-video-conference-products-you-ll-wish-you-discovered-sooner-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-5-incredible-video-conference-products-you-ll-wish-you-discovered-sooner-intro.jpg",
                         "imageAlt": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8481,7 +8483,7 @@
                         "title": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-build-a-high-efficiency-sales-team-from-the-ground-up-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-build-a-high-efficiency-sales-team-from-the-ground-up-intro.jpg",
                         "imageAlt": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8547,7 +8549,7 @@
                         "title": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                         "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8557,7 +8559,7 @@
                         "title": "Author Image",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/author-image.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/author-image.jpg",
                         "imageAlt": "Author Image",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8567,7 +8569,7 @@
                         "title": "Blog Post Customer Stories Icon Intro",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-intro.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-intro.jpg",
                         "imageAlt": "Blog Post Customer Stories Icon Intro",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8577,7 +8579,7 @@
                         "title": "Blog Post Customer Stories Icon Teaser",
                         "meta": "",
                         "text": "",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-teaser.jpg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-teaser.jpg",
                         "imageAlt": "Blog Post Customer Stories Icon Teaser",
                         "thumbnailUrl": "",
                         "showAction": false
@@ -8847,6 +8849,9 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridRowGap": "large",
@@ -8908,10 +8913,10 @@
                   {
                     "id": "yootheme-image-5-1-1-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-api.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-api.svg",
                     "imageAlt": "",
                     "imageMaxWidth": 370,
-                    "imageWidth": "370",
+                    "imageWidth": "370px",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
@@ -8990,6 +8995,9 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridRowGap": "large",
@@ -9206,7 +9214,7 @@
                   {
                     "id": "yootheme-image-6-0-1-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow.svg",
                     "imageAlt": "",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
@@ -9228,7 +9236,7 @@
                   {
                     "id": "yootheme-image-6-0-1-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow-floating-icon.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-efficient-workflow-floating-icon.svg",
                     "imageAlt": "",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
@@ -9384,6 +9392,9 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridGap": "large",
@@ -9430,10 +9441,10 @@
                   {
                     "id": "yootheme-image-6-1-0-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                     "imageAlt": "",
                     "imageMaxWidth": 1000,
-                    "imageWidth": "1000",
+                    "imageWidth": "1000px",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
                     "imageShape": "none",
@@ -9474,7 +9485,7 @@
         "visualStyle": {
           "background": {
             "type": "image",
-            "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-bg.svg",
+            "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-bg.svg",
             "imagePosition": "center-center"
           }
         },
@@ -9583,7 +9594,7 @@
                   {
                     "id": "yootheme-image-7-1-0-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-02.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-02.svg",
                     "imageAlt": "",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
@@ -9610,7 +9621,7 @@
                   {
                     "id": "yootheme-image-7-1-0-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-01.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-project-management-01.svg",
                     "imageAlt": "",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
@@ -9675,7 +9686,7 @@
                     "gridItems": [
                       {
                         "id": "yootheme-grid-item-7-2-0-0-0",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-coordinate-progress.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/squared-icon-coordinate-progress.svg",
                         "imageAlt": "Coordinate Progress",
                         "title": "Coordinate Progress",
                         "meta": "",
@@ -9689,7 +9700,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-7-2-0-0-1",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-monitor-activity.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/squared-icon-monitor-activity.svg",
                         "imageAlt": "Monitor Activity",
                         "title": "Monitor Activity",
                         "meta": "",
@@ -9703,7 +9714,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-7-2-0-0-2",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/squared-icon-report-changes.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/squared-icon-report-changes.svg",
                         "imageAlt": "Report Changes in Real Time",
                         "title": "Report Changes in Real Time",
                         "meta": "",
@@ -9726,6 +9737,9 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridGap": "large",
@@ -9941,10 +9955,10 @@
                   {
                     "id": "yootheme-image-8-1-0-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration.svg",
                     "imageAlt": "",
                     "imageMaxWidth": 380,
-                    "imageWidth": "380",
+                    "imageWidth": "380px",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
@@ -9965,7 +9979,7 @@
                   {
                     "id": "yootheme-image-8-1-0-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration-floating-icon.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-collaboration-floating-icon.svg",
                     "imageAlt": "",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
@@ -10009,7 +10023,7 @@
                     "imageUrl": "",
                     "imageAlt": "Team Collaboration",
                     "imageMaxWidth": 450,
-                    "imageWidth": "450",
+                    "imageWidth": "450px",
                     "imageSvgColor": "emphasis",
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=20",
@@ -10064,10 +10078,10 @@
                   {
                     "id": "yootheme-image-8-1-1-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud.svg",
                     "imageAlt": "",
                     "imageMaxWidth": 380,
-                    "imageWidth": "380",
+                    "imageWidth": "380px",
                     "imageSvgInline": true,
                     "imageRatio": "natural",
                     "imageShape": "none",
@@ -10087,7 +10101,7 @@
                   {
                     "id": "yootheme-image-8-1-1-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud-floating-icon.svg",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/enterprise-feature-enterprise-cloud-floating-icon.svg",
                     "imageAlt": "",
                     "imageSvgInline": true,
                     "imageSvgColor": "emphasis",
@@ -10131,7 +10145,7 @@
                     "imageUrl": "",
                     "imageAlt": "Enterprise Cloud",
                     "imageMaxWidth": 450,
-                    "imageWidth": "450",
+                    "imageWidth": "450px",
                     "imageSvgColor": "emphasis",
                     "buttonLabel": "Learn More",
                     "buttonUrl": "?page_id=20",
@@ -10294,7 +10308,113 @@
                 "sticky": {
                   "breakpoint": "m"
                 },
-                "elements": []
+                "elements": [
+                  {
+                    "id": "yootheme-overlay-slider-9-1-0-0",
+                    "kind": "overlaySlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-9-1-0-0-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "textColor": "light",
+                        "itemElement": "article",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "post",
+                          "mode": "collection",
+                          "query": {
+                            "start": 1,
+                            "quantity": 6,
+                            "order": "menuOrder",
+                            "direction": "desc",
+                            "filters": {
+                              "rawTermIds": [
+                                4
+                              ],
+                              "termMatch": "any"
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.teaser_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.teaser_image.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "overlay-slider",
+                      "variant": "overlay",
+                      "slideMode": "overlay",
+                      "showTitle": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "itemWidthMode": "auto",
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": true,
+                      "loop": true,
+                      "spaceBetween": 15,
+                      "divider": false,
+                      "cardsPerViewPhone": 1,
+                      "cardsPerViewMedium": 1.25,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "navigationBelow": true,
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "paginationPosition": "bottom-center",
+                      "slidenavBreakpoint": "small",
+                      "headingLevel": "h3",
+                      "metaPosition": "above-title",
+                      "metaHtmlElement": "div",
+                      "buttonLabel": "Read Story",
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "linkMarginTop": "xlarge",
+                      "effect": "slide",
+                      "overlayMode": "cover",
+                      "overlayDisplay": "hover",
+                      "overlayPosition": "bottom-center",
+                      "overlayPadding": "large",
+                      "overlayStyle": "none",
+                      "imageWidth": "800px"
+                    },
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "removeBottomMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large",
+                        "removeBottomMargin": true,
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -10401,7 +10521,7 @@
                     "gridItems": [
                       {
                         "id": "yootheme-grid-item-10-0-0-2-0",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-meetups-events.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-meetups-events.svg",
                         "imageAlt": "Meetups &<br class=\"uk-visible@m\"> Events",
                         "title": "Meetups &amp;<br class=\"uk-visible@m\"> Events",
                         "meta": "",
@@ -10414,7 +10534,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-10-0-0-2-1",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-workshops-trainings.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-workshops-trainings.svg",
                         "imageAlt": "Workshops & Trainings",
                         "title": "Workshops &amp; Trainings",
                         "meta": "",
@@ -10427,7 +10547,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-10-0-0-2-2",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-community-chat.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-community-chat.svg",
                         "imageAlt": "Community<br class=\"uk-visible@m\"> Chat",
                         "title": "Community<br class=\"uk-visible@m\"> Chat",
                         "meta": "",
@@ -10440,7 +10560,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-10-0-0-2-3",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-help-guides.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-help-guides.svg",
                         "imageAlt": "Help Guides",
                         "title": "Help Guides",
                         "meta": "",
@@ -10453,7 +10573,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-10-0-0-2-4",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-24-7-support.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-24-7-support.svg",
                         "imageAlt": "24/7 Support",
                         "title": "24/7 Support",
                         "meta": "",
@@ -10475,6 +10595,9 @@
                     "gridCardVariant": "default",
                     "gridCardSize": "large",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": true,
+                    "panelHover": true,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "showDividers": false,
@@ -10484,7 +10607,7 @@
                     "columnsPhoneLandscape": "2",
                     "columnsTabletLandscape": "3",
                     "gridMediaWidth": "medium",
-                    "imageWidth": "80",
+                    "imageWidth": "80px",
                     "imageSvgInline": true,
                     "imageSvgColor": "primary",
                     "imageMaxWidth": 80,
@@ -10542,10 +10665,10 @@
                   {
                     "id": "yootheme-image-10-1-0-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
                     "imageAlt": "",
                     "imageMaxWidth": 500,
-                    "imageWidth": "500",
+                    "imageWidth": "500px",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
                     "imageShape": "none",
@@ -10713,7 +10836,7 @@
                     "gridItems": [
                       {
                         "id": "yootheme-grid-item-11-0-1-0-0",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                         "imageAlt": "Around the Clock Support",
                         "title": "Around the Clock Support",
                         "meta": "",
@@ -10727,7 +10850,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-11-0-1-0-1",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                         "imageAlt": "Project Dashboard",
                         "title": "Project Dashboard",
                         "meta": "",
@@ -10741,7 +10864,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-11-0-1-0-2",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                         "imageAlt": "Dedicated Account Manager",
                         "title": "Dedicated Account Manager",
                         "meta": "",
@@ -10755,7 +10878,7 @@
                       },
                       {
                         "id": "yootheme-grid-item-11-0-1-0-3",
-                        "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
+                        "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-check.svg",
                         "imageAlt": "Short Implementation Time",
                         "title": "Short Implementation Time",
                         "meta": "",
@@ -10778,6 +10901,9 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridGap": "large",
@@ -10849,10 +10975,10 @@
                   {
                     "id": "yootheme-image-11-1-0-0",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                     "imageAlt": "",
                     "imageMaxWidth": 900,
-                    "imageWidth": "900",
+                    "imageWidth": "900px",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
                     "imageShape": "none",
@@ -10874,10 +11000,10 @@
                   {
                     "id": "yootheme-image-11-1-0-1",
                     "kind": "image",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                     "imageAlt": "",
                     "imageMaxWidth": 450,
-                    "imageWidth": "450",
+                    "imageWidth": "450px",
                     "imageSvgColor": "emphasis",
                     "imageRatio": "natural",
                     "imageShape": "none",
@@ -11033,7 +11159,7 @@
                         "imageAlt": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                         "title": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                         "meta": "Free",
-                        "text": "<ul class=\"uk-list uk-list-large uk-text-left\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Unlimited Public Repositories</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Code and Productivity Analysis</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Time Tracking</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Access to Documentation</div>\n        </div>\n    </li>\n</ul>",
+                        "text": "<ul class=\"uk-list uk-list-large uk-text-left\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Unlimited Public Repositories</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Code and Productivity Analysis</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Time Tracking</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Access to Documentation</div>\n        </div>\n    </li>\n</ul>",
                         "buttonLabel": "Try for Free",
                         "buttonUrl": "?page_id=21",
                         "buttonTarget": "_self",
@@ -11050,7 +11176,7 @@
                         "imageAlt": "<p class=\"uk-margin-remove\">$120</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                         "title": "<p class=\"uk-margin-remove\">$120</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                         "meta": "Professional",
-                        "text": "<ul class=\"uk-list uk-list-large uk-text-emphasis uk-text-left\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Unlimited Private Repositories</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Vulnerability Management</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Compliance Automation</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">24/7 Community Support</div>\n        </div>\n    </li>\n</ul>",
+                        "text": "<ul class=\"uk-list uk-list-large uk-text-emphasis uk-text-left\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Unlimited Private Repositories</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Vulnerability Management</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Compliance Automation</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://store.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-emphasis\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">24/7 Community Support</div>\n        </div>\n    </li>\n</ul>",
                         "buttonLabel": "Get Started",
                         "buttonUrl": "?page_id=21",
                         "buttonTarget": "_self",
@@ -11072,6 +11198,9 @@
                     "gridCardVariant": "default",
                     "gridCardSize": "large",
                     "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
                     "panelExpand": "content",
                     "gridMediaPlacement": "top",
                     "showDividers": false,
@@ -11166,7 +11295,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-14T04:18:41.835Z"
+    "updatedAt": "2026-08-14T18:00:57.556Z"
   },
   "page:clean": {
     "version": 1,

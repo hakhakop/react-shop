@@ -2,6 +2,9 @@
 
 import type { ChangeEvent, ReactNode } from "react";
 import { RotateCcw, AlignLeft, AlignCenter, AlignRight, AlignJustify, PanelTop, PanelLeft, PanelRight } from "lucide-react";
+import type { DynamicContentContextDescriptor, DynamicFieldBinding, DynamicFieldBindings } from "@/lib/dynamicContent";
+import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
+import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 
 export type InspectorOption<T extends string = string> = {
   value: T;
@@ -9,6 +12,33 @@ export type InspectorOption<T extends string = string> = {
   icon?: ReactNode;
   disabled?: boolean;
 };
+
+export type InspectorDynamicBindingOwner = {
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings;
+};
+
+export type InspectorDynamicBindingPatch = {
+  dynamicBindings?: DynamicFieldBindings;
+};
+
+export function inspectorDynamicBinding(
+  owner: InspectorDynamicBindingOwner,
+  update: (patch: InspectorDynamicBindingPatch) => void,
+  destination: DynamicBindingDestination,
+) {
+  return {
+    destination,
+    descriptor: owner.dynamicContext,
+    bindings: owner.dynamicBindings,
+    onChange: (field: string, binding: DynamicFieldBinding | undefined) => {
+      const next = { ...(owner.dynamicBindings ?? {}) };
+      if (binding) next[field] = binding;
+      else delete next[field];
+      update({ dynamicBindings: Object.keys(next).length > 0 ? next : undefined });
+    },
+  };
+}
 
 type FieldProps = {
   label?: string;
@@ -20,6 +50,12 @@ type FieldProps = {
   onReset?: () => void;
   children: ReactNode;
   className?: string;
+  dynamicBinding?: {
+    destination: DynamicBindingDestination;
+    descriptor?: DynamicContentContextDescriptor;
+    bindings?: DynamicFieldBindings;
+    onChange: (destination: string, binding: DynamicFieldBinding | undefined) => void;
+  };
 };
 
 export function InspectorFieldRow({
@@ -31,15 +67,25 @@ export function InspectorFieldRow({
   inheritedValueText,
   onReset,
   children,
-  className = ""
+  className = "",
+  dynamicBinding,
 }: FieldProps) {
+  const dynamicAccessory = label && dynamicBinding ? (
+    <DynamicFieldBindingControl
+      destination={dynamicBinding.destination}
+      label={label}
+      descriptor={dynamicBinding.descriptor}
+      binding={dynamicBinding.bindings?.[dynamicBinding.destination]}
+      onChange={(binding) => dynamicBinding.onChange(dynamicBinding.destination, binding)}
+    />
+  ) : null;
   return (
     <div className={`builder-field inspector-field-row ${isOverridden ? "has-override" : ""} ${className}`.trim()}>
       {label && (
         <div className="inspector-field-row-label">
           <div className="inspector-field-label-inline">
             <span className="inspector-field-title-text">{label}</span>
-            {labelAccessory}
+            {labelAccessory ?? dynamicAccessory}
             {isOverridden && onReset && (
               <button
                 type="button"

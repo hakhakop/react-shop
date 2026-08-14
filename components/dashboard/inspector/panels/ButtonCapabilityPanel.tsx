@@ -10,11 +10,13 @@ import {
   InspectorSwitch,
   InspectorTextField,
   InspectorTextarea,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import { ActionSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -90,10 +92,11 @@ function ButtonItemsEditor({ block, update }: Pick<Props, "block" | "update">) {
         onDelete={(index) => updateItems(items.filter((_, itemIndex) => itemIndex !== index))}
         onReorder={reorder}
         renderItem={(item, index) => <>
-          <InspectorFieldRow label="Label">
+          <DynamicContentInspectorGroup item={item} update={(patch) => updateItem(index, patch as Partial<ButtonItem>)} />
+          <InspectorFieldRow label="Label" dynamicBinding={inspectorDynamicBinding(item, (patch) => updateItem(index, patch as Partial<ButtonItem>), "label")}>
             <InspectorTextField value={item.label ?? ""} onChange={(label) => updateItem(index, { label })} ariaLabel={`Button item ${index + 1} label`} />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Link URL">
+          <InspectorFieldRow label="Link URL" dynamicBinding={inspectorDynamicBinding(item, (patch) => updateItem(index, patch as Partial<ButtonItem>), "url")}>
             <InspectorTextField value={item.url ?? ""} onChange={(url) => updateItem(index, { url: url || undefined })} ariaLabel={`Button item ${index + 1} URL`} />
           </InspectorFieldRow>
           <InspectorFieldRow label="Link target">
@@ -114,12 +117,13 @@ function ButtonItemsEditor({ block, update }: Pick<Props, "block" | "update">) {
 }
 
 export default function ButtonCapabilityPanel({ block, tab, shellSettings, update }: Props) {
+  const labelBinding = inspectorDynamicBinding(block, update, "buttonLabel");
   // CONTENT TAB
   if (tab === "content") {
     const hasCanonicalItems = Array.isArray(block.buttons);
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-content">
-        {hasCanonicalItems ? <ButtonItemsEditor block={block} update={update} /> : <ActionSettingsGroup block={block} update={update} title="BUTTON" showPresentation={false} />}
+        {hasCanonicalItems ? <ButtonItemsEditor block={block} update={update} /> : <ActionSettingsGroup block={block} update={update} title="BUTTON" showPresentation={false} dynamicContext={block.dynamicContext} dynamicBindings={block.dynamicBindings} onDynamicBindingChange={labelBinding.onChange} />}
       </div>
     );
   }
@@ -128,6 +132,7 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-advanced">
+        {!Array.isArray(block.buttons) && <DynamicContentInspectorGroup item={block} update={update} />}
         <InspectorDivision title="ADVANCED">
           <InspectorFieldRow label="ID">
             <InspectorTextField

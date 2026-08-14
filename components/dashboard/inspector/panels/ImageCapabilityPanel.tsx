@@ -9,10 +9,12 @@ import {
   InspectorTextField,
   InspectorTextarea,
   InspectorSelect,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import { ImageSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -31,7 +33,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-content">
         <InspectorDivision title="IMAGE">
-          <InspectorFieldRow label="Image source">
+          <InspectorFieldRow label="Image source" dynamicBinding={inspectorDynamicBinding(block, update, "imageUrl")}>
             <BuilderImageUrlControl
               value={image.imageUrl ?? ""}
               onChange={(event) => update({ imageUrl: event.target.value })}
@@ -48,7 +50,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               }
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Alt text">
+          <InspectorFieldRow label="Alt text" dynamicBinding={inspectorDynamicBinding(block, update, "imageAlt")}>
             <InspectorTextField
               value={image.imageAlt ?? ""}
               onChange={(value) => update({ imageAlt: value })}
@@ -131,6 +133,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-advanced">
+        <DynamicContentInspectorGroup item={block} update={update} />
         <InspectorDivision title="ADVANCED">
           <InspectorFieldRow label="ID">
             <InspectorTextField

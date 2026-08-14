@@ -45,6 +45,8 @@ export type BuilderListItem = {
   target?: "_self" | "_blank";
   iconName?: string;
   iconSize?: number;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
 
 export type BuilderDesign = {
@@ -77,6 +79,11 @@ export type BuilderDesign = {
 export type BuilderLayoutBlock = {
   id?: string;
   kind?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<
+    | "headingText" | "body" | "eyebrow" | "title"
+    | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
+  >;
   loggedOutLabel?: string;
   loggedInLabel?: string;
   loggedOutUrl?: string;
@@ -125,6 +132,8 @@ export type BuilderLayoutBlock = {
     target?: string;
     style?: string;
     size?: "small" | "default" | "large";
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<"label" | "url">;
   }[];
   buttonBg?: string;
   buttonTextColor?: string;

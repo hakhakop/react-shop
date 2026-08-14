@@ -13,12 +13,14 @@ import {
   InspectorTextField,
   InspectorTextarea,
   InspectorAlignmentControl,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { ContentSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -52,6 +54,8 @@ function canonicalItems(block: BuilderLayoutBlock): BuilderListItem[] {
 export default function ListCapabilityPanel({ block, tab, update }: Props) {
   const items = canonicalItems(block);
   const updateItems = (next: BuilderListItem[]) => update({ listItems: next });
+  const updateItem = (index: number, patch: Partial<BuilderListItem>) =>
+    updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
   const copySequenceRef = useRef(0);
 
   const reorderItems = (sourceIndex: number, targetIndex: number) => {
@@ -112,9 +116,10 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             onCopy={copyItem}
             onDelete={removeItem}
             onReorder={reorderItems}
-            renderItem={(item, index) => (
-              <>
-                <InspectorFieldRow label="Content">
+            renderItem={(item, index) => {
+              return <>
+                <DynamicContentInspectorGroup item={item} update={(patch) => updateItem(index, patch as Partial<BuilderListItem>)} />
+                <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(item, (patch) => updateItem(index, patch as Partial<BuilderListItem>), "text")}>
                   <RichTextEditor
                     value={item.text}
                     onChange={(value) =>
@@ -124,7 +129,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
                     }
                   />
                 </InspectorFieldRow>
-                <InspectorFieldRow label="Link URL">
+                <InspectorFieldRow label="Link URL" dynamicBinding={inspectorDynamicBinding(item, (patch) => updateItem(index, patch as Partial<BuilderListItem>), "url")}>
                   <InspectorTextField
                     value={item.url ?? ""}
                     onChange={(value) =>
@@ -181,8 +186,8 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
                     ariaLabel={`List item ${index + 1} icon size`}
                   />
                 </InspectorFieldRow>
-              </>
-            )}
+              </>;
+            }}
           />
         </InspectorDivision>
       </div>

@@ -11,10 +11,12 @@ import {
   InspectorTextarea,
   InspectorTextField,
   InspectorDivision,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { Link, Image as ImageIcon } from "lucide-react";
 import { TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -52,7 +54,7 @@ export default function HeadingCapabilityPanel({
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-content">
         <InspectorDivision title="CONTENT">
-          <InspectorFieldRow label="Content">
+          <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "headingText")}>
             <InspectorTextarea
               value={block.headingText ?? block.title ?? ""}
               onChange={(value) => update({ headingText: value, title: value })}
@@ -283,6 +285,7 @@ export default function HeadingCapabilityPanel({
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-advanced">
+        <DynamicContentInspectorGroup item={block} update={update} />
         <InspectorDivision title="GENERAL">
           <InspectorFieldRow label="ID">
             <InspectorTextField

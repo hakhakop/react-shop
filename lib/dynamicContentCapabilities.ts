@@ -20,9 +20,15 @@ export type DynamicContentSourceField = {
 };
 
 export type DynamicBindingDestination =
+  | "headingText"
+  | "body"
+  | "eyebrow"
+  | "alertLinkUrl"
   | "title"
   | "meta"
   | "text"
+  | "label"
+  | "url"
   | "imageUrl"
   | "imageAlt"
   | "buttonLabel"
@@ -36,9 +42,15 @@ export type DynamicBindingDestinationCapability = {
 export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   Record<DynamicBindingDestination, DynamicBindingDestinationCapability>
 > = {
+  headingText: { label: "Content", acceptedTypes: ["string", "richText"] },
+  body: { label: "Content", acceptedTypes: ["string", "richText"] },
+  eyebrow: { label: "Meta", acceptedTypes: ["string"] },
+  alertLinkUrl: { label: "Link URL", acceptedTypes: ["url"] },
   title: { label: "Title", acceptedTypes: ["string", "richText"] },
   meta: { label: "Meta", acceptedTypes: ["string", "richText"] },
   text: { label: "Content", acceptedTypes: ["string", "richText"] },
+  label: { label: "Label", acceptedTypes: ["string", "richText"] },
+  url: { label: "Link URL", acceptedTypes: ["url"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
   buttonLabel: { label: "Button Label", acceptedTypes: ["string", "richText"] },

@@ -497,6 +497,11 @@ function dynamicContentPreviewSignature(sections: BuilderSection[]) {
       const block = candidate as Record<string, any>;
       const gridItems = Array.isArray(block.gridItems) ? block.gridItems : [];
       const slides = Array.isArray(block.slides) ? block.slides : [];
+      const listItems = Array.isArray(block.listItems) ? block.listItems : [];
+      const buttons = Array.isArray(block.buttons) ? block.buttons : [];
+      if (block.dynamicContext || block.dynamicBindings) {
+        metadata.push({ owner, kind: block.kind, id: block.id, dynamicContext: block.dynamicContext, dynamicBindings: block.dynamicBindings });
+      }
       gridItems.forEach((item: Record<string, any>) => {
         if (item.dynamicContext || item.dynamicBindings) {
           metadata.push({ owner, kind: "grid", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
@@ -505,6 +510,16 @@ function dynamicContentPreviewSignature(sections: BuilderSection[]) {
       slides.forEach((slide: Record<string, any>) => {
         if (slide.dynamicContext || slide.dynamicBindings) {
           metadata.push({ owner, kind: "panel-slider", id: slide.id, dynamicContext: slide.dynamicContext, dynamicBindings: slide.dynamicBindings });
+        }
+      });
+      listItems.forEach((item: Record<string, any>) => {
+        if (item.dynamicContext || item.dynamicBindings) {
+          metadata.push({ owner, kind: "list-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
+        }
+      });
+      buttons.forEach((item: Record<string, any>) => {
+        if (item.dynamicContext || item.dynamicBindings) {
+          metadata.push({ owner, kind: "button-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
         }
       });
       const nestedLayout = block.nestedLayout as { rows?: Array<{ columns?: Array<{ blocks?: unknown[]; id?: string }> }> } | undefined;

@@ -3,9 +3,10 @@
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl, InspectorSwitch } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl, InspectorSwitch, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -21,7 +22,9 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
     return (
       <div className="builder-inspector-stack" data-uikit-capability="text-content">
         <div className="builder-element-inspector-note"><strong>Rich text content</strong><span>WebPages owns the semantic HTML and inline formatting.</span></div>
-        <RichTextEditor value={block.body ?? ""} onChange={(body) => update({ body })} placeholder="Write your text..." minHeight="180px" />
+        <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}>
+          <RichTextEditor value={block.body ?? ""} onChange={(body) => update({ body })} placeholder="Write your text..." minHeight="180px" />
+        </InspectorFieldRow>
       </div>
     );
   }
@@ -96,6 +99,6 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
   }
 
 
-  if (tab === "advanced") return null;
+  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="text-advanced"><DynamicContentInspectorGroup item={block} update={update} /></div>;
   return null;
 }

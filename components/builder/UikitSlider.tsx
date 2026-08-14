@@ -85,6 +85,14 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         alignImageWithoutPadding: rawCarouselSettings.alignImageWithoutPadding ?? false,
       }
     : null;
+  const sharedImageSettings = !panelMode && (rawBlock.kind === "overlaySlider" || rawBlock.kind === "slideshow")
+    ? {
+        imageWidth: rawCarouselSettings.imageWidth,
+        imageHeight: rawCarouselSettings.imageHeight,
+        imageLoading: rawCarouselSettings.imageLoading,
+        imageHoverTransition: rawCarouselSettings.imageHoverTransition,
+      }
+    : null;
 
   // An explicit empty collection is meaningful after a static YOOtheme import:
   // it must remain empty rather than being replaced by local demonstration
@@ -110,14 +118,15 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         panelSize: slide.panelSize ?? panelShared?.panelSize,
         panelHover: slide.panelHover ?? panelShared?.panelHover,
         linkPanel: slide.linkPanel ?? panelShared?.linkPanel,
-        imageWidth: slide.imageWidth ?? panelShared?.imageWidth,
-        imageHeight: slide.imageHeight ?? panelShared?.imageHeight,
+        imageWidth: slide.imageWidth ?? panelShared?.imageWidth ?? sharedImageSettings?.imageWidth,
+        imageHeight: slide.imageHeight ?? panelShared?.imageHeight ?? sharedImageSettings?.imageHeight,
         imageRatio: panelMode ? slide.imageRatio ?? panelShared?.imageRatio : slide.imageRatio,
         imageFit: panelMode ? slide.imageFit ?? panelShared?.imageFit : slide.imageFit,
         imageShape: panelMode ? slide.imageShape ?? panelShared?.imageShape : slide.imageShape,
         imageShadow: panelMode ? slide.imageShadow ?? panelShared?.imageShadow : slide.imageShadow,
         imageAlignment: panelMode ? slide.imageAlignment ?? panelShared?.imageAlignment : slide.imageAlignment,
-        imageLoading: panelMode ? slide.imageLoading ?? panelShared?.imageLoading : slide.imageLoading,
+        imageLoading: slide.imageLoading ?? panelShared?.imageLoading ?? sharedImageSettings?.imageLoading,
+        imageHoverTransition: slide.imageHoverTransition ?? sharedImageSettings?.imageHoverTransition,
         imageSvgInline: panelMode ? slide.imageSvgInline ?? panelShared?.imageSvgInline : slide.imageSvgInline,
         imageSvgColor: panelMode ? slide.imageSvgColor ?? panelShared?.imageSvgColor : slide.imageSvgColor,
         imageBoxDecoration: slide.imageBoxDecoration ?? panelShared?.imageBoxDecoration,

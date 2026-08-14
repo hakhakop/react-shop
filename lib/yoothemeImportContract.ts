@@ -147,8 +147,14 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
 }
 
 export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<Pick<BuilderLayoutBlock, "imageFit" | "imageRatio" | "imageAlignment" | "imagePosition" | "imageLoading" | "imageWidth" | "imageHeight" | "imageSvgInline" | "imageSvgColor">> {
-  const width = string(props.image_width);
-  const height = string(props.image_height);
+  const cssDimension = (value: unknown) => {
+    if (typeof value === "number" && Number.isFinite(value)) return `${value}px`;
+    const normalized = string(value);
+    if (!normalized || normalized === "auto") return normalized;
+    return /^\d+(?:\.\d+)?$/.test(normalized) ? `${normalized}px` : normalized;
+  };
+  const width = cssDimension(props.image_width);
+  const height = cssDimension(props.image_height);
   const ratio = string(props.image_ratio);
   const fit = string(props.image_fit);
   const position = string(props.image_position);
