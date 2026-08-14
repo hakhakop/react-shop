@@ -42,13 +42,23 @@ export function resolveCanonicalGridAction(
   // presentation defaults only; they must never manufacture `Read more → #`
   // for an item with no canonical URL.
   const itemUrl = rawItem.buttonUrl ?? rawItem.linkUrl ?? rawItem.link;
+  const cardVariant = String(rawItem.cardVariant ?? raw.gridCardVariant ?? raw.panelVariant ?? "").toLowerCase();
+  const itemStyle = rawItem.buttonStyle ?? rawItem.actionStyle ?? rawItem.linkStyle;
+  let style = normalizeActionStyle(itemStyle ?? raw.buttonStyle ?? raw.linkStyle);
+  // YOOtheme's primary card uses the default (solid) button unless the item
+  // explicitly authors a button style. Do not let a Grid-level fallback
+  // promote that inverse-card CTA to the primary gradient/shadow contract.
+  if (itemStyle == null && (cardVariant === "primary" || cardVariant === "card-primary")) {
+    style = "default";
+  }
+  if (raw.spacingContract === "yootheme" && style === "default" && (cardVariant === "default" || cardVariant === "card-default")) {
+    style = "primary";
+  }
   return {
     label: String(rawItem.buttonLabel ?? raw.buttonLabel ?? raw.linkText ?? "").trim(),
     url: typeof itemUrl === "string" ? itemUrl.trim() : "",
     target: String(rawItem.buttonTarget ?? rawItem.linkTarget ?? raw.buttonTarget ?? raw.linkTarget ?? "_self"),
-    style: normalizeActionStyle(
-      rawItem.buttonStyle ?? rawItem.actionStyle ?? raw.buttonStyle ?? raw.linkStyle,
-    ),
+    style,
     size: normalizeActionSize(
       rawItem.actionSize ?? raw.size ?? raw.linkButtonSize,
     ),

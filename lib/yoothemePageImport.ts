@@ -23,6 +23,13 @@ import {
 } from "@/lib/yoothemeImportContract";
 import { createYoothemePageImportReport, formatYoothemeImportWarnings, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
 import type { UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
+import type {
+  DynamicContentContextDescriptor,
+  DynamicFieldBinding,
+  DynamicFieldBindings,
+  DynamicContentValueType,
+} from "@/lib/dynamicContent";
+import { WORDPRESS_POST_COLLECTION_FIELDS } from "@/lib/dynamicContentCapabilities";
 
 /**
  * Pure compatibility analysis and static-content mapping for YOOtheme layout exports.
@@ -838,6 +845,203 @@ const sourceGridTags = (value: unknown): string[] | undefined => {
   return tags.length ? Array.from(new Set(tags)) : undefined;
 };
 
+type DynamicImportDestination =
+  | "title"
+  | "meta"
+  | "text"
+  | "imageUrl"
+  | "imageAlt"
+  | "buttonLabel"
+  | "buttonUrl"
+  | "subtitle";
+
+type DynamicImportResult = {
+  context?: DynamicContentContextDescriptor;
+  bindings?: DynamicFieldBindings<DynamicImportDestination>;
+  hasSource: boolean;
+  supported: boolean;
+};
+
+const canonicalDynamicField = (
+  path: string,
+): { path: string; valueType: DynamicContentValueType } | undefined => {
+  const field = WORDPRESS_POST_COLLECTION_FIELDS.find((candidate) => candidate.path === path);
+  return field ? { path: field.path, valueType: field.valueType } : undefined;
+};
+
+const dynamicBinding = (
+  destination: DynamicImportDestination,
+  path: string,
+  bindings: DynamicFieldBindings<DynamicImportDestination>,
+  warnings: string[],
+  sourcePath: string,
+) => {
+  const field = canonicalDynamicField(path);
+  if (!field) {
+    warnings.push(`${sourcePath}: dynamic field '${path}' has no canonical WebPages source-field owner and was not imported.`);
+    return;
+  }
+  bindings[destination] = { path: field.path, valueType: field.valueType } as DynamicFieldBinding;
+};
+
+const sourceDynamicFieldPath = (
+  value: unknown,
+): { path: string; filters?: unknown } | undefined => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const descriptor = value as Record<string, unknown>;
+  const name = asString(descriptor.name);
+  if (!name) return undefined;
+  if (name === "title" || name === "content" || name === "excerpt" || name === "date" || name === "link") {
+    return { path: name, filters: descriptor.filters };
+  }
+  if (name === "modified" || name === "modifiedDate") return { path: "modifiedDate", filters: descriptor.filters };
+  if (name === "field.featured_image.url" || name === "featuredImage.url") return { path: "featuredImage.url", filters: descriptor.filters };
+  if (name === "field.featured_image.alt" || name === "featuredImage.alt") return { path: "featuredImage.alt", filters: descriptor.filters };
+  if (name === "field.featured_image.caption" || name === "featuredImage.caption") return { path: "featuredImage.caption", filters: descriptor.filters };
+  return { path: name, filters: descriptor.filters };
+};
+
+const mapDynamicQuery = (
+  source: Record<string, unknown>,
+  warnings: string[],
+  sourcePath: string,
+): Record<string, unknown> | null => {
+  const query = source.query;
+  if (!query || typeof query !== "object" || Array.isArray(query)) {
+    warnings.push(`${sourcePath}: Custom Posts source is missing a structured query and was not imported.`);
+    return null;
+  }
+  const queryRecord = query as Record<string, unknown>;
+  if (queryRecord.name !== "posts.customPosts") {
+    warnings.push(`${sourcePath}: dynamic source '${String(queryRecord.name ?? "unknown")}' is unsupported; static fallback was retained.`);
+    return null;
+  }
+  const args = queryRecord.arguments;
+  if (!args || typeof args !== "object" || Array.isArray(args)) {
+    warnings.push(`${sourcePath}: Custom Posts query arguments are missing or malformed.`);
+    return null;
+  }
+  const input = args as Record<string, unknown>;
+  const output: Record<string, unknown> = {};
+  const start = input.offset;
+  const quantity = input.limit;
+  if (Number.isInteger(start) && (start as number) >= 0) output.start = start;
+  else if (start !== undefined) warnings.push(`${sourcePath}.query.arguments.offset: unsupported non-negative integer required.`);
+  if (Number.isInteger(quantity) && (quantity as number) >= 1) output.quantity = quantity;
+  else if (quantity !== undefined) warnings.push(`${sourcePath}.query.arguments.limit: unsupported positive integer required.`);
+
+  const orderMap: Record<string, string> = {
+    date: "date",
+    modified: "modifiedDate",
+    modified_date: "modifiedDate",
+    title: "title",
+    menu_order: "menuOrder",
+    id: "id",
+  };
+  if (input.order !== undefined) {
+    const mappedOrder = orderMap[String(input.order)];
+    if (mappedOrder) output.order = mappedOrder;
+    else warnings.push(`${sourcePath}.query.arguments.order: '${String(input.order)}' is unsupported.`);
+  }
+  if (input.order_direction !== undefined) {
+    const direction = String(input.order_direction).toLowerCase();
+    if (direction === "asc" || direction === "desc") output.direction = direction;
+    else warnings.push(`${sourcePath}.query.arguments.order_direction: '${String(input.order_direction)}' is unsupported.`);
+  }
+
+  const filters: Record<string, unknown> = {};
+  if (Array.isArray(input.users) && input.users.length > 0) {
+    if (input.users_operator === undefined || input.users_operator === "IN") filters.authors = input.users;
+    else warnings.push(`${sourcePath}.query.arguments.users_operator: only IN/any author matching is supported.`);
+  }
+  const explicitCategories = input.categories;
+  const explicitTags = input.tags;
+  if (Array.isArray(explicitCategories)) filters.categories = explicitCategories;
+  if (Array.isArray(explicitTags)) filters.tags = explicitTags;
+  if (input.terms !== undefined) {
+    if (Array.isArray(input.terms) && input.terms.every((term) => term && typeof term === "object" && !Array.isArray(term))) {
+      filters.terms = input.terms;
+    } else if (Array.isArray(input.terms)) {
+      warnings.push(`${sourcePath}.query.arguments.terms: raw term IDs do not carry taxonomy identity in the export; no guessed category/tag mapping was applied.`);
+    } else {
+      warnings.push(`${sourcePath}.query.arguments.terms: structured taxonomy terms are required.`);
+    }
+  }
+  for (const [key, label] of [["category_operator", "category"], ["post_tag_operator", "tag"]] as const) {
+    if (input[key] !== undefined && input[key] !== "IN") {
+      warnings.push(`${sourcePath}.query.arguments.${key}: only IN/any ${label} matching is supported.`);
+    }
+  }
+  if (Object.keys(filters).length > 0) {
+    filters.termMatch = "any";
+    output.filters = filters;
+  }
+  return output;
+};
+
+const mapDynamicSource = (
+  node: YoothemeSourceNode,
+  destinationMap: Record<string, DynamicImportDestination>,
+  warnings: string[],
+  sourcePath: string,
+): DynamicImportResult => {
+  const source = node.source;
+  if (!source || typeof source !== "object" || Array.isArray(source)) {
+    return { hasSource: false, supported: true };
+  }
+  const sourceRecord = source as Record<string, unknown>;
+  const query = sourceRecord.query;
+  const queryName = query && typeof query === "object" && !Array.isArray(query)
+    ? (query as Record<string, unknown>).name
+    : undefined;
+  if (queryName !== "posts.customPosts") {
+    warnings.push(`${sourcePath}: DYNAMIC CONTENT UNSUPPORTED FOR NOW (source/query). Static fallback content was retained.`);
+    return { hasSource: true, supported: false };
+  }
+  const queryData = mapDynamicQuery(sourceRecord, warnings, sourcePath);
+  if (!queryData) return { hasSource: true, supported: false };
+  const bindings: DynamicFieldBindings<DynamicImportDestination> = {};
+  const sourceProps = sourceRecord.props;
+  if (sourceProps && typeof sourceProps === "object" && !Array.isArray(sourceProps)) {
+    for (const [sourceKey, destination] of Object.entries(destinationMap)) {
+      const descriptor = sourceDynamicFieldPath((sourceProps as Record<string, unknown>)[sourceKey]);
+      if (!descriptor) continue;
+      if (descriptor.filters !== undefined) {
+        warnings.push(`${sourcePath}.source.props.${sourceKey}: dynamic filters/transforms are unsupported and the binding was not imported.`);
+        continue;
+      }
+      dynamicBinding(destination, descriptor.path, bindings, warnings, `${sourcePath}.source.props.${sourceKey}`);
+    }
+  }
+  return {
+    hasSource: true,
+    supported: true,
+    context: {
+      provider: "wordpress",
+      source: "post",
+      mode: "collection",
+      ...(Object.keys(queryData).length > 0 ? { query: queryData as DynamicContentContextDescriptor["query"] } : {}),
+    },
+    ...(Object.keys(bindings).length > 0 ? { bindings } : {}),
+  };
+};
+
+const dynamicSourceIsUnsupported = (node: YoothemeSourceNode): boolean => {
+  const source = node.source;
+  if (!source || typeof source !== "object" || Array.isArray(source)) return false;
+  const query = (source as Record<string, unknown>).query;
+  if (!query || typeof query !== "object" || Array.isArray(query)) return true;
+  if ((query as Record<string, unknown>).name !== "posts.customPosts") return true;
+  const argumentsValue = (query as Record<string, unknown>).arguments;
+  return !argumentsValue || typeof argumentsValue !== "object" || Array.isArray(argumentsValue);
+};
+
+const hasStaticItemFallback = (node: YoothemeSourceNode): boolean => {
+  const props = sourceProps(node);
+  return ["title", "meta", "content", "image", "image_alt", "link", "link_text"]
+    .some((key) => asString(props[key]) !== null);
+};
+
 const sourceGridItem = (
   node: YoothemeSourceNode,
   path: string,
@@ -845,6 +1049,20 @@ const sourceGridItem = (
   warnings: string[],
 ): NonNullable<BuilderLayoutBlock["gridItems"]>[number] => {
   const props = sourceProps(node);
+  const dynamic = mapDynamicSource(
+    node,
+    {
+      title: "title",
+      meta: "meta",
+      content: "text",
+      image: "imageUrl",
+      image_alt: "imageAlt",
+      link_text: "buttonLabel",
+      link: "buttonUrl",
+    },
+    warnings,
+    path,
+  );
   const media = normalizeYoothemeMedia({ ...parentProps, ...props });
   const panelStyle = sourcePanelStyle(props.panel_style ?? parentProps.panel_style);
   const hasItemPanelStyle = Object.prototype.hasOwnProperty.call(props, "panel_style");
@@ -881,6 +1099,8 @@ const sourceGridItem = (
     imagePosition: media.imagePosition,
     titleElement: sourceHeadingLevel(props.title_element ?? parentProps.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
     titleStyle: sourceHeadingSize(props.title_style ?? parentProps.title_style) as "inherit" | "h3" | "h4" | "h5" | undefined,
+    ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
+    ...(dynamic.bindings ? { dynamicBindings: dynamic.bindings as NonNullable<BuilderLayoutBlock["gridItems"]>[number]["dynamicBindings"] } : {}),
   };
 };
 
@@ -888,8 +1108,23 @@ const sourceSliderItem = (
   node: YoothemeSourceNode,
   path: string,
   parentProps: Record<string, unknown> = {},
+  warnings: string[] = [],
 ): NonNullable<BuilderSection["slides"]>[number] => {
   const itemProps = sourceProps(node);
+  const dynamic = mapDynamicSource(
+    node,
+    {
+      title: "title",
+      meta: "meta",
+      content: "text",
+      image: "imageUrl",
+      image_alt: "imageAlt",
+      link_text: "buttonLabel",
+      link: "buttonUrl",
+    },
+    warnings,
+    path,
+  );
   const props = { ...parentProps, ...itemProps };
   const media = normalizeYoothemeMedia(props);
   // Element-level links must not leak into each item as manufactured actions.
@@ -988,12 +1223,14 @@ const sourceSliderItem = (
     ...(Object.prototype.hasOwnProperty.call(itemProps, "panel_link")
       ? { linkPanel: itemProps.panel_link === true || itemProps.panel_link === "true" }
       : {}),
+    ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
+    ...(dynamic.bindings ? { dynamicBindings: dynamic.bindings as NonNullable<BuilderSection["slides"]>[number]["dynamicBindings"] } : {}),
   };
 };
 
-/** A YOOtheme item can carry a dynamic field binding in `source`, separate
- * from its authored static props. Phase 9 deliberately imports only actual
- * static fallback content; bindings themselves belong to Phase 13. */
+/** A YOOtheme item carries dynamic field descriptors in `source`, separate
+ * from its authored static props. Supported Custom Posts descriptors are
+ * normalized into the shared Phase 13 document contract here. */
 const hasDynamicSourceBinding = (node: YoothemeSourceNode) => {
   const source = node.source;
   return Boolean(
@@ -1018,6 +1255,7 @@ const sourceStaticSliderItems = (
 ) => {
   const items = sourceChildren(node).filter((child) => child.type === itemType);
   const hasDynamicItemSource = items.some(hasDynamicSourceBinding);
+  const hasUnsupportedDynamicSource = dynamicSourceIsUnsupported(node) || items.some(dynamicSourceIsUnsupported);
   const slides = items
     .filter((child) => !hasDynamicSourceBinding(child) || hasStaticSliderFallback(child))
     .map((child, index) => {
@@ -1025,11 +1263,12 @@ const sourceStaticSliderItems = (
       if (itemType === "panel-slider_item" && warnings) {
         warnPanelSliderFields(itemPath, sourceProps(child), warnings, PANEL_SLIDER_ITEM_SUPPORTED_FIELDS);
       }
-      return sourceSliderItem(child, itemPath, parentProps);
+      return sourceSliderItem(child, itemPath, parentProps, warnings);
     });
   return {
     slides,
     hasDynamicSource: hasDynamicItemSource || hasDynamicSourceBinding(node),
+    hasUnsupportedDynamicSource,
   };
 };
 
@@ -1154,12 +1393,8 @@ const PANEL_SLIDER_ITEM_SUPPORTED_FIELDS = new Set([
   "panel_style", "panel_padding", "panel_link_hover",
 ]);
 
-/**
- * YOOtheme's source/query descriptors describe a dynamic collection rather
- * than static element content. Dynamic Content / Field Binding is deliberately
- * a cross-element capability, so Phase 9 must neither persist these objects
- * nor pretend the carousel can resolve them.
- */
+/** Classify legacy source/query descriptors while preserving static fallback
+ * behavior for providers and query semantics not yet owned by WebPages. */
 const reportUnsupportedDynamicSource = (
   path: string,
   props: Record<string, unknown>,
@@ -1304,7 +1539,14 @@ const mapStaticElement = (
   if (type === "grid") {
     const items = sourceChildren(node)
       .filter((child) => child.type === "grid_item")
-      .map((child, index) => sourceGridItem(child, `${path}.${index}`, props, warnings));
+      .flatMap((child, index) => {
+        const itemPath = `${path}.${index}`;
+        if (dynamicSourceIsUnsupported(child) && !hasStaticItemFallback(child)) {
+          warnings.push(`${itemPath}: DYNAMIC CONTENT UNSUPPORTED FOR NOW (source/query). The item was not imported because no static fallback items exist.`);
+          return [];
+        }
+        return [sourceGridItem(child, itemPath, props, warnings)];
+      });
     const panelStyle = sourcePanelStyle(props.panel_style);
     if (props.panel_style && !panelStyle) {
       warnings.push(`${path}: panel style '${String(props.panel_style)}' has no canonical WebPages equivalent.`);
@@ -1339,6 +1581,9 @@ const mapStaticElement = (
       gridCardVariant: sourceCardVariant(props.panel_style),
       gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
       gridCardHover: props.panel_style === "card-hover",
+      panelExpand: props.panel_expand === "image" || props.panel_expand === "content" || props.panel_expand === "both"
+        ? props.panel_expand
+        : "none",
       gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
       gridGap: typeof props.grid_column_gap === "string" ? props.grid_column_gap : undefined,
       gridRowGap: ["none", "small", "medium", "large"].includes(String(props.grid_row_gap))
@@ -1752,8 +1997,8 @@ const mapStaticElement = (
   }
 
   if (type === "slideshow") {
-    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
-    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
+    if (hasUnsupportedDynamicSource && reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
       "show_title", "show_meta", "show_content", "show_link", "link", "link_target", "link_text", "link_style", "link_size", "link_fullwidth", "link_margin", "margin",
       "slideshow_height", "slideshow_height_viewport", "slideshow_ratio", "slideshow_min_height", "slideshow_max_height", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
@@ -1840,8 +2085,8 @@ const mapStaticElement = (
   }
 
   if (type === "panel-slider") {
-    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props, warnings);
-    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props, warnings);
+    if (hasUnsupportedDynamicSource && reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     const sourceSlidenav = asString(props.slidenav);
     const sourceNavigation = asString(props.nav);
     // Panel Slider's Image Alignment is structural (`top` / `left`) and
@@ -1922,8 +2167,8 @@ const mapStaticElement = (
   }
 
   if (type === "overlay-slider") {
-    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "overlay-slider_item", path, props);
-    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "overlay-slider_item", path, props);
+    if (hasUnsupportedDynamicSource && reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
       "show_content", "show_link", "show_meta", "show_title", "nav", "nav_below", "nav_position", "nav_position_margin", "nav_breakpoint", "slidenav", "slidenav_margin", "slidenav_breakpoint", "slider_autoplay_pause", "slider_center", "slider_autoplay", "slider_autoplay_interval", "slider_finite",
       "slider_divider", "slider_gap", "slider_width", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "overlay_mode", "overlay_display", "overlay_position", "overlay_padding", "overlay_style", "text_color", "text_align", "title_element", "title_style", "meta_align", "meta_element", "meta_style", "link_text", "link_style", "link_size", "link_target", "link_margin", "margin", "visibility",
@@ -2353,6 +2598,19 @@ export const mapYoothemeStaticContent = (
 
     const sectionProps = sourceProps(sectionNode);
     const normalizedSection = normalizeYoothemeSection(sectionProps);
+    const importedSectionImage = asString(sectionProps.image)
+      ? resolveYoothemeAssetUrl(sectionProps.image)
+      : undefined;
+    const importedSectionVisualStyle = importedSectionImage
+      ? {
+          ...(normalizedSection.visualStyle ?? {}),
+          background: {
+            ...(normalizedSection.visualStyle?.background ?? {}),
+            type: "image" as const,
+            imageUrl: importedSectionImage,
+          },
+        }
+      : normalizedSection.visualStyle;
 
     sections.push({
       id: structureSection.id,
@@ -2360,6 +2618,7 @@ export const mapYoothemeStaticContent = (
       title: structureSection.title,
       background: structureSection.background,
       ...normalizedSection,
+      ...(importedSectionVisualStyle ? { visualStyle: importedSectionVisualStyle } : {}),
       preserveColor: Boolean(sectionProps.preserve_color),
       overlap: Boolean(sectionProps.overlap),
       textColor: sectionProps.text_color === "light" || sectionProps.text_color === "dark" ? sectionProps.text_color : "none",

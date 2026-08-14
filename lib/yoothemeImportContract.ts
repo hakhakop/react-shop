@@ -109,6 +109,19 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   const htmlElement = string(props.html_element);
   const textColor = string(props.text_color);
   const headerTextColor = string(props.header_text_color);
+  const imageUrl = string(props.image);
+  const imagePosition = string(props.image_position);
+  const imageSize = string(props.image_size);
+  const imageRepeat = string(props.image_repeat);
+  const sectionBackground: NonNullable<BuilderVisualStyle["background"]> | undefined = imageUrl || imagePosition || imageSize || imageRepeat
+    ? {
+        type: "image" as const,
+        ...(imageUrl ? { imageUrl } : {}),
+        ...(imagePosition ? { imagePosition } : {}),
+        ...(imageSize === "auto" || imageSize === "cover" || imageSize === "contain" ? { imageSize } : {}),
+        ...(imageRepeat === "no-repeat" || imageRepeat === "repeat" || imageRepeat === "repeat-x" || imageRepeat === "repeat-y" ? { imageRepeat } : {}),
+      }
+    : undefined;
   return {
     ...(role ? { backgroundRole: role, sectionVariant: role } : {}),
     ...(contentMode ? { contentMode, maxWidth: contentMode } : {}),
@@ -129,6 +142,7 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
     ...(headerTextColor === "none" || headerTextColor === "light" || headerTextColor === "dark" ? { headerTextColor } : {}),
     ...(textColor === "none" || textColor === "light" || textColor === "dark" ? { textColor } : {}),
     ...(htmlElement === "div" || htmlElement === "section" || htmlElement === "header" || htmlElement === "footer" || htmlElement === "aside" || htmlElement === "main" ? { htmlElement } : {}),
+    ...(sectionBackground ? { visualStyle: { background: sectionBackground } } : {}),
   };
 }
 
@@ -224,7 +238,9 @@ export function normalizeYoothemeGridPanelPresentation(props: Record<string, unk
       ...(Object.keys(card).length ? { card } : {}),
     } } : {}),
     ...(metaAlign === "above-title" || metaAlign === "below-title" || metaAlign === "above-content" || metaAlign === "below-content" ? { gridMetaAlign: metaAlign } : {}),
-    ...(metaElement === "div" || metaElement === "span" || metaElement === "p" ? { gridMetaHtmlElement: metaElement } : {}),
+    ...(metaElement === "div" || metaElement === "span" || metaElement === "p" || (typeof metaElement === "string" && /^h[1-6]$/.test(metaElement))
+      ? { gridMetaHtmlElement: metaElement }
+      : {}),
   };
 }
 

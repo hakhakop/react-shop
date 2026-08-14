@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Plus, ImagePlus } from "lucide-react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { DynamicFieldBinding } from "@/lib/dynamicContent";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { sanitizeHtml } from "@/lib/safeHtml";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
@@ -19,6 +20,8 @@ import {
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 import {
   InspectorDivision,
   InspectorFieldRow,
@@ -101,7 +104,7 @@ export default function SliderCapabilityPanel({
   const inheritedDotnavStyle = isPanelSlider ? "minimal-dots" : (shellSettings.sliderDotnavStyle ?? "minimal-dots");
   const inheritedDotnavPosition = isPanelSlider ? "bottom" : (shellSettings.sliderDotnavPosition ?? "bottom");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings">>({});
+  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings" | "advanced">>({});
 
   const updateCarousel = (patch: any) => {
     const nextCarouselSettings = {
@@ -380,28 +383,52 @@ export default function SliderCapabilityPanel({
                 updated[index] = { ...updated[index], ...patch };
                 update({ slides: updated } as any);
               };
+              const updateDynamicBinding = (
+                destination: string,
+                binding: DynamicFieldBinding | undefined,
+              ) => {
+                const nextBindings = { ...(slide.dynamicBindings ?? {}) };
+                if (binding) nextBindings[destination] = binding;
+                else delete nextBindings[destination];
+                updateSlide({
+                  dynamicBindings: Object.keys(nextBindings).length > 0 ? nextBindings : undefined,
+                });
+              };
+              const bindingControl = (
+                destination: string,
+                label: string,
+              ) => (
+                <DynamicFieldBindingControl
+                  destination={destination as "title" | "meta" | "text" | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl"}
+                  label={label}
+                  descriptor={slide.dynamicContext}
+                  binding={slide.dynamicBindings?.[destination]}
+                  onChange={(binding) => updateDynamicBinding(destination, binding)}
+                />
+              );
 
               const itemKey = String(slide.id ?? index);
               const activeTab = activeItemTabs[itemKey] ?? "content";
               const updateItemTab = (value: string) =>
                 setActiveItemTabs((current) => ({
                   ...current,
-                  [itemKey]: value as "content" | "settings",
+                  [itemKey]: value as "content" | "settings" | "advanced",
                 }));
 
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {!isPanelSlider && !isOverlaySlider && <InspectorPillGroup
+                  {!isOverlaySlider && <InspectorPillGroup
                     value={activeTab}
                     options={[
                       { value: "content", label: "Content" },
                       { value: "settings", label: "Settings" },
+                      { value: "advanced", label: "Advanced" },
                     ]}
                     onChange={updateItemTab}
                     ariaLabel={`${itemLabel} ${index + 1} tab`}
                   />}
 
-                  {(isPanelSlider || activeTab === "content") ? (
+                  {activeTab === "content" ? (
                     <>
                       {isSlideshow && <>
                         <InspectorFieldRow label="Image">
@@ -418,49 +445,67 @@ export default function SliderCapabilityPanel({
                           <InspectorTextField value={slide.imageAlt ?? ""} onChange={(value: string) => updateSlide({ imageAlt: value })} />
                         </InspectorFieldRow>
                       </>}
-                      <InspectorFieldRow label="Title">
-                        <InspectorTextarea
-                          value={slide.title ?? ""}
-                          onChange={(value: string) => updateSlide({ title: sanitizeHtml(value) })}
-                          placeholder={`${itemLabel} title (inline HTML such as <br> is supported)...`}
-                          ariaLabel={`${itemLabel} ${index + 1} title`}
-                        />
+                      <InspectorFieldRow label="Title" labelAccessory={isPanelSlider ? bindingControl("title", "Title") : undefined}>
+                        <>
+                          <InspectorTextarea
+                            value={slide.title ?? ""}
+                            onChange={(value: string) => updateSlide({ title: sanitizeHtml(value) })}
+                            placeholder={`${itemLabel} title (inline HTML such as <br> is supported)...`}
+                            ariaLabel={`${itemLabel} ${index + 1} title`}
+                          />
+                        </>
                       </InspectorFieldRow>
 
-                      <InspectorFieldRow label="Meta">
-                        <InspectorTextField
-                          value={slide.meta ?? slide.subtitle ?? ""}
-                          onChange={(value: string) => updateSlide({ meta: value })}
-                          placeholder="Meta text..."
-                          ariaLabel={`${itemLabel} ${index + 1} meta`}
-                        />
+                      <InspectorFieldRow label="Meta" labelAccessory={isPanelSlider ? bindingControl("meta", "Meta") : undefined}>
+                        <>
+                          <InspectorTextField
+                            value={slide.meta ?? slide.subtitle ?? ""}
+                            onChange={(value: string) => updateSlide({ meta: value })}
+                            placeholder="Meta text..."
+                            ariaLabel={`${itemLabel} ${index + 1} meta`}
+                          />
+                        </>
                       </InspectorFieldRow>
 
-                      <InspectorFieldRow label="Content">
-                        <RichTextEditor
-                          value={slide.text ?? ""}
-                          onChange={(value) => updateSlide({ text: value })}
-                          placeholder={`${itemLabel} content...`}
-                          minHeight="120px"
-                        />
+                      <InspectorFieldRow label="Content" labelAccessory={isPanelSlider ? bindingControl("text", "Content") : undefined}>
+                        <>
+                          <RichTextEditor
+                            value={slide.text ?? ""}
+                            onChange={(value) => updateSlide({ text: value })}
+                            placeholder={`${itemLabel} content...`}
+                            minHeight="120px"
+                          />
+                        </>
                       </InspectorFieldRow>
 
-                      {!isSlideshow && <InspectorFieldRow label="Image">
-                        <BuilderImageUrlControl
-                          value={slide.imageUrl ?? ""}
-                          onChange={(event) => updateSlide({ imageUrl: event.target.value })}
-                          onChoose={() =>
-                            openWordPressMediaPicker?.({
-                              title: `${itemLabel} ${index + 1} image`,
-                              currentUrl: slide.imageUrl,
-                              onSelect: (media: any) =>
-                                updateSlide({
-                                  imageUrl: media.sourceUrl,
-                                  imageAlt: media.altText || media.title || "",
-                                }),
-                            })
-                          }
-                        />
+                      {!isSlideshow && <InspectorFieldRow label="Image" labelAccessory={isPanelSlider ? bindingControl("imageUrl", "Image") : undefined}>
+                        <>
+                          <BuilderImageUrlControl
+                            value={slide.imageUrl ?? ""}
+                            onChange={(event) => updateSlide({ imageUrl: event.target.value })}
+                            onChoose={() =>
+                              openWordPressMediaPicker?.({
+                                title: `${itemLabel} ${index + 1} image`,
+                                currentUrl: slide.imageUrl,
+                                onSelect: (media: any) =>
+                                  updateSlide({
+                                    imageUrl: media.sourceUrl,
+                                    imageAlt: media.altText || media.title || "",
+                                  }),
+                              })
+                            }
+                          />
+                        </>
+                      </InspectorFieldRow>}
+
+                      {isPanelSlider && <InspectorFieldRow label="Image Alt" labelAccessory={bindingControl("imageAlt", "Image Alt")}>
+                        <>
+                          <InspectorTextField
+                            value={slide.imageAlt ?? ""}
+                            onChange={(value: string) => updateSlide({ imageAlt: value })}
+                            ariaLabel={`${itemLabel} ${index + 1} image alt`}
+                          />
+                        </>
                       </InspectorFieldRow>}
 
                       {!isPanelSlider && !isSlideshow && !isOverlaySlider && <InspectorFieldRow label="Icon">
@@ -488,6 +533,9 @@ export default function SliderCapabilityPanel({
                             style: "buttonStyle",
                             size: "buttonSize",
                           }}
+                          dynamicContext={slide.dynamicContext}
+                          dynamicBindings={slide.dynamicBindings}
+                          onDynamicBindingChange={isPanelSlider ? updateDynamicBinding : undefined}
                         />
                       </> : <>
                         <InspectorFieldRow label="Link">
@@ -515,6 +563,11 @@ export default function SliderCapabilityPanel({
                         </>}
                       </>}
                     </>
+                  ) : activeTab === "advanced" ? (
+                    <DynamicContentInspectorGroup
+                      item={slide}
+                      update={updateSlide}
+                    />
                   ) : isSlideshow ? (
                     <>
                       <InspectorDivision title="ITEM">
@@ -582,7 +635,33 @@ export default function SliderCapabilityPanel({
                         }}
                       />
                     </>
-                  ) : null}
+                  ) : (
+                    <InspectorDivision title="ITEM">
+                      <InspectorFieldRow label="Text Color">
+                        <InspectorSelect
+                          value={slide.textColor ?? "none"}
+                          onChange={(value: string) => updateSlide({ textColor: value === "none" ? undefined : value })}
+                          options={[
+                            { value: "none", label: "None" },
+                            { value: "light", label: "Light" },
+                            { value: "dark", label: "Dark" },
+                          ]}
+                        />
+                      </InspectorFieldRow>
+                      <InspectorFieldRow label="HTML Element">
+                        <InspectorSelect
+                          value={slide.itemElement ?? "div"}
+                          onChange={(value: string) => updateSlide({ itemElement: value })}
+                          options={[
+                            { value: "div", label: "div" },
+                            { value: "article", label: "article" },
+                            { value: "section", label: "section" },
+                            { value: "li", label: "li" },
+                          ]}
+                        />
+                      </InspectorFieldRow>
+                    </InspectorDivision>
+                  )}
                 </div>
               );
             }}

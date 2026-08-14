@@ -13,6 +13,7 @@ import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getOrCreateHeaderBuilderLayout, migrateLegacyHeaderDocument } from "@/lib/headerBuilderDocument";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,7 +35,22 @@ export async function GET(request: NextRequest) {
         !access.scope.websiteId,
       )
     : await getPublishedBuilderLayout(page, access.scope);
-  return NextResponse.json({ layout });
+  const materialization = layout
+    ? await materializeBuilderDynamicContent(layout, {
+        website: "website" in access ? access.website : undefined,
+      })
+    : null;
+  return NextResponse.json({
+    // Persistence authority: Builder hydration and Save continue using this.
+    layout,
+    // Render-only projection: never copied into editable Builder state.
+    renderLayout:
+      materialization && materialization.renderLayout !== layout
+        ? materialization.renderLayout
+        : null,
+    dynamicContentDiagnostics: materialization?.diagnostics ?? [],
+    materializedGridBlocks: materialization?.materializedGridBlocks ?? [],
+  });
 }
 
 export async function POST(request: NextRequest) {

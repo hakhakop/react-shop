@@ -31,6 +31,7 @@ import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -157,8 +158,17 @@ export default async function WebsiteFrontend({
   const resolvedMediaLayout = localizedLayout
     ? resolveBuilderMediaUrls(localizedLayout, getWordPressBaseUrl(website))
     : localizedLayout;
+  const materialization = resolvedMediaLayout
+    ? await materializeBuilderDynamicContent(resolvedMediaLayout, { website })
+    : null;
+  const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;
+  materialization?.diagnostics
+    .filter((diagnostic) => diagnostic.status === "fallback")
+    .forEach((diagnostic) => {
+      console.warn("[dynamic-content] storefront fallback", diagnostic);
+    });
 
-  const hasVisibleLayout = resolvedMediaLayout?.sections?.some((section) => section.visible);
+  const hasVisibleLayout = renderLayout?.sections?.some((section) => section.visible);
 
   if (!hasVisibleLayout && !fallbackContent) {
     return (
@@ -200,9 +210,9 @@ export default async function WebsiteFrontend({
         website={website}
         activeContentLanguage={activeContentLanguage}
       />
-      {resolvedMediaLayout && hasVisibleLayout ? (
+      {renderLayout && hasVisibleLayout ? (
         <StorefrontBuilderRenderer
-          layout={resolvedMediaLayout}
+          layout={renderLayout}
           page={page}
           pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
           website={website}

@@ -1997,6 +1997,20 @@ body.dark {
   width: var(--shop-builder-grid-card-width, var(--shop-builder-grid-card-width-base, auto));
 }
 
+.shop-builder-grid-card.shop-builder-panel--expand-content,
+.shop-builder-grid-card.shop-builder-panel--expand-content .shop-builder-grid-content {
+  height: 100%;
+}
+
+/* YOOtheme's panel_expand=content makes the card a vertical flex track and
+   anchors the action to the shared lower edge. This is shared by Builder and
+   storefront; editor chrome remains outside the flow. */
+.shop-builder-grid-card.shop-builder-panel--expand-content {
+  display: flex;
+  flex-direction: column;
+}
+
+
 .builder-card-preset--none .shop-builder-grid-card,
 .builder-card-preset--none .shop-builder-badge-card,
 .builder-card-preset--none .shop-builder-column-block--panel,
@@ -2256,6 +2270,45 @@ body.dark {
   text-align: var(--builder-card-title-align, inherit);
 }
 
+.shop-builder-grid-content .shop-builder-title.uk-h1 {
+  font-size: var(--uk-h1-font-size, 2.5rem);
+  line-height: var(--uk-h1-line-height, 1.2);
+}
+
+.shop-builder-grid-content .shop-builder-title p.uk-text-meta {
+  font-size: var(--uk-text-meta-font-size, 0.875rem);
+  line-height: var(--uk-text-meta-line-height, 1.4);
+  color: var(--uk-text-meta-color, var(--builder-active-muted, inherit));
+}
+
+.shop-builder-grid-content .shop-builder-title > span > p:first-child {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.shop-builder-grid-content .shop-builder-title > span {
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+/* Rich YOOtheme titles contain a price paragraph plus a deliberately muted
+   subtitle. The price must inherit the inverse Card foreground; the subtitle
+   keeps its explicit uk-text-meta treatment. */
+.shop-builder-grid-content .shop-builder-title > span > p.uk-margin-remove:not(.uk-text-meta) {
+  color: inherit !important;
+}
+
+/* Imported YOOtheme checkmarks are external SVG images. In an inverse Card,
+   the semantic emphasis class resolves to the inverse foreground. */
+.shop-builder-card--inverse .shop-builder-grid-content img.uk-text-emphasis {
+  filter: brightness(0) invert(1);
+}
+
+.shop-builder-grid-content .shop-builder-grid-meta.uk-h3 {
+  font-size: var(--uk-h3-font-size, 1.5rem);
+  line-height: var(--uk-h3-line-height, 1.4);
+}
+
 .shop-builder-grid-content small,
 .shop-builder-grid-content .shop-builder-grid-meta {
   margin-top: var(--builder-card-meta-spacing, initial);
@@ -2275,6 +2328,9 @@ body.dark {
 .shop-builder-grid-button {
   margin: var(--builder-card-button-margin, initial);
   justify-content: var(--builder-card-button-align, inherit);
+  /* Grid link_margin owns vertical rhythm only. UIkit's generic margin
+     utility must not push a full-width CTA outside the padded card body. */
+  margin-inline: 0 !important;
 }
 
 .shop-builder-badge-card {
@@ -6015,6 +6071,11 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   background: var(--uikit-section-secondary-bg, #1e1b4b) !important;
   background-image: var(--uikit-section-secondary-bg-image, none) !important;
   color: var(--uikit-section-secondary-color, #ffffff) !important;
+}
+.shop-builder-section--has-background-image {
+  background-size: var(--builder-section-background-size, auto) !important;
+  background-position: var(--builder-section-background-position, center center) !important;
+  background-repeat: var(--builder-section-background-repeat, no-repeat) !important;
 }
 .uk-section-image {
   background-position: center;

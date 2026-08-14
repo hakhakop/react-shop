@@ -6,6 +6,8 @@ import type {
   InspectorTab,
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
+import type { DynamicFieldBinding } from "@/lib/dynamicContent";
+import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
@@ -31,6 +33,8 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import { sanitizeHtml } from "@/lib/safeHtml";
 import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -155,7 +159,7 @@ export default function GridCapabilityPanel({
   openWordPressMediaPicker,
 }: Props) {
   const items = block.gridItems ?? [];
-  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings">>({});
+  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings" | "advanced">>({});
   const copySequenceRef = useRef(0);
   const updateItems = (next: GridItem[]) => update({ gridItems: next });
   
@@ -227,16 +231,45 @@ export default function GridCapabilityPanel({
             onReorder={reorderItems}
             renderItem={(item, index) => {
               const activeTab = item.id ? (activeItemTabs[item.id] ?? "content") : "content";
+              const updateDynamicBinding = (
+                destination: keyof NonNullable<GridItem["dynamicBindings"]>,
+                binding: DynamicFieldBinding | undefined,
+              ) => {
+                updateItems(
+                  items.map((entry, i) => {
+                    if (i !== index) return entry;
+                    const nextBindings = { ...(entry.dynamicBindings ?? {}) };
+                    if (binding) nextBindings[destination] = binding;
+                    else delete nextBindings[destination];
+                    return {
+                      ...entry,
+                      dynamicBindings: Object.keys(nextBindings).length > 0 ? nextBindings : undefined,
+                    };
+                  }),
+                );
+              };
+              const bindingControl = (
+                destination: Extract<keyof NonNullable<GridItem["dynamicBindings"]>, DynamicBindingDestination>,
+                label: string,
+              ) => (
+                <DynamicFieldBindingControl
+                  destination={destination}
+                  label={label}
+                  descriptor={item.dynamicContext}
+                  binding={item.dynamicBindings?.[destination]}
+                  onChange={(binding) => updateDynamicBinding(destination, binding)}
+                />
+              );
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
                   <InspectorPillGroup
                     value={activeTab}
-                    options={opts(["content", "settings"] as const)}
+                    options={opts(["content", "settings", "advanced"] as const)}
                     onChange={(value) => {
                       if (item.id) {
                         setActiveItemTabs((prev) => ({
                           ...prev,
-                          [item.id as string]: value as "content" | "settings",
+                          [item.id as string]: value as "content" | "settings" | "advanced",
                         }));
                       }
                     }}
@@ -245,96 +278,110 @@ export default function GridCapabilityPanel({
 
                   {activeTab === "content" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
-                      <InspectorFieldRow label="Title">
-                        <InspectorTextarea
-                          value={item.title ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, title: sanitizeHtml(value) } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} title`}
-                          placeholder="Title (inline HTML such as <br> is supported)"
-                        />
+                      <InspectorFieldRow label="Title" labelAccessory={bindingControl("title", "Title")}>
+                        <>
+                          <InspectorTextarea
+                            value={item.title ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, title: sanitizeHtml(value) } : entry))
+                              )
+                            }
+                            ariaLabel={`Item ${index + 1} title`}
+                            placeholder="Title (inline HTML such as <br> is supported)"
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Meta">
-                        <InspectorTextField
-                          value={item.meta ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, meta: value } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} meta`}
-                        />
+                      <InspectorFieldRow label="Meta" labelAccessory={bindingControl("meta", "Meta")}>
+                        <>
+                          <InspectorTextField
+                            value={item.meta ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, meta: value } : entry))
+                              )
+                            }
+                            ariaLabel={`Item ${index + 1} meta`}
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Content">
-                        <RichTextEditor
-                          value={item.text ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, text: sanitizeHtml(value) } : entry))
-                            )
-                          }
-                          placeholder="Write item content..."
-                          minHeight="180px"
-                        />
+                      <InspectorFieldRow label="Content" labelAccessory={bindingControl("text", "Content")}>
+                        <>
+                          <RichTextEditor
+                            value={item.text ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, text: sanitizeHtml(value) } : entry))
+                              )
+                            }
+                            placeholder="Write item content..."
+                            minHeight="180px"
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Image">
-                        <BuilderImageUrlControl
-                          value={item.imageUrl ?? ""}
-                          onChange={(e) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, imageUrl: e.target.value } : entry))
-                            )
-                          }
-                          onChoose={() =>
-                            openWordPressMediaPicker?.({
-                              title: `Item ${index + 1} Image`,
-                              currentUrl: item.imageUrl,
-                              onSelect: (m) =>
-                                updateItems(
-                                  items.map((entry, i) =>
-                                    i === index ? { ...entry, imageUrl: m.sourceUrl, imageAlt: m.altText || m.title || "" } : entry
-                                  )
-                                ),
-                            })
-                          }
-                        />
+                      <InspectorFieldRow label="Image" labelAccessory={bindingControl("imageUrl", "Image")}>
+                        <>
+                          <BuilderImageUrlControl
+                            value={item.imageUrl ?? ""}
+                            onChange={(e) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, imageUrl: e.target.value } : entry))
+                              )
+                            }
+                            onChoose={() =>
+                              openWordPressMediaPicker?.({
+                                title: `Item ${index + 1} Image`,
+                                currentUrl: item.imageUrl,
+                                onSelect: (m) =>
+                                  updateItems(
+                                    items.map((entry, i) =>
+                                      i === index ? { ...entry, imageUrl: m.sourceUrl, imageAlt: m.altText || m.title || "" } : entry
+                                    )
+                                  ),
+                              })
+                            }
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Image Alt">
-                        <InspectorTextField
-                          value={item.imageAlt ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, imageAlt: value } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} image alt`}
-                        />
+                      <InspectorFieldRow label="Image Alt" labelAccessory={bindingControl("imageAlt", "Image Alt")}>
+                        <>
+                          <InspectorTextField
+                            value={item.imageAlt ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, imageAlt: value } : entry))
+                              )
+                            }
+                            ariaLabel={`Item ${index + 1} image alt`}
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Link">
-                        <InspectorTextField
-                          value={item.buttonUrl ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, buttonUrl: value } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} link`}
-                          placeholder="http://"
-                        />
+                      <InspectorFieldRow label="Link" labelAccessory={bindingControl("buttonUrl", "Link")}>
+                        <>
+                          <InspectorTextField
+                            value={item.buttonUrl ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, buttonUrl: value } : entry))
+                              )
+                            }
+                            ariaLabel={`Item ${index + 1} link`}
+                            placeholder="http://"
+                          />
+                        </>
                       </InspectorFieldRow>
-                      <InspectorFieldRow label="Link Text">
-                        <InspectorTextField
-                          value={item.buttonLabel ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, buttonLabel: value } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} link text`}
-                        />
+                      <InspectorFieldRow label="Link Text" labelAccessory={bindingControl("buttonLabel", "Link Text")}>
+                        <>
+                          <InspectorTextField
+                            value={item.buttonLabel ?? ""}
+                            onChange={(value) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, buttonLabel: value } : entry))
+                              )
+                            }
+                            ariaLabel={`Item ${index + 1} link text`}
+                          />
+                        </>
                       </InspectorFieldRow>
                       <InspectorFieldRow label="Tags">
                         <InspectorTextField
@@ -396,6 +443,17 @@ export default function GridCapabilityPanel({
                         />
                       </InspectorFieldRow>
                     </div>
+                  )}
+
+                  {activeTab === "advanced" && (
+                    <DynamicContentInspectorGroup
+                      item={item}
+                      update={(patch) =>
+                        updateItems(
+                          items.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)),
+                        )
+                      }
+                    />
                   )}
                 </div>
               );

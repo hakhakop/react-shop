@@ -13,6 +13,7 @@ export type BuilderRowStyleInput = {
   rowBorderRadius?: number;
   rowVisualStyle?: Parameters<typeof visualStyleToCss>[0];
   rowGap?: string;
+  maxWidth?: string;
   headerJustify?: "start" | "center" | "space-between" | "end";
   headerAlign?: "start" | "center" | "end" | "stretch";
 };
@@ -80,6 +81,19 @@ export function resolveBuilderRowStyle(
     // rowGap; an explicit local margin replaces that boundary's gap.
     marginTop: explicitSpacing(row?.rowTopMargin, "rowMargin", row?.spacingContract),
     marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
+    ...(row?.maxWidth && row.maxWidth !== "default" && row.maxWidth !== "inherit"
+      ? {
+          maxWidth:
+            row.maxWidth === "small" ? "960px"
+            : row.maxWidth === "xsmall" ? "750px"
+            : row.maxWidth === "medium" ? "1200px"
+            : row.maxWidth === "large" ? "1600px"
+            : undefined,
+          width: "100%",
+          marginInline: "auto",
+          justifySelf: "center",
+        }
+      : {}),
     borderRadius:
       row?.rowBorderRadius !== undefined &&
       Boolean(row.rowBackground || row.rowVisualStyle?.background)

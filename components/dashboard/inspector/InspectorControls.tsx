@@ -12,6 +12,7 @@ export type InspectorOption<T extends string = string> = {
 
 type FieldProps = {
   label?: string;
+  labelAccessory?: ReactNode;
   help?: string;
   description?: string;
   isOverridden?: boolean;
@@ -23,6 +24,7 @@ type FieldProps = {
 
 export function InspectorFieldRow({
   label,
+  labelAccessory,
   help,
   description,
   isOverridden = false,
@@ -37,6 +39,7 @@ export function InspectorFieldRow({
         <div className="inspector-field-row-label">
           <div className="inspector-field-label-inline">
             <span className="inspector-field-title-text">{label}</span>
+            {labelAccessory}
             {isOverridden && onReset && (
               <button
                 type="button"

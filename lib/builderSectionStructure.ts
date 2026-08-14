@@ -193,6 +193,7 @@ function rowStyleInput(
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,
     rowBottomMargin: row.bottomMargin ?? legacyItem?.rowBottomMargin,
     rowGap: row.rowGap ?? legacyItem?.rowGap,
+    maxWidth: row.maxWidth,
   };
 }
 

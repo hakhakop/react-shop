@@ -10,6 +10,7 @@ import {
   readBuilderCustomPages,
   type BuilderCustomPageKey,
 } from "../../lib/builderLayouts";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import { getWebsiteByDomainHost } from "../../lib/websites";
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
@@ -90,11 +91,20 @@ export default async function WPPage({
             ) as typeof layout.sections,
           }
         : layout;
+      const materialization = localizedLayout
+        ? await materializeBuilderDynamicContent(localizedLayout)
+        : null;
+      const renderLayout = materialization?.renderLayout ?? localizedLayout;
+      materialization?.diagnostics
+        .filter((diagnostic) => diagnostic.status === "fallback")
+        .forEach((diagnostic) => {
+          console.warn("[dynamic-content] root storefront fallback", diagnostic);
+        });
 
-      if (localizedLayout?.sections?.some((section) => section.visible)) {
+      if (renderLayout?.sections?.some((section) => section.visible)) {
         return (
           <StorefrontBuilderRenderer
-            layout={localizedLayout}
+            layout={renderLayout}
             page={builderPage.key}
             pageLabel={builderPage.title}
             breadcrumbItems={[

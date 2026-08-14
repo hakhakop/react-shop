@@ -2,6 +2,12 @@
 
 import React from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
+import type {
+  DynamicContentContextDescriptor,
+  DynamicFieldBinding,
+  DynamicFieldBindings,
+} from "@/lib/dynamicContent";
+import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import {
   InspectorFieldRow,
   InspectorSelect,
@@ -15,6 +21,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import { UIKIT_HEADING_CAPABILITY, UIKIT_IMAGE_CAPABILITY, UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 
 const labels = <T extends string>(values: readonly T[]) =>
   values.map((value) => ({
@@ -864,6 +871,11 @@ export function ActionSettingsGroup({
   inheritedValues,
   showPresentation = true,
   terminology = "action",
+  dynamicContext,
+  dynamicBindings,
+  dynamicLabelDestination,
+  dynamicUrlDestination,
+  onDynamicBindingChange,
   keys = {
     visible: "panelActionVisible",
     label: "buttonLabel",
@@ -896,6 +908,14 @@ export function ActionSettingsGroup({
   showPresentation?: boolean;
   /** Grid uses YOOtheme's Link vocabulary while keeping the same owner. */
   terminology?: "action" | "link";
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings;
+  dynamicLabelDestination?: DynamicBindingDestination;
+  dynamicUrlDestination?: DynamicBindingDestination;
+  onDynamicBindingChange?: (
+    destination: string,
+    binding: DynamicFieldBinding | undefined,
+  ) => void;
   keys?: {
     visible?: string;
     label?: string;
@@ -976,30 +996,52 @@ export function ActionSettingsGroup({
       {showLabel && labelKey && (
         <InspectorFieldRow
           label={labelLabel}
+          labelAccessory={dynamicContext && onDynamicBindingChange ? (
+            <DynamicFieldBindingControl
+              destination={dynamicLabelDestination ?? "buttonLabel"}
+              label={labelLabel}
+              descriptor={dynamicContext}
+              binding={dynamicBindings?.[labelKey]}
+              onChange={(binding) => onDynamicBindingChange(labelKey, binding)}
+            />
+          ) : undefined}
           isOverridden={values[labelKey] !== undefined}
           inheritedValueText="Action"
           onReset={() => update({ [labelKey]: undefined })}
         >
-          <InspectorTextField
-            value={String(values[labelKey] ?? "")}
-            onChange={(val) => update({ [labelKey]: val })}
-            ariaLabel={labelLabel}
-          />
+          <>
+            <InspectorTextField
+              value={String(values[labelKey] ?? "")}
+              onChange={(val) => update({ [labelKey]: val })}
+              ariaLabel={labelLabel}
+            />
+          </>
         </InspectorFieldRow>
       )}
 
       {showUrl && urlKey && (
         <InspectorFieldRow
           label={urlLabel}
+          labelAccessory={dynamicContext && onDynamicBindingChange ? (
+            <DynamicFieldBindingControl
+              destination={dynamicUrlDestination ?? "buttonUrl"}
+              label={urlLabel}
+              descriptor={dynamicContext}
+              binding={dynamicBindings?.[urlKey]}
+              onChange={(binding) => onDynamicBindingChange(urlKey, binding)}
+            />
+          ) : undefined}
           isOverridden={values[urlKey] !== undefined}
           inheritedValueText="#"
           onReset={() => update({ [urlKey]: undefined })}
         >
-          <InspectorTextField
-            value={String(values[urlKey] ?? "")}
-            onChange={(val) => update({ [urlKey]: val })}
-            ariaLabel={urlLabel}
-          />
+          <>
+            <InspectorTextField
+              value={String(values[urlKey] ?? "")}
+              onChange={(val) => update({ [urlKey]: val })}
+              ariaLabel={urlLabel}
+            />
+          </>
         </InspectorFieldRow>
       )}
 

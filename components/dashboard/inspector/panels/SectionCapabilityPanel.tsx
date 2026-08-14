@@ -7,6 +7,7 @@ import type {
   BuilderSection,
   BuilderShellSettings,
   InspectorTab,
+  WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
 import {
   InspectorFieldRow,
@@ -15,6 +16,7 @@ import {
   InspectorTextField,
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
+import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import { resolveSectionBackground } from "@/lib/semanticBackgrounds";
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
@@ -24,6 +26,7 @@ type Props = {
   shellSettings: BuilderShellSettings;
   tab: InspectorTab;
   update: (patch: Partial<BuilderSection>) => void;
+  openWordPressMediaPicker?: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
 };
 
 function attributesValue(attributes: BuilderLayoutAdvancedSettings["attributes"]) {
@@ -38,8 +41,13 @@ function Group({ title, children }: { title?: string; children: ReactNode }) {
 }
 
 /** Canonical Section inspector following YOOtheme's Content / Settings / Advanced contract. */
-export default function SectionCapabilityPanel({ section, tab, update }: Props) {
+export default function SectionCapabilityPanel({ section, tab, update, openWordPressMediaPicker }: Props) {
   const resolvedBackground = resolveSectionBackground(section);
+  const background = section.visualStyle?.background;
+  const legacyImageUrl = section.backgroundOverride?.trim().match(/^(?:https?:\/\/|\/|[\w.-]+\/)/) ? section.backgroundOverride : undefined;
+  const imageUrl = background?.imageUrl ?? legacyImageUrl ?? "";
+  const updateBackgroundImage = (patch: Partial<NonNullable<NonNullable<BuilderSection["visualStyle"]>["background"]>>) =>
+    update({ backgroundOverride: legacyImageUrl ? undefined : section.backgroundOverride, visualStyle: { ...(section.visualStyle ?? {}), background: { ...(background ?? {}), type: "image", ...patch } } });
   const updateVisualStyle = (patch: Partial<NonNullable<BuilderSection["visualStyle"]>>) =>
     update({ visualStyle: { ...(section.visualStyle ?? {}), ...patch } });
   const updateAdvanced = (patch: Partial<BuilderLayoutAdvancedSettings>) => {
@@ -61,8 +69,11 @@ export default function SectionCapabilityPanel({ section, tab, update }: Props) 
       <div className="builder-inspector-stack" data-uikit-capability="section-content">
         <Group title="Content">
           <InspectorFieldRow label="Image" description="Section background image source.">
-            <InspectorTextField value={section.backgroundOverride ?? ""} placeholder="Image URL" onChange={(backgroundOverride) => update({ backgroundOverride: backgroundOverride || undefined })} ariaLabel="Section image" />
+            <BuilderImageUrlControl value={imageUrl} placeholder="http://" onChange={(event) => updateBackgroundImage({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Section Background Image", currentUrl: imageUrl || undefined, onSelect: (media) => updateBackgroundImage({ imageUrl: media.sourceUrl }) })} />
           </InspectorFieldRow>
+          <InspectorFieldRow label="Image Size"><InspectorSelect value={background?.imageSize ?? "auto"} options={[{ value: "auto", label: "Auto" }, { value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} onChange={(imageSize) => updateBackgroundImage({ imageSize })} ariaLabel="Section image size" /></InspectorFieldRow>
+          <InspectorFieldRow label="Image Position"><InspectorSelect value={background?.imagePosition ?? "center-center"} options={["top-left", "top-center", "top-right", "center-left", "center-center", "center-right", "bottom-left", "bottom-center", "bottom-right"].map((value) => ({ value, label: value.replace(/-/g, " ").replace(/(^| )([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`) }))} onChange={(imagePosition) => updateBackgroundImage({ imagePosition })} ariaLabel="Section image position" /></InspectorFieldRow>
+          <InspectorFieldRow label="Image Repeat"><InspectorSelect value={background?.imageRepeat ?? "no-repeat"} options={[{ value: "no-repeat", label: "No Repeat" }, { value: "repeat", label: "Repeat" }, { value: "repeat-x", label: "Repeat X" }, { value: "repeat-y", label: "Repeat Y" }]} onChange={(imageRepeat) => updateBackgroundImage({ imageRepeat })} ariaLabel="Section image repeat" /></InspectorFieldRow>
           <InspectorFieldRow label="Video" description="Video backgrounds are not currently supported by the canonical Section owner.">
             <InspectorTextField value="" placeholder="Deferred" disabled onChange={() => undefined} ariaLabel="Section video (deferred)" />
           </InspectorFieldRow>

@@ -83,7 +83,8 @@ function sanitizeServerHtml(html: string): string {
         return value && /^\d{1,5}$/.test(value) ? ` ${name}="${value}"` : "";
       }).join("");
       const loading = /\bloading\s*=\s*["']?eager/i.test(attrs) ? " loading=\"eager\"" : " loading=\"lazy\"";
-      return `<img src="${escaped(src)}"${alt}${size}${safeClass(attrs)}${loading}>`;
+      const svg = /\buk-svg\b/i.test(attrs) ? " uk-svg" : "";
+      return `<img src="${escaped(src)}"${alt}${size}${safeClass(attrs)}${svg}${loading}>`;
     }
     return `<${tag}${safeClass(attrs)}>`;
   }).join("");

@@ -9,6 +9,10 @@ import {
 } from "@/lib/websiteBuilderData";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
 import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
+import type {
+  DynamicContentContextDescriptor,
+  DynamicFieldBindings,
+} from "@/lib/dynamicContent";
 export type { BuilderSection };
 
 export type BuilderCustomPageKey = `page:${string}`;
@@ -239,6 +243,20 @@ export type BuilderLayoutBlock = {
     listIcon?: string;
     listIconColorScheme?: string;
     listIconSize?: number;
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<
+      | "title"
+      | "subtitle"
+      | "text"
+      | "badge"
+      | "imageUrl"
+      | "imageAlt"
+      | "thumbnailUrl"
+      | "navigationLabel"
+      | "buttonAriaLabel"
+      | "buttonLabel"
+      | "buttonUrl"
+    >;
   }[];
   carouselSettings?: {
     variant?: string;
@@ -446,6 +464,17 @@ export type BuilderLayoutBlock = {
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
     listIconSize?: number;
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<
+      | "imageUrl"
+      | "imageAlt"
+      | "eyebrow"
+      | "title"
+      | "meta"
+      | "text"
+      | "buttonLabel"
+      | "buttonUrl"
+    >;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: string;

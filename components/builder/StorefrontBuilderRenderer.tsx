@@ -76,7 +76,7 @@ import {
   getYoothemeImportGlobalAliases,
   hasYoothemeImportContract,
 } from "@/lib/uikitSemanticContext";
-import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
+import { resolveSectionBackground, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
@@ -595,6 +595,7 @@ function sectionStyle(
       "sectionMargin",
     ),
     ...contextVars,
+    ...sectionBackgroundImageVariables(section),
     ...visualStyleToCss(visual),
   };
 
@@ -644,8 +645,11 @@ export function getBuilderSectionClassName(
     section.sectionTitleRotation && section.sectionTitleRotation !== "none"
       ? `shop-builder-section--title-rotate-${section.sectionTitleRotation}`
       : "";
+  const imageClass = section.visualStyle?.background?.imageUrl
+    ? "shop-builder-section--has-background-image"
+    : "";
 
-  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${removeTopPadClass} ${removeBottomPadClass} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${maxWidth} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
+  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${removeTopPadClass} ${removeBottomPadClass} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} ${imageClass} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${maxWidth} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
 }
 
 function SectionFrame({

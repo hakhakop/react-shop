@@ -300,7 +300,9 @@ export function GridCardsClient({
             const titleMarginTopClass = getUikitMarginClass(rawBlock.titleMarginTop);
 
             // Meta styling
-            const metaStyleClass = getUikitTextStyleClass(rawBlock.metaStyle ?? "text-meta");
+            const metaStyleClass = getUikitTextStyleClass(
+              rawBlock.metaStyle ?? (rawBlock.spacingContract === "yootheme" ? undefined : "text-meta"),
+            );
             const metaColorVal = rawBlock.metaColor;
             const metaColorClass = metaColorVal && metaColorVal !== "none" && metaColorVal !== "default"
               ? (metaColorVal.startsWith("uk-text-") ? metaColorVal : `uk-text-${metaColorVal}`)
@@ -308,7 +310,11 @@ export function GridCardsClient({
             const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop);
             const rawMetaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below-title";
             const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
-            const MetaTag = (rawBlock.gridMetaHtmlElement ?? "div") as any;
+            const MetaTag = (rawBlock.gridMetaHtmlElement ?? (rawBlock.spacingContract === "yootheme" ? "h3" : "div")) as any;
+            const metaElement = String(rawBlock.gridMetaHtmlElement ?? (rawBlock.spacingContract === "yootheme" ? "h3" : "div"));
+            const metaElementClass = /^h[1-6]$/.test(metaElement)
+              ? `uk-${metaElement}`
+              : "";
 
             // Content styling
             const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
@@ -360,7 +366,7 @@ export function GridCardsClient({
               canShowMeta && item.meta ? (
                 <Typog
                   as={MetaTag}
-                  className={`${metaStyleClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
+                  className={`${metaStyleClass} ${metaElementClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
                   style={colorSemantics.metaStyle}
@@ -495,7 +501,7 @@ export function GridCardsClient({
                 key={item.id}
                 className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
-                } ${builderItemClassName ?? ""}`.trim()}
+                } ${rawBlock.panelExpand === "content" || rawBlock.panelExpand === "both" ? "shop-builder-panel--expand-content" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     textAlign: itemContentAlignment,
@@ -549,6 +555,7 @@ export function GridCardsClient({
                     >
                       <a
                         className={`shop-builder-grid-action ${linkStyleClass}`.trim()}
+                        style={action.fullWidth ? { width: "100%" } : undefined}
                         href={itemUrl}
                         {...builderLinkTargetProps(linkTarget)}
                       >

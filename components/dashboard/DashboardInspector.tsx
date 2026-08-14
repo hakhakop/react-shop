@@ -1224,9 +1224,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         ]
       : isCanonicalColumnSelection
         ? [
-            ["layout", t("builder.inspector.layout")],
-            ["style", t("builder.inspector.styling")],
-            ["spacing", t("builder.inspector.spacing")],
+            ["content", t("builder.inspector.content")],
+            ["settings", "Settings"],
             ["advanced", t("builder.inspector.advanced")],
           ]
       : [
@@ -1359,8 +1358,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       return;
     }
     if (isCanonicalColumnSelection) {
-      if (!["layout", "style", "spacing", "advanced"].includes(inspectorTab)) {
-        setInspectorTab("layout");
+      if (!["content", "settings", "advanced"].includes(inspectorTab)) {
+        setInspectorTab("settings");
       }
       return;
     }
@@ -1834,6 +1833,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             : isElementTypographyTab
               ? "Element Typography"
               : "Element Advanced"
+    : isCanonicalColumnSelection
+      ? inspectorTab === "content"
+        ? "Column Content"
+        : inspectorTab === "settings"
+          ? "Column Settings"
+          : "Column Advanced"
     : selectedLayoutRow
       ? selectedColumnIndex >= 0 || selectedNestedColumn
         ? inspectorTab === "layout"
@@ -2448,6 +2453,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               shellSettings={shellSettings}
               tab={inspectorTab}
               update={updateSelected}
+              openWordPressMediaPicker={openWordPressMediaPicker}
             />
           )}
 
@@ -2470,6 +2476,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               column={selectedCanonicalColumnLocation!.column}
               tab={inspectorTab}
               update={onUpdateColumnStyle}
+              openWordPressMediaPicker={openWordPressMediaPicker}
             />
           )}
 

@@ -7,6 +7,7 @@ type SectionBackgroundInput = {
   sectionVariant?: unknown;
   backgroundOverride?: unknown;
   background?: unknown;
+  visualStyle?: { background?: { imageUrl?: unknown; imageSize?: unknown; imagePosition?: unknown; imageRepeat?: unknown } };
 };
 
 function semanticRole(value: unknown): SemanticBackgroundRole | undefined {
@@ -30,4 +31,19 @@ export function resolveSectionBackground(section: SectionBackgroundInput): { rol
 
 export function sectionBackgroundClass(role: SemanticBackgroundRole): string {
   return `uk-section-${role}`;
+}
+
+/** Shared UIkit variable projection for a Section-owned background image. */
+export function sectionBackgroundImageVariables(section: SectionBackgroundInput): Record<string, string> {
+  const imageUrl = section.visualStyle?.background?.imageUrl;
+  if (typeof imageUrl !== "string" || !imageUrl.trim()) return {};
+  const { role } = resolveSectionBackground(section);
+  const background = section.visualStyle?.background;
+  const position = typeof background?.imagePosition === "string" ? background.imagePosition.replace(/-/g, " ") : undefined;
+  return {
+    [`--uikit-section-${role}-bg-image`]: `url("${imageUrl}")`,
+    ...(typeof background?.imageSize === "string" ? { "--builder-section-background-size": background.imageSize } : {}),
+    ...(position ? { "--builder-section-background-position": position } : {}),
+    ...(typeof background?.imageRepeat === "string" ? { "--builder-section-background-repeat": background.imageRepeat } : {}),
+  };
 }

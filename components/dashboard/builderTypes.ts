@@ -19,6 +19,10 @@ import type {
   BuilderHeaderTextMode,
 } from "@/lib/builderShell";
 import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
+import type {
+  DynamicContentContextDescriptor,
+  DynamicFieldBindings,
+} from "@/lib/dynamicContent";
 
 export type {
   BuilderHeaderLayout,
@@ -294,6 +298,10 @@ export type BuilderLayoutAdvancedSettings = {
   className?: string;
   attributes?: Record<string, string> | string;
   css?: string;
+  /**
+   * @deprecated Import-staging only. It has no runtime ownership; canonical
+   * item Dynamic Content uses dynamicContext + dynamicBindings.
+   */
   dynamicSource?: unknown;
 };
 
@@ -334,6 +342,7 @@ export type BuilderColumnStickySettings = {
   topOffset?: string;
   bottomOffset?: string;
   breakpoint?: "s" | "m" | "l" | "xl" | "";
+  blend?: boolean;
 };
 
 export type BuilderColumn = {
@@ -752,6 +761,17 @@ export type BuilderLayoutBlock = {
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
     listIconSize?: number;
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<
+      | "imageUrl"
+      | "imageAlt"
+      | "eyebrow"
+      | "title"
+      | "meta"
+      | "text"
+      | "buttonLabel"
+      | "buttonUrl"
+    >;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: "bottom" | "left";
@@ -1073,6 +1093,21 @@ export type BuilderSection = {
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
     listIconSize?: number;
+    dynamicContext?: DynamicContentContextDescriptor;
+    dynamicBindings?: DynamicFieldBindings<
+      | "title"
+      | "meta"
+      | "subtitle"
+      | "text"
+      | "badge"
+      | "imageUrl"
+      | "imageAlt"
+      | "thumbnailUrl"
+      | "navigationLabel"
+      | "buttonAriaLabel"
+      | "buttonLabel"
+      | "buttonUrl"
+    >;
   }[];
   carouselSettings?: {
     variant?: string;

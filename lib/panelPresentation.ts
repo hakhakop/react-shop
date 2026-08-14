@@ -44,12 +44,20 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   // Primary/Secondary classes retain their explicit global variant tokens.
   if (!hasExplicitActionColor) {
     Object.assign(style, {
-      "--uk-button-default-background": "transparent",
-      "--uk-button-default-text": text,
-      "--uk-button-default-border": text,
-      "--uk-button-default-hover-background": text,
-      "--uk-button-default-hover-text": surface,
-      "--uk-button-default-hover-border": text,
+      // On a primary Card, YOOtheme's default link is the filled inverse
+      // action (white surface, dark text), not the generic outline fallback.
+      "--uk-button-default-background": role === "primary" ? text : "transparent",
+      "--uk-button-default-text": role === "primary"
+        ? "var(--uk-global-emphasis-color, var(--uk-global-color, #111111))"
+        : text,
+      "--uk-button-default-border": role === "primary" ? "transparent" : text,
+      "--uk-button-default-hover-background": role === "primary"
+        ? "var(--uk-button-inverse-default-hover-background, color-mix(in srgb, var(--uk-global-inverse-color, #fff) 95%, #000))"
+        : text,
+      "--uk-button-default-hover-text": role === "primary"
+        ? "var(--uk-button-inverse-default-hover-text, var(--uk-global-text-color, #111827))"
+        : surface,
+      "--uk-button-default-hover-border": role === "primary" ? "transparent" : text,
       "--uk-button-text-color": text,
       "--uk-button-link-color": text,
       // YOOtheme's inverse surface contract also applies to an inheriting
@@ -65,6 +73,16 @@ export function resolvePanelColorSemantics(block: PanelLike) {
       "--uk-button-primary-hover-background": text,
       "--uk-button-primary-hover-text": "var(--uk-global-link-hover-color, var(--uk-global-emphasis-color, currentColor))",
       "--uk-button-primary-hover-border": text,
+      ...(role === "primary"
+        ? {
+            // Project the canonical YOOtheme inverse-button tokens onto the
+            // card-local default action. This prevents the normal light-card
+            // shadow from leaking into the solid CTA.
+            "--uk-button-default-shadow": "var(--uk-button-inverse-default-shadow, 0 5px 15px rgba(0, 0, 0, 0.2))",
+            "--uk-button-default-hover-shadow": "var(--uk-button-inverse-default-shadow, 0 5px 15px rgba(0, 0, 0, 0.2))",
+            "--uk-button-default-active-shadow": "var(--uk-button-inverse-default-shadow, 0 5px 15px rgba(0, 0, 0, 0.2))",
+          }
+        : {}),
     });
   }
 

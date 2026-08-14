@@ -170,7 +170,7 @@ import { getGeneralElementShellClassName, getGeneralElementShellStyle } from "@/
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { resolvePanelPresentation } from "@/lib/panelPresentation";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
-import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
+import { resolveSectionBackground, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
 import {
   normalizeLayoutToUikitPreset,
   UIKIT_LAYOUT_PRESETS,
@@ -487,6 +487,36 @@ function getBuilderTemplateDragType(
   if (dragTypes.includes(BUILDER_TEMPLATE_ROW_DND_TYPE)) return "row";
   if (dragTypes.includes(BUILDER_TEMPLATE_ELEMENT_DND_TYPE)) return "element";
   return null;
+}
+
+/** Only Dynamic Content metadata participates in the render-preview refresh key. */
+function dynamicContentPreviewSignature(sections: BuilderSection[]) {
+  const metadata: Array<Record<string, unknown>> = [];
+  const visitBlocks = (blocks: unknown[], owner: string) => {
+    blocks.forEach((candidate) => {
+      const block = candidate as Record<string, any>;
+      const gridItems = Array.isArray(block.gridItems) ? block.gridItems : [];
+      const slides = Array.isArray(block.slides) ? block.slides : [];
+      gridItems.forEach((item: Record<string, any>) => {
+        if (item.dynamicContext || item.dynamicBindings) {
+          metadata.push({ owner, kind: "grid", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
+        }
+      });
+      slides.forEach((slide: Record<string, any>) => {
+        if (slide.dynamicContext || slide.dynamicBindings) {
+          metadata.push({ owner, kind: "panel-slider", id: slide.id, dynamicContext: slide.dynamicContext, dynamicBindings: slide.dynamicBindings });
+        }
+      });
+      const nestedLayout = block.nestedLayout as { rows?: Array<{ columns?: Array<{ blocks?: unknown[]; id?: string }> }> } | undefined;
+      nestedLayout?.rows?.forEach((row) => row.columns?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? owner)));
+    });
+  };
+
+  sections.forEach((section) => {
+    section.rows?.forEach((row) => row.columns.forEach((column) => visitBlocks(column.elements, column.id)));
+    section.layoutItems?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? section.id));
+  });
+  return JSON.stringify(metadata);
 }
 
 // Memoized to prevent Swiper from remounting on every DashboardBuilder state change
@@ -2033,6 +2063,18 @@ export default function DashboardBuilder({
     ? "Website settings"
     : "Style customizer";
   const [builderState, setRawBuilderState] = useState<BuilderState>(defaultState);
+  const [builderRenderProjection, setBuilderRenderProjection] = useState<{
+    page: BuilderLayoutKey;
+    sourceSignature: string;
+    sections: BuilderSection[];
+  } | null>(null);
+  const dynamicContentSignature = useMemo(
+    () => dynamicContentPreviewSignature(builderState.sections),
+    [builderState.sections],
+  );
+  const dynamicPreviewRequestRef = useRef(0);
+  const previousDynamicContentSignatureRef = useRef<string | null>(null);
+  const previousDynamicContentPageRef = useRef<BuilderLayoutKey | null>(null);
   const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
     setRawBuilderState((current) => {
       let nextState = typeof value === "function" ? value(current) : value;
@@ -2067,6 +2109,38 @@ export default function DashboardBuilder({
   }, []);
   const builderStateRef = useRef(builderState);
   builderStateRef.current = builderState;
+
+  const refreshDynamicContentPreview = useCallback(async () => {
+    const requestedState = builderStateRef.current;
+    const requestedSignature = JSON.stringify(requestedState);
+    const requestId = ++dynamicPreviewRequestRef.current;
+    const response = await fetch(builderApiUrl("/api/builder-layouts/preview"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ layout: requestedState }),
+      cache: "no-store",
+    });
+    if (
+      requestId !== dynamicPreviewRequestRef.current ||
+      JSON.stringify(builderStateRef.current) !== requestedSignature
+    ) return;
+    if (!response.ok) {
+      setBuilderRenderProjection(null);
+      return;
+    }
+    const payload = (await response.json()) as {
+      renderLayout?: BuilderState | null;
+    };
+    setBuilderRenderProjection(
+      payload.renderLayout?.sections?.length
+        ? {
+            page: requestedState.page,
+            sourceSignature: requestedSignature,
+            sections: payload.renderLayout.sections,
+          }
+        : null,
+    );
+  }, [builderApiUrl]);
   const restoredDraftKeysRef = useRef(new Set<BuilderLayoutKey>());
   const draftMetadataRef = useRef<BuilderDraftMetadata>({});
   // A YOOtheme import replaces a persisted document. Its old local draft must
@@ -2363,6 +2437,25 @@ export default function DashboardBuilder({
     () => resolveContentSections(builderState.sections, contentLanguage, primaryContentLanguage),
     [builderState.sections, contentLanguage, primaryContentLanguage],
   );
+  const materializedPreviewSections = useMemo(() => {
+    if (
+      !builderRenderProjection ||
+      builderRenderProjection.page !== builderState.page ||
+      builderRenderProjection.sourceSignature !== JSON.stringify(builderState)
+    ) {
+      return null;
+    }
+    return resolveContentSections(
+      builderRenderProjection.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    );
+  }, [
+    builderRenderProjection,
+    builderState,
+    contentLanguage,
+    primaryContentLanguage,
+  ]);
   const headerContextState = useMemo(
     () =>
       builderState.page === "header"
@@ -2822,6 +2915,7 @@ export default function DashboardBuilder({
       localPages = [];
     }
     setCustomPages(localPages);
+    setBuilderRenderProjection(null);
     setBuilderState(draft);
     setSelectedId("");
     setDraftReady(true);
@@ -6548,6 +6642,11 @@ export default function DashboardBuilder({
 
     const payload = (await response.json()) as {
       layout?: BuilderState | null;
+      renderLayout?: BuilderState | null;
+      dynamicContentDiagnostics?: Array<{
+        status: "materialized" | "fallback";
+        message?: string;
+      }>;
     };
 
     if (JSON.stringify(builderStateRef.current) !== requestedSignature) {
@@ -6581,11 +6680,44 @@ export default function DashboardBuilder({
       }, requestedState.page);
 
     const nextSignature = JSON.stringify(nextPublishedState);
+    const nextRenderState = payload.renderLayout?.sections?.length
+      ? normalizeBuilderState({
+          page: payload.renderLayout.page,
+          targetType:
+            payload.renderLayout.targetType ?? requestedState.targetType ?? "page",
+          template: payload.renderLayout.template,
+          design: {
+            ...defaultDesign,
+            ...(payload.renderLayout.design ?? {}),
+          },
+          sections: payload.renderLayout.sections,
+        }, requestedState.page)
+      : null;
+    const nextRenderProjection = nextRenderState
+      ? {
+          page: nextPublishedState.page,
+          sourceSignature: nextSignature,
+          sections: nextRenderState.sections,
+        }
+      : null;
+    const applyProjectionForSignature = (signature: string) => {
+      setBuilderRenderProjection(
+        nextRenderProjection?.sourceSignature === signature
+          ? nextRenderProjection
+          : null,
+      );
+    };
+    payload.dynamicContentDiagnostics
+      ?.filter((diagnostic) => diagnostic.status === "fallback")
+      .forEach((diagnostic) => {
+        console.warn("[dynamic-content] Builder preview fallback", diagnostic);
+      });
     const draftMetadata = draftMetadataRef.current[requestedState.page];
     const hasCompatibleRestoredDraft =
       hasStoredDraft &&
       draftMetadata?.basePublishedSignature === nextSignature;
     if (hasCompatibleRestoredDraft) {
+      applyProjectionForSignature(requestedSignature);
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus(
         nextSignature === requestedSignature
@@ -6605,6 +6737,7 @@ export default function DashboardBuilder({
       delete draftMetadataRef.current[requestedState.page];
     }
     if (nextSignature === requestedSignature) {
+      applyProjectionForSignature(requestedSignature);
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus("Local draft matches published");
       setPublishedDocumentReady(true);
@@ -6612,6 +6745,7 @@ export default function DashboardBuilder({
     }
 
     undoHistoryRef.current = [structuredClone(nextPublishedState)];
+    applyProjectionForSignature(nextSignature);
     setCommittedBuilderStateSignature(nextSignature);
     setBuilderState(nextPublishedState);
     setSelectedId(nextPublishedState.sections[0]?.id ?? "");
@@ -6627,6 +6761,28 @@ export default function DashboardBuilder({
     if (!draftReady) return;
     void loadPublishedLayout();
   }, [builderState.page, draftReady, loadPublishedLayout]);
+
+  useEffect(() => {
+    if (!draftReady || !publishedDocumentReady) return;
+    const pageChanged = previousDynamicContentPageRef.current !== builderState.page;
+    const dynamicMetadataChanged =
+      previousDynamicContentSignatureRef.current !== dynamicContentSignature;
+    if (!pageChanged && !dynamicMetadataChanged) return;
+
+    previousDynamicContentPageRef.current = builderState.page;
+    previousDynamicContentSignatureRef.current = dynamicContentSignature;
+    if (dynamicContentSignature === "[]") {
+      setBuilderRenderProjection(null);
+      return;
+    }
+    void refreshDynamicContentPreview();
+  }, [
+    builderState.page,
+    draftReady,
+    dynamicContentSignature,
+    publishedDocumentReady,
+    refreshDynamicContentPreview,
+  ]);
 
   const publishLayout = async () => {
     setPublishStatus("Publishing...");
@@ -10361,6 +10517,11 @@ export default function DashboardBuilder({
                 interactionScale={device === "desktop" ? 1 : previewScale}
                 continuousGeometryUpdates={isResizingDevice}
                 sections={headerContextSections}
+                renderSections={
+                  builderState.page !== "header" && builderState.page !== "footer"
+                    ? materializedPreviewSections ?? undefined
+                    : undefined
+                }
                 page={headerContextState.page}
                 previewProducts={previewProducts}
                 previewCategoryTree={previewCategoryTree}
@@ -10701,6 +10862,7 @@ function PreviewCanvas({
   interactionScale,
   continuousGeometryUpdates,
   sections,
+  renderSections,
   page,
   previewProducts,
   previewCategoryTree,
@@ -10781,6 +10943,8 @@ function PreviewCanvas({
   interactionScale: number;
   continuousGeometryUpdates: boolean;
   sections: BuilderSection[];
+  /** Transient server projection; authored `sections` remain interaction authority. */
+  renderSections?: BuilderSection[];
   page: BuilderLayoutKey;
   previewProducts: ProductNode[];
   previewCategoryTree: CategoryTreeItem[];
@@ -11316,8 +11480,8 @@ function PreviewCanvas({
   );
 
   const visibleSections = useMemo(
-    () => sections.filter((section) => section.visible),
-    [sections],
+    () => (renderSections ?? sections).filter((section) => section.visible),
+    [renderSections, sections],
   );
   const responsiveBreakpointPolicy = useMemo(
     () => resolveResponsiveBreakpointPolicy(shellSettings),
@@ -11763,6 +11927,7 @@ function PreviewCanvas({
                             ? undefined
                             : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
                         ...sectionSchemeStyle(section),
+                        ...sectionBackgroundImageVariables(section),
                         ...visualStyleToCss(
                           section.visualStyle as BuilderVisualStyle | undefined,
                         ),
