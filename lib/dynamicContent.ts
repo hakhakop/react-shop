@@ -65,7 +65,16 @@ export type DynamicFieldBinding = {
   path: string;
   /** Optional runtime guard for destinations that require a specific type. */
   valueType?: DynamicContentValueType;
+  transform?: DynamicFieldTransform;
 };
+
+/** Explicit, non-executable transforms supported by the shared resolver. */
+export type DynamicFieldTransform = {
+  kind: "dateFormat";
+  format: string;
+};
+
+export const SUPPORTED_DYNAMIC_DATE_FORMATS = ["d F, Y"] as const;
 
 export type DynamicFieldBindings<Field extends string = string> = Partial<
   Record<Field, DynamicFieldBinding>
@@ -119,6 +128,37 @@ const getBoundValue = (
   return entry.value;
 };
 
+const DATE_MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+] as const;
+const DATE_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+const formatDateValue = (value: string, format: string): string | undefined => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime()) || !SUPPORTED_DYNAMIC_DATE_FORMATS.includes(format as never)) return undefined;
+  const tokens: Record<string, string> = {
+    d: String(date.getUTCDate()).padStart(2, "0"),
+    D: DATE_WEEKDAYS[date.getUTCDay()],
+    F: DATE_MONTHS[date.getUTCMonth()],
+    j: String(date.getUTCDate()),
+    m: String(date.getUTCMonth() + 1).padStart(2, "0"),
+    n: String(date.getUTCMonth() + 1),
+    Y: String(date.getUTCFullYear()),
+    y: String(date.getUTCFullYear()).slice(-2),
+  };
+  return format.replace(/[dDjFmMnYy]/g, (token) => tokens[token]);
+};
+
+const applyDynamicTransform = (
+  value: unknown,
+  transform: DynamicFieldTransform | undefined,
+): unknown => {
+  if (!transform) return value;
+  if (transform.kind !== "dateFormat" || typeof transform.format !== "string") return undefined;
+  return typeof value === "string" ? formatDateValue(value, transform.format) : undefined;
+};
+
 /**
  * Resolve dynamic bindings over an authored static item. Missing or invalid
  * values retain the existing destination field as the static fallback.
@@ -138,7 +178,7 @@ export function resolveDynamicItem<
     [Field, DynamicFieldBinding | undefined]
   >) {
     if (!binding) continue;
-    const value = getBoundValue(context, binding);
+    const value = applyDynamicTransform(getBoundValue(context, binding), binding.transform);
     if (value === undefined) continue;
     resolved ??= { ...staticItem };
     resolved[destination] = value;

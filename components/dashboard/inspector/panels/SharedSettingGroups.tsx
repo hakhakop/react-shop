@@ -1157,6 +1157,8 @@ export function CardSettingsGroup({
   hoverLabel = "Enable hover effect",
   showHeight = false,
   showImageNoPadding = false,
+  heightLabel = "Fill the available column space",
+  imageNoPaddingLabel = "Image without padding",
   keys = {
     variant: "panelVariant",
     size: "panelSize",
@@ -1178,6 +1180,8 @@ export function CardSettingsGroup({
   showHeight?: boolean;
   /** Panel-only image padding semantics belong to its Panel group. */
   showImageNoPadding?: boolean;
+  heightLabel?: string;
+  imageNoPaddingLabel?: string;
   keys?: {
     variant: string;
     size: string;
@@ -1241,6 +1245,7 @@ export function CardSettingsGroup({
             checked={Boolean(values[keys.hover])}
             onChange={(checked) => update({ [keys.hover]: checked })}
             label={hoverLabel}
+            disabled={showLink && !Boolean(values[linkKey])}
           />
         </InspectorFieldRow>
       )}
@@ -1284,7 +1289,7 @@ export function CardSettingsGroup({
           <InspectorSwitch
             checked={values.panelImageNoPadding === true}
             onChange={(checked) => update({ panelImageNoPadding: checked })}
-            label="Image without padding"
+            label={imageNoPaddingLabel}
           />
         </InspectorFieldRow>
       )}
@@ -1295,7 +1300,7 @@ export function CardSettingsGroup({
             <InspectorSwitch
               checked={values.panelHeightExpand === true}
               onChange={(checked) => update({ panelHeightExpand: checked, panelExpand: checked ? values.panelExpand ?? "none" : "none" })}
-              label="Fill the available column space"
+              label={heightLabel}
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Expand Content">

@@ -66,6 +66,71 @@ test("rejects unsupported term matching and an unbounded start/quantity window",
   })).toThrow(/cannot exceed 100/);
 });
 
+test("compiles resolved raw terms into the existing category/tag filters", () => {
+  const compiled = compileWordPressPostCollectionQuery({
+    quantity: 3,
+    filters: { rawTermIds: [2, 3, 5] },
+  }, {
+    resolvedRawTerms: [
+      { taxonomy: "category", id: 2 },
+      { taxonomy: "tag", id: 3 },
+      { taxonomy: "category", id: 5 },
+    ],
+  });
+  expect(compiled.variables.where).toMatchObject({
+    categoryIn: [2, 5],
+    tagIn: [3],
+  });
+});
+
+test("resolves raw terms once before querying posts and fails on missing terms", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests: Array<{ query: string; variables: Record<string, unknown> }> = [];
+  globalThis.fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body));
+    requests.push(body);
+    const data = body.query.includes("DynamicContentWordPressTerms")
+      ? { terms: { nodes: [
+        { databaseId: 2, __typename: "Category" },
+        { databaseId: 3, __typename: "Tag" },
+        { databaseId: 5, __typename: "Category" },
+      ] } }
+      : { posts: { nodes: [{ id: "post-1", title: "Resolved post", link: "https://tenant.example/post-1/" }] } };
+    return new Response(JSON.stringify({ data }), { status: 200 });
+  };
+  try {
+    const contexts = await resolveDynamicContentContexts({
+      website: websiteWithGraphQL("https://active-tenant.example/graphql"),
+      descriptor: {
+        provider: "wordpress", source: "post", mode: "collection",
+        query: { quantity: 3, filters: { rawTermIds: [2, 3, 5] } },
+      },
+    });
+    expect(requests).toHaveLength(2);
+    expect(requests[0].query).toContain("DynamicContentWordPressTerms");
+    expect(requests[0].variables).toEqual({ where: { include: [2, 3, 5] } });
+    expect(requests[1].variables.where).toMatchObject({ categoryIn: [2, 5], tagIn: [3] });
+    expect(contexts).toHaveLength(1);
+
+    globalThis.fetch = async (_input, init) => {
+      const body = JSON.parse(String(init?.body));
+      const data = body.query.includes("DynamicContentWordPressTerms")
+        ? { terms: { nodes: [{ databaseId: 2, __typename: "Category" }] } }
+        : { posts: { nodes: [] } };
+      return new Response(JSON.stringify({ data }), { status: 200 });
+    };
+    await expect(resolveDynamicContentContexts({
+      website: websiteWithGraphQL("https://active-tenant.example/graphql"),
+      descriptor: {
+        provider: "wordpress", source: "post", mode: "collection",
+        query: { filters: { rawTermIds: [2, 3] } },
+      },
+    })).rejects.toThrow(/did not resolve: 3/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("normalizes only canonical post fields", () => {
   const rawPost = {
     id: "post-1",
@@ -156,6 +221,59 @@ test("normalizes only canonical post fields", () => {
   });
   expect(JSON.stringify(normalized)).not.toContain("rawOnlySecret");
   expect(JSON.stringify(normalized)).not.toContain("must-not-leak");
+});
+
+test("normalizes provider-owned ACF media children without leaking the raw field", () => {
+  const normalized = normalizeWordPressPostContext({
+    id: "post-acf",
+    title: "ACF post",
+    acfFields: {
+      intro_image: {
+        node: {
+          databaseId: 2192,
+          sourceUrl: "https://tenant.example/intro.jpg",
+          altText: "Intro image",
+          caption: "<p>Caption</p>",
+        },
+      },
+    },
+  });
+  expect(normalized.fields).toMatchObject({
+    "acf.intro_image.url": { type: "url", value: "https://tenant.example/intro.jpg" },
+    "acf.intro_image.alt": { type: "string", value: "Intro image" },
+    "acf.intro_image.caption": { type: "richText", value: "<p>Caption</p>" },
+    "acf.intro_image.id": { type: "identifier", value: 2192 },
+    "acf.intro_image": {
+      type: "media",
+      value: { url: "https://tenant.example/intro.jpg", id: 2192, alt: "Intro image", caption: "<p>Caption</p>" },
+    },
+  });
+  expect(JSON.stringify(normalized)).not.toContain("sourceUrl");
+});
+
+test("projects the live WPGraphQL ACF group and normalizes its media edge", () => {
+  const compiled = compileWordPressPostCollectionQuery({ quantity: 3 });
+  expect(compiled.query).toContain("acfFields: postAcfFields");
+  expect(compiled.query).toContain("intro_image: introImage");
+  const normalized = normalizeWordPressPostContext({
+    id: "post-live-acf",
+    acfFields: {
+      intro_image: {
+        node: {
+          databaseId: 4321,
+          sourceUrl: "https://store.webpages.am/wp-content/uploads/post-intro.jpg",
+          altText: "Intro image alt",
+          caption: "Intro caption",
+        },
+      },
+    },
+  });
+  expect(normalized.fields).toMatchObject({
+    "acf.intro_image.url": { type: "url", value: "https://store.webpages.am/wp-content/uploads/post-intro.jpg" },
+    "acf.intro_image.alt": { type: "string", value: "Intro image alt" },
+    "acf.intro_image.caption": { type: "richText", value: "Intro caption" },
+    "acf.intro_image.id": { type: "identifier", value: 4321 },
+  });
 });
 
 test("uses the active website endpoint and normalizes multiple provider posts", async () => {

@@ -151,6 +151,9 @@ async function materializeGridBlock(
       }
 
       const template = staticGridTemplate(item);
+      const unavailableAcfPaths = Object.values(item.dynamicBindings ?? {})
+        .map((binding) => binding?.path)
+        .filter((path): path is string => typeof path === "string" && path.startsWith("acf.") && !identifiedContexts.some((context) => context.fields[path]));
       renderItems.push(
         ...identifiedContexts.map((context) => ({
           ...resolveDynamicItem(template, context, item.dynamicBindings),
@@ -166,7 +169,9 @@ async function materializeGridBlock(
         contextCount: identifiedContexts.length,
         ...(identifiedContexts.length !== contexts.length
           ? { message: `${contexts.length - identifiedContexts.length} context item(s) without an identifier were skipped.` }
-          : {}),
+          : unavailableAcfPaths.length > 0
+            ? { message: `ACF value unavailable from the WordPress GraphQL Post projection: ${Array.from(new Set(unavailableAcfPaths)).join(", ")}. Static fallbacks were retained.` }
+            : {}),
       });
     } catch (error) {
       diagnostics.push({
@@ -245,6 +250,9 @@ async function materializePanelSliderBlock(
       }
 
       const template = staticPanelSliderTemplate(slide);
+      const unavailableAcfPaths = Object.values(slide.dynamicBindings ?? {})
+        .map((binding) => binding?.path)
+        .filter((path): path is string => typeof path === "string" && path.startsWith("acf.") && !identifiedContexts.some((context) => context.fields[path]));
       renderSlides.push(
         ...identifiedContexts.map((context) => ({
           ...resolveDynamicItem(template, context, slide.dynamicBindings),
@@ -259,7 +267,9 @@ async function materializePanelSliderBlock(
         contextCount: identifiedContexts.length,
         ...(identifiedContexts.length !== contexts.length
           ? { message: `${contexts.length - identifiedContexts.length} context item(s) without an identifier were skipped.` }
-          : {}),
+          : unavailableAcfPaths.length > 0
+            ? { message: `ACF value unavailable from the WordPress GraphQL Post projection: ${Array.from(new Set(unavailableAcfPaths)).join(", ")}. Static fallbacks were retained.` }
+            : {}),
       });
     } catch (error) {
       diagnostics.push({

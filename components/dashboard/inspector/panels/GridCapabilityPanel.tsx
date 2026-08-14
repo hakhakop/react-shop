@@ -771,17 +771,23 @@ export default function GridCapabilityPanel({
           update={update}
           title="PANEL"
           showLink
-          keys={{ variant: "gridCardVariant", size: "gridCardSize", hover: "gridCardHover", link: "linkPanel" }}
+          linkFirst
+          hoverLabel="Add hover style"
+          keys={{ variant: "gridCardVariant", size: "gridCardSize", hover: "panelHover", link: "linkPanel" }}
           surfaceOptions={[
             { value: "blank", label: "None" },
             { value: "default", label: "Card Default" },
             { value: "primary", label: "Card Primary" },
             { value: "secondary", label: "Card Secondary" },
+            { value: "card-hover", label: "Card Hover" },
             { value: "tile-default", label: "Tile Default" },
+            { value: "tile-muted", label: "Tile Muted" },
             { value: "tile-primary", label: "Tile Primary" },
             { value: "tile-secondary", label: "Tile Secondary" },
           ]}
           defaultSize="none"
+          showImageNoPadding
+          imageNoPaddingLabel="Align image without padding"
           sizeOptions={[
             { value: "none", label: "None" },
             { value: "small", label: "Small" },

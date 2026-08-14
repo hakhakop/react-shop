@@ -2055,14 +2055,6 @@
                               "format": "d F, Y"
                             }
                           },
-                          "imageUrl": {
-                            "path": "acf.intro_image.url",
-                            "valueType": "url"
-                          },
-                          "imageAlt": {
-                            "path": "acf.intro_image.alt",
-                            "valueType": "string"
-                          },
                           "buttonUrl": {
                             "path": "link",
                             "valueType": "url"
@@ -2135,7 +2127,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-14T15:27:06.764Z"
+    "updatedAt": "2026-08-14T13:44:12.417Z"
   },
   "shop": {
     "version": 1,

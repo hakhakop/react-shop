@@ -426,7 +426,7 @@ export type BuilderLayoutBlock = {
   gridShowButton?: boolean;
   gridRowGap?: "none" | "small" | "medium" | "large";
   gridItemRenderer?: "plain" | "card";
-  gridCardVariant?: "default" | "primary" | "secondary" | "blank";
+  gridCardVariant?: "default" | "primary" | "secondary" | "blank" | "card-hover" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
   gridCardSize?: "none" | "small" | "default" | "large";
   gridCardHover?: boolean;
   gridItems?: {

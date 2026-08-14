@@ -97,6 +97,35 @@ test("incorrect dynamic value type safely retains the static fallback", () => {
   expect(resolveDynamicItem(staticItem, context, bindings)).toBe(staticItem);
 });
 
+test("source-proven date format transform resolves into the destination field", () => {
+  const context: DynamicItemContext = {
+    fields: { date: { type: "string", value: "2021-02-02T08:00:00" } },
+  };
+  const bindings: DynamicFieldBindings<keyof TestItem> = {
+    text: {
+      path: "date",
+      valueType: "string",
+      transform: { kind: "dateFormat", format: "d F, Y" },
+    },
+  };
+
+  expect(resolveDynamicItem(staticItem, context, bindings).text).toBe("02 February, 2021");
+});
+
+test("invalid date transform input retains the authored fallback", () => {
+  const bindings: DynamicFieldBindings<keyof TestItem> = {
+    text: {
+      path: "date",
+      valueType: "string",
+      transform: { kind: "dateFormat", format: "Y-m-d;DROP" },
+    },
+  };
+
+  expect(resolveDynamicItem(staticItem, {
+    fields: { date: { type: "string", value: "not-a-date" } },
+  }, bindings)).toBe(staticItem);
+});
+
 test("text, URL, and media context values remain typed", () => {
   const context: DynamicItemContext = {
     fields: {

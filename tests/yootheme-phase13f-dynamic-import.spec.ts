@@ -38,11 +38,20 @@ test("imports a real YOOtheme Custom Posts Grid item into the canonical contract
     },
     dynamicBindings: {
       title: { path: "title", valueType: "string" },
+      meta: {
+        path: "date",
+        valueType: "string",
+        transform: { kind: "dateFormat", format: "d F, Y" },
+      },
       buttonUrl: { path: "link", valueType: "url" },
     },
   });
-  expect(item.dynamicBindings.imageUrl).toBeUndefined();
-  expect(mapped.warnings.some((warning) => warning.includes("raw term IDs do not carry taxonomy identity"))).toBeTruthy();
+  expect(item.dynamicBindings.imageUrl).toEqual({ path: "acf.intro_image.url", valueType: "url" });
+  expect(item.dynamicBindings.imageAlt).toEqual({ path: "acf.intro_image.alt", valueType: "string" });
+  expect(item.dynamicContext.query).toMatchObject({
+    filters: { rawTermIds: [2, 3, 5] },
+  });
+  expect(mapped.warnings.some((warning) => warning.includes("raw term IDs do not carry taxonomy identity"))).toBeFalsy();
 });
 
 test("preserves authored static fallbacks beside supported bindings", () => {

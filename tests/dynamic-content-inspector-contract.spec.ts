@@ -54,6 +54,8 @@ test("Custom Posts exposes one typed normalized field catalog", () => {
     { path: "featuredImage", label: "Featured Image", valueType: "media" },
     { path: "featuredImage.url", label: "Featured Image URL", valueType: "url" },
     { path: "featuredImage.alt", label: "Featured Image Alt", valueType: "string" },
+    { path: "acf.intro_image.url", label: "Intro Image → URL", valueType: "url" },
+    { path: "acf.intro_image.alt", label: "Intro Image → Alt", valueType: "string" },
     { path: "link", label: "Link", valueType: "url" },
     { path: "id", label: "ID", valueType: "identifier" },
   ]));

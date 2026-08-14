@@ -9,6 +9,7 @@ import {
   graphqlFetch,
 } from "@/lib/graphql";
 import type { SaaSWebsite } from "@/lib/websites";
+import { WORDPRESS_POST_ACF_FIELDS } from "@/lib/wordpressDynamicContentFields";
 
 const DEFAULT_QUANTITY = 10;
 const MAX_QUERY_WINDOW = 100;
@@ -65,6 +66,43 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
             caption
           }
         }
+        # Keep the provider's GraphQL projection generic: aliases map the
+        # schema's ACF field names to the canonical ACF field keys consumed by
+        # the shared media normalizer.
+        acfFields: postAcfFields {
+          intro_image: introImage {
+            node {
+              id
+              databaseId
+              sourceUrl
+              altText
+              caption
+            }
+          }
+          teaser_image: teaserImage {
+            node {
+              id
+              databaseId
+              sourceUrl
+              altText
+              caption
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const WORDPRESS_TERM_RESOLUTION_QUERY = `
+  query DynamicContentWordPressTerms(
+    $where: RootQueryToTermNodeConnectionWhereArgs
+  ) {
+    terms(where: $where) {
+      nodes {
+        databaseId
+        slug
+        __typename
       }
     }
   }
@@ -90,6 +128,8 @@ export type WordPressPostCollectionQuery = {
       taxonomy: "category" | "tag";
       ids: Array<string | number>;
     }>;
+    /** Raw YOOtheme IDs; taxonomy is intentionally resolved by the provider. */
+    rawTermIds?: Array<string | number>;
     /** Core WPGraphQL `*In` filters provide OR/any matching within a taxonomy. */
     termMatch?: "any";
   };
@@ -104,6 +144,8 @@ type CompiledWordPressPostCollectionQuery = {
   start: number;
   quantity: number;
 };
+
+type ResolvedRawTerm = { taxonomy: "category" | "tag"; id: string | number };
 
 type WordPressTermNode = {
   id?: unknown;
@@ -134,6 +176,8 @@ type WordPressPostNode = {
       caption?: unknown;
     }) | null;
   } | null;
+  /** Optional provider projection populated when WPGraphQL ACF is available. */
+  acfFields?: Record<string, unknown> | null;
 };
 
 type WordPressPostsResponse = {
@@ -253,6 +297,7 @@ const readTerms = (
  */
 export function compileWordPressPostCollectionQuery(
   queryData: DynamicContentContextDescriptor["query"],
+  options?: { resolvedRawTerms?: ResolvedRawTerm[] },
 ): CompiledWordPressPostCollectionQuery {
   const query = assertRecord(queryData, "WordPress post collection query");
   assertAllowedKeys(
@@ -290,7 +335,7 @@ export function compileWordPressPostCollectionQuery(
   const filters = assertRecord(query.filters, "query.filters");
   assertAllowedKeys(
     filters,
-    ["authors", "categories", "tags", "terms", "termMatch"],
+    ["authors", "categories", "tags", "terms", "rawTermIds", "termMatch"],
     "WordPress post collection filter",
   );
   const termMatch = readEnum(
@@ -301,6 +346,11 @@ export function compileWordPressPostCollectionQuery(
   );
   const authors = readIdList(filters.authors, "query.filters.authors");
   const terms = readTerms(filters.terms);
+  const rawTermIds = readIdList(filters.rawTermIds, "query.filters.rawTermIds");
+  if (rawTermIds.length > 0 && !options?.resolvedRawTerms) {
+    throw new Error("query.filters.rawTermIds must be resolved by the WordPress provider before compilation.");
+  }
+  const resolvedTerms = options?.resolvedRawTerms ?? [];
   const categories = Array.from(new Set([
     ...readIdList(filters.categories, "query.filters.categories"),
     ...terms.categories,
@@ -308,14 +358,18 @@ export function compileWordPressPostCollectionQuery(
   const tags = Array.from(new Set([
     ...readIdList(filters.tags, "query.filters.tags"),
     ...terms.tags,
+    ...resolvedTerms.filter((term) => term.taxonomy === "tag").map((term) => term.id),
   ]));
+  categories.push(...resolvedTerms.filter((term) => term.taxonomy === "category").map((term) => term.id));
+  const uniqueCategories = Array.from(new Set(categories));
+  const uniqueTags = Array.from(new Set(tags));
 
   const where: Record<string, unknown> = {
     orderby: [{ field: ORDER_FIELDS[order], order: direction.toUpperCase() }],
   };
   if (authors.length > 0) where.authorIn = authors;
-  if (categories.length > 0) where.categoryIn = categories;
-  if (tags.length > 0) where.tagIn = tags;
+  if (uniqueCategories.length > 0) where.categoryIn = uniqueCategories;
+  if (uniqueTags.length > 0) where.tagIn = uniqueTags;
 
   // Kept explicit so broadening term matching requires an intentional compiler change.
   void termMatch;
@@ -359,6 +413,53 @@ const normalizeTerm = (
   });
   return Object.keys(normalized).length > 0 ? normalized : undefined;
 };
+
+type WordPressTermResolutionNode = {
+  databaseId?: unknown;
+  __typename?: unknown;
+};
+
+type WordPressTermsResponse = {
+  terms?: { nodes?: WordPressTermResolutionNode[] | null } | null;
+};
+
+const normalizeResolvedTaxonomy = (typename: unknown): "category" | "tag" => {
+  if (typename === "Category") return "category";
+  if (typename === "Tag" || typename === "PostTag") return "tag";
+  throw new Error(`Unsupported WordPress taxonomy returned for raw term ID: ${String(typename)}.`);
+};
+
+async function resolveRawWordPressTerms(
+  rawTermIds: Array<string | number>,
+  endpoint: string,
+): Promise<ResolvedRawTerm[]> {
+  const uniqueIds = Array.from(new Set(rawTermIds));
+  const data = await graphqlFetch<WordPressTermsResponse>(
+    WORDPRESS_TERM_RESOLUTION_QUERY,
+    { where: { include: uniqueIds } },
+    { endpoint },
+  );
+  const nodes = data.terms?.nodes ?? [];
+  const seen = new Set<string>();
+  const resolved = nodes.map((node) => {
+    const id = identifierValue(node.databaseId);
+    const key = id === undefined ? "" : String(id);
+    if (id === undefined || seen.has(key)) {
+      throw new Error("WordPress raw term resolution returned an ambiguous or invalid term ID.");
+    }
+    seen.add(key);
+    return { taxonomy: normalizeResolvedTaxonomy(node.__typename), id };
+  });
+  const missing = uniqueIds.filter((id) => !seen.has(String(id)));
+  if (missing.length > 0) {
+    throw new Error(`WordPress raw term ID(s) did not resolve: ${missing.join(", ")}.`);
+  }
+  return rawTermIds.map((id) => {
+    const match = resolved.find((term) => String(term.id) === String(id));
+    if (!match) throw new Error(`WordPress raw term ID did not resolve: ${String(id)}.`);
+    return match;
+  });
+}
 
 const setField = (
   fields: Record<string, DynamicItemContextValue>,
@@ -441,6 +542,36 @@ export function normalizeWordPressPostContext(
     });
   }
 
+  // Normalize provider-owned ACF media without leaking the GraphQL response.
+  // The current public Post schema may omit this projection; in that case the
+  // authored binding remains a safe fallback and materialization reports it.
+  const acfFields = post.acfFields;
+  for (const field of WORDPRESS_POST_ACF_FIELDS) {
+    const raw = acfFields?.[field.name];
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) continue;
+    // WPGraphQL for ACF exposes media fields as connection edges. Accept the
+    // normalized direct shape too so this owner remains compatible with
+    // existing provider fixtures and future ACF field types.
+    const edge = raw as Record<string, unknown>;
+    const media = edge.node && typeof edge.node === "object" && !Array.isArray(edge.node)
+      ? edge.node as Record<string, unknown>
+      : edge;
+    const url = stringValue(media.sourceUrl) ?? stringValue(media.url);
+    const alt = stringValue(media.altText) ?? stringValue(media.alt);
+    const caption = stringValue(media.caption);
+    const id = identifierValue(media.databaseId) ?? identifierValue(media.id);
+    if (url !== undefined) setField(fields, `acf.${field.name}.url`, { type: "url", value: url });
+    if (alt !== undefined) setField(fields, `acf.${field.name}.alt`, { type: "string", value: alt });
+    if (caption !== undefined) setField(fields, `acf.${field.name}.caption`, { type: "richText", value: caption });
+    if (id !== undefined) setField(fields, `acf.${field.name}.id`, { type: "identifier", value: id });
+    if (url !== undefined) {
+      setField(fields, `acf.${field.name}`, {
+        type: "media",
+        value: { url, ...(id !== undefined ? { id } : {}), ...(alt !== undefined ? { alt } : {}), ...(caption !== undefined ? { caption } : {}) },
+      });
+    }
+  }
+
   return { ...(id !== undefined ? { id } : {}), fields };
 }
 
@@ -464,7 +595,13 @@ export async function resolveWordPressPostCollection(input: {
     throw new Error("The active website has no WordPress GraphQL endpoint configured.");
   }
 
-  const compiled = compileWordPressPostCollectionQuery(descriptor.query);
+  const query = assertRecord(descriptor.query, "WordPress post collection query");
+  const filters = assertRecord(query.filters, "query.filters");
+  const rawTermIds = readIdList(filters.rawTermIds, "query.filters.rawTermIds");
+  const resolvedRawTerms = rawTermIds.length > 0
+    ? await resolveRawWordPressTerms(rawTermIds, endpoint)
+    : undefined;
+  const compiled = compileWordPressPostCollectionQuery(descriptor.query, { resolvedRawTerms });
   const data = await graphqlFetch<WordPressPostsResponse>(
     compiled.query,
     compiled.variables,

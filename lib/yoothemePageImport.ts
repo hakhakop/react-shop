@@ -27,8 +27,10 @@ import type {
   DynamicContentContextDescriptor,
   DynamicFieldBinding,
   DynamicFieldBindings,
+  DynamicFieldTransform,
   DynamicContentValueType,
 } from "@/lib/dynamicContent";
+import { SUPPORTED_DYNAMIC_DATE_FORMATS } from "@/lib/dynamicContent";
 import { WORDPRESS_POST_COLLECTION_FIELDS } from "@/lib/dynamicContentCapabilities";
 
 /**
@@ -802,13 +804,15 @@ const sourcePanelStyle = (
 const sourceCardVariant = (
   value: unknown,
 ): NonNullable<BuilderLayoutBlock["gridCardVariant"]> => {
-  const normalized = typeof value === "string" ? value.trim().toLowerCase().replace(/^(?:card|tile)-/, "") : "";
+  const source = typeof value === "string" ? value.trim().toLowerCase() : "";
+  const normalized = source.replace(/^(?:card|tile)-/, "");
   // An omitted YOOtheme panel_style means Grid Panel Style = None. It must
   // remain distinct from Card Default through import and rendering.
   if (normalized === "" || normalized === "none" || normalized === "blank") return "blank";
-  return normalized === "primary" || normalized === "secondary" || normalized === "blank"
-    ? normalized
-    : "default";
+  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary"].includes(source)) {
+    return source as NonNullable<BuilderLayoutBlock["gridCardVariant"]>;
+  }
+  return normalized === "primary" || normalized === "secondary" || normalized === "blank" ? normalized : "default";
 };
 
 const sourcePanelVariant = (
@@ -875,13 +879,41 @@ const dynamicBinding = (
   bindings: DynamicFieldBindings<DynamicImportDestination>,
   warnings: string[],
   sourcePath: string,
+  transform?: DynamicFieldTransform,
 ) => {
   const field = canonicalDynamicField(path);
   if (!field) {
     warnings.push(`${sourcePath}: dynamic field '${path}' has no canonical WebPages source-field owner and was not imported.`);
     return;
   }
-  bindings[destination] = { path: field.path, valueType: field.valueType } as DynamicFieldBinding;
+  bindings[destination] = {
+    path: field.path,
+    valueType: field.valueType,
+    ...(transform ? { transform } : {}),
+  } as DynamicFieldBinding;
+};
+
+const sourceDateTransform = (
+  filters: unknown,
+  warnings: string[],
+  sourcePath: string,
+): DynamicFieldTransform | undefined => {
+  if (filters === undefined) return undefined;
+  if (!filters || typeof filters !== "object" || Array.isArray(filters)) {
+    warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
+    return undefined;
+  }
+  const entries = Object.entries(filters as Record<string, unknown>);
+  if (entries.length !== 1 || entries[0][0] !== "date" || typeof entries[0][1] !== "string") {
+    warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
+    return undefined;
+  }
+  const format = entries[0][1];
+  if (!(SUPPORTED_DYNAMIC_DATE_FORMATS as readonly string[]).includes(format)) {
+    warnings.push(`${sourcePath}: date format is not supported by the canonical Dynamic Content transform.`);
+    return undefined;
+  }
+  return { kind: "dateFormat", format };
 };
 
 const sourceDynamicFieldPath = (
@@ -898,6 +930,9 @@ const sourceDynamicFieldPath = (
   if (name === "field.featured_image.url" || name === "featuredImage.url") return { path: "featuredImage.url", filters: descriptor.filters };
   if (name === "field.featured_image.alt" || name === "featuredImage.alt") return { path: "featuredImage.alt", filters: descriptor.filters };
   if (name === "field.featured_image.caption" || name === "featuredImage.caption") return { path: "featuredImage.caption", filters: descriptor.filters };
+  if (name === "field.intro_image.url") return { path: "acf.intro_image.url", filters: descriptor.filters };
+  if (name === "field.intro_image.alt") return { path: "acf.intro_image.alt", filters: descriptor.filters };
+  if (name === "field.intro_image.caption") return { path: "acf.intro_image.caption", filters: descriptor.filters };
   return { path: name, filters: descriptor.filters };
 };
 
@@ -962,16 +997,24 @@ const mapDynamicQuery = (
     if (Array.isArray(input.terms) && input.terms.every((term) => term && typeof term === "object" && !Array.isArray(term))) {
       filters.terms = input.terms;
     } else if (Array.isArray(input.terms)) {
-      warnings.push(`${sourcePath}.query.arguments.terms: raw term IDs do not carry taxonomy identity in the export; no guessed category/tag mapping was applied.`);
+      const rawTermIds = input.terms.filter((id): id is string | number =>
+        (typeof id === "number" && Number.isInteger(id) && id > 0) ||
+        (typeof id === "string" && id.trim().length > 0),
+      );
+      if (rawTermIds.length === input.terms.length) filters.rawTermIds = rawTermIds;
+      else warnings.push(`${sourcePath}.query.arguments.terms: raw term IDs must be positive integers or non-empty strings.`);
     } else {
       warnings.push(`${sourcePath}.query.arguments.terms: structured taxonomy terms are required.`);
     }
   }
+  let unsupportedTermOperator = false;
   for (const [key, label] of [["category_operator", "category"], ["post_tag_operator", "tag"]] as const) {
     if (input[key] !== undefined && input[key] !== "IN") {
       warnings.push(`${sourcePath}.query.arguments.${key}: only IN/any ${label} matching is supported.`);
+      unsupportedTermOperator = true;
     }
   }
+  if (unsupportedTermOperator) return null;
   if (Object.keys(filters).length > 0) {
     filters.termMatch = "any";
     output.filters = filters;
@@ -1006,11 +1049,14 @@ const mapDynamicSource = (
     for (const [sourceKey, destination] of Object.entries(destinationMap)) {
       const descriptor = sourceDynamicFieldPath((sourceProps as Record<string, unknown>)[sourceKey]);
       if (!descriptor) continue;
-      if (descriptor.filters !== undefined) {
-        warnings.push(`${sourcePath}.source.props.${sourceKey}: dynamic filters/transforms are unsupported and the binding was not imported.`);
-        continue;
-      }
-      dynamicBinding(destination, descriptor.path, bindings, warnings, `${sourcePath}.source.props.${sourceKey}`);
+      const bindingPath = `${sourcePath}.source.props.${sourceKey}`;
+      const transform = descriptor.path === "date"
+        ? sourceDateTransform(descriptor.filters, warnings, bindingPath)
+        : descriptor.filters === undefined
+          ? undefined
+          : (warnings.push(`${bindingPath}: dynamic filters/transforms are unsupported and the binding was not imported.`), undefined);
+      if (descriptor.filters !== undefined && !transform) continue;
+      dynamicBinding(destination, descriptor.path, bindings, warnings, bindingPath, transform);
     }
   }
   return {
@@ -1581,6 +1627,9 @@ const mapStaticElement = (
       gridCardVariant: sourceCardVariant(props.panel_style),
       gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
       gridCardHover: props.panel_style === "card-hover",
+      panelImageNoPadding: props.panel_image_no_padding === true || props.panel_image_no_padding === "true",
+      linkPanel: props.panel_link === true || props.panel_link === "true",
+      panelHover: props.panel_link_hover === true || props.panel_link_hover === "true",
       panelExpand: props.panel_expand === "image" || props.panel_expand === "content" || props.panel_expand === "both"
         ? props.panel_expand
         : "none",

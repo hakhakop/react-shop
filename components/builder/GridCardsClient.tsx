@@ -253,7 +253,9 @@ export function GridCardsClient({
             const panelPadding = rawBlock.gridCardSize ?? rawBlock.panelSize ?? rawBlock.panelPadding ?? "none";
             let panelClass = "";
 
-            if (
+            if (panelStyle === "card-hover") {
+              panelClass = "uk-card uk-card-default";
+            } else if (
               panelStyle.startsWith("card-") ||
               panelStyle === "default" ||
               panelStyle === "primary" ||
@@ -279,7 +281,7 @@ export function GridCardsClient({
 
             const isCard = Boolean(panelClass);
             // Explicit false suppresses every Grid-card hover presentation.
-            const cardHover = item.cardHover ?? (block.gridCardHover !== undefined ? block.gridCardHover : rawBlock.panelHover) ?? false;
+            const cardHover = panelStyle === "card-hover" || (item.cardHover ?? (rawBlock.panelHover !== undefined ? rawBlock.panelHover : block.gridCardHover) ?? false);
             const colorSemantics = resolvePanelColorSemantics({
               ...rawBlock,
               cardVariant: panelStyle,
@@ -329,7 +331,13 @@ export function GridCardsClient({
             const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageShadow ?? rawBlock.imageBoxShadow);
             const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
-            const isFrameless = (rawBlock as any).alignImageWithoutPadding === true || imagePaddingClass === "frameless";
+            const isFrameless = rawBlock.panelImageNoPadding === true || rawBlock.alignImageWithoutPadding === true || imagePaddingClass === "frameless";
+            const panelExpand = rawBlock.panelExpand === "image" || rawBlock.panelExpand === "content" || rawBlock.panelExpand === "both"
+              ? rawBlock.panelExpand
+              : "none";
+            const panelHeightClass = rawBlock.panelHeightExpand === true ? "shop-builder-panel--height-expand" : "";
+            const panelExpandClass = panelExpand !== "none" ? `shop-builder-panel--expand-${panelExpand}` : "";
+            const panelLinkClass = rawBlock.linkPanel === true ? "shop-builder-panel--linked" : "";
             const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
             const imageWidth = imageDimension(rawBlock.imageWidth);
             const imageHeight = imageDimension(rawBlock.imageHeight);
@@ -501,7 +509,7 @@ export function GridCardsClient({
                 key={item.id}
                 className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
-                } ${rawBlock.panelExpand === "content" || rawBlock.panelExpand === "both" ? "shop-builder-panel--expand-content" : ""} ${builderItemClassName ?? ""}`.trim()}
+                } ${panelHeightClass} ${panelExpandClass} ${panelLinkClass} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     textAlign: itemContentAlignment,
@@ -514,6 +522,14 @@ export function GridCardsClient({
                 {...builderItemEventProps}
               >
                 {itemChrome?.(item, sourceIndex)}
+                {rawBlock.linkPanel === true && itemUrl && (
+                  <a
+                    className="shop-builder-panel-link-overlay"
+                    href={itemUrl}
+                    aria-label={item.title || buttonText || "Open item"}
+                    {...builderLinkTargetProps(linkTarget)}
+                  />
+                )}
                 {/* Frameless (Flush) image rendered outside card body */}
                 {isFrameless && renderImage()}
 

@@ -16324,7 +16324,7 @@ const PreviewSection = memo(function PreviewSection({
                             }}
                             gridGapClass={gridSpacingClass(block.gridGap, ["none", "small", "medium", "large", "max"], "medium")}
                             gridGapCustom={gridSpacingClass(block.gridGap, ["none", "small", "medium", "large", "max"], "medium") === "custom" ? cssSpacingValue(block.gridGap) : null}
-                            imagePaddingClass={Boolean((block as any).alignImageWithoutPadding) ? "frameless" : gridSpacingClass(block.gridImagePadding, ["frameless", "none", "small", "medium", "max"], "none")}
+                            imagePaddingClass={Boolean(block.panelImageNoPadding || (block as any).alignImageWithoutPadding) ? "frameless" : gridSpacingClass(block.gridImagePadding, ["frameless", "none", "small", "medium", "max"], "none")}
                             imagePaddingCustom={gridSpacingClass(block.gridImagePadding, ["frameless", "none", "small", "medium", "max"], "none") === "custom" ? cssSpacingValue(block.gridImagePadding) : null}
                             contentPaddingClass={gridSpacingClass(block.gridContentPadding, ["none", "small", "medium", "large"], "medium")}
                             contentPaddingCustom={gridSpacingClass(block.gridContentPadding, ["none", "small", "medium", "large"], "medium") === "custom" ? cssSpacingValue(block.gridContentPadding) : null}

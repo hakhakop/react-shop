@@ -6,6 +6,7 @@ import { getWebsiteByDomainHost } from "@/lib/websites";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 
 export const dynamic = "force-dynamic";
 
@@ -44,10 +45,20 @@ export default async function HomePage() {
         ) as typeof layout.sections,
       }
     : layout;
-  if (localizedLayout?.sections?.some((section) => section.visible)) {
+  const materialization = localizedLayout
+    ? await materializeBuilderDynamicContent(localizedLayout)
+    : null;
+  const renderLayout = materialization?.renderLayout ?? localizedLayout;
+  materialization?.diagnostics
+    .filter((diagnostic) => diagnostic.status === "fallback")
+    .forEach((diagnostic) => {
+      console.warn("[dynamic-content] root storefront fallback", diagnostic);
+    });
+
+  if (renderLayout?.sections?.some((section) => section.visible)) {
     return (
       <StorefrontBuilderRenderer
-        layout={localizedLayout}
+        layout={renderLayout}
         page="home"
         headerOverlay={headerDocumentSettings.overlay}
         shellSettings={shellSettings}

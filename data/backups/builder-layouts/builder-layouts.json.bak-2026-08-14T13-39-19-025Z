@@ -528,9 +528,6 @@
                     "gridCardVariant": "blank",
                     "gridCardSize": "none",
                     "gridCardHover": false,
-                    "panelImageNoPadding": false,
-                    "linkPanel": false,
-                    "panelHover": false,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "gridGap": "large",
@@ -1270,9 +1267,6 @@
                     "gridCardVariant": "default",
                     "gridCardSize": "default",
                     "gridCardHover": false,
-                    "panelImageNoPadding": false,
-                    "linkPanel": true,
-                    "panelHover": true,
                     "panelExpand": "none",
                     "gridMediaPlacement": "top",
                     "showDividers": false,
@@ -1761,9 +1755,6 @@
                     "gridCardVariant": "default",
                     "gridCardSize": "large",
                     "gridCardHover": false,
-                    "panelImageNoPadding": true,
-                    "linkPanel": false,
-                    "panelHover": false,
                     "panelExpand": "content",
                     "gridMediaPlacement": "top",
                     "showDividers": false,
@@ -2055,16 +2046,12 @@
                               "format": "d F, Y"
                             }
                           },
-                          "imageUrl": {
-                            "path": "acf.intro_image.url",
-                            "valueType": "url"
-                          },
-                          "imageAlt": {
-                            "path": "acf.intro_image.alt",
-                            "valueType": "string"
-                          },
                           "buttonUrl": {
                             "path": "link",
+                            "valueType": "url"
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
                             "valueType": "url"
                           }
                         }
@@ -2080,9 +2067,6 @@
                     "gridCardVariant": "default",
                     "gridCardSize": "default",
                     "gridCardHover": false,
-                    "panelImageNoPadding": true,
-                    "linkPanel": true,
-                    "panelHover": true,
                     "panelExpand": "content",
                     "gridMediaPlacement": "top",
                     "showDividers": false,
@@ -2126,7 +2110,8 @@
                     "gridMetaHtmlElement": "div",
                     "removeBottomMargin": true,
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "panelImageNoPadding": true
                   }
                 ]
               }
@@ -2135,7 +2120,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-14T15:27:06.764Z"
+    "updatedAt": "2026-08-14T13:39:17.633Z"
   },
   "shop": {
     "version": 1,

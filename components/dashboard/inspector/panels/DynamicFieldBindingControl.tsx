@@ -186,6 +186,7 @@ export default function DynamicFieldBindingControl({
         <div
           ref={pickerRef}
           className="builder-dynamic-binding-picker"
+          data-inspector-owned-portal
           role="dialog"
           aria-label={`${fieldLabel} dynamic field picker`}
           style={{

@@ -1532,7 +1532,7 @@ body.dark {
   border-radius: inherit;
 }
 
-.shop-builder-panel--linked > :not(.shop-builder-panel-link-overlay) {
+.shop-builder-panel--linked > :not(.shop-builder-panel-link-overlay):not(.builder-preview-grid-item-tools):not(.builder-preview-grid-drag-handle) {
   position: relative;
   z-index: 0;
 }
@@ -1581,19 +1581,24 @@ body.dark {
 .shop-builder-panel--height-expand .uk-card-body {
   min-height: 0;
 }
-.shop-builder-panel--expand-content .uk-card-body {
+.shop-builder-panel--expand-content .uk-card-body,
+.shop-builder-panel--expand-content .shop-builder-grid-content {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 }
-.shop-builder-panel--expand-content .shop-builder-panel-action {
+.shop-builder-panel--expand-content .shop-builder-panel-action,
+.shop-builder-panel--expand-content .shop-builder-grid-button {
   margin-top: auto;
 }
-.shop-builder-panel--expand-image.shop-builder-panel--media-top > .shop-builder-panel-media {
+.shop-builder-panel--expand-image.shop-builder-panel--media-top > .shop-builder-panel-media,
+.shop-builder-panel--expand-image.shop-builder-panel--media-top > .shop-builder-grid-image {
   flex: 1 1 auto;
 }
 .shop-builder-panel--expand-both.shop-builder-panel--media-top > .shop-builder-panel-media,
-.shop-builder-panel--expand-both .uk-card-body {
+.shop-builder-panel--expand-both.shop-builder-panel--media-top > .shop-builder-grid-image,
+.shop-builder-panel--expand-both .uk-card-body,
+.shop-builder-panel--expand-both .shop-builder-grid-content {
   flex: 1 1 auto;
 }
 
@@ -2000,6 +2005,19 @@ body.dark {
 .shop-builder-grid-card.shop-builder-panel--expand-content,
 .shop-builder-grid-card.shop-builder-panel--expand-content .shop-builder-grid-content {
   height: 100%;
+}
+
+/* YOOtheme's default card body uses the theme's 40px card padding. Keep this
+   contract scoped to imported YOOtheme panels; ordinary WebPages cards retain
+   their existing default padding token. */
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-default {
+  padding: 40px !important;
+}
+
+/* In the source template the title is the flexible track in an expanded
+   content panel, so the action remains on the shared lower edge. */
+.shop-builder-grid-card--yootheme.shop-builder-panel--expand-content .shop-builder-title {
+  flex: 1 1 0%;
 }
 
 /* YOOtheme's panel_expand=content makes the card a vertical flex track and
@@ -2903,6 +2921,10 @@ body.dark {
 .shop-builder-grid-card .uk-card-media-top {
   margin: 0 !important;
   display: block;
+  /* YOOtheme's flush media keeps its intrinsic image height. Allowing this
+     flex child to shrink makes equal-height Grid rows crop the media wrapper
+     differently from the source card. */
+  flex: 0 0 auto;
   border-top-left-radius: inherit !important;
   border-top-right-radius: inherit !important;
   border-bottom-left-radius: 0 !important;

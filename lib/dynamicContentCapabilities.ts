@@ -2,6 +2,7 @@ import type {
   DynamicContentContextDescriptor,
   DynamicContentValueType,
 } from "@/lib/dynamicContent";
+import { wordPressPostAcfSourceFields } from "@/lib/wordpressDynamicContentFields";
 
 export type DynamicContentSourceCapability = {
   key: "static" | "wordpress-post-collection";
@@ -67,6 +68,7 @@ export const WORDPRESS_POST_COLLECTION_FIELDS: readonly DynamicContentSourceFiel
   { path: "featuredImage.caption", label: "Featured Image Caption", valueType: "richText" },
   { path: "link", label: "Link", valueType: "url" },
   { path: "id", label: "ID", valueType: "identifier" },
+  ...wordPressPostAcfSourceFields().map(({ path, label, valueType }) => ({ path, label, valueType })),
 ] as const;
 
 /**
