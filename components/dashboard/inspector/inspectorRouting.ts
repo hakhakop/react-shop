@@ -6,6 +6,7 @@ import type {
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
 import type { ComponentType } from "react";
+import type { CategoryTreeItem } from "@/lib/categories";
 import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
 import AlertCapabilityPanel from "@/components/dashboard/inspector/panels/AlertCapabilityPanel";
 import BadgeGridCapabilityPanel from "@/components/dashboard/inspector/panels/BadgeGridCapabilityPanel";
@@ -58,6 +59,7 @@ export type InspectorPanelContext = {
   tab: InspectorTab;
   shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
+  previewCategoryTree?: CategoryTreeItem[];
   openWordPressMediaPicker: (options: {
     title: string;
     currentUrl?: string;
@@ -88,6 +90,8 @@ export type InspectorElementCapabilityDeclaration = {
   available?: (sectionId?: string) => boolean;
   /** Canonical destination fields that may receive provider-independent bindings. */
   dynamicFields?: Readonly<Record<string, { label: string; destination: string }>>;
+  /** Whether the element itself owns a shared Dynamic Content source surface. */
+  dynamicSourceSurface?: "element" | "item";
 };
 
 const normalImageAvailability = (sectionId?: string) => sectionId !== "header-document";
@@ -109,6 +113,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
       label: { label: "Action label", destination: "buttonLabel" },
       url: { label: "Action URL", destination: "buttonUrl" },
     },
+    dynamicSourceSurface: "element",
   },
   panel: {
     capabilities: ["content", "style", "advanced"],
@@ -128,6 +133,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
       actionLabel: { label: "Text", destination: "buttonLabel" },
       actionUrl: { label: "URL", destination: "buttonUrl" },
     },
+    dynamicSourceSurface: "element",
   },
   heading: {
     capabilities: ["content", "style", "advanced"],
@@ -136,6 +142,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     panel: HeadingCapabilityPanel,
     settingsLabel: "Settings",
     dynamicFields: { content: { label: "Content", destination: "headingText" } },
+    dynamicSourceSurface: "element",
   },
   text: {
     capabilities: ["content", "style", "advanced"],
@@ -144,6 +151,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     panel: TextCapabilityPanel,
     settingsLabel: "Settings",
     dynamicFields: { content: { label: "Content", destination: "body" } },
+    dynamicSourceSurface: "element",
   },
   list: {
     capabilities: ["content", "style", "advanced"],
@@ -174,6 +182,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
       source: { label: "Image source", destination: "imageUrl" },
       alt: { label: "Alt text", destination: "imageAlt" },
     },
+    dynamicSourceSurface: "element",
   },
   hero: {
     capabilities: ["content", "style", "advanced"],
@@ -284,6 +293,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
       content: { label: "Content", destination: "body" },
       link: { label: "Link URL", destination: "alertLinkUrl" },
     },
+    dynamicSourceSurface: "element",
   },
   breadcrumbs: {
     capabilities: ["content", "style", "advanced"],

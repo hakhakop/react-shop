@@ -84,6 +84,7 @@ function navigationReducer(state: NavigationState, action: NavigationAction): Na
         menu: "Menu",
         pages: "Pages",
         templates: "Templates",
+        routingTemplates: "Templates",
         settings: "Settings",
       };
 

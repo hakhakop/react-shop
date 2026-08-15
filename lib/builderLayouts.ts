@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   backupRootBuilderFileBeforeWrite,
@@ -12,6 +13,7 @@ import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBindings,
+  DynamicItemContext,
 } from "@/lib/dynamicContent";
 export type { BuilderSection };
 
@@ -19,11 +21,14 @@ export type BuilderCustomPageKey = `page:${string}`;
 export type BuilderPage = "home" | "shop" | "client" | BuilderCustomPageKey;
 export type BuilderTemplate =
   | "product-single"
+  | "post-single"
   | "product-category"
   | "product-category-specific"
   | "search-results";
 export type BuilderDocumentKey = "header" | "footer";
-export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey;
+/** Internal storage key for a strictly validated opaque Builder document ID. */
+export type DynamicBuilderDocumentKey = `dynamic:${string}`;
+export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey | DynamicBuilderDocumentKey;
 export type BuilderPanelStyle =
   | "default"
   | "princity"
@@ -84,6 +89,8 @@ export type BuilderLayoutBlock = {
     | "headingText" | "body" | "eyebrow" | "title"
     | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
   >;
+  /** Transient canonical Product contexts; never authored persistence data. */
+  dynamicProductContexts?: DynamicItemContext[];
   loggedOutLabel?: string;
   loggedInLabel?: string;
   loggedOutUrl?: string;
@@ -531,8 +538,11 @@ export type BuilderLayout = {
   version: 1;
   key?: BuilderLayoutKey;
   page: BuilderLayoutKey;
-  targetType?: "page" | "template" | BuilderDocumentKey;
+  targetType?: "page" | "template" | "document" | BuilderDocumentKey;
   template?: BuilderTemplate;
+  /** Canonical external identity for dynamically created documents only. */
+  documentId?: string;
+  displayName?: string;
   design?: BuilderDesign;
   sections: BuilderSection[];
   updatedAt: string;
@@ -563,6 +573,7 @@ export type BuilderDataScope = {
 const pages = new Set(["home", "shop", "client"]);
 const templates = new Set([
   "product-single",
+  "post-single",
   "product-category",
   "product-category-specific",
   "search-results",
@@ -602,6 +613,7 @@ export function normalizeLayoutBlockKind(
 
 
 export function getBuilderTargetType(key: BuilderLayoutKey) {
+  if (key.startsWith("dynamic:")) return "document";
   return key === "header" || key === "footer"
     ? key
     : templates.has(key)
@@ -656,7 +668,43 @@ export async function writeBuilderLayoutStore(
   if (!scope.websiteId) {
     await backupRootBuilderFileBeforeWrite("builder-layouts.json");
   }
-  await writeFile(filePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+  const temporaryPath = `${filePath}.${process.pid}.${randomUUID()}.tmp`;
+  try {
+    await writeFile(temporaryPath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+    await rename(temporaryPath, filePath);
+  } finally {
+    await rm(temporaryPath, { force: true }).catch(() => undefined);
+  }
+}
+
+const builderLayoutStoreMutationQueues = new Map<string, Promise<void>>();
+
+/**
+ * Serializes a latest-state read/mutate/atomic-write transaction per website.
+ * Callers must mutate only the entries they own and return their operation result.
+ */
+export async function mutateBuilderLayoutStore<Result>(
+  mutate: (store: BuilderLayoutStore) => Result | Promise<Result>,
+  scope: BuilderDataScope = {},
+): Promise<Result> {
+  const filePath = getBuilderLayoutStorePath(scope.websiteId);
+  const previous = builderLayoutStoreMutationQueues.get(filePath) ?? Promise.resolve();
+  let release!: () => void;
+  const current = new Promise<void>((resolve) => { release = resolve; });
+  const queued = previous.then(() => current);
+  builderLayoutStoreMutationQueues.set(filePath, queued);
+  await previous;
+  try {
+    const store = await readBuilderLayoutStore(scope);
+    const result = await mutate(store);
+    await writeBuilderLayoutStore(store, scope);
+    return result;
+  } finally {
+    release();
+    if (builderLayoutStoreMutationQueues.get(filePath) === queued) {
+      builderLayoutStoreMutationQueues.delete(filePath);
+    }
+  }
 }
 
 export async function readBuilderCustomPages(

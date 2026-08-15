@@ -1812,6 +1812,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           block: selectedLayoutBlock,
           tab: inspectorTab,
           shellSettings,
+          previewCategoryTree,
           update: updateSelectedLayoutBlockByKey,
           openWordPressMediaPicker,
         })

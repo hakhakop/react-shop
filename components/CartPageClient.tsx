@@ -13,6 +13,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useCart } from "./CartProvider";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type CartPageClientProps = {
   asSlot?: boolean;
@@ -106,7 +107,7 @@ export default function CartPageClient({ asSlot = false }: CartPageClientProps) 
 
                 return (
                   <article key={item.id} className="cart-item">
-                    <Link href={`/product/${item.slug}`} className="cart-item-image">
+                    <Link href={getStorefrontContentHref({ contentType: "product", slug: item.slug })!} className="cart-item-image">
                       {item.imageUrl ? (
                         <Image
                           src={item.imageUrl}
@@ -120,7 +121,7 @@ export default function CartPageClient({ asSlot = false }: CartPageClientProps) 
                     </Link>
 
                     <div className="cart-item-info">
-                      <Link href={`/product/${item.slug}`} className="cart-item-name">
+                      <Link href={getStorefrontContentHref({ contentType: "product", slug: item.slug })!} className="cart-item-name">
                         {item.name}
                       </Link>
                       <div className="cart-item-meta">

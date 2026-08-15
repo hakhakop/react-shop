@@ -7,10 +7,16 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import ProductAdminMarker from "@/components/ProductAdminMarker";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
-import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
-import { getProductBySlug } from "@/lib/products";
+import { getCanonicalProductSingularBySlug } from "@/lib/productSingularContext.server";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
+import { resolveLayout, type SingularRouteContext } from "@/lib/layoutRouting";
+import {
+  ensureProductSingleRoutingCompatibility,
+  getBuilderLayoutByDocumentId,
+} from "@/lib/layoutRoutingStore.server";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type WPImage = {
   sourceUrl: string;
@@ -43,9 +49,11 @@ export default async function ProductPage({
   const { slug } = await params;
   const website = await getCurrentWebsiteFromHeaders();
   let p: Product | null;
+  let canonicalProductContext: Awaited<ReturnType<typeof getCanonicalProductSingularBySlug>>;
 
   try {
-    p = await getProductBySlug(slug, { website });
+    canonicalProductContext = await getCanonicalProductSingularBySlug(slug, website);
+    p = canonicalProductContext?.product ?? null;
   } catch (err: any) {
     return (
       <main className="product-page">
@@ -125,18 +133,51 @@ const priceFormatted =
     images,
     attributes,
   };
-  const domainWebsitePage = await renderDomainWebsiteFrontend({
-    requestedPage: "product-single",
-    pageLabel: p.name,
-    rendererProps: {
-      breadcrumbItems: [
-        { label: "Home", href: "/" },
-        { label: "Shop", href: "/shop" },
-        { label: p.name },
-      ],
-      product: rendererProduct,
-    },
-  });
+
+  const routeContext: SingularRouteContext = {
+    view: "singular",
+    provider: "woocommerce",
+    contentType: "product",
+    contentId: p.id,
+    ...(p.databaseId != null ? { databaseId: p.databaseId } : {}),
+    slug: p.slug,
+    uri: getStorefrontContentHref({ contentType: "product", slug: p.slug })!,
+    taxonomyTerms: canonicalProductContext?.taxonomyTerms ?? [],
+  };
+  const routingScope = website ? { websiteId: website.id } : {};
+  let selectedLayout = null;
+  try {
+    const registry = await ensureProductSingleRoutingCompatibility(routingScope);
+    const resolution = resolveLayout({
+      context: routeContext,
+      individualOverrides: registry.individualOverrides,
+      routingTemplates: registry.routingTemplates,
+      nativeFallbackAvailable: true,
+    });
+    if (resolution.outcome === "individual" || resolution.outcome === "routing-template") {
+      selectedLayout = await getBuilderLayoutByDocumentId(resolution.layoutId, routingScope);
+    }
+  } catch (error) {
+    // Invalid routing persistence fails closed into the defined native Product fallback.
+    console.error("[layout-routing] Product resolution failed", error);
+  }
+
+  const domainWebsitePage = selectedLayout
+    ? await renderDomainWebsiteFrontend({
+        requestedPage: "product-single",
+        pageLabel: p.name,
+        layoutOverride: selectedLayout,
+        dynamicItemContextOverride: canonicalProductContext?.dynamicContext,
+        rendererProps: {
+          breadcrumbItems: [
+            { label: "Home", href: "/" },
+            { label: "Shop", href: "/shop" },
+            { label: p.name },
+          ],
+          product: rendererProduct,
+        },
+      })
+    : null;
 
   if (domainWebsitePage) {
     return (
@@ -154,12 +195,14 @@ const priceFormatted =
     );
   }
 
-  const [templateLayout, shellSettings] = await Promise.all([
-    getPublishedBuilderLayout("product-single"),
-    getBuilderShellSettings(),
-  ]);
+  const shellSettings = selectedLayout && !website
+    ? await getBuilderShellSettings()
+    : null;
 
-  if (templateLayout) {
+  if (selectedLayout && shellSettings) {
+    const materialization = await materializeBuilderDynamicContent(selectedLayout, {
+      rootContext: canonicalProductContext?.dynamicContext,
+    });
     return (
       <>
         <ProductAdminMarker productId={wpProductId} />
@@ -171,7 +214,7 @@ const priceFormatted =
           price={priceFormatted}
         />
         <StorefrontBuilderRenderer
-          layout={templateLayout}
+          layout={materialization.renderLayout}
           page="product-single"
           pageLabel={p.name}
           breadcrumbItems={[

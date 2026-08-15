@@ -132,7 +132,6 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-advanced">
-        {!Array.isArray(block.buttons) && <DynamicContentInspectorGroup item={block} update={update} />}
         <InspectorDivision title="ADVANCED">
           <InspectorFieldRow label="ID">
             <InspectorTextField

@@ -6,8 +6,11 @@ import type {
 } from "@/lib/dynamicContent";
 import {
   DYNAMIC_CONTENT_SOURCE_CAPABILITIES,
+  dynamicContentSourceCapability,
   dynamicContentSourceKey,
   WORDPRESS_POST_COLLECTION_SOURCE,
+  type DynamicContentQueryControl,
+  type DynamicContentSourceCapability,
 } from "@/lib/dynamicContentCapabilities";
 import {
   InspectorDivision,
@@ -15,6 +18,9 @@ import {
   InspectorSelect,
   InspectorTextField,
 } from "@/components/dashboard/inspector/InspectorControls";
+import { flattenCategoryTree } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import type { CategoryTreeItem } from "@/lib/categories";
+import { useMemo, useState } from "react";
 
 type DynamicItem = {
   dynamicContext?: DynamicContentContextDescriptor;
@@ -23,6 +29,8 @@ type DynamicItem = {
 type Props<Item extends DynamicItem = DynamicItem> = {
   item: Item;
   update: (patch: Partial<Item>) => void;
+  fixedSourceKey?: DynamicContentSourceCapability["key"];
+  categoryTree?: CategoryTreeItem[];
 };
 
 const sourceOptions = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.map((source) => ({
@@ -78,25 +86,91 @@ const formatTerms = (value: unknown) =>
       }).join(", ")
     : "";
 
+function ProductCategoryPicker({
+  value,
+  onChange,
+  categoryTree,
+}: {
+  value: unknown;
+  onChange: (value: string[]) => void;
+  categoryTree: CategoryTreeItem[];
+}) {
+  const [search, setSearch] = useState("");
+  const selected = new Set(Array.isArray(value) ? value.map(String) : []);
+  const options = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return flattenCategoryTree(categoryTree).filter((category) =>
+      !query || category.label.toLowerCase().includes(query) || category.slug.toLowerCase().includes(query),
+    );
+  }, [categoryTree, search]);
+  return (
+    <div className="builder-category-visibility-card">
+      <input
+        className="builder-category-search"
+        type="search"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="Search product categories..."
+        aria-label="Search product categories"
+      />
+      <div className="builder-category-hide-list">
+        {options.map((category) => {
+          const id = String((category as { dbId?: number }).dbId ?? category.slug);
+          const checked = selected.has(id);
+          return (
+            <label key={id} className="builder-category-hide-option">
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={(event) => {
+                  const next = new Set(selected);
+                  if (event.target.checked) next.add(id); else next.delete(id);
+                  onChange(Array.from(next));
+                }}
+              />
+              <span className="builder-category-hide-copy"><strong>{category.label}</strong></span>
+            </label>
+          );
+        })}
+        {options.length === 0 && <div className="builder-category-hide-empty">No product categories available.</div>}
+      </div>
+    </div>
+  );
+}
+
 export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
   item,
   update,
+  fixedSourceKey,
+  categoryTree = [],
 }: Props<Item>) {
   const descriptor = item.dynamicContext;
-  const source = dynamicContentSourceKey(descriptor);
-  const isCollection = source === WORDPRESS_POST_COLLECTION_SOURCE.key;
-  const query = asRecord(descriptor?.query);
+  const fixedCapability = fixedSourceKey
+    ? DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((candidate) => candidate.key === fixedSourceKey)
+    : undefined;
+  const source = fixedSourceKey ?? dynamicContentSourceKey(descriptor);
+  const effectiveDescriptor = fixedCapability?.provider && fixedCapability.source && fixedCapability.mode
+    ? {
+        provider: fixedCapability.provider,
+        source: fixedCapability.source,
+        mode: fixedCapability.mode,
+        ...(descriptor?.query ? { query: descriptor.query } : {}),
+      } satisfies DynamicContentContextDescriptor
+    : descriptor;
+  const isWordPressPostCollection = source === WORDPRESS_POST_COLLECTION_SOURCE.key;
+  const capability = fixedCapability ?? dynamicContentSourceCapability(effectiveDescriptor);
+  const query = asRecord(effectiveDescriptor?.query);
   const filters = asRecord(query.filters);
 
   const setQuery = (patch: Record<string, unknown>) => {
-    if (!descriptor) return;
+    if (!effectiveDescriptor) return;
     const nextQuery = { ...query, ...patch };
     Object.keys(nextQuery).forEach((key) => {
       if (nextQuery[key] === undefined) delete nextQuery[key];
     });
     update({
       dynamicContext: {
-        ...descriptor,
+        ...effectiveDescriptor,
         query: nextQuery as Record<string, DynamicContentData>,
       },
     } as Partial<Item>);
@@ -118,31 +192,79 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
       update({ dynamicContext: undefined } as Partial<Item>);
       return;
     }
-    if (value !== WORDPRESS_POST_COLLECTION_SOURCE.key) return;
+    const capability = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find(
+      (candidate) => candidate.key === value,
+    );
+    if (!capability?.provider || !capability.source || !capability.mode) return;
     const nextDescriptor: DynamicContentContextDescriptor = {
-      provider: WORDPRESS_POST_COLLECTION_SOURCE.provider!,
-      source: WORDPRESS_POST_COLLECTION_SOURCE.source!,
-      mode: WORDPRESS_POST_COLLECTION_SOURCE.mode!,
-      ...(isCollection && descriptor?.query ? { query: descriptor.query } : {}),
+      provider: capability.provider,
+      source: capability.source,
+      mode: capability.mode,
+      ...(source === capability.key && descriptor?.query ? { query: descriptor.query } : {}),
     };
     update({ dynamicContext: nextDescriptor } as Partial<Item>);
   };
 
-  return (
-    <InspectorDivision title="DYNAMIC CONTENT">
-      <InspectorFieldRow
-        label="Source"
-        description="Use the authored item as a template for provider content."
-      >
-        <InspectorSelect
-          value={source}
-          options={sourceOptions}
-          onChange={selectSource}
-          ariaLabel="Dynamic Content source"
+  const renderCapabilityQueryControl = (control: DynamicContentQueryControl) => {
+    const value = query[control.key];
+    if (fixedSourceKey === "woocommerce-product-collection" && control.key === "categories") {
+      return (
+        <InspectorFieldRow key={control.key} label={control.label} description="Select one or more product categories.">
+          <ProductCategoryPicker value={value} categoryTree={categoryTree} onChange={(nextValue) => setQuery({ categories: nextValue })} />
+        </InspectorFieldRow>
+      );
+    }
+    if (control.control === "select") {
+      return (
+        <InspectorFieldRow key={control.key} label={control.label} description={control.description}>
+          <InspectorSelect
+            value={value == null ? "" : String(value)}
+            options={control.options ?? []}
+            onChange={(nextValue) => setQuery({
+              [control.key]: nextValue === "true" ? true : nextValue === "false" ? false : nextValue || undefined,
+            })}
+            ariaLabel={`Dynamic Content ${control.label}`}
+          />
+        </InspectorFieldRow>
+      );
+    }
+    return (
+      <InspectorFieldRow key={control.key} label={control.label} description={control.description}>
+        <InspectorTextField
+          value={control.control === "list" ? listValue(value) : value == null ? "" : String(value)}
+          placeholder={control.placeholder}
+          ariaLabel={`Dynamic Content ${control.label}`}
+          onChange={(nextValue) => setQuery({
+            [control.key]: nextValue.trim() === ""
+              ? undefined
+              : control.control === "integer"
+                ? Math.max(control.minimum ?? 0, Number.parseInt(nextValue, 10) || control.minimum || 0)
+                : control.control === "list"
+                  ? parseList(nextValue)
+                  : nextValue,
+          })}
         />
       </InspectorFieldRow>
+    );
+  };
 
-      {isCollection && (
+  return (
+    <InspectorDivision title={fixedSourceKey === "woocommerce-product-collection" ? "PRODUCT QUERY" : "DYNAMIC CONTENT"}>
+      {!fixedSourceKey && (
+        <InspectorFieldRow
+          label="Source"
+          description="Use the authored item as a template for provider content."
+        >
+          <InspectorSelect
+            value={source}
+            options={sourceOptions}
+            onChange={selectSource}
+            ariaLabel="Dynamic Content source"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {isWordPressPostCollection && (
         <>
           <InspectorFieldRow label="Start">
             <InspectorTextField
@@ -225,6 +347,10 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
           </InspectorFieldRow>
         </>
       )}
+
+      {!isWordPressPostCollection && capability?.queryControls?.length ? (
+        <>{capability.queryControls.map(renderCapabilityQueryControl)}</>
+      ) : null}
     </InspectorDivision>
   );
 }

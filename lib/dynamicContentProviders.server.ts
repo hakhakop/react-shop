@@ -2,7 +2,8 @@ import type {
   DynamicContentContextDescriptor,
   DynamicItemContext,
 } from "@/lib/dynamicContent";
-import { resolveWordPressPostCollection } from "@/lib/wordpressDynamicContentProvider.server";
+import { resolveWordPressPostContexts } from "@/lib/wordpressDynamicContentProvider.server";
+import { resolveWooCommerceProductContexts } from "@/lib/woocommerceDynamicContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
 
 export type DynamicContentProviderInput = {
@@ -15,17 +16,26 @@ export type DynamicContentProvider = (
 ) => Promise<DynamicItemContext[]>;
 
 const providers: Readonly<Record<string, DynamicContentProvider>> = {
-  wordpress: resolveWordPressPostCollection,
+  "wordpress/post": resolveWordPressPostContexts,
+  "woocommerce/product": resolveWooCommerceProductContexts,
 };
 
 /** Server/data-layer orchestration. Presentation components must not call providers. */
 export async function resolveDynamicContentContexts(
   input: DynamicContentProviderInput,
 ): Promise<DynamicItemContext[]> {
-  const provider = providers[input.descriptor.provider];
+  const providerKey = `${input.descriptor.provider}/${input.descriptor.source}`;
+  const provider = providers[providerKey];
   if (!provider) {
+    const providerExists = Object.keys(providers).some((key) =>
+      key.startsWith(`${input.descriptor.provider}/`),
+    );
     throw new Error(
-      `Unsupported Dynamic Content provider: ${input.descriptor.provider}.`,
+      providerExists
+        ? input.descriptor.provider === "wordpress"
+          ? `Unsupported WordPress Dynamic Content source: ${input.descriptor.source}.`
+          : `Unsupported Dynamic Content source: ${providerKey}.`
+        : `Unsupported Dynamic Content provider: ${input.descriptor.provider}.`,
     );
   }
   return provider(input);

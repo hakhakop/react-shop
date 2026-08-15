@@ -149,6 +149,55 @@ test("one authored Grid template transiently expands into three ordinary cards",
   expect(gridBlock(authored).gridItems).toHaveLength(1);
 });
 
+test("legacy product Grid resolves on the server into canonical Grid cards", async () => {
+  const authored = proofLayout();
+  const block = gridBlock(authored);
+  block.gridSource = "products";
+  block.columns = 2;
+  block.gridRows = 1;
+  block.gridItems = [];
+
+  const result = await materializeBuilderDynamicContent(authored, {
+    resolveContexts: async ({ descriptor }) => {
+      expect(descriptor).toEqual({
+        provider: "woocommerce",
+        source: "product",
+        mode: "collection",
+        query: { quantity: 2 },
+      });
+      return [
+        {
+          id: 41,
+          fields: {
+            title: { type: "string", value: "Canonical Product" },
+            price: { type: "string", value: "$49" },
+            image: { type: "media", value: { url: "https://cms.example/product.jpg", alt: "Product image" } },
+            "categories.label": { type: "string", value: "Objects" },
+            "storefront.href": { type: "url", value: "/product/canonical-product" },
+          },
+        },
+      ];
+    },
+  });
+  const cards = gridBlock(result.renderLayout).gridItems ?? [];
+
+  expect(cards).toEqual([expect.objectContaining({
+    id: "product-grid-41",
+    title: "Canonical Product",
+    meta: "$49",
+    imageUrl: "https://cms.example/product.jpg",
+    imageAlt: "Product image",
+    text: "Objects",
+    buttonLabel: "View product",
+    buttonUrl: "/product/canonical-product",
+  })]);
+  expect(result.materializedGridBlocks).toEqual([{
+    sectionId: "proof-section",
+    columnKey: "proof-column",
+    blockKey: "proof-grid",
+  }]);
+});
+
 test("provider failure preserves the authored static fallback and reports diagnostics", async () => {
   const authored = proofLayout();
   const result = await materializeBuilderDynamicContent(authored, {

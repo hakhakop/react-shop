@@ -117,6 +117,7 @@ import StorefrontBuilderRenderer, {
   getBuilderSectionClassName,
   isRichPreviewText,
 } from "@/components/builder/StorefrontBuilderRenderer";
+import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName, UIKIT_ICON_OPTIONS } from "@/lib/uikitIconRegistry";
@@ -213,6 +214,12 @@ import {
   selectedBuilderTarget,
   type BuilderInteractionTarget,
 } from "@/components/dashboard/builderInteraction";
+import {
+  isBuilderPreviewInteractiveControl,
+  resolveBuilderOpenLinkIntent,
+  shouldSuppressBuilderKeyboardNavigation,
+  shouldSuppressBuilderNavigation,
+} from "@/components/dashboard/builderInteractionBoundary";
 import MediaManager from "@/components/dashboard/media/MediaManager";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
@@ -347,6 +354,7 @@ import {
 } from "@/lib/builderImages";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
 import { invalidateImportedBuilderDraft } from "@/lib/builderDraftInvalidation";
+import type { BuilderEditorContext } from "@/lib/builderEditorContext";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -501,6 +509,12 @@ function dynamicContentPreviewSignature(sections: BuilderSection[]) {
       const buttons = Array.isArray(block.buttons) ? block.buttons : [];
       if (block.dynamicContext || block.dynamicBindings) {
         metadata.push({ owner, kind: block.kind, id: block.id, dynamicContext: block.dynamicContext, dynamicBindings: block.dynamicBindings });
+      }
+      // Products render from a transient materialized collection. Any authored
+      // Products setting invalidates the render projection, even when the
+      // canonical descriptor itself is unchanged.
+      if (block.kind === "products") {
+        metadata.push({ owner, kind: block.kind, id: block.id, productBlock: block });
       }
       gridItems.forEach((item: Record<string, any>) => {
         if (item.dynamicContext || item.dynamicBindings) {
@@ -907,42 +921,43 @@ function getLayoutLabel(
   return layoutLabels[key] ?? "Page";
 }
 
-function getFrontendUrlForBuilderKey(
-  key: BuilderLayoutKey,
-  customPages: BuilderCustomPage[],
-) {
-  if (key === "home") return "/";
-  if (key === "shop") return "/shop";
-  if (key === "client") return "/client";
-  if (key === "page:cart") return "/cart";
-  if (key === "page:checkout") return "/checkout";
-  if (key === "page:my-account") return "/my-account";
-  if (key === "product-single") return "/product/pink-jumper";
-  if (key === "product-category" || key === "product-category-specific") {
-    return "/category/shoes";
+function builderDocumentKindLabel(context: BuilderEditorContext | null) {
+  if (!context) return "Page";
+  if (context.document.kind === "routing-template") {
+    return context.content.family === "product"
+      ? "Single Product Template"
+      : "Single Post Template";
   }
-  if (key === "search-results") return "/search";
-  if (isBuilderCustomPageKey(key)) {
-    const page = customPages.find((item) => item.key === key);
-    return page ? `/${page.slug}` : "/";
+  if (context.document.kind === "individual") {
+    return context.content.family === "product"
+      ? "Individual Product Layout"
+      : "Individual Post Layout";
   }
-  return "/";
+  if (context.document.kind === "header") return "Header";
+  if (context.document.kind === "footer") return "Footer";
+  return "Page";
 }
 
-function getPreviewUrlForBuilderKey(
-  key: BuilderLayoutKey,
-  customPages: BuilderCustomPage[],
-  websiteRouteSegment?: string,
-) {
-  if (key === "header" || key === "footer") {
-    return websiteRouteSegment
-      ? `/app/websites/${websiteRouteSegment}/preview?page=home`
-      : "/";
+function builderDocumentOwnershipLabel(context: BuilderEditorContext | null) {
+  if (!context) return "";
+  if (context.document.kind === "routing-template") {
+    return `Used for: ${context.ownership.assignmentSummary ?? "Matching content"}`;
   }
-  if (!websiteRouteSegment) return getFrontendUrlForBuilderKey(key, customPages);
+  if (context.document.kind === "individual") {
+    const assigned = context.ownership.assignedTemplate?.name;
+    return assigned
+      ? `Effective: Individual Layout · Assigned Template: ${assigned}`
+      : "Effective: Individual Layout";
+  }
+  return context.document.kind === "page" ? "Page" : "Global site document";
+}
 
-  const params = new URLSearchParams({ page: key });
-  return `/app/websites/${websiteRouteSegment}/preview?${params.toString()}`;
+function builderFrontendActionLabel(context: BuilderEditorContext | null) {
+  if (!context) return "Open Frontend";
+  if (context.document.kind === "routing-template" || context.document.kind === "individual") {
+    return context.content.family === "product" ? "View Product" : "View Post";
+  }
+  return context.document.kind === "page" ? "View Page" : "Open Frontend";
 }
 
 const lightScheme = {
@@ -1697,6 +1712,8 @@ function normalizeBuilderState(
     targetType:
       key === "header" || key === "footer"
         ? key
+        : key.startsWith("dynamic:")
+          ? "document"
         : isTemplate
           ? "template"
           : "page",
@@ -2008,6 +2025,63 @@ export default function DashboardBuilder({
   );
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [activeDynamicDocumentId, setActiveDynamicDocumentId] = useState<string | null>(null);
+  const [activeRoutingTemplateId, setActiveRoutingTemplateId] = useState<string | null>(null);
+  const [activeIndividualContextToken, setActiveIndividualContextToken] = useState<string | null>(null);
+  const ordinaryLoadRequestRef = useRef(0);
+  const strictBuilderTargetRef = useRef(false);
+  const strictBuilderTargetIdentityRef = useRef("");
+  const strictBuilderTargetParts = [
+    searchParams.get("document") ?? "",
+    searchParams.get("routingTemplate") ?? "",
+    searchParams.get("individual") ?? "",
+    activeRoutingTemplateId ?? "",
+    activeIndividualContextToken ?? "",
+  ];
+  const hasStrictBuilderTarget = strictBuilderTargetParts.some(Boolean);
+  const strictBuilderTargetIdentity = strictBuilderTargetParts.join("|");
+  useLayoutEffect(() => {
+    if (strictBuilderTargetIdentityRef.current !== strictBuilderTargetIdentity) {
+      strictBuilderTargetIdentityRef.current = strictBuilderTargetIdentity;
+      if (hasStrictBuilderTarget) ordinaryLoadRequestRef.current += 1;
+    }
+    strictBuilderTargetRef.current = hasStrictBuilderTarget;
+  }, [hasStrictBuilderTarget, strictBuilderTargetIdentity]);
+  const [builderEditorContext, setBuilderEditorContext] = useState<BuilderEditorContext | null>(null);
+  const [templateBuilderContext, setTemplateBuilderContext] = useState<{
+    documentId: string;
+    routingTemplateId: string;
+    displayName: string;
+    family: "product" | "post";
+    familyLabel: "Single Product" | "Single Post";
+    provider: "woocommerce" | "wordpress";
+    source: "product" | "post";
+    websiteId?: string;
+    assignmentSummary: "All Products" | "All Posts";
+  } | null>(null);
+  const [individualBuilderContext, setIndividualBuilderContext] = useState<{
+    mode: "individual";
+    documentId: string;
+    identity: { provider: string; contentType: "product" | "post"; contentId: string };
+    family: "product" | "post";
+    familyLabel: "Individual Product Layout" | "Individual Post Layout";
+    title: string | null;
+    slug: string | null;
+    availability: "published" | "unpublished" | "unknown" | "missing";
+    websiteId?: string;
+    storefrontHref?: string;
+    assignedTemplate: null | { templateId: string; name: string; layoutId: string };
+  } | null>(null);
+  const [templatePreviewCandidates, setTemplatePreviewCandidates] = useState<Array<{
+    identity: { provider: string; contentType: string; contentId: string };
+    label: string;
+    storefrontHref?: string;
+  }>>([]);
+  const [templatePreviewIdentity, setTemplatePreviewIdentity] = useState<{
+    provider: string;
+    contentType: string;
+    contentId: string;
+  } | null>(null);
   const [headerContextKey, setHeaderContextKey] = useState<BuilderLayoutKey>(() => {
     const requestedContext = parseBuilderLayoutKey(searchParams.get("context"));
     return requestedContext && requestedContext !== "header" ? requestedContext : "shop";
@@ -2062,14 +2136,6 @@ export default function DashboardBuilder({
   const isWebsiteScopedBuilder = Boolean(websiteId);
   const canEditShellSettings =
     isWebsiteScopedBuilder || saasUserRole === "super_admin";
-  const websiteListHref =
-    saasUserRole === "admin" || saasUserRole === "super_admin"
-      ? "/admin/websites"
-      : "/app/websites";
-  const websiteListLabel =
-    saasUserRole === "admin" || saasUserRole === "super_admin"
-      ? "All Websites"
-      : "My Websites";
   const shellSettingsLabel = isWebsiteScopedBuilder
     ? "Website Settings"
     : "Style Customizer";
@@ -2087,9 +2153,19 @@ export default function DashboardBuilder({
     () => dynamicContentPreviewSignature(builderState.sections),
     [builderState.sections],
   );
+  // Authored state is the source of truth for context-aware projection
+  // invalidation. It deliberately excludes renderLayout/materialized values.
+  const authoredRevisionSignature = useMemo(
+    () => JSON.stringify(builderState),
+    [builderState],
+  );
   const dynamicPreviewRequestRef = useRef(0);
   const previousDynamicContentSignatureRef = useRef<string | null>(null);
   const previousDynamicContentPageRef = useRef<BuilderLayoutKey | null>(null);
+  const previousAuthoredRevisionRef = useRef<string | null>(null);
+  const authoredRevisionSignatureRef = useRef(authoredRevisionSignature);
+  authoredRevisionSignatureRef.current = authoredRevisionSignature;
+  const authoredRefreshTimerRef = useRef<number | null>(null);
   const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
     setRawBuilderState((current) => {
       let nextState = typeof value === "function" ? value(current) : value;
@@ -2129,10 +2205,25 @@ export default function DashboardBuilder({
     const requestedState = builderStateRef.current;
     const requestedSignature = JSON.stringify(requestedState);
     const requestId = ++dynamicPreviewRequestRef.current;
-    const response = await fetch(builderApiUrl("/api/builder-layouts/preview"), {
+    const response = await fetch(builderApiUrl(
+      activeIndividualContextToken
+        ? "/api/builder-individual-context"
+        : activeRoutingTemplateId
+          ? "/api/builder-template-context"
+          : "/api/builder-layouts/preview",
+    ), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ layout: requestedState }),
+      body: JSON.stringify(activeIndividualContextToken ? {
+        layout: requestedState,
+        documentId: individualBuilderContext?.documentId,
+        individual: activeIndividualContextToken,
+      } : activeRoutingTemplateId ? {
+          layout: requestedState,
+          documentId: templateBuilderContext?.documentId,
+          routingTemplateId: activeRoutingTemplateId,
+          previewIdentity: templatePreviewIdentity,
+        } : { layout: requestedState }),
       cache: "no-store",
     });
     if (
@@ -2145,7 +2236,9 @@ export default function DashboardBuilder({
     }
     const payload = (await response.json()) as {
       renderLayout?: BuilderState | null;
+      editorContext?: BuilderEditorContext;
     };
+    if (payload.editorContext) setBuilderEditorContext(payload.editorContext);
     setBuilderRenderProjection(
       payload.renderLayout?.sections?.length
         ? {
@@ -2155,7 +2248,32 @@ export default function DashboardBuilder({
           }
         : null,
     );
-  }, [builderApiUrl]);
+  }, [activeIndividualContextToken, activeRoutingTemplateId, builderApiUrl, individualBuilderContext?.documentId, templateBuilderContext?.documentId, templatePreviewIdentity]);
+
+  useEffect(() => {
+    if (!activeRoutingTemplateId || !templatePreviewIdentity) return;
+    if (authoredRefreshTimerRef.current !== null) {
+      window.clearTimeout(authoredRefreshTimerRef.current);
+      authoredRefreshTimerRef.current = null;
+    }
+    previousAuthoredRevisionRef.current = authoredRevisionSignatureRef.current;
+    void refreshDynamicContentPreview();
+  }, [activeRoutingTemplateId, refreshDynamicContentPreview, templatePreviewIdentity]);
+  useEffect(() => {
+    if (!activeIndividualContextToken) return;
+    if (authoredRefreshTimerRef.current !== null) {
+      window.clearTimeout(authoredRefreshTimerRef.current);
+      authoredRefreshTimerRef.current = null;
+    }
+    previousAuthoredRevisionRef.current = authoredRevisionSignatureRef.current;
+    void refreshDynamicContentPreview();
+  }, [activeIndividualContextToken, refreshDynamicContentPreview]);
+  useEffect(() => () => {
+    if (authoredRefreshTimerRef.current !== null) {
+      window.clearTimeout(authoredRefreshTimerRef.current);
+      authoredRefreshTimerRef.current = null;
+    }
+  }, []);
   const restoredDraftKeysRef = useRef(new Set<BuilderLayoutKey>());
   const draftMetadataRef = useRef<BuilderDraftMetadata>({});
   // A YOOtheme import replaces a persisted document. Its old local draft must
@@ -2293,6 +2411,7 @@ export default function DashboardBuilder({
   >(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("layout");
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorRendered, setInspectorRendered] = useState(false);
   const [inspectorMode, setInspectorMode] = useState<InspectorMode>(
     readInspectorModePreference,
   );
@@ -2370,6 +2489,23 @@ export default function DashboardBuilder({
   }, [storageKeys.sidebarCollapsed]);
 
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
+  const resolveRequestedPageFromSearch = useCallback((fallbackPage: BuilderLayoutKey) => {
+    const requestedPage = searchParams.get("page") ?? searchParams.get("template");
+    return (
+      parseBuilderLayoutKey(requestedPage) ??
+      (websiteId && requestedPage
+        ? tenantCorePageKeys[requestedPage] ?? null
+        : null) ??
+      (websiteId && requestedPage
+        ? customPages.find(
+            (page) =>
+              page.slug === requestedPage ||
+              page.key === `page:${requestedPage}`,
+          )?.key ?? null
+        : null) ??
+      fallbackPage
+    );
+  }, [customPages, searchParams, websiteId]);
   const [publishedKeys, setPublishedKeys] = useState<string[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [pageStatus, setPageStatus] = useState("Builder pages save to React");
@@ -2689,7 +2825,17 @@ export default function DashboardBuilder({
     if (!workspace) return;
 
     const updateWorkspaceSize = () => {
-      setInspectorWorkspaceWidth(workspace.getBoundingClientRect().width);
+      const workspaceRect = workspace.getBoundingClientRect();
+      const dashboardRect = workspace.parentElement?.getBoundingClientRect();
+      // The Inspector occupies a sibling grid track. Measuring only the
+      // remaining canvas makes the Inspector's maximum depend on its current
+      // width, creating a resize/clamp feedback loop. Measure the stable area
+      // from the workspace's left edge through the dashboard's right edge.
+      setInspectorWorkspaceWidth(
+        dashboardRect
+          ? Math.max(0, dashboardRect.right - workspaceRect.left)
+          : workspaceRect.width,
+      );
       setInspectorDesktopLayout(
         window.innerWidth >= INSPECTOR_RESIZE_BREAKPOINT,
       );
@@ -2711,6 +2857,24 @@ export default function DashboardBuilder({
   useEffect(() => {
     return () => restoreInspectorResizeDocumentStyles();
   }, [restoreInspectorResizeDocumentStyles]);
+
+  // Keep the drawer mounted briefly while closing so its panel transition can
+  // finish instead of disappearing on the same click that requests close.
+  useEffect(() => {
+    if (inspectorOpen && selectedSection) {
+      setInspectorRendered(true);
+      return;
+    }
+    // Docked mode owns a real grid track, so retaining a closed panel would
+    // leave an empty column behind. Only floating mode needs close retention.
+    if (effectiveInspectorMode !== "floating") {
+      setInspectorRendered(false);
+      return;
+    }
+    if (!inspectorRendered) return;
+    const timer = window.setTimeout(() => setInspectorRendered(false), 280);
+    return () => window.clearTimeout(timer);
+  }, [effectiveInspectorMode, inspectorOpen, inspectorRendered, selectedSection?.id]);
 
   useEffect(() => {
     if (!inspectorOpen) return;
@@ -2778,6 +2942,42 @@ export default function DashboardBuilder({
     selectedLayoutColumnKey,
     selectedSection,
   ]);
+  const inheritedTemplateDynamicContext = useMemo(() => {
+    const family = templateBuilderContext?.family ??
+      builderEditorContext?.content.family ??
+      (builderState.page === "post-single"
+        ? "post"
+        : builderState.page === "product-single"
+          ? "product"
+          : builderState.template === "post-single"
+            ? "post"
+          : builderState.template === "product-single"
+              ? "product"
+              : activeRoutingTemplateId
+                ? activeRoutingTemplateId.toLowerCase().includes("product")
+                  ? "product"
+                  : "post"
+                : undefined);
+    if (!family) return undefined;
+    return {
+      provider: family === "product" ? "woocommerce" : "wordpress",
+      source: family,
+      mode: "single" as const,
+    };
+  }, [activeRoutingTemplateId, builderEditorContext?.content.family, builderState.page, builderState.template, templateBuilderContext?.family]);
+  const selectedLayoutBlockForInspector = useMemo(() => {
+    if (
+      !selectedLayoutBlock ||
+      selectedLayoutBlock.dynamicContext ||
+      !inheritedTemplateDynamicContext
+    ) {
+      return selectedLayoutBlock;
+    }
+    return {
+      ...selectedLayoutBlock,
+      dynamicContext: inheritedTemplateDynamicContext,
+    };
+  }, [inheritedTemplateDynamicContext, selectedLayoutBlock]);
   const availableLayoutBlockKinds = useMemo(
     () =>
       builderState.page === "header"
@@ -2785,14 +2985,48 @@ export default function DashboardBuilder({
         : getLayoutBlockKindsForState(),
     [builderState.page],
   );
-  const currentFrontendUrl = useMemo(
-    () =>
-      getPreviewUrlForBuilderKey(
-        builderState.page === "header" ? headerContextState.page : builderState.page,
-        customPages,
-        websiteRouteSegment,
-      ),
-    [builderState.page, customPages, headerContextState.page, websiteRouteSegment],
+  const frontendHref = builderEditorContext?.navigation.frontendHref;
+  const handleScopedBuilderNavigate = useCallback(
+    (href: string) => {
+      // A strict routing-template document already owns the live preview
+      // context. When one of its canonical entity hrefs is clicked, switch
+      // only the materialized candidate and keep the authored document open.
+      if (builderEditorContext?.content.mode === "preview") {
+        const candidate = templatePreviewCandidates.find(
+          (item) => item.storefrontHref === href,
+        );
+        if (!candidate) return false;
+        setTemplatePreviewIdentity(candidate.identity);
+        return true;
+      }
+
+      // A normal page Builder has no preview candidate list yet. Resolve a
+      // canonical Post target through the existing editor-context boundary,
+      // then let the normal query-driven Builder hydration switch context.
+      if (!href.startsWith("/") || href.includes("?")) return false;
+      const path = href.replace(/\/+$/, "") || "/";
+      if (["/", "/shop", "/client", "/cart", "/checkout", "/my-account", "/search", "/categories"].includes(path)) {
+        return false;
+      }
+      if (customPages.some((page) => page.slug === path.slice(1))) return false;
+      void (async () => {
+        const response = await fetch(builderApiUrl("/api/builder-editor-context", { href: path }), {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          window.location.assign(href);
+          return;
+        }
+        const payload = await response.json() as { target?: { builderHref?: string } | null };
+        if (payload.target?.builderHref) {
+          router.push(payload.target.builderHref);
+        } else {
+          window.location.assign(href);
+        }
+      })();
+      return true;
+    },
+    [builderApiUrl, builderEditorContext?.content.mode, customPages, router, templatePreviewCandidates],
   );
   const scopedPreviewPages = useMemo(
     () =>
@@ -3161,6 +3395,24 @@ export default function DashboardBuilder({
     };
   }, [websiteId]);
 
+  // Compatibility bridge for the legacy semantic Product blocks. Ordinary
+  // bound elements use the canonical root DynamicItemContext projection.
+  useEffect(() => {
+    const fixedIdentity = individualBuilderContext?.family === "product"
+      ? individualBuilderContext.identity
+      : templateBuilderContext?.family === "product"
+        ? templatePreviewIdentity
+        : null;
+    if (!fixedIdentity) return;
+    setPreviewProducts((current) => {
+      const selectedIndex = current.findIndex((product) =>
+        String(product.databaseId ?? product.id) === fixedIdentity.contentId,
+      );
+      if (selectedIndex <= 0) return current;
+      return [current[selectedIndex]!, ...current.slice(0, selectedIndex), ...current.slice(selectedIndex + 1)];
+    });
+  }, [individualBuilderContext, previewProducts.length, templateBuilderContext?.family, templatePreviewIdentity]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -3193,23 +3445,96 @@ export default function DashboardBuilder({
   useEffect(() => {
     if (!draftReady) return;
 
-    const requestedPage =
-      searchParams.get("page") ?? searchParams.get("template");
-    const nextKey =
-      parseBuilderLayoutKey(requestedPage) ??
-      (websiteId && requestedPage
-        ? tenantCorePageKeys[requestedPage] ?? null
-        : null) ??
-      (websiteId && requestedPage
-        ? customPages.find(
-            (page) =>
-              page.slug === requestedPage ||
-              page.key === `page:${requestedPage}`,
-          )?.key ?? null
-        : null);
+    const requestedDocument = searchParams.get("document");
+    const requestedRoutingTemplate = searchParams.get("routingTemplate");
+    const requestedIndividual = searchParams.get("individual");
+    const requestedPreviewProvider = searchParams.get("previewProvider");
+    const requestedPreviewContentType = searchParams.get("previewContentType");
+    const requestedPreviewContentId = searchParams.get("previewContentId");
+    if (!requestedDocument || (
+      requestedDocument === (individualBuilderContext?.documentId ?? templateBuilderContext?.documentId) &&
+      requestedRoutingTemplate === activeRoutingTemplateId &&
+      requestedIndividual === activeIndividualContextToken
+    )) return;
+    let cancelled = false;
+    void (async () => {
+      setPublishedDocumentReady(false);
+      const response = await fetch(builderApiUrl(
+        requestedRoutingTemplate || requestedIndividual
+          ? "/api/builder-editor-context"
+          : "/api/builder-layouts",
+        {
+          document: requestedDocument,
+          ...(requestedRoutingTemplate ? { routingTemplate: requestedRoutingTemplate } : {}),
+          ...(requestedIndividual ? { individual: requestedIndividual } : {}),
+          ...(requestedPreviewProvider ? { previewProvider: requestedPreviewProvider } : {}),
+          ...(requestedPreviewContentType ? { previewContentType: requestedPreviewContentType } : {}),
+          ...(requestedPreviewContentId ? { previewContentId: requestedPreviewContentId } : {}),
+        },
+      ), { cache: "no-store" });
+      if (cancelled) return;
+      if (!response.ok) {
+        setPublishStatus(response.status === 404 ? "Document not found" : "Invalid document target");
+        setPublishedDocumentReady(true);
+        return;
+      }
+      const payload = await response.json() as {
+        layout?: BuilderState;
+        renderLayout?: BuilderState;
+        context?: typeof templateBuilderContext;
+        candidates?: typeof templatePreviewCandidates;
+        previewIdentity?: typeof templatePreviewIdentity;
+        unavailable?: boolean;
+        editorContext?: BuilderEditorContext;
+      };
+      if (!payload.layout?.sections?.length || (!requestedRoutingTemplate && !payload.layout.page?.startsWith("dynamic:"))) {
+        setPublishStatus("Invalid document response");
+        setPublishedDocumentReady(true);
+        return;
+      }
+      const nextState = normalizeBuilderState(payload.layout, payload.layout.page);
+      setActiveDynamicDocumentId(requestedDocument.startsWith("layout:builder:dynamic:") ? requestedDocument : null);
+      setActiveRoutingTemplateId(requestedRoutingTemplate);
+      setActiveIndividualContextToken(requestedIndividual);
+      setBuilderEditorContext(payload.editorContext ?? null);
+      if (payload.editorContext?.document.kind === "individual") {
+        setIndividualBuilderContext((payload.context as typeof individualBuilderContext) ?? null);
+        setTemplateBuilderContext(null);
+        setTemplatePreviewCandidates([]);
+        setTemplatePreviewIdentity(null);
+      } else if (payload.editorContext?.document.kind === "routing-template") {
+        setIndividualBuilderContext(null);
+        setTemplateBuilderContext(payload.context ?? null);
+        setTemplatePreviewCandidates(payload.candidates ?? []);
+        setTemplatePreviewIdentity(payload.previewIdentity ?? null);
+      } else {
+        setIndividualBuilderContext(null);
+        setTemplateBuilderContext(null);
+        setTemplatePreviewCandidates([]);
+        setTemplatePreviewIdentity(null);
+      }
+      setBuilderState(nextState);
+      const sourceSignature = JSON.stringify(nextState);
+      setBuilderRenderProjection(payload.renderLayout?.sections?.length ? {
+        page: nextState.page,
+        sourceSignature,
+        sections: payload.renderLayout.sections,
+      } : null);
+      setSelectedId(nextState.sections[0]?.id ?? "");
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutBlockKey(null);
+      setCommittedBuilderStateSignature(JSON.stringify(nextState));
+      setPublishStatus(payload.unavailable ? "Assigned content unavailable" : "Published document loaded");
+      setPublishedDocumentReady(true);
+    })();
+    return () => { cancelled = true; };
+  }, [activeIndividualContextToken, activeRoutingTemplateId, builderApiUrl, draftReady, individualBuilderContext?.documentId, searchParams, templateBuilderContext?.documentId]);
 
-    if (!nextKey || nextKey === builderState.page) return;
-
+  useEffect(() => {
+    if (!draftReady) return;
+    if (searchParams.get("document")) return;
+    const nextKey = resolveRequestedPageFromSearch(builderState.page);
+    if (nextKey === builderState.page) return;
     setPublishedDocumentReady(false);
     const nextState = hydrateDocumentBuilderState(
       loadDraftForKey(nextKey, storageKeys),
@@ -3438,6 +3763,14 @@ export default function DashboardBuilder({
     nextKey: BuilderLayoutKey,
     options: { syncUrl?: boolean } = {},
   ) => {
+    setActiveDynamicDocumentId(null);
+    setActiveRoutingTemplateId(null);
+    setActiveIndividualContextToken(null);
+    setTemplateBuilderContext(null);
+    setIndividualBuilderContext(null);
+    setBuilderEditorContext(null);
+    setTemplatePreviewCandidates([]);
+    setTemplatePreviewIdentity(null);
     const nextState = hydrateDocumentBuilderState(
       loadDraftForKey(nextKey, storageKeys),
       shellSettings,
@@ -4238,7 +4571,7 @@ export default function DashboardBuilder({
     });
   };
 
-  const selectSection = (sectionId: string) => {
+  const selectSection = (sectionId: string, shouldOpenInspector = false) => {
     setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
@@ -4247,11 +4580,15 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
-    openInspectorPanel();
+    if (shouldOpenInspector) openInspectorPanel();
     revealCanvasTarget(sectionId);
   };
 
-  const selectLayoutColumn = (sectionId: string, columnKey: string) => {
+  const selectLayoutColumn = (
+    sectionId: string,
+    columnKey: string,
+    shouldOpenInspector = false,
+  ) => {
     setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
@@ -4259,7 +4596,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(columnKey);
     setInspectorTab("layout");
-    openInspectorPanel();
+    if (shouldOpenInspector) openInspectorPanel();
     revealCanvasTarget(columnKey);
   };
 
@@ -4267,6 +4604,7 @@ export default function DashboardBuilder({
     sectionId: string,
     columnKey: string,
     blockKey: string,
+    shouldOpenInspector = false,
   ) => {
     setHeaderSelected(false);
     setSelectedId(sectionId);
@@ -4282,11 +4620,15 @@ export default function DashboardBuilder({
         ? "style"
         : "content",
     );
-    openInspectorPanel();
+    if (shouldOpenInspector) openInspectorPanel();
     revealCanvasTarget(blockKey);
   };
 
-  const selectLayoutRow = (sectionId: string, rowIndex: number) => {
+  const selectLayoutRow = (
+    sectionId: string,
+    rowIndex: number,
+    shouldOpenInspector = false,
+  ) => {
     setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(rowIndex);
@@ -4294,7 +4636,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
-    openInspectorPanel();
+    if (shouldOpenInspector) openInspectorPanel();
     const section = builderState.sections.find((item) => item.id === sectionId);
     const row = section
       ? normalizeBuilderSectionLayout(section).rows[rowIndex]
@@ -5707,6 +6049,25 @@ export default function DashboardBuilder({
           return section;
         }
 
+        if (section.rows !== undefined) {
+          const targetRow = section.rows[rowIndex];
+          const insertIndex = targetRow
+            ? rowIndex + (placement === "after" ? 1 : 0)
+            : section.rows.length;
+          const rowId = newItems[0]?.rowId ?? `layout-row-${Date.now().toString(36)}`;
+          const nextRow: BuilderRow = {
+            id: rowId,
+            layout: preset.key,
+            columns: newItems.map((item, index) => ({
+              id: item.id ?? `${rowId}-column-${index + 1}`,
+              elements: item.blocks ?? [],
+            })),
+          };
+          const rows = [...section.rows];
+          rows.splice(insertIndex, 0, nextRow);
+          return { ...section, rows, layoutRows: rows.length };
+        }
+
         const layoutItems = section.layoutItems ?? [];
         const anchorIndex = anchorColumnKey
           ? layoutItems.findIndex(
@@ -6232,6 +6593,26 @@ export default function DashboardBuilder({
           return section;
         }
 
+        if (section.rows !== undefined) {
+          const targetRow = section.rows[rowIndex];
+          const insertIndex = targetRow
+            ? rowIndex + (placement === "after" ? 1 : 0)
+            : section.rows.length;
+          const rowId =
+            newItems[0]?.rowId ?? `layout-row-${Date.now().toString(36)}`;
+          const nextRow: BuilderRow = {
+            id: rowId,
+            layout: preset.key,
+            columns: newItems.map((item, index) => ({
+              id: item.id ?? `${rowId}-column-${index + 1}`,
+              elements: item.blocks ?? [],
+            })),
+          };
+          const rows = [...section.rows];
+          rows.splice(insertIndex, 0, nextRow);
+          return { ...section, rows, layoutRows: rows.length };
+        }
+
         const layoutItems = section.layoutItems ?? [];
         const layoutRows = getPreviewLayoutRows(section, layoutItems);
         const targetRow = layoutRows[rowIndex];
@@ -6265,6 +6646,20 @@ export default function DashboardBuilder({
       sections: current.sections.map((section) => {
         if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
+        }
+
+        if (section.rows !== undefined) {
+          const targetRow = section.rows[rowIndex];
+          if (!targetRow) return section;
+          const isEmptyRow = targetRow.columns.every(
+            (column) => column.elements.length === 0,
+          );
+          if (!isEmptyRow) return section;
+          targetRow.columns.forEach((column) =>
+            removedColumnKeys.add(column.id),
+          );
+          const rows = section.rows.filter((_, index) => index !== rowIndex);
+          return { ...section, rows, layoutRows: rows.length };
         }
 
         const layoutItems = section.layoutItems ?? [];
@@ -6388,6 +6783,27 @@ export default function DashboardBuilder({
           return section;
         }
 
+        if (section.rows !== undefined) {
+          const targetRow = section.rows[rowIndex];
+          if (!targetRow) return section;
+          const copiedRow: BuilderRow = {
+            ...(JSON.parse(JSON.stringify(targetRow)) as BuilderRow),
+            id: rowId,
+            columns: targetRow.columns.map((column, index) => ({
+              ...JSON.parse(JSON.stringify(column)),
+              id: `${rowId}-column-${index + 1}`,
+              elements: column.elements.map((block) => ({
+                ...JSON.parse(JSON.stringify(block)),
+                id: createBlockId((block.kind ?? "text") as LayoutBlockKind),
+              })),
+            })),
+          };
+          nextSelectedColumnKey = copiedRow.columns[0]?.id ?? null;
+          const rows = [...section.rows];
+          rows.splice(rowIndex + 1, 0, copiedRow);
+          return { ...section, rows, layoutRows: rows.length };
+        }
+
         const layoutItems = section.layoutItems ?? [];
         const layoutRows = getPreviewLayoutRows(section, layoutItems);
         const targetRow = layoutRows[rowIndex];
@@ -6441,6 +6857,15 @@ export default function DashboardBuilder({
       sections: current.sections.map((section) => {
         if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
+        }
+
+        if (section.rows !== undefined) {
+          const rows = [...section.rows];
+          if (!rows[rowIndex] || !rows[targetRowIndex]) return section;
+          const [movedRow] = rows.splice(rowIndex, 1);
+          if (!movedRow) return section;
+          rows.splice(targetRowIndex, 0, movedRow);
+          return { ...section, rows };
         }
 
         const layoutItems = section.layoutItems ?? [];
@@ -6639,15 +7064,32 @@ export default function DashboardBuilder({
   };
 
   const loadPublishedLayout = useCallback(async () => {
+    // Template and Individual modes have stricter context owners that load the
+    // authored document and its root materialization together. A generic
+    // document reload would discard that validated render projection.
+    if (strictBuilderTargetRef.current) return;
+    const requestId = ++ordinaryLoadRequestRef.current;
     setPublishStatus("Reading published layout...");
     const requestedState = builderStateRef.current;
-    const requestedSignature = JSON.stringify(requestedState);
-    const hasStoredDraft = restoredDraftKeysRef.current.has(requestedState.page);
-    const response = await fetch(builderApiUrl("/api/builder-layouts", {
-      key: requestedState.page,
-    }), {
+    const requestedPage = resolveRequestedPageFromSearch(requestedState.page);
+    const requestedStateForPage = {
+      ...requestedState,
+      page: requestedPage,
+    };
+    const requestedSignature = JSON.stringify(requestedStateForPage);
+    const hasStoredDraft = restoredDraftKeysRef.current.has(requestedPage);
+    const response = await fetch(builderApiUrl("/api/builder-layouts",
+      activeDynamicDocumentId && requestedState.page.startsWith("dynamic:")
+        ? { document: activeDynamicDocumentId }
+        : { key: requestedPage },
+    ), {
       cache: "no-store",
     });
+
+    if (
+      requestId !== ordinaryLoadRequestRef.current ||
+      strictBuilderTargetRef.current
+    ) return;
 
     if (!response.ok) {
       setPublishStatus("Could not read published layout");
@@ -6658,20 +7100,28 @@ export default function DashboardBuilder({
     const payload = (await response.json()) as {
       layout?: BuilderState | null;
       renderLayout?: BuilderState | null;
+      editorContext?: BuilderEditorContext;
       dynamicContentDiagnostics?: Array<{
         status: "materialized" | "fallback";
         message?: string;
       }>;
-    };
+      };
 
-    if (JSON.stringify(builderStateRef.current) !== requestedSignature) {
+    if (
+      requestId !== ordinaryLoadRequestRef.current ||
+      strictBuilderTargetRef.current
+    ) return;
+
+    if (payload.editorContext) setBuilderEditorContext(payload.editorContext);
+
+    const currentState = builderStateRef.current;
+    if (currentState.page !== requestedPage) {
       setPublishStatus("Kept newer local changes");
-      // A response for the previous page must not unlock draft persistence for
-      // the newly selected page. That race created a one-section Enterprise
-      // draft before its persisted document had loaded.
-      if (builderStateRef.current.page === requestedState.page) {
-        setPublishedDocumentReady(true);
-      }
+      setPublishedDocumentReady(true);
+      return;
+    }
+    if (JSON.stringify(currentState) !== requestedSignature) {
+      setPublishStatus("Kept newer local changes");
       return;
     }
 
@@ -6685,28 +7135,28 @@ export default function DashboardBuilder({
     const nextPublishedState = normalizeBuilderState({
         page: payload.layout.page,
         targetType:
-          payload.layout.targetType ?? requestedState.targetType ?? "page",
+          payload.layout.targetType ?? requestedStateForPage.targetType ?? "page",
         template: payload.layout.template,
         design: {
           ...defaultDesign,
           ...(payload.layout.design ?? {}),
         },
         sections: payload.layout.sections,
-      }, requestedState.page);
+      }, requestedPage);
 
     const nextSignature = JSON.stringify(nextPublishedState);
     const nextRenderState = payload.renderLayout?.sections?.length
       ? normalizeBuilderState({
           page: payload.renderLayout.page,
           targetType:
-            payload.renderLayout.targetType ?? requestedState.targetType ?? "page",
+            payload.renderLayout.targetType ?? requestedStateForPage.targetType ?? "page",
           template: payload.renderLayout.template,
           design: {
             ...defaultDesign,
             ...(payload.renderLayout.design ?? {}),
           },
           sections: payload.renderLayout.sections,
-        }, requestedState.page)
+        }, requestedPage)
       : null;
     const nextRenderProjection = nextRenderState
       ? {
@@ -6727,7 +7177,7 @@ export default function DashboardBuilder({
       .forEach((diagnostic) => {
         console.warn("[dynamic-content] Builder preview fallback", diagnostic);
       });
-    const draftMetadata = draftMetadataRef.current[requestedState.page];
+    const draftMetadata = draftMetadataRef.current[requestedPage];
     const hasCompatibleRestoredDraft =
       hasStoredDraft &&
       draftMetadata?.basePublishedSignature === nextSignature;
@@ -6747,9 +7197,9 @@ export default function DashboardBuilder({
     // differs from the persisted document is also stale (for example after a
     // YOOtheme import or restore). Neither may conceal the persisted page.
     if (hasStoredDraft) {
-      removeBuilderDraft(storageKeys, requestedState.page);
-      restoredDraftKeysRef.current.delete(requestedState.page);
-      delete draftMetadataRef.current[requestedState.page];
+      removeBuilderDraft(storageKeys, requestedPage);
+      restoredDraftKeysRef.current.delete(requestedPage);
+      delete draftMetadataRef.current[requestedPage];
     }
     if (nextSignature === requestedSignature) {
       applyProjectionForSignature(requestedSignature);
@@ -6767,6 +7217,10 @@ export default function DashboardBuilder({
     setPublishStatus("Published layout loaded");
     setPublishedDocumentReady(true);
   }, [
+    activeDynamicDocumentId,
+    activeIndividualContextToken,
+    activeRoutingTemplateId,
+    resolveRequestedPageFromSearch,
     builderApiUrl,
     builderState.page,
     storageKeys,
@@ -6774,11 +7228,19 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (!draftReady) return;
+    // Strict document sessions hydrate through their canonical owner context.
+    // Do not let the ordinary page loader race that request and replace the
+    // authored document with the initial Home draft.
+    if (searchParams.get("document")) return;
+    if (activeRoutingTemplateId || activeIndividualContextToken) return;
     void loadPublishedLayout();
-  }, [builderState.page, draftReady, loadPublishedLayout]);
+  }, [activeIndividualContextToken, activeRoutingTemplateId, builderState.page, draftReady, loadPublishedLayout, searchParams]);
 
   useEffect(() => {
     if (!draftReady || !publishedDocumentReady) return;
+    const contextAware = builderEditorContext?.content.mode === "preview" ||
+      builderEditorContext?.content.mode === "fixed";
+    if (contextAware) return;
     const pageChanged = previousDynamicContentPageRef.current !== builderState.page;
     const dynamicMetadataChanged =
       previousDynamicContentSignatureRef.current !== dynamicContentSignature;
@@ -6786,15 +7248,49 @@ export default function DashboardBuilder({
 
     previousDynamicContentPageRef.current = builderState.page;
     previousDynamicContentSignatureRef.current = dynamicContentSignature;
-    if (dynamicContentSignature === "[]") {
+    if (dynamicContentSignature === "[]" && !activeRoutingTemplateId && !activeIndividualContextToken) {
       setBuilderRenderProjection(null);
       return;
     }
     void refreshDynamicContentPreview();
   }, [
     builderState.page,
+    activeIndividualContextToken,
+    activeRoutingTemplateId,
+    builderEditorContext?.content.mode,
     draftReady,
     dynamicContentSignature,
+    publishedDocumentReady,
+    refreshDynamicContentPreview,
+  ]);
+
+  useEffect(() => {
+    if (!draftReady || !publishedDocumentReady) return;
+    const contextAware = builderEditorContext?.content.mode === "preview" ||
+      builderEditorContext?.content.mode === "fixed";
+    if (!contextAware) {
+      previousAuthoredRevisionRef.current = authoredRevisionSignature;
+      return;
+    }
+    if (previousAuthoredRevisionRef.current === null) {
+      previousAuthoredRevisionRef.current = authoredRevisionSignature;
+      return;
+    }
+    if (previousAuthoredRevisionRef.current === authoredRevisionSignature) return;
+    previousAuthoredRevisionRef.current = authoredRevisionSignature;
+    if (authoredRefreshTimerRef.current !== null) {
+      window.clearTimeout(authoredRefreshTimerRef.current);
+    }
+    // Coalesce the burst of AST mutations emitted by one Builder interaction
+    // while retaining the existing request-id and authored-signature guards.
+    authoredRefreshTimerRef.current = window.setTimeout(() => {
+      authoredRefreshTimerRef.current = null;
+      void refreshDynamicContentPreview();
+    }, 60);
+  }, [
+    authoredRevisionSignature,
+    builderEditorContext?.content.mode,
+    draftReady,
     publishedDocumentReady,
     refreshDynamicContentPreview,
   ]);
@@ -6815,7 +7311,11 @@ export default function DashboardBuilder({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(builderState),
+      body: JSON.stringify(
+        activeDynamicDocumentId
+          ? { ...builderState, action: "save", documentId: activeDynamicDocumentId }
+          : builderState,
+      ),
     });
 
     if (!response.ok) {
@@ -7456,6 +7956,10 @@ export default function DashboardBuilder({
 
   const applySavedTemplate = (template: BuilderSavedTemplate) => {
     const templateType = template.templateType ?? "page";
+    if (templateType === "page" && builderState.sections.length > 0 &&
+      !window.confirm(`Replace the current layout with “${template.title}”?`)) {
+      return;
+    }
     const clonedSections = template.sections.map(cloneTemplateSection);
 
     if (templateType === "page") {
@@ -8230,7 +8734,7 @@ export default function DashboardBuilder({
       sectionSettingsOpen={sectionSettingsOpen}
       selectedLayoutColumnKey={selectedLayoutColumnKey}
       selectedLayoutRowIndex={selectedLayoutRowIndex}
-      selectedLayoutBlock={selectedLayoutBlock}
+      selectedLayoutBlock={selectedLayoutBlockForInspector}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
       anchorIdEntries={composedAnchorIdEntries}
@@ -8301,10 +8805,19 @@ export default function DashboardBuilder({
   );
 
   const wireframeActions = useStableCallbackObject<BuilderWireframeActions>({
-    selectSection,
-    selectRow: selectLayoutRow,
-    selectColumn: selectLayoutColumn,
-    selectBlock: selectLayoutBlock,
+    addSection: (targetSectionId, placement) =>
+      addWireframeNear(
+        1,
+        1,
+        targetSectionId ?? "__empty-page__",
+        placement,
+        undefined,
+        "section",
+      ),
+    selectSection: (sectionId) => selectSection(sectionId, true),
+    selectRow: (sectionId, rowIndex) => selectLayoutRow(sectionId, rowIndex, true),
+    selectColumn: (sectionId, columnKey) => selectLayoutColumn(sectionId, columnKey, true),
+    selectBlock: (sectionId, columnKey, blockKey) => selectLayoutBlock(sectionId, columnKey, blockKey, true),
     hover: handleHoverTarget,
     renameSection: renameBuilderSection,
     renameComplete: () => setRenameSectionRequestId(null),
@@ -8322,7 +8835,11 @@ export default function DashboardBuilder({
   const builderWireframePanel = (
     <BuilderWireframePanel
       page={builderState.page}
-      pageLabel={getLayoutLabel(builderState.page, customPages)}
+      pageLabel={builderEditorContext?.document.displayName ?? getLayoutLabel(builderState.page, customPages)}
+      documentKindLabel={builderDocumentKindLabel(builderEditorContext)}
+      documentBadgeLabel={builderDocumentKindLabel(builderEditorContext)}
+      structureLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
+      structureAriaLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
       sections={builderState.sections}
       selectedSectionId={selectedId}
       selectedLayoutRowIndex={selectedLayoutRowIndex}
@@ -9658,51 +10175,73 @@ export default function DashboardBuilder({
   );
 
   const sidebarTopActions = (
-    <div
-      className="builder-sidebar-top-action-bar"
-      aria-label="Builder page actions"
-    >
-      <div className="builder-sidebar-top-action-copy">
-        <strong>
-          {sidebarTab === "globalStyles" ? (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
+    <div className="builder-editor-chrome" aria-label="Builder document and canvas controls">
+      <header className="builder-document-header" data-testid="builder-document-header">
+        <div className="builder-document-breadcrumb" aria-label="Builder breadcrumb">
+          {builderEditorContext ? (
+            <button
+              type="button"
+              className="builder-document-back"
+              onClick={() => router.push(builderEditorContext.navigation.returnHref)}
+              title={builderEditorContext.navigation.returnLabel}
             >
-              <Sliders
-                size={12}
-                className="builder-wireframe-icon"
-                style={{ flexShrink: 0 }}
-              />
-              {shellSettingsLabel}
+              <ArrowLeft size={14} />
+              {builderEditorContext.navigation.returnLabel}
+            </button>
+          ) : <span className="builder-document-back-placeholder">Builder</span>}
+          <span aria-hidden="true">/</span>
+          <span>{builderEditorContext ? builderEditorContext.document.displayName : getLayoutLabel(builderState.page, customPages)}</span>
+        </div>
+        <div className="builder-document-header-main">
+          <div className="builder-document-identity">
+            <span className="builder-document-kind-badge">
+              {builderEditorContext ? builderDocumentKindLabel(builderEditorContext) : "Page"}
             </span>
-          ) : hasPendingChanges ? (
-            "Unsaved changes"
-          ) : (
-            "Saved draft"
-          )}
-        </strong>
-        <span>
-          {sidebarTab === "globalStyles"
-            ? shellStatus
-            : hasPendingChanges
-              ? getLayoutLabel(builderState.page, customPages)
-              : publishStatus}
-        </span>
-      </div>
-      <div className="builder-sidebar-top-action-buttons">
-        {websiteId ? (
-          <button
-            type="button"
-            onClick={() => router.push(websiteListHref)}
-            title={`Back to ${websiteListLabel}`}
-          >
-            <ArrowLeft size={15} />
-            {websiteListLabel}
-          </button>
+            <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : getLayoutLabel(builderState.page, customPages))}</h1>
+            <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : publishStatus}</p>
+          </div>
+          {sidebarTab === "globalStyles" ? (
+            <button
+              type="button"
+              className="builder-canvas-control is-primary"
+              onClick={publishShellSettings}
+              title={`Publish ${shellSettingsLabel}`}
+            >
+              <CloudUpload size={14} />
+              Publish Settings
+            </button>
+          ) : (hasPendingChanges || Boolean(websiteId)) ? (
+            <button
+              type="button"
+              className="builder-canvas-control is-primary"
+              onClick={() => void publishLayout()}
+            >
+              <CloudUpload size={14} />
+              {t("builder.toolbar.publish")}
+            </button>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="builder-canvas-controls" aria-label="Canvas controls">
+        <span className="builder-canvas-controls-label">Canvas controls</span>
+        {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
+          <label className="builder-template-preview-select">
+            <span>Preview {builderEditorContext.content.family === "product" ? "Product" : "Post"}</span>
+            {templatePreviewCandidates.length ? (
+              <select
+                value={templatePreviewIdentity?.contentId ?? builderEditorContext.content.identity?.contentId ?? ""}
+                onChange={(event) => {
+                  const candidate = templatePreviewCandidates.find((item) => item.identity.contentId === event.target.value);
+                  if (candidate) setTemplatePreviewIdentity(candidate.identity);
+                }}
+              >
+                {templatePreviewCandidates.map((candidate) => (
+                  <option key={`${candidate.identity.provider}:${candidate.identity.contentId}`} value={candidate.identity.contentId}>{candidate.label}</option>
+                ))}
+              </select>
+            ) : <small>No live {builderEditorContext.content.family === "product" ? "products" : "posts"} available</small>}
+          </label>
         ) : null}
         <label className="builder-content-language-select">
           <span>{t("builder.contentLanguage.editing")}</span>
@@ -9730,65 +10269,47 @@ export default function DashboardBuilder({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
-          }}
-          title="Open page"
-        >
-          <ExternalLink size={15} />
-          View Page
-        </button>
+        {builderEditorContext?.capabilities.canOpenFrontend && frontendHref ? (
+          <button
+            type="button"
+            className="builder-canvas-control"
+            onClick={() => window.open(frontendHref, "_blank", "noopener,noreferrer")}
+            title={builderFrontendActionLabel(builderEditorContext)}
+          >
+            <ExternalLink size={14} />
+            {builderFrontendActionLabel(builderEditorContext)}
+          </button>
+        ) : null}
         {builderState.page === "header" ? (
           <button
             type="button"
+            className="builder-canvas-control"
             onClick={openHeaderSettings}
             title="Open Header document settings"
           >
-            <Settings2 size={15} />
+            <Settings2 size={14} />
             Header Settings
           </button>
         ) : null}
         <button
           type="button"
+          className="builder-canvas-control"
           onClick={undoBuilder}
           disabled={undoHistoryRef.current.length <= 1}
           title={t("builder.toolbar.undo")}
         >
-          <Undo2 size={15} />
+          <Undo2 size={14} />
           {t("builder.toolbar.undo")}
         </button>
         <button
           type="button"
+          className="builder-canvas-control"
           onClick={redoBuilder}
           disabled={redoHistoryRef.current.length === 0}
           title={t("builder.toolbar.redo")}
         >
-          <Redo2 size={15} />
+          <Redo2 size={14} />
         </button>
-        {sidebarTab === "globalStyles" ? (
-          <button
-            type="button"
-            className="is-primary"
-            onClick={publishShellSettings}
-            title={`Publish ${shellSettingsLabel}`}
-          >
-            <CloudUpload size={15} />
-            Publish Settings
-          </button>
-        ) : (
-          (hasPendingChanges || Boolean(websiteId)) && (
-            <button
-              type="button"
-              className="is-primary"
-              onClick={() => void publishLayout()}
-            >
-              <CloudUpload size={15} />
-              {t("builder.toolbar.publish")}
-            </button>
-          )
-        )}
       </div>
     </div>
   );
@@ -9961,6 +10482,7 @@ export default function DashboardBuilder({
     >
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
+        websiteId={websiteId}
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
@@ -10054,18 +10576,18 @@ export default function DashboardBuilder({
               "--builder-preview-shell-bg": previewPageBackground,
             } as CSSProperties
           }
-        >
-          <motion.div
-            className="builder-preview-viewport-container"
+          >
+            <motion.div
+              data-builder-editable-canvas="true"
+              className="builder-preview-viewport-container"
             animate={{
               width: device === "desktop" ? "100%" : previewCanvasWidth,
               scale: device === "desktop" ? 1 : previewScale,
             }}
-            transition={
-              isResizingDevice
-                ? { type: "tween", duration: 0 }
-                : { type: "spring", stiffness: 380, damping: 38, mass: 1 }
-            }
+            // Inspector docking changes the available grid width. A spring
+            // here makes open/close feel like a heavy mechanical shift and
+            // needlessly animates the whole canvas.
+            transition={{ type: "tween", duration: 0 }}
             style={
               {
                 transformOrigin: "top center",
@@ -10073,7 +10595,38 @@ export default function DashboardBuilder({
                 "--builder-preview-header-width": `${previewCanvasWidth}px`,
               } as CSSProperties
             }
+            onClickCapture={(event) => {
+              // Navigation suppression belongs to the rendered Builder
+              // canvas only. Builder chrome lives outside this boundary and
+              // must retain normal application navigation.
+              if (
+                event.target instanceof Element &&
+                event.target.closest("a[href]") &&
+                shouldSuppressBuilderNavigation(event.target, event)
+              ) {
+                event.preventDefault();
+              }
+            }}
+            onKeyDownCapture={(event) => {
+              if (
+                event.target instanceof Element &&
+                event.target.closest("a[href]") &&
+                shouldSuppressBuilderKeyboardNavigation(event.target, event.key)
+              ) {
+                event.preventDefault();
+              }
+            }}
+            onSubmitCapture={(event) => {
+              event.preventDefault();
+            }}
           >
+            <ScopedPreviewLinkRouter
+              websiteId={websiteRouteSegment}
+              pages={scopedPreviewPages}
+              mode="builder"
+              scopeSelector='[data-builder-editable-canvas="true"]'
+              onNavigate={handleScopedBuilderNavigate}
+            />
             <div
               ref={headerPreviewSlotRef}
               id={builderState.page === "header" ? "builder-header-document-preview-slot" : undefined}
@@ -10167,6 +10720,7 @@ export default function DashboardBuilder({
                           data-header-element={element.type}
                           onClickCapture={(event) => {
                             const target = event.target as HTMLElement;
+                            if (resolveBuilderOpenLinkIntent(target)) return;
                             if (
                               target.closest(".builder-preview-block-tools") ||
                               !target.closest("a, button, [role='button']")
@@ -10205,6 +10759,7 @@ export default function DashboardBuilder({
                             if (target.closest(".builder-preview-block-tools")) {
                               return;
                             }
+                            if (resolveBuilderOpenLinkIntent(target)) return;
                             event.preventDefault();
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
@@ -10264,7 +10819,7 @@ export default function DashboardBuilder({
                             label={element.type}
                             canMoveUp={elementIndex > 0}
                             canMoveDown={elementIndex >= 0 && elementIndex < columnElements.length - 1}
-                            onSettings={() => selectLayoutBlock("header-document", columnId, element.id)}
+                            onSettings={() => selectLayoutBlock("header-document", columnId, element.id, true)}
                             onMoveUp={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: -1 })}
                             onMoveDown={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: 1 })}
                             onSave={() => saveElementTemplateByKey("header-document", columnId, element.id)}
@@ -10384,7 +10939,7 @@ export default function DashboardBuilder({
                                 setHeaderRowDropTarget(null);
                               }}
                             ><GripVertical size={12} /></button>
-                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow("header-document", rowIndex)}><Settings2 size={12} /></button>
+                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow("header-document", rowIndex, true)}><Settings2 size={12} /></button>
                             <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow("header-document", rowIndex)}><Copy size={12} /></button>
                             <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow("header-document", rowIndex)}><Trash2 size={12} /></button>
                           </div>
@@ -10589,7 +11144,7 @@ export default function DashboardBuilder({
                 onAddSection={(targetSectionId, placement) =>
                   addWireframeNear(
                     1,
-                    0,
+                    1,
                     targetSectionId,
                     placement,
                     undefined,
@@ -10706,10 +11261,12 @@ export default function DashboardBuilder({
         </div>
       </main>
 
-      {inspectorOpen && selectedSection ? (
+      {(inspectorOpen || inspectorRendered) && selectedSection ? (
         <div
           ref={inspectorPanelRef}
           className={`builder-floating-inspector is-${effectiveInspectorMode}${
+            !inspectorOpen ? " is-closing" : ""
+          }${
             inspectorResizing ? " is-resizing" : ""
           }${inspectorDragging ? " is-dragging" : ""}`}
           onMouseDown={(event) => event.stopPropagation()}
@@ -10804,7 +11361,7 @@ export default function DashboardBuilder({
         </div>
       ) : null}
 
-      {!inspectorOpen && selectedSection ? (
+      {!inspectorOpen && !inspectorRendered && selectedSection ? (
         <button
           type="button"
           className="builder-inspector-collapsed-rail"
@@ -10976,13 +11533,14 @@ function PreviewCanvas({
   selectedLayoutBlockKey: string | null;
   draggingSectionId: string | null;
   draggingLayoutBlockKey: string | null;
-  onSelect: (id: string) => void;
-  onSelectColumn: (sectionId: string, columnKey: string) => void;
-  onSelectRow: (sectionId: string, rowIndex: number) => void;
+  onSelect: (id: string, openInspector?: boolean) => void;
+  onSelectColumn: (sectionId: string, columnKey: string, openInspector?: boolean) => void;
+  onSelectRow: (sectionId: string, rowIndex: number, openInspector?: boolean) => void;
   onSelectBlock: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
+    openInspector?: boolean,
   ) => void;
   onOpenInspector: () => void;
   onDragStart: (sectionId: string) => void;
@@ -11376,15 +11934,14 @@ function PreviewCanvas({
 
   const selectDelegatedTarget = useCallback(
     (target: BuilderInteractionTarget, openInspector: boolean) => {
-      if (target.type === "section") onSelect(target.sectionId);
-      if (target.type === "row") onSelectRow(target.sectionId, target.rowIndex);
-      if (target.type === "column") onSelectColumn(target.sectionId, target.columnKey);
+      if (target.type === "section") onSelect(target.sectionId, openInspector);
+      if (target.type === "row") onSelectRow(target.sectionId, target.rowIndex, openInspector);
+      if (target.type === "column") onSelectColumn(target.sectionId, target.columnKey, openInspector);
       if (target.type === "block") {
-        onSelectBlock(target.sectionId, target.columnKey, target.blockKey);
+        onSelectBlock(target.sectionId, target.columnKey, target.blockKey, openInspector);
       }
-      if (openInspector) onOpenInspector();
     },
-    [onOpenInspector, onSelect, onSelectBlock, onSelectColumn, onSelectRow],
+    [onSelect, onSelectBlock, onSelectColumn, onSelectRow],
   );
   const scheduleDelegatedSelection = useCallback(
     (target: BuilderInteractionTarget, openInspector: boolean) => {
@@ -11469,10 +12026,71 @@ function PreviewCanvas({
     (event: ReactMouseEvent<HTMLDivElement>) => {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest('[contenteditable="true"]')) return;
+      // Deliberate website anchors are owned by the scoped preview router (or
+      // by the browser for external destinations), not by canvas selection.
+      if (resolveBuilderOpenLinkIntent(event.target)) return;
       const target = builderTargetFromElement(event.target);
       if (target) {
         onHoverTarget(null);
         scheduleDelegatedSelection(target, false);
+      }
+    },
+    [onHoverTarget, scheduleDelegatedSelection],
+  );
+
+  const handleBuilderNavigationCapture = useCallback(
+    (event: ReactMouseEvent<HTMLDivElement>) => {
+      // Portaled Builder chrome remains in this component's React event tree,
+      // but it is not part of the rendered canvas DOM. E3 suppression is
+      // canvas-scoped, so toolbar and breadcrumb actions must bypass it.
+      if (
+        !(event.target instanceof Node) ||
+        !event.currentTarget.contains(event.target)
+      ) {
+        return;
+      }
+      if (shouldSuppressBuilderNavigation(event.target, event)) {
+        // Keep bubbling intact: the canvas delegated click handler still owns
+        // selection, while the authored destination cannot escape Builder.
+        event.preventDefault();
+        const actionable = event.target instanceof Element
+          ? event.target.closest<HTMLElement>(
+              "button, [role=\"button\"], summary, input[type=\"submit\"], input[type=\"button\"]",
+            )
+          : null;
+        if (actionable && !isBuilderPreviewInteractiveControl(event.target)) {
+          // Commerce and submit controls are actions, not navigation. Stop the
+          // renderer-owned action, then preserve the canonical canvas select.
+          event.stopPropagation();
+          const target = builderTargetFromElement(event.target as Element);
+          if (target) {
+            onHoverTarget(null);
+            scheduleDelegatedSelection(target, false);
+          }
+        }
+      }
+    },
+    [onHoverTarget, scheduleDelegatedSelection],
+  );
+
+  const handleBuilderKeyboardCapture = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (
+        !(event.target instanceof Node) ||
+        !event.currentTarget.contains(event.target)
+      ) {
+        return;
+      }
+      if (shouldSuppressBuilderKeyboardNavigation(event.target, event.key)) {
+        // This covers Enter-generated anchor clicks and Space activation, too.
+        event.preventDefault();
+        const target = builderTargetFromElement(
+          event.target instanceof Element ? event.target : null,
+        );
+        if (target) {
+          onHoverTarget(null);
+          scheduleDelegatedSelection(target, false);
+        }
       }
     },
     [onHoverTarget, scheduleDelegatedSelection],
@@ -11612,6 +12230,13 @@ function PreviewCanvas({
       onMouseOver={handleDelegatedMouseOver}
       onMouseOut={handleDelegatedMouseOut}
       onMouseMove={handleDelegatedMouseMove}
+      onClickCapture={handleBuilderNavigationCapture}
+      onKeyDownCapture={handleBuilderKeyboardCapture}
+      onSubmitCapture={(event) => {
+        // Forms are preview-only in Builder. Do not submit to a CMS or
+        // external action while preserving normal field editing above.
+        event.preventDefault();
+      }}
       onClick={handleDelegatedClick}
       onDoubleClick={handleDelegatedDoubleClick}
       onFocusCapture={(event) => {
@@ -11620,7 +12245,7 @@ function PreviewCanvas({
           if (event.target.matches(".builder-main-row-frame")) {
             const target = builderTargetFromElement(event.target);
             if (target?.type === "row") {
-              onSelectRow(target.sectionId, target.rowIndex);
+              onSelectRow(target.sectionId, target.rowIndex, false);
             }
           }
           return;
@@ -11629,7 +12254,7 @@ function PreviewCanvas({
         if (target?.type === "block") {
           setEditingTarget(target);
           onHoverTarget(null);
-          onSelectBlock(target.sectionId, target.columnKey, target.blockKey);
+          onSelectBlock(target.sectionId, target.columnKey, target.blockKey, false);
         }
       }}
       onBlurCapture={(event) => {
@@ -11764,6 +12389,7 @@ function PreviewCanvas({
           <button
             type="button"
             className="builder-preview-empty-add"
+            data-builder-preview-interactive="true"
             onClick={() => onAddSection("__empty-page__", "below")}
           >
             <Plus size={16} />
@@ -11862,20 +12488,11 @@ function PreviewCanvas({
               return (
                 <motion.div
                   key={section.id}
-                  layout
-                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96, y: -8 }}
+                  exit={undefined}
                   transition={{
-                    layout: {
-                      type: "spring",
-                      stiffness: 380,
-                      damping: 38,
-                      mass: 0.8,
-                    },
-                    opacity: { duration: 0.16, ease: "easeOut" },
-                    y: { type: "spring", stiffness: 380, damping: 38 },
-                    scale: { duration: 0.16, ease: "easeOut" },
+                    duration: 0,
                   }}
                 >
                   <div
@@ -13119,11 +13736,29 @@ function BuilderInteractionLayer({
   onSaveElementTemplate: (sectionId: string, columnKey: string, blockKey: string) => void;
 }) {
   const selectedVisualTarget = editingTarget ?? selectedTarget;
+  // This layer is portaled to document.body. Keep its first client render
+  // identical to SSR, then attach the portal after hydration.
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
   const [selectedRect, setSelectedRect] =
     useState<BuilderInteractionLayerRect | null>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const [addMenuOpen, setAddMenuOpen] = useState(false);
+  const [previousSelection, setPreviousSelection] =
+    useState<BuilderInteractionTarget | null>(null);
+  const lastSelectionRef = useRef<BuilderInteractionTarget | null>(null);
   useEffect(() => setAddMenuOpen(false), [selectedVisualTarget]);
+  useEffect(() => {
+    const previous = lastSelectionRef.current;
+    if (
+      selectedVisualTarget &&
+      previous &&
+      !builderTargetsEqual(previous, selectedVisualTarget)
+    ) {
+      setPreviousSelection(previous);
+    }
+    lastSelectionRef.current = selectedVisualTarget;
+  }, [selectedVisualTarget]);
   const selectedHierarchy = useMemo(() => {
     if (!selectedVisualTarget) return null;
     const section = sections.find(
@@ -13137,11 +13772,9 @@ function BuilderInteractionLayer({
       ? selectedVisualTarget.rowIndex
       : -1;
     if (rowIndex < 0 && columnKey) {
-      const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
-      rowIndex = rows.findIndex((row) =>
-        row.items.some((item, columnIndex) =>
-          (item.id ?? `layout-item-${row.startIndex + columnIndex}`) === columnKey,
-        ),
+      const structure = resolveBuilderSectionStructure(section);
+      rowIndex = structure.rows.findIndex((row) =>
+        row.columns.some((column) => column.column.id === columnKey),
       );
     }
     return { section, columnKey, rowIndex };
@@ -13259,11 +13892,13 @@ function BuilderInteractionLayer({
         onDelete={() => onDeleteSection(section.id)} />;
     }
     if (target.type === "row") {
-      const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
+      const rows = resolveBuilderSectionStructure(section).rows;
       const row = rows[target.rowIndex];
       if (!row) return null;
-      const preset = getBuilderRowLayoutPreset(row.layoutKey);
-      const isEmpty = row.items.every((item) => !layoutColumnHasContent(item as PreviewLayoutItem));
+      const preset = getBuilderRowLayoutPreset(row.row.layout);
+      const isEmpty = row.columns.every(
+        (column) => column.column.elements.length === 0,
+      );
       return <BuilderContextToolbar context="layout" label={preset?.label ? `Layout · ${preset.label}` : "Layout"}
         canMoveUp={target.rowIndex > 0} canMoveDown={target.rowIndex < rows.length - 1} canDelete={isEmpty}
         onChangeLayout={() => onChangeLayout(section.id, target.rowIndex)}
@@ -13287,7 +13922,7 @@ function BuilderInteractionLayer({
       onDuplicate={() => onDuplicateBlock(target)} onDelete={() => onDeleteBlock(target)} />;
   };
 
-  if (typeof document === "undefined") return null;
+  if (!isMounted || typeof document === "undefined") return null;
   const renderFrame = (target: BuilderInteractionTarget | null, rect: BuilderInteractionLayerRect | null,
     state: "selected" | "hovered" | "editing") => {
     if (!target || !rect) return null;
@@ -13305,7 +13940,35 @@ function BuilderInteractionLayer({
         />
       </div>
       {selectedVisualTarget && selectedHierarchy && !editingTarget ? (
-        <div className="builder-fixed-selection-toolbar" role="toolbar" aria-label="Selected Builder object">
+        <div
+          className={`builder-fixed-selection-toolbar${selectedRect ? " is-anchored" : ""}`}
+          role="toolbar"
+          aria-label="Selected Builder object"
+          style={(() => {
+            if (!selectedRect) return undefined;
+            const toolbarY = selectedRect.top + selectedRect.height + 8;
+            const viewportHeight = window.innerHeight;
+            const top = toolbarY > viewportHeight - 64
+              ? Math.max(12, selectedRect.top - 52)
+              : toolbarY;
+            const left = Math.min(
+              Math.max(selectedRect.left + selectedRect.width / 2, 180),
+              window.innerWidth - 180,
+            );
+            return { left, top, right: "auto", bottom: "auto" };
+          })()}
+        >
+          {previousSelection ? (
+            <button
+              type="button"
+              className="builder-fixed-selection-back"
+              onClick={() => onSelectTarget(previousSelection)}
+              title="Return to previous selection"
+            >
+              <ArrowLeft size={13} />
+              Back to {previousSelection.type === "block" ? "Element" : previousSelection.type[0].toUpperCase() + previousSelection.type.slice(1)}
+            </button>
+          ) : null}
           <nav className="builder-fixed-selection-breadcrumb" aria-label="Builder object hierarchy">
             <button type="button" onClick={() => onSelectTarget({ type: "section", sectionId: selectedVisualTarget.sectionId })}>
               Section
@@ -14248,12 +14911,13 @@ const PreviewSection = memo(function PreviewSection({
       placement?: "above" | "below" | "inside";
     } | null,
   ) => void;
-  onSelectColumn: (sectionId: string, columnKey: string) => void;
-  onSelectRow: (sectionId: string, rowIndex: number) => void;
+  onSelectColumn: (sectionId: string, columnKey: string, openInspector?: boolean) => void;
+  onSelectRow: (sectionId: string, rowIndex: number, openInspector?: boolean) => void;
   onSelectBlock: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
+    openInspector?: boolean,
   ) => void;
   onOpenInspector: () => void;
   onBlockDragStart: (blockKey: string) => void;
@@ -16325,7 +16989,7 @@ const PreviewSection = memo(function PreviewSection({
                         ) : block.kind === "slider" || block.kind === "slideshow" || block.kind === "overlaySlider" ? (
                           <UikitSlider block={block} isCanvas shellSettings={shellSettings} />
                         ) : block.kind === "products" ? (
-                          <UikitProducts block={block} isCanvas products={previewProducts} categoryTree={previewCategoryTree} />
+                          <UikitProducts block={block} productContexts={block.dynamicProductContexts} categoryTree={previewCategoryTree} />
                         ) : block.kind === "grid" ? (
                           <GridCardsClient
                             block={block}

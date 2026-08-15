@@ -16,7 +16,6 @@ import {
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { Link, Image as ImageIcon } from "lucide-react";
 import { TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -44,6 +43,8 @@ export default function HeadingCapabilityPanel({
   update,
   openWordPressMediaPicker,
 }: Props) {
+  const isImportedYoothemeHeading =
+    block.spacingContract === "yootheme" || block.id?.startsWith("yootheme-");
   // --------------------------------------------------------------------------
   // TAB 1: CONTENT (CONTENT & LINK SECTIONS)
   // --------------------------------------------------------------------------
@@ -158,7 +159,7 @@ export default function HeadingCapabilityPanel({
           update={update}
           showDecoration
           showColor
-          defaultSize="medium"
+          defaultSize={isImportedYoothemeHeading ? "none" : "medium"}
           visualPresetOptions={headingStyleOptions}
           styleAriaLabel="Heading style"
           keys={{
@@ -285,7 +286,6 @@ export default function HeadingCapabilityPanel({
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-advanced">
-        <DynamicContentInspectorGroup item={block} update={update} />
         <InspectorDivision title="GENERAL">
           <InspectorFieldRow label="ID">
             <InspectorTextField

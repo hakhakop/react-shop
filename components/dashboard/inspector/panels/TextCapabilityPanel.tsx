@@ -6,7 +6,6 @@ import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl, InspectorSwitch, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -99,6 +98,6 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
   }
 
 
-  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="text-advanced"><DynamicContentInspectorGroup item={block} update={update} /></div>;
+  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="text-advanced" />;
   return null;
 }

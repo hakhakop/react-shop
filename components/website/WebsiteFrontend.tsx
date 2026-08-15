@@ -11,6 +11,7 @@ import {
   isBuilderCustomPageKey,
   normalizeBuilderLayoutKey,
   readBuilderCustomPages,
+  type BuilderLayout,
   type BuilderLayoutKey,
 } from "@/lib/builderLayouts";
 import {
@@ -32,6 +33,7 @@ import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
+import type { DynamicItemContext } from "@/lib/dynamicContent";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -45,6 +47,9 @@ type WebsiteFrontendProps = {
     "layout" | "page" | "pageLabel" | "website"
   >;
   fallbackContent?: ReactNode;
+  /** Pre-resolved document ownership; selection remains outside rendering. */
+  layoutOverride?: BuilderLayout;
+  dynamicItemContextOverride?: DynamicItemContext;
 };
 
 function spacing(value: string | undefined, context: BuilderSpacingContext) {
@@ -102,6 +107,7 @@ function resolveWebsitePageKey(
     normalizedDirect !== "shop" ||
     requestedPage === "shop" ||
     requestedPage === "product-single" ||
+    requestedPage === "post-single" ||
     requestedPage === "product-category" ||
     requestedPage === "product-category-specific" ||
     requestedPage === "search-results" ||
@@ -128,6 +134,8 @@ export default async function WebsiteFrontend({
   pageLabelOverride,
   rendererProps,
   fallbackContent,
+  layoutOverride,
+  dynamicItemContextOverride,
 }: WebsiteFrontendProps) {
   await ensureWebsiteBuilderData(website.id);
 
@@ -141,7 +149,7 @@ export default async function WebsiteFrontend({
   const page = resolveWebsitePageKey(requestedPage, customPages);
 
   const [layout, shellSettings] = await Promise.all([
-    getPublishedBuilderLayout(page, scope),
+    layoutOverride ?? getPublishedBuilderLayout(page, scope),
     getBuilderShellSettings(scope),
   ]);
   const headerDocumentSettings = await getPublishedHeaderDocumentSettings(
@@ -159,7 +167,10 @@ export default async function WebsiteFrontend({
     ? resolveBuilderMediaUrls(localizedLayout, getWordPressBaseUrl(website))
     : localizedLayout;
   const materialization = resolvedMediaLayout
-    ? await materializeBuilderDynamicContent(resolvedMediaLayout, { website })
+    ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
+        website,
+        rootContext: dynamicItemContextOverride,
+      })
     : null;
   const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;
   materialization?.diagnostics

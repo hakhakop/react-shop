@@ -1,0 +1,33 @@
+import { expect, test } from "@playwright/test";
+import { mkdtemp, readFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { readDynamicBuilderDocument } from "@/lib/builderLayoutDocuments.server";
+import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
+
+test("starter creation supplies ordinary canonical bindings atomically", async () => {
+  const dataDir = await mkdtemp(path.join(os.tmpdir(), "webpages-routing-starters-"));
+  process.env.WEBPAGES_DATA_DIR = dataDir;
+  const scope = { websiteId: "starter-site" };
+  const service = createRoutingTemplatesService(scope);
+  const post = await service.create({ name: "Post Starter", contentType: "post", starter: "minimal" });
+  const product = await service.create({ name: "Product Starter", contentType: "product", starter: "minimal" });
+  const blank = await service.create({ name: "Blank Product", contentType: "product", starter: "blank" });
+  const postLayout = await readDynamicBuilderDocument(post.template.layoutId, scope);
+  const productLayout = await readDynamicBuilderDocument(product.template.layoutId, scope);
+  const blankLayout = await readDynamicBuilderDocument(blank.template.layoutId, scope);
+  const postBlocks = postLayout.sections.flatMap((section) => section.layoutItems ?? []).flatMap((item) => item.blocks ?? []);
+  const productBlocks = productLayout.sections.flatMap((section) => section.layoutItems ?? []).flatMap((item) => item.blocks ?? []);
+  expect(postBlocks.map((block) => block.kind)).toEqual(["heading", "image", "text"]);
+  expect(productBlocks.map((block) => block.kind)).toEqual(["productGallery", "heading", "text", "productAddToCart", "text"]);
+  expect(postBlocks.find((block) => block.kind === "heading")?.dynamicBindings?.headingText?.path).toBe("title");
+  expect(postBlocks.find((block) => block.kind === "image")?.dynamicBindings?.imageUrl?.path).toBe("featuredImage.url");
+  expect(postBlocks.find((block) => block.kind === "text")?.dynamicBindings?.body?.path).toBe("content");
+  expect(productBlocks.find((block) => block.kind === "heading")?.dynamicBindings?.headingText?.path).toBe("title");
+  expect(productBlocks.filter((block) => block.kind === "text").map((block) => block.dynamicBindings?.body?.path)).toEqual(["price", "description"]);
+  expect(productBlocks.some((block) => ["productTitle", "productPrice", "productDescription"].includes(String(block.kind)))).toBe(false);
+  expect(blankLayout.sections[0]?.layoutItems?.[0]?.blocks).toEqual([]);
+  const persisted = await readFile(path.join(dataDir, "websites", "starter-site", "builder-layouts.json"), "utf8");
+  expect(persisted).not.toContain("Wool Bblend");
+  expect(persisted).not.toContain("Post content from");
+});

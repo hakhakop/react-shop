@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useWishlist } from "./WishlistProvider";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 export default function WishlistPageClient() {
   const { items, removeItem, clearWishlist } = useWishlist();
@@ -45,7 +46,7 @@ export default function WishlistPageClient() {
                 </div>
                 <div className="cart-item-info">
                   <Link
-                    href={`/product/${item.slug}`}
+                    href={getStorefrontContentHref({ contentType: "product", slug: item.slug })!}
                     className="cart-item-name"
                   >
                     {item.name}

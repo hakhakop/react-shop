@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import SearchModal from "./SearchModal";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type SearchContextType = {
   openSearch: () => void;
@@ -116,7 +117,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
 
   const handleSelectResult = (slug: string) => {
     closeSearch();
-    router.push(`/product/${slug}`);
+    const href = getStorefrontContentHref({ contentType: "product", slug });
+    if (href) router.push(href);
   };
 
   return (

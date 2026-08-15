@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import { searchProducts, type ProductNode } from "@/lib/products";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 // Next.js 16: searchParams is a Promise
 type SearchPageProps = {
@@ -102,7 +103,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             return (
               <Link
                 key={p.id}
-                href={`/product/${p.slug}`}
+                href={getStorefrontContentHref({ contentType: "product", slug: p.slug })!}
                 className="product-card"
               >
                 <div className="product-image">

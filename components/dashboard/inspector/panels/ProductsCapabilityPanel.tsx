@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import {
@@ -20,6 +20,7 @@ import {
   ContentSettingsGroup,
   ActionSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -34,30 +35,6 @@ const opts = <T extends string>(values: readonly T[]) =>
     label: value.replace(/[-_]/g, " ").replace(/\b\w/g, (m) => m.toUpperCase()),
   }));
 
-const SOURCE_OPTIONS = [
-  { value: "all", label: "All Products" },
-  { value: "featured", label: "Featured Products Only" },
-  { value: "sale", label: "On Sale Products Only" },
-  { value: "category", label: "Specific Category" },
-];
-
-const DEFAULT_CATEGORY_OPTIONS = [
-  { value: "all", label: "All Categories" },
-  { value: "footwear", label: "Footwear / Shoes" },
-  { value: "clothing", label: "Clothing / Apparel" },
-  { value: "accessories", label: "Accessories / Bags" },
-  { value: "electronics", label: "Electronics / Gadgets" },
-  { value: "custom", label: "Custom Category Slug / ID..." },
-];
-
-const ORDER_OPTIONS = [
-  { value: "date-desc", label: "Latest / Newest First" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-  { value: "popularity", label: "Best Sellers / Popularity" },
-  { value: "rating", label: "Highest Rated" },
-];
-
 const PAGINATION_STYLE_OPTIONS = [
   { value: "numbers", label: "Numeric Page Buttons (1 2 3)" },
   { value: "load-more", label: "Load More Button" },
@@ -68,40 +45,11 @@ export default function ProductsCapabilityPanel({
   block,
   tab,
   shellSettings,
+  previewCategoryTree,
   update,
 }: Props) {
   const rawBlock = (block ?? {}) as any;
   const isPaginationOn = Boolean(rawBlock.paginationEnabled || rawBlock.pagination?.enabled);
-  const [fetchedCategories, setFetchedCategories] = useState<{ value: string; label: string }[]>([]);
-
-  useEffect(() => {
-    let isMounted = true;
-    fetch("/api/builder-preview-categories")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!isMounted) return;
-        if (data?.categories && Array.isArray(data.categories) && data.categories.length > 0) {
-          const list = data.categories.map((c: any) => ({
-            value: c.slug || String(c.id),
-            label: `${c.name || c.title} (${c.slug})`,
-          }));
-          setFetchedCategories([
-            { value: "all", label: "All Categories" },
-            ...list,
-            { value: "custom", label: "Custom Category Slug / ID..." },
-          ]);
-        }
-      })
-      .catch(() => {});
-    return () => { isMounted = false; };
-  }, []);
-
-  const categoryOptions = fetchedCategories.length > 0 ? fetchedCategories : DEFAULT_CATEGORY_OPTIONS;
-  const currentCategoryValue = rawBlock.productCategory ?? rawBlock.category ?? rawBlock.categoryId ?? "all";
-  const isCustomCategory =
-    currentCategoryValue !== "all" &&
-    !categoryOptions.some((opt) => opt.value === currentCategoryValue);
-
   // --------------------------------------------------------------------------
   // TAB: CONTENT
   // --------------------------------------------------------------------------
@@ -109,7 +57,14 @@ export default function ProductsCapabilityPanel({
     return (
       <div className="builder-inspector-stack" data-uikit-capability="products-content">
 
-        <InspectorDivision title="PRODUCT SOURCE">
+        <DynamicContentInspectorGroup
+          item={block}
+          update={update}
+          fixedSourceKey="woocommerce-product-collection"
+          categoryTree={previewCategoryTree}
+        />
+
+        <InspectorDivision title="CONTENT">
           <InspectorFieldRow label="Block title">
             <InspectorTextField
               value={rawBlock.title ?? ""}
@@ -118,90 +73,6 @@ export default function ProductsCapabilityPanel({
             />
           </InspectorFieldRow>
 
-          <InspectorFieldRow
-            label="Source"
-            isOverridden={rawBlock.productSource !== undefined && rawBlock.productSource !== "all"}
-            inheritedValueText="All products"
-            onReset={() => update({ productSource: undefined, source: undefined } as any)}
-          >
-            <InspectorPillGroup
-              value={rawBlock.productSource ?? rawBlock.source ?? "all"}
-              options={SOURCE_OPTIONS}
-              onChange={(value: string) => update({ productSource: value, source: value } as any)}
-              ariaLabel="Product source"
-            />
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="Category"
-            isOverridden={currentCategoryValue !== "all"}
-            inheritedValueText="All categories"
-            onReset={() => update({ productCategory: undefined, category: undefined, categoryId: undefined } as any)}
-          >
-            <InspectorSelect
-              value={isCustomCategory ? "custom" : currentCategoryValue}
-              onChange={(value: string) => {
-                if (value === "custom") {
-                  update({ productCategory: "", category: "", categoryId: "" } as any);
-                } else {
-                  update({ productCategory: value, category: value, categoryId: value } as any);
-                }
-              }}
-              options={categoryOptions}
-              ariaLabel="Product category"
-            />
-          </InspectorFieldRow>
-
-          {isCustomCategory && (
-            <InspectorFieldRow label="Custom slug / ID">
-              <InspectorTextField
-                value={currentCategoryValue === "custom" ? "" : currentCategoryValue}
-                onChange={(value: string) =>
-                  update({ productCategory: value, category: value, categoryId: value } as any)
-                }
-                placeholder="e.g. footwear or 15"
-              />
-            </InspectorFieldRow>
-          )}
-
-          <InspectorFieldRow
-            label="Sort order"
-            isOverridden={rawBlock.productSort !== undefined && rawBlock.productSort !== "date-desc"}
-            inheritedValueText="Latest first"
-            onReset={() => update({ productSort: undefined } as any)}
-          >
-            <InspectorSelect
-              value={rawBlock.productSort ?? "date-desc"}
-              onChange={(value: string) => update({ productSort: value } as any)}
-              options={ORDER_OPTIONS}
-              ariaLabel="Product sort order"
-            />
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="Limit"
-            isOverridden={rawBlock.productsLimit !== undefined}
-            inheritedValueText="4"
-            onReset={() => update({ productsLimit: undefined, limit: undefined, gridLimit: undefined } as any)}
-          >
-            <InspectorSelect
-              value={String(rawBlock.productsLimit ?? rawBlock.limit ?? rawBlock.gridLimit ?? 4)}
-              onChange={(value: string) =>
-                update({ productsLimit: parseInt(value, 10), limit: parseInt(value, 10), gridLimit: parseInt(value, 10) } as any)
-              }
-              options={[
-                { value: "0", label: "All (no limit)" },
-                { value: "4", label: "4 products" },
-                { value: "6", label: "6 products" },
-                { value: "8", label: "8 products" },
-                { value: "12", label: "12 products" },
-                { value: "16", label: "16 products" },
-                { value: "24", label: "24 products" },
-                { value: "48", label: "48 products" },
-              ]}
-              ariaLabel="Product limit"
-            />
-          </InspectorFieldRow>
         </InspectorDivision>
 
         <InspectorDivision title="PAGINATION">

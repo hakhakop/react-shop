@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import type { ProductNode } from "../lib/products";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type Props = {
   products: ProductNode[];
@@ -51,7 +52,7 @@ export function ShopProductGrid({ products }: Props) {
                 />
               </div>
 
-              <Link href={`/product/${p.slug}`} className="product-card-link">
+              <Link href={getStorefrontContentHref({ contentType: "product", slug: p.slug })!} className="product-card-link">
                 <div className="product-image">
                   {imageUrl ? (
                     <img
@@ -202,7 +203,7 @@ export function ShopProductGrid({ products }: Props) {
                             imageUrl={qpImageUrl}
                           />
                           <Link
-                            href={`/product/${qp.slug}`}
+                            href={getStorefrontContentHref({ contentType: "product", slug: qp.slug })!}
                             className="quick-view-full-link"
                             onClick={() => setQuickViewProduct(null)}
                           >

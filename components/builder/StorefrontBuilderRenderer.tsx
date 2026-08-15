@@ -65,7 +65,6 @@ import { getCategoryTree } from "@/lib/categories";
 import type { CategoryTreeItem } from "@/lib/categories";
 import { getProductCategories, type ProductCategory } from "@/lib/navigation";
 import { getProductsForGrid, type ProductNode } from "@/lib/products";
-import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import type { SaaSWebsite } from "@/lib/websites";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
@@ -1268,40 +1267,7 @@ function GridCards({
   );
 }
 
-async function ContentGridBlock({
-  block,
-  website,
-}: {
-  block: BuilderLayoutBlock;
-  website?: SaaSWebsite | null;
-}) {
-  if (block.gridSource === "products") {
-    const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
-    const products = await getProductsForGrid({
-      limit,
-      source: "all",
-      website,
-    });
-    return (
-      <GridCards
-        block={block}
-        items={products.map((product) => ({
-          id: product.id,
-          imageUrl: product.image?.sourceUrl,
-          imageAlt: product.image?.altText ?? product.name,
-          eyebrow: "Product",
-          title: product.name,
-          meta: product.price ?? undefined,
-          text: product.attributes?.nodes
-            ?.map((attribute) => safeDecodeURI(attribute.label ?? attribute.name))
-            .join(", "),
-          buttonLabel: "View product",
-          buttonUrl: `/product/${product.slug}`,
-        }))}
-      />
-    );
-  }
-
+function ContentGridBlock({ block }: { block: BuilderLayoutBlock }) {
   return (
     <GridCards
       block={block}
@@ -1754,14 +1720,14 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "products") {
-    return <UikitProducts block={block as any} />;
+    return <UikitProducts block={block as any} productContexts={(block as any).dynamicProductContexts} />;
   }
 
   if (block.kind === "grid") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--grid">
         <Suspense fallback={<ProductsSkeleton />}>
-          <ContentGridBlock block={block} website={website} />
+          <ContentGridBlock block={block} />
         </Suspense>
       </div>
     );

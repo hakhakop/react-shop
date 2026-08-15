@@ -1159,6 +1159,12 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
+      dynamicContext: {
+        provider: "woocommerce",
+        source: "product",
+        mode: "collection",
+        query: { quantity: 8 },
+      },
       title: "Objects chosen for everyday rituals",
       source: "all",
       layoutVariant: "grid",

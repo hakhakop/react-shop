@@ -15,6 +15,13 @@ import { getWebsiteByDomainHost } from "../../lib/websites";
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
 import { getPublishedHeaderDocumentSettings } from "../../lib/publishedHeaderDocumentSettings";
+import { getCanonicalPostSingularBySlug } from "@/lib/postSingularContext.server";
+import { resolveLayout, type SingularRouteContext } from "@/lib/layoutRouting";
+import {
+  ensurePostSingleRoutingCompatibility,
+  getBuilderLayoutByDocumentId,
+} from "@/lib/layoutRoutingStore.server";
+import type { SaaSWebsite } from "@/lib/websites";
 
 type WPPageParams = {
   slug?: string[];
@@ -28,6 +35,76 @@ type PageByUriResult = {
   } | null;
 };
 
+async function renderCanonicalPost(slug: string, website?: SaaSWebsite | null) {
+  const canonical = await getCanonicalPostSingularBySlug(slug, website);
+  if (!canonical) return null;
+  const { post } = canonical;
+  const context: SingularRouteContext = {
+    view: "singular",
+    provider: "wordpress",
+    contentType: "post",
+    contentId: post.id,
+    ...(post.databaseId !== undefined ? { databaseId: post.databaseId } : {}),
+    slug: post.slug,
+    uri: post.uri ?? `/${post.slug}/`,
+    taxonomyTerms: canonical.taxonomyTerms,
+  };
+  const scope = website ? { websiteId: website.id } : {};
+  let selectedLayout = null;
+  try {
+    const registry = await ensurePostSingleRoutingCompatibility(scope);
+    const resolution = resolveLayout({
+      context,
+      individualOverrides: registry.individualOverrides,
+      routingTemplates: registry.routingTemplates,
+      nativeFallbackAvailable: true,
+    });
+    if (resolution.outcome === "individual" || resolution.outcome === "routing-template") {
+      selectedLayout = await getBuilderLayoutByDocumentId(resolution.layoutId, scope);
+    }
+  } catch (error) {
+    console.error("[layout-routing] Post resolution failed", error);
+  }
+
+  const fallbackContent = (
+    <main className="page">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: post.title, href: post.uri ?? `/${post.slug}/` }]} />
+      <h1 className="page-title">{post.title}</h1>
+      {post.featuredImage?.sourceUrl ? <img src={post.featuredImage.sourceUrl} alt={post.featuredImage.altText ?? ""} /> : null}
+      <article className="prose" dangerouslySetInnerHTML={{ __html: post.content ?? post.excerpt ?? "" }} />
+    </main>
+  );
+
+  if (website) {
+    return (
+      <WebsiteFrontend
+        website={website}
+        requestedPage="post-single"
+        pageLabelOverride={post.title}
+        mode="domain"
+        layoutOverride={selectedLayout ?? undefined}
+        dynamicItemContextOverride={canonical.dynamicContext}
+        fallbackContent={fallbackContent}
+        rendererProps={{ breadcrumbItems: [{ label: "Home", href: "/" }, { label: post.title }] }}
+      />
+    );
+  }
+  if (!selectedLayout) return fallbackContent;
+  const [materialization, shellSettings] = await Promise.all([
+    materializeBuilderDynamicContent(selectedLayout, { rootContext: canonical.dynamicContext }),
+    getBuilderShellSettings(),
+  ]);
+  return (
+    <StorefrontBuilderRenderer
+      layout={materialization.renderLayout}
+      page="post-single"
+      pageLabel={post.title}
+      breadcrumbItems={[{ label: "Home", href: "/" }, { label: post.title }]}
+      shellSettings={shellSettings}
+    />
+  );
+}
+
 export default async function WPPage({
   params,
 }: {
@@ -37,6 +114,18 @@ export default async function WPPage({
   const resolved = await params;
   const slugSegments = resolved.slug;
   const domainWebsite = await getWebsiteByDomainHost((await headers()).get("host"));
+
+  if (domainWebsite && slugSegments?.length === 1) {
+    const domainPages = await readBuilderCustomPages({ websiteId: domainWebsite.id });
+    if (!domainPages.some((page) => page.slug === slugSegments[0])) {
+      try {
+        const post = await renderCanonicalPost(slugSegments[0], domainWebsite);
+        if (post) return post;
+      } catch (error) {
+        console.error("[wordpress/post] singular resolution failed", error);
+      }
+    }
+  }
 
   if (domainWebsite) {
     return (
@@ -125,6 +214,13 @@ export default async function WPPage({
           </p>
         </main>
       );
+    }
+
+    try {
+      const post = await renderCanonicalPost(slug);
+      if (post) return post;
+    } catch (error) {
+      console.error("[wordpress/post] singular resolution failed", error);
     }
   }
 

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "routingTemplates": [
+    {
+      "id": "routing:legacy-product-single",
+      "name": "Product Single",
+      "enabled": true,
+      "order": 0,
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product"
+        }
+      ],
+      "layoutId": "layout:builder:product-single"
+    },
+    {
+      "id": "routing:template:bd1c3b99-711c-4d24-8a85-c4d0baaac547",
+      "name": "Single Post",
+      "enabled": true,
+      "order": 10,
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "post"
+        }
+      ],
+      "layoutId": "layout:builder:post-single"
+    },
+    {
+      "id": "routing:legacy-post-single",
+      "name": "Single Post",
+      "enabled": true,
+      "order": 20,
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "post"
+        }
+      ],
+      "layoutId": "layout:builder:post-single"
+    }
+  ],
+  "individualOverrides": []
+}

@@ -5,8 +5,7 @@ import type {
 } from "@/lib/builderLayouts";
 import {
   getPublishedBuilderLayout,
-  readBuilderLayoutStore,
-  writeBuilderLayoutStore,
+  mutateBuilderLayoutStore,
 } from "@/lib/builderLayouts";
 
 export const builderDocumentConfig: Record<
@@ -42,9 +41,10 @@ export async function getOrCreateBuilderDocumentLayout({
   const existing = await getPublishedBuilderLayout(key, scope);
   if (existing) return existing;
 
-  const layout = create();
-  const store = await readBuilderLayoutStore(scope);
-  store[key] = layout;
-  await writeBuilderLayoutStore(store, scope);
-  return layout;
+  return mutateBuilderLayoutStore((store) => {
+    if (store[key]) return store[key]!;
+    const layout = create();
+    store[key] = layout;
+    return layout;
+  }, scope);
 }

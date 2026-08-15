@@ -18,7 +18,9 @@ export default function UikitHeading({ block }: Props) {
   const Tag = (rawBlock.headingLevel ?? rawBlock.headingElement ?? "h2") as any;
   const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
   const uikitHeadingClass =
-    styleVal && styleVal !== "none" && styleVal !== "inherit"
+    styleVal === "none" || styleVal === "inherit"
+      ? ""
+      : styleVal
       ? styleVal.startsWith("text-")
         ? getUikitTextClass(styleVal)
         : styleVal.startsWith("heading-") || ["h1", "h2", "h3", "h4", "h5", "h6"].includes(styleVal)

@@ -171,6 +171,7 @@ export function TitleSettingsGroup({
               { value: "success", label: "Success" },
               { value: "warning", label: "Warning" },
               { value: "danger", label: "Danger" },
+              { value: "background", label: "Background" },
             ]}
             onChange={(value) => update({ [colorKey]: value })}
           />

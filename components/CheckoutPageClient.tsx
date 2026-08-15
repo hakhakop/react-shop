@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CartItem, useCart } from "./CartProvider";
 import { useWordPressSession } from "./useWordPressSession";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type CheckoutPageClientProps = {
   asSlot?: boolean;
@@ -648,7 +649,7 @@ export default function CheckoutPageClient({
                       </div>
                       <div className="checkout-summary-item-main">
                         {slug ? (
-                          <Link href={`/product/${slug}`}>{name}</Link>
+                          <Link href={getStorefrontContentHref({ contentType: "product", slug })!}>{name}</Link>
                         ) : (
                           <strong>{name}</strong>
                         )}

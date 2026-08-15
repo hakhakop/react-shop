@@ -438,9 +438,9 @@ export function InspectorGroupSummary({
 export function flattenCategoryTree(
   categoryTree: CategoryTreeItem[],
   depth = 0,
-): { label: string; slug: string }[] {
+): { label: string; slug: string; dbId: number }[] {
   return categoryTree.flatMap((category) => [
-    { label: `${"— ".repeat(depth)}${category.name}`, slug: category.slug },
+    { label: `${"— ".repeat(depth)}${category.name}`, slug: category.slug, dbId: category.dbId },
     ...flattenCategoryTree(category.children, depth + 1),
   ]);
 }

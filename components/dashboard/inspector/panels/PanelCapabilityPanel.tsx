@@ -13,7 +13,6 @@ import {
   MetaSettingsGroup,
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -168,7 +167,7 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
     );
   }
 
-  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="panel-advanced"><DynamicContentInspectorGroup item={block} update={update} /></div>;
+  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="panel-advanced" />;
 
   return null;
 }

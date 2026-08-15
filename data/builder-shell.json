@@ -240,7 +240,7 @@
       "id": "menu_sbyhyzc43",
       "label": "Օրինակներ",
       "url": "/demos",
-      "parentId": null
+      "parentId": "home"
     },
     {
       "id": "menu_c8gxt1zuo",
@@ -288,7 +288,7 @@
       "id": "menu_02ncte54p",
       "label": "Devstack Pricing",
       "url": "/devstack-pricing",
-      "parentId": null
+      "parentId": "home"
     },
     {
       "id": "menu_pgxpaji7n",
@@ -318,7 +318,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-14T18:00:57.664Z",
+  "updatedAt": "2026-08-15T15:55:12.671Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",

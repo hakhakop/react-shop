@@ -18,6 +18,7 @@ import {
   type ProductImageFit,
   type ProductImageRatio,
 } from "@/lib/productCardImage";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 const MotionDiv = motion.div;
 
@@ -156,6 +157,7 @@ export default function ProductCard({
   const priceNumber = product.price ? parseFloat(product.price) : null;
   const formattedPrice = formatPrice(product.price);
   const attributes = getProductAttributes(product);
+  const productHref = getStorefrontContentHref({ contentType: "product", slug: product.slug })!;
 
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
@@ -289,7 +291,7 @@ export default function ProductCard({
 
         {/* Main clickable area */}
         <Link
-          href={`/product/${product.slug}`}
+          href={productHref}
           className="product-card-link"
           aria-label={product.name}
         >
@@ -395,7 +397,7 @@ export default function ProductCard({
 
                     <div className="quick-view-actions">
                       <Link
-                        href={`/product/${product.slug}`}
+                        href={productHref}
                         className="quick-view-full-link"
                         onClick={() => setIsQuickViewOpen(false)}
                       >

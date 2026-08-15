@@ -14,9 +14,10 @@ const BUILDER_FILES = [
   "builder-shell.json",
 ] as const;
 const BUILDER_TEMPLATES_FILE = "builder-templates.json";
+const BUILDER_ROUTING_FILE = "builder-routing.json";
 
 type BuilderFileName = (typeof BUILDER_FILES)[number];
-type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE;
+type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE | typeof BUILDER_ROUTING_FILE;
 type BuilderFileState = "missing" | "empty" | "non-empty" | "invalid";
 let rootBuilderDataEnsurePromise: Promise<void> | null = null;
 
@@ -66,6 +67,12 @@ export function getBuilderShellPath(websiteId?: string) {
 
 export function getBuilderTemplatesPath() {
   return getRuntimeBuilderFilePath(BUILDER_TEMPLATES_FILE);
+}
+
+export function getBuilderRoutingPath(websiteId?: string) {
+  return websiteId
+    ? path.join(getWebsiteBuilderDir(websiteId), BUILDER_ROUTING_FILE)
+    : getRuntimeBuilderFilePath(BUILDER_ROUTING_FILE);
 }
 
 async function fileExists(filePath: string) {

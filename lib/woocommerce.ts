@@ -38,6 +38,12 @@ export function hasUsableWooCommerceConnection(connection: WooCommerceConnection
   );
 }
 
+export class WooCommerceRequestError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
+
 export function getWooAccountUrl(
   connection: WooCommerceConnection,
   path = "",
@@ -91,8 +97,9 @@ export async function wooCommerceFetch<T>(
     : null;
 
   if (!response.ok) {
-    throw new Error(
+    throw new WooCommerceRequestError(
       payload?.message || `WooCommerce returned ${response.status}.`,
+      response.status,
     );
   }
 

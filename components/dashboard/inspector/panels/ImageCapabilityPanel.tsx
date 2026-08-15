@@ -14,7 +14,6 @@ import {
 import { ImageSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -133,7 +132,6 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-advanced">
-        <DynamicContentInspectorGroup item={block} update={update} />
         <InspectorDivision title="ADVANCED">
           <InspectorFieldRow label="ID">
             <InspectorTextField

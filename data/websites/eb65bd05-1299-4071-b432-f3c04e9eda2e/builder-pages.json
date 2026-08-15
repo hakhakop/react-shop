@@ -4,5 +4,29 @@
     "title": "Pricing",
     "slug": "pricing",
     "updatedAt": "2026-08-10T10:12:21.830Z"
+  },
+  {
+    "key": "page:new-page",
+    "title": "New Page",
+    "slug": "new-page",
+    "updatedAt": "2026-08-15T06:11:50.537Z"
+  },
+  {
+    "key": "page:new-page-2",
+    "title": "New Page",
+    "slug": "new-page-2",
+    "updatedAt": "2026-08-15T06:11:56.928Z"
+  },
+  {
+    "key": "page:new-page-3",
+    "title": "New Page",
+    "slug": "new-page-3",
+    "updatedAt": "2026-08-15T06:12:04.649Z"
+  },
+  {
+    "key": "page:new-page-4",
+    "title": "New Page",
+    "slug": "new-page-4",
+    "updatedAt": "2026-08-15T06:12:12.364Z"
   }
 ]

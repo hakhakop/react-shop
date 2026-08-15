@@ -4,6 +4,7 @@ import { Edit3, ExternalLink, Gauge, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { EditableLayoutTarget } from "@/lib/builderEditorContext";
 import {
   getDefaultWebsiteBuilderPageKey,
   resolveBuilderPageParam,
@@ -34,6 +35,10 @@ type DashboardTarget = {
 type BuilderPagesResponse = {
   pages?: BuilderPageSummary[];
   publishedKeys?: string[];
+};
+
+type BuilderEditorTargetResponse = {
+  target?: EditableLayoutTarget | null;
 };
 
 type DomainWebsiteContext = {
@@ -160,6 +165,8 @@ export default function FrontendAdminBar({
   const [productEditHref, setProductEditHref] = useState<string | null>(null);
   const [pageParam, setPageParam] = useState<string | null>(null);
   const [builderPages, setBuilderPages] = useState<WebsiteBuilderPages | null>(null);
+  const [routedContentTarget, setRoutedContentTarget] =
+    useState<EditableLayoutTarget | null>(null);
   const scopedWebsiteId = useMemo(
     () =>
       scopedWebsiteIdFromPreviewPath(pathname ?? "/") ??
@@ -167,17 +174,28 @@ export default function FrontendAdminBar({
       null,
     [domainWebsite?.routeSegment, pathname],
   );
-  const target = useMemo(
-    () =>
-      dashboardTargetForPath(
-        pathname ?? "/",
-        pageParam,
-        builderPages,
-        saasUser,
-        domainWebsite,
-      ),
-    [builderPages, domainWebsite, pageParam, pathname, saasUser],
-  );
+  const target = useMemo(() => {
+    const pathTarget = dashboardTargetForPath(
+      pathname ?? "/",
+      pageParam,
+      builderPages,
+      saasUser,
+      domainWebsite,
+    );
+    if (!pathTarget || !routedContentTarget) return pathTarget;
+    return {
+      ...pathTarget,
+      href: routedContentTarget.builderHref,
+      label: routedContentTarget.label,
+    };
+  }, [
+    builderPages,
+    domainWebsite,
+    pageParam,
+    pathname,
+    routedContentTarget,
+    saasUser,
+  ]);
 
   useEffect(() => {
     window.queueMicrotask(() => {
@@ -188,6 +206,35 @@ export default function FrontendAdminBar({
   useEffect(() => {
     setPageParam(new URLSearchParams(window.location.search).get("page"));
   }, [pathname]);
+
+  useEffect(() => {
+    if (!pathname || pathname.startsWith("/dashboard") || !saasUser) {
+      setRoutedContentTarget(null);
+      return;
+    }
+
+    let cancelled = false;
+    async function loadRoutedContentTarget() {
+      setRoutedContentTarget(null);
+      try {
+        const params = new URLSearchParams({ href: window.location.href });
+        const response = await fetch(
+          `/api/builder-editor-context?${params.toString()}`,
+          { cache: "no-store" },
+        );
+        if (!response.ok) return;
+        const payload = (await response.json()) as BuilderEditorTargetResponse;
+        if (!cancelled) setRoutedContentTarget(payload.target ?? null);
+      } catch {
+        if (!cancelled) setRoutedContentTarget(null);
+      }
+    }
+
+    void loadRoutedContentTarget();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, saasUser]);
 
   useEffect(() => {
     if (!scopedWebsiteId || !saasUser) {

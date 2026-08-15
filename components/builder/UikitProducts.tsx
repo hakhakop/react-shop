@@ -13,6 +13,7 @@ import {
   type SelectedProductAttributes,
 } from "@/lib/productAttributeFilters";
 import { typographyRoleClass } from "@/lib/builderTypography";
+import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
 import {
   getUikitButtonClass,
   getUikitCardClass,
@@ -21,47 +22,13 @@ import {
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import type { CategoryTreeItem } from "@/lib/categories";
+import type { DynamicItemContext } from "@/lib/dynamicContent";
 
 type Props = {
   block: any;
-  isCanvas?: boolean;
-  products?: any[];
+  productContexts?: DynamicItemContext[];
   categoryTree?: CategoryTreeItem[];
 };
-
-const MOCK_PRODUCTS = [
-  { id: "1", slug: "classic-leather-sneaker", name: "Classic Leather Sneaker", price: "$120.00", priceAmount: 120, category: "footwear", categoryName: "Footwear", badge: "New", featured: true, onSale: false, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80", date: "2026-08-01", productCategories: { nodes: [{ slug: "footwear", name: "Footwear" }] } },
-  { id: "2", slug: "minimalist-canvas-backpack", name: "Minimalist Canvas Backpack", price: "$85.00", priceAmount: 85, category: "accessories", categoryName: "Accessories", badge: "Sale", featured: false, onSale: true, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80", date: "2026-07-20", productCategories: { nodes: [{ slug: "accessories", name: "Accessories" }] } },
-  { id: "3", slug: "wireless-headphones", name: "Wireless Headphones", price: "$249.00", priceAmount: 249, category: "electronics", categoryName: "Electronics", badge: "Hot", featured: true, onSale: false, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80", date: "2026-08-05", productCategories: { nodes: [{ slug: "electronics", name: "Electronics" }] } },
-  { id: "4", slug: "smart-fitness-watch", name: "Smart Fitness Watch", price: "$199.00", priceAmount: 199, category: "electronics", categoryName: "Electronics", badge: "Sale", featured: false, onSale: true, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80", date: "2026-07-15", productCategories: { nodes: [{ slug: "electronics", name: "Electronics" }] } },
-  { id: "5", slug: "cotton-crewneck-t-shirt", name: "Cotton Crewneck T-Shirt", price: "$45.00", priceAmount: 45, category: "clothing", categoryName: "Clothing", badge: "New", featured: true, onSale: false, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80", date: "2026-08-06", productCategories: { nodes: [{ slug: "clothing", name: "Clothing" }] } },
-  { id: "6", slug: "waterproof-trail-boots", name: "Waterproof Trail Boots", price: "$180.00", priceAmount: 180, category: "footwear", categoryName: "Footwear", badge: "Sale", featured: false, onSale: true, image: "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=600&q=80", date: "2026-06-30", productCategories: { nodes: [{ slug: "footwear", name: "Footwear" }] } },
-  { id: "7", slug: "leather-messenger-bag", name: "Leather Messenger Bag", price: "$145.00", priceAmount: 145, category: "accessories", categoryName: "Accessories", badge: "Featured", featured: true, onSale: false, image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80", date: "2026-07-10", productCategories: { nodes: [{ slug: "accessories", name: "Accessories" }] } },
-  { id: "8", slug: "slim-fit-chino-pants", name: "Slim Fit Chino Pants", price: "$65.00", priceAmount: 65, category: "clothing", categoryName: "Clothing", badge: "", featured: false, onSale: false, image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80", date: "2026-07-05", productCategories: { nodes: [{ slug: "clothing", name: "Clothing" }] } },
-];
-
-function resolveProductPrice(rawPrice: unknown, fallbackAmount: unknown) {
-  const raw = String(rawPrice ?? fallbackAmount ?? "").trim();
-  if (!raw) return { label: "$99.00", amount: 99 };
-
-  // Variable products from this WooGraphQL source can return one price per
-  // variation as a comma-separated string. Collapse repeated values and show
-  // a compact range only when there are genuinely different prices.
-  const values = raw
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean)
-    .filter((value, index, all) => all.indexOf(value) === index);
-  const label = values.length <= 1
-    ? (values[0] ?? raw)
-    : `${values[0]} – ${values[values.length - 1]}`;
-  const amount = Number.parseFloat((values[0] ?? raw).replace(/[^0-9.]/g, ""));
-
-  return {
-    label,
-    amount: Number.isFinite(amount) ? amount : 99,
-  };
-}
 
 function getCardAttributeSummary(product: { attributes?: { nodes?: readonly unknown[] | null } | null }) {
   const attributes = (product.attributes?.nodes ?? [])
@@ -74,52 +41,50 @@ function getCardAttributeSummary(product: { attributes?: { nodes?: readonly unkn
   return { attributes, tooltip };
 }
 
-function normalizeProduct(p: any, idx: number) {
-  // productCategories: WooCommerce standard shape
-  const catNodes: { slug: string; name: string }[] =
-    p.productCategories?.nodes ||
-    p.categories?.nodes ||
-    (Array.isArray(p.categories) ? p.categories : []);
-  const firstCat = catNodes[0];
-  const catSlug = (p.category || firstCat?.slug || firstCat?.name || "shop").toLowerCase();
-  const catName = p.categoryName || firstCat?.name || "Shop";
+function contextValue(context: DynamicItemContext, path: string) {
+  return context.fields[path]?.value;
+}
 
-  // featured / onSale - read from real fields or fallback to badge
-  const featured = Boolean(p.featured);
-  const onSale = Boolean(p.onSale);
-  const resolvedPrice = resolveProductPrice(p.price, p.priceAmount);
-
+function productFromContext(context: DynamicItemContext, index: number) {
+  const categories = (contextValue(context, "categories") as { items?: Array<Record<string, unknown>> } | undefined)?.items ?? [];
+  const attributes = (contextValue(context, "attributes") as { items?: Array<Record<string, unknown>> } | undefined)?.items ?? [];
+  const image = contextValue(context, "image") as { url?: string; alt?: string } | undefined;
+  const id = context.id ?? contextValue(context, "id") ?? index;
+  const firstCategory = categories[0];
+  const slug = String(contextValue(context, "slug") ?? id);
   return {
-    ...p,
-    id: String(p.id || p.databaseId || idx),
-    slug: String(p.slug || p.databaseId || p.id || `product-${idx + 1}`),
-    name: p.name || p.title || "WooCommerce Product",
-    price: resolvedPrice.label,
-    priceAmount: typeof p.priceAmount === "number" ? p.priceAmount : resolvedPrice.amount,
-    category: catSlug,
-    categoryName: catName,
-    badge: onSale ? "Sale" : featured ? "Featured" : p.badge ?? "",
-    featured,
-    onSale,
-    image: p.imageUrl || p.image?.sourceUrl || MOCK_PRODUCTS[idx % MOCK_PRODUCTS.length].image,
-    date: p.date || "2026-08-01",
-    productCategories: p.productCategories || { nodes: catNodes.length ? catNodes : [{ slug: catSlug, name: catName }] },
-    attributes: p.attributes ?? {
-      nodes: [
-        { name: "Color", options: idx % 2 === 0 ? ["Black", "White"] : ["Tan", "Blue"] },
-        { name: "Size", options: idx % 3 === 0 ? ["Small", "Medium"] : ["Medium", "Large"] },
-      ],
-    },
+    id: String(id),
+    databaseId: contextValue(context, "databaseId") ?? id,
+    slug,
+    link: String(
+      contextValue(context, "storefront.href") ??
+      contextValue(context, "link") ??
+      "",
+    ),
+    category: String(firstCategory?.slug ?? ""),
+    categoryName: String(firstCategory?.name ?? ""),
+    name: String(contextValue(context, "title") ?? "Product"),
+    price: String(contextValue(context, "price") ?? ""),
+    priceAmount: contextValue(context, "price.amount"),
+    image: image?.url ?? String(contextValue(context, "image.url") ?? ""),
+    imageAlt: image?.alt ?? String(contextValue(context, "image.alt") ?? ""),
+    featured: Boolean((contextValue(context, "meta") as Record<string, unknown> | undefined)?.featured),
+    onSale: Boolean((contextValue(context, "meta") as Record<string, unknown> | undefined)?.onSale),
+    productCategories: { nodes: categories.map((category) => ({ slug: String(category.slug ?? ""), name: String(category.name ?? "") })) },
+    attributes: { nodes: attributes.map((attribute) => ({ name: String(attribute.name ?? ""), label: String(attribute.name ?? ""), options: Array.isArray(attribute.options) ? attribute.options.map(String) : [] })) },
   };
 }
 
-export default function UikitProducts({ block, isCanvas, products: passedProducts, categoryTree }: Props) {
+export default function UikitProducts({ block, productContexts, categoryTree }: Props) {
   const rawBlock = (block ?? {}) as any;
 
   // Derive block settings
   const selectedCategory = (rawBlock.productCategory ?? rawBlock.category ?? rawBlock.categoryId ?? "all").toLowerCase().trim();
   const blockSortOrder = rawBlock.productSort ?? "date-desc";
-  const source = rawBlock.productSource ?? rawBlock.source ?? "all";
+  // Product source/query ownership lives in dynamicContext. This local value
+  // is presentation-only and is intentionally not read from legacy source
+  // fields (which previously selected and fetched products here).
+  const source = rawBlock.productFilter ?? "all";
   const isPaginationEnabled = Boolean(rawBlock.paginationEnabled || rawBlock.pagination?.enabled);
   const rawPageSize = Number(rawBlock.pageSize ?? rawBlock.productsLimit ?? rawBlock.limit ?? 4);
   // pageSize === 0 means "show all" (no limit)
@@ -128,7 +93,6 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   const attributeFilterPresentation = rawBlock.attributeFilterPresentation === "sidebar" ? "sidebar" : "top";
 
   // Local state
-  const [fetchedProducts, setFetchedProducts] = useState<any[]>([]);
   const [activeCategoryPill, setActiveCategoryPill] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>(blockSortOrder);
   const [selectedAttributes, setSelectedAttributes] = useState<SelectedProductAttributes>({});
@@ -153,56 +117,21 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
     setLoadMoreCount(pageSize);
   }, [selectedCategory, activeCategoryPill, sortOption, source, pageSize, selectedAttributes]);
 
-  // Fetch products — always re-fetch when category or source changes.
-  // When passedProducts (canvas preview pool) are available AND no specific
-  // category is selected, use them directly to avoid a round-trip.
-  // When a category IS selected, fetch from API so we get the correct set.
+  // Provider rematerialization replaces the collection. Do not carry a
+  // transient frontend category/attribute selection into an unrelated result
+  // set; authored Product query settings remain untouched.
   useEffect(() => {
-    const needsCategoryFetch = selectedCategory && selectedCategory !== "all";
-    const needsSourceFetch = source === "featured" || source === "sale";
-    // The builder preview pool is intentionally small. Attribute facets must
-    // instead use the full product result so a facet is never omitted merely
-    // because its first product falls outside that preview slice.
-    const needsAttributeFacetFetch = rawBlock.showAttributeFilters === true;
+    setActiveCategoryPill("all");
+    setSelectedAttributes({});
+    setOpenAttributeFacet(null);
+    setOpenProductAttribute(null);
+  }, [productContexts]);
 
-    // Use passedProducts pool only when showing all / no category filter
-    if (passedProducts && passedProducts.length > 0 && !needsCategoryFetch && !needsSourceFetch && !needsAttributeFacetFetch) {
-      setFetchedProducts(passedProducts);
-      return;
-    }
-
-    let isMounted = true;
-    // Fetch the full catalogue so client-side filtering and its facets are complete.
-    const catQuery = needsCategoryFetch ? `&categoryId=${encodeURIComponent(selectedCategory)}` : "";
-    const srcQuery = needsSourceFetch ? `&source=${encodeURIComponent(source)}` : "";
-    fetch(`/api/builder-preview-products?limit=500${catQuery}${srcQuery}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!isMounted) return;
-        if (data?.products && Array.isArray(data.products) && data.products.length > 0) {
-          setFetchedProducts(data.products);
-        } else if (!needsCategoryFetch && !needsSourceFetch && passedProducts && passedProducts.length > 0) {
-          // Fallback to passedProducts if API returns nothing
-          setFetchedProducts(passedProducts);
-        }
-      })
-      .catch(() => {
-        // On error fallback to passedProducts if available
-        if (passedProducts && passedProducts.length > 0) {
-          setFetchedProducts(passedProducts);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [passedProducts, selectedCategory, source, rawBlock.showAttributeFilters]);
-
-  // Normalize all fetched or mock products
+  // Products presentation consumes only canonical provider contexts. Legacy
+  // products and mock fallback are intentionally ignored.
   const normalizedProducts = useMemo(() => {
-    const base = fetchedProducts.length > 0 ? fetchedProducts : MOCK_PRODUCTS;
-    return base.map(normalizeProduct);
-  }, [fetchedProducts]);
+    return (productContexts ?? []).map(productFromContext);
+  }, [productContexts]);
 
   // Build filtered + sorted product list
   const filteredProducts = useMemo(() => {
@@ -398,6 +327,13 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   const cardClass = getUikitCardClass(panelVariant, {
     padding: panelSize,
     hover: panelHover ? "hover" : "none",
+  });
+  const colorSemantics = resolvePanelColorSemantics({
+    ...rawBlock,
+    panelVariant,
+    titleColor: rawBlock.titleColor,
+    metaColor: rawBlock.metaColor,
+    contentColor: rawBlock.contentColor,
   });
 
   // Product cards own only structural media layout. Image appearance is shared
@@ -608,8 +544,9 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
             {visibleProducts.map((product) => (
               <div key={product.id} className={`${columnWidthClass} uk-width-1-2@s`}>
                 <div
-                  className={cardClass}
+                  className={`${cardClass} ${colorSemantics.className}`.trim()}
                   style={{
+                    ...colorSemantics.style,
                     overflow: "hidden",
                     display: isSideMedia && showMedia ? "flex" : undefined,
                     flexDirection: mediaPlacement === "right" ? "row-reverse" : undefined,
@@ -618,7 +555,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                   {/* Product Media */}
                   {showMedia && (
                     <Link
-                      href={`/product/${encodeURIComponent(product.slug)}`}
+                      href={product.link}
                       aria-label={`View ${product.name}`}
                       style={{
                         display: "block",
@@ -639,7 +576,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                       >
                         <img
                           src={product.image}
-                          alt={product.name}
+                          alt={product.imageAlt || product.name}
                           loading={imageLoading}
                           className={imageShadowClass || undefined}
                           style={{
@@ -684,7 +621,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                     }}
                   >
                     <Link
-                      href={`/product/${encodeURIComponent(product.slug)}`}
+                      href={product.link}
                       style={{ color: "inherit", textDecoration: "none", display: "block" }}
                     >
                       {rawBlock.showCategoryLabel !== false && (
@@ -692,7 +629,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                           metaLevel,
                           {
                             className: metaClassName || undefined,
-                            style: { textTransform: "uppercase", letterSpacing: "0.6px", display: "block", textAlign: metaAlignStyle },
+                            style: { ...colorSemantics.metaStyle, textTransform: "uppercase", letterSpacing: "0.6px", display: "block", textAlign: metaAlignStyle },
                           },
                           product.categoryName,
                         )
@@ -735,7 +672,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                       ) : null;
                     })()}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: contentAlignStyle === "center" ? "center" : contentAlignStyle === "right" ? "flex-end" : "space-between", gap: "8px", flexWrap: "wrap" }}>
-                      <strong className={`uk-text-primary ${contentClassName}`.trim()} style={{ fontSize: "15px", fontWeight: 700 }}>
+                      <strong className={contentClassName} style={{ ...colorSemantics.style, color: "var(--builder-card-content-color, inherit)", fontSize: "15px", fontWeight: 700 }}>
                         {product.price}
                       </strong>
                       {showCartButton && (

@@ -2,18 +2,28 @@
 
 import { useEffect } from "react";
 import {
+  resolveScopedBuilderHref,
   resolveScopedPreviewHref,
   type ScopedPreviewPage,
 } from "@/lib/scopedPreviewLinks";
 
 type ScopedPreviewLinkRouterProps = {
-  websiteId: string;
+  websiteId?: string;
   pages?: ScopedPreviewPage[];
+  /** The same router is used by the standalone preview and the Builder shell. */
+  mode?: "preview" | "builder";
+  /** Limit interception to a rendered preview boundary when mounted in Builder. */
+  scopeSelector?: string;
+  /** Optional owner hook for a destination that can be rendered in-place. */
+  onNavigate?: (href: string, resolvedHref: string) => boolean | void;
 };
 
 export default function ScopedPreviewLinkRouter({
   websiteId,
   pages,
+  mode = "preview",
+  scopeSelector,
+  onNavigate,
 }: ScopedPreviewLinkRouterProps) {
   useEffect(() => {
     const hiddenHeaders = new Set<HTMLElement>();
@@ -27,7 +37,7 @@ export default function ScopedPreviewLinkRouter({
       });
     };
 
-    hideRootHeader();
+    if (mode === "preview") hideRootHeader();
 
     const onClick = (event: MouseEvent) => {
       if (
@@ -42,14 +52,25 @@ export default function ScopedPreviewLinkRouter({
       }
 
       const target = event.target as Element | null;
+      if (scopeSelector && !target?.closest(scopeSelector)) return;
       const anchor = target?.closest<HTMLAnchorElement>("a[href]");
       if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) {
         return;
       }
 
       const href = anchor.getAttribute("href");
-      const resolvedHref = resolveScopedPreviewHref(href, { websiteId, pages });
-      if (!href || resolvedHref === href) return;
+      if (!href) return;
+      const resolvedHref = websiteId
+        ? mode === "builder"
+          ? resolveScopedBuilderHref(href, { websiteId, pages })
+          : resolveScopedPreviewHref(href, { websiteId, pages })
+        : href;
+      const navigationHandled = onNavigate?.(href, resolvedHref) === true;
+      if (navigationHandled) {
+        event.preventDefault();
+        return;
+      }
+      if (resolvedHref === href) return;
 
       event.preventDefault();
       window.location.assign(resolvedHref);
@@ -63,7 +84,7 @@ export default function ScopedPreviewLinkRouter({
         delete header.dataset.scopedPreviewHidden;
       });
     };
-  }, [pages, websiteId]);
+  }, [mode, onNavigate, pages, scopeSelector, websiteId]);
 
   return (
     <style>{`

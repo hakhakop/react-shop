@@ -3,7 +3,7 @@
 import {
   Box, ChevronDown, ChevronRight, ChevronUp, Columns3, Copy, FileText,
   GripVertical, Image as ImageIcon, Layers3, LayoutGrid, List,
-  MousePointerClick, Rows3, Settings2, Sliders, Sparkles, Square, Trash2, Type,
+  MousePointerClick, Plus, Rows3, Settings2, Sliders, Sparkles, Square, Trash2, Type,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BuilderLayoutBlock, BuilderLayoutKey, BuilderSection, LayoutBlockKind } from "@/components/dashboard/builderTypes";
@@ -16,6 +16,10 @@ import type { BuilderInteractionTarget } from "@/components/dashboard/builderInt
 export type BuilderHoverTarget = BuilderInteractionTarget;
 
 export type BuilderWireframeActions = {
+  addSection?: (
+    targetSectionId: string | null,
+    placement: "above" | "below",
+  ) => void;
   selectSection: (sectionId: string) => void;
   selectRow: (sectionId: string, rowIndex: number) => void;
   selectColumn: (sectionId: string, columnKey: string) => void;
@@ -37,6 +41,10 @@ export type BuilderWireframeActions = {
 type Props = {
   page: BuilderLayoutKey;
   pageLabel: string;
+  documentKindLabel?: string;
+  documentBadgeLabel?: string;
+  structureLabel?: string;
+  structureAriaLabel?: string;
   sections: BuilderSection[];
   selectedSectionId: string;
   selectedLayoutRowIndex: number | null;
@@ -109,6 +117,27 @@ function blockIcon(kind: string) {
   return <Box {...props} />;
 }
 
+function hasDynamicContent(value: {
+  dynamicContext?: unknown;
+  dynamicBindings?: Record<string, unknown>;
+}) {
+  return Boolean(
+    value.dynamicContext ||
+      (value.dynamicBindings && Object.keys(value.dynamicBindings).length > 0),
+  );
+}
+
+function blockHasDynamicContent(block: BuilderLayoutBlock) {
+  return (
+    hasDynamicContent(block) ||
+    block.gridItems?.some(hasDynamicContent) === true ||
+    block.slides?.some(hasDynamicContent) === true ||
+    block.listItems?.some(hasDynamicContent) === true ||
+    block.buttons?.some(hasDynamicContent) === true ||
+    block.badges?.some(hasDynamicContent) === true
+  );
+}
+
 const WireframeBlock = memo(function WireframeBlock({ sectionId, columnKey, block, index, count, selected, hovered, actions }: {
   sectionId: string; columnKey: string; block: BuilderLayoutBlock; index: number; count: number;
   selected: boolean; hovered: boolean; actions: BuilderWireframeActions;
@@ -121,7 +150,7 @@ const WireframeBlock = memo(function WireframeBlock({ sectionId, columnKey, bloc
     onClick={() => actions.selectBlock(sectionId, columnKey, blockKey)} role="treeitem" tabIndex={0} aria-selected={selected}>
     <GripVertical size={11} className="builder-wireframe-grip" />{blockIcon(block.kind ?? "text")}
     <span className="builder-wireframe-label-wrap" title={blockTitle(block, index, true)}><strong>{layoutBlockLabels[(block.kind ?? "text") as LayoutBlockKind] ?? block.kind ?? "Element"}</strong></span>
-    <span className="builder-wireframe-meta"><span className="builder-wireframe-badge builder-wireframe-badge--element">ELM</span><div className="builder-wireframe-actions">
+    <span className="builder-wireframe-meta"><span className="builder-wireframe-badge builder-wireframe-badge--element">ELM</span>{blockHasDynamicContent(block) ? <span className="builder-wireframe-badge builder-wireframe-badge--dynamic" title="Dynamic content">DYN</span> : null}<div className="builder-wireframe-actions">
       {actions.moveBlock && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveBlock?.({ sectionId, columnKey, blockKey, direction: -1 }); }} disabled={index === 0} title="Move element up"><ChevronUp size={11} /></button>}
       {actions.moveBlock && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveBlock?.({ sectionId, columnKey, blockKey, direction: 1 }); }} disabled={index === count - 1} title="Move element down"><ChevronDown size={11} /></button>}
       {actions.duplicateBlock && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.duplicateBlock?.({ sectionId, columnKey, blockKey }); }} title="Duplicate element"><Copy size={10} /></button>}
@@ -221,18 +250,102 @@ const WireframeSection = memo(function WireframeSection({ section, index, total,
   </div>;
 });
 
-export default function BuilderWireframePanel({ page, pageLabel, sections, selectedSectionId, selectedLayoutRowIndex, selectedLayoutColumnKey, selectedLayoutBlockKey, hoveredTarget = null, actions, renameSectionId = null }: Props) {
+export default function BuilderWireframePanel({ page, pageLabel, documentKindLabel = "Page", documentBadgeLabel = "Page", structureLabel, structureAriaLabel = "Page structure", sections, selectedSectionId, selectedLayoutRowIndex, selectedLayoutColumnKey, selectedLayoutBlockKey, hoveredTarget = null, actions, renameSectionId = null }: Props) {
   const treeRef = useRef<HTMLDivElement>(null); const renameDraftRef = useRef(""); const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set()); const [editingSectionId, setEditingSectionId] = useState<string | null>(null); const [renameDraft, setRenameDraft] = useState("");
   const selected = useMemo(() => selectedKey(selectedSectionId, selectedLayoutRowIndex, selectedLayoutColumnKey, selectedLayoutBlockKey), [selectedSectionId, selectedLayoutRowIndex, selectedLayoutColumnKey, selectedLayoutBlockKey]);
   const hovered = useMemo(() => structureKey(hoveredTarget), [hoveredTarget]); const header = page === "header";
   useEffect(() => { setCollapsedSections((current) => { const valid = new Set(sections.map((section) => section.id)); const next = new Set([...current].filter((id) => valid.has(id))); if (selectedSectionId) next.delete(selectedSectionId); return next.size === current.size && [...next].every((id) => current.has(id)) ? current : next; }); }, [sections, selectedSectionId]);
-  useEffect(() => { if (!hoveredTarget) return; setCollapsedSections((current) => current.has(hoveredTarget.sectionId) ? new Set([...current].filter((id) => id !== hoveredTarget.sectionId)) : current); }, [hoveredTarget]);
   useEffect(() => { if (!renameSectionId) return; const section = sections.find((item) => item.id === renameSectionId); if (!section) return; setEditingSectionId(section.id); renameDraftRef.current = section.name ?? ""; setRenameDraft(section.name ?? ""); }, [renameSectionId, sections]);
-  useEffect(() => { const key = selected ?? hovered; const node = key ? treeRef.current?.querySelector<HTMLElement>(`[data-structure-key="${CSS.escape(key)}"]`) : null; node?.scrollIntoView({ block: "nearest", inline: "nearest" }); }, [hovered, selected]);
+  // Hovering the canvas should highlight the matching tree item without
+  // hijacking the user's scroll position. Only an explicit selection should
+  // bring the corresponding structure node into view.
+  useEffect(() => { const node = selected ? treeRef.current?.querySelector<HTMLElement>(`[data-structure-key="${CSS.escape(selected)}"]`) : null; node?.scrollIntoView({ block: "nearest", inline: "nearest" }); }, [selected]);
   const setRenameValue = useCallback((value: string) => { renameDraftRef.current = value; setRenameDraft(value); }, []);
   const finishRename = useCallback((sectionId: string, commit: boolean) => { if (commit && renameDraftRef.current.trim()) actions.renameSection?.(sectionId, renameDraftRef.current.trim()); setEditingSectionId(null); renameDraftRef.current = ""; setRenameDraft(""); actions.renameComplete?.(); }, [actions]);
   const beginRename = useCallback((section: BuilderSection) => { setEditingSectionId(section.id); renameDraftRef.current = section.name ?? ""; setRenameDraft(section.name ?? ""); }, []);
   const toggle = useCallback((id: string) => setCollapsedSections((current) => { const next = new Set(current); next.has(id) ? next.delete(id) : next.add(id); return next; }), []);
   const headerRows = header ? sections.reduce((count, section) => count + getWireframeRows(section).length, 0) : 0;
-  return <div className="builder-sidebar-panel builder-wireframe-panel"><div className="builder-wireframe-header-consolidated"><div className="builder-wireframe-header-row"><div className="builder-wireframe-header-title-wrap"><FileText size={13} className="builder-wireframe-icon builder-wireframe-icon--page" /><strong>{pageLabel}</strong></div><span className="builder-wireframe-badge builder-wireframe-badge--page">PAGE</span></div><div className="builder-wireframe-header-row builder-wireframe-header-row--sub"><span>{header ? "Header structure" : "Current page structure"}</span><small>{header ? `${headerRows} ${headerRows === 1 ? "row" : "rows"}` : `${sections.length} ${sections.length === 1 ? "section" : "sections"}`}</small></div></div><div ref={treeRef} className="builder-wireframe-tree" role="tree" aria-label="Page structure">{sections.length === 0 ? <div className="builder-wireframe-empty"><Layers3 size={16} /><strong>No sections</strong><span>Add a section to start building this page.</span></div> : sections.map((section, index) => { const sectionSelectedKey = `section:${section.id}`; const sectionHoveredKey = sectionSelectedKey; const selectedTarget = selectedSectionId === section.id ? (selectedLayoutBlockKey ? { type: "block" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey!, blockKey: selectedLayoutBlockKey } : selectedLayoutColumnKey ? { type: "column" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey } : selectedLayoutRowIndex !== null ? { type: "row" as const, sectionId: selectedSectionId, rowIndex: selectedLayoutRowIndex } : { type: "section" as const, sectionId: selectedSectionId }) : null; return <WireframeSection key={section.id} section={section} index={index} total={sections.length} collapsed={collapsedSections.has(section.id)} selected={selected === sectionSelectedKey} hovered={hovered === sectionHoveredKey} hasSelectedDescendant={isDescendant(sectionSelectedKey, selected)} hasHoveredDescendant={isDescendant(sectionHoveredKey, hovered)} selectedTarget={selectedTarget} hoveredTarget={hoveredTarget?.sectionId === section.id ? hoveredTarget : null} editing={editingSectionId === section.id} renameDraft={editingSectionId === section.id ? renameDraft : ""} onRenameDraft={setRenameValue} onStartRename={beginRename} onFinishRename={finishRename} onToggle={toggle} actions={actions} header={header} />; })}</div></div>;
+  return (
+    <div className="builder-sidebar-panel builder-wireframe-panel">
+      <div className="builder-wireframe-header-consolidated">
+        <div className="builder-wireframe-header-row">
+          <div className="builder-wireframe-header-title-wrap">
+            <FileText size={13} className="builder-wireframe-icon builder-wireframe-icon--page" />
+            <strong>{pageLabel}</strong>
+          </div>
+          <span className="builder-wireframe-badge builder-wireframe-badge--page">{documentBadgeLabel}</span>
+        </div>
+        <div className="builder-wireframe-header-row builder-wireframe-header-row--sub">
+          <span>{structureLabel ?? (header ? "Header structure" : `${documentKindLabel} structure`)}</span>
+          <small>{header ? `${headerRows} ${headerRows === 1 ? "row" : "rows"}` : `${sections.length} ${sections.length === 1 ? "section" : "sections"}`}</small>
+        </div>
+      </div>
+      <div ref={treeRef} className="builder-wireframe-tree" role="tree" aria-label={structureAriaLabel}>
+        {sections.length === 0 ? (
+          <div className="builder-wireframe-empty">
+            <Layers3 size={16} />
+            <strong>No sections</strong>
+            <span>Add a section to start building this page.</span>
+            {actions.addSection ? (
+              <button
+                type="button"
+                className="builder-wireframe-add-section is-empty"
+                onClick={() => actions.addSection?.(null, "below")}
+              >
+                <Plus size={13} />
+                Add first section
+              </button>
+            ) : null}
+          </div>
+        ) : sections.map((section, index) => {
+          const sectionSelectedKey = `section:${section.id}`;
+          const sectionHoveredKey = sectionSelectedKey;
+          const selectedTarget = selectedSectionId === section.id
+            ? selectedLayoutBlockKey
+              ? { type: "block" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey!, blockKey: selectedLayoutBlockKey }
+              : selectedLayoutColumnKey
+                ? { type: "column" as const, sectionId: selectedSectionId, columnKey: selectedLayoutColumnKey }
+                : selectedLayoutRowIndex !== null
+                  ? { type: "row" as const, sectionId: selectedSectionId, rowIndex: selectedLayoutRowIndex }
+                  : { type: "section" as const, sectionId: selectedSectionId }
+            : null;
+          return (
+            <div key={section.id} className="builder-wireframe-section-slot">
+              <WireframeSection
+                section={section}
+              index={index}
+              total={sections.length}
+              collapsed={collapsedSections.has(section.id)}
+              selected={selected === sectionSelectedKey}
+              hovered={hovered === sectionHoveredKey}
+              hasSelectedDescendant={isDescendant(sectionSelectedKey, selected)}
+              hasHoveredDescendant={isDescendant(sectionHoveredKey, hovered)}
+              selectedTarget={selectedTarget}
+              hoveredTarget={hoveredTarget?.sectionId === section.id ? hoveredTarget : null}
+              editing={editingSectionId === section.id}
+              renameDraft={editingSectionId === section.id ? renameDraft : ""}
+              onRenameDraft={setRenameValue}
+              onStartRename={beginRename}
+              onFinishRename={finishRename}
+              onToggle={toggle}
+              actions={actions}
+              header={header}
+              />
+              {!header && actions.addSection ? (
+                <button
+                  type="button"
+                  className="builder-wireframe-insert-section"
+                  onClick={() => actions.addSection?.(section.id, "below")}
+                  aria-label={`Add section after ${section.name || section.title || `Section ${index + 1}`}`}
+                  title="Add section here"
+                >
+                  <Plus size={12} />
+                </button>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

@@ -53,7 +53,17 @@ export default function DynamicFieldBindingControl({
       `${field.label} ${field.path}`.toLowerCase().includes(query),
     );
   }, [fields, search]);
-  const selectedField = fields.find((field) => field.path === binding?.path);
+  // Persisted template bindings may arrive before their provider descriptor is
+  // available. Keep the selected binding visible in that case instead of
+  // making an actively dynamic field look static.
+  const selectedField = fields.find((field) => field.path === binding?.path) ??
+    (binding?.path
+      ? {
+          path: binding.path,
+          label: binding.path,
+          valueType: binding.valueType ?? "string",
+        }
+      : undefined);
   const sourceLabel = dynamicContentSourceCapability(descriptor)?.label ?? "Dynamic Content";
 
   const updatePickerPosition = useCallback(() => {
@@ -116,7 +126,7 @@ export default function DynamicFieldBindingControl({
     };
   }, [open, updatePickerPosition]);
 
-  if (!descriptor || !destinationCapability || fields.length === 0) return null;
+  if (!destinationCapability || (!descriptor && !binding) || (descriptor && fields.length === 0 && !binding)) return null;
 
   const selectField = (path: string) => {
     const field = fields.find((candidate) => candidate.path === path);
@@ -143,7 +153,9 @@ export default function DynamicFieldBindingControl({
         className="builder-inspector-secondary-button"
         aria-expanded={open}
         aria-label={`${fieldLabel} dynamic binding`}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => {
+          if (fields.length > 0) setOpen((current) => !current);
+        }}
         style={{
           display: "inline-flex",
           alignItems: "center",

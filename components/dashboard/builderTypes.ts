@@ -2,12 +2,14 @@ export type BuilderCustomPageKey = `page:${string}`;
 export type BuilderPage = "home" | "shop" | "client" | BuilderCustomPageKey;
 export type BuilderTemplate =
   | "product-single"
+  | "post-single"
   | "product-category"
   | "product-category-specific"
   | "search-results";
 export type BuilderDocumentKey = "header" | "footer";
-export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey;
-export type BuilderTargetType = "page" | "template" | BuilderDocumentKey;
+export type DynamicBuilderDocumentKey = `dynamic:${string}`;
+export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey | DynamicBuilderDocumentKey;
+export type BuilderTargetType = "page" | "template" | "document" | BuilderDocumentKey;
 import type {
   BuilderHeaderLayout,
   BuilderHeaderBrandMode,
@@ -22,6 +24,7 @@ import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBindings,
+  DynamicItemContext,
 } from "@/lib/dynamicContent";
 
 export type {
@@ -92,12 +95,14 @@ export type InspectorTab =
   | "advanced";
 export type SidebarTab =
   | "builder"
+  | "content"
   | "elements"
   | "globalStyles"
   | "history"
   | "menu"
   | "pages"
   | "templates"
+  | "routingTemplates"
   | "settings";
 export type SlideImagePadding = "frameless" | "small" | "medium" | "max";
 /** Shared carousel values persisted by the Slideshow/Panel Slider adapters. */
@@ -426,6 +431,8 @@ export type BuilderLayoutBlock = {
     | "headingText" | "body" | "eyebrow" | "title"
     | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
   >;
+  /** Transient canonical Product contexts supplied by materialization/preview. */
+  dynamicProductContexts?: DynamicItemContext[];
   loggedOutLabel?: string;
   loggedInLabel?: string;
   loggedOutUrl?: string;
@@ -597,7 +604,7 @@ export type BuilderLayoutBlock = {
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   headingAlign?: "left" | "center" | "right";
-  headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | "3xlarge";
+  headingSize?: "none" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | "3xlarge";
   textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
   textAlign?: "left" | "center" | "right";
   /** Canonical YOOtheme Text element presentation fields. */
@@ -1278,6 +1285,8 @@ export type BuilderState = {
   page: BuilderLayoutKey;
   targetType?: BuilderTargetType;
   template?: BuilderTemplate;
+  documentId?: string;
+  displayName?: string;
   design: BuilderDesign;
   sections: BuilderSection[];
 };

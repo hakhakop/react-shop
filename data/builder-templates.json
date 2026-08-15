@@ -1,5 +1,436 @@
 [
   {
+    "id": "product-single-msucq3jx-v3gn",
+    "title": "product-single 2",
+    "templateType": "page",
+    "description": "Page template saved from Single Product",
+    "sourcePage": "product-single",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "template-product-layout",
+        "kind": "contentLayout",
+        "title": "Product Content",
+        "eyebrow": "Dynamic area",
+        "body": "Use this section to shape gallery, information, and related content zones.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "template-product-media",
+            "blocks": [
+              {
+                "id": "template-product-gallery",
+                "kind": "productGallery",
+                "title": "Product Gallery",
+                "body": "Dynamic field: current product gallery."
+              }
+            ]
+          },
+          {
+            "id": "template-product-summary",
+            "blocks": [
+              {
+                "id": "template-product-title",
+                "kind": "productTitle",
+                "title": "Product Title",
+                "body": "Dynamic field: current product title."
+              },
+              {
+                "id": "template-product-price",
+                "kind": "productPrice",
+                "title": "Product Price",
+                "body": "Dynamic field: current product price."
+              },
+              {
+                "id": "template-product-cart",
+                "kind": "productAddToCart",
+                "title": "Add To Cart",
+                "body": "Dynamic WooCommerce add-to-cart button."
+              },
+              {
+                "id": "template-product-attributes",
+                "kind": "productAttributes",
+                "title": "Product Attributes",
+                "body": "Dynamic field: size, color, material, and other attributes."
+              },
+              {
+                "id": "template-product-description",
+                "kind": "productDescription",
+                "title": "Product Description",
+                "body": "Dynamic field: current product description."
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "template-product-recent",
+        "kind": "recentlyViewed",
+        "title": "Recently Viewed",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "layout": "carousel",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-15T12:28:07.557Z"
+  },
+  {
+    "id": "dynamic-b469800c-3758-47a9-9525-0876e0e9b68c-msubryvt-zxpg",
+    "title": "single post",
+    "templateType": "page",
+    "description": "Page template saved from Page",
+    "sourcePage": "shop",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "starter-post-section-3292ff41-f53c-467d-b682-15313197784c",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "transparent",
+        "visible": true,
+        "contentMode": "default",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "starter-post-column-2500eb3a-235e-4876-96bd-d556c9695a2d",
+            "rowId": "starter-post-row-b8c5a202-a730-4f6e-8296-8e851d7f45b4",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "starter-post-image-8171a9ec-1e49-4913-9aa1-74849dc1c97d",
+                "kind": "image",
+                "imageUrl": "",
+                "imageAlt": "",
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "featuredImage.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "featuredImage.alt",
+                    "valueType": "string"
+                  }
+                },
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "post",
+                  "mode": "collection"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-msube4kw-vur61",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msube9y7-column-1",
+            "rowId": "layout-row-msube9y7",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "text-block-msubeonn-ekfh9",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "Good work begins with a clear point of view",
+                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "textVariant": "default",
+                "textAlign": "left",
+                "elementPadding": "sm",
+                "visualStyle": {
+                  "customClass": "builder-premium-starter"
+                },
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "post",
+                  "mode": "collection"
+                },
+                "dynamicBindings": {
+                  "body": {
+                    "path": "content",
+                    "valueType": "richText"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msubjdkc-6vppd",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msubjji1-column-1",
+            "rowId": "layout-row-msubjji1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-msubjuir-vwth7",
+                "kind": "heading",
+                "headingText": "Thoughtful work creates momentum that lasts",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "headingSize": "medium",
+                "elementPadding": "sm",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "post",
+                  "mode": "collection"
+                },
+                "dynamicBindings": {
+                  "headingText": {
+                    "path": "title",
+                    "valueType": "string"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msubojtb-jpxvr",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msubondq-column-1",
+            "rowId": "layout-row-msubondq",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "list-block-msuboq8e-233ah",
+                "kind": "list",
+                "title": "What you can expect",
+                "items": [
+                  "A focused discovery session before design begins",
+                  "Clear recommendations grounded in your goals",
+                  "Responsive design considered at every stage",
+                  "A flexible system your team can confidently maintain"
+                ],
+                "listPresentation": "default",
+                "listMarker": "none",
+                "listAlign": "left",
+                "listSpacing": "default",
+                "elementPadding": "md",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "listItems": [
+                  {
+                    "id": "list-block-msuboq8e-233ah-item-1",
+                    "text": "<p>A focused discovery session before design begins1</p>"
+                  },
+                  {
+                    "id": "list-block-msuboq8e-233ah-item-2",
+                    "text": "Clear recommendations grounded in your goals"
+                  },
+                  {
+                    "id": "list-block-msuboq8e-233ah-item-3",
+                    "text": "Responsive design considered at every stage"
+                  },
+                  {
+                    "id": "list-block-msuboq8e-233ah-item-4",
+                    "text": "A flexible system your team can confidently maintain"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-15T12:01:29.580Z"
+  },
+  {
+    "id": "text-msubeqfp-8q5k",
+    "title": "Text",
+    "templateType": "element",
+    "description": "Element template saved from Page",
+    "sourcePage": "shop",
+    "sections": [
+      {
+        "id": "contentLayout-msubeqf5-hjsnk",
+        "kind": "contentLayout",
+        "title": "Text",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-msubeqf5-template-element",
+            "rowId": "layout-row-msubeqf5-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "text-block-msubeqf5-lce87",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "Good work begins with a clear point of view",
+                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "textVariant": "default",
+                "textAlign": "left",
+                "elementPadding": "sm",
+                "visualStyle": {
+                  "customClass": "builder-premium-starter"
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-15T11:51:04.021Z"
+  },
+  {
     "id": "panel-slider-msji4s07-g500",
     "title": "Panel Slider",
     "templateType": "element",

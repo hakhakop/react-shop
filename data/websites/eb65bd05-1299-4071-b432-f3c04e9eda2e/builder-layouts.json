@@ -2668,7 +2668,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-14T18:36:16.800Z"
+    "updatedAt": "2026-08-15T06:12:12.333Z"
   },
   "header": {
     "version": 1,
@@ -6382,5 +6382,73 @@
       }
     ],
     "updatedAt": "2026-08-12T17:56:52.524Z"
+  },
+  "post-single": {
+    "version": 1,
+    "page": "post-single",
+    "targetType": "template",
+    "template": "post-single",
+    "updatedAt": "1970-01-01T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "post-single-content",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "visible": true,
+        "contentMode": "default",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "post-single-column",
+            "rowId": "post-single-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "post-single-heading",
+                "kind": "heading",
+                "headingText": "Post title",
+                "dynamicBindings": {
+                  "headingText": {
+                    "path": "title",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-image",
+                "kind": "image",
+                "imageUrl": "",
+                "imageAlt": "",
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "featuredImage.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "featuredImage.alt",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-content-body",
+                "kind": "text",
+                "body": "Post content",
+                "dynamicBindings": {
+                  "body": {
+                    "path": "content",
+                    "valueType": "richText"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

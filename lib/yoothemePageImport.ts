@@ -18,6 +18,7 @@ import {
   normalizeYoothemeSection,
   normalizeYoothemeTemplateGlobals,
   normalizeYoothemeTypography,
+  normalizeYoothemeHeadingColor,
   normalizeYoothemeTypographyRole,
   normalizeYoothemeTextPresentation,
 } from "@/lib/yoothemeImportContract";
@@ -738,6 +739,7 @@ const sourceHeadingSize = (
   value: unknown,
 ): BuilderLayoutBlock["headingSize"] | undefined => {
   if (typeof value !== "string") return undefined;
+  if (value === "none") return "none";
   if (["h1", "h2", "h3", "h4", "h5", "h6", "small", "medium", "large", "xlarge", "2xlarge", "3xlarge"].includes(value)) {
     return value as BuilderLayoutBlock["headingSize"];
   }
@@ -1503,6 +1505,7 @@ const mapStaticElement = (
       ...(normalizeYoothemeTypographyRole(props.title_font_family)
         ? { headingTypographyRole: normalizeYoothemeTypographyRole(props.title_font_family) }
         : {}),
+      ...normalizeYoothemeHeadingColor(props),
       ...normalizeYoothemeTypography(props),
     }, props);
   }

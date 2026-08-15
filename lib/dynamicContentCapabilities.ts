@@ -5,18 +5,33 @@ import type {
 import { wordPressPostAcfSourceFields } from "@/lib/wordpressDynamicContentFields";
 
 export type DynamicContentSourceCapability = {
-  key: "static" | "wordpress-post-collection";
+  key:
+    | "static"
+    | "wordpress-post-collection"
+    | "woocommerce-product-collection"
+    | "woocommerce-product-single";
   label: string;
-  provider?: "wordpress";
-  source?: "post";
-  mode?: "collection";
+  provider?: "wordpress" | "woocommerce";
+  source?: "post" | "product";
+  mode?: "collection" | "single";
   fields?: readonly DynamicContentSourceField[];
+  queryControls?: readonly DynamicContentQueryControl[];
 };
 
 export type DynamicContentSourceField = {
   path: string;
   label: string;
   valueType: DynamicContentValueType;
+};
+
+export type DynamicContentQueryControl = {
+  key: string;
+  label: string;
+  control: "integer" | "text" | "list" | "select";
+  minimum?: number;
+  placeholder?: string;
+  description?: string;
+  options?: readonly { value: string; label: string }[];
 };
 
 export type DynamicBindingDestination =
@@ -83,10 +98,67 @@ export const WORDPRESS_POST_COLLECTION_FIELDS: readonly DynamicContentSourceFiel
   ...wordPressPostAcfSourceFields().map(({ path, label, valueType }) => ({ path, label, valueType })),
 ] as const;
 
+export const WOOCOMMERCE_PRODUCT_FIELDS: readonly DynamicContentSourceField[] = [
+  { path: "id", label: "ID", valueType: "identifier" },
+  { path: "databaseId", label: "Database ID", valueType: "identifier" },
+  { path: "title", label: "Title", valueType: "string" },
+  { path: "description", label: "Description", valueType: "richText" },
+  { path: "excerpt", label: "Excerpt", valueType: "richText" },
+  { path: "slug", label: "Slug", valueType: "string" },
+  { path: "link", label: "Product URL", valueType: "url" },
+  { path: "image", label: "Image", valueType: "media" },
+  { path: "image.url", label: "Image URL", valueType: "url" },
+  { path: "image.alt", label: "Image Alt", valueType: "string" },
+  { path: "gallery", label: "Gallery", valueType: "metadata" },
+  { path: "price", label: "Price", valueType: "string" },
+  { path: "price.amount", label: "Price Amount", valueType: "number" },
+  { path: "regularPrice", label: "Regular Price", valueType: "string" },
+  { path: "regularPrice.amount", label: "Regular Price Amount", valueType: "number" },
+  { path: "salePrice", label: "Sale Price", valueType: "string" },
+  { path: "salePrice.amount", label: "Sale Price Amount", valueType: "number" },
+  { path: "sku", label: "SKU", valueType: "string" },
+  { path: "stockStatus", label: "Stock Status", valueType: "string" },
+  { path: "stockQuantity", label: "Stock Quantity", valueType: "number" },
+  { path: "categories", label: "Categories", valueType: "metadata" },
+  { path: "categories.label", label: "Category Labels", valueType: "string" },
+  { path: "tags", label: "Tags", valueType: "metadata" },
+  { path: "attributes", label: "Attributes", valueType: "metadata" },
+  { path: "meta", label: "Product Metadata", valueType: "metadata" },
+] as const;
+
+const WOOCOMMERCE_PRODUCT_COLLECTION_QUERY_CONTROLS: readonly DynamicContentQueryControl[] = [
+  { key: "start", label: "Start", control: "integer", minimum: 0, placeholder: "0" },
+  { key: "quantity", label: "Quantity", control: "integer", minimum: 1, placeholder: "10" },
+  { key: "order", label: "Order", control: "select", options: [
+    { value: "date", label: "Date" }, { value: "title", label: "Title" },
+    { value: "price", label: "Price" }, { value: "menuOrder", label: "Menu Order" },
+    { value: "id", label: "ID" }, { value: "popularity", label: "Popularity" },
+    { value: "rating", label: "Rating" },
+  ] },
+  { key: "direction", label: "Direction", control: "select", options: [
+    { value: "desc", label: "Descending" }, { value: "asc", label: "Ascending" },
+  ] },
+  { key: "search", label: "Search", control: "text", placeholder: "Product search" },
+  { key: "categories", label: "Categories", control: "list", placeholder: "3, 7", description: "Comma-separated WooCommerce category IDs." },
+  { key: "featured", label: "Featured", control: "select", options: [{ value: "", label: "Any" }, { value: "true", label: "Yes" }, { value: "false", label: "No" }] },
+  { key: "onSale", label: "On Sale", control: "select", options: [{ value: "", label: "Any" }, { value: "true", label: "Yes" }, { value: "false", label: "No" }] },
+  { key: "stockStatus", label: "Stock Status", control: "select", options: [
+    { value: "", label: "Any" },
+    { value: "instock", label: "In stock" }, { value: "outofstock", label: "Out of stock" }, { value: "onbackorder", label: "On backorder" },
+  ] },
+  { key: "include", label: "Include", control: "list", placeholder: "41, 42", description: "Comma-separated WooCommerce product IDs." },
+  { key: "exclude", label: "Exclude", control: "list", placeholder: "99", description: "Comma-separated WooCommerce product IDs." },
+] as const;
+
+const WOOCOMMERCE_PRODUCT_SINGLE_QUERY_CONTROLS: readonly DynamicContentQueryControl[] = [
+  { key: "slug", label: "Slug", control: "text", placeholder: "product-slug" },
+  { key: "id", label: "Numeric ID", control: "integer", minimum: 1, placeholder: "41" },
+] as const;
+
 /**
  * The single source/query capability registry shared by the inspector and
- * server orchestration. Unsupported YOOtheme providers are intentionally not
- * advertised until a provider adapter exists.
+ * server orchestration. Query controls are declared alongside each source so
+ * authoring remains a projection of the canonical provider contract.
  */
 export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceCapability[] = [
   { key: "static", label: "None / Static" },
@@ -98,22 +170,46 @@ export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceC
     mode: "collection",
     fields: WORDPRESS_POST_COLLECTION_FIELDS,
   },
+  {
+    key: "woocommerce-product-collection",
+    label: "Custom Products",
+    provider: "woocommerce",
+    source: "product",
+    mode: "collection",
+    fields: WOOCOMMERCE_PRODUCT_FIELDS,
+    queryControls: WOOCOMMERCE_PRODUCT_COLLECTION_QUERY_CONTROLS,
+  },
+  {
+    key: "woocommerce-product-single",
+    label: "Product",
+    provider: "woocommerce",
+    source: "product",
+    mode: "single",
+    fields: WOOCOMMERCE_PRODUCT_FIELDS,
+    queryControls: WOOCOMMERCE_PRODUCT_SINGLE_QUERY_CONTROLS,
+  },
 ] as const;
 
 export const WORDPRESS_POST_COLLECTION_SOURCE =
   DYNAMIC_CONTENT_SOURCE_CAPABILITIES[1];
 
+export const WOOCOMMERCE_PRODUCT_COLLECTION_SOURCE =
+  DYNAMIC_CONTENT_SOURCE_CAPABILITIES[2];
+
+export const WOOCOMMERCE_PRODUCT_SINGLE_SOURCE =
+  DYNAMIC_CONTENT_SOURCE_CAPABILITIES[3];
+
 export function dynamicContentSourceKey(
   descriptor: DynamicContentContextDescriptor | null | undefined,
 ): DynamicContentSourceCapability["key"] {
   if (!descriptor) return "static";
-  if (
-    descriptor?.provider === WORDPRESS_POST_COLLECTION_SOURCE.provider &&
-    descriptor.source === WORDPRESS_POST_COLLECTION_SOURCE.source &&
-    descriptor.mode === WORDPRESS_POST_COLLECTION_SOURCE.mode
-  ) {
-    return WORDPRESS_POST_COLLECTION_SOURCE.key;
-  }
+  const capability = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find(
+    (candidate) =>
+      candidate.provider === descriptor.provider &&
+      candidate.source === descriptor.source &&
+      candidate.mode === descriptor.mode,
+  );
+  if (capability) return capability.key;
   return "static";
 }
 

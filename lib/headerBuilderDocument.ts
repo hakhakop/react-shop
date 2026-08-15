@@ -1,6 +1,5 @@
 import {
-  readBuilderLayoutStore,
-  writeBuilderLayoutStore,
+  mutateBuilderLayoutStore,
   type BuilderLayout,
   type BuilderDataScope,
 } from "@/lib/builderLayouts";
@@ -258,9 +257,13 @@ export async function getOrCreateHeaderBuilderLayout(
   });
   const migrated = migrateLegacyHeaderDocument(layout, settings);
   if (layout.sections[0]?.headerArchitectureVersion !== 2) {
-    const store = await readBuilderLayoutStore(scope);
-    store.header = migrated;
-    await writeBuilderLayoutStore(store, scope);
+    return mutateBuilderLayoutStore((store) => {
+      const current = store.header ?? layout;
+      if (current.sections[0]?.headerArchitectureVersion === 2) return current;
+      const latestMigration = migrateLegacyHeaderDocument(current, settings);
+      store.header = latestMigration;
+      return latestMigration;
+    }, scope);
   }
   return migrated;
 }

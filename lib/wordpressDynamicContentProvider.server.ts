@@ -10,6 +10,7 @@ import {
 } from "@/lib/graphql";
 import type { SaaSWebsite } from "@/lib/websites";
 import { WORDPRESS_POST_ACF_FIELDS } from "@/lib/wordpressDynamicContentFields";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 const DEFAULT_QUANTITY = 10;
 const MAX_QUERY_WINDOW = 100;
@@ -24,6 +25,7 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
         id
         databaseId
         slug
+        uri
         status
         title
         content
@@ -94,6 +96,14 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
   }
 `;
 
+const WORDPRESS_POST_SINGLE_QUERY = WORDPRESS_POST_COLLECTION_QUERY
+  .replace("query DynamicContentWordPressPosts(\n    $first: Int!\n    $where: RootQueryToPostConnectionWhereArgs\n  )", "query DynamicContentWordPressPost($id: ID!)")
+  .replace("posts(first: $first, where: $where) {\n      nodes {", "post(id: $id, idType: SLUG) {")
+  .replace(/\n      }\n    }\n  }\n$/, "\n    }\n  }\n");
+
+const WORDPRESS_POST_SINGLE_BY_ID_QUERY = WORDPRESS_POST_SINGLE_QUERY
+  .replace("post(id: $id, idType: SLUG)", "post(id: $id, idType: ID)");
+
 const WORDPRESS_TERM_RESOLUTION_QUERY = `
   query DynamicContentWordPressTerms(
     $where: RootQueryToTermNodeConnectionWhereArgs
@@ -120,6 +130,7 @@ export type WordPressPostCollectionQuery = {
   quantity?: number;
   order?: WordPressPostCollectionOrder;
   direction?: "asc" | "desc";
+  search?: string;
   filters?: {
     authors?: Array<string | number>;
     categories?: Array<string | number>;
@@ -159,6 +170,7 @@ type WordPressPostNode = {
   id?: unknown;
   databaseId?: unknown;
   slug?: unknown;
+  uri?: unknown;
   status?: unknown;
   title?: unknown;
   content?: unknown;
@@ -185,6 +197,26 @@ type WordPressPostsResponse = {
     nodes?: WordPressPostNode[] | null;
   } | null;
 };
+
+type WordPressPostResponse = { post?: WordPressPostNode | null };
+
+export function compileWordPressPostSingleQuery(
+  queryData: DynamicContentContextDescriptor["query"],
+) {
+  const query = assertRecord(queryData, "WordPress post single query");
+  assertAllowedKeys(query, ["slug", "id"], "WordPress post single query");
+  const slug = typeof query.slug === "string" ? query.slug.trim() : "";
+  const id = typeof query.id === "string" ? query.id.trim() : "";
+  if (query.id === undefined && !slug) {
+    throw new Error("query.slug must be a non-empty string.");
+  }
+  if ((slug ? 1 : 0) + (id ? 1 : 0) !== 1) {
+    throw new Error("WordPress post single query requires exactly one non-empty slug or stable id.");
+  }
+  return id
+    ? { query: WORDPRESS_POST_SINGLE_BY_ID_QUERY, variables: { id } }
+    : { query: WORDPRESS_POST_SINGLE_QUERY, variables: { id: slug } };
+}
 
 const ORDER_FIELDS: Record<WordPressPostCollectionOrder, string> = {
   date: "DATE",
@@ -302,7 +334,7 @@ export function compileWordPressPostCollectionQuery(
   const query = assertRecord(queryData, "WordPress post collection query");
   assertAllowedKeys(
     query,
-    ["start", "quantity", "order", "direction", "filters"],
+    ["start", "quantity", "order", "direction", "search", "filters"],
     "WordPress post collection query",
   );
 
@@ -367,6 +399,11 @@ export function compileWordPressPostCollectionQuery(
   const where: Record<string, unknown> = {
     orderby: [{ field: ORDER_FIELDS[order], order: direction.toUpperCase() }],
   };
+  if (query.search !== undefined) {
+    if (typeof query.search !== "string") throw new Error("query.search must be a string.");
+    const search = query.search.trim();
+    if (search) where.search = search;
+  }
   if (authors.length > 0) where.authorIn = authors;
   if (uniqueCategories.length > 0) where.categoryIn = uniqueCategories;
   if (uniqueTags.length > 0) where.tagIn = uniqueTags;
@@ -480,7 +517,12 @@ export function normalizeWordPressPostContext(
   const excerpt = stringValue(post.excerpt);
   const date = stringValue(post.date);
   const modifiedDate = stringValue(post.modified);
-  const link = stringValue(post.link);
+  const originPermalink = stringValue(post.link);
+  const slug = stringValue(post.slug);
+  const uri = stringValue(post.uri);
+  const storefrontHref = slug
+    ? getStorefrontContentHref({ contentType: "post", slug })
+    : null;
 
   if (id !== undefined) setField(fields, "id", { type: "identifier", value: id });
   if (title !== undefined) setField(fields, "title", { type: "string", value: title });
@@ -494,7 +536,21 @@ export function normalizeWordPressPostContext(
   if (modifiedDate !== undefined) {
     setField(fields, "modifiedDate", { type: "string", value: modifiedDate });
   }
-  if (link !== undefined) setField(fields, "link", { type: "url", value: link });
+  if (originPermalink !== undefined) {
+    setField(fields, "origin.permalink", { type: "url", value: originPermalink });
+  }
+  if (storefrontHref) {
+    setField(fields, "storefront.href", { type: "url", value: storefrontHref });
+    // Preserve existing authored buttonUrl → link bindings while projecting
+    // navigation to the internal WebPages Post route.
+    setField(fields, "link", { type: "url", value: storefrontHref });
+  }
+  if (slug !== undefined) setField(fields, "slug", { type: "string", value: slug });
+  if (uri !== undefined) setField(fields, "uri", { type: "url", value: uri });
+  if (post.databaseId !== undefined) {
+    const databaseId = identifierValue(post.databaseId);
+    if (databaseId !== undefined) setField(fields, "databaseId", { type: "identifier", value: databaseId });
+  }
 
   const author = normalizeTerm(post.author?.node);
   const meta = compactRecord({
@@ -575,7 +631,7 @@ export function normalizeWordPressPostContext(
   return { ...(id !== undefined ? { id } : {}), fields };
 }
 
-export async function resolveWordPressPostCollection(input: {
+export async function resolveWordPressPostContexts(input: {
   website?: SaaSWebsite | null;
   descriptor: DynamicContentContextDescriptor;
 }): Promise<DynamicItemContext[]> {
@@ -586,13 +642,23 @@ export async function resolveWordPressPostCollection(input: {
   if (descriptor.source !== "post") {
     throw new Error(`Unsupported WordPress Dynamic Content source: ${descriptor.source}.`);
   }
-  if (descriptor.mode !== "collection") {
+  if (descriptor.mode !== "collection" && descriptor.mode !== "single") {
     throw new Error(`Unsupported WordPress post Dynamic Content mode: ${descriptor.mode}.`);
   }
 
   const endpoint = getWebsiteGraphQLEndpoint(website);
   if (!endpoint) {
     throw new Error("The active website has no WordPress GraphQL endpoint configured.");
+  }
+
+  if (descriptor.mode === "single") {
+    const compiled = compileWordPressPostSingleQuery(descriptor.query);
+    const data = await graphqlFetch<WordPressPostResponse>(
+      compiled.query,
+      compiled.variables,
+      { endpoint },
+    );
+    return data.post ? [normalizeWordPressPostContext(data.post)] : [];
   }
 
   const query = assertRecord(descriptor.query, "WordPress post collection query");
@@ -612,3 +678,7 @@ export async function resolveWordPressPostCollection(input: {
     .slice(compiled.start, compiled.start + compiled.quantity)
     .map(normalizeWordPressPostContext);
 }
+
+
+/** Backwards-compatible collection-owner export. */
+export const resolveWordPressPostCollection = resolveWordPressPostContexts;

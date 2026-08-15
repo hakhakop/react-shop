@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { resolveDynamicContentContexts } from "@/lib/dynamicContentProviders.server";
 import {
   compileWordPressPostCollectionQuery,
+  compileWordPressPostSingleQuery,
   normalizeWordPressPostContext,
 } from "@/lib/wordpressDynamicContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
@@ -163,12 +164,16 @@ test("normalizes only canonical post fields", () => {
     id: "post-1",
     fields: {
       id: { type: "identifier", value: "post-1" },
+      databaseId: { type: "identifier", value: 1 },
+      slug: { type: "string", value: "post-one" },
       title: { type: "string", value: "Post one" },
       content: { type: "richText", value: "<p>Body</p>" },
       excerpt: { type: "richText", value: "<p>Summary</p>" },
       date: { type: "string", value: "2026-08-01T10:00:00" },
       modifiedDate: { type: "string", value: "2026-08-02T10:00:00" },
-      link: { type: "url", value: "https://tenant.example/post-one/" },
+      "origin.permalink": { type: "url", value: "https://tenant.example/post-one/" },
+      "storefront.href": { type: "url", value: "/post-one" },
+      link: { type: "url", value: "/post-one" },
       meta: {
         type: "metadata",
         value: {
@@ -335,13 +340,58 @@ test("uses the active website endpoint and normalizes multiple provider posts", 
   }
 });
 
-test("fails explicitly for unsupported provider, source, and mode", async () => {
+test("resolves one Post through the canonical provider boundary", async () => {
+  const compiled = compileWordPressPostSingleQuery({ slug: "post-one" });
+  expect(compiled.query).toContain("query DynamicContentWordPressPost($id: ID!)");
+  expect(compiled.query).toContain("post(id: $id, idType: SLUG)");
+  expect(compiled.variables).toEqual({ id: "post-one" });
+  expect(() => compileWordPressPostSingleQuery({ slug: "post-one", graphql: "query Bad" }))
+    .toThrow(/Unsupported WordPress post single query field: graphql/);
+
+  const originalFetch = globalThis.fetch;
+  let fetchCount = 0;
+  globalThis.fetch = async () => {
+    fetchCount += 1;
+    return new Response(JSON.stringify({ data: { post: {
+      id: "post-1", databaseId: 1, slug: "post-one", uri: "/post-one/",
+      title: "Post one", content: "<p>Body</p>",
+    } } }), { status: 200 });
+  };
+  try {
+    const contexts = await resolveDynamicContentContexts({
+      website: websiteWithGraphQL("https://active-tenant.example/graphql"),
+      descriptor: { provider: "wordpress", source: "post", mode: "single", query: { slug: "post-one" } },
+    });
+    expect(fetchCount).toBe(1);
+    expect(contexts).toHaveLength(1);
+    expect(contexts[0].fields.title).toEqual({ type: "string", value: "Post one" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Post provider projects internal navigation while preserving the origin permalink", () => {
+  const normalized = normalizeWordPressPostContext({
+    id: "post-42",
+    databaseId: 42,
+    slug: "customer-story-ambitech",
+    title: "Customer Story: Ambitech",
+    link: "https://cms.example/customer-story-ambitech/",
+  });
+  expect(normalized.fields.link).toEqual({ type: "url", value: "/customer-story-ambitech" });
+  expect(normalized.fields["storefront.href"]).toEqual({ type: "url", value: "/customer-story-ambitech" });
+  expect(normalized.fields["origin.permalink"]).toEqual({
+    type: "url", value: "https://cms.example/customer-story-ambitech/",
+  });
+});
+
+test("fails explicitly for unsupported provider, source, and malformed single query", async () => {
   const website = websiteWithGraphQL("https://active-tenant.example/graphql");
 
   await expect(resolveDynamicContentContexts({
     website,
-    descriptor: { provider: "woocommerce", source: "product", mode: "collection" },
-  })).rejects.toThrow(/Unsupported Dynamic Content provider: woocommerce/);
+    descriptor: { provider: "shopify", source: "product", mode: "collection" },
+  })).rejects.toThrow(/Unsupported Dynamic Content provider: shopify/);
 
   await expect(resolveDynamicContentContexts({
     website,
@@ -351,5 +401,5 @@ test("fails explicitly for unsupported provider, source, and mode", async () => 
   await expect(resolveDynamicContentContexts({
     website,
     descriptor: { provider: "wordpress", source: "post", mode: "single" },
-  })).rejects.toThrow(/Unsupported WordPress post Dynamic Content mode: single/);
+  })).rejects.toThrow(/query.slug must be a non-empty string/);
 });

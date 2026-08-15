@@ -12,7 +12,6 @@ import {
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -53,7 +52,7 @@ export default function AlertCapabilityPanel({ block, tab, shellSettings, update
 
   // ADVANCED TAB
   if (tab === "advanced") {
-    return <div className="builder-inspector-stack" data-uikit-capability="alert-advanced"><DynamicContentInspectorGroup item={block} update={update} /><ElementAdvancedPanel block={block} update={update} /></div>;
+    return <div className="builder-inspector-stack" data-uikit-capability="alert-advanced"><ElementAdvancedPanel block={block} update={update} /></div>;
   }
 
   // SETTINGS TAB (Default)

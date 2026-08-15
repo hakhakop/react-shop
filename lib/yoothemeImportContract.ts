@@ -196,6 +196,20 @@ export function normalizeYoothemeTypographyRole(
     : undefined;
 }
 
+/** YOOtheme Headline's semantic color is stored as text_color. Keep the
+ * explicit "none" value so the renderer can distinguish inherit from a
+ * selected semantic color, including the UIkit background token. */
+export function normalizeYoothemeHeadingColor(props: Record<string, unknown>): {
+  headingColor?: string;
+} {
+  const color = string(props.text_color) || string(props.title_color);
+  return color === "none" || color === "default" || color === "muted" || color === "emphasis" ||
+    color === "primary" || color === "secondary" || color === "success" || color === "warning" ||
+    color === "danger" || color === "background"
+    ? { headingColor: color }
+    : {};
+}
+
 /** Canonical Text element presentation. These values are intentionally separate
  * from raw typography overrides: YOOtheme Text owns semantic styles/colors and
  * responsive columns, while absent fields continue to inherit Globals. */

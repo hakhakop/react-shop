@@ -19,6 +19,7 @@ import {
   FileText,
   History,
   Menu,
+  Route,
 } from "lucide-react";
 import {
   useEffect,
@@ -44,6 +45,8 @@ import type {
   BuilderShellSettings,
 } from "@/components/dashboard/builderTypes";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
+import RoutingTemplatesPanel from "@/components/dashboard/RoutingTemplatesPanel";
+import ContentPanel from "@/components/dashboard/ContentPanel";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
 import { createDragGhost } from "@/components/dashboard/builderDragGhost";
 import {
@@ -81,6 +84,7 @@ const corePages = [
 ] as const;
 
 type DashboardSidebarProps = {
+  websiteId?: string;
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
@@ -143,6 +147,7 @@ type DashboardSidebarProps = {
 };
 
 export default function DashboardSidebar({
+  websiteId,
   availableLayoutBlockKinds,
   builderState,
   customPages,
@@ -295,10 +300,20 @@ export default function DashboardSidebar({
       count: corePages.length + customPages.length,
     },
     {
+      tab: "content",
+      label: "Content",
+      description: "Manage Products and Posts and their Individual Layouts.",
+    },
+    {
       tab: "templates",
       label: t("builder.navigation.templates"),
       description: "Save reusable page starting points.",
       count: savedTemplates.length,
+    },
+    {
+      tab: "routingTemplates",
+      label: "Templates",
+      description: "Manage routing assignments and layouts.",
     },
 
   ];
@@ -339,6 +354,8 @@ export default function DashboardSidebar({
     { tab: "builder" as SidebarTab, label: t("builder.navigation.structure"), icon: <Layers3 size={18} /> },
     { tab: "elements" as SidebarTab, label: t("builder.navigation.blocks"), icon: <Boxes size={18} /> },
     { tab: "templates" as SidebarTab, label: t("builder.navigation.layouts"), icon: <LayoutTemplate size={18} /> },
+    { tab: "routingTemplates" as SidebarTab, label: "Templates", icon: <Route size={18} /> },
+    { tab: "content" as SidebarTab, label: "Content", icon: <FileText size={18} /> },
     ...(canUseShellSettings
       ? [
           {
@@ -944,12 +961,25 @@ export default function DashboardSidebar({
                   <div style={{ padding: "12px 4px", fontSize: "12px", color: "var(--builder-ui-muted)", textAlign: "center" }}>
                     No custom pages created yet.
                   </div>
-                )}
+            )}
+
                 <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
               </div>
 
             </div>
           </motion.div>
+          )}
+
+          {sidebarTab === "routingTemplates" && (
+            <motion.div key="routingTemplates" initial={{ opacity: 0, scale: 0.985 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.995 }} transition={{ duration: 0.12, ease: "easeOut" }}>
+              <RoutingTemplatesPanel websiteId={websiteId} />
+            </motion.div>
+          )}
+
+          {sidebarTab === "content" && (
+            <motion.div key="content" initial={{ opacity: 0, scale: 0.985 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.995 }} transition={{ duration: 0.12, ease: "easeOut" }}>
+              <ContentPanel websiteId={websiteId} />
+            </motion.div>
           )}
 
           {sidebarTab === "history" && (

@@ -1,5 +1,6 @@
 import type { BuilderLayout, BuilderLayoutBlock, BuilderSection } from "@/lib/builderLayouts";
 import {
+  getDynamicItemContextValue,
   resolveDynamicItem,
   type DynamicContentContextDescriptor,
   type DynamicFieldBindings,
@@ -149,6 +150,7 @@ const staticElementTemplate = (block: BuilderLayoutBlock): BuilderLayoutBlock =>
   const projected = { ...block };
   delete projected.dynamicContext;
   delete projected.dynamicBindings;
+  delete projected.dynamicProductContexts;
   return projected;
 };
 
@@ -259,6 +261,26 @@ async function materializeElementBlock(
   diagnostics: DynamicContentMaterializationDiagnostic[],
   inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
+  if (block.kind === "products") {
+    const productDescriptor = block.dynamicContext ?? {
+      provider: "woocommerce",
+      source: "product",
+      mode: "collection" as const,
+      query: { quantity: 8 },
+    };
+    try {
+      const contexts = await resolveContexts({ website, descriptor: productDescriptor });
+      if (productDescriptor.mode !== "collection") {
+        diagnostics.push({ status: "fallback", ...location, message: "Products requires a collection Dynamic Content source." });
+        return block;
+      }
+      diagnostics.push({ status: "materialized", ...location, contextCount: contexts.length });
+      return { ...block, dynamicProductContexts: contexts };
+    } catch (error) {
+      diagnostics.push({ status: "fallback", ...location, message: safeErrorMessage(error) });
+      return block;
+    }
+  }
   if (!DYNAMIC_SINGLE_ELEMENT_KINDS.has(String(block.kind))) return block;
 
   if (!block.dynamicContext) {
@@ -292,7 +314,46 @@ async function materializeGridBlock(
   materializedGridBlocks: MaterializedGridBlock[],
   inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
-  if (block.kind !== "grid" || !block.gridItems?.length) return block;
+  if (block.kind !== "grid") return block;
+
+  if (block.gridSource === "products") {
+    const quantity = typeof block.gridLimit === "number" && block.gridLimit > 0
+      ? Math.round(block.gridLimit)
+      : Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
+    try {
+      const contexts = await resolveContexts({
+        website,
+        descriptor: {
+          provider: "woocommerce",
+          source: "product",
+          mode: "collection",
+          query: { quantity },
+        },
+      });
+      const gridItems: GridItem[] = contexts.slice(0, quantity).map((context, index) => {
+        const image = getDynamicItemContextValue(context, "image", "media");
+        return {
+          id: `product-grid-${String(context.id ?? index)}`,
+          imageUrl: image?.url,
+          imageAlt: image?.alt ?? getDynamicItemContextValue(context, "title", "string"),
+          eyebrow: "Product",
+          title: getDynamicItemContextValue(context, "title", "string") ?? "Product",
+          meta: getDynamicItemContextValue(context, "price", "string"),
+          text: getDynamicItemContextValue(context, "categories.label", "string"),
+          buttonLabel: "View product",
+          buttonUrl: getDynamicItemContextValue(context, "storefront.href", "url"),
+        };
+      });
+      diagnostics.push({ status: "materialized", ...location, contextCount: contexts.length });
+      materializedGridBlocks.push(location);
+      return { ...block, gridItems };
+    } catch (error) {
+      diagnostics.push({ status: "fallback", ...location, message: safeErrorMessage(error) });
+      return block;
+    }
+  }
+
+  if (!block.gridItems?.length) return block;
 
   let changed = false;
   let blockMaterialized = false;
@@ -646,12 +707,13 @@ async function materializeSectionInstance(
 
 async function materializeSection(
   section: BuilderSection,
+  inheritedContext: DynamicItemContext | undefined,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
   diagnostics: DynamicContentMaterializationDiagnostic[],
   materializedGridBlocks: MaterializedGridBlock[],
 ): Promise<BuilderSection[]> {
-  const projections = await expandStructuralNode(section, undefined, website, resolveContexts);
+  const projections = await expandStructuralNode(section, inheritedContext, website, resolveContexts);
   return Promise.all(projections.map(({ node, context }) => materializeSectionInstance(
     node,
     context,
@@ -671,6 +733,7 @@ export async function materializeBuilderDynamicContent(
   options: {
     website?: SaaSWebsite | null;
     resolveContexts?: DynamicContentContextResolver;
+    rootContext?: DynamicItemContext;
   } = {},
 ): Promise<BuilderDynamicContentMaterialization> {
   const diagnostics: DynamicContentMaterializationDiagnostic[] = [];
@@ -680,6 +743,7 @@ export async function materializeBuilderDynamicContent(
   const sectionGroups = await Promise.all(authoredLayout.sections.map(async (section) => {
     const renderSections = await materializeSection(
       section,
+      options.rootContext,
       options.website,
       resolveContexts,
       diagnostics,

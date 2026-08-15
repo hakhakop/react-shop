@@ -24,6 +24,7 @@ import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import type { CategoryTreeItem } from "../lib/categories";
 import type { ProductNode } from "../lib/products";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 import {
   getProductImageStyleVars,
   type ProductImageFit,
@@ -1193,7 +1194,7 @@ export default function CategoryWithFilters({
                     </div>
 
                     <Link
-                      href={`/product/${p.slug}`}
+                      href={getStorefrontContentHref({ contentType: "product", slug: p.slug })!}
                       className="product-card-link"
                     >
                       <div className="product-image">
@@ -1214,7 +1215,7 @@ export default function CategoryWithFilters({
                     </Link>
 
                     <div className="product-main">
-                      <Link href={`/product/${p.slug}`} className="product-card-title-link">
+                      <Link href={getStorefrontContentHref({ contentType: "product", slug: p.slug })!} className="product-card-title-link">
                           {(() => {
                           const tp = resolveTypographyProps(typography, "title");
                           return (

@@ -4,6 +4,7 @@ import { useCart } from "./CartProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 export default function MiniCart() {
   const {
@@ -94,7 +95,7 @@ export default function MiniCart() {
 
                   <div className="mini-cart-item-main">
                     <Link
-                      href={`/product/${item.slug}`}
+                      href={getStorefrontContentHref({ contentType: "product", slug: item.slug })!}
                       className="mini-cart-item-name"
                       onClick={closeMiniCart}
                     >

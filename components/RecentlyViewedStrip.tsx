@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { useRecentlyViewed } from "./RecentlyViewedProvider";
+import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 const subscribeToHydration = (callback: () => void) => {
   window.queueMicrotask(callback);
@@ -70,7 +71,7 @@ export default function RecentlyViewedStrip() {
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
             >
               <Link
-                href={`/product/${item.slug}`}
+                href={getStorefrontContentHref({ contentType: "product", slug: item.slug })!}
                 className="flex flex-col gap-1"
               >
                 {item.thumbnailUrl && (
