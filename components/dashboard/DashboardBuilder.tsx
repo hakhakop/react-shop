@@ -4589,6 +4589,28 @@ export default function DashboardBuilder({
     columnKey: string,
     shouldOpenInspector = false,
   ) => {
+    const section = builderState.sections.find((item) => item.id === sectionId);
+    const rowIndex = section
+      ? normalizeBuilderSectionLayout(section).rows.findIndex((row) =>
+          row.columns.some((column) => column.id === columnKey),
+        )
+      : -1;
+
+    // Columns belong to a Row. Canvas and Structure clicks therefore select
+    // that Row; the Row Inspector remains the sole owner of column settings.
+    if (sectionId !== "header-document" && rowIndex >= 0) {
+      setHeaderSelected(false);
+      setSelectedId(sectionId);
+      setSelectedLayoutRowIndex(rowIndex);
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutBlockKey(null);
+      setOpenLayoutItemId(null);
+      setInspectorTab("settings");
+      if (shouldOpenInspector) openInspectorPanel();
+      revealCanvasTarget(normalizeBuilderSectionLayout(section!).rows[rowIndex]?.id);
+      return;
+    }
+
     setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
@@ -4635,9 +4657,12 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
-    setInspectorTab("layout");
-    if (shouldOpenInspector) openInspectorPanel();
     const section = builderState.sections.find((item) => item.id === sectionId);
+    const isCanonicalRow = Boolean(
+      section && normalizeBuilderSectionLayout(section).source === "canonical",
+    );
+    setInspectorTab(isCanonicalRow ? "settings" : "layout");
+    if (shouldOpenInspector) openInspectorPanel();
     const row = section
       ? normalizeBuilderSectionLayout(section).rows[rowIndex]
       : null;

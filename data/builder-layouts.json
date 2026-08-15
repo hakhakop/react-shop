@@ -83,6 +83,29 @@
                     }
                   },
                   {
+                    "id": "heading-block-msujy7jp-rqjso",
+                    "kind": "heading",
+                    "headingText": "Build Anything on<br class=\"uk-visible@s\"> DevStack",
+                    "title": "Build Anything on<br class=\"uk-visible@s\"> DevStack",
+                    "headingLevel": "h1",
+                    "headingSize": "medium",
+                    "headingAlign": "center",
+                    "elementAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "zIndex": 3,
+                        "blockAlign": "center",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
                     "id": "yootheme-text-0-0-0-1",
                     "kind": "text",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
@@ -304,6 +327,34 @@
                 },
                 "elements": [
                   {
+                    "id": "yootheme-image-0-1-0-1",
+                    "kind": "image",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 100,
+                    "imageSvgColor": "emphasis",
+                    "imageLoading": "eager",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "50%",
+                        "zIndex": 2,
+                        "marginMode": "none",
+                        "textAlign": "center"
+                      },
+                      "customClass": "uk-disabled",
+                      "customCss": ".el-image {\n\tborder-radius: 50%;\n\tbox-shadow: 0 0 0 0 #4C6CD8;\n\ttransform: scale(1);\n\tanimation: pulse 2s infinite;\n    margin-top: -42px;\n}\n\n@keyframes pulse {\n\t0% {\n\t\ttransform: scale(0.95);\n\t\tbox-shadow: 0 0 0 0 rgba(76,108,216, 0.8);\n\t}\n\n\t70% {\n\t\ttransform: scale(1);\n\t\tbox-shadow: 0 0 0 10px rgba(76,108,216, 0);\n\t}\n\n\t100% {\n\t\ttransform: scale(0.95);\n\t\tbox-shadow: 0 0 0 0 rgba(76,108,216, 0);\n\t}\n}",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
                     "id": "yootheme-image-0-1-0-0",
                     "kind": "image",
                     "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/home-hero.jpg",
@@ -330,33 +381,136 @@
                       "effects": {},
                       "card": {}
                     }
-                  },
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-msus7h9f-yzfdq",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-msus7h9f-1-column-1",
+            "rowId": "layout-row-msus7h9f-1",
+            "rowLayout": "1-col",
+            "blocks": []
+          }
+        ],
+        "layoutRows": 1,
+        "rows": [
+          {
+            "id": "layout-row-msus7h9f-1",
+            "layout": "2-col-equal",
+            "columns": [
+              {
+                "id": "layout-row-msus7h9f-1-column-1",
+                "elements": [
                   {
-                    "id": "yootheme-image-0-1-0-1",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
-                    "imageAlt": "",
-                    "imageMaxWidth": 100,
-                    "imageSvgColor": "emphasis",
-                    "imageLoading": "eager",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "textAlign": "center",
-                    "headingAlign": "center",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
+                    "id": "text-block-msuslt9z-lzhic",
+                    "kind": "text",
+                    "eyebrow": "",
+                    "title": "Good work begins with a clear point of view",
+                    "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
+                    "buttonLabel": "",
+                    "buttonUrl": "",
+                    "textVariant": "default",
+                    "textAlign": "left",
+                    "elementPadding": "sm",
                     "visualStyle": {
-                      "layout": {
-                        "position": "absolute",
-                        "top": "50%",
-                        "zIndex": 2,
-                        "marginMode": "none",
-                        "textAlign": "center"
+                      "customClass": "builder-premium-starter"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "layout-row-msus7h9f-1-column-2",
+                "elements": [
+                  {
+                    "id": "table-block-msusluxu-vb98z",
+                    "kind": "table",
+                    "title": "Choose the partnership that fits your next chapter",
+                    "body": "Every engagement begins with the same care; choose the level of collaboration your goals require.",
+                    "tableHeadings": [
+                      "What’s included",
+                      "Essential",
+                      "Signature",
+                      "Partnership"
+                    ],
+                    "tableRows": [
+                      [
+                        "Discovery workshop",
+                        "90 minutes",
+                        "Half day",
+                        "Full day"
+                      ],
+                      [
+                        "Design directions",
+                        "1 direction",
+                        "2 directions",
+                        "3 directions"
+                      ],
+                      [
+                        "Launch support",
+                        "7 days",
+                        "30 days",
+                        "90 days"
+                      ],
+                      [
+                        "Ongoing guidance",
+                        "By request",
+                        "Monthly",
+                        "Dedicated"
+                      ]
+                    ],
+                    "tableStyle": "striped",
+                    "elementPadding": "sm",
+                    "typography": {
+                      "eyebrow": {
+                        "variant": "subheading",
+                        "fontSize": "12px",
+                        "fontWeight": "700",
+                        "lineHeight": "1.2",
+                        "letterSpacing": "0.12em",
+                        "textTransform": "uppercase"
                       },
-                      "customClass": "uk-disabled",
-                      "customCss": ".el-image {\n\tborder-radius: 50%;\n\tbox-shadow: 0 0 0 0 #4C6CD8;\n\ttransform: scale(1);\n\tanimation: pulse 2s infinite;\n    margin-top: -42px;\n}\n\n@keyframes pulse {\n\t0% {\n\t\ttransform: scale(0.95);\n\t\tbox-shadow: 0 0 0 0 rgba(76,108,216, 0.8);\n\t}\n\n\t70% {\n\t\ttransform: scale(1);\n\t\tbox-shadow: 0 0 0 10px rgba(76,108,216, 0);\n\t}\n\n\t100% {\n\t\ttransform: scale(0.95);\n\t\tbox-shadow: 0 0 0 0 rgba(76,108,216, 0);\n\t}\n}",
-                      "effects": {},
-                      "card": {}
+                      "title": {
+                        "variant": "heading",
+                        "fontSize": "clamp(28px, 3vw, 46px)",
+                        "fontWeight": "720",
+                        "lineHeight": "1.06",
+                        "letterSpacing": "-0.025em"
+                      },
+                      "body": {
+                        "variant": "body",
+                        "fontSize": "16px",
+                        "fontWeight": "400",
+                        "lineHeight": "1.7"
+                      },
+                      "button": {
+                        "variant": "button",
+                        "fontSize": "14px",
+                        "fontWeight": "700",
+                        "lineHeight": "1",
+                        "letterSpacing": "0.01em"
+                      }
                     }
                   }
                 ]
@@ -2182,7 +2336,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-15T15:50:07.242Z"
+    "updatedAt": "2026-08-15T19:52:36.349Z"
   },
   "shop": {
     "version": 1,

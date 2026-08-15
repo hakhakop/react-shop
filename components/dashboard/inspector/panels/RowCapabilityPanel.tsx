@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type {
   BuilderLayoutAdvancedSettings,
   BuilderLayoutHtmlElement,
@@ -64,6 +65,8 @@ export default function RowCapabilityPanel({
   applyLayoutPreset,
   onEditColumn,
 }: Props) {
+  const [layoutPickerOpen, setLayoutPickerOpen] = useState(false);
+  const currentLayout = builderRowLayoutPresets.find((preset) => preset.key === row.layout);
   const updateColumn = (
     columnIndex: number,
     patch: {
@@ -78,19 +81,20 @@ export default function RowCapabilityPanel({
   const updateAdvanced = (patch: Partial<BuilderLayoutAdvancedSettings>) =>
     update({ advanced: { ...(row.advanced ?? {}), ...patch } });
 
-  if (tab === "settings") {
+  if (tab === "settings" || tab === "layout") {
     return (
       <div className="builder-inspector-stack" data-canonical-owner="BuilderRow">
         <div className="builder-field-header"><strong>Layout</strong></div>
-        <div className="builder-field-header"><strong>Current layout</strong><small>{builderRowLayoutPresets.find((preset) => preset.key === row.layout)?.label ?? row.layout}</small></div>
-        <InspectorFieldRow label="Edit Layout">
-          <InspectorSelect
-            value={row.layout}
-            options={builderRowLayoutPresets.map((preset) => ({ value: preset.key, label: preset.label }))}
-            onChange={applyLayoutPreset}
-            ariaLabel="Edit Row layout"
-          />
-        </InspectorFieldRow>
+        <button type="button" className="builder-row-layout-launcher" onClick={() => setLayoutPickerOpen(true)} aria-haspopup="dialog">
+          <span className="builder-row-layout-launcher-preview" aria-hidden="true">{(currentLayout?.ratios ?? [1]).map((ratio, index) => <i key={index} style={{ flex: ratio }} />)}</span>
+          <span><strong>{currentLayout?.label ?? row.layout}</strong><small>Change layout</small></span>
+        </button>
+        {layoutPickerOpen ? <div className="builder-layout-modal" role="dialog" aria-modal="true" aria-label="Select a grid layout" onClick={() => setLayoutPickerOpen(false)}>
+          <div className="builder-layout-dialog" onClick={(event) => event.stopPropagation()}>
+            <div className="builder-layout-header"><div><strong>Select a grid layout</strong><span>Choose the column structure for this Row.</span></div><button type="button" className="builder-layout-close" onClick={() => setLayoutPickerOpen(false)} aria-label="Close layout picker">×</button></div>
+            <div className="builder-layout-picker-body"><div className="builder-layout-picker-grid">{builderRowLayoutPresets.map((preset) => <button key={preset.key} type="button" className={`builder-layout-picker-card${preset.key === row.layout ? " is-active" : ""}`} onClick={() => { applyLayoutPreset(preset.key); setLayoutPickerOpen(false); }}><span className="builder-row-layout-launcher-preview" aria-hidden="true">{preset.ratios.map((ratio, index) => <i key={index} style={{ flex: ratio }} />)}</span><span className="builder-layout-picker-card-copy"><strong>{preset.label}</strong></span></button>)}</div></div>
+          </div>
+        </div> : null}
 
         <div className="builder-inspector-section" data-row-responsive-layout>
           <div className="builder-field-header">

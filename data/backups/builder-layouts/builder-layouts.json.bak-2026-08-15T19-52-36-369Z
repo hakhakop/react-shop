@@ -2182,7 +2182,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-15T13:45:18.199Z"
+    "updatedAt": "2026-08-15T15:50:07.242Z"
   },
   "shop": {
     "version": 1,
@@ -2736,7 +2736,24 @@
     },
     "sections": [
       {
-        "id": "contentLayout-msucqn42-aj5ig",
+        "id": "template-product-hero",
+        "kind": "hero",
+        "title": "Product Detail Template",
+        "eyebrow": "WooCommerce product",
+        "body": "This template will be used for every single product page.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "split",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "buttonLabel": "Back to shop",
+        "buttonUrl": "/shop",
+        "visible": true
+      },
+      {
+        "id": "template-product-layout",
         "kind": "contentLayout",
         "title": "Product Content",
         "eyebrow": "Dynamic area",
@@ -2749,10 +2766,10 @@
         "layoutColumns": 2,
         "layoutItems": [
           {
-            "id": "layout-item-msucqn42-0-dgah",
+            "id": "template-product-media",
             "blocks": [
               {
-                "id": "productGallery-block-msucqn42-ovgri",
+                "id": "template-product-gallery",
                 "kind": "productGallery",
                 "title": "Product Gallery",
                 "body": "Dynamic field: current product gallery."
@@ -2760,34 +2777,34 @@
             ]
           },
           {
-            "id": "layout-item-msucqn42-1-2rmj",
+            "id": "template-product-summary",
             "blocks": [
               {
-                "id": "productTitle-block-msucqn42-f35gh",
+                "id": "template-product-title",
                 "kind": "productTitle",
                 "title": "Product Title",
                 "body": "Dynamic field: current product title."
               },
               {
-                "id": "productPrice-block-msucqn42-1jt4f",
+                "id": "template-product-price",
                 "kind": "productPrice",
                 "title": "Product Price",
                 "body": "Dynamic field: current product price."
               },
               {
-                "id": "productAddToCart-block-msucqn42-vinjk",
+                "id": "template-product-cart",
                 "kind": "productAddToCart",
                 "title": "Add To Cart",
                 "body": "Dynamic WooCommerce add-to-cart button."
               },
               {
-                "id": "productAttributes-block-msucqn42-m0a5t",
+                "id": "template-product-attributes",
                 "kind": "productAttributes",
                 "title": "Product Attributes",
                 "body": "Dynamic field: size, color, material, and other attributes."
               },
               {
-                "id": "productDescription-block-msucqn42-w6tt9",
+                "id": "template-product-description",
                 "kind": "productDescription",
                 "title": "Product Description",
                 "body": "Dynamic field: current product description."
@@ -2798,7 +2815,7 @@
         "visible": true
       },
       {
-        "id": "recentlyViewed-msucqn42-pqkyu",
+        "id": "template-product-recent",
         "kind": "recentlyViewed",
         "title": "Recently Viewed",
         "background": "#ffffff",
@@ -2809,7 +2826,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-15T12:28:22.554Z"
+    "updatedAt": "2026-08-15T15:47:02.604Z"
   },
   "page:home-2": {
     "version": 1,
@@ -4157,8 +4174,8 @@
         "title": "Header",
         "headerUtilityMigrationVersion": 3,
         "headerVisible": true,
-        "headerTransparent": true,
-        "headerOverlay": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
         "headerHeight": "compact",
         "headerCustomHeight": 92,
         "headerArchitectureVersion": 2,
@@ -4274,7 +4291,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-15T12:06:07.610Z"
+    "updatedAt": "2026-08-15T15:47:27.158Z"
   },
   "footer": {
     "version": 1,

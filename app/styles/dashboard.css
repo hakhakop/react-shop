@@ -385,7 +385,7 @@
   position: absolute;
   right: 10px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) !important;
   pointer-events: none;
   color: #94a3b8;
   display: flex;
@@ -2799,6 +2799,48 @@
   cursor: pointer;
   font: inherit;
   transition: all 0.15s ease;
+}
+
+.builder-row-layout-launcher {
+  width: 100%;
+  min-height: 78px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 6px;
+  background: var(--builder-ui-surface);
+  color: var(--builder-ui-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.builder-row-layout-launcher:hover {
+  border-color: var(--builder-ui-accent);
+}
+
+.builder-row-layout-launcher > span:last-child {
+  display: grid;
+  gap: 3px;
+  justify-items: end;
+}
+
+.builder-row-layout-launcher small {
+  color: var(--builder-ui-muted);
+}
+
+.builder-row-layout-launcher-preview {
+  height: 36px;
+  display: flex;
+  gap: 4px;
+}
+
+.builder-row-layout-launcher-preview i {
+  min-width: 0;
+  border: 2px solid currentColor;
+  opacity: .72;
 }
 
 .builder-layout-picker-card:hover {
@@ -18666,4 +18708,521 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .builder-dashboard[data-theme="light"] .builder-wireframe-item--block,
 .builder-dashboard[data-theme="light"] .builder-wireframe-item--block.is-selected {
   background: rgba(255, 255, 255, .94);
+}
+
+/* Structure projection: a quiet document canvas inspired by the supplied
+   reference. Sections, rows and columns stay canonical AST owners, but the
+   panel stops rendering every level as a competing card. */
+.builder-dashboard .builder-wireframe-tree {
+  gap: 14px;
+  padding: 8px 12px 20px;
+}
+
+.builder-dashboard .builder-wireframe-section-slot {
+  padding-bottom: 18px;
+}
+
+.builder-dashboard .builder-wireframe-section-slot::after {
+  right: 0;
+  bottom: 9px;
+  left: 0;
+  border-top-color: var(--builder-ui-border);
+}
+
+.builder-dashboard .builder-wireframe-insert-section {
+  width: 26px !important;
+  min-width: 26px !important;
+  height: 26px;
+  min-height: 26px;
+  margin-bottom: -4px;
+  border-color: var(--builder-ui-border-strong);
+  background: var(--builder-ui-panel-solid);
+  color: var(--builder-ui-muted);
+}
+
+.builder-dashboard .builder-wireframe-section,
+.builder-dashboard .builder-wireframe-row,
+.builder-dashboard .builder-wireframe-column,
+.builder-dashboard[data-theme="light"] .builder-wireframe-section,
+.builder-dashboard[data-theme="light"] .builder-wireframe-row,
+.builder-dashboard[data-theme="light"] .builder-wireframe-column {
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+.builder-dashboard .builder-wireframe-section.is-selected,
+.builder-dashboard .builder-wireframe-row.is-selected,
+.builder-dashboard .builder-wireframe-column.is-selected {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.builder-dashboard .builder-wireframe-rowline {
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 0;
+}
+
+.builder-dashboard .builder-wireframe-toggle {
+  width: 28px;
+  height: 38px;
+  color: var(--builder-ui-muted);
+}
+
+.builder-dashboard .builder-wireframe-item--section,
+.builder-dashboard .builder-wireframe-item--row,
+.builder-dashboard .builder-wireframe-item--column {
+  min-height: 38px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.builder-dashboard .builder-wireframe-item--section {
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--builder-ui-border);
+}
+
+.builder-dashboard .builder-wireframe-item--section > .builder-wireframe-icon,
+.builder-dashboard .builder-wireframe-item--row > .builder-wireframe-icon,
+.builder-dashboard .builder-wireframe-item--column > .builder-wireframe-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap strong {
+  font-size: 15px;
+}
+
+.builder-dashboard .builder-wireframe-item--row .builder-wireframe-label-wrap strong,
+.builder-dashboard .builder-wireframe-item--column .builder-wireframe-label-wrap strong {
+  font-size: 13px;
+}
+
+.builder-dashboard .builder-wireframe-label-wrap small {
+  color: var(--builder-ui-muted);
+  font-size: 10px;
+}
+
+.builder-dashboard .builder-wireframe-children {
+  gap: 12px;
+  margin-left: 28px !important;
+  padding-left: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-children--columns {
+  gap: 8px !important;
+  margin-left: 28px !important;
+  padding-left: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-children--blocks {
+  gap: 4px !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-children--blocks {
+  padding: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-item--block {
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--builder-ui-surface);
+  box-shadow: none;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block,
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block.is-selected {
+  background: #f5f5f5;
+  box-shadow: none !important;
+}
+
+.builder-dashboard .builder-wireframe-item--block.is-selected {
+  border-color: #818cf8 !important;
+  background: color-mix(in srgb, #818cf8 12%, var(--builder-ui-surface)) !important;
+  box-shadow: inset 3px 0 0 #6366f1 !important;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block.is-selected {
+  background: #eef2ff !important;
+}
+
+.builder-dashboard .builder-wireframe-item--block:hover:not(.is-selected),
+.builder-dashboard .builder-wireframe-item--section:hover:not(.is-selected),
+.builder-dashboard .builder-wireframe-item--row:hover:not(.is-selected),
+.builder-dashboard .builder-wireframe-item--column:hover:not(.is-selected) {
+  background: color-mix(in srgb, var(--builder-ui-accent) 6%, var(--builder-ui-surface));
+}
+
+.builder-dashboard .builder-wireframe-badge--section,
+.builder-dashboard .builder-wireframe-badge--row,
+.builder-dashboard .builder-wireframe-badge--element {
+  display: none;
+}
+
+.builder-dashboard .builder-wireframe-badge--column-pct,
+.builder-dashboard .builder-wireframe-count {
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 10px;
+}
+
+.builder-dashboard .builder-wireframe-badge--dynamic {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, #0ea5e9 42%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, #0ea5e9 13%, transparent);
+  color: #0284c7;
+}
+
+.builder-dashboard .builder-wireframe-meta {
+  gap: 6px;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-actions {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(4px);
+}
+
+.builder-dashboard .builder-wireframe-item:hover .builder-wireframe-actions,
+.builder-dashboard .builder-wireframe-item.is-selected .builder-wireframe-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.builder-dashboard .builder-wireframe-action-btn {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.builder-dashboard .builder-wireframe-action-btn:hover:not(:disabled) {
+  background: var(--builder-ui-surface-hover);
+}
+
+/* Row and Column are structural containers. Their layout is the primary
+   explanation; labels appear only as compact hover handles for selection. */
+.builder-dashboard .builder-wireframe-row,
+.builder-dashboard .builder-wireframe-column {
+  position: relative;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  position: absolute;
+  z-index: 4;
+  top: 4px;
+  left: 4px;
+  width: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.builder-dashboard .builder-wireframe-row:hover > .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-row.is-selected > .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-column.is-selected) > .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-column:hover > .builder-wireframe-item--column,
+.builder-dashboard .builder-wireframe-column.is-selected > .builder-wireframe-item--column {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  display: flex;
+  grid-template-columns: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 24px;
+  gap: 2px;
+  padding: 0;
+  top: 8px;
+  right: 4px;
+  left: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline > .builder-wireframe-toggle {
+  display: none;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  width: 24px !important;
+  max-width: 24px !important;
+  flex: 0 0 24px !important;
+  min-height: 24px;
+  height: auto;
+  padding: 0;
+  justify-content: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  display: flex;
+  flex: 0 0 auto !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row:hover {
+  background: transparent !important;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-meta {
+  position: static;
+  display: flex;
+  align-items: flex-start;
+  width: 24px;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-grip,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-grip,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-badge,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: none !important;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-icon--row,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-icon--column {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  width: 24px;
+  height: auto !important;
+  min-height: 0;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+  transition: none;
+}
+
+.builder-dashboard .builder-wireframe-row:hover > .builder-wireframe-rowline .builder-wireframe-actions,
+.builder-dashboard .builder-wireframe-row.is-selected > .builder-wireframe-rowline .builder-wireframe-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn {
+  display: inline-flex;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--builder-ui-text);
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn:hover:not(:disabled) {
+  background: transparent;
+  color: var(--builder-ui-accent);
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn:disabled {
+  opacity: .35;
+}
+
+/* Keep the structural Row rail icon-only in both themes. Older generic action
+   styles must not reintroduce a dark floating panel while the row is hovered. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-meta,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn,
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn:hover:not(:disabled) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  border: 1px solid var(--builder-ui-border) !important;
+  border-radius: 5px !important;
+  background: rgba(255, 255, 255, .045) !important;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-row > .builder-wireframe-rowline {
+  background: rgba(31, 31, 27, .06) !important;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  background: rgba(255, 255, 255, .075) !important;
+}
+
+/* Elements keep their established horizontal toolbar; only its visual treatment
+   matches the quiet Row rail. */
+.builder-dashboard .builder-wireframe-item--block {
+  position: relative;
+}
+
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-meta {
+  position: static;
+}
+
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-actions {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  right: 8px;
+  bottom: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  height: 24px;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .075) !important;
+  box-shadow: none !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 140ms ease;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block .builder-wireframe-actions {
+  background: rgba(31, 31, 27, .06) !important;
+}
+
+.builder-dashboard .builder-wireframe-item--block:hover .builder-wireframe-actions,
+.builder-dashboard .builder-wireframe-item--block.is-selected .builder-wireframe-actions {
+  opacity: 1;
+  pointer-events: auto;
+  padding: 2px !important;
+  background: rgba(255, 255, 255, .075) !important;
+  box-shadow: none !important;
+  transform: translateY(-50%) !important;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block:hover .builder-wireframe-actions,
+.builder-dashboard[data-theme="light"] .builder-wireframe-item--block.is-selected .builder-wireframe-actions {
+  background: rgba(31, 31, 27, .06) !important;
+}
+
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-action-btn,
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-action-btn:hover:not(:disabled) {
+  display: inline-flex;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--builder-ui-text);
+}
+
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-action-btn:hover:not(:disabled) {
+  color: var(--builder-ui-accent);
+}
+
+.builder-dashboard .builder-wireframe-item--block .builder-wireframe-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: 0 !important;
+  padding-right: 42px !important;
+}
+
+/* A newly created Section contains one empty Whole Row. Reserve the full
+   structural rail height so its Row controls remain inside that Section. */
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 168px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 168px;
+  padding: 8px 42px 8px 0 !important;
+  border: 0;
+  background: rgba(52, 211, 153, .07);
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  background: rgba(16, 185, 129, .06);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 100%;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 150px;
+  border: 0;
+  background: transparent;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-empty-label {
+  color: var(--builder-ui-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Column settings are owned by the Row inspector. Do not duplicate a column
+   handle over the element surface in Structure. */
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: none !important;
 }

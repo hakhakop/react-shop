@@ -1129,6 +1129,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     normalizedSectionLayout?.source === "canonical" && selectedLayoutRowIndex !== null
       ? normalizedSectionLayout.rows[selectedLayoutRowIndex]
       : undefined;
+  const selectedInspectorRow = selectedCanonicalRow ?? (
+    selectedLayoutRowIndex !== null
+      ? normalizedSectionLayout?.rows[selectedLayoutRowIndex]
+      : undefined
+  );
   const selectedLayoutRow: (typeof layoutRows)[number] | null = selectedLegacyLayoutRow ?? (selectedCanonicalRow
     ? {
         id: selectedCanonicalRow.id,
@@ -1165,7 +1170,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       selectedSection?.id !== "header-document",
   );
   const isCanonicalRowSelection = Boolean(
-    selectedCanonicalRow &&
+    selectedInspectorRow &&
       selectedSection?.id !== "header-document",
   );
   const supportedAreas = selectedLayoutBlock
@@ -1217,11 +1222,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? canonicalBlockTabs
-      : selectedLayoutRow
-        ? [
-          ["settings", "Settings"],
-          ["advanced", t("builder.inspector.advanced")],
-        ]
+    : selectedLayoutRow
+        ? isCanonicalRowSelection
+          ? [
+            ["settings", "Settings"],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+          : [
+            ["layout", t("builder.inspector.layout")],
+            ["spacing", t("builder.inspector.spacing")],
+            ["style", t("builder.inspector.styling")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
       : isCanonicalColumnSelection
         ? [
             ["content", t("builder.inspector.content")],
@@ -1352,8 +1364,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       return;
     }
     if (selectedLayoutRow) {
-      if (inspectorTab !== "settings" && inspectorTab !== "advanced") {
-        setInspectorTab("settings");
+      const validTabs = isCanonicalRowSelection
+        ? ["settings", "advanced"]
+        : ["layout", "spacing", "style", "advanced"];
+      if (!validTabs.includes(inspectorTab)) {
+        setInspectorTab(isCanonicalRowSelection ? "settings" : "layout");
       }
       return;
     }
@@ -1372,7 +1387,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     if (inspectorTab !== "content" && inspectorTab !== "settings" && inspectorTab !== "advanced") {
       setInspectorTab("settings");
     }
-  }, [inspectorTab, selectedLayoutBlock, selectedSection?.id, selectedLayoutRow, isCanonicalColumnSelection, setInspectorTab]);
+  }, [inspectorTab, selectedLayoutBlock, selectedSection?.id, selectedLayoutRow, isCanonicalRowSelection, isCanonicalColumnSelection, setInspectorTab]);
 
   useEffect(() => {
     if (!spacingFocusRequest?.field) return;
@@ -2460,7 +2475,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {isCanonicalRowSelection && (
             <RowCapabilityPanel
-              row={selectedCanonicalRow!}
+              row={selectedInspectorRow!}
               tab={inspectorTab}
               update={onUpdateRowStyle}
               applyLayoutPreset={applySelectedRowLayoutPreset}
