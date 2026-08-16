@@ -57,6 +57,7 @@ export default function ButtonPresentationFields({
           options={options(UIKIT_BUTTON_CAPABILITY.properties.variant.values, allowInherit)}
           onChange={onVariantChange}
           ariaLabel={`${title} variant`}
+          className="button-variant-control"
         />
       </InspectorFieldRow>
       <InspectorFieldRow
@@ -75,4 +76,3 @@ export default function ButtonPresentationFields({
     </InspectorSection>
   );
 }
-

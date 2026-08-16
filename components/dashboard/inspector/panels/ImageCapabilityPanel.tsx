@@ -25,12 +25,35 @@ type Props = {
 
 export default function ImageCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const image = block;
-  const isImportedYoothemeImage = image.spacingContract === "yootheme" || image.id?.startsWith("yootheme-image-");
-
+  const isHeaderLogo = image.id === "header-logo" || image.headerBrandMode !== undefined;
   // CONTENT TAB
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-content">
+        {isHeaderLogo && (
+          <InspectorDivision title="HEADER LOGO">
+            <InspectorFieldRow label="Presentation">
+              <InspectorSelect
+                value={image.headerBrandMode ?? (image.imageUrl ? "logo" : "brand")}
+                options={[
+                  { value: "logo", label: "Logo only" },
+                  { value: "brand", label: "Text brand" },
+                  { value: "both", label: "Logo + text" },
+                ]}
+                onChange={(value) => update({ headerBrandMode: value as BuilderLayoutBlock["headerBrandMode"] })}
+                ariaLabel="Header logo presentation"
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Brand text">
+              <InspectorTextField
+                value={image.headerBrandText ?? ""}
+                onChange={(value) => update({ headerBrandText: value })}
+                placeholder="WebPages"
+                ariaLabel="Header brand text"
+              />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
         <InspectorDivision title="IMAGE">
           <InspectorFieldRow label="Image source" dynamicBinding={inspectorDynamicBinding(block, update, "imageUrl")}>
             <BuilderImageUrlControl
@@ -59,7 +82,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
           <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             <InspectorFieldRow label="Width">
               <InspectorTextField
-                value={String(image.imageWidth ?? "")}
+                value={String(image.imageWidth ?? (isHeaderLogo ? image.imageMaxWidth ?? "" : ""))}
                 placeholder="auto"
                 onChange={(value) => update({ imageWidth: value || undefined })}
                 ariaLabel="Image width"
@@ -82,28 +105,6 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Image Caption"
             />
           </InspectorFieldRow>
-          {!isImportedYoothemeImage && <>
-            <InspectorFieldRow label="Make SVG stylable with CSS">
-              <input
-                type="checkbox"
-                checked={image.imageSvgInline === true}
-                onChange={(event) => update({ imageSvgInline: event.target.checked || undefined })}
-                aria-label="Make SVG stylable with CSS"
-              />
-            </InspectorFieldRow>
-            {image.imageSvgInline === true && <InspectorFieldRow label="SVG color">
-              <InspectorSelect
-                value={image.imageSvgColor ?? "primary"}
-                options={[
-                  { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" },
-                  { value: "default", label: "Default" }, { value: "muted", label: "Muted" },
-                  { value: "inverse", label: "Inverse" },
-                ]}
-                onChange={(value) => update({ imageSvgColor: value })}
-                ariaLabel="SVG color"
-              />
-            </InspectorFieldRow>}
-          </>}
         </InspectorDivision>
 
         <InspectorDivision title="LINK">
@@ -178,10 +179,10 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
         update={update}
         showDimensions={false}
         showFrameControls={false}
-        showAlignment={!isImportedYoothemeImage}
-        showSvgControls={isImportedYoothemeImage}
+        showAlignment
+        showSvgControls
         svgColorLabel="SVG Color"
-        svgColorOptions={isImportedYoothemeImage ? UIKIT_YOOTHEME_SVG_COLOR_OPTIONS : undefined}
+        svgColorOptions={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}
       />
     </div>
   );

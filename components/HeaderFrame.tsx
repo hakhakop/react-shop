@@ -20,6 +20,10 @@ type HeaderFrameProps = {
   style?: React.CSSProperties;
   id?: string;
   overlapHeader?: boolean;
+  scrollState?: {
+    scrolled: boolean;
+    hidden: boolean;
+  };
 };
 
 /**
@@ -37,10 +41,16 @@ export default function HeaderFrame({
   style,
   id,
   overlapHeader = false,
+  scrollState,
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
   const [hiddenByScroll, setHiddenByScroll] = React.useState(false);
+  const [builderSurface, setBuilderSurface] = React.useState(false);
+  const builderContextDetected =
+    builderSurface ||
+    (typeof document !== "undefined" &&
+      Boolean(document.querySelector(".builder-dashboard")));
   const previousScrollYRef = React.useRef(0);
   const [autoTextState, setAutoTextState] = React.useState<{
     context: EffectiveHeaderBackgroundContext;
@@ -48,33 +58,38 @@ export default function HeaderFrame({
   } | null>(null);
   const scheduleUpdateRef = React.useRef<() => void>(() => {});
 
+  React.useEffect(() => {
+    setBuilderSurface(Boolean(document.querySelector(".builder-dashboard")));
+  }, []);
+
   React.useLayoutEffect(() => {
     const header = headerRef.current;
     const previewViewport = header?.closest<HTMLElement>(
       ".builder-preview-viewport-container",
     );
-    if (!header || !previewViewport) return;
+    if (!header) return;
 
     const publishRenderedHeight = () => {
       const headerRect = header.getBoundingClientRect();
-      const viewportRect = previewViewport.getBoundingClientRect();
-      previewViewport.style.setProperty(
-        "--builder-preview-rendered-header-height",
-        `${Math.max(headerRect.height, headerRect.bottom - viewportRect.top)}px`,
-      );
+      if (previewViewport) {
+        const viewportRect = previewViewport.getBoundingClientRect();
+        previewViewport.style.setProperty(
+          "--builder-preview-rendered-header-height",
+          `${Math.max(headerRect.height, headerRect.bottom - viewportRect.top)}px`,
+        );
+      }
     };
     publishRenderedHeight();
     const observer = new ResizeObserver(publishRenderedHeight);
     observer.observe(header);
     return () => {
       observer.disconnect();
-      previewViewport.style.removeProperty(
-        "--builder-preview-rendered-header-height",
-      );
+      previewViewport?.style.removeProperty("--builder-preview-rendered-header-height");
     };
   }, [children, behavior]);
 
   React.useEffect(() => {
+    if (scrollState || builderContextDetected) return;
     const getScrollY = () => {
       const previewShell = headerRef.current?.closest<HTMLElement>(".builder-preview-shell");
       if (previewShell) {
@@ -112,7 +127,7 @@ export default function HeaderFrame({
     // including the builder preview shell.
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, [behavior]);
+  }, [behavior, builderContextDetected, scrollState]);
 
   React.useEffect(() => {
     const pill = headerRef.current?.querySelector<HTMLElement>("#site-header-pill");
@@ -301,15 +316,19 @@ export default function HeaderFrame({
     };
   }, [backgroundMode, textMode, scrolled, overlapHeader]);
 
+  const effectiveScrolled = scrollState?.scrolled ?? (builderContextDetected ? false : scrolled);
+  const effectiveHidden = scrollState?.hidden ?? (builderContextDetected ? false : hiddenByScroll);
+  const hideBuilderServiceHeader =
+    builderContextDetected && className.split(/\s+/).includes("site-header--service");
   let bgClass = "";
   let borderClass = "";
   let textClass = "";
 
   if (backgroundMode === "none") {
-    bgClass = scrolled ? "bg-[var(--header-bg)]" : "bg-transparent";
-    borderClass = scrolled ? "border-[var(--header-border)]" : "border-transparent";
+    bgClass = effectiveScrolled ? "bg-[var(--header-bg)]" : "bg-transparent";
+    borderClass = effectiveScrolled ? "border-[var(--header-border)]" : "border-transparent";
   } else if (backgroundMode === "glass") {
-    bgClass = scrolled
+    bgClass = effectiveScrolled
       ? "bg-white/90 dark:bg-slate-950/90 shadow-md"
       : "bg-white/60 dark:bg-slate-950/60 shadow-sm";
     borderClass = "border-[var(--header-border)]";
@@ -320,7 +339,7 @@ export default function HeaderFrame({
   } else {
     // default background supports both light and dark mode colors through the CSS variable fallback
     bgClass = "bg-[var(--header-bg,rgba(255,255,255,0.92))]";
-    borderClass = scrolled ? "border-[var(--header-border,rgba(209,213,219,0.72))]" : "border-transparent";
+    borderClass = effectiveScrolled ? "border-[var(--header-border,rgba(209,213,219,0.72))]" : "border-transparent";
   }
 
   const baseSticky = `site-header sticky top-0 z-40 backdrop-blur-xl transition-all duration-300 ${textClass}`;
@@ -334,14 +353,14 @@ export default function HeaderFrame({
 
   const resolvedTextMode =
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
-
   return (
       <header
         id={id}
         ref={headerRef}
-        className={`${base} ${state} ${className} ${hiddenByScroll ? "site-header--scroll-hidden" : ""}`}
+        className={`${base} ${state} ${className} ${effectiveHidden ? "site-header--scroll-hidden" : ""}`}
         style={{
-          ...(isSticky ? { borderBottomColor: scrolled ? accentColor : "transparent" } : {}),
+          ...(hideBuilderServiceHeader ? { display: "none" } : {}),
+          ...(isSticky ? { borderBottomColor: effectiveScrolled ? accentColor : "transparent" } : {}),
           ...style,
         }}
         data-header-behavior={behavior}

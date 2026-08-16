@@ -62,7 +62,10 @@ export function resolveHeaderBuilderComposition(
       blockColumnMeta.get(block)?.count,
     ),
     visualStyle: block.visualStyle,
-    typography: block.typography,
+    typography: (block.kind === "menu" && !block.headerNavigationOverrides?.typography) ||
+      ((block.kind === "button" || block.id === "header-button") && !block.headerButtonOverrides?.typography)
+      ? undefined
+      : block.typography,
   });
   const elements = blocks.flatMap((block, blockIndex): HeaderBuilderElement[] => {
     if (block.id === "header-logo" || block.kind === "image") return [{
@@ -71,6 +74,18 @@ export function resolveHeaderBuilderComposition(
       imageUrl: block.imageUrl,
       imageAlt: block.imageAlt,
       imageMaxWidth: block.imageMaxWidth,
+      imageWidth: block.imageWidth,
+      imageHeight: block.imageHeight,
+      imageFit: block.imageFit,
+      imageRatio: block.imageRatio,
+      imageShape: block.imageShape,
+      imageBorder: block.imageBorder,
+      imageShadow: block.imageShadow,
+      imageBoxShadow: block.imageBoxShadow,
+      imageSvgInline: block.imageSvgInline,
+      imageSvgColor: block.imageSvgColor,
+      imagePosition: block.imagePosition,
+      imageLoading: block.imageLoading,
       imageAlignment: resolveHeaderElementAlignment(
         block,
         blockColumnMeta.get(block)?.index,
@@ -80,32 +95,48 @@ export function resolveHeaderBuilderComposition(
       headerBrandText: block.headerBrandText,
       ...sharedElementFields(block),
     }];
-    if (block.id === "header-navigation" || block.kind === "menu") return [{
+    if (block.id === "header-navigation" || block.kind === "menu") {
+      const overrides = block.headerNavigationOverrides;
+      return [{
       id: block.id ?? `header-navigation-${blockIndex}`,
       type: "navigation",
-      menuItemGap: block.menuItemGap,
-      menuHoverColor: block.menuHoverColor,
-      menuActiveColor: block.menuActiveColor,
-      menuActiveIndicator: block.menuActiveIndicator,
+      menuItemGap: overrides?.gap ? block.menuItemGap : undefined,
+      menuHoverColor: overrides?.hoverColor ? block.menuHoverColor : undefined,
+      menuActiveColor: overrides?.activeColor ? block.menuActiveColor : undefined,
+      menuActiveIndicator: overrides?.indicator ? block.menuActiveIndicator : undefined,
+      headerNavigationOverrides: overrides,
       ...sharedElementFields(block),
-    }];
+      }];
+    }
     if (block.id === "header-button" || block.kind === "button") return [{
+      ...(() => {
+        const overrides = block.headerButtonOverrides;
+        return {
+          buttonStyle: overrides?.variant ? block.buttonStyle : undefined,
+          size: overrides?.size ? block.size : undefined,
+          fullWidthButton: overrides?.width ? block.fullWidthButton : undefined,
+          buttonBg: overrides?.background ? block.buttonBg : undefined,
+          buttonTextColor: overrides?.text ? block.buttonTextColor : undefined,
+          buttonBorderRadius: overrides?.radius ? block.buttonBorderRadius : undefined,
+          buttonBorderWidth: overrides?.border ? block.buttonBorderWidth : undefined,
+          buttonBorderColor: overrides?.border ? block.buttonBorderColor : undefined,
+          buttonPaddingY: overrides?.padding ? block.buttonPaddingY : undefined,
+          buttonPaddingX: overrides?.padding ? block.buttonPaddingX : undefined,
+          buttonHoverBg: overrides?.hoverBackground ? block.buttonHoverBg : undefined,
+          buttonHoverTextColor: overrides?.hoverText ? block.buttonHoverTextColor : undefined,
+          buttonHoverBorderColor: overrides?.hoverBorder ? block.buttonHoverBorderColor : undefined,
+          buttonHoverEffect: overrides?.hoverEffect ? headerButtonHoverEffect(block.buttonHoverEffect) : undefined,
+          buttonHoverTransform: overrides?.hoverEffect ? block.buttonHoverTransform : undefined,
+          buttonHoverBoxShadow: overrides?.hoverEffect ? block.buttonHoverBoxShadow : undefined,
+          buttonTarget: block.buttonTarget,
+          buttonGap: block.buttonGap,
+          headerButtonOverrides: overrides,
+        };
+      })(),
       id: block.id ?? `header-button-${blockIndex}`,
       type: "button",
       label: block.buttonLabel,
       url: block.buttonUrl,
-      buttonStyle: block.buttonStyle,
-      buttonBg: block.buttonBg,
-      buttonTextColor: block.buttonTextColor,
-      buttonBorderRadius: block.buttonBorderRadius,
-      buttonBorderWidth: block.buttonBorderWidth,
-      buttonBorderColor: block.buttonBorderColor,
-      buttonPaddingY: block.buttonPaddingY,
-      buttonPaddingX: block.buttonPaddingX,
-      buttonHoverBg: block.buttonHoverBg,
-      buttonHoverTextColor: block.buttonHoverTextColor,
-      buttonHoverBorderColor: block.buttonHoverBorderColor,
-      buttonHoverEffect: headerButtonHoverEffect(block.buttonHoverEffect),
       ...sharedElementFields(block),
     }];
     if (block.id === "header-spacer" || block.kind === "embed") return [{

@@ -48,6 +48,61 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+type Rgba = { r: number; g: number; b: number; a: number };
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function hslToRgba(h: number, s: number, l: number, a: number): Rgba {
+  const hex = hslToHex(h, s, l).slice(1);
+  return { r: parseInt(hex.slice(0, 2), 16), g: parseInt(hex.slice(2, 4), 16), b: parseInt(hex.slice(4, 6), 16), a };
+}
+
+function rgbToHsl({ r, g, b }: Rgba) {
+  return hexToHsl(`#${[r, g, b].map((value) => value.toString(16).padStart(2, "0")).join("")}`);
+}
+
+function parseCssColor(value: string): Rgba {
+  const raw = value.trim().toLowerCase();
+  if (raw === "transparent") return { r: 255, g: 255, b: 255, a: 0 };
+  const hex = raw.replace(/^#/, "");
+  if (/^[0-9a-f]{3,8}$/i.test(hex)) {
+    const full = hex.length <= 4 ? hex.split("").map((part) => part + part).join("") : hex;
+    return {
+      r: parseInt(full.slice(0, 2), 16),
+      g: parseInt(full.slice(2, 4), 16),
+      b: parseInt(full.slice(4, 6), 16),
+      a: full.length === 8 ? parseInt(full.slice(6, 8), 16) / 255 : 1,
+    };
+  }
+  const rgb = raw.match(/^rgba?\(([^)]+)\)$/i);
+  if (rgb) {
+    const parts = rgb[1].split(/\s*,\s*|\s*\/\s*/).map((part) => part.trim());
+    const channel = (part: string) => part.endsWith("%") ? (parseFloat(part) / 100) * 255 : parseFloat(part);
+    const alpha = parts[3] == null ? 1 : parts[3].endsWith("%") ? parseFloat(parts[3]) / 100 : parseFloat(parts[3]);
+    return { r: clamp(channel(parts[0]), 0, 255), g: clamp(channel(parts[1]), 0, 255), b: clamp(channel(parts[2]), 0, 255), a: clamp(alpha, 0, 1) };
+  }
+  const hsl = raw.match(/^hsla?\(([^)]+)\)$/i);
+  if (hsl) {
+    const parts = hsl[1].split(/\s*,\s*|\s*\/\s*/).map((part) => part.trim());
+    const hue = parseFloat(parts[0]);
+    const saturation = parseFloat(parts[1]);
+    const lightness = parseFloat(parts[2]);
+    const alpha = parts[3] == null ? 1 : parts[3].endsWith("%") ? parseFloat(parts[3]) / 100 : parseFloat(parts[3]);
+    return { ...hslToRgba(hue, saturation, lightness, clamp(alpha, 0, 1)), a: clamp(alpha, 0, 1) };
+  }
+  return { r: 255, g: 255, b: 255, a: 1 };
+}
+
+function formatRgba(color: Rgba) {
+  if (color.a <= 0) return "transparent";
+  if (color.a >= 0.999) return `#${[color.r, color.g, color.b].map((value) => Math.round(value).toString(16).padStart(2, "0")).join("")}`;
+  return `rgba(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)}, ${Math.round(color.a * 1000) / 1000})`;
+}
+
+const CHECKERBOARD = "linear-gradient(45deg, rgba(148,163,184,.28) 25%, transparent 25%, transparent 75%, rgba(148,163,184,.28) 75%), linear-gradient(45deg, rgba(148,163,184,.28) 25%, transparent 25%, transparent 75%, rgba(148,163,184,.28) 75%)";
+
 type ColorPickerProps = {
   label: string;
   value: string;
@@ -71,35 +126,43 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
   }, []);
 
   const displayColor = value || "#ffffff";
-  const initialHsl = hexToHsl(displayColor);
+  const isGradientPaint = allowGradient && isGradientBackgroundPaint(value);
+  const initialRgba = parseCssColor(displayColor);
+  const initialHsl = isGradientPaint ? { h: 0, s: 0, l: 100 } : rgbToHsl(initialRgba);
   const [hue, setHue] = useState(initialHsl.h);
   const [sat, setSat] = useState(initialHsl.s);
   const [light, setLight] = useState(initialHsl.l);
+  const [alpha, setAlpha] = useState(initialRgba.a);
 
   useEffect(() => {
     setHexInput(value || "#ffffff");
     setPaintInput(value || "#ffffff");
     setMode(allowGradient && isGradientBackgroundPaint(value) ? "gradient" : "color");
-    const hsl = hexToHsl(value || "#ffffff");
-    setHue(hsl.h);
-    setSat(hsl.s);
-    setLight(hsl.l);
-  }, [value]);
+    if (!allowGradient || !isGradientBackgroundPaint(value)) {
+      const rgba = parseCssColor(value || "#ffffff");
+      const hsl = rgbToHsl(rgba);
+      setHue(hsl.h);
+      setSat(hsl.s);
+      setLight(hsl.l);
+      setAlpha(rgba.a);
+    }
+  }, [allowGradient, value]);
 
-  const updateColorFromHsl = useCallback((newH: number, newS: number, newL: number) => {
+  const updateColorFromHsl = useCallback((newH: number, newS: number, newL: number, newAlpha = alpha) => {
     setHue(newH);
     setSat(newS);
     setLight(newL);
-    const hex = hslToHex(newH, newS, newL);
-    setHexInput(hex);
-    onChange(hex);
-  }, [onChange]);
+    setAlpha(newAlpha);
+    const next = formatRgba(hslToRgba(newH, newS, newL, newAlpha));
+    setHexInput(next);
+    onChange(next);
+  }, [alpha, onChange]);
 
   const handleOpen = () => {
     if (swatchRef.current) {
       const rect = swatchRef.current.getBoundingClientRect();
       const popoverWidth = 250;
-      const popoverHeight = 310;
+      const popoverHeight = 400;
 
       // Smart vertical placement: drop down or flip up depending on viewport space
       let top = rect.bottom + 6;
@@ -124,6 +187,22 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
     setPaintInput(next);
     if (isValidBackgroundPaint(next)) onChange(next.trim());
   };
+
+  const commitColor = (next: string) => {
+    setHexInput(next);
+    if (!isValidBackgroundPaint(next) || isGradientBackgroundPaint(next)) return;
+    const rgba = parseCssColor(next);
+    const hsl = rgbToHsl(rgba);
+    setHue(hsl.h);
+    setSat(hsl.s);
+    setLight(hsl.l);
+    setAlpha(rgba.a);
+    onChange(next.trim());
+  };
+
+  const previewStyle = isGradientPaint
+    ? { background: displayColor }
+    : { backgroundColor: displayColor, backgroundImage: parseCssColor(displayColor).a < 1 ? CHECKERBOARD : undefined, backgroundSize: "10px 10px, 10px 10px" };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -155,8 +234,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
             width: "26px",
             height: "26px",
             borderRadius: "50%",
-            background: allowGradient ? displayColor : undefined,
-            backgroundColor: allowGradient ? undefined : displayColor,
+            ...previewStyle,
             border: "2px solid rgba(255,255,255,0.2)",
             cursor: "pointer",
             boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
@@ -182,6 +260,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
             borderRadius: "12px",
             boxShadow: "0 12px 35px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.12)",
             color: "#f8fafc",
+            minHeight: "372px",
           }}
         >
           {allowGradient && <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
@@ -203,6 +282,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
             <div aria-label={`${label} gradient preview`} style={{ height: "96px", marginTop: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,.16)", background: isValidBackgroundPaint(paintInput) ? paintInput : "transparent" }} />
             <span style={{ display: "block", marginTop: "8px", fontSize: "10px", color: "#94a3b8", textAlign: "center", letterSpacing: ".04em" }}>CSS LINEAR OR RADIAL GRADIENT</span>
           </> : <>
+          <div aria-label={`${label} current color preview`} style={{ height: "34px", marginBottom: "12px", borderRadius: "6px", border: "1px solid rgba(255,255,255,.16)", ...previewStyle }} />
           {/* Saturation/Lightness 2D Color Box */}
           <div
             style={{
@@ -260,6 +340,20 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
             />
           </div>
 
+          {/* Alpha / transparency slider */}
+          <div style={{ marginBottom: "12px" }}>
+            <input
+              aria-label={`${label} alpha`}
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={alpha}
+              onChange={(event) => updateColorFromHsl(hue, sat, light, Number(event.target.value))}
+              style={{ width: "100%", height: "10px", borderRadius: "5px", appearance: "none", background: `${CHECKERBOARD}, linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1))`, backgroundSize: "10px 10px, auto", cursor: "pointer", outline: "none" }}
+            />
+          </div>
+
           {/* Color Preview Swatches */}
           <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
             {["#6f40f1", "#111827", "#ffffff", "#38bdf8", "#16a34a", "#dc2626", "#d97706", "#64748b"].map((swatchHex) => (
@@ -270,7 +364,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
                   setHexInput(swatchHex);
                   onChange(swatchHex);
                   const hsl = hexToHsl(swatchHex);
-                  setHue(hsl.h); setSat(hsl.s); setLight(hsl.l);
+                  setHue(hsl.h); setSat(hsl.s); setLight(hsl.l); setAlpha(1);
                 }}
                 style={{
                   width: "20px",
@@ -291,13 +385,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
               type="text"
               value={hexInput}
               onChange={(e) => {
-                const val = e.target.value;
-                setHexInput(val);
-                if (/^#[0-9a-f]{3,8}$/i.test(val)) {
-                  onChange(val);
-                  const hsl = hexToHsl(val);
-                  setHue(hsl.h); setSat(hsl.s); setLight(hsl.l);
-                }
+                commitColor(e.target.value);
               }}
               style={{
                 width: "100%",
@@ -312,6 +400,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
                 textTransform: "uppercase",
               }}
               placeholder="#HEX / KEYWORD"
+              aria-label={`${label} CSS color`}
             />
             <span style={{ fontSize: "9px", color: "#94a3b8", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               HEX / KEYWORD

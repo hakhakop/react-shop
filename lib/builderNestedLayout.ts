@@ -225,6 +225,57 @@ export function updateBlockInLayoutColumn(
   }));
 }
 
+/**
+ * Update a block in the raw canonical layout tree without relying on the
+ * currently rendered/localized column projection.
+ */
+export function updateLayoutBlockEverywhere(
+  section: BuilderSection,
+  blockKey: string,
+  updater: (block: BuilderLayoutBlock) => BuilderLayoutBlock,
+): BuilderSection {
+  const updateBlocks = (blocks: BuilderLayoutBlock[]) =>
+    blocks.map((block, index) => {
+      const key = block.id ?? `layout-block-${index}`;
+      return key === blockKey ? updater(block) : block;
+    });
+
+  if (section.rows !== undefined) {
+    return {
+      ...section,
+      rows: section.rows.map((row) => ({
+        ...row,
+        columns: row.columns.map((column) => ({
+          ...column,
+          elements: updateBlocks(column.elements ?? []),
+        })),
+      })),
+    };
+  }
+
+  const updateColumn = (column: BuilderLayoutColumn): BuilderLayoutColumn => ({
+    ...column,
+    blocks: updateBlocks(column.blocks ?? []),
+    nestedLayout: column.nestedLayout
+      ? {
+          ...column.nestedLayout,
+          rows: column.nestedLayout.rows.map((row) => ({
+            ...row,
+            columns: row.columns.map((nestedColumn) => ({
+              ...nestedColumn,
+              blocks: updateBlocks(nestedColumn.blocks ?? []),
+            })),
+          })),
+        }
+      : column.nestedLayout,
+  });
+
+  return {
+    ...section,
+    layoutItems: (section.layoutItems ?? []).map(updateColumn),
+  };
+}
+
 export function removeBlockInLayoutColumn(
   section: BuilderSection,
   columnKey: string,

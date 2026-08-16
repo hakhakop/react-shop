@@ -34,6 +34,13 @@
   gap: 0;
 }
 
+/* The application shell Header is not the website Header being edited. Keep
+   it out of the Builder viewport so the canonical Builder Header is the only
+   Header participating in scroll behavior there. */
+body:has(.builder-dashboard) .site-header--service {
+  display: none !important;
+}
+
 .builder-dashboard:not(.is-sidebar-resizing) {
   transition: grid-template-columns 220ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   background: var(--builder-dashboard-bg, var(--builder-ui-bg));
@@ -985,7 +992,6 @@
   left: auto !important;
   width: 100% !important;
 }
-
 
 .builder-header-document-preview.is-header-hidden .site-header {
   opacity: 0.55;
@@ -10593,12 +10599,10 @@ body[data-storefront-preset="princity"]
   }
 }
 
-/* Preview fidelity polish: keep edit affordances present but quiet. */
+/* Preview fidelity polish: keep edit affordances present but quiet. The slot
+   must stay paint-free; the rendered Header is the sole surface owner. */
 .builder-preview-header-slot {
-  background: var(
-    --builder-preview-effective-bg,
-    var(--builder-preview-shell-bg, transparent)
-  ) !important;
+  background: transparent !important;
 }
 
 /* Collapse slot height and remove background/borders when transparent header is at top */
@@ -15572,6 +15576,13 @@ body:has([data-scoped-builder-root]) #site-header-pill .site-header-pill-main {
   z-index: 1200 !important;
 }
 
+.builder-preview-header-slot.builder-preview-header-slot--scroll-hidden {
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  visibility: hidden !important;
+}
+
 .builder-preview-header-slot .site-header,
 body.is-visual-builder-active .builder-preview-header-slot .site-header,
 body:has([data-scoped-builder-root]) .builder-preview-header-slot .site-header {
@@ -15581,6 +15592,7 @@ body:has([data-scoped-builder-root]) .builder-preview-header-slot .site-header {
   right: auto !important;
   width: 100% !important;
   max-width: 100% !important;
+  transition: none !important;
 }
 
 .builder-preview-header-slot .site-header[data-header-behavior="static"] {
@@ -17219,6 +17231,12 @@ body:has(.builder-dashboard.is-inspector-docked)
 .builder-design-shadow { grid-column: 1 / -1; }
 .builder-design-shadow-fields { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .builder-design-shadow-preview { width: 100%; height: 28px; margin-top: 7px; border-radius: 6px; background: var(--builder-ui-surface, #fff); }
+.builder-design-shadow-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; }
+.builder-design-shadow-summary::-webkit-details-marker { display: none; }
+.builder-design-shadow-swatch { display: block; width: 34px; height: 26px; border: 1px solid var(--builder-ui-border, #d7dce5); border-radius: 6px; background: var(--builder-ui-surface, #fff); }
+.builder-design-shadow-popover { grid-column: 1 / -1; display: grid; gap: 12px; margin-top: 4px; padding: 14px; border: 1px solid var(--builder-ui-border, #d7dce5); border-radius: 8px; background: var(--builder-ui-panel-solid, #fff); }
+.builder-design-shadow-fields label { display: grid; gap: 5px; color: var(--builder-ui-muted, #768096); font-size: 11px; font-weight: 600; }
+.builder-design-shadow-inset input { width: 22px; height: 22px; justify-self: start; }
 .builder-design-live-type-preview { padding: 20px; border-radius: 8px; background: var(--uk-global-muted-background, #f4f6fa); color: var(--uk-global-text-color, #172033); font-size: 26px; }
 .builder-design-preview { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--builder-ui-border, #e5e7eb); border-radius: 10px; background: var(--uk-global-background-color, #fff); color: var(--uk-global-text-color, #172033); }
 .builder-design-preview-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
@@ -17749,6 +17767,8 @@ body:has(.builder-dashboard.is-inspector-docked)
 .builder-inspector .inspector-segmented button.is-selected { background: var(--builder-ui-surface, #ffffff); border: 1px solid var(--builder-ui-border, #cbd5e1); color: var(--builder-ui-text, #0f172a); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .builder-inspector .inspector-pill-group .inspector-segmented { border: 0; padding: 0; background: transparent; gap: 4px; }
 .builder-inspector .inspector-pill-group .inspector-segmented button { border: 1px solid var(--builder-ui-border, #cbd5e1); border-radius: 999px; }
+.builder-inspector .button-variant-control .inspector-segmented { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 4px; }
+.builder-inspector .button-variant-control .inspector-segmented button { min-width: 0; white-space: normal; line-height: 1.15; padding: 6px 5px; }
 .builder-inspector .inspector-switch { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; color: var(--builder-ui-text, #334155); font-size: 12px; cursor: pointer; }
 .builder-inspector .inspector-switch input { position: absolute; opacity: 0; pointer-events: none; }
 .builder-inspector .inspector-switch-track { display: inline-flex; align-items: center; width: 30px; height: 18px; padding: 2px; border: 1px solid var(--builder-ui-border, #cbd5e1); border-radius: 999px; background: var(--builder-ui-surface-soft, #cbd5e1); transition: background .15s ease, border-color .15s ease; }

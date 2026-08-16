@@ -459,6 +459,10 @@ type UikitButtonLocalOverrideSource = {
   buttonBg?: unknown;
   buttonTextColor?: unknown;
   buttonBorderColor?: unknown;
+  buttonBorderWidth?: unknown;
+  buttonBorderRadius?: unknown;
+  buttonPaddingY?: unknown;
+  buttonPaddingX?: unknown;
   buttonHoverBg?: unknown;
   buttonHoverTextColor?: unknown;
   buttonHoverBorderColor?: unknown;
@@ -477,14 +481,24 @@ export function getUikitButtonLocalOverride(
   const background = value(source.buttonBg);
   const text = value(source.buttonTextColor);
   const border = value(source.buttonBorderColor);
+  const borderWidth = value(source.buttonBorderWidth);
+  const radius = value(source.buttonBorderRadius);
+  const paddingY = value(source.buttonPaddingY);
+  const paddingX = value(source.buttonPaddingX);
   const hoverBackground = value(source.buttonHoverBg);
   const hoverText = value(source.buttonHoverTextColor);
   const hoverBorder = value(source.buttonHoverBorderColor);
   const style: Record<string, string> = {
     ...(background ? { "--uikit-button-local-background": background } : {}),
+    ...(background?.includes("gradient(") ? { "--uikit-button-local-background-image": background } : {}),
     ...(text ? { "--uikit-button-local-text": text } : {}),
     ...(border ? { "--uikit-button-local-border": border } : {}),
+    ...(borderWidth ? { "--uk-button-border-width": borderWidth } : {}),
+    ...(radius ? { "--uk-button-border-radius": radius } : {}),
+    ...(paddingX ? { "--uk-button-padding-x": paddingX } : {}),
+    ...(paddingY ? { "--uikit-button-local-padding-y": paddingY } : {}),
     ...(hoverBackground ? { "--uikit-button-local-hover-background": hoverBackground } : {}),
+    ...(hoverBackground?.includes("gradient(") ? { "--uikit-button-local-hover-background-image": hoverBackground } : {}),
     ...(hoverText ? { "--uikit-button-local-hover-text": hoverText } : {}),
     ...(hoverBorder ? { "--uikit-button-local-hover-border": hoverBorder } : {}),
   };
@@ -493,6 +507,7 @@ export function getUikitButtonLocalOverride(
     background && "shop-builder-uikit-button--local-background",
     text && "shop-builder-uikit-button--local-text",
     border && "shop-builder-uikit-button--local-border",
+    paddingY && "shop-builder-uikit-button--local-padding-y",
     hoverBackground && "shop-builder-uikit-button--local-hover-background",
     hoverText && "shop-builder-uikit-button--local-hover-text",
     hoverBorder && "shop-builder-uikit-button--local-hover-border",
@@ -744,6 +759,8 @@ export const UIKIT_YOOTHEME_SVG_COLOR_OPTIONS = [
   { value: "success", label: "Success" },
   { value: "warning", label: "Warning" },
   { value: "danger", label: "Danger" },
+  { value: "default", label: "Default" },
+  { value: "inverse", label: "Inverse" },
 ] as const;
 
 /** Resolves stored Image fields into the shared UIkit Image semantic contract. */

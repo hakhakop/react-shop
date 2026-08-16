@@ -57,11 +57,12 @@ import {
 } from "@/components/dashboard/pageTemplateLibrary";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
+import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 
-type TemplateLibraryTab = "page" | "section" | "row" | "element";
+type TemplateLibraryTab = LayoutLibraryType;
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
-const BUILDER_TEMPLATE_DND_TYPES: Record<Exclude<TemplateLibraryTab, "page">, string> = {
+const BUILDER_TEMPLATE_DND_TYPES: Record<Exclude<LayoutLibraryType, "page" | "header" | "footer">, string> = {
   section: "application/x-builder-template-section",
   row: "application/x-builder-template-row",
   element: "application/x-builder-template-element",
@@ -69,6 +70,8 @@ const BUILDER_TEMPLATE_DND_TYPES: Record<Exclude<TemplateLibraryTab, "page">, st
 
 const templateLibraryTabs: { value: TemplateLibraryTab; label: string }[] = [
   { value: "page", label: "Pages" },
+  { value: "header", label: "Headers" },
+  { value: "footer", label: "Footers" },
   { value: "section", label: "Sections" },
   { value: "row", label: "Rows" },
   { value: "element", label: "Elements" },
@@ -144,6 +147,8 @@ type DashboardSidebarProps = {
   openElementsPanelKey: number;
   sidebarCollapsed?: boolean;
   onSetSidebarCollapsed?: (collapsed: boolean) => void;
+  requestedLayoutType?: LayoutLibraryType | null;
+  requestedLayoutTypeRequestKey?: number;
 };
 
 export default function DashboardSidebar({
@@ -194,6 +199,8 @@ export default function DashboardSidebar({
   onReorderCustomPages,
   sidebarCollapsed = true,
   onSetSidebarCollapsed,
+  requestedLayoutType = null,
+  requestedLayoutTypeRequestKey = 0,
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [nestedOpen, setNestedOpen] = useState(false);
@@ -247,6 +254,14 @@ export default function DashboardSidebar({
     const frame = window.requestAnimationFrame(() => setNestedOpen(true));
     return () => window.cancelAnimationFrame(frame);
   }, [openElementsPanelKey]);
+
+  useEffect(() => {
+    if (!requestedLayoutType) return;
+    onSetSidebarTab("templates");
+    setNestedOpen(true);
+    setTemplateLibraryTab(requestedLayoutType);
+    setRenamingTemplateId(null);
+  }, [onSetSidebarTab, requestedLayoutType, requestedLayoutTypeRequestKey]);
 
   useEffect(() => {
     if (!renameTemplateRequest) return;
@@ -1035,6 +1050,12 @@ export default function DashboardSidebar({
                   );
                 })}
               </div>
+              {(templateLibraryTab === "header" || templateLibraryTab === "footer") ? (
+                <div className="builder-template-note">
+                  <LibraryBig size={16} />
+                  <span>{templateLibraryTab === "header" ? "Header layouts will be available here." : "Footer layouts will be available here."}</span>
+                </div>
+              ) : null}
               {templateLibraryTab === "page" ? (
                 <div className="builder-card builder-pages-card" style={{ marginBottom: "12px" }}>
                   <div className="builder-card-title"><strong>Global Layout Target</strong></div>
@@ -1109,10 +1130,10 @@ export default function DashboardSidebar({
                 <div className="builder-pages-list builder-template-list">
                   {filteredTemplates.map((template) => {
                     const templateType = template.templateType ?? "page";
-                    const canDragTemplate = templateType !== "page";
+                    const canDragTemplate = templateType !== "page" && templateType !== "header" && templateType !== "footer";
                     const templateDragMimeType = canDragTemplate
                       ? BUILDER_TEMPLATE_DND_TYPES[
-                          templateType as Exclude<TemplateLibraryTab, "page">
+                          templateType as Exclude<LayoutLibraryType, "page" | "header" | "footer">
                         ]
                       : null;
                     return (
@@ -1221,21 +1242,23 @@ export default function DashboardSidebar({
                   </span>
                 </div>
               )}
-              <label className="builder-template-import-control">
-                <Upload size={14} />
-                <span>Upload {selectedTemplateTabSingular} Export</span>
-                <input
-                  key={`${templateLibraryTab}-${templateImportKey}`}
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={async (event) => {
-                    const file = event.currentTarget.files?.[0];
-                    if (!file) return;
-                    await onImportSavedTemplate(file, templateLibraryTab);
-                    setTemplateImportKey((key) => key + 1);
-                  }}
-                />
-              </label>
+              {templateLibraryTab !== "header" && templateLibraryTab !== "footer" && (
+                <label className="builder-template-import-control">
+                  <Upload size={14} />
+                  <span>Upload {selectedTemplateTabSingular} Export</span>
+                  <input
+                    key={`${templateLibraryTab}-${templateImportKey}`}
+                    type="file"
+                    accept=".json,application/json"
+                    onChange={async (event) => {
+                      const file = event.currentTarget.files?.[0];
+                      if (!file) return;
+                      await onImportSavedTemplate(file, templateLibraryTab);
+                      setTemplateImportKey((key) => key + 1);
+                    }}
+                  />
+                </label>
+              )}
               {templateLibraryTab === "page" && (
                 <label className="builder-template-import-control">
                   <Upload size={14} />

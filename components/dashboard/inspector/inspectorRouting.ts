@@ -94,7 +94,7 @@ export type InspectorElementCapabilityDeclaration = {
   dynamicSourceSurface?: "element" | "item";
 };
 
-const normalImageAvailability = (sectionId?: string) => sectionId !== "header-document";
+const normalImageAvailability = () => true;
 
 /**
  * The single element-to-capability composition registry used by DashboardInspector.

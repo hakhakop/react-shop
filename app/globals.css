@@ -1636,7 +1636,7 @@ a {
    authored local value wins, while omitted values continue to inherit the
    normal or inverse UIkit surface tokens. */
 .shop-builder-main .shop-builder-uikit-button--local-background {
-  background-image: none !important;
+  background-image: var(--uikit-button-local-background-image, none) !important;
   background-color: var(--uikit-button-local-background) !important;
 }
 .shop-builder-main .shop-builder-uikit-button--local-text {
@@ -1646,7 +1646,7 @@ a {
   border-color: var(--uikit-button-local-border) !important;
 }
 .shop-builder-main .shop-builder-uikit-button--local-hover-background:hover {
-  background-image: none !important;
+  background-image: var(--uikit-button-local-hover-background-image, none) !important;
   background-color: var(--uikit-button-local-hover-background) !important;
 }
 .shop-builder-main .shop-builder-uikit-button--local-hover-text:hover {
@@ -1654,6 +1654,10 @@ a {
 }
 .shop-builder-main .shop-builder-uikit-button--local-hover-border:hover {
   border-color: var(--uikit-button-local-hover-border) !important;
+}
+.shop-builder-main .shop-builder-uikit-button--local-padding-y .uk-button {
+  padding-top: var(--uikit-button-local-padding-y) !important;
+  padding-bottom: var(--uikit-button-local-padding-y) !important;
 }
 
 .shop-builder-main .uk-button-small {

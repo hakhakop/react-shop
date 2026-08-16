@@ -189,8 +189,9 @@ export function InspectorSegmentedControl<T extends string = string>({ value, op
   );
 }
 
-export function InspectorPillGroup<T extends string = string>(props: { value: T | undefined; options: readonly InspectorOption<T>[]; onChange: (value: T) => void; ariaLabel?: string }) {
-  return <div className="inspector-pill-group"><InspectorSegmentedControl {...props} /></div>;
+export function InspectorPillGroup<T extends string = string>(props: { value: T | undefined; options: readonly InspectorOption<T>[]; onChange: (value: T) => void; ariaLabel?: string; className?: string }) {
+  const { className = "", ...controlProps } = props;
+  return <div className={`inspector-pill-group ${className}`.trim()}><InspectorSegmentedControl {...controlProps} /></div>;
 }
 
 export function InspectorAlignmentControl<T extends string = string>({

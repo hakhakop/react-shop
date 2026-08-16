@@ -15,6 +15,7 @@ import type {
   DynamicFieldBindings,
   DynamicItemContext,
 } from "@/lib/dynamicContent";
+import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 export type { BuilderSection };
 
 export type BuilderCustomPageKey = `page:${string}`;
@@ -101,6 +102,13 @@ export type BuilderLayoutBlock = {
   menuHoverColor?: string;
   menuActiveColor?: string;
   menuActiveIndicator?: "princity" | "underline" | "none";
+  headerNavigationOverrides?: {
+    gap?: boolean;
+    hoverColor?: boolean;
+    activeColor?: boolean;
+    indicator?: boolean;
+    typography?: boolean;
+  };
   headerBrandMode?: "logo" | "brand" | "both";
   headerBrandText?: string;
   headerUtilityAction?: string;
@@ -157,6 +165,19 @@ export type BuilderLayoutBlock = {
   buttonHoverTransform?: string;
   buttonHoverBoxShadow?: string;
   buttonHoverEffect?: string;
+  headerButtonOverrides?: {
+    variant?: boolean;
+    background?: boolean;
+    text?: boolean;
+    border?: boolean;
+    radius?: boolean;
+    padding?: boolean;
+    typography?: boolean;
+    hoverBackground?: boolean;
+    hoverText?: boolean;
+    hoverBorder?: boolean;
+    hoverEffect?: boolean;
+  };
   imageUrl?: string;
   imageAlt?: string;
   imageAlignment?: "left" | "center" | "right";
@@ -559,7 +580,7 @@ export type BuilderCustomPage = {
 export type BuilderSavedTemplate = {
   id: string;
   title: string;
-  templateType?: "page" | "section" | "row" | "element";
+  templateType?: LayoutLibraryType;
   description?: string;
   sourcePage?: BuilderLayoutKey;
   design?: BuilderDesign;

@@ -4,12 +4,14 @@ import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { getUikitButtonClass, getUikitButtonLocalOverride } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
+import { typographyProps } from "@/lib/builderTypography";
 
 type Props = {
   block: any;
+  scopeClassName?: string;
 };
 
-export default function UikitButton({ block }: Props) {
+export default function UikitButton({ block, scopeClassName }: Props) {
   const rawBlock = (block ?? {}) as any;
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
@@ -33,6 +35,7 @@ export default function UikitButton({ block }: Props) {
   const hasCanonicalItems = Array.isArray(rawBlock.buttons);
   const buttonsList = hasCanonicalItems ? rawBlock.buttons : [];
   const localOverride = getUikitButtonLocalOverride(rawBlock);
+  const localTypography = typographyProps(rawBlock.typography, "button");
   const isImportedYoothemeButton = rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
   const actionClassName = (style: string | undefined, size: string | undefined) =>
     `${getUikitButtonClass(
@@ -47,7 +50,7 @@ export default function UikitButton({ block }: Props) {
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
-      className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      className={`${scopeClassName ?? ""} shop-builder-column-block shop-builder-column-block--button ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
       <div
         className={`uk-flex uk-flex-wrap ${alignFlexClass} ${isStacked ? "uk-flex-column" : "uk-flex-middle"} ${isFullWidth ? "uk-child-width-1-1" : ""}`.trim()}
@@ -57,7 +60,7 @@ export default function UikitButton({ block }: Props) {
           <a
             className={actionClassName(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
             href={rawBlock.buttonUrl || "#"}
-            style={localOverride.style}
+            style={{ ...localOverride.style, ...localTypography.style }}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
           >
             {rawBlock.buttonLabel}
@@ -68,7 +71,7 @@ export default function UikitButton({ block }: Props) {
             key={btn.id ?? btnIdx}
             className={actionClassName(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)}
             href={btn.url || "#"}
-            style={localOverride.style}
+            style={{ ...localOverride.style, ...localTypography.style }}
             {...builderLinkTargetProps(btn.target)}
           >
             {btn.label || btn.text || `Button ${btnIdx + 1}`}

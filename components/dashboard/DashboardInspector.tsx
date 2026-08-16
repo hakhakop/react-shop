@@ -46,7 +46,6 @@ import {
   getBuilderRowLayoutSummary,
 } from "@/components/dashboard/builderLayoutPresets";
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
-import { headerPresets } from "./headerPresets";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
 import SpacingControl from "@/components/dashboard/style/SpacingControl";
 import SectionCapabilityPanel from "@/components/dashboard/inspector/panels/SectionCapabilityPanel";
@@ -102,7 +101,7 @@ import {
   builderButtonPresetFields,
   clearBuilderButtonOverrides,
   getBuilderButtonPresetKey,
-  hasLocalButtonStyles,
+  hasLocalButtonStyles as hasStoredLocalButtonStyles,
 } from "@/lib/builderButtons";
 
 function resolveInspectorHeaderAlignment(
@@ -493,6 +492,7 @@ type DashboardInspectorProps = {
   inspectorOpen: boolean;
   inspectorTab: InspectorTab;
   contentFallbackActive?: boolean;
+  activeContentLanguage?: string;
   spacingFocusRequest?: {
     id: number;
     scope: string;
@@ -534,7 +534,8 @@ type DashboardInspectorProps = {
   duplicateSelected: LooseHandler;
   duplicateSelectedRow?: LooseHandler;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
-  onApplyHeaderPreset?: (presetKey: string) => void;
+  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
+  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: {
@@ -741,8 +742,8 @@ function HeaderDocumentSettings({
   headerHeight,
   headerCustomHeight,
   onHeaderDocumentChange,
-  onApplyHeaderPreset,
-  headerPresetKey,
+  onOpenLayoutLibrary,
+  onSaveWholeLayout,
 }: {
   headerSettings: HeaderDocumentSettingsValues;
   headerVisible: boolean;
@@ -751,61 +752,43 @@ function HeaderDocumentSettings({
   headerHeight?: string;
   headerCustomHeight?: number;
   onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
-  onApplyHeaderPreset?: (presetKey: string) => void;
-  headerPresetKey?: string;
+  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
+  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
 }) {
-  const activePreset = headerPresets.find((p) => p.key === headerPresetKey);
   return (
     <div className="builder-inspector-stack">
-      {onApplyHeaderPreset && (
-        <details className="builder-collapse" open>
-          <summary>
-            <InspectorGroupSummary
-              title="Header Presets"
-              description="Choose a quick-start visual layout for your Header."
-              meta={activePreset ? activePreset.name : "Custom"}
-            />
-          </summary>
-          <div className="builder-header-presets-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", padding: "8px 0" }}>
-            {headerPresets.map((preset) => {
-              const isActive = headerPresetKey === preset.key;
-              return (
-                <button
-                  key={preset.key}
-                  type="button"
-                  className={`builder-header-preset-card${isActive ? " is-active" : ""}`}
-                  onClick={() => onApplyHeaderPreset(preset.key)}
-                  title={preset.description}
-                  style={{
-                    minWidth: 0,
-                    border: "1px solid var(--builder-ui-border)",
-                    borderRadius: "var(--builder-ui-radius-sm)",
-                    padding: "8px 10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    background: isActive ? "rgba(13, 115, 255, 0.12)" : "var(--builder-ui-panel-solid)",
-                    color: "var(--builder-ui-text)",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    font: "inherit",
-                    borderColor: isActive ? "var(--builder-ui-accent, #0d73ff)" : "var(--builder-ui-border)",
-                    boxShadow: isActive ? "inset 0 0 0 1px var(--builder-ui-accent, #0d73ff)" : "none",
-                  }}
-                >
-                  <strong style={{ fontSize: "12px", fontWeight: 700, marginBottom: "2px", display: "block" }}>{preset.name}</strong>
-                  <small style={{ color: "var(--builder-ui-muted)", fontSize: "10px", lineHeight: "1.3" }}>{preset.description}</small>
-                </button>
-              );
-            })}
-          </div>
-        </details>
-      )}
+      <details className="builder-collapse" open>
+        <summary>
+          <InspectorGroupSummary
+            title="Layout"
+            description="The current Header Builder composition."
+            meta="Builder"
+          />
+        </summary>
+        {onOpenLayoutLibrary && (
+          <button
+            type="button"
+            className="builder-secondary-button"
+            onClick={() => onOpenLayoutLibrary("header")}
+          >
+            Choose Layout from Library
+          </button>
+        )}
+        {onSaveWholeLayout && (
+          <button
+            type="button"
+            className="builder-secondary-button"
+            onClick={() => onSaveWholeLayout("header")}
+          >
+            Save Header to Library
+          </button>
+        )}
+      </details>
 
       <details className="builder-collapse" open>
         <summary>
           <InspectorGroupSummary
-            title="Header Settings"
+            title="Behavior"
             description="Document-wide behavior shared by every Header row and element."
             meta={headerVisible ? "visible" : "hidden"}
           />
@@ -831,31 +814,6 @@ function HeaderDocumentSettings({
             <option value="pill-on-scroll">Pill on scroll</option>
           </select>
         </label>
-        <div className="builder-two-column">
-          <label className="builder-field">
-            <span>Background mode</span>
-            <select
-              value={headerSettings.headerBackgroundMode ?? "default"}
-              onChange={(event) => onHeaderDocumentChange({ headerBackgroundMode: event.target.value as BuilderSection["headerBackgroundMode"] })}
-            >
-              <option value="default">Default</option>
-              <option value="glass">Glass</option>
-              <option value="accent">Accent</option>
-              <option value="none">None</option>
-            </select>
-          </label>
-          <label className="builder-field">
-            <span>Text mode</span>
-            <select
-              value={headerSettings.headerTextMode ?? "auto"}
-              onChange={(event) => onHeaderDocumentChange({ headerTextMode: event.target.value as BuilderSection["headerTextMode"] })}
-            >
-              <option value="auto">Auto contrast</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
-        </div>
         <label className="builder-check">
           <input
             data-testid="header-transparent-checkbox"
@@ -897,7 +855,7 @@ function HeaderDocumentSettings({
       <details className="builder-collapse">
         <summary>
           <InspectorGroupSummary
-            title="Top Toolbar"
+            title="Advanced"
             description="Header-wide announcement and support metadata."
             meta={headerSettings.headerTopToolbarVisible ? "visible" : "hidden"}
           />
@@ -926,6 +884,38 @@ function HeaderDocumentSettings({
         <strong>Page visibility rules</strong>
         <span>This project currently has no per-page or device-wide Header visibility rule fields. Use element Advanced visibility for element-level responsive control.</span>
       </div>
+    </div>
+  );
+}
+
+function FooterDocumentSettings({
+  onOpenLayoutLibrary,
+  onSaveWholeLayout,
+}: {
+  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
+  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
+}) {
+  if (!onOpenLayoutLibrary && !onSaveWholeLayout) return null;
+  return (
+    <div className="builder-inspector-stack">
+      {onOpenLayoutLibrary && (
+        <button
+          type="button"
+          className="builder-secondary-button"
+          onClick={() => onOpenLayoutLibrary("footer")}
+        >
+          Choose Layout from Library
+        </button>
+      )}
+      {onSaveWholeLayout && (
+        <button
+          type="button"
+          className="builder-secondary-button"
+          onClick={() => onSaveWholeLayout("footer")}
+        >
+          Save Whole Footer to Library
+        </button>
+      )}
     </div>
   );
 }
@@ -1034,6 +1024,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     inspectorOpen,
     inspectorTab,
     contentFallbackActive = false,
+    activeContentLanguage,
     layoutBlockLabels,
     openLayoutItemId,
     openSlideId,
@@ -1073,7 +1064,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     duplicateSelected,
     duplicateSelectedRow = () => undefined,
     applySelectedRowLayoutPreset = () => undefined,
-    onApplyHeaderPreset,
+    onOpenLayoutLibrary,
+    onSaveWholeLayout,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
     onUpdateColumnStyle = () => undefined,
@@ -1099,6 +1091,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     uploadSelectedLayoutBlockSlideImage,
     uploadSelectedSlideImage,
   } = props;
+  const hasLocalButtonStyles = (block: BuilderLayoutBlock) =>
+    selectedSection?.id === "header-document" &&
+    (block.id === "header-button" || block.kind === "button")
+      ? Object.values(block.headerButtonOverrides ?? {}).some(Boolean)
+      : hasStoredLocalButtonStyles(block);
   const layoutContainerSection = isLayoutContainerSection(selectedSection)
     ? selectedSection
     : null;
@@ -1452,7 +1449,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               ? legacySpacingToSides(selectedLayoutBlock.gridMargin)
               : undefined),
         },
-        typography: selectedLayoutBlock.typography,
+        typography:
+          selectedSection?.id === "header-document" &&
+          (selectedLayoutBlock.id === "header-button" || selectedLayoutBlock.kind === "button") &&
+          !selectedLayoutBlock.headerButtonOverrides?.typography
+            ? undefined
+            : selectedLayoutBlock.typography,
         cardPreset: selectedLayoutBlock.cardPreset,
         cardStyle: selectedLayoutBlock.cardStyle,
         gridImageFrame: selectedLayoutBlock.gridImageFrame,
@@ -1468,7 +1470,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         addToCartDisplay: selectedLayoutBlock.addToCartDisplay,
         addToCartVisibility: selectedLayoutBlock.addToCartVisibility,
         addToCartPosition: selectedLayoutBlock.addToCartPosition,
-        buttonVariant: selectedLayoutBlock.buttonStyle,
+        buttonVariant:
+          selectedSection?.id === "header-document" &&
+          (selectedLayoutBlock.id === "header-button" || selectedLayoutBlock.kind === "button") &&
+          !selectedLayoutBlock.headerButtonOverrides?.variant
+            ? undefined
+            : selectedLayoutBlock.buttonStyle,
         buttonSize: selectedLayoutBlock.size,
       }
     : {
@@ -1500,16 +1507,40 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       buttonSize?: string;
     }>,
   ) {
+    const markHeaderButtonOverrides = (nextPatch: Record<string, unknown>) => {
+      const isHeaderButton =
+        selectedSection?.id === "header-document" &&
+        selectedLayoutBlock &&
+        (selectedLayoutBlock.id === "header-button" || selectedLayoutBlock.kind === "button");
+      if (!isHeaderButton) return nextPatch;
+      const fields: Array<[string, keyof NonNullable<BuilderLayoutBlock["headerButtonOverrides"]>]> = [
+        ["buttonStyle", "variant"],
+        ["size", "size"],
+        ["fullWidthButton", "width"],
+        ["typography", "typography"],
+      ];
+      return {
+        ...nextPatch,
+        headerButtonOverrides: fields.reduce(
+          (overrides, [field, owner]) =>
+            Object.prototype.hasOwnProperty.call(nextPatch, field)
+              ? { ...overrides, [owner]: nextPatch[field] !== undefined }
+              : overrides,
+          { ...(selectedLayoutBlock.headerButtonOverrides ?? {}) },
+        ),
+      };
+    };
     if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
       if (selectedLayoutColumnKey) {
         const nextPatch = { ...patch } as any;
         if ("buttonVariant" in nextPatch) { nextPatch.buttonStyle = nextPatch.buttonVariant; delete nextPatch.buttonVariant; }
         if ("buttonSize" in nextPatch) { nextPatch.size = nextPatch.buttonSize === "default" ? undefined : nextPatch.buttonSize; delete nextPatch.buttonSize; }
+        const markedPatch = markHeaderButtonOverrides(nextPatch);
         updateLayoutBlockByKey(
           selectedSection.id,
           selectedLayoutColumnKey,
           selectedLayoutBlockKey,
-          nextPatch,
+          markedPatch,
         );
         return;
       }
@@ -1525,7 +1556,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             const nextPatch = { ...patch } as any;
             if ("buttonVariant" in nextPatch) { nextPatch.buttonStyle = nextPatch.buttonVariant; delete nextPatch.buttonVariant; }
             if ("buttonSize" in nextPatch) { nextPatch.size = nextPatch.buttonSize === "default" ? undefined : nextPatch.buttonSize; delete nextPatch.buttonSize; }
-            updateSelectedLayoutBlock(ci, bi, nextPatch);
+            updateSelectedLayoutBlock(ci, bi, markHeaderButtonOverrides(nextPatch));
             return;
           }
         }
@@ -1787,6 +1818,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       !selectedLayoutColumnKey &&
       selectedSection.id !== "header-document",
   );
+  const isHeaderDocumentRoot = Boolean(
+    selectedSection?.id === "header-document" &&
+      !selectedLayoutBlock &&
+      !selectedLayoutRow &&
+      !selectedLayoutColumnKey,
+  );
   const updateSelectedLayoutBlockByKey = (
     patch: Partial<BuilderLayoutBlock>,
   ) => {
@@ -1797,6 +1834,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         selectedLayoutColumnKey,
         selectedLayoutBlockKey,
         patch,
+        activeContentLanguage,
       );
       return;
     }
@@ -1814,7 +1852,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           (block.id ?? `${itemKey}-block-${index}`) === selectedLayoutBlockKey,
       );
       if (blockIndex >= 0) {
-        updateSelectedLayoutBlock(itemIndex, blockIndex, patch);
+        updateSelectedLayoutBlock(itemIndex, blockIndex, patch, activeContentLanguage);
         return;
       }
     }
@@ -1867,6 +1905,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         : inspectorTab === "settings"
           ? "Row Settings"
           : "Row Advanced"
+      : isHeaderDocumentRoot
+        ? "Header"
       : isCanonicalSectionSelection
         ? inspectorTab === "content"
           ? "Section Content"
@@ -1924,6 +1964,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       ? `${selectedColumnLabel} · Column`
                       : selectedLayoutRow
                         ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
+                    : isHeaderDocumentRoot
+                      ? "Header · Document"
                       : `${selectedSection.name || sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
                 </strong>
                 {selectedLayoutBlock && (
@@ -1980,10 +2022,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   setInspectorTab("layout");
                 }}
               >
-                {selectedSection.name ||
-                  sectionLabels[selectedSection.kind] ||
-                  selectedSection.title ||
-                  "Section"}
+                {isHeaderDocumentRoot
+                  ? "Header"
+                  : selectedSection.name ||
+                    sectionLabels[selectedSection.kind] ||
+                    selectedSection.title ||
+                    "Section"}
               </button>
               {selectedLayoutRow && (
                 <>
@@ -2035,20 +2079,22 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             )}
           </div>
 
-          <div className="builder-inspector-tabs" aria-label="Inspector tabs">
-            {inspectorTabs.map(([tab, label]) => (
-              <button
-                key={tab}
-                type="button"
-                className={inspectorTab === tab ? "is-active" : ""}
-                onClick={() => setInspectorTab(tab)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {!isHeaderDocumentRoot && (
+            <div className="builder-inspector-tabs" aria-label="Inspector tabs">
+              {inspectorTabs.map(([tab, label]) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={inspectorTab === tab ? "is-active" : ""}
+                  onClick={() => setInspectorTab(tab)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
-          {!selectedLayoutBlock && selectedLayoutRow ? (
+          {!isHeaderDocumentRoot && !selectedLayoutBlock && selectedLayoutRow ? (
             <div className="builder-actions-row">
               <button
                 type="button"
@@ -2070,7 +2116,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 <Trash2 size={15} />
               </button>
             </div>
-          ) : !selectedLayoutBlock ? (
+          ) : !isHeaderDocumentRoot && !selectedLayoutBlock ? (
             <div className="builder-actions-row">
               <button
                 type="button"
@@ -2125,8 +2171,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
                 onHeaderDocumentChange={updateSelected}
-                onApplyHeaderPreset={onApplyHeaderPreset}
-                headerPresetKey={selectedSection.headerPresetKey}
+                onOpenLayoutLibrary={onOpenLayoutLibrary}
+                onSaveWholeLayout={onSaveWholeLayout}
+              />
+            ) : null}
+
+          {selectedSection.id === "footer-document" &&
+            !selectedLayoutBlock &&
+            !selectedLayoutRow ? (
+              <FooterDocumentSettings
+                onOpenLayoutLibrary={onOpenLayoutLibrary}
+                onSaveWholeLayout={onSaveWholeLayout}
               />
             ) : null}
 
@@ -2498,7 +2553,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {selectedElementCapabilityPanel}
 
-          {!isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
+          {!isHeaderDocumentRoot && !isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
             selectedSection.id !== "header-document") ||
@@ -3018,12 +3073,31 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           ? "Button typography"
                                                           : "Eyebrow typography"}
                                                   </span>
+                                                  {block.kind === "menu" && (
+                                                    <label className="builder-check">
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={block.headerNavigationOverrides?.typography === true}
+                                                        onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                          typography: undefined,
+                                                          headerNavigationOverrides: {
+                                                            ...block.headerNavigationOverrides,
+                                                            typography: event.target.checked,
+                                                          },
+                                                        })}
+                                                      />
+                                                      <span>Custom navigation typography</span>
+                                                    </label>
+                                                  )}
                                                   <TypographyPanel
                                                     hideVariant={block.kind === "heading"}
                                                     hideFontSize={block.kind === "heading"}
                                                     value={{
                                                       ...resolveTypographyInput(
-                                                        block.typography,
+                                                        block.kind === "menu" &&
+                                                        !block.headerNavigationOverrides?.typography
+                                                          ? undefined
+                                                          : block.typography,
                                                         activeTypographyArea,
                                                       ),
                                                       ...(block.kind ===
@@ -3064,6 +3138,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       ) {
                                                         patch.headingAlign =
                                                           textAlign;
+                                                      }
+                                                      if (block.kind === "menu") {
+                                                        patch.headerNavigationOverrides = {
+                                                          ...block.headerNavigationOverrides,
+                                                          typography: true,
+                                                        };
                                                       }
                                                       updateSelectedLayoutBlock(
                                                         index,
@@ -4090,7 +4170,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 )}
 
                                                 {[
-                                                  "button",
                                                   "hero",
                                                   "panel",
                                                   "slider",
@@ -5240,15 +5319,91 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </label>
                                                     <label className="builder-field">
                                                       <span>Item Spacing</span>
-                                                      <input value={block.menuItemGap ?? ""} placeholder="Inherit (for example 1.4rem)" onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuItemGap: event.target.value || undefined })} />
+                                                      <input
+                                                        value={block.headerNavigationOverrides?.gap ? block.menuItemGap ?? "" : ""}
+                                                        placeholder="Inherit (for example 1.4rem)"
+                                                        onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                          menuItemGap: event.target.value || undefined,
+                                                          headerNavigationOverrides: {
+                                                            ...block.headerNavigationOverrides,
+                                                            gap: Boolean(event.target.value),
+                                                          },
+                                                        })}
+                                                      />
                                                     </label>
                                                     <div className="builder-two-column">
-                                                      <label className="builder-field"><span>Hover Color</span><input type="color" value={block.menuHoverColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuHoverColor: event.target.value })} /></label>
-                                                      <label className="builder-field"><span>Active Color</span><input type="color" value={block.menuActiveColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuActiveColor: event.target.value })} /></label>
+                                                      <label className="builder-field">
+                                                        <span>Hover Color</span>
+                                                        <input
+                                                          type="color"
+                                                          value={block.headerNavigationOverrides?.hoverColor ? block.menuHoverColor ?? "#111827" : "#111827"}
+                                                          disabled={!block.headerNavigationOverrides?.hoverColor}
+                                                          onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                            menuHoverColor: event.target.value,
+                                                            headerNavigationOverrides: {
+                                                              ...block.headerNavigationOverrides,
+                                                              hoverColor: true,
+                                                            },
+                                                          })}
+                                                        />
+                                                        <label className="builder-check">
+                                                          <input
+                                                            type="checkbox"
+                                                            checked={block.headerNavigationOverrides?.hoverColor === true}
+                                                            onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                              menuHoverColor: undefined,
+                                                              headerNavigationOverrides: {
+                                                                ...block.headerNavigationOverrides,
+                                                                hoverColor: event.target.checked,
+                                                              },
+                                                            })}
+                                                          />
+                                                          <span>Custom</span>
+                                                        </label>
+                                                      </label>
+                                                      <label className="builder-field">
+                                                        <span>Active Color</span>
+                                                        <input
+                                                          type="color"
+                                                          value={block.headerNavigationOverrides?.activeColor ? block.menuActiveColor ?? "#111827" : "#111827"}
+                                                          disabled={!block.headerNavigationOverrides?.activeColor}
+                                                          onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                            menuActiveColor: event.target.value,
+                                                            headerNavigationOverrides: {
+                                                              ...block.headerNavigationOverrides,
+                                                              activeColor: true,
+                                                            },
+                                                          })}
+                                                        />
+                                                        <label className="builder-check">
+                                                          <input
+                                                            type="checkbox"
+                                                            checked={block.headerNavigationOverrides?.activeColor === true}
+                                                            onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                              menuActiveColor: undefined,
+                                                              headerNavigationOverrides: {
+                                                                ...block.headerNavigationOverrides,
+                                                                activeColor: event.target.checked,
+                                                              },
+                                                            })}
+                                                          />
+                                                          <span>Custom</span>
+                                                        </label>
+                                                      </label>
                                                     </div>
                                                     <label className="builder-field">
                                                       <span>Active indicator</span>
-                                                      <select value={block.menuActiveIndicator ?? "underline"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuActiveIndicator: event.target.value as BuilderLayoutBlock["menuActiveIndicator"] })}>
+                                                      <select
+                                                        value={block.headerNavigationOverrides?.indicator ? block.menuActiveIndicator ?? "underline" : "inherit"}
+                                                        onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                          menuActiveIndicator: event.target.value === "inherit" ? undefined : event.target.value as BuilderLayoutBlock["menuActiveIndicator"],
+                                                          headerNavigationOverrides: {
+                                                            ...block.headerNavigationOverrides,
+                                                            indicator: event.target.value !== "inherit",
+                                                          },
+                                                        })}
+                                                      >
+                                                        <option value="inherit">Inherit Global</option>
                                                         <option value="princity">Princity motion</option>
                                                         <option value="underline">Underline</option>
                                                         <option value="none">None</option>
@@ -5319,7 +5474,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </div>
                                                     <label className="builder-field">
                                                       <span>Language labels</span>
-                                                      <select value={block.headerLanguageDisplay ?? "native"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerLanguageDisplay: event.target.value as BuilderLayoutBlock["headerLanguageDisplay"] })}>
+                                                      <select value={block.headerLanguageDisplay ?? "native"} onChange={(event) => updateSelectedLayoutBlockByKey({ headerLanguageDisplay: event.target.value as BuilderLayoutBlock["headerLanguageDisplay"] })}>
                                                         <option value="native">Native names</option>
                                                         <option value="code">Language codes</option>
                                                       </select>
@@ -5341,7 +5496,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </select>
                                                     </label>
                                                   </>
-                                                ) : block.kind === "button" ? (
+                                                ) : block.kind === "button" && !selectedElementCapabilityDeclaration ? (
                                                   <>
                                                     <div className="builder-inspector-section" style={{ marginBottom: "16px" }}>
                                                       <div className="builder-field-header" style={{ marginBottom: "8px" }}>

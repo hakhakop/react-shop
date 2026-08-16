@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, type CSSProperties, type ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import HeaderActions from "./HeaderActions";
@@ -26,6 +25,8 @@ import type { HeaderBuilderComposition, HeaderBuilderElement } from "@/lib/heade
 import { visualStyleClassName, visualStyleToCss } from "@/lib/builderVisualStyle";
 import { typographyProps } from "@/lib/builderTypography";
 import WebsiteLanguageSwitcher from "@/components/website/WebsiteLanguageSwitcher";
+import UikitButton from "@/components/builder/UikitButton";
+import UikitImage from "@/components/builder/UikitImage";
 import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
@@ -139,6 +140,10 @@ type HeaderShellViewProps = {
   languageSwitcherPreviewOnly?: boolean;
   onContentLanguageChange?: (language: string) => void;
   publicAnchorId?: string;
+  scrollState?: {
+    scrolled: boolean;
+    hidden: boolean;
+  };
 };
 
 export default function HeaderShellView({
@@ -165,6 +170,7 @@ export default function HeaderShellView({
   languageSwitcherPreviewOnly = false,
   onContentLanguageChange,
   publicAnchorId,
+  scrollState,
 }: HeaderShellViewProps) {
   const documentLogo = headerComposition.elements.find((item) => item.type === "logo");
   const documentNavigation = headerComposition.elements.find((item) => item.type === "navigation");
@@ -290,8 +296,19 @@ export default function HeaderShellView({
   const effectiveIconVariant =
     shellSettings.headerIconVariant || headerSettings.iconVariant;
   const effectiveActiveIndicator =
-    documentNavigation?.menuActiveIndicator || shellSettings.headerActiveIndicator ||
+    documentNavigation?.menuActiveIndicator ||
     (layout === "princity" ? "princity" : "underline");
+  const navbarLineMode = shellSettings.navbarNavItemLineMode === "true" ? "enabled" : "disabled";
+  const navbarLinePosition = ["top", "bottom", "left", "right"].includes(
+    shellSettings.navbarNavItemLinePositionMode ?? "",
+  )
+    ? shellSettings.navbarNavItemLinePositionMode
+    : "bottom";
+  const navbarLineSlide = ["center", "left", "right"].includes(
+    shellSettings.navbarNavItemLineSlideMode ?? "",
+  )
+    ? shellSettings.navbarNavItemLineSlideMode
+    : "center";
   const headerClassName = [
     layout === "pill" || layout === "princity" ? "site-header--pill" : "",
     serviceHomepageMode ? "site-header--service" : "",
@@ -301,6 +318,9 @@ export default function HeaderShellView({
       : "",
     `site-header--background-${headerMustBeTransparent ? "none" : effectiveHeaderBackgroundMode}`,
     `site-header--indicator-${effectiveActiveIndicator}`,
+    `site-header--navbar-line-mode-${navbarLineMode}`,
+    `site-header--navbar-line-position-${navbarLinePosition}`,
+    `site-header--navbar-line-slide-${navbarLineSlide}`,
     documentSettings.overlay ? "site-header--builder-overlay" : "",
     hasDocumentBackground
       ? "site-header--document-background"
@@ -401,12 +421,27 @@ export default function HeaderShellView({
       <div className="site-header-logo-wrap" style={alignStyle}>
         {elementShowLogo && elementLogoUrl && (
           <Link href={homeHref} className="site-header-logo-img-wrap">
-            <Image
-              src={elementLogoUrl}
-              alt={elementLogoAlt}
-              width={elementLogoMaxWidth}
-              height={elementLogoMaxWidth}
-              style={{ objectFit: "contain", maxWidth: elementLogoMaxWidth }}
+            <UikitImage
+              block={{
+                id: element?.id ?? "header-logo",
+                kind: "image",
+                imageUrl: elementLogoUrl,
+                imageAlt: elementLogoAlt,
+                imageWidth: element?.imageWidth,
+                imageMaxWidth: elementLogoMaxWidth,
+                imageHeight: element?.imageHeight,
+                imageFit: element?.imageFit ?? "contain",
+                imageRatio: element?.imageRatio,
+                imageAlignment: elementImageAlignment,
+                imageShape: element?.imageShape,
+                imageBorder: element?.imageBorder,
+                imageShadow: element?.imageShadow,
+                imageBoxShadow: element?.imageBoxShadow,
+                imageSvgInline: element?.imageSvgInline,
+                imageSvgColor: element?.imageSvgColor,
+                imagePosition: element?.imagePosition,
+                imageLoading: element?.imageLoading,
+              }}
             />
           </Link>
         )}
@@ -422,22 +457,34 @@ export default function HeaderShellView({
     );
   };
   const renderHeaderButton = (buttonElement?: HeaderBuilderElement) => showButtonElement ? (
-    <Link
-      href={buttonElement?.url || clientHref}
-      className={`site-header-button-element ${buttonElement?.buttonStyle ? `site-header-button--${buttonElement.buttonStyle}` : "site-header-button--primary"}`}
-      style={{
-        ...(buttonElement?.buttonBg ? { background: buttonElement.buttonBg } : {}),
-        ...(buttonElement?.buttonTextColor ? { color: buttonElement.buttonTextColor } : {}),
-        ...(buttonElement?.buttonBorderRadius ? { borderRadius: buttonElement.buttonBorderRadius } : {}),
-        ...(buttonElement?.buttonBorderWidth ? { borderWidth: buttonElement.buttonBorderWidth, borderStyle: "solid" } : {}),
-        ...(buttonElement?.buttonBorderColor ? { borderColor: buttonElement.buttonBorderColor } : {}),
-        ...(buttonElement?.buttonPaddingY ? { paddingTop: buttonElement.buttonPaddingY, paddingBottom: buttonElement.buttonPaddingY } : {}),
-        ...(buttonElement?.buttonPaddingX ? { paddingLeft: buttonElement.buttonPaddingX, paddingRight: buttonElement.buttonPaddingX } : {}),
-        ...typographyProps(buttonElement?.typography, "button").style,
+    <UikitButton
+      scopeClassName="shop-builder-main"
+      block={{
+        id: buttonElement?.id ?? "header-button",
+        kind: "button",
+        buttonLabel: buttonElement?.label || "Start",
+        buttonUrl: buttonElement?.url || clientHref,
+        buttonStyle: buttonElement?.buttonStyle || "primary",
+        size: buttonElement?.size,
+        fullWidthButton: buttonElement?.fullWidthButton,
+        buttonTarget: buttonElement?.buttonTarget,
+        buttonGap: buttonElement?.buttonGap,
+        buttonBg: buttonElement?.buttonBg,
+        buttonTextColor: buttonElement?.buttonTextColor,
+        buttonBorderWidth: buttonElement?.buttonBorderWidth,
+        buttonBorderColor: buttonElement?.buttonBorderColor,
+        buttonBorderRadius: buttonElement?.buttonBorderRadius,
+        buttonPaddingY: buttonElement?.buttonPaddingY,
+        buttonPaddingX: buttonElement?.buttonPaddingX,
+        buttonHoverBg: buttonElement?.buttonHoverBg,
+        buttonHoverTextColor: buttonElement?.buttonHoverTextColor,
+        buttonHoverBorderColor: buttonElement?.buttonHoverBorderColor,
+        buttonHoverEffect: buttonElement?.buttonHoverEffect,
+        buttonHoverTransform: buttonElement?.buttonHoverTransform,
+        buttonHoverBoxShadow: buttonElement?.buttonHoverBoxShadow,
+        typography: buttonElement?.typography,
       }}
-    >
-      {buttonElement?.label || "Start"}
-    </Link>
+    />
   ) : null;
   const primaryRowId = headerComposition.columns?.[0]?.rowId ?? allDocumentElements[0]?.rowId;
   const orderedElements = primaryRowId
@@ -608,20 +655,28 @@ export default function HeaderShellView({
         : {}),
       ...(element.type === "navigation"
         ? ({
-            "--header-builder-menu-gap": element.menuItemGap,
+            ...(element.menuItemGap
+              ? { "--header-builder-menu-gap": element.menuItemGap }
+              : {}),
             ...(element.menuHoverColor ? { "--header-builder-menu-hover": element.menuHoverColor } : {}),
             ...(element.menuActiveColor ? { "--header-builder-menu-active": element.menuActiveColor } : {}),
           } as CSSProperties)
         : {}),
       ...(element.type === "button" || element.type === "categories" || element.type === "language"
         ? ({
-            "--header-builder-button-hover-bg": element.buttonHoverBg,
+            "--header-builder-button-hover-bg": element.type === "button" ? undefined : element.buttonHoverBg,
             "--header-builder-button-hover-text": element.buttonHoverTextColor,
             "--header-builder-button-hover-border": element.buttonHoverBorderColor,
+            "--header-builder-button-hover-background": element.type === "button" ? element.buttonHoverBg : undefined,
             "--header-builder-button-hover-transform": localHoverTransform,
             "--header-builder-button-hover-shadow": localHoverShadow,
-            "--header-builder-button-hover-bg-fallback": element.buttonBg || "",
-            "--header-builder-button-hover-text-fallback": element.buttonTextColor || "",
+            "--header-builder-button-background": element.type === "button" ? element.buttonBg : undefined,
+            "--header-builder-button-text": element.type === "button" ? element.buttonTextColor : undefined,
+            "--header-builder-button-radius": element.type === "button" ? element.buttonBorderRadius : undefined,
+            "--header-builder-button-border-width": element.type === "button" ? element.buttonBorderWidth : undefined,
+            "--header-builder-button-border-color": element.type === "button" ? element.buttonBorderColor : undefined,
+            "--header-builder-button-padding-y": element.type === "button" ? element.buttonPaddingY : undefined,
+            "--header-builder-button-padding-x": element.type === "button" ? element.buttonPaddingX : undefined,
           } as CSSProperties)
         : {}),
       ...(element.type === "categories" || element.type === "language"
@@ -754,6 +809,7 @@ export default function HeaderShellView({
       backgroundMode={headerMustBeTransparent ? "none" : effectiveHeaderBackgroundMode}
       textMode={effectiveHeaderTextMode}
       overlapHeader={documentSettings.overlay}
+      scrollState={scrollState}
       style={{
         ...documentVisualCss,
         ...visualStyleToCss(headerComposition.rowVisualStyle),
@@ -769,9 +825,13 @@ export default function HeaderShellView({
         "--header-builder-row-justify": headerComposition.rowJustify,
         "--header-builder-row-align": headerComposition.rowAlign,
         "--header-builder-height": headerHeight,
-        ...(headerHeight ? { "--header-main-h": headerHeight } : {}),
         "--header-document-padding-top": documentPaddingTop,
         "--header-document-padding-bottom": documentPaddingBottom,
+        ...(effectiveHeaderBackgroundMode === "default" &&
+        !headerMustBeTransparent &&
+        !hasDocumentBackground
+          ? { backdropFilter: "var(--uk-navbar-backdrop-filter)" }
+          : {}),
         paddingTop: documentPaddingTop,
         paddingBottom: documentPaddingBottom,
         marginTop: documentMarginTop,

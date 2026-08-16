@@ -1106,6 +1106,7 @@ export function ActionSettingsGroup({
               options={styleOptions}
               onChange={(value) => update({ [styleKey]: value })}
               ariaLabel="Button variant"
+              className="button-variant-control"
             />
           )}
         </InspectorFieldRow>

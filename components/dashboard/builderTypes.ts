@@ -21,6 +21,7 @@ import type {
   BuilderHeaderTextMode,
 } from "@/lib/builderShell";
 import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
+import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBindings,
@@ -480,6 +481,21 @@ export type BuilderLayoutBlock = {
   buttonHoverTransform?: string;
   buttonHoverBoxShadow?: string;
   buttonHoverEffect?: "none" | "lift" | "grow" | "inherit";
+  headerButtonOverrides?: {
+    variant?: boolean;
+    size?: boolean;
+    width?: boolean;
+    background?: boolean;
+    text?: boolean;
+    border?: boolean;
+    radius?: boolean;
+    padding?: boolean;
+    typography?: boolean;
+    hoverBackground?: boolean;
+    hoverText?: boolean;
+    hoverBorder?: boolean;
+    hoverEffect?: boolean;
+  };
   imageUrl?: string;
   imageAlt?: string;
   imageAlignment?: "left" | "center" | "right";
@@ -579,6 +595,13 @@ export type BuilderLayoutBlock = {
   menuHoverColor?: string;
   menuActiveColor?: string;
   menuActiveIndicator?: BuilderHeaderActiveIndicator;
+  headerNavigationOverrides?: {
+    gap?: boolean;
+    hoverColor?: boolean;
+    activeColor?: boolean;
+    indicator?: boolean;
+    typography?: boolean;
+  };
   headerBrandMode?: BuilderHeaderBrandMode;
   headerBrandText?: string;
   headerUtilityAction?: BuilderHeaderIconId;
@@ -1301,7 +1324,7 @@ export type BuilderCustomPage = {
 export type BuilderSavedTemplate = {
   id: string;
   title: string;
-  templateType?: "page" | "section" | "row" | "element";
+  templateType?: LayoutLibraryType;
   description?: string;
   sourcePage?: BuilderLayoutKey;
   design?: BuilderDesign;

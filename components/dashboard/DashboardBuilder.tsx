@@ -76,6 +76,7 @@ import {
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
+import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
@@ -298,6 +299,7 @@ import {
   removeBlockInLayoutColumn,
   updateBlockInLayoutColumn,
   updateLayoutColumn,
+  updateLayoutBlockEverywhere,
 } from "@/lib/builderNestedLayout";
 import {
   GLOBAL_STYLE_PRESETS,
@@ -2004,6 +2006,7 @@ export type DashboardBuilderProps = {
   enabledContentLanguages?: string[];
   /** Server-provided CMS origin for canonical imported WordPress media URLs. */
   wordpressMediaOrigin?: string | null;
+  requestedLayoutType?: LayoutLibraryType | null;
 };
 
 export default function DashboardBuilder({
@@ -2014,11 +2017,17 @@ export default function DashboardBuilder({
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
   wordpressMediaOrigin = null,
+  requestedLayoutType = null,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { locale, setLocale, t } = useTranslation();
   const { theme: storefrontTheme } = useTheme();
   const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
+  // Inspector callbacks can remain mounted while the active editing locale
+  // changes. Keep the mutation boundary on the current locale rather than a
+  // callback's previous render snapshot.
+  const contentLanguageRef = useRef(contentLanguage);
+  contentLanguageRef.current = contentLanguage;
   const previewLanguageStorageKey = useMemo(
     () => `builder_preview_language_${websiteId ?? "root"}`,
     [websiteId],
@@ -2026,6 +2035,10 @@ export default function DashboardBuilder({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [activeDynamicDocumentId, setActiveDynamicDocumentId] = useState<string | null>(null);
+  const [layoutLibraryRequest, setLayoutLibraryRequest] = useState<{
+    type: LayoutLibraryType;
+    key: number;
+  } | null>(null);
   const [activeRoutingTemplateId, setActiveRoutingTemplateId] = useState<string | null>(null);
   const [activeIndividualContextToken, setActiveIndividualContextToken] = useState<string | null>(null);
   const ordinaryLoadRequestRef = useRef(0);
@@ -2382,6 +2395,10 @@ export default function DashboardBuilder({
   const [selectedLayoutBlockKey, setSelectedLayoutBlockKey] = useState<
     string | null
   >(null);
+  const [activeShellEntry, setActiveShellEntry] = useState<{
+    shellType: "header" | "footer";
+    rootId: string;
+  } | null>(null);
   const [hoveredBuilderTarget, setHoveredBuilderTarget] =
     useState<BuilderHoverTarget | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -2540,6 +2557,10 @@ export default function DashboardBuilder({
   const mediaSelectManyRef = useRef<((media: WordPressMediaItem[]) => void) | null>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
   const headerPreviewSlotRef = useRef<HTMLDivElement>(null);
+  const [builderHeaderScrollState, setBuilderHeaderScrollState] = useState({
+    scrolled: false,
+    hidden: false,
+  });
   const headerPageContextRef = useRef<HTMLDivElement>(null);
   const builderWorkspaceRef = useRef<HTMLElement>(null);
   const inspectorPanelRef = useRef<HTMLDivElement>(null);
@@ -2698,6 +2719,54 @@ export default function DashboardBuilder({
     () => resolveHeaderDocumentSettings(currentHeaderComposition, shellSettings),
     [currentHeaderComposition, shellSettings],
   );
+
+  useEffect(() => {
+    const behavior = currentHeaderDocumentSettings.behavior;
+    const getScrollY = () => {
+      const previewShell = previewShellRef.current;
+      if (previewShell) {
+        const previewStyle = window.getComputedStyle(previewShell);
+        const previewOwnsScroll =
+          previewShell.scrollHeight > previewShell.clientHeight + 1 &&
+          (previewStyle.overflowY === "auto" || previewStyle.overflowY === "scroll");
+        if (previewOwnsScroll) return previewShell.scrollTop;
+      }
+      return window.scrollY;
+    };
+
+    const onScroll = () => {
+      const nextScrollY = getScrollY();
+      setBuilderHeaderScrollState((current) => {
+        const next = {
+          scrolled: behavior !== "static" && nextScrollY > 24,
+          hidden: nextScrollY <= 24 ? false : current.hidden,
+        };
+        return next.scrolled === current.scrolled && next.hidden === current.hidden
+          ? current
+          : next;
+      });
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (behavior !== "sticky-on-scroll-up" || Math.abs(event.deltaY) <= 2) return;
+      setBuilderHeaderScrollState((current) => ({
+        ...current,
+        hidden: event.deltaY > 0,
+      }));
+    };
+
+    const initialScrollY = getScrollY();
+    setBuilderHeaderScrollState({
+      scrolled: behavior !== "static" && initialScrollY > 24,
+      hidden: false,
+    });
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    window.addEventListener("wheel", onWheel, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("wheel", onWheel, { capture: true });
+    };
+  }, [currentHeaderDocumentSettings.behavior]);
   const composedAnchorIdEntries = useMemo(() => {
     const sections = [
       ...builderState.sections,
@@ -3759,6 +3828,33 @@ export default function DashboardBuilder({
     setCommittedShellSettingsSignature(JSON.stringify(shellSettings));
   }, [shellSettings, committedShellSettingsSignature, draftReady]);
 
+  useEffect(() => {
+    const active = activeShellEntry;
+    if (!active || builderState.page !== active.shellType) return;
+    const rootId = builderState.sections.some(
+      (section) => section.id === active.rootId,
+    )
+      ? active.rootId
+      : builderState.sections[0]?.id;
+    if (!rootId) return;
+
+    if (selectedId === rootId) {
+      setActiveShellEntry(null);
+      return;
+    }
+    setSelectedId(rootId);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setInspectorTab("layout");
+    setSectionSettingsOpen(true);
+    setInspectorOpen(true);
+    // Shell entry establishes the initial root selection only. Descendant
+    // clicks must continue through the ordinary Builder selection path.
+    setActiveShellEntry(null);
+  }, [activeShellEntry, builderState.page, builderState.sections, selectedId]);
+
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
     options: { syncUrl?: boolean } = {},
@@ -3908,28 +4004,69 @@ export default function DashboardBuilder({
     columnKey: string,
     blockKey: string,
     patch: Partial<BuilderLayoutBlock>,
+    mutationLanguage = contentLanguageRef.current,
   ) => {
-    syncHeaderBlockPatch(blockKey, patch);
+    const currentSection = builderState.sections.find(
+      (section) => section.id === sectionId,
+    );
+    const currentBlock = currentSection
+      ? findLayoutBlock(currentSection, blockKey, columnKey)
+      : null;
+    const isHeaderButton =
+      sectionId === "header-document" &&
+      (currentBlock?.id === "header-button" || currentBlock?.kind === "button");
+    const headerButtonOverrideFields: Array<[
+      keyof BuilderLayoutBlock,
+      keyof NonNullable<BuilderLayoutBlock["headerButtonOverrides"]>,
+    ]> = [
+      ["buttonStyle", "variant"],
+      ["size", "size"],
+      ["fullWidthButton", "width"],
+      ["buttonBg", "background"],
+      ["buttonTextColor", "text"],
+      ["buttonBorderRadius", "radius"],
+      ["buttonBorderWidth", "border"],
+      ["buttonBorderColor", "border"],
+      ["buttonPaddingY", "padding"],
+      ["buttonPaddingX", "padding"],
+      ["buttonHoverBg", "hoverBackground"],
+      ["buttonHoverTextColor", "hoverText"],
+      ["buttonHoverBorderColor", "hoverBorder"],
+      ["buttonHoverEffect", "hoverEffect"],
+      ["buttonHoverTransform", "hoverEffect"],
+      ["buttonHoverBoxShadow", "hoverEffect"],
+      ["typography", "typography"],
+    ];
+    const canonicalPatch = isHeaderButton
+      ? {
+          ...patch,
+          headerButtonOverrides: headerButtonOverrideFields.reduce(
+            (overrides, [field, owner]) =>
+              Object.prototype.hasOwnProperty.call(patch, field)
+                ? { ...overrides, [owner]: patch[field] !== undefined }
+                : overrides,
+            {
+              ...(currentBlock?.headerButtonOverrides ?? {}),
+              ...(patch.headerButtonOverrides ?? {}),
+            },
+          ),
+        }
+      : patch;
+
+    syncHeaderBlockPatch(blockKey, canonicalPatch);
 
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
-        return updateLayoutColumn(section, columnKey, (item) => ({
-              ...item,
-              blocks: (item.blocks ?? []).map((block, blockIndex) => {
-                const currentBlockKey =
-                  block.id ?? `${columnKey}-block-${blockIndex}`;
-                return currentBlockKey === blockKey
-                  ? applyContentPatch(
-                      block,
-                      patch,
-                      contentLanguage,
-                      primaryContentLanguage,
-                    )
-                  : block;
-              }),
-            }));
+        return updateLayoutBlockEverywhere(section, blockKey, (block) =>
+          applyContentPatch(
+            block,
+            canonicalPatch,
+            mutationLanguage,
+            primaryContentLanguage,
+          ),
+        );
       }),
     }));
   };
@@ -4669,49 +4806,20 @@ export default function DashboardBuilder({
     revealCanvasTarget(row?.id);
   };
 
-  const selectHeader = () => {
-    const contextKey = builderState.page === "header" ? headerContextKey : builderState.page;
+  const enterShellEdit = (shellType: "header" | "footer") => {
+    const contextKey =
+      builderState.page === "header" || builderState.page === "footer"
+        ? headerContextKey
+        : builderState.page;
+    const shellRootId =
+      loadDraftForKey(shellType, storageKeys).sections[0]?.id ??
+      (shellType === "header" ? "header-document" : "footer-document");
+    setActiveShellEntry({ shellType, rootId: shellRootId });
     setHeaderContextKey(contextKey);
-    switchBuilderTarget("header", { syncUrl: false });
-    router.replace(`${pathname}?page=header&context=${encodeURIComponent(contextKey)}`, { scroll: false });
+    switchBuilderTarget(shellType, { syncUrl: false });
+    router.replace(`${pathname}?page=${shellType}&context=${encodeURIComponent(contextKey)}`, { scroll: false });
     setHeaderSelected(false);
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
-    setOpenLayoutItemId(null);
-    setSidebarCollapsed(false);
-    setSidebarTab("builder");
-  };
-
-  const selectFooter = () => {
-    const contextKey = builderState.page === "header" || builderState.page === "footer"
-      ? headerContextKey
-      : builderState.page;
-    setHeaderContextKey(contextKey);
-    switchBuilderTarget("footer", { syncUrl: false });
-    router.replace(`${pathname}?page=footer&context=${encodeURIComponent(contextKey)}`, { scroll: false });
-    setHeaderSelected(false);
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
-    setOpenLayoutItemId(null);
-    setSidebarCollapsed(false);
-    setSidebarTab("builder");
-  };
-
-  const openHeaderSettings = () => {
-    if (builderState.page !== "header") {
-      const contextKey = builderState.page;
-      setHeaderContextKey(contextKey);
-      const nextState = hydrateDocumentBuilderState(
-        loadDraftForKey("header", storageKeys),
-        shellSettings,
-      );
-      setBuilderState(nextState);
-      router.replace(`${pathname}?page=header&context=${encodeURIComponent(contextKey)}`, { scroll: false });
-    }
-    setSelectedId("header-document");
-    setHeaderSelected(false);
+    setSelectedId(shellRootId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
@@ -4720,7 +4828,41 @@ export default function DashboardBuilder({
     setSectionSettingsOpen(true);
     setSidebarCollapsed(false);
     setSidebarTab("builder");
-    openInspectorPanel();
+    window.setTimeout(() => {
+      if (builderStateRef.current.page !== shellType) return;
+      selectSection(shellRootId, true);
+    }, 100);
+  };
+
+  const selectHeader = () => {
+    enterShellEdit("header");
+  };
+
+  const selectFooter = () => {
+    enterShellEdit("footer");
+  };
+
+  const openHeaderSettings = () => {
+    enterShellEdit("header");
+  };
+
+  const exitShellEdit = () => {
+    if (builderState.page !== "header" && builderState.page !== "footer") return;
+    const contextKey = headerContextKey;
+    setActiveShellEntry(null);
+    switchBuilderTarget(contextKey, { syncUrl: false });
+    router.replace(`${pathname}?page=${contextKey}`, { scroll: false });
+    setHeaderSelected(false);
+    setSelectedId("");
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setOpenSlideId(null);
+    setSectionSettingsOpen(false);
+    setInspectorOpen(false);
+    setSidebarCollapsed(false);
+    setSidebarTab("builder");
   };
 
   const openSpacingSettings = (target: SpacingInspectorTarget) => {
@@ -5028,7 +5170,10 @@ export default function DashboardBuilder({
       );
       mergedSections[0] = {
         ...mergedSections[0],
-        headerPresetKey: presetKey,
+        // Presets remain readable for compatibility, but an application is
+        // now materialized as ordinary Header composition/settings rather
+        // than leaving a named preset as an active owner.
+        headerPresetKey: undefined,
         headerArchitectureVersion: 2,
         headerVisible:
           currentHeaderSections[0]?.headerVisible ??
@@ -5096,8 +5241,46 @@ export default function DashboardBuilder({
     columnIndex: number,
     blockIndex: number,
     patch: BuilderLayoutBlock,
+    mutationLanguage = contentLanguageRef.current,
   ) => {
     if (!rawSelectedSection) return;
+    const targetForProvenance = selectedLayoutColumnKey && selectedLayoutBlockKey
+      ? selectedLayoutBlock
+      : getLayoutItemBlocks(rawSelectedSection.layoutItems?.[columnIndex] ?? {})[blockIndex];
+    const isHeaderButton =
+      (builderState.page === "header" || rawSelectedSection.id === "header-document") &&
+      (targetForProvenance?.id === "header-button" || targetForProvenance?.kind === "button");
+    const buttonOverrideFields: Array<[keyof BuilderLayoutBlock, keyof NonNullable<BuilderLayoutBlock["headerButtonOverrides"]>]> = [
+      ["buttonStyle", "variant"],
+      ["size", "size"],
+      ["fullWidthButton", "width"],
+      ["buttonBg", "background"],
+      ["buttonTextColor", "text"],
+      ["buttonBorderRadius", "radius"],
+      ["buttonBorderWidth", "border"],
+      ["buttonBorderColor", "border"],
+      ["buttonPaddingY", "padding"],
+      ["buttonPaddingX", "padding"],
+      ["buttonHoverBg", "hoverBackground"],
+      ["buttonHoverTextColor", "hoverText"],
+      ["buttonHoverBorderColor", "hoverBorder"],
+      ["buttonHoverEffect", "hoverEffect"],
+      ["buttonHoverTransform", "hoverEffect"],
+      ["buttonHoverBoxShadow", "hoverEffect"],
+      ["typography", "typography"],
+    ];
+    const nextPatch = isHeaderButton
+      ? {
+          ...patch,
+          headerButtonOverrides: buttonOverrideFields.reduce(
+            (overrides, [field, owner]) =>
+              Object.prototype.hasOwnProperty.call(patch, field)
+                ? { ...overrides, [owner]: patch[field] !== undefined }
+                : overrides,
+            { ...(targetForProvenance?.headerButtonOverrides ?? {}) },
+          ),
+        }
+      : patch;
     if (
       selectedLayoutColumnKey &&
       selectedLayoutBlockKey &&
@@ -5107,7 +5290,8 @@ export default function DashboardBuilder({
         rawSelectedSection.id,
         selectedLayoutColumnKey,
         selectedLayoutBlockKey,
-        patch,
+        nextPatch,
+        mutationLanguage,
       );
       return;
     }
@@ -5117,12 +5301,12 @@ export default function DashboardBuilder({
     const targetBlock = blocks[blockIndex] ?? {};
     syncHeaderBlockPatch(
       targetBlock.id ?? `${item.id ?? `layout-item-${columnIndex}`}-block-${blockIndex}`,
-      patch,
+      nextPatch,
     );
     blocks[blockIndex] = applyContentPatch(
       targetBlock,
-      patch,
-      contentLanguage,
+      nextPatch,
+      mutationLanguage,
       primaryContentLanguage,
     );
     const requestedHeaderAlignment =
@@ -7826,6 +8010,10 @@ export default function DashboardBuilder({
         description:
           templateType === "page"
             ? `Page template saved from ${pageTitle}`
+            : templateType === "header"
+              ? "Header layout saved from the current Header document"
+              : templateType === "footer"
+                ? "Footer layout saved from the current Footer document"
             : templateType === "section"
               ? `Section template saved from ${pageTitle}`
               : templateType === "row"
@@ -7879,13 +8067,17 @@ export default function DashboardBuilder({
       customTitle?.trim() ||
       (templateType === "page"
         ? pageTitle
+        : templateType === "header"
+          ? "Saved Header"
+          : templateType === "footer"
+            ? "Saved Footer"
         : templateType === "section"
           ? selectedSection?.title || "Saved Section"
           : selectedLayoutBlock
             ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
             : "Saved Element");
     const sections =
-      templateType === "page"
+      templateType === "page" || templateType === "header" || templateType === "footer"
         ? builderState.sections
         : templateType === "section"
           ? selectedSection
@@ -7986,6 +8178,121 @@ export default function DashboardBuilder({
       return;
     }
     const clonedSections = template.sections.map(cloneTemplateSection);
+
+    if (templateType === "header") {
+      const currentHeaderSection = builderState.sections.find(
+        (section) => section.id === "header-document",
+      ) ?? builderState.sections[0];
+      const savedHeaderSection = clonedSections[0];
+      if (!savedHeaderSection) {
+        setTemplateStatus("Header template is empty");
+        return;
+      }
+
+      const documentFields = [
+        "headerVisible",
+        "headerTransparent",
+        "headerOverlay",
+        "headerHeight",
+        "headerCustomHeight",
+        "headerLayout",
+        "headerBehavior",
+        "headerWidthMode",
+        "headerBackgroundMode",
+        "headerTextMode",
+        "headerZIndex",
+        "headerTopToolbarVisible",
+        "headerTopToolbarText",
+        "headerTopToolbarPhone",
+        "headerTopToolbarMeta",
+      ] as const;
+      const preservedFields = Object.fromEntries(
+        documentFields.flatMap((field) =>
+          savedHeaderSection[field] === undefined && currentHeaderSection?.[field] !== undefined
+            ? [[field, currentHeaderSection[field]]]
+            : [],
+        ),
+      );
+      const nextHeaderSections = clonedSections.map((section, index) =>
+        index === 0
+          ? {
+              ...section,
+              id: currentHeaderSection?.id ?? section.id,
+              ...preservedFields,
+            }
+          : section,
+      );
+
+      setBuilderState((current) => ({
+        ...current,
+        page: "header",
+        targetType: "header",
+        sections: nextHeaderSections,
+      }));
+      setSelectedId(nextHeaderSections[0]?.id ?? "");
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutRowIndex(null);
+      setSelectedLayoutBlockKey(null);
+      setOpenLayoutItemId(null);
+      setTemplateStatus("Header layout applied");
+      return;
+    }
+
+    if (templateType === "footer") {
+      const currentFooterSection = builderState.sections.find(
+        (section) => section.id === "footer-document",
+      ) ?? builderState.sections[0];
+      const savedFooterSection = clonedSections[0];
+      if (!savedFooterSection) {
+        setTemplateStatus("Footer template is empty");
+        return;
+      }
+
+      const documentFields = [
+        "background",
+        "backgroundMode",
+        "contentMode",
+        "colorScheme",
+        "topSpacing",
+        "bottomSpacing",
+        "topMargin",
+        "bottomMargin",
+        "pullUnderHeader",
+        "visible",
+        "visualStyle",
+        "animation",
+      ] as const;
+      const preservedFields = Object.fromEntries(
+        documentFields.flatMap((field) =>
+          savedFooterSection[field] === undefined && currentFooterSection?.[field] !== undefined
+            ? [[field, currentFooterSection[field]]]
+            : [],
+        ),
+      );
+      const nextFooterSections = clonedSections.map((section, index) =>
+        index === 0
+          ? {
+              ...section,
+              id: currentFooterSection?.id ?? section.id,
+              ...preservedFields,
+            }
+          : section,
+      );
+
+      setBuilderState((current) => ({
+        ...current,
+        page: "footer",
+        targetType: "footer",
+        sections: nextFooterSections,
+      }));
+      setSelectedId(nextFooterSections[0]?.id ?? "");
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutRowIndex(null);
+      setSelectedLayoutBlockKey(null);
+      setOpenLayoutItemId(null);
+      setTemplateStatus("Footer layout applied");
+      return;
+    }
 
     if (templateType === "page") {
       setBuilderState((current) => ({
@@ -8747,6 +9054,7 @@ export default function DashboardBuilder({
         contentLanguage,
         primaryContentLanguage,
       )}
+      activeContentLanguage={contentLanguage}
       spacingFocusRequest={spacingFocusRequest}
       spacingOverlayEnabled={spacingOverlayEnabled}
       layoutBlockLabels={layoutBlockLabels}
@@ -8783,7 +9091,15 @@ export default function DashboardBuilder({
       deleteSelectedSlide={deleteSelectedSlide}
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
-      onApplyHeaderPreset={applyHeaderPreset}
+      onOpenLayoutLibrary={(layoutType) =>
+        setLayoutLibraryRequest((current) => ({
+          type: layoutType,
+          key: (current?.key ?? 0) + 1,
+        }))
+      }
+      onSaveWholeLayout={(layoutType) => {
+        void saveTemplate(layoutType);
+      }}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       onUpdateColumnStyle={updateSelectedColumnStyle}
@@ -10305,6 +10621,17 @@ export default function DashboardBuilder({
             {builderFrontendActionLabel(builderEditorContext)}
           </button>
         ) : null}
+        {builderState.page === "header" || builderState.page === "footer" ? (
+          <button
+            type="button"
+            className="builder-canvas-control is-primary"
+            onClick={exitShellEdit}
+            title="Back to Page"
+          >
+            <ArrowLeft size={14} />
+            Back to Page
+          </button>
+        ) : null}
         {builderState.page === "header" ? (
           <button
             type="button"
@@ -10560,6 +10887,8 @@ export default function DashboardBuilder({
         onSaveMenuItems={saveMenuItems}
         sidebarCollapsed={sidebarCollapsed}
         onSetSidebarCollapsed={setSidebarCollapsedPreference}
+        requestedLayoutType={layoutLibraryRequest?.type ?? requestedLayoutType}
+        requestedLayoutTypeRequestKey={layoutLibraryRequest?.key ?? 0}
       />
 
       <main ref={builderWorkspaceRef} className="builder-workspace">
@@ -10655,7 +10984,7 @@ export default function DashboardBuilder({
             <div
               ref={headerPreviewSlotRef}
               id={builderState.page === "header" ? "builder-header-document-preview-slot" : undefined}
-              className="builder-preview-header-slot"
+              className={`builder-preview-header-slot${builderHeaderScrollState.hidden ? " builder-preview-header-slot--scroll-hidden" : ""}`}
             >
               {builderState.page === "header" && (
                 <div
@@ -10721,6 +11050,7 @@ export default function DashboardBuilder({
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
                     headerComposition={currentHeaderComposition}
+                    scrollState={builderHeaderScrollState}
                     publicAnchorId={builderState.sections.find((section) => section.id === "header-document")?.anchorId}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
@@ -11022,6 +11352,7 @@ export default function DashboardBuilder({
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
                     headerComposition={currentHeaderComposition}
+                    scrollState={builderHeaderScrollState}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
                     languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
@@ -11058,16 +11389,17 @@ export default function DashboardBuilder({
             </div>
             {builderState.page === "footer" ? (
               <div className="builder-context-page-preview is-locked builder-footer-page-context" aria-label="Locked page context">
-                <div className="builder-context-page-lock-badge">
-                  Previewing {getLayoutLabel(footerPageContextState.page, customPages)} · Page content locked
+                <div className="builder-context-preview-status-sticky-wrapper">
+                  <div
+                    className="builder-context-preview-status"
+                    role="group"
+                    aria-label="Locked page preview status"
+                  >
+                    <span>
+                      Previewing {getLayoutLabel(footerPageContextState.page, customPages)} · Page content locked
+                    </span>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className="builder-context-page-edit-overlay"
-                  aria-label={`Edit ${getLayoutLabel(footerPageContextState.page, customPages)} page`}
-                  title={`Edit ${getLayoutLabel(footerPageContextState.page, customPages)} page`}
-                  onClick={() => switchBuilderTarget(footerPageContextState.page)}
-                />
                 <StorefrontBuilderRenderer
                   layout={footerPageContextLayout}
                   page={footerPageContextState.page}
@@ -11081,7 +11413,7 @@ export default function DashboardBuilder({
               data-overlap-header={currentHeaderDocumentSettings.overlay ? "true" : "false"}
               className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
               aria-label={builderState.page === "header" ? "Locked page context" : undefined}
-              onClick={builderState.page === "header" ? () => switchBuilderTarget(headerContextState.page) : undefined}
+              onClick={builderState.page === "header" ? exitShellEdit : undefined}
             >
             {builderState.page === "header" ? (
               <div className="builder-context-preview-status-sticky-wrapper">
@@ -11093,15 +11425,6 @@ export default function DashboardBuilder({
                   <span>
                     Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page editing locked
                   </span>
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      switchBuilderTarget(headerContextState.page);
-                    }}
-                  >
-                    Edit {getLayoutLabel(headerContextState.page, customPages)} Page
-                  </button>
                 </div>
               </div>
             ) : null}
@@ -16483,17 +16806,6 @@ const PreviewSection = memo(function PreviewSection({
                                           ? "shop-builder-title--gradient"
                                           : ""}`}
                                     typography={block.typography}
-                                    value={block.title}
-                                    onChange={(title) =>
-                                      onUpdateBlock(
-                                        section.id,
-                                        columnKey,
-                                        blockKey,
-                                        {
-                                          title,
-                                        },
-                                      )
-                                    }
                                     style={
                                       block.textGradientPreset === "custom"
                                         ? {
@@ -16504,6 +16816,17 @@ const PreviewSection = memo(function PreviewSection({
                                             display: "inline-block",
                                           }
                                         : undefined
+                                    }
+                                    value={block.title}
+                                    onChange={(title) =>
+                                      onUpdateBlock(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        {
+                                          title,
+                                        },
+                                      )
                                     }
                                   />
                                 ))}

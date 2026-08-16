@@ -64,8 +64,13 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   const imageLoading =
     resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
+  const imageAuthoredMaxWidth = imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
   const imageClass = `${getUikitImageClass(imageSemantics)} el-image`.trim();
+  const imageAlignmentClass = imageSemantics.alignment &&
+    ["left", "center", "right"].includes(imageSemantics.alignment)
+    ? `uk-align-${imageSemantics.alignment}`
+    : "";
   const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
     ? `uk-background-${rawBlock.imageBoxDecoration}`
     : "";
@@ -94,9 +99,9 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
   const usesContextualSvgColor = Boolean(svgColorClass);
   const fallbackImage = usesIntrinsicGeometry ? (
-    <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: preserveIntrinsicImageSize ? "auto" : "100%", maxWidth: preserveIntrinsicImageSize ? "100%" : undefined, height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
+    <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: preserveIntrinsicImageSize ? "auto" : "100%", maxWidth: preserveIntrinsicImageSize ? "100%" : undefined, height: imageStyle.height ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
   ) : (
-    <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
+    <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.height || imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
   );
   const renderImage = () => isStylableSvg ? (
     <UikitStylableSvg
@@ -114,7 +119,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
       fallback={fallbackImage}
       style={{
         width: preserveIntrinsicSvgSize ? undefined : "100%",
-        height: imageStyle.aspectRatio ? "100%" : preserveIntrinsicSvgSize ? undefined : "auto",
+        height: imageStyle.height || imageStyle.aspectRatio ? "100%" : preserveIntrinsicSvgSize ? undefined : "auto",
         aspectRatio: imageStyle.aspectRatio,
         position: imageStyle.position,
         inset: imageStyle.inset,
@@ -137,11 +142,17 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
       style={{ display: "block" }}
     >
       <figure
-        className="shop-builder-image-figure"
+        className={`shop-builder-image-figure ${imageAlignmentClass}`.trim()}
         style={{
           display: "inline-block",
-          maxWidth: imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined),
-          width: imageStyle.width ?? (!imageStyle.aspectRatio ? "fit-content" : undefined),
+          // Intrinsic images keep their natural width, but the containing
+          // media box must never escape the Builder/storefront column.
+          maxWidth: imageAuthoredMaxWidth
+            ? `min(100%, ${imageAuthoredMaxWidth})`
+            : "100%",
+          width: imageStyle.width
+            ? `min(${imageStyle.width}, 100%)`
+            : (!imageStyle.aspectRatio ? "fit-content" : undefined),
           height: imageStyle.height,
         }}
       >
@@ -153,6 +164,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
           style={{
             aspectRatio: imageStyle.aspectRatio,
             width: "100%",
+            height: imageStyle.height,
             position: imageStyle.aspectRatio ? "relative" : undefined,
           }}
         >

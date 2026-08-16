@@ -234,6 +234,9 @@ function renderMenuItems(
             style={
               {
                 "--submenu-columns": submenuColumns,
+                ...(submenuLayout === "list"
+                  ? { backdropFilter: "var(--uk-navbar-backdrop-filter)" }
+                  : {}),
               } as CSSProperties
             }
           >

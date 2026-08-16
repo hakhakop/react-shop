@@ -48,6 +48,8 @@ export async function POST(request: Request) {
     id: existing?.id ?? body.id ?? createTemplateId(title),
     title,
     templateType:
+      body.templateType === "header" ||
+      body.templateType === "footer" ||
       body.templateType === "section" ||
       body.templateType === "row" ||
       body.templateType === "element"

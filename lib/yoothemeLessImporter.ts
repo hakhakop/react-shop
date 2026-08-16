@@ -92,7 +92,7 @@ type Declaration = {
 };
 
 const SUPPORTED_FUNCTIONS = new Set(["darken", "lighten", "fade", "mix"]);
-const OPAQUE_CSS_FUNCTIONS = new Set(["rgb", "rgba", "hsl", "hsla", "url", "linear-gradient", "radial-gradient", "conic-gradient", "min", "max", "clamp", "color-mix"]);
+const OPAQUE_CSS_FUNCTIONS = new Set(["rgb", "rgba", "hsl", "hsla", "url", "blur", "linear-gradient", "radial-gradient", "conic-gradient", "min", "max", "clamp", "color-mix"]);
 const HEX_COLOR = /^#([0-9a-f]{3,8})$/i;
 
 function stripComments(input: string) {
@@ -256,6 +256,15 @@ function resolveExpression(raw: string, values: Map<string, string>, trail: stri
     const resolved = resolveExpression(referenced, values, [...trail, reference]);
     if (!resolved.value) return resolved;
     value = value.replace(new RegExp(`@${reference}\\b`, "g"), resolved.value);
+  }
+
+  // UIkit theme layers use this compact form for dropdown offsets. Resolve
+  // only same-unit subtraction; other arithmetic remains intentionally
+  // unsupported rather than being guessed into a canonical style value.
+  const dimensionSubtraction = /^-?\(\s*(-?(?:\d+\.?\d*|\.\d+))(px|rem|em|%|vh|vw)\s*-\s*(-?(?:\d+\.?\d*|\.\d+))\2\s*\)$/.exec(value);
+  if (dimensionSubtraction) {
+    const sign = value.trim().startsWith("-") ? -1 : 1;
+    value = `${sign * (Number(dimensionSubtraction[1]) - Number(dimensionSubtraction[3]))}${dimensionSubtraction[2]}`;
   }
 
   let changed = true;
@@ -564,6 +573,110 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "accordion-item-border-width": { destination: "shellSettings.accordionItemBorderWidth", domain: "Accordion" },
   "accordion-item-border": { destination: "shellSettings.accordionItemBorder", domain: "Accordion" },
   "accordion-item-box-shadow": { destination: "shellSettings.accordionItemBoxShadow", domain: "Accordion" },
+  "nav-divider-margin-vertical": { destination: "shellSettings.navDividerMarginVertical", domain: "Nav" },
+  "nav-default-font-size": { destination: "shellSettings.navDefaultFontSize", domain: "Nav" },
+  "nav-default-item-color": { destination: "shellSettings.navDefaultItemColor", domain: "Nav" },
+  "nav-default-item-hover-color": { destination: "shellSettings.navDefaultItemHoverColor", domain: "Nav" },
+  "nav-default-item-active-color": { destination: "shellSettings.navDefaultItemActiveColor", domain: "Nav" },
+  "nav-default-subtitle-font-size": { destination: "shellSettings.navDefaultSubtitleFontSize", domain: "Nav" },
+  "nav-default-subtitle-color": { destination: "shellSettings.navDefaultSubtitleColor", domain: "Nav" },
+  "nav-default-subtitle-font-weight": { destination: "shellSettings.navDefaultSubtitleFontWeight", domain: "Nav" },
+  "nav-default-header-color": { destination: "shellSettings.navDefaultHeaderColor", domain: "Nav" },
+  "nav-default-sublist-item-hover-color": { destination: "shellSettings.navDefaultSublistItemHoverColor", domain: "Nav" },
+  "nav-default-sublist-item-active-color": { destination: "shellSettings.navDefaultSublistItemActiveColor", domain: "Nav" },
+  "nav-default-divider-box-shadow": { destination: "shellSettings.navDefaultDividerBoxShadow", domain: "Nav" },
+  "nav-primary-item-color": { destination: "shellSettings.navPrimaryItemColor", domain: "Nav" },
+  "nav-primary-item-hover-color": { destination: "shellSettings.navPrimaryItemHoverColor", domain: "Nav" },
+  "nav-primary-item-active-color": { destination: "shellSettings.navPrimaryItemActiveColor", domain: "Nav" },
+  "nav-primary-subtitle-font-size": { destination: "shellSettings.navPrimarySubtitleFontSize", domain: "Nav" },
+  "nav-primary-subtitle-color": { destination: "shellSettings.navPrimarySubtitleColor", domain: "Nav" },
+  "nav-primary-subtitle-font-weight": { destination: "shellSettings.navPrimarySubtitleFontWeight", domain: "Nav" },
+  "nav-primary-header-color": { destination: "shellSettings.navPrimaryHeaderColor", domain: "Nav" },
+  "nav-primary-sublist-item-hover-color": { destination: "shellSettings.navPrimarySublistItemHoverColor", domain: "Nav" },
+  "nav-primary-sublist-item-active-color": { destination: "shellSettings.navPrimarySublistItemActiveColor", domain: "Nav" },
+  "nav-primary-divider-box-shadow": { destination: "shellSettings.navPrimaryDividerBoxShadow", domain: "Nav" },
+  "nav-secondary-line-height": { destination: "shellSettings.navSecondaryLineHeight", domain: "Nav" },
+  "nav-secondary-item-hover-color": { destination: "shellSettings.navSecondaryItemHoverColor", domain: "Nav" },
+  "nav-secondary-item-active-color": { destination: "shellSettings.navSecondaryItemActiveColor", domain: "Nav" },
+  "nav-secondary-subtitle-active-color": { destination: "shellSettings.navSecondarySubtitleActiveColor", domain: "Nav" },
+  "nav-secondary-sublist-font-size": { destination: "shellSettings.navSecondarySublistFontSize", domain: "Nav" },
+  "nav-secondary-sublist-item-hover-color": { destination: "shellSettings.navSecondarySublistItemHoverColor", domain: "Nav" },
+  "nav-secondary-sublist-item-active-color": { destination: "shellSettings.navSecondarySublistItemActiveColor", domain: "Nav" },
+  "nav-secondary-subtitle-font-weight": { destination: "shellSettings.navSecondarySubtitleFontWeight", domain: "Nav" },
+  "nav-medium-line-height": { destination: "shellSettings.navMediumLineHeight", domain: "Nav" },
+  "nav-medium-font-size-l": { destination: "shellSettings.navMediumFontSizeResponsive", domain: "Nav" },
+  "nav-dividers-margin-top": { destination: "shellSettings.navDividersMarginTop", domain: "Nav" },
+  "nav-secondary-margin-top": { destination: "shellSettings.navSecondaryMarginTop", domain: "Nav" },
+  "nav-secondary-item-padding-vertical": { destination: "shellSettings.navSecondaryItemPaddingVertical", domain: "Nav" },
+  "nav-secondary-item-padding-horizontal": { destination: "shellSettings.navSecondaryItemPaddingHorizontal", domain: "Nav" },
+  "nav-secondary-item-hover-background": { destination: "shellSettings.navSecondaryItemHoverBackground", domain: "Nav" },
+  "nav-secondary-item-active-background": { destination: "shellSettings.navSecondaryItemActiveBackground", domain: "Nav" },
+  "nav-secondary-item-border-radius": { destination: "shellSettings.navSecondaryItemBorderRadius", domain: "Nav" },
+  "nav-dividers-box-shadow": { destination: "shellSettings.navDividersBoxShadow", domain: "Nav" },
+  "inverse-nav-secondary-subtitle-hover-color": { destination: "shellSettings.inverseNavSecondarySubtitleHoverColor", domain: "Nav" },
+  "inverse-nav-background-item-hover-background": { destination: "shellSettings.inverseNavBackgroundItemHoverBackground", domain: "Nav" },
+  "inverse-nav-background-item-active-background": { destination: "shellSettings.inverseNavBackgroundItemActiveBackground", domain: "Nav" },
+  "inverse-nav-secondary-item-hover-background": { destination: "shellSettings.inverseNavSecondaryItemHoverBackground", domain: "Nav" },
+  "inverse-nav-secondary-item-active-background": { destination: "shellSettings.inverseNavSecondaryItemActiveBackground", domain: "Nav" },
+  "navbar-background": { destination: "shellSettings.navbarBackground", domain: "Navbar" },
+  "navbar-gap": { destination: "shellSettings.navbarGap", domain: "Navbar" },
+  "navbar-gap-m": { destination: "shellSettings.navbarGapMedium", domain: "Navbar" },
+  "navbar-nav-gap": { destination: "shellSettings.navbarNavGap", domain: "Navbar" },
+  "navbar-nav-gap-m": { destination: "shellSettings.navbarNavGapMedium", domain: "Navbar" },
+  "navbar-nav-item-height": { destination: "shellSettings.navbarNavItemHeight", domain: "Navbar" },
+  "navbar-nav-item-padding-horizontal": { destination: "shellSettings.navbarNavItemPaddingHorizontal", domain: "Navbar" },
+  "navbar-nav-item-padding-horizontal-m": { destination: "shellSettings.navbarNavItemPaddingHorizontalMedium", domain: "Navbar" },
+  "navbar-nav-item-color": { destination: "shellSettings.navbarNavItemColor", domain: "Navbar" },
+  "navbar-nav-item-font-size": { destination: "shellSettings.navbarNavItemFontSize", domain: "Navbar" },
+  "navbar-nav-item-hover-color": { destination: "shellSettings.navbarNavItemHoverColor", domain: "Navbar" },
+  "navbar-nav-item-onclick-color": { destination: "shellSettings.navbarNavItemOnclickColor", domain: "Navbar" },
+  "navbar-nav-item-active-color": { destination: "shellSettings.navbarNavItemActiveColor", domain: "Navbar" },
+  "navbar-nav-item-text-transform": { destination: "shellSettings.navbarNavItemTextTransform", domain: "Navbar" },
+  "navbar-primary-nav-item-font-size": { destination: "shellSettings.navbarPrimaryNavItemFontSize", domain: "Navbar" },
+  "navbar-toggle-color": { destination: "shellSettings.navbarToggleColor", domain: "Navbar" },
+  "navbar-toggle-hover-color": { destination: "shellSettings.navbarToggleHoverColor", domain: "Navbar" },
+  "navbar-subtitle-font-size": { destination: "shellSettings.navbarSubtitleFontSize", domain: "Navbar" },
+  "navbar-subtitle-color": { destination: "shellSettings.navbarSubtitleColor", domain: "Navbar" },
+  "navbar-item-padding-horizontal": { destination: "shellSettings.navbarItemPaddingHorizontal", domain: "Navbar" },
+  "navbar-item-padding-horizontal-m": { destination: "shellSettings.navbarItemPaddingHorizontalMedium", domain: "Navbar" },
+  "navbar-backdrop-filter": { destination: "shellSettings.navbarBackdropFilter", domain: "Navbar" },
+  "navbar-mode": { destination: "shellSettings.navbarMode", domain: "Navbar" },
+  "navbar-border-width": { destination: "shellSettings.navbarBorderWidth", domain: "Navbar" },
+  "navbar-border": { destination: "shellSettings.navbarBorder", domain: "Navbar" },
+  "navbar-nav-item-line-mode": { destination: "shellSettings.navbarNavItemLineMode", domain: "Navbar" },
+  "navbar-nav-item-line-position-mode": { destination: "shellSettings.navbarNavItemLinePositionMode", domain: "Navbar" },
+  "navbar-nav-item-line-slide-mode": { destination: "shellSettings.navbarNavItemLineSlideMode", domain: "Navbar" },
+  "navbar-nav-item-line-height": { destination: "shellSettings.navbarNavItemLineHeight", domain: "Navbar" },
+  "navbar-nav-item-line-transition-duration": { destination: "shellSettings.navbarNavItemLineTransitionDuration", domain: "Navbar" },
+  "navbar-nav-item-line-hover-height": { destination: "shellSettings.navbarNavItemLineHoverHeight", domain: "Navbar" },
+  "navbar-nav-item-line-onclick-height": { destination: "shellSettings.navbarNavItemLineOnclickHeight", domain: "Navbar" },
+  "navbar-nav-item-line-active-height": { destination: "shellSettings.navbarNavItemLineActiveHeight", domain: "Navbar" },
+  "navbar-nav-item-line-opacity": { destination: "shellSettings.navbarNavItemLineOpacity", domain: "Navbar" },
+  "internal-navbar-nav-item-line-gradient": { destination: "shellSettings.navbarNavItemLineGradient", domain: "Navbar" },
+  "navbar-dropdown-margin": { destination: "shellSettings.navbarDropdownMargin", domain: "Navbar" },
+  "navbar-dropdown-shift-margin": { destination: "shellSettings.navbarDropdownShiftMargin", domain: "Navbar" },
+  "navbar-dropdown-width": { destination: "shellSettings.navbarDropdownWidth", domain: "Navbar" },
+  "navbar-dropdown-padding": { destination: "shellSettings.navbarDropdownPadding", domain: "Navbar" },
+  "navbar-dropdown-background": { destination: "shellSettings.navbarDropdownBackground", domain: "Navbar" },
+  "navbar-dropdown-large-shift-margin": { destination: "shellSettings.navbarDropdownLargeShiftMargin", domain: "Navbar" },
+  "navbar-dropdown-dropbar-shift-margin": { destination: "shellSettings.navbarDropdownDropbarShiftMargin", domain: "Navbar" },
+  "navbar-dropdown-dropbar-padding-top": { destination: "shellSettings.navbarDropdownDropbarPaddingTop", domain: "Navbar" },
+  "navbar-dropdown-dropbar-large-shift-margin": { destination: "shellSettings.navbarDropdownDropbarLargeShiftMargin", domain: "Navbar" },
+  "navbar-dropdown-nav-item-color": { destination: "shellSettings.navbarDropdownNavItemColor", domain: "Navbar" },
+  "navbar-dropdown-nav-item-hover-color": { destination: "shellSettings.navbarDropdownNavItemHoverColor", domain: "Navbar" },
+  "navbar-dropdown-nav-item-active-color": { destination: "shellSettings.navbarDropdownNavItemActiveColor", domain: "Navbar" },
+  "navbar-dropdown-nav-subtitle-font-size": { destination: "shellSettings.navbarDropdownNavSubtitleFontSize", domain: "Navbar" },
+  "navbar-dropdown-nav-subtitle-color": { destination: "shellSettings.navbarDropdownNavSubtitleColor", domain: "Navbar" },
+  "navbar-dropdown-nav-sublist-item-hover-color": { destination: "shellSettings.navbarDropdownNavSublistItemHoverColor", domain: "Navbar" },
+  "navbar-dropdown-nav-sublist-item-active-color": { destination: "shellSettings.navbarDropdownNavSublistItemActiveColor", domain: "Navbar" },
+  "navbar-dropdown-nav-item-padding-vertical": { destination: "shellSettings.navbarDropdownNavItemPaddingVertical", domain: "Navbar" },
+  "navbar-dropdown-nav-font-size": { destination: "shellSettings.navbarDropdownNavFontSize", domain: "Navbar" },
+  "navbar-dropdown-border-radius": { destination: "shellSettings.navbarDropdownBorderRadius", domain: "Navbar" },
+  "navbar-dropdown-box-shadow": { destination: "shellSettings.navbarDropdownBoxShadow", domain: "Navbar" },
+  "navbar-dropdown-shift-margin-m": { destination: "shellSettings.navbarDropdownShiftMarginMedium", domain: "Navbar" },
+  "navbar-dropdown-dropbar-shift-margin-m": { destination: "shellSettings.navbarDropdownDropbarShiftMarginMedium", domain: "Navbar" },
+  "navbar-dropdown-dropbar-large-shift-margin-m": { destination: "shellSettings.navbarDropdownDropbarLargeShiftMarginMedium", domain: "Navbar" },
+  "inverse-navbar-nav-item-hover-color": { destination: "shellSettings.inverseNavbarNavItemHoverColor", domain: "Navbar" },
 };
 
 function setNested(target: Record<string, unknown>, path: string, value: string) {
@@ -682,7 +795,8 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
     { domain: "Lists", pattern: /^list-/ },
     { domain: "Tables", pattern: /^table-/ },
     { domain: "Accordion", pattern: /^accordion-/ },
-    { domain: "Navigation", pattern: /^navbar-/ },
+    { domain: "Nav", pattern: /^(?:inverse-)?nav-/ },
+    { domain: "Navbar", pattern: /^(?:inverse-)?navbar-/ },
   ];
   for (const [variable, declaration] of latest.entries()) {
     const domain = reportOnlyPatterns.find((entry) => entry.pattern.test(variable))?.domain;
