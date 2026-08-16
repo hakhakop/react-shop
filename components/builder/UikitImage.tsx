@@ -65,6 +65,8 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
     resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAuthoredMaxWidth = imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined);
+  const generalPosition = rawBlock.visualStyle?.layout?.position;
+  const allowsPositionedOverflow = generalPosition === "absolute" || generalPosition === "fixed";
   const imageAttributes = getUikitImageAttributes(imageSemantics);
   const imageClass = `${getUikitImageClass(imageSemantics)} el-image`.trim();
   const imageAlignmentClass = imageSemantics.alignment &&
@@ -145,14 +147,16 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
         className={`shop-builder-image-figure ${imageAlignmentClass}`.trim()}
         style={{
           display: "inline-block",
-          // Intrinsic images keep their natural width, but the containing
-          // media box must never escape the Builder/storefront column.
-          maxWidth: imageAuthoredMaxWidth
-            ? `min(100%, ${imageAuthoredMaxWidth})`
-            : "100%",
-          width: imageStyle.width
-            ? `min(${imageStyle.width}, 100%)`
-            : (!imageStyle.aspectRatio ? "fit-content" : undefined),
+          maxWidth: allowsPositionedOverflow
+            ? imageAuthoredMaxWidth
+            : imageAuthoredMaxWidth
+              ? `min(100%, ${imageAuthoredMaxWidth})`
+              : "100%",
+          width: allowsPositionedOverflow
+            ? imageStyle.width ?? (!imageStyle.aspectRatio ? "fit-content" : undefined)
+            : imageStyle.width
+              ? `min(${imageStyle.width}, 100%)`
+              : (!imageStyle.aspectRatio ? "fit-content" : undefined),
           height: imageStyle.height,
         }}
       >

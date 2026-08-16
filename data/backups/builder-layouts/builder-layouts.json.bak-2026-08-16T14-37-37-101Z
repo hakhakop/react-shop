@@ -7,7 +7,7 @@
     "design": {},
     "sections": [
       {
-        "id": "contentLayout-msvl1r3u-spn8u",
+        "id": "contentLayout-msvve409-n74wl",
         "kind": "contentLayout",
         "title": "Hero",
         "background": "transparent",
@@ -20,7 +20,7 @@
         "sectionTitlePosition": "top-left",
         "sectionTitleRotation": "left",
         "sectionTitleBreakpoint": "xl",
-        "headerTransparent": false,
+        "headerTransparent": true,
         "visualStyle": {
           "background": {
             "type": "image",
@@ -85,7 +85,7 @@
                   {
                     "id": "yootheme-text-0-0-0-1",
                     "kind": "text",
-                    "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.11111</p>",
+                    "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut. ARM</p>",
                     "textVariant": "lead",
                     "elementAlign": "center",
                     "textColumnBreakpoint": "medium",
@@ -108,7 +108,7 @@
                     },
                     "contentTranslations": {
                       "en": {
-                        "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.1</p>"
+                        "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut. ENG</p>"
                       }
                     }
                   },
@@ -121,7 +121,7 @@
                         "label": "Sign up for Free",
                         "url": "?page_id=21",
                         "target": "_self",
-                        "style": "default"
+                        "style": "primary"
                       },
                       {
                         "id": "yootheme-button-0-0-0-2-1",
@@ -371,7 +371,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3u-ebjon",
+        "id": "contentLayout-msvve409-3mfar",
         "kind": "contentLayout",
         "title": "Clients",
         "background": "transparent",
@@ -583,7 +583,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3v-yxime",
+        "id": "contentLayout-msvve409-q7qva",
         "kind": "contentLayout",
         "title": "How It Works",
         "background": "transparent",
@@ -772,7 +772,7 @@
                   {
                     "id": "yootheme-panel-2-1-0-1",
                     "kind": "panel",
-                    "title": "Integrate",
+                    "title": "",
                     "eyebrow": "",
                     "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
                     "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/home-feature-integrate.svg",
@@ -1039,7 +1039,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3v-95hgq",
+        "id": "contentLayout-msvve409-12xtq",
         "kind": "contentLayout",
         "title": "Feature Grid",
         "background": "transparent",
@@ -1407,7 +1407,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3v-2doml",
+        "id": "contentLayout-msvve409-bkt26",
         "kind": "contentLayout",
         "title": "Testimonials",
         "background": "transparent",
@@ -1675,7 +1675,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3v-fdgfe",
+        "id": "contentLayout-msvve40a-iq5uv",
         "kind": "contentLayout",
         "title": "Call to Action",
         "background": "transparent",
@@ -1939,7 +1939,7 @@
         ]
       },
       {
-        "id": "contentLayout-msvl1r3v-n8u1y",
+        "id": "contentLayout-msvve40a-jdzgk",
         "kind": "contentLayout",
         "title": "Latest Posts",
         "background": "transparent",
@@ -2187,7 +2187,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-16T12:55:24.164Z"
+    "updatedAt": "2026-08-16T14:25:57.927Z"
   },
   "shop": {
     "version": 1,
@@ -4186,7 +4186,7 @@
         "headerArchitectureVersion": 2,
         "headerLayout": "two-row",
         "headerBehavior": "sticky-on-scroll-up",
-        "headerWidthMode": "boxed",
+        "headerWidthMode": "full",
         "headerBackgroundMode": "default",
         "headerTextMode": "auto",
         "headerZIndex": 40,
@@ -4214,7 +4214,7 @@
                 "imageMaxWidth": 302,
                 "headerBrandMode": "logo",
                 "headerBrandText": "WebPages",
-                "imageWidth": "302",
+                "imageWidth": "200",
                 "contentTranslations": {
                   "en": {}
                 },
@@ -4266,6 +4266,11 @@
                 "headerCategoriesShowHierarchy": true
               },
               {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
                 "id": "header-spacer",
                 "kind": "embed",
                 "embedMode": "code",
@@ -4300,11 +4305,6 @@
                 "kind": "headerSearch",
                 "headerUtilityAction": "search",
                 "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-language",
-                "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -4312,7 +4312,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-16T12:45:47.942Z"
+    "updatedAt": "2026-08-16T14:30:17.509Z"
   },
   "footer": {
     "version": 1,
@@ -9130,12 +9130,17 @@
                 "id": "page:enterprise-hero",
                 "kind": "hero",
                 "eyebrow": "New page",
-                "title": "Enterprise",
+                "title": "Enterprise Arm",
                 "body": "Ներկայացնել this page with a clear headline, useful context, and a focused next step.",
                 "buttonLabel": "Get Started",
                 "buttonUrl": "#",
                 "buttonStyle": "primary",
-                "elementPadding": "lg"
+                "elementPadding": "lg",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Enterprise Eng"
+                  }
+                }
               }
             ]
           }
@@ -9211,7 +9216,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-16T12:40:58.415Z"
+    "updatedAt": "2026-08-16T13:09:35.079Z"
   },
   "page:clean": {
     "version": 1,
