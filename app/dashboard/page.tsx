@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
+import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
 
 export const metadata = {
   title: "Root Website Builder",
@@ -39,11 +41,38 @@ function dashboardPathWithSearch(
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  const user = await getCurrentUser(await cookies());
+  const cookieStore = await cookies();
+  const user = await getCurrentUser(cookieStore);
+  const resolvedSearchParams = await searchParams;
 
   if (!user) {
-    redirect(loginRedirectFor(dashboardPathWithSearch(await searchParams)));
+    redirect(loginRedirectFor(dashboardPathWithSearch(resolvedSearchParams)));
   }
+
+  const requestedTargetValue =
+    resolvedSearchParams?.page ?? resolvedSearchParams?.template ?? "home";
+  const requestedTarget = Array.isArray(requestedTargetValue)
+    ? requestedTargetValue[0] ?? "home"
+    : requestedTargetValue;
+  const initialPage = normalizeBuilderLayoutKey(requestedTarget);
+  const hasStrictDocumentTarget = Boolean(
+    resolvedSearchParams?.document ||
+    resolvedSearchParams?.routingTemplate ||
+    resolvedSearchParams?.individual,
+  );
+  const initialPageHydration =
+    !hasStrictDocumentTarget && initialPage !== "header" && initialPage !== "footer"
+      ? await resolveInitialBuilderPage({
+          page: initialPage,
+          contentLanguage: ["hy", "en", "ru"].includes(
+            cookieStore.get("website_content_language_root")?.value as never,
+          )
+            ? cookieStore.get("website_content_language_root")!.value
+            : "hy",
+          primaryContentLanguage: "hy",
+          wordpressMediaOrigin: getWordPressBaseUrl(),
+        })
+      : undefined;
 
   return (
     <SaaSI18nProvider userLocale={user.language} persistForUser>
@@ -53,6 +82,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           primaryContentLanguage="hy"
           enabledContentLanguages={["hy", "en", "ru"]}
           wordpressMediaOrigin={getWordPressBaseUrl()}
+          initialPageHydration={initialPageHydration}
         />
       </Suspense>
     </SaaSI18nProvider>

@@ -77,6 +77,7 @@ import {
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
+import type { BuilderLayout } from "@/lib/builderLayouts";
 import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
@@ -375,6 +376,45 @@ const INSPECTOR_DEFAULT_HEIGHT = 720;
 const INSPECTOR_MIN_CANVAS_WIDTH = 320;
 const INSPECTOR_RESIZE_BREAKPOINT = 1180;
 const INSPECTOR_VIEWPORT_GUTTER = 12;
+
+type PublishedBuilderLayoutPayload = {
+  layout?: BuilderState | null;
+  renderLayout?: BuilderState | null;
+  editorContext?: BuilderEditorContext;
+  dynamicContentDiagnostics?: Array<{
+    status: "materialized" | "fallback";
+    message?: string;
+  }>;
+};
+
+// Share only an in-flight request while the dashboard route settles. Completed
+// documents are not cached here; the published API remains the hydration
+// authority for every genuine load.
+const publishedLayoutRequests = new Map<
+  string,
+  Promise<{ ok: boolean; payload: PublishedBuilderLayoutPayload }>
+>();
+
+function fetchPublishedLayoutOnce(url: string) {
+  const existing = publishedLayoutRequests.get(url);
+  if (existing) return existing;
+
+  let request!: Promise<{ ok: boolean; payload: PublishedBuilderLayoutPayload }>;
+  request = fetch(url, { cache: "no-store" })
+    .then(async (response) => ({
+      ok: response.ok,
+      payload: response.ok
+        ? await response.json() as PublishedBuilderLayoutPayload
+        : {},
+    }))
+    .finally(() => {
+      if (publishedLayoutRequests.get(url) === request) {
+        publishedLayoutRequests.delete(url);
+      }
+    });
+  publishedLayoutRequests.set(url, request);
+  return request;
+}
 
 type InspectorMode = "docked" | "floating";
 type InspectorFloatingRect = {
@@ -2007,6 +2047,10 @@ export type DashboardBuilderProps = {
   /** Server-provided CMS origin for canonical imported WordPress media URLs. */
   wordpressMediaOrigin?: string | null;
   requestedLayoutType?: LayoutLibraryType | null;
+  initialPageHydration?: {
+    authoredLayout: BuilderLayout | null;
+    renderLayout: BuilderLayout | null;
+  };
 };
 
 export default function DashboardBuilder({
@@ -2018,6 +2062,7 @@ export default function DashboardBuilder({
   enabledContentLanguages = [primaryContentLanguage],
   wordpressMediaOrigin = null,
   requestedLayoutType = null,
+  initialPageHydration,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { locale, setLocale, t } = useTranslation();
@@ -2042,7 +2087,13 @@ export default function DashboardBuilder({
   const [activeRoutingTemplateId, setActiveRoutingTemplateId] = useState<string | null>(null);
   const [activeIndividualContextToken, setActiveIndividualContextToken] = useState<string | null>(null);
   const ordinaryLoadRequestRef = useRef(0);
+  const ordinaryLoadIdentityRef = useRef("");
+  const initialHydrationConsumedRef = useRef("");
   const strictBuilderTargetRef = useRef(false);
+  const shellTransitionRef = useRef<{
+    direction: "enter" | "exit";
+    page: BuilderLayoutKey;
+  } | null>(null);
   const strictBuilderTargetIdentityRef = useRef("");
   const strictBuilderTargetParts = [
     searchParams.get("document") ?? "",
@@ -2158,7 +2209,60 @@ export default function DashboardBuilder({
   const shellSettingsStatusLabel = isWebsiteScopedBuilder
     ? "Website settings"
     : "Style customizer";
-  const [builderState, setRawBuilderState] = useState<BuilderState>(defaultState);
+  const initialResolvedPage = parseBuilderLayoutKey(
+    searchParams.get("page") ?? searchParams.get("template"),
+  );
+  const initialRequestedPage =
+    hasStrictBuilderTarget ||
+    initialResolvedPage === "header" ||
+    initialResolvedPage === "footer"
+      ? null
+      : initialResolvedPage;
+  const initialPublishedState = useMemo(() => initialPageHydration?.authoredLayout
+    ? normalizeBuilderState({
+        page: initialPageHydration.authoredLayout.page,
+        targetType: initialPageHydration.authoredLayout.targetType ?? "page",
+        template: initialPageHydration.authoredLayout.template,
+        documentId: initialPageHydration.authoredLayout.documentId,
+        displayName: initialPageHydration.authoredLayout.displayName,
+        design: {
+          ...defaultDesign,
+          ...(initialPageHydration.authoredLayout.design ?? {}),
+        } as BuilderState["design"],
+        sections: initialPageHydration.authoredLayout.sections,
+      }, initialPageHydration.authoredLayout.page)
+    : null, [initialPageHydration]);
+  const initialRenderState = useMemo(() => initialPageHydration?.renderLayout
+    ? normalizeBuilderState({
+        page: initialPageHydration.renderLayout.page,
+        targetType: initialPageHydration.renderLayout.targetType ?? "page",
+        template: initialPageHydration.renderLayout.template,
+        documentId: initialPageHydration.renderLayout.documentId,
+        displayName: initialPageHydration.renderLayout.displayName,
+        design: {
+          ...defaultDesign,
+          ...(initialPageHydration.renderLayout.design ?? {}),
+        } as BuilderState["design"],
+        sections: initialPageHydration.renderLayout.sections,
+      }, initialPageHydration.renderLayout.page)
+    : null, [initialPageHydration]);
+  const initialRenderProjection = useMemo(() => initialPublishedState && initialRenderState
+    ? {
+        page: initialPublishedState.page,
+        sourceSignature: JSON.stringify(initialPublishedState),
+        sections: initialRenderState.sections,
+      }
+    : null, [initialPublishedState, initialRenderState]);
+  const [builderState, setRawBuilderState] = useState<BuilderState>(() =>
+    initialPublishedState ?? (
+      initialRequestedPage
+        ? hydrateDocumentBuilderState(
+            loadDraftForKey(initialRequestedPage, storageKeys),
+            defaultShellSettings,
+          )
+        : defaultState
+    ),
+  );
   useEffect(() => {
     if (builderState.page !== "header" && builderState.page !== "footer") {
       pageContextStateRef.current = builderState;
@@ -2168,7 +2272,7 @@ export default function DashboardBuilder({
     page: BuilderLayoutKey;
     sourceSignature: string;
     sections: BuilderSection[];
-  } | null>(null);
+  } | null>(initialRenderProjection);
   const dynamicContentSignature = useMemo(
     () => dynamicContentPreviewSignature(builderState.sections),
     [builderState.sections],
@@ -2305,6 +2409,7 @@ export default function DashboardBuilder({
   } | null>(null);
   const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
   const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
+  const footerDocumentLoadRef = useRef<Promise<BuilderState | null> | null>(null);
   const [presetToApply, setPresetToApply] = useState<{ presetKey: string; name: string } | null>(null);
   const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
     "dark",
@@ -2570,6 +2675,7 @@ export default function DashboardBuilder({
     hidden: false,
   });
   const headerPageContextRef = useRef<HTMLDivElement>(null);
+  const [footerEntryHeight, setFooterEntryHeight] = useState<number | null>(null);
   const builderWorkspaceRef = useRef<HTMLElement>(null);
   const inspectorPanelRef = useRef<HTMLDivElement>(null);
   const inspectorToggleRef = useRef<HTMLButtonElement>(null);
@@ -2654,6 +2760,25 @@ export default function DashboardBuilder({
     },
     [contentLanguage, headerContextState.sections, primaryContentLanguage],
   );
+  const headerContextRenderSections = useMemo(() => {
+    if (
+      !builderRenderProjection ||
+      builderRenderProjection.page !== headerContextState.page ||
+      builderRenderProjection.sourceSignature !== JSON.stringify(headerContextState)
+    ) {
+      return undefined;
+    }
+    return resolveContentSections(
+      builderRenderProjection.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    );
+  }, [
+    builderRenderProjection,
+    contentLanguage,
+    headerContextState,
+    primaryContentLanguage,
+  ]);
   const headerDocumentState = useMemo(
     () => builderState.page === "header"
       ? builderState
@@ -3201,10 +3326,25 @@ export default function DashboardBuilder({
       restoredDraftKeysRef.current = new Set();
       draftMetadataRef.current = {};
     }
-    const draft = hydrateDocumentBuilderState(
-      resolveBuilderMediaUrls(loadInitialState(storageKeys), wordpressMediaOrigin),
-      shellSettings,
+    const localDraft = initialRequestedPage
+      ? hydrateDocumentBuilderState(
+          loadDraftForKey(initialRequestedPage, storageKeys),
+          shellSettings,
+        )
+      : hydrateDocumentBuilderState(
+          resolveBuilderMediaUrls(loadInitialState(storageKeys), wordpressMediaOrigin),
+          shellSettings,
+        );
+    const hasCompatibleInitialDraft = Boolean(
+      initialPublishedState &&
+      initialRequestedPage === initialPublishedState.page &&
+      restoredDraftKeysRef.current.has(initialRequestedPage) &&
+      draftMetadataRef.current[initialRequestedPage]?.basePublishedSignature ===
+        JSON.stringify(initialPublishedState),
     );
+    const draft = initialPublishedState && !hasCompatibleInitialDraft
+      ? initialPublishedState
+      : localDraft;
     let localPages: BuilderCustomPage[] = [];
     try {
       const rawPages = window.localStorage.getItem(storageKeys.pages);
@@ -3217,11 +3357,18 @@ export default function DashboardBuilder({
       localPages = [];
     }
     setCustomPages(localPages);
-    setBuilderRenderProjection(null);
+    setBuilderRenderProjection(initialRenderProjection);
     setBuilderState(draft);
     setSelectedId("");
     setDraftReady(true);
-  }, [storageKeys, wordpressMediaOrigin]);
+  }, [
+    initialPublishedState,
+    initialRenderProjection,
+    initialRequestedPage,
+    shellSettings,
+    storageKeys,
+    wordpressMediaOrigin,
+  ]);
 
   useEffect(() => {
     const scheme = builderState.design.colorScheme ?? "auto";
@@ -3585,6 +3732,16 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (!draftReady) return;
+    const shellTransition = shellTransitionRef.current;
+    if (shellTransition) {
+      const requestedPage = resolveRequestedPageFromSearch(builderState.page);
+      if (requestedPage !== shellTransition.page) return;
+      shellTransitionRef.current = null;
+    }
+    // Shell entry owns the active document transition until the synchronized
+    // URL is visible. Do not let the previous page query restore the page
+    // draft over the shell target during that transaction.
+    if (activeShellEntry) return;
     if (searchParams.get("document")) return;
     const nextKey = resolveRequestedPageFromSearch(builderState.page);
     if (nextKey === builderState.page) return;
@@ -3602,8 +3759,10 @@ export default function DashboardBuilder({
     setPublishStatus("Loaded from menu selection");
   }, [
     builderState.page,
+    activeShellEntry,
     customPages,
     draftReady,
+    resolveRequestedPageFromSearch,
     searchParams,
     storageKeys,
     websiteId,
@@ -3712,10 +3871,10 @@ export default function DashboardBuilder({
     if (builderState.page === "header") {
       setHeaderDocumentPreviewState(builderState);
     }
-    if (builderState.page === "footer") {
+    if (builderState.page === "footer" && footerDocumentPreviewState) {
       setFooterDocumentPreviewState(builderState);
     }
-  }, [builderState]);
+  }, [builderState, footerDocumentPreviewState]);
 
   useEffect(() => {
     if (!draftReady || builderState.page === "header" || headerDocumentPreviewState) return;
@@ -3750,19 +3909,18 @@ export default function DashboardBuilder({
     };
   }, [builderApiUrl, builderState.page, draftReady, headerDocumentPreviewState, shellSettings]);
 
-  useEffect(() => {
-    if (!draftReady || builderState.page === "footer" || footerDocumentPreviewState) return;
-    let cancelled = false;
+  const loadFooterDocumentPreview = useCallback(async () => {
+    if (footerDocumentPreviewState) return footerDocumentPreviewState;
+    if (footerDocumentLoadRef.current) return footerDocumentLoadRef.current;
 
-    async function loadFooterDocumentPreview() {
-      try {
-        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "footer" }), {
-          cache: "no-store",
-        });
-        if (!response.ok) return;
+    const request = fetch(builderApiUrl("/api/builder-layouts", { key: "footer" }), {
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
         const payload = (await response.json()) as { layout?: BuilderState | null };
-        if (cancelled || !payload.layout?.sections?.length) return;
-        setFooterDocumentPreviewState(hydrateDocumentBuilderState(
+        if (!payload.layout?.sections?.length) return null;
+        const nextState = hydrateDocumentBuilderState(
           normalizeBuilderState({
             page: "footer",
             targetType: "footer",
@@ -3770,17 +3928,23 @@ export default function DashboardBuilder({
             sections: payload.layout.sections,
           }, "footer"),
           shellSettings,
-        ));
-      } catch {
-        // Keep the locally hydrated Footer document when the published layout is unavailable.
-      }
-    }
+        );
+        setFooterDocumentPreviewState(nextState);
+        return nextState;
+      })
+      .catch(() => null)
+      .finally(() => {
+        footerDocumentLoadRef.current = null;
+      });
 
+    footerDocumentLoadRef.current = request;
+    return request;
+  }, [builderApiUrl, footerDocumentPreviewState, shellSettings]);
+
+  useEffect(() => {
+    if (!draftReady || footerDocumentPreviewState) return;
     void loadFooterDocumentPreview();
-    return () => {
-      cancelled = true;
-    };
-  }, [builderApiUrl, builderState.page, draftReady, footerDocumentPreviewState, shellSettings]);
+  }, [draftReady, footerDocumentPreviewState, loadFooterDocumentPreview]);
 
   useEffect(() => {
     if (!draftReady) return;
@@ -3823,6 +3987,9 @@ export default function DashboardBuilder({
     if (!rootId) return;
 
     if (selectedId === rootId) {
+      setInspectorTab("layout");
+      setSectionSettingsOpen(true);
+      setInspectorOpen(true);
       setActiveShellEntry(null);
       return;
     }
@@ -3841,7 +4008,7 @@ export default function DashboardBuilder({
 
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
-    options: { syncUrl?: boolean } = {},
+    options: { syncUrl?: boolean; state?: BuilderState } = {},
   ) => {
     setActiveDynamicDocumentId(null);
     setActiveRoutingTemplateId(null);
@@ -3851,7 +4018,7 @@ export default function DashboardBuilder({
     setBuilderEditorContext(null);
     setTemplatePreviewCandidates([]);
     setTemplatePreviewIdentity(null);
-    const nextState = hydrateDocumentBuilderState(
+    const nextState = options.state ?? hydrateDocumentBuilderState(
       loadDraftForKey(nextKey, storageKeys),
       shellSettings,
     );
@@ -4811,7 +4978,11 @@ export default function DashboardBuilder({
     revealCanvasTarget(row?.id);
   };
 
-  const enterShellEdit = (shellType: "header" | "footer") => {
+  const enterShellEdit = async (shellType: "header" | "footer") => {
+    if (shellType === "footer") {
+      const footerSlot = document.querySelector<HTMLElement>(".builder-preview-footer-slot");
+      setFooterEntryHeight(footerSlot?.getBoundingClientRect().height ?? null);
+    }
     if (builderState.page !== "header" && builderState.page !== "footer") {
       pageContextStateRef.current = builderState;
       setShellPageContextState(builderState);
@@ -4820,12 +4991,20 @@ export default function DashboardBuilder({
       builderState.page === "header" || builderState.page === "footer"
         ? headerContextKey
         : builderState.page;
+    const targetState = shellType === "footer"
+      ? footerDocumentPreviewState ?? await loadFooterDocumentPreview()
+      : null;
+    const nextState = targetState ?? hydrateDocumentBuilderState(
+      loadDraftForKey(shellType, storageKeys),
+      shellSettings,
+    );
     const shellRootId =
-      loadDraftForKey(shellType, storageKeys).sections[0]?.id ??
+      nextState.sections[0]?.id ??
       (shellType === "header" ? "header-document" : "footer-document");
+    shellTransitionRef.current = { direction: "enter", page: shellType };
     setActiveShellEntry({ shellType, rootId: shellRootId });
     setHeaderContextKey(contextKey);
-    switchBuilderTarget(shellType, { syncUrl: false });
+    switchBuilderTarget(shellType, { syncUrl: false, state: nextState });
     router.replace(`${pathname}?page=${shellType}&context=${encodeURIComponent(contextKey)}`, { scroll: false });
     setHeaderSelected(shellType === "header");
     setFooterSelected(shellType === "footer");
@@ -4838,11 +5017,7 @@ export default function DashboardBuilder({
     setSectionSettingsOpen(true);
     setSidebarCollapsed(false);
     setSidebarTab("builder");
-    window.setTimeout(() => {
-      if (builderStateRef.current.page !== shellType) return;
-      selectSection(shellRootId, true);
-      if (shellType === "footer") setFooterSelected(true);
-    }, 100);
+    if (shellType === "footer") setFooterSelected(true);
   };
 
   const selectHeader = () => {
@@ -4856,9 +5031,17 @@ export default function DashboardBuilder({
   const exitShellEdit = () => {
     if (builderState.page !== "header" && builderState.page !== "footer") return;
     const contextKey = headerContextKey;
+    const preservedPageState =
+      shellPageContextState ?? pageContextStateRef.current;
+    if (!preservedPageState) return;
+
+    shellTransitionRef.current = { direction: "exit", page: contextKey };
     setActiveShellEntry(null);
     setShellPageContextState(null);
-    switchBuilderTarget(contextKey, { syncUrl: false });
+    undoHistoryRef.current = [structuredClone(preservedPageState)];
+    setCommittedBuilderStateSignature(JSON.stringify(preservedPageState));
+    setBuilderState(preservedPageState);
+    setPublishedDocumentReady(true);
     router.replace(`${pathname}?page=${contextKey}`, { scroll: false });
     setHeaderSelected(false);
     setSelectedId("");
@@ -7285,28 +7468,51 @@ export default function DashboardBuilder({
     // authored document and its root materialization together. A generic
     // document reload would discard that validated render projection.
     if (strictBuilderTargetRef.current) return;
-    const requestId = ++ordinaryLoadRequestRef.current;
-    setPublishStatus("Reading published layout...");
     const requestedState = builderStateRef.current;
     const requestedPage = resolveRequestedPageFromSearch(requestedState.page);
+    const hasStoredDraft = restoredDraftKeysRef.current.has(requestedPage);
+    const requestUrl = builderApiUrl("/api/builder-layouts",
+      activeDynamicDocumentId && requestedState.page.startsWith("dynamic:")
+        ? { document: activeDynamicDocumentId }
+        : { key: requestedPage },
+    );
+    const requestIdentity = requestUrl;
+    if (ordinaryLoadIdentityRef.current === requestIdentity) return;
+    ordinaryLoadIdentityRef.current = requestIdentity;
+    const requestId = ++ordinaryLoadRequestRef.current;
+    setPublishStatus("Reading published layout...");
     const requestedStateForPage = {
       ...requestedState,
       page: requestedPage,
     };
     const requestedSignature = JSON.stringify(requestedStateForPage);
-    const hasStoredDraft = restoredDraftKeysRef.current.has(requestedPage);
-    const response = await fetch(builderApiUrl("/api/builder-layouts",
-      activeDynamicDocumentId && requestedState.page.startsWith("dynamic:")
-        ? { document: activeDynamicDocumentId }
-        : { key: requestedPage },
-    ), {
-      cache: "no-store",
-    });
+    const canUseInitialHydration = Boolean(
+      initialPageHydration?.authoredLayout &&
+      initialPageHydration.authoredLayout.page === requestedPage &&
+      initialHydrationConsumedRef.current !== requestUrl,
+    );
+    const response: {
+      ok: boolean;
+      payload: PublishedBuilderLayoutPayload;
+    } = canUseInitialHydration
+      ? {
+          ok: true,
+          payload: {
+            layout: initialPageHydration!.authoredLayout,
+            renderLayout: initialPageHydration!.renderLayout,
+          },
+        }
+      : await fetchPublishedLayoutOnce(requestUrl);
+    if (canUseInitialHydration) {
+      initialHydrationConsumedRef.current = requestUrl;
+    }
 
     if (
       requestId !== ordinaryLoadRequestRef.current ||
       strictBuilderTargetRef.current
-    ) return;
+    ) {
+      return;
+    }
 
     if (!response.ok) {
       setPublishStatus("Could not read published layout");
@@ -7314,20 +7520,15 @@ export default function DashboardBuilder({
       return;
     }
 
-    const payload = (await response.json()) as {
-      layout?: BuilderState | null;
-      renderLayout?: BuilderState | null;
-      editorContext?: BuilderEditorContext;
-      dynamicContentDiagnostics?: Array<{
-        status: "materialized" | "fallback";
-        message?: string;
-      }>;
-      };
+    const payload = response.payload;
+
 
     if (
       requestId !== ordinaryLoadRequestRef.current ||
       strictBuilderTargetRef.current
-    ) return;
+    ) {
+      return;
+    }
 
     if (payload.editorContext) setBuilderEditorContext(payload.editorContext);
 
@@ -7439,8 +7640,8 @@ export default function DashboardBuilder({
     activeRoutingTemplateId,
     resolveRequestedPageFromSearch,
     builderApiUrl,
-    builderState.page,
     storageKeys,
+    initialPageHydration,
   ]);
 
   useEffect(() => {
@@ -7448,10 +7649,17 @@ export default function DashboardBuilder({
     // Strict document sessions hydrate through their canonical owner context.
     // Do not let the ordinary page loader race that request and replace the
     // authored document with the initial Home draft.
-    if (searchParams.get("document")) return;
+    if (
+      shellTransitionRef.current ||
+      activeShellEntry ||
+      searchParams.get("document") ||
+      builderState.page === "header" ||
+      builderState.page === "footer"
+    ) return;
+    if (resolveRequestedPageFromSearch(builderState.page) !== builderState.page) return;
     if (activeRoutingTemplateId || activeIndividualContextToken) return;
     void loadPublishedLayout();
-  }, [activeIndividualContextToken, activeRoutingTemplateId, builderState.page, draftReady, loadPublishedLayout, searchParams]);
+  }, [activeIndividualContextToken, activeRoutingTemplateId, activeShellEntry, builderState.page, draftReady, loadPublishedLayout, resolveRequestedPageFromSearch, searchParams]);
 
   useEffect(() => {
     if (!draftReady || !publishedDocumentReady) return;
@@ -10650,17 +10858,6 @@ export default function DashboardBuilder({
             {builderFrontendActionLabel(builderEditorContext)}
           </button>
         ) : null}
-        {builderState.page === "header" || builderState.page === "footer" ? (
-          <button
-            type="button"
-            className="builder-canvas-control is-primary"
-            onClick={exitShellEdit}
-            title="Back to Page"
-          >
-            <ArrowLeft size={14} />
-            Back to Page
-          </button>
-        ) : null}
         <button
           type="button"
           className="builder-canvas-control"
@@ -10824,6 +11021,92 @@ export default function DashboardBuilder({
       </div>
     </div>
   ) : null;
+
+  // Both the page context and an active Footer use the same canonical Builder
+  // canvas. Only the document-specific sections/design/page metadata vary.
+  const sharedPreviewCanvasProps = {
+    device,
+    previewWidth: previewCanvasWidth,
+    interactionScale: device === "desktop" ? 1 : previewScale,
+    continuousGeometryUpdates: isResizingDevice,
+    previewProducts,
+    previewCategoryTree,
+    previewCategoryCounts,
+    layoutScheme,
+    shellSettings,
+    spacingOverlayEnabled,
+    selectedId,
+    selectedLayoutColumnKey,
+    selectedLayoutRowIndex,
+    selectedLayoutBlockKey,
+    draggingSectionId,
+    draggingLayoutBlockKey,
+    onSelect: selectSection,
+    onSelectColumn: selectLayoutColumn,
+    onSelectRow: selectLayoutRow,
+    onSelectBlock: selectLayoutBlock,
+    onOpenInspector: openInspectorPanel,
+    onDragStart: setDraggingSectionId,
+    onDragEnd: () => setDraggingSectionId(null),
+    onReorder: reorderSection,
+    onBlockDragStart: setDraggingLayoutBlockKey,
+    onBlockDragEnd: () => setDraggingLayoutBlockKey(null),
+    onMoveBlock: moveLayoutBlock,
+    onCreateBlock: createLayoutBlockAtDrop,
+    onDuplicateBlock: duplicateLayoutBlock,
+    onDeleteBlock: deleteLayoutBlock,
+    onUpdateBlock: updateLayoutBlockByKey,
+    onUpdateGridItem: updateGridItemByKey,
+    onDeleteGridItem: deleteGridItemByKey,
+    onDuplicateGridItem: duplicateGridItemByKey,
+    onMoveGridItem: moveGridItemByKey,
+    onMoveBadge: moveBadgeByKey,
+    onMoveButton: moveButtonByKey,
+    onMoveListItem: moveListItemByKey,
+    onDeleteBadge: deleteBadgeByKey,
+    onDuplicateBadge: duplicateBadgeByKey,
+    onDeleteButton: deleteButtonByKey,
+    onDuplicateButton: duplicateButtonByKey,
+    onDeleteListItem: deleteListItemByKey,
+    onDuplicateListItem: duplicateListItemByKey,
+    onDeleteSectionBadge: deleteSectionBadgeByKey,
+    onDuplicateSectionBadge: duplicateSectionBadgeByKey,
+    onMoveSectionBadge: moveSectionBadgeByKey,
+    onUploadGridItemImage: pickGridItemImage,
+    onUploadBlockImage: pickBlockImage,
+    onAddSection: (targetSectionId: string, placement: "above" | "below") =>
+      addWireframeNear(1, 1, targetSectionId, placement, undefined, "section"),
+    onAddRow: addRowNear,
+    onAddColumnAfter: addSelectedLayoutItem,
+    onStackColumnBelow: stackColumnBelow,
+    onAppendNestedRow: appendNestedRow,
+    onDeleteNestedRow: deleteNestedRow,
+    onUnwrapNestedColumn: unwrapNestedColumn,
+    onDeleteRow: deleteEmptyRow,
+    onDuplicateRow: duplicateLayoutRow,
+    onMoveRow: moveLayoutRow,
+    onSaveSectionTemplate: saveSectionTemplateById,
+    onSaveRowTemplate: saveRowTemplateByIndex,
+    onSaveElementTemplate: saveElementTemplateByKey,
+    onMoveBlockWithinColumn: moveLayoutBlockWithinColumn,
+    onDropSectionTemplate: insertSectionTemplateNear,
+    onDropRowTemplate: insertRowTemplateAt,
+    onDropElementTemplate: insertElementTemplateAt,
+    onMoveSection: moveSection,
+    onDuplicateSection: duplicateSection,
+    onDeleteSection: deleteSection,
+    onOpenSpacingSettings: openSpacingSettings,
+    onSetSidebarTab: setSidebarTab,
+    onOpenElementsPanel: openElementsPanel,
+    onCycleSectionSpacing: cycleSectionSpacing,
+    onApplyLayoutPreset: applyContentLayoutPreset,
+  };
+  const isPrimaryPageHydrationPending =
+    !publishedDocumentReady &&
+    !initialPageHydration?.authoredLayout &&
+    !activeShellEntry &&
+    builderState.page !== "header" &&
+    builderState.page !== "footer";
 
   return (
     <div
@@ -11047,6 +11330,7 @@ export default function DashboardBuilder({
                     canDelete={false}
                     onSelect={() => selectShellRoot("header")}
                     onSettings={() => selectShellRoot("header", true)}
+                    onBackToPage={builderState.page === "header" ? exitShellEdit : undefined}
                   />
                   <HeaderShellView
                     layoutOverride={shellSettings.headerLayout}
@@ -11377,6 +11661,7 @@ export default function DashboardBuilder({
                     canDelete={false}
                     onSelect={() => selectShellRoot("header")}
                     onSettings={() => selectShellRoot("header", true)}
+                    onBackToPage={undefined}
                   />
                 </div>
               )}
@@ -11384,8 +11669,18 @@ export default function DashboardBuilder({
             <div
               ref={headerPageContextRef}
               data-overlap-header={currentHeaderDocumentSettings.overlay ? "true" : "false"}
-              className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
-              aria-label={builderState.page === "header" ? "Locked page context" : undefined}
+              className={
+                builderState.page === "header"
+                  ? "builder-context-page-preview builder-header-page-context is-locked"
+                  : builderState.page === "footer"
+                    ? "builder-context-page-preview builder-footer-page-context is-locked"
+                    : ""
+              }
+              aria-label={
+                builderState.page === "header" || builderState.page === "footer"
+                  ? "Locked page context"
+                  : undefined
+              }
               onClick={builderState.page === "header" ? exitShellEdit : undefined}
             >
             {builderState.page === "header" ? (
@@ -11401,17 +11696,24 @@ export default function DashboardBuilder({
                 </div>
               </div>
             ) : null}
-            <ProductCategoryFilterProvider key={headerContextState.page}>
-              <PreviewCanvas
+            {isPrimaryPageHydrationPending ? (
+              <div className="builder-preview-hydrating" role="status">
+                Loading page…
+              </div>
+            ) : (
+              <ProductCategoryFilterProvider key={headerContextState.page}>
+                <PreviewCanvas
                 device={device}
                 previewWidth={previewCanvasWidth}
                 interactionScale={device === "desktop" ? 1 : previewScale}
                 continuousGeometryUpdates={isResizingDevice}
                 sections={headerContextSections}
                 renderSections={
-                  builderState.page !== "header" && builderState.page !== "footer"
-                    ? materializedPreviewSections ?? undefined
-                    : undefined
+                  builderState.page === "footer"
+                    ? headerContextRenderSections
+                    : builderState.page !== "header"
+                      ? materializedPreviewSections ?? undefined
+                      : undefined
                 }
                 page={headerContextState.page}
                 previewProducts={previewProducts}
@@ -11496,44 +11798,71 @@ export default function DashboardBuilder({
                 onOpenElementsPanel={openElementsPanel}
                 onCycleSectionSpacing={cycleSectionSpacing}
                 onApplyLayoutPreset={applyContentLayoutPreset}
-              />
-            </ProductCategoryFilterProvider>
+                />
+              </ProductCategoryFilterProvider>
+            )}
             </div>
-            <div className="builder-preview-footer-slot" aria-label="Footer preview">
+            <div
+              className="builder-preview-footer-slot"
+              aria-label="Footer preview"
+              style={
+                builderState.page === "footer" && footerEntryHeight !== null
+                  ? { minHeight: `${footerEntryHeight}px` }
+                  : undefined
+              }
+            >
                 {builderState.page === "footer" ? (
-                  <BuilderContextToolbar
-                    context="shell"
-                    label="Footer"
-                    canMoveUp={false}
-                    canMoveDown={false}
-                    canDelete={false}
-                    onSelect={() => selectShellRoot("footer")}
-                    onSettings={() => selectShellRoot("footer", true)}
-                  />
+                  <>
+                    <BuilderContextToolbar
+                      context="shell"
+                      label="Footer"
+                      canMoveUp={false}
+                      canMoveDown={false}
+                      canDelete={false}
+                      onSelect={() => selectShellRoot("footer")}
+                      onSettings={() => selectShellRoot("footer", true)}
+                      onBackToPage={builderState.page === "footer" ? exitShellEdit : undefined}
+                    />
+                    <ProductCategoryFilterProvider key="footer-edit-canvas">
+                      <PreviewCanvas
+                        {...sharedPreviewCanvasProps}
+                        sections={localizedSections}
+                        page="footer"
+                        pageLabel="Footer"
+                        design={builderState.design}
+                        headerOverlay={false}
+                      />
+                    </ProductCategoryFilterProvider>
+                  </>
                 ) : null}
-                <StorefrontBuilderRenderer
-                  layout={footerSlotLayout}
-                  page="footer"
-                  pageLabel="Footer"
-                  rootElement="footer"
-                  shellSettings={shellSettings}
-                />
-                <button
-                  type="button"
-                  className="builder-preview-footer-edit-overlay"
-                  aria-label="Edit Footer"
-                  title="Edit Footer"
-                  onClick={selectFooter}
-                />
-                <BuilderContextToolbar
-                  context="shell"
-                  label="Footer"
-                  canMoveUp={false}
-                  canMoveDown={false}
-                  canDelete={false}
-                  onSelect={() => selectShellRoot("footer")}
-                  onSettings={() => selectShellRoot("footer", true)}
-                />
+                {builderState.page !== "footer" ? (
+                  <>
+                    <StorefrontBuilderRenderer
+                      layout={footerSlotLayout}
+                      page="footer"
+                      pageLabel="Footer"
+                      rootElement="footer"
+                      shellSettings={shellSettings}
+                    />
+                    <button
+                      type="button"
+                      className="builder-preview-footer-edit-overlay"
+                      aria-label="Edit Footer"
+                      title="Edit Footer"
+                      onClick={selectFooter}
+                    />
+                    <BuilderContextToolbar
+                      context="shell"
+                      label="Footer"
+                      canMoveUp={false}
+                      canMoveDown={false}
+                      canDelete={false}
+                      onSelect={() => selectShellRoot("footer")}
+                      onSettings={() => selectShellRoot("footer", true)}
+                      onBackToPage={undefined}
+                    />
+                  </>
+                ) : null}
             </div>
             {device !== "desktop" && (
               <>
@@ -13848,6 +14177,7 @@ function BuilderContextToolbar({
   onChangeLayout,
   onSelect,
   onSettings,
+  onBackToPage,
   onMoveUp,
   onMoveDown,
   onSave,
@@ -13862,6 +14192,7 @@ function BuilderContextToolbar({
   onChangeLayout?: () => void;
   onSelect?: () => void;
   onSettings: () => void;
+  onBackToPage?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onSave?: () => void;
@@ -13891,6 +14222,16 @@ function BuilderContextToolbar({
         >
           <Pencil size={13} />
         </button>
+        {onBackToPage ? (
+          <button
+            type="button"
+            onClick={onBackToPage}
+            aria-label="Back to Page"
+            title="Back to Page"
+          >
+            <ArrowLeft size={13} />
+          </button>
+        ) : null}
       </div>
     );
   }
