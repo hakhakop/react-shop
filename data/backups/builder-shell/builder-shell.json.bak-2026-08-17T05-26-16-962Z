@@ -7,7 +7,7 @@
   "headerBackgroundMode": "none",
   "headerTextMode": "auto",
   "headerLayout": "two-row",
-  "headerBrandMode": "both",
+  "headerBrandMode": "brand",
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
   "headerLogoAlt": "WebPages logo",
@@ -225,6 +225,12 @@
   "buttonHoverEffect": "lift",
   "menuItems": [
     {
+      "id": "menu_nlbej8tax",
+      "label": "New",
+      "url": "/new-clean-page",
+      "parentId": null
+    },
+    {
       "id": "home",
       "label": "Գլխավոր",
       "url": "/",
@@ -273,27 +279,27 @@
       "parentId": "menu_sbyhyzc43"
     },
     {
-      "id": "menu_02ncte54p",
-      "label": "Devstack Pricing",
-      "url": "/devstack-pricing",
-      "parentId": "home"
-    },
-    {
       "id": "shop",
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
     },
     {
-      "id": "menu_nlbej8tax",
-      "label": "New",
-      "url": "/new-clean-page",
-      "parentId": null
+      "id": "menu_02ncte54p",
+      "label": "Devstack Pricing",
+      "url": "/devstack-pricing",
+      "parentId": "home"
     },
     {
       "id": "menu_pgxpaji7n",
       "label": "Enterprise",
       "url": "/enterprise",
+      "parentId": null
+    },
+    {
+      "id": "menu_jz1c9w0r3",
+      "label": "DevStack",
+      "url": "/devstack",
       "parentId": null
     }
   ],
@@ -318,7 +324,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-17T06:49:27.748Z",
+  "updatedAt": "2026-08-17T05:26:11.780Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",

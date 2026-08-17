@@ -23,6 +23,7 @@ import {
 } from "react";
 import type {
   BuilderLayoutBlock,
+  BuilderSavedTemplate,
   BuilderAnimationPreset,
   BuilderSection,
   EmbedMode,
@@ -39,6 +40,8 @@ import type {
   SectionSpacing,
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
+import type { LayoutLibraryType } from "@/lib/layoutLibrary";
+import LayoutLibrarySurface from "@/components/dashboard/LayoutLibrarySurface";
 import {
   builderRowLayoutPresets,
   getBuilderLayoutRows,
@@ -512,6 +515,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
+  footerDocumentRoot?: boolean;
   anchorIdEntries?: Array<{ sectionId: string; anchorId: string }>;
   selectedSectionIsFirstVisible?: boolean;
   shellSettings: BuilderShellSettings;
@@ -534,8 +538,10 @@ type DashboardInspectorProps = {
   duplicateSelected: LooseHandler;
   duplicateSelectedRow?: LooseHandler;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
-  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
-  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
+  savedTemplates: BuilderSavedTemplate[];
+  templateStatus?: string;
+  onSaveContextualLayout?: (layoutType: LayoutLibraryType) => void | Promise<unknown>;
+  onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: {
@@ -742,8 +748,6 @@ function HeaderDocumentSettings({
   headerHeight,
   headerCustomHeight,
   onHeaderDocumentChange,
-  onOpenLayoutLibrary,
-  onSaveWholeLayout,
 }: {
   headerSettings: HeaderDocumentSettingsValues;
   headerVisible: boolean;
@@ -752,8 +756,6 @@ function HeaderDocumentSettings({
   headerHeight?: string;
   headerCustomHeight?: number;
   onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
-  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
-  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
 }) {
   return (
     <div className="builder-inspector-stack">
@@ -765,24 +767,6 @@ function HeaderDocumentSettings({
             meta="Builder"
           />
         </summary>
-        {onOpenLayoutLibrary && (
-          <button
-            type="button"
-            className="builder-secondary-button"
-            onClick={() => onOpenLayoutLibrary("header")}
-          >
-            Choose Layout from Library
-          </button>
-        )}
-        {onSaveWholeLayout && (
-          <button
-            type="button"
-            className="builder-secondary-button"
-            onClick={() => onSaveWholeLayout("header")}
-          >
-            Save Header to Library
-          </button>
-        )}
       </details>
 
       <details className="builder-collapse" open>
@@ -884,38 +868,6 @@ function HeaderDocumentSettings({
         <strong>Page visibility rules</strong>
         <span>This project currently has no per-page or device-wide Header visibility rule fields. Use element Advanced visibility for element-level responsive control.</span>
       </div>
-    </div>
-  );
-}
-
-function FooterDocumentSettings({
-  onOpenLayoutLibrary,
-  onSaveWholeLayout,
-}: {
-  onOpenLayoutLibrary?: (layoutType: "header" | "footer") => void;
-  onSaveWholeLayout?: (layoutType: "header" | "footer") => void;
-}) {
-  if (!onOpenLayoutLibrary && !onSaveWholeLayout) return null;
-  return (
-    <div className="builder-inspector-stack">
-      {onOpenLayoutLibrary && (
-        <button
-          type="button"
-          className="builder-secondary-button"
-          onClick={() => onOpenLayoutLibrary("footer")}
-        >
-          Choose Layout from Library
-        </button>
-      )}
-      {onSaveWholeLayout && (
-        <button
-          type="button"
-          className="builder-secondary-button"
-          onClick={() => onSaveWholeLayout("footer")}
-        >
-          Save Whole Footer to Library
-        </button>
-      )}
     </div>
   );
 }
@@ -1044,6 +996,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedLayoutRowIndex,
     setSelectedLayoutRowIndex,
     selectedSection,
+    footerDocumentRoot = false,
     anchorIdEntries = [],
     selectedSectionIsFirstVisible = false,
     shellSettings,
@@ -1064,8 +1017,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     duplicateSelected,
     duplicateSelectedRow = () => undefined,
     applySelectedRowLayoutPreset = () => undefined,
-    onOpenLayoutLibrary,
-    onSaveWholeLayout,
+    savedTemplates,
+    templateStatus,
+    onSaveContextualLayout,
+    onApplySavedTemplate = () => undefined,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
     onUpdateColumnStyle = () => undefined,
@@ -1218,18 +1173,20 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       : blockTabs;
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
-    ? canonicalBlockTabs
+    ? [...canonicalBlockTabs, ["library", "Library"]]
     : selectedLayoutRow
         ? isCanonicalRowSelection
           ? [
             ["settings", "Settings"],
             ["advanced", t("builder.inspector.advanced")],
+            ["library", "Library"],
           ]
           : [
             ["layout", t("builder.inspector.layout")],
             ["spacing", t("builder.inspector.spacing")],
             ["style", t("builder.inspector.styling")],
             ["advanced", t("builder.inspector.advanced")],
+            ["library", "Library"],
           ]
       : isCanonicalColumnSelection
         ? [
@@ -1237,10 +1194,22 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             ["settings", "Settings"],
             ["advanced", t("builder.inspector.advanced")],
           ]
+      : (selectedSection?.id === "header-document" ||
+          selectedSection?.id === "footer-document") &&
+          !selectedLayoutColumnKey &&
+          !selectedLayoutRow &&
+          !selectedLayoutBlock
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["settings", "Settings"],
+            ["advanced", t("builder.inspector.advanced")],
+            ["library", "Library"],
+          ]
       : [
           ["content", t("builder.inspector.content")],
           ["settings", "Settings"],
           ["advanced", t("builder.inspector.advanced")],
+          ["library", "Library"],
         ];
   const categoryFilterOptions = flattenCategoryTree(previewCategoryTree);
   const filteredCategoryFilterOptions = categoryFilterOptions.filter(
@@ -1347,7 +1316,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         selectedLayoutBlock.kind,
         selectedSection?.id,
       );
-      if (declaration && !declaration.capabilities.includes(inspectorTab)) {
+      if (
+        inspectorTab !== "library" &&
+        declaration &&
+        !declaration.capabilities.includes(inspectorTab)
+      ) {
         setInspectorTab(declaration.capabilities[0] ?? "content");
         return;
       }
@@ -1362,26 +1335,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }
     if (selectedLayoutRow) {
       const validTabs = isCanonicalRowSelection
-        ? ["settings", "advanced"]
-        : ["layout", "spacing", "style", "advanced"];
+        ? ["settings", "advanced", "library"]
+        : ["layout", "spacing", "style", "advanced", "library"];
       if (!validTabs.includes(inspectorTab)) {
         setInspectorTab(isCanonicalRowSelection ? "settings" : "layout");
       }
       return;
     }
     if (isCanonicalColumnSelection) {
-      if (!["content", "settings", "advanced"].includes(inspectorTab)) {
+      if (!["content", "settings", "advanced", "library"].includes(inspectorTab)) {
         setInspectorTab("settings");
       }
       return;
     }
     if (isCanonicalSectionSelection) {
-      if (!["content", "settings", "advanced"].includes(inspectorTab)) {
+      if (!["content", "settings", "advanced", "library"].includes(inspectorTab)) {
         setInspectorTab("settings");
       }
       return;
     }
-    if (inspectorTab !== "content" && inspectorTab !== "settings" && inspectorTab !== "advanced") {
+    if (inspectorTab !== "content" && inspectorTab !== "settings" && inspectorTab !== "advanced" && inspectorTab !== "library") {
       setInspectorTab("settings");
     }
   }, [inspectorTab, selectedLayoutBlock, selectedSection?.id, selectedLayoutRow, isCanonicalRowSelection, isCanonicalColumnSelection, setInspectorTab]);
@@ -1824,6 +1797,34 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       !selectedLayoutRow &&
       !selectedLayoutColumnKey,
   );
+  const isFooterDocumentRoot = Boolean(
+    (footerDocumentRoot || selectedSection?.id === "footer-document") &&
+      !selectedLayoutBlock &&
+      !selectedLayoutRow &&
+      !selectedLayoutColumnKey,
+  );
+  const isDocumentRoot = isHeaderDocumentRoot || isFooterDocumentRoot;
+  const contextualLibraryType: LayoutLibraryType | null = selectedLayoutBlock
+    ? "element"
+    : selectedLayoutRow
+      ? "row"
+      : isHeaderDocumentRoot
+        ? "header"
+        : isFooterDocumentRoot
+          ? "footer"
+          : selectedSection && isCanonicalSectionSelection
+            ? "section"
+            : null;
+  const contextualLibrarySaveLabel = contextualLibraryType
+    ? ({
+        header: "Save Current Header to Library",
+        footer: "Save Current Footer to Library",
+        section: "Save Current Section to Library",
+        row: "Save Current Row to Library",
+        element: "Save Current Element to Library",
+        page: "Save Current Page to Library",
+      } satisfies Record<LayoutLibraryType, string>)[contextualLibraryType]
+    : undefined;
   const updateSelectedLayoutBlockByKey = (
     patch: Partial<BuilderLayoutBlock>,
   ) => {
@@ -1905,7 +1906,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         : inspectorTab === "settings"
           ? "Row Settings"
           : "Row Advanced"
-      : isHeaderDocumentRoot
+      : isDocumentRoot
         ? "Header"
       : isCanonicalSectionSelection
         ? inspectorTab === "content"
@@ -1964,8 +1965,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       ? `${selectedColumnLabel} · Column`
                       : selectedLayoutRow
                         ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
-                    : isHeaderDocumentRoot
-                      ? "Header · Document"
+                    : isDocumentRoot
+                      ? `${isFooterDocumentRoot ? "Footer" : "Header"} · Document`
                       : `${selectedSection.name || sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
                 </strong>
                 {selectedLayoutBlock && (
@@ -2022,7 +2023,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   setInspectorTab("layout");
                 }}
               >
-                {isHeaderDocumentRoot
+                {isDocumentRoot
                   ? "Header"
                   : selectedSection.name ||
                     sectionLabels[selectedSection.kind] ||
@@ -2079,7 +2080,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             )}
           </div>
 
-          {!isHeaderDocumentRoot && (
+          {selectedSection && (
             <div className="builder-inspector-tabs" aria-label="Inspector tabs">
               {inspectorTabs.map(([tab, label]) => (
                 <button
@@ -2094,7 +2095,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {!isHeaderDocumentRoot && !selectedLayoutBlock && selectedLayoutRow ? (
+          {!isDocumentRoot && !selectedLayoutBlock && selectedLayoutRow ? (
             <div className="builder-actions-row">
               <button
                 type="button"
@@ -2116,7 +2117,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 <Trash2 size={15} />
               </button>
             </div>
-          ) : !isHeaderDocumentRoot && !selectedLayoutBlock ? (
+          ) : !isDocumentRoot && !selectedLayoutBlock ? (
             <div className="builder-actions-row">
               <button
                 type="button"
@@ -2146,6 +2147,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           ) : null}
 
           {selectedSection.id === "header-document" &&
+            inspectorTab !== "library" &&
             !selectedLayoutBlock &&
             !selectedLayoutRow ? (
               <HeaderDocumentSettings
@@ -2171,19 +2173,24 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
                 onHeaderDocumentChange={updateSelected}
-                onOpenLayoutLibrary={onOpenLayoutLibrary}
-                onSaveWholeLayout={onSaveWholeLayout}
               />
             ) : null}
 
-          {selectedSection.id === "footer-document" &&
-            !selectedLayoutBlock &&
-            !selectedLayoutRow ? (
-              <FooterDocumentSettings
-                onOpenLayoutLibrary={onOpenLayoutLibrary}
-                onSaveWholeLayout={onSaveWholeLayout}
-              />
-            ) : null}
+          {inspectorTab === "library" && contextualLibraryType ? (
+            <LayoutLibrarySurface
+              mode="contextual"
+              libraryType={contextualLibraryType}
+              savedTemplates={savedTemplates}
+              templateStatus={templateStatus}
+              saveLabel={contextualLibrarySaveLabel}
+              onSaveCurrent={
+                onSaveContextualLayout
+                  ? () => onSaveContextualLayout(contextualLibraryType)
+                  : undefined
+              }
+              onApply={onApplySavedTemplate}
+            />
+          ) : null}
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
@@ -2518,7 +2525,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {isCanonicalSectionSelection && (
+          {isCanonicalSectionSelection && inspectorTab !== "library" && (
             <SectionCapabilityPanel
               section={selectedSection!}
               shellSettings={shellSettings}
@@ -2528,7 +2535,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             />
           )}
 
-          {isCanonicalRowSelection && (
+          {isCanonicalRowSelection && inspectorTab !== "library" && (
             <RowCapabilityPanel
               row={selectedInspectorRow!}
               tab={inspectorTab}
@@ -2542,7 +2549,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             />
           )}
 
-          {isCanonicalColumnSelection && (
+          {isCanonicalColumnSelection && inspectorTab !== "library" && (
             <ColumnCapabilityPanel
               column={selectedCanonicalColumnLocation!.column}
               tab={inspectorTab}
@@ -2551,9 +2558,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             />
           )}
 
-          {selectedElementCapabilityPanel}
+          {inspectorTab !== "library" && selectedElementCapabilityPanel}
 
-          {!isHeaderDocumentRoot && !isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
+          {!isDocumentRoot && !isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
             selectedSection.id !== "header-document") ||

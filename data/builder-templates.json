@@ -1,5 +1,415 @@
 [
   {
+    "id": "call-to-action-mswvswri-4h2z",
+    "title": "Call to Action",
+    "templateType": "section",
+    "description": "Section template saved from Footer",
+    "sourcePage": "footer",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "animationDelay": 100,
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 2,
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-1-column-1",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-1-column-2",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-0-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Ready to get started?",
+                    "title": "Ready to get started?",
+                    "headingLevel": "h2",
+                    "headingSize": "h1",
+                    "headingAlign": "left",
+                    "textAlign": "left",
+                    "removeBottomMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "zIndex": 1,
+                        "removeBottomMargin": true,
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-text-0-0-0-1",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet diam nonumy invidunt ut.",
+                    "textVariant": "lead",
+                    "textColor": "muted",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "zIndex": 1,
+                        "marginMode": "small",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-button-0-0-1-0",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-1-0-0",
+                        "label": "Sign up for Free",
+                        "url": "#",
+                        "target": "_self",
+                        "style": "primary"
+                      }
+                    ],
+                    "size": "large",
+                    "fullWidthButton": false,
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-1-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "visibility": "xl",
+                    "visibilityMode": "xl",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "-340px",
+                        "left": "-40vw",
+                        "zIndex": 0,
+                        "marginMode": "default",
+                        "visibilityMode": "xl"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-0-1-0-1",
+                    "kind": "image",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
+                    "imageAlt": "",
+                    "imageMaxWidth": 600,
+                    "imageWidth": "600px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "visibility": "xl",
+                    "visibilityMode": "xl",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "-170px",
+                        "right": "-30vw",
+                        "zIndex": 0,
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "visibilityMode": "xl"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-17T06:57:30.078Z"
+  },
+  {
+    "id": "saved-header-mswvis8x-vb1o",
+    "title": "Saved Header",
+    "templateType": "header",
+    "description": "Header layout saved from the current Header document",
+    "sourcePage": "header",
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "headerUtilityMigrationVersion": 3,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerHeight": "custom",
+        "headerCustomHeight": 90,
+        "headerArchitectureVersion": 2,
+        "headerLayout": "two-row",
+        "headerBehavior": "sticky-on-scroll-up",
+        "headerWidthMode": "full",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏",
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "WebPages logo",
+                "imageMaxWidth": 302,
+                "headerBrandMode": "both",
+                "headerBrandText": "WebPages",
+                "imageWidth": "200",
+                "contentTranslations": {
+                  "en": {}
+                },
+                "imageAlignment": "left",
+                "imageCaption": "fdsfsdfsd"
+              },
+              {
+                "id": "header-button",
+                "kind": "button",
+                "buttonLabel": "Start",
+                "buttonUrl": "/client",
+                "size": "default",
+                "buttonStyle": "primary",
+                "headerButtonOverrides": {
+                  "variant": true
+                }
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "princity"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-categories",
+                "kind": "headerCategories",
+                "headerCategoriesLabel": "Categories",
+                "headerCategoriesShowLabel": true,
+                "headerCategoriesDisplay": "icon-label",
+                "headerCategoriesIcon": "menu",
+                "headerCategoriesIconPosition": "left",
+                "headerCategoriesDropdownAlign": "left",
+                "headerCategoriesShowAll": true,
+                "headerCategoriesShowCounts": true,
+                "headerCategoriesShowHierarchy": true
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
+                "id": "header-spacer",
+                "kind": "embed",
+                "embedMode": "code",
+                "embedCode": ""
+              },
+              {
+                "id": "header-utility-wishlist",
+                "kind": "headerWishlist",
+                "headerUtilityAction": "wishlist",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-17T06:49:37.665Z"
+  },
+  {
     "id": "menu-msvql1ne-i8wc",
     "title": "Menu",
     "templateType": "element",

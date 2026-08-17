@@ -7,7 +7,7 @@
     "design": {},
     "sections": [
       {
-        "id": "contentLayout-mswt42oi-tbj57",
+        "id": "contentLayout-msvve409-n74wl",
         "kind": "contentLayout",
         "title": "Hero",
         "background": "transparent",
@@ -85,7 +85,7 @@
                   {
                     "id": "yootheme-text-0-0-0-1",
                     "kind": "text",
-                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
+                    "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut. ARM</p>",
                     "textVariant": "lead",
                     "elementAlign": "center",
                     "textColumnBreakpoint": "medium",
@@ -105,6 +105,11 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut. ENG</p>"
+                      }
                     }
                   },
                   {
@@ -366,7 +371,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-8gmy6",
+        "id": "contentLayout-msvve409-3mfar",
         "kind": "contentLayout",
         "title": "Clients",
         "background": "transparent",
@@ -578,7 +583,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-vkmtx",
+        "id": "contentLayout-msvve409-q7qva",
         "kind": "contentLayout",
         "title": "How It Works",
         "background": "transparent",
@@ -767,7 +772,7 @@
                   {
                     "id": "yootheme-panel-2-1-0-1",
                     "kind": "panel",
-                    "title": "Integrate",
+                    "title": "News",
                     "eyebrow": "",
                     "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
                     "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/home-feature-integrate.svg",
@@ -812,7 +817,6 @@
                     "gridMetaHtmlElement": "div",
                     "textAlign": "center",
                     "headingAlign": "center",
-                    "elementPadding": "none",
                     "spacingContract": "yootheme"
                   }
                 ]
@@ -1034,7 +1038,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-if2hz",
+        "id": "contentLayout-msvve409-12xtq",
         "kind": "contentLayout",
         "title": "Feature Grid",
         "background": "transparent",
@@ -1402,7 +1406,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-5vv3m",
+        "id": "contentLayout-msvve409-bkt26",
         "kind": "contentLayout",
         "title": "Testimonials",
         "background": "transparent",
@@ -1670,7 +1674,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-g4f65",
+        "id": "contentLayout-msvve40a-iq5uv",
         "kind": "contentLayout",
         "title": "Call to Action",
         "background": "transparent",
@@ -1934,7 +1938,7 @@
         ]
       },
       {
-        "id": "contentLayout-mswt42oi-nkv3b",
+        "id": "contentLayout-msvve40a-jdzgk",
         "kind": "contentLayout",
         "title": "Latest Posts",
         "background": "transparent",
@@ -2182,7 +2186,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-17T05:42:19.172Z"
+    "updatedAt": "2026-08-16T17:12:43.672Z"
   },
   "shop": {
     "version": 1,
@@ -15109,7 +15113,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-17T05:43:03.799Z"
+    "updatedAt": "2026-08-16T17:13:18.146Z"
   },
   "post-single": {
     "version": 1,

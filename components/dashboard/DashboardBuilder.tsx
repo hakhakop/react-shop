@@ -2099,6 +2099,8 @@ export default function DashboardBuilder({
     const requestedContext = parseBuilderLayoutKey(searchParams.get("context"));
     return requestedContext && requestedContext !== "header" ? requestedContext : "shop";
   });
+  const [shellPageContextState, setShellPageContextState] = useState<BuilderState | null>(null);
+  const pageContextStateRef = useRef<BuilderState | null>(null);
 
   useEffect(() => {
     const storedLanguage = window.sessionStorage.getItem(previewLanguageStorageKey);
@@ -2157,6 +2159,11 @@ export default function DashboardBuilder({
     ? "Website settings"
     : "Style customizer";
   const [builderState, setRawBuilderState] = useState<BuilderState>(defaultState);
+  useEffect(() => {
+    if (builderState.page !== "header" && builderState.page !== "footer") {
+      pageContextStateRef.current = builderState;
+    }
+  }, [builderState]);
   const [builderRenderProjection, setBuilderRenderProjection] = useState<{
     page: BuilderLayoutKey;
     sourceSignature: string;
@@ -2353,6 +2360,7 @@ export default function DashboardBuilder({
       : storefrontTheme;
   const [selectedId, setSelectedId] = useState("");
   const [headerSelected, setHeaderSelected] = useState(false);
+  const [footerSelected, setFooterSelected] = useState(false);
   const [headerHovered, setHeaderHovered] = useState(false);
   const [draggingHeaderElementId, setDraggingHeaderElementId] = useState<string | null>(null);
   const [draggingHeaderRowId, setDraggingHeaderRowId] = useState<string | null>(null);
@@ -2630,10 +2638,10 @@ export default function DashboardBuilder({
   ]);
   const headerContextState = useMemo(
     () =>
-      builderState.page === "header"
-        ? loadDraftForKey(headerContextKey, storageKeys)
+      builderState.page === "header" || builderState.page === "footer"
+        ? shellPageContextState ?? pageContextStateRef.current ?? loadDraftForKey(headerContextKey, storageKeys)
         : builderState,
-    [builderState, headerContextKey, storageKeys],
+    [builderState, headerContextKey, shellPageContextState, storageKeys],
   );
   const headerContextSections = useMemo(
     () => {
@@ -2645,20 +2653,6 @@ export default function DashboardBuilder({
       return resolved;
     },
     [contentLanguage, headerContextState.sections, primaryContentLanguage],
-  );
-  const footerPageContextState = useMemo(
-    () => builderState.page === "footer"
-      ? loadDraftForKey(headerContextKey, storageKeys)
-      : builderState,
-    [builderState, headerContextKey, storageKeys],
-  );
-  const footerPageContextSections = useMemo(
-    () => resolveContentSections(
-      footerPageContextState.sections,
-      contentLanguage,
-      primaryContentLanguage,
-    ),
-    [contentLanguage, footerPageContextState.sections, primaryContentLanguage],
   );
   const headerDocumentState = useMemo(
     () => builderState.page === "header"
@@ -2679,16 +2673,6 @@ export default function DashboardBuilder({
       primaryContentLanguage,
     ),
     [contentLanguage, footerDocumentState.sections, primaryContentLanguage],
-  );
-  const footerPageContextLayout = useMemo(
-    () => ({
-      version: 1 as const,
-      key: footerPageContextState.page,
-      updatedAt: "",
-      ...footerPageContextState,
-      sections: footerPageContextSections,
-    }),
-    [footerPageContextState, footerPageContextSections],
   );
   const footerSlotLayout = useMemo(
     () => ({
@@ -4683,6 +4667,7 @@ export default function DashboardBuilder({
   const clearInspectorSelection = () => {
     setInspectorOpen(false);
     setHeaderSelected(false);
+    setFooterSelected(false);
     setSelectedId("");
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
@@ -4710,6 +4695,7 @@ export default function DashboardBuilder({
 
   const selectSection = (sectionId: string, shouldOpenInspector = false) => {
     setHeaderSelected(false);
+    setFooterSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
@@ -4719,6 +4705,21 @@ export default function DashboardBuilder({
     setSectionSettingsOpen(true);
     if (shouldOpenInspector) openInspectorPanel();
     revealCanvasTarget(sectionId);
+  };
+
+  const selectShellRoot = (shellType: "header" | "footer", shouldOpenInspector = false) => {
+    if (builderState.page !== shellType) {
+      enterShellEdit(shellType);
+      return;
+    }
+
+    const rootId =
+      builderState.sections[0]?.id ??
+      loadDraftForKey(shellType, storageKeys).sections[0]?.id ??
+      (shellType === "header" ? "header-document" : "footer-document");
+    selectSection(rootId, shouldOpenInspector);
+    setHeaderSelected(shellType === "header");
+    setFooterSelected(shellType === "footer");
   };
 
   const selectLayoutColumn = (
@@ -4737,6 +4738,7 @@ export default function DashboardBuilder({
     // that Row; the Row Inspector remains the sole owner of column settings.
     if (sectionId !== "header-document" && rowIndex >= 0) {
       setHeaderSelected(false);
+      setFooterSelected(false);
       setSelectedId(sectionId);
       setSelectedLayoutRowIndex(rowIndex);
       setSelectedLayoutColumnKey(null);
@@ -4749,6 +4751,7 @@ export default function DashboardBuilder({
     }
 
     setHeaderSelected(false);
+    setFooterSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(columnKey);
@@ -4766,6 +4769,7 @@ export default function DashboardBuilder({
     shouldOpenInspector = false,
   ) => {
     setHeaderSelected(false);
+    setFooterSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(columnKey);
@@ -4789,6 +4793,7 @@ export default function DashboardBuilder({
     shouldOpenInspector = false,
   ) => {
     setHeaderSelected(false);
+    setFooterSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(rowIndex);
     setSelectedLayoutColumnKey(null);
@@ -4807,6 +4812,10 @@ export default function DashboardBuilder({
   };
 
   const enterShellEdit = (shellType: "header" | "footer") => {
+    if (builderState.page !== "header" && builderState.page !== "footer") {
+      pageContextStateRef.current = builderState;
+      setShellPageContextState(builderState);
+    }
     const contextKey =
       builderState.page === "header" || builderState.page === "footer"
         ? headerContextKey
@@ -4818,7 +4827,8 @@ export default function DashboardBuilder({
     setHeaderContextKey(contextKey);
     switchBuilderTarget(shellType, { syncUrl: false });
     router.replace(`${pathname}?page=${shellType}&context=${encodeURIComponent(contextKey)}`, { scroll: false });
-    setHeaderSelected(false);
+    setHeaderSelected(shellType === "header");
+    setFooterSelected(shellType === "footer");
     setSelectedId(shellRootId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
@@ -4831,6 +4841,7 @@ export default function DashboardBuilder({
     window.setTimeout(() => {
       if (builderStateRef.current.page !== shellType) return;
       selectSection(shellRootId, true);
+      if (shellType === "footer") setFooterSelected(true);
     }, 100);
   };
 
@@ -4842,14 +4853,11 @@ export default function DashboardBuilder({
     enterShellEdit("footer");
   };
 
-  const openHeaderSettings = () => {
-    enterShellEdit("header");
-  };
-
   const exitShellEdit = () => {
     if (builderState.page !== "header" && builderState.page !== "footer") return;
     const contextKey = headerContextKey;
     setActiveShellEntry(null);
+    setShellPageContextState(null);
     switchBuilderTarget(contextKey, { syncUrl: false });
     router.replace(`${pathname}?page=${contextKey}`, { scroll: false });
     setHeaderSelected(false);
@@ -9070,6 +9078,7 @@ export default function DashboardBuilder({
       selectedLayoutBlock={selectedLayoutBlockForInspector}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
+      footerDocumentRoot={footerSelected}
       anchorIdEntries={composedAnchorIdEntries}
       selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
       shellSettings={shellSettings}
@@ -9091,15 +9100,35 @@ export default function DashboardBuilder({
       deleteSelectedSlide={deleteSelectedSlide}
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
-      onOpenLayoutLibrary={(layoutType) =>
-        setLayoutLibraryRequest((current) => ({
-          type: layoutType,
-          key: (current?.key ?? 0) + 1,
-        }))
-      }
-      onSaveWholeLayout={(layoutType) => {
-        void saveTemplate(layoutType);
+      savedTemplates={savedTemplates}
+      templateStatus={templateStatus}
+      onSaveContextualLayout={(layoutType) => {
+        if (layoutType === "header" || layoutType === "footer") {
+          void saveTemplate(layoutType);
+          return;
+        }
+        if (layoutType === "section" && selectedSection) {
+          void saveSectionTemplateById(selectedSection.id);
+          return;
+        }
+        if (layoutType === "row" && selectedSection && selectedLayoutRowIndex !== null) {
+          void saveRowTemplateByIndex(selectedSection.id, selectedLayoutRowIndex);
+          return;
+        }
+        if (
+          layoutType === "element" &&
+          selectedSection &&
+          selectedLayoutColumnKey &&
+          selectedLayoutBlockKey
+        ) {
+          void saveElementTemplateByKey(
+            selectedSection.id,
+            selectedLayoutColumnKey,
+            selectedLayoutBlockKey,
+          );
+        }
       }}
+      onApplySavedTemplate={applySavedTemplate}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       onUpdateColumnStyle={updateSelectedColumnStyle}
@@ -10632,17 +10661,6 @@ export default function DashboardBuilder({
             Back to Page
           </button>
         ) : null}
-        {builderState.page === "header" ? (
-          <button
-            type="button"
-            className="builder-canvas-control"
-            onClick={openHeaderSettings}
-            title="Open Header document settings"
-          >
-            <Settings2 size={14} />
-            Header Settings
-          </button>
-        ) : null}
         <button
           type="button"
           className="builder-canvas-control"
@@ -11021,23 +11039,15 @@ export default function DashboardBuilder({
                   {!currentHeaderDocumentSettings.visible ? (
                     <span className="builder-header-hidden-badge">Header hidden on website</span>
                   ) : null}
-                  <div className="builder-header-document-tools" aria-label="Header settings control">
-                    <button
-                      type="button"
-                      className={selectedId === "header-document" && !selectedLayoutColumnKey ? "is-active" : ""}
-                      onClick={() => {
-                        setSelectedId("header-document");
-                        setSelectedLayoutRowIndex(null);
-                        setSelectedLayoutColumnKey(null);
-                        setSelectedLayoutBlockKey(null);
-                        openInspectorPanel();
-                      }}
-                      aria-label="Header Settings"
-                      title="Header Settings"
-                    >
-                      <Settings2 size={13} />
-                    </button>
-                  </div>
+                  <BuilderContextToolbar
+                    context="shell"
+                    label="Header"
+                    canMoveUp={false}
+                    canMoveDown={false}
+                    canDelete={false}
+                    onSelect={() => selectShellRoot("header")}
+                    onSettings={() => selectShellRoot("header", true)}
+                  />
                   <HeaderShellView
                     layoutOverride={shellSettings.headerLayout}
                     shellSettings={shellSettings}
@@ -11359,55 +11369,18 @@ export default function DashboardBuilder({
                     languageSwitcherPreviewOnly={true}
                     onContentLanguageChange={setContentLanguage}
                   />
-                  <div
-                    className="builder-preview-header-tools"
-                    onClick={(event) => event.stopPropagation()}
-                    onMouseDown={(event) => event.stopPropagation()}
-                  >
-                    <div className="builder-preview-header-tools-main">
-                      <span>Header</span>
-                      <button
-                        type="button"
-                        onClick={selectHeader}
-                        aria-label="Edit Header"
-                        title="Edit Header"
-                      >
-                        <SquareMousePointer size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={openHeaderSettings}
-                        aria-label="Header Settings"
-                        title="Header Settings"
-                      >
-                        <Settings2 size={14} />
-                      </button>
-                    </div>
-                  </div>
+                  <BuilderContextToolbar
+                    context="shell"
+                    label="Header"
+                    canMoveUp={false}
+                    canMoveDown={false}
+                    canDelete={false}
+                    onSelect={() => selectShellRoot("header")}
+                    onSettings={() => selectShellRoot("header", true)}
+                  />
                 </div>
               )}
             </div>
-            {builderState.page === "footer" ? (
-              <div className="builder-context-page-preview is-locked builder-footer-page-context" aria-label="Locked page context">
-                <div className="builder-context-preview-status-sticky-wrapper">
-                  <div
-                    className="builder-context-preview-status"
-                    role="group"
-                    aria-label="Locked page preview status"
-                  >
-                    <span>
-                      Previewing {getLayoutLabel(footerPageContextState.page, customPages)} · Page content locked
-                    </span>
-                  </div>
-                </div>
-                <StorefrontBuilderRenderer
-                  layout={footerPageContextLayout}
-                  page={footerPageContextState.page}
-                  pageLabel={getLayoutLabel(footerPageContextState.page, customPages)}
-                  shellSettings={shellSettings}
-                />
-              </div>
-            ) : null}
             <div
               ref={headerPageContextRef}
               data-overlap-header={currentHeaderDocumentSettings.overlay ? "true" : "false"}
@@ -11526,8 +11499,18 @@ export default function DashboardBuilder({
               />
             </ProductCategoryFilterProvider>
             </div>
-            {builderState.page !== "footer" ? (
-              <div className="builder-preview-footer-slot" aria-label="Footer preview">
+            <div className="builder-preview-footer-slot" aria-label="Footer preview">
+                {builderState.page === "footer" ? (
+                  <BuilderContextToolbar
+                    context="shell"
+                    label="Footer"
+                    canMoveUp={false}
+                    canMoveDown={false}
+                    canDelete={false}
+                    onSelect={() => selectShellRoot("footer")}
+                    onSettings={() => selectShellRoot("footer", true)}
+                  />
+                ) : null}
                 <StorefrontBuilderRenderer
                   layout={footerSlotLayout}
                   page="footer"
@@ -11542,19 +11525,16 @@ export default function DashboardBuilder({
                   title="Edit Footer"
                   onClick={selectFooter}
                 />
-                <div className="builder-preview-footer-tools">
-                  <span>Footer</span>
-                  <button
-                    type="button"
-                    onClick={selectFooter}
-                    aria-label="Edit Footer"
-                    title="Edit Footer"
-                  >
-                    <SquareMousePointer size={14} />
-                  </button>
-                </div>
-              </div>
-            ) : null}
+                <BuilderContextToolbar
+                  context="shell"
+                  label="Footer"
+                  canMoveUp={false}
+                  canMoveDown={false}
+                  canDelete={false}
+                  onSelect={() => selectShellRoot("footer")}
+                  onSettings={() => selectShellRoot("footer", true)}
+                />
+            </div>
             {device !== "desktop" && (
               <>
                 <div
@@ -13866,6 +13846,7 @@ function BuilderContextToolbar({
   canMoveDown,
   canDelete,
   onChangeLayout,
+  onSelect,
   onSettings,
   onMoveUp,
   onMoveDown,
@@ -13873,23 +13854,46 @@ function BuilderContextToolbar({
   onDuplicate,
   onDelete,
 }: {
-  context: "section" | "layout";
+  context: "section" | "layout" | "shell";
   label: string;
   canMoveUp: boolean;
   canMoveDown: boolean;
   canDelete: boolean;
   onChangeLayout?: () => void;
+  onSelect?: () => void;
   onSettings: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onSave: () => void;
-  onDuplicate: () => void;
-  onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onSave?: () => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
 }) {
   const cls =
-    context === "section"
+    context === "section" || context === "shell"
       ? "builder-context-toolbar builder-preview-section-tools-main"
       : "builder-context-toolbar builder-preview-row-toolbar";
+
+  if (context === "shell") {
+    return (
+      <div
+        className={`${cls} builder-shell-toolbar`}
+        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <button type="button" className="builder-shell-toolbar-label" onClick={onSelect}>
+          {label}
+        </button>
+        <button
+          type="button"
+          onClick={onSettings}
+          aria-label={`${label} settings`}
+          title={`${label} settings`}
+        >
+          <Pencil size={13} />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div

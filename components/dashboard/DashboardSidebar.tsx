@@ -2,11 +2,9 @@
 
 import {
   ChevronLeft,
-  Download,
   ExternalLink,
   GripVertical,
   LibraryBig,
-  Pencil,
   Plus,
   Save,
   Trash2,
@@ -48,7 +46,7 @@ import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import RoutingTemplatesPanel from "@/components/dashboard/RoutingTemplatesPanel";
 import ContentPanel from "@/components/dashboard/ContentPanel";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
-import { createDragGhost } from "@/components/dashboard/builderDragGhost";
+import LayoutLibrarySurface from "@/components/dashboard/LayoutLibrarySurface";
 import {
   pageTemplateCategories,
   pageTemplateLibrary,
@@ -60,22 +58,6 @@ import { useTranslation } from "@/components/i18n/LanguageProvider";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 
 type TemplateLibraryTab = LayoutLibraryType;
-
-const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
-const BUILDER_TEMPLATE_DND_TYPES: Record<Exclude<LayoutLibraryType, "page" | "header" | "footer">, string> = {
-  section: "application/x-builder-template-section",
-  row: "application/x-builder-template-row",
-  element: "application/x-builder-template-element",
-};
-
-const templateLibraryTabs: { value: TemplateLibraryTab; label: string }[] = [
-  { value: "page", label: "Pages" },
-  { value: "header", label: "Headers" },
-  { value: "footer", label: "Footers" },
-  { value: "section", label: "Sections" },
-  { value: "row", label: "Rows" },
-  { value: "element", label: "Elements" },
-];
 
 const corePages = [
   { key: "home", title: "Home", slug: "" },
@@ -350,16 +332,19 @@ export default function DashboardSidebar({
 
     setTemplateDraftTitle("");
   };
-  const filteredTemplates = savedTemplates.filter(
-    (template) => (template.templateType ?? "page") === templateLibraryTab,
-  );
   const pageTemplates = pageTemplateLibrary.filter(
     (template) =>
       pageTemplateCategory === "all" || template.category === pageTemplateCategory,
   );
   const selectedTemplateTabLabel =
-    templateLibraryTabs.find((tab) => tab.value === templateLibraryTab)?.label ??
-    "Templates";
+    ({
+      page: "Pages",
+      header: "Headers",
+      footer: "Footers",
+      section: "Sections",
+      row: "Rows",
+      element: "Elements",
+    } satisfies Record<LayoutLibraryType, string>)[templateLibraryTab];
   const selectedTemplateTabSingular =
     selectedTemplateTabLabel.endsWith("s")
       ? selectedTemplateTabLabel.slice(0, -1)
@@ -1027,29 +1012,20 @@ export default function DashboardSidebar({
               transition={{ duration: 0.12, ease: "easeOut" }}
             >
             <div className="builder-sidebar-panel">
-              <div className="builder-template-tabs" role="tablist" aria-label="Template types">
-                {templateLibraryTabs.map((tab) => {
-                  const tabCount = savedTemplates.filter(
-                    (template) => (template.templateType ?? "page") === tab.value,
-                  ).length;
-                  return (
-                    <button
-                      key={tab.value}
-                      type="button"
-                      role="tab"
-                      aria-selected={templateLibraryTab === tab.value}
-                      className={templateLibraryTab === tab.value ? "is-active" : ""}
-                      onClick={() => {
-                        setTemplateLibraryTab(tab.value);
-                        setRenamingTemplateId(null);
-                      }}
-                    >
-                      <span>{tab.label}</span>
-                      <small>{tabCount}</small>
-                    </button>
-                  );
-                })}
-              </div>
+              <LayoutLibrarySurface
+                mode="management"
+                libraryType={templateLibraryTab}
+                savedTemplates={savedTemplates}
+                templateStatus={templateStatus}
+                onLibraryTypeChange={(type) => {
+                  setTemplateLibraryTab(type);
+                  setRenamingTemplateId(null);
+                }}
+                onApply={onApplySavedTemplate}
+                onExport={onExportSavedTemplate}
+                onDelete={onDeleteSavedTemplate}
+                onRename={onRenameSavedTemplate}
+              />
               {(templateLibraryTab === "header" || templateLibraryTab === "footer") ? (
                 <div className="builder-template-note">
                   <LibraryBig size={16} />
@@ -1126,122 +1102,6 @@ export default function DashboardSidebar({
                   )}
                 </div>
               ) : null}
-              {filteredTemplates.length > 0 ? (
-                <div className="builder-pages-list builder-template-list">
-                  {filteredTemplates.map((template) => {
-                    const templateType = template.templateType ?? "page";
-                    const canDragTemplate = templateType !== "page" && templateType !== "header" && templateType !== "footer";
-                    const templateDragMimeType = canDragTemplate
-                      ? BUILDER_TEMPLATE_DND_TYPES[
-                          templateType as Exclude<LayoutLibraryType, "page" | "header" | "footer">
-                        ]
-                      : null;
-                    return (
-                    <div
-                      key={template.id}
-                      className="builder-page-row builder-template-row"
-                      draggable={canDragTemplate && renamingTemplateId !== template.id}
-                      onDragStart={(event) => {
-                        if (!canDragTemplate || renamingTemplateId === template.id) {
-                          event.preventDefault();
-                          return;
-                        }
-                        event.dataTransfer.setData(
-                          BUILDER_TEMPLATE_DND_TYPE,
-                          template.id,
-                        );
-                        if (templateDragMimeType) {
-                          event.dataTransfer.setData(templateDragMimeType, template.id);
-                        }
-                        event.dataTransfer.effectAllowed = "copy";
-                        createDragGhost(event, template.title || "Template");
-                      }}
-                    >
-                      {renamingTemplateId === template.id ? (
-                        <>
-                          <input
-                            className="builder-template-rename-input"
-                            value={renamingTemplateTitle}
-                            onChange={(event) => setRenamingTemplateTitle(event.target.value)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter") {
-                                onRenameSavedTemplate(template, renamingTemplateTitle);
-                                setRenamingTemplateId(null);
-                              }
-                              if (event.key === "Escape") {
-                                setRenamingTemplateId(null);
-                              }
-                            }}
-                            autoFocus
-                          />
-                          <button
-                            type="button"
-                            className="builder-icon-button"
-                            onClick={() => {
-                              onRenameSavedTemplate(template, renamingTemplateTitle);
-                              setRenamingTemplateId(null);
-                            }}
-                            aria-label={`Save new name for ${template.title}`}
-                          >
-                            <Save size={14} />
-                          </button>
-                          <button
-                            type="button"
-                            className="builder-icon-button"
-                            onClick={() => setRenamingTemplateId(null)}
-                            aria-label="Cancel rename"
-                          >
-                            <X size={14} />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button type="button" onClick={() => onApplySavedTemplate(template)}>
-                            <strong>{template.title}</strong>
-                            <span>
-                              {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
-                            </span>
-                          </button>
-                          <button type="button" className="builder-template-use-button" onClick={() => onApplySavedTemplate(template)}>
-                            <Plus size={14} />
-                            Use
-                          </button>
-                          <button
-                            type="button"
-                            className="builder-icon-button"
-                            onClick={() => onExportSavedTemplate(template)}
-                            aria-label={`Export ${template.title}`}
-                          >
-                            <Download size={14} />
-                          </button>
-                          <button
-                            type="button"
-                            className="builder-icon-button"
-                            onClick={() => {
-                              setRenamingTemplateId(template.id);
-                              setRenamingTemplateTitle(template.title);
-                            }}
-                            aria-label={`Rename ${template.title}`}
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
-                        </>
-                      )}
-                    </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="builder-template-note">
-                  <LibraryBig size={16} />
-                  <span>
-                    {savedTemplates.length > 0
-                      ? `No ${selectedTemplateTabLabel.toLowerCase()} templates saved yet.`
-                      : "Saved templates will appear here after you save from a page, section, row, or element toolbar."}
-                  </span>
-                </div>
-              )}
               {templateLibraryTab !== "header" && templateLibraryTab !== "footer" && (
                 <label className="builder-template-import-control">
                   <Upload size={14} />

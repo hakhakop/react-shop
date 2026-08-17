@@ -1298,6 +1298,44 @@ body:has(.builder-dashboard) .site-header--service {
   color: #fff;
 }
 
+/* Header and Footer shell chrome use the same settings language as the
+   canonical Section/Row toolbars. The label selects the shell root; the
+   pencil opens its document Inspector. */
+.builder-shell-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1200;
+  min-height: 28px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+}
+
+.builder-shell-toolbar .builder-shell-toolbar-label {
+  width: auto !important;
+  min-width: 0;
+  padding: 0 8px !important;
+  color: var(--builder-ui-muted) !important;
+  font-size: 10px !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.builder-shell-toolbar > button:not(.builder-shell-toolbar-label) {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 999px !important;
+}
+
+.builder-shell-toolbar > button:hover,
+.builder-shell-toolbar > button:focus-visible {
+  background: var(--builder-ui-accent) !important;
+  color: #fff !important;
+}
+
 .builder-header-live-element[data-header-element="spacer"] {
   flex: 1 1 48px;
   align-self: stretch;
@@ -4555,6 +4593,30 @@ body:has(.builder-dashboard) .site-header--service {
 
 .builder-template-row[draggable="true"]:active {
   cursor: grabbing;
+}
+
+.builder-library-surface.is-contextual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.builder-library-context-save {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.builder-library-surface.is-contextual .builder-template-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.builder-library-surface.is-contextual .builder-template-row > .builder-icon-button {
+  display: none;
+}
+
+.builder-library-status {
+  color: var(--builder-ui-muted);
 }
 
 .builder-template-use-button {

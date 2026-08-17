@@ -93,7 +93,8 @@ export type InspectorTab =
   | "typography"
   | "behavior"
   | "effects"
-  | "advanced";
+  | "advanced"
+  | "library";
 export type SidebarTab =
   | "builder"
   | "content"
