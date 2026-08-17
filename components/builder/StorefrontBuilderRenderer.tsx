@@ -156,6 +156,9 @@ export type StorefrontBuilderRendererProps = {
    *  the first section's background for text-mode adaptation. */
   headerOverlay?: boolean;
   rootElement?: "main" | "footer";
+  /** Exposes canonical selection identity when this storefront projection is
+   * hosted inside the visual Builder. */
+  builderInteractionIdentity?: boolean;
 };
 
 export type StorefrontBuilderProduct = {
@@ -655,11 +658,13 @@ function SectionFrame({
   section,
   layoutScheme = "light",
   extra,
+  builderInteractionIdentity = false,
   children,
 }: {
   section: BuilderSection;
   layoutScheme?: "light" | "dark" | "auto";
   extra?: string;
+  builderInteractionIdentity?: boolean;
   children: ReactNode;
 }) {
   const ComponentTag = (section.htmlElement || "section") as any;
@@ -685,6 +690,7 @@ function SectionFrame({
     <ComponentTag
       id={section.anchorId || section.id}
       data-builder-section-id={section.id}
+      data-builder-object-type={builderInteractionIdentity ? "section" : undefined}
       className={`${getBuilderSectionClassName(section, layoutScheme, extra)} ${
         isFullTheme
           ? "shop-builder-section--effect-antigravity"
@@ -2456,6 +2462,7 @@ function ContentLayoutSection({
   website,
   shellSettings,
   layoutScheme = "light",
+  builderInteractionIdentity = false,
 }: {
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
@@ -2467,6 +2474,7 @@ function ContentLayoutSection({
   website?: SaaSWebsite | null;
   shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
+  builderInteractionIdentity?: boolean;
 }) {
   const structure = resolveBuilderSectionStructure(section, {
     fallbackLayoutItems: [{
@@ -2491,6 +2499,7 @@ function ContentLayoutSection({
       section={section}
       layoutScheme={layoutScheme}
       extra="shop-builder-content-layout"
+      builderInteractionIdentity={builderInteractionIdentity}
     >
       <div
         className="shop-builder-content-layout-rows-wrapper"
@@ -2530,20 +2539,23 @@ function ContentLayoutSection({
           return (
             <div key={structuralRow.row.id} style={{ paddingTop: rowIndex > 0 ? structuralRow.precedingGap : 0 }}>
               <div
-              className={`${structuralRow.className} shop-builder-content-row ${
-                isFullRowTheme
-                  ? "shop-builder-section--effect-antigravity"
-                  : isRowAnimatedBg
-                    ? "relative overflow-hidden"
-                    : ""
-              }`}
-              style={{
-                ...structuralRow.style,
-                ...rowContextStyle(rowItem, sectionColorScheme),
-                ...rowAnimationAttrs.style,
-              }}
-              {...rowAnimationAttrs.data}
-            >
+                data-builder-object-type={builderInteractionIdentity ? "row" : undefined}
+                data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
+                data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
+                className={`${structuralRow.className} shop-builder-content-row ${
+                  isFullRowTheme
+                    ? "shop-builder-section--effect-antigravity"
+                    : isRowAnimatedBg
+                      ? "relative overflow-hidden"
+                      : ""
+                }`}
+                style={{
+                  ...structuralRow.style,
+                  ...rowContextStyle(rowItem, sectionColorScheme),
+                  ...rowAnimationAttrs.style,
+                }}
+                {...rowAnimationAttrs.data}
+              >
               {isRowAnimatedBg && (
                 <>
                   <AntigravityCanvas
@@ -2631,6 +2643,10 @@ function ContentLayoutSection({
                       <div
                         key={block.id ?? blockIndex}
                         data-builder-block-id={block.id}
+                        data-builder-object-type={builderInteractionIdentity ? "block" : undefined}
+                        data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
+                        data-builder-column-key={builderInteractionIdentity ? columnKey : undefined}
+                        data-builder-block-key={builderInteractionIdentity ? block.id : undefined}
                         data-builder-element-scope={elementAdvancedScope(block)}
                         className={blockShellClassName(block)}
                         style={{
@@ -2662,6 +2678,8 @@ function ContentLayoutSection({
                   <article
                     key={columnKey}
                     data-builder-object-type="column"
+                    data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
+                    data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
                     data-builder-column-key={columnKey}
                     className={`${structuralColumn.className} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
@@ -2824,6 +2842,7 @@ function BuilderSectionRenderer({
   website,
   shellSettings,
   layoutScheme = "light",
+  builderInteractionIdentity = false,
 }: {
   section: BuilderSection;
   products?: ProductNode[];
@@ -2836,6 +2855,7 @@ function BuilderSectionRenderer({
   website?: SaaSWebsite | null;
   shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
+  builderInteractionIdentity?: boolean;
 }) {
   if (!section.visible) return null;
 
@@ -2900,6 +2920,7 @@ function BuilderSectionRenderer({
         website={website}
         shellSettings={shellSettings}
         layoutScheme={layoutScheme}
+        builderInteractionIdentity={builderInteractionIdentity}
       />
     );
   } else if (section.kind === "slider") {
@@ -2937,6 +2958,7 @@ function StorefrontBuilderRendererBase({
   shellSettings,
   headerOverlay = false,
   rootElement = "main",
+  builderInteractionIdentity = false,
 }: StorefrontBuilderRendererProps) {
   const label =
     pageLabel ??
@@ -3028,6 +3050,7 @@ function StorefrontBuilderRendererBase({
               website={website}
               shellSettings={shellSettings}
               layoutScheme={layoutScheme}
+              builderInteractionIdentity={builderInteractionIdentity}
             />
           ))}
         </div>

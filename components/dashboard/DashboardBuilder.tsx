@@ -2089,6 +2089,7 @@ export default function DashboardBuilder({
   const ordinaryLoadRequestRef = useRef(0);
   const ordinaryLoadIdentityRef = useRef("");
   const initialHydrationConsumedRef = useRef("");
+  const initializedStorageScopeRef = useRef<string | null>(null);
   const strictBuilderTargetRef = useRef(false);
   const shellTransitionRef = useRef<{
     direction: "enter" | "exit";
@@ -2152,7 +2153,6 @@ export default function DashboardBuilder({
   });
   const [shellPageContextState, setShellPageContextState] = useState<BuilderState | null>(null);
   const pageContextStateRef = useRef<BuilderState | null>(null);
-
   useEffect(() => {
     const storedLanguage = window.sessionStorage.getItem(previewLanguageStorageKey);
     if (storedLanguage && enabledContentLanguages.includes(storedLanguage)) {
@@ -2675,7 +2675,7 @@ export default function DashboardBuilder({
     hidden: false,
   });
   const headerPageContextRef = useRef<HTMLDivElement>(null);
-  const [footerEntryHeight, setFooterEntryHeight] = useState<number | null>(null);
+  const footerPreviewSlotRef = useRef<HTMLDivElement>(null);
   const builderWorkspaceRef = useRef<HTMLElement>(null);
   const inspectorPanelRef = useRef<HTMLDivElement>(null);
   const inspectorToggleRef = useRef<HTMLButtonElement>(null);
@@ -2760,25 +2760,6 @@ export default function DashboardBuilder({
     },
     [contentLanguage, headerContextState.sections, primaryContentLanguage],
   );
-  const headerContextRenderSections = useMemo(() => {
-    if (
-      !builderRenderProjection ||
-      builderRenderProjection.page !== headerContextState.page ||
-      builderRenderProjection.sourceSignature !== JSON.stringify(headerContextState)
-    ) {
-      return undefined;
-    }
-    return resolveContentSections(
-      builderRenderProjection.sections,
-      contentLanguage,
-      primaryContentLanguage,
-    );
-  }, [
-    builderRenderProjection,
-    contentLanguage,
-    headerContextState,
-    primaryContentLanguage,
-  ]);
   const headerDocumentState = useMemo(
     () => builderState.page === "header"
       ? builderState
@@ -3308,6 +3289,8 @@ export default function DashboardBuilder({
   );
 
   useEffect(() => {
+    if (initializedStorageScopeRef.current === storageKeys.state) return;
+    initializedStorageScopeRef.current = storageKeys.state;
     setPublishedDocumentReady(false);
     try {
       const storedDrafts = window.localStorage.getItem(storageKeys.drafts);
@@ -3987,9 +3970,6 @@ export default function DashboardBuilder({
     if (!rootId) return;
 
     if (selectedId === rootId) {
-      setInspectorTab("layout");
-      setSectionSettingsOpen(true);
-      setInspectorOpen(true);
       setActiveShellEntry(null);
       return;
     }
@@ -4901,9 +4881,13 @@ export default function DashboardBuilder({
         )
       : -1;
 
-    // Columns belong to a Row. Canvas and Structure clicks therefore select
-    // that Row; the Row Inspector remains the sole owner of column settings.
-    if (sectionId !== "header-document" && rowIndex >= 0) {
+    // Page-document columns belong to a Row. Shell documents retain direct
+    // column selection so Header and Footer expose the same Inspector contract.
+    if (
+      sectionId !== "header-document" &&
+      builderState.page !== "footer" &&
+      rowIndex >= 0
+    ) {
       setHeaderSelected(false);
       setFooterSelected(false);
       setSelectedId(sectionId);
@@ -4979,10 +4963,6 @@ export default function DashboardBuilder({
   };
 
   const enterShellEdit = async (shellType: "header" | "footer") => {
-    if (shellType === "footer") {
-      const footerSlot = document.querySelector<HTMLElement>(".builder-preview-footer-slot");
-      setFooterEntryHeight(footerSlot?.getBoundingClientRect().height ?? null);
-    }
     if (builderState.page !== "header" && builderState.page !== "footer") {
       pageContextStateRef.current = builderState;
       setShellPageContextState(builderState);
@@ -7500,7 +7480,7 @@ export default function DashboardBuilder({
           payload: {
             layout: initialPageHydration!.authoredLayout,
             renderLayout: initialPageHydration!.renderLayout,
-          },
+          } as PublishedBuilderLayoutPayload,
         }
       : await fetchPublishedLayoutOnce(requestUrl);
     if (canUseInitialHydration) {
@@ -11022,85 +11002,6 @@ export default function DashboardBuilder({
     </div>
   ) : null;
 
-  // Both the page context and an active Footer use the same canonical Builder
-  // canvas. Only the document-specific sections/design/page metadata vary.
-  const sharedPreviewCanvasProps = {
-    device,
-    previewWidth: previewCanvasWidth,
-    interactionScale: device === "desktop" ? 1 : previewScale,
-    continuousGeometryUpdates: isResizingDevice,
-    previewProducts,
-    previewCategoryTree,
-    previewCategoryCounts,
-    layoutScheme,
-    shellSettings,
-    spacingOverlayEnabled,
-    selectedId,
-    selectedLayoutColumnKey,
-    selectedLayoutRowIndex,
-    selectedLayoutBlockKey,
-    draggingSectionId,
-    draggingLayoutBlockKey,
-    onSelect: selectSection,
-    onSelectColumn: selectLayoutColumn,
-    onSelectRow: selectLayoutRow,
-    onSelectBlock: selectLayoutBlock,
-    onOpenInspector: openInspectorPanel,
-    onDragStart: setDraggingSectionId,
-    onDragEnd: () => setDraggingSectionId(null),
-    onReorder: reorderSection,
-    onBlockDragStart: setDraggingLayoutBlockKey,
-    onBlockDragEnd: () => setDraggingLayoutBlockKey(null),
-    onMoveBlock: moveLayoutBlock,
-    onCreateBlock: createLayoutBlockAtDrop,
-    onDuplicateBlock: duplicateLayoutBlock,
-    onDeleteBlock: deleteLayoutBlock,
-    onUpdateBlock: updateLayoutBlockByKey,
-    onUpdateGridItem: updateGridItemByKey,
-    onDeleteGridItem: deleteGridItemByKey,
-    onDuplicateGridItem: duplicateGridItemByKey,
-    onMoveGridItem: moveGridItemByKey,
-    onMoveBadge: moveBadgeByKey,
-    onMoveButton: moveButtonByKey,
-    onMoveListItem: moveListItemByKey,
-    onDeleteBadge: deleteBadgeByKey,
-    onDuplicateBadge: duplicateBadgeByKey,
-    onDeleteButton: deleteButtonByKey,
-    onDuplicateButton: duplicateButtonByKey,
-    onDeleteListItem: deleteListItemByKey,
-    onDuplicateListItem: duplicateListItemByKey,
-    onDeleteSectionBadge: deleteSectionBadgeByKey,
-    onDuplicateSectionBadge: duplicateSectionBadgeByKey,
-    onMoveSectionBadge: moveSectionBadgeByKey,
-    onUploadGridItemImage: pickGridItemImage,
-    onUploadBlockImage: pickBlockImage,
-    onAddSection: (targetSectionId: string, placement: "above" | "below") =>
-      addWireframeNear(1, 1, targetSectionId, placement, undefined, "section"),
-    onAddRow: addRowNear,
-    onAddColumnAfter: addSelectedLayoutItem,
-    onStackColumnBelow: stackColumnBelow,
-    onAppendNestedRow: appendNestedRow,
-    onDeleteNestedRow: deleteNestedRow,
-    onUnwrapNestedColumn: unwrapNestedColumn,
-    onDeleteRow: deleteEmptyRow,
-    onDuplicateRow: duplicateLayoutRow,
-    onMoveRow: moveLayoutRow,
-    onSaveSectionTemplate: saveSectionTemplateById,
-    onSaveRowTemplate: saveRowTemplateByIndex,
-    onSaveElementTemplate: saveElementTemplateByKey,
-    onMoveBlockWithinColumn: moveLayoutBlockWithinColumn,
-    onDropSectionTemplate: insertSectionTemplateNear,
-    onDropRowTemplate: insertRowTemplateAt,
-    onDropElementTemplate: insertElementTemplateAt,
-    onMoveSection: moveSection,
-    onDuplicateSection: duplicateSection,
-    onDeleteSection: deleteSection,
-    onOpenSpacingSettings: openSpacingSettings,
-    onSetSidebarTab: setSidebarTab,
-    onOpenElementsPanel: openElementsPanel,
-    onCycleSectionSpacing: cycleSectionSpacing,
-    onApplyLayoutPreset: applyContentLayoutPreset,
-  };
   const isPrimaryPageHydrationPending =
     !publishedDocumentReady &&
     !initialPageHydration?.authoredLayout &&
@@ -11708,12 +11609,12 @@ export default function DashboardBuilder({
                 interactionScale={device === "desktop" ? 1 : previewScale}
                 continuousGeometryUpdates={isResizingDevice}
                 sections={headerContextSections}
+                interactionSections={builderState.page === "footer" ? localizedSections : undefined}
+                externalInteractionRootRef={builderState.page === "footer" ? footerPreviewSlotRef : undefined}
                 renderSections={
-                  builderState.page === "footer"
-                    ? headerContextRenderSections
-                    : builderState.page !== "header"
-                      ? materializedPreviewSections ?? undefined
-                      : undefined
+                  builderState.page !== "header" && builderState.page !== "footer"
+                    ? materializedPreviewSections ?? undefined
+                    : undefined
                 }
                 page={headerContextState.page}
                 previewProducts={previewProducts}
@@ -11803,66 +11704,48 @@ export default function DashboardBuilder({
             )}
             </div>
             <div
+              ref={footerPreviewSlotRef}
               className="builder-preview-footer-slot"
               aria-label="Footer preview"
-              style={
-                builderState.page === "footer" && footerEntryHeight !== null
-                  ? { minHeight: `${footerEntryHeight}px` }
-                  : undefined
-              }
             >
                 {builderState.page === "footer" ? (
-                  <>
-                    <BuilderContextToolbar
-                      context="shell"
-                      label="Footer"
-                      canMoveUp={false}
-                      canMoveDown={false}
-                      canDelete={false}
-                      onSelect={() => selectShellRoot("footer")}
-                      onSettings={() => selectShellRoot("footer", true)}
-                      onBackToPage={builderState.page === "footer" ? exitShellEdit : undefined}
-                    />
-                    <ProductCategoryFilterProvider key="footer-edit-canvas">
-                      <PreviewCanvas
-                        {...sharedPreviewCanvasProps}
-                        sections={localizedSections}
-                        page="footer"
-                        pageLabel="Footer"
-                        design={builderState.design}
-                        headerOverlay={false}
-                      />
-                    </ProductCategoryFilterProvider>
-                  </>
+                  <BuilderContextToolbar
+                    context="shell"
+                    label="Footer"
+                    canMoveUp={false}
+                    canMoveDown={false}
+                    canDelete={false}
+                    onSelect={() => selectShellRoot("footer")}
+                    onSettings={() => selectShellRoot("footer", true)}
+                    onBackToPage={builderState.page === "footer" ? exitShellEdit : undefined}
+                  />
                 ) : null}
+                <StorefrontBuilderRenderer
+                  layout={footerSlotLayout}
+                  page="footer"
+                  pageLabel="Footer"
+                  rootElement="footer"
+                  shellSettings={shellSettings}
+                  builderInteractionIdentity={builderState.page === "footer"}
+                />
                 {builderState.page !== "footer" ? (
-                  <>
-                    <StorefrontBuilderRenderer
-                      layout={footerSlotLayout}
-                      page="footer"
-                      pageLabel="Footer"
-                      rootElement="footer"
-                      shellSettings={shellSettings}
-                    />
-                    <button
-                      type="button"
-                      className="builder-preview-footer-edit-overlay"
-                      aria-label="Edit Footer"
-                      title="Edit Footer"
-                      onClick={selectFooter}
-                    />
-                    <BuilderContextToolbar
-                      context="shell"
-                      label="Footer"
-                      canMoveUp={false}
-                      canMoveDown={false}
-                      canDelete={false}
-                      onSelect={() => selectShellRoot("footer")}
-                      onSettings={() => selectShellRoot("footer", true)}
-                      onBackToPage={undefined}
-                    />
-                  </>
+                  <button
+                    type="button"
+                    className="builder-preview-footer-edit-overlay"
+                    aria-label="Edit Footer"
+                    title="Edit Footer"
+                    onClick={selectFooter}
+                  />
                 ) : null}
+                <BuilderContextToolbar
+                  context="shell"
+                  label="Footer"
+                  canMoveUp={false}
+                  canMoveDown={false}
+                  canDelete={false}
+                  onSelect={() => selectShellRoot("footer")}
+                  onSettings={() => selectShellRoot("footer", true)}
+                />
             </div>
             {device !== "desktop" && (
               <>
@@ -12091,6 +11974,8 @@ function PreviewCanvas({
   interactionScale,
   continuousGeometryUpdates,
   sections,
+  interactionSections,
+  externalInteractionRootRef,
   renderSections,
   page,
   previewProducts,
@@ -12172,6 +12057,8 @@ function PreviewCanvas({
   interactionScale: number;
   continuousGeometryUpdates: boolean;
   sections: BuilderSection[];
+  interactionSections?: BuilderSection[];
+  externalInteractionRootRef?: { current: HTMLDivElement | null };
   /** Transient server projection; authored `sections` remain interaction authority. */
   renderSections?: BuilderSection[];
   page: BuilderLayoutKey;
@@ -13510,9 +13397,10 @@ function PreviewCanvas({
         : null}
       <BuilderInteractionLayer
         canvasRef={canvasRef}
+        externalInteractionRootRef={externalInteractionRootRef}
         hoverFrameRef={hoverFrameRef}
         hoverSuppressedByScrollRef={hoverSuppressedByScrollRef}
-        sections={sections}
+        sections={interactionSections ?? sections}
         selectedTarget={interactionSelectedTarget}
         editingTarget={editingTarget}
         onRequestAddRow={requestRowInsert}
@@ -14373,6 +14261,7 @@ type BuilderInteractionLayerRect = {
 
 function BuilderInteractionLayer({
   canvasRef,
+  externalInteractionRootRef,
   hoverFrameRef,
   hoverSuppressedByScrollRef,
   sections,
@@ -14401,6 +14290,7 @@ function BuilderInteractionLayer({
   onSaveElementTemplate,
 }: {
   canvasRef: { current: HTMLDivElement | null };
+  externalInteractionRootRef?: { current: HTMLDivElement | null };
   hoverFrameRef: { current: HTMLDivElement | null };
   hoverSuppressedByScrollRef: { current: boolean };
   sections: BuilderSection[];
@@ -14440,6 +14330,31 @@ function BuilderInteractionLayer({
   const [previousSelection, setPreviousSelection] =
     useState<BuilderInteractionTarget | null>(null);
   const lastSelectionRef = useRef<BuilderInteractionTarget | null>(null);
+  const interactionRoots = useCallback(
+    () => [canvasRef.current, externalInteractionRootRef?.current].filter(
+      (root): root is HTMLDivElement => Boolean(root),
+    ),
+    [canvasRef, externalInteractionRootRef],
+  );
+  const findInteractionElement = useCallback(
+    (target: BuilderInteractionTarget | null) => {
+      if (!target) return null;
+      const sectionId = CSS.escape(target.sectionId);
+      const selector = target.type === "section"
+        ? `[data-builder-object-type="section"][data-builder-section-id="${sectionId}"]`
+        : target.type === "row"
+          ? `[data-builder-object-type="row"][data-builder-section-id="${sectionId}"][data-builder-row-index="${target.rowIndex}"]`
+          : target.type === "column"
+            ? `[data-builder-object-type="column"][data-builder-section-id="${sectionId}"][data-builder-column-key="${CSS.escape(target.columnKey)}"]`
+            : `[data-builder-object-type="block"][data-builder-section-id="${sectionId}"][data-builder-column-key="${CSS.escape(target.columnKey)}"][data-builder-block-key="${CSS.escape(target.blockKey)}"]`;
+      for (const root of interactionRoots()) {
+        const element = root.querySelector<HTMLElement>(selector);
+        if (element) return element;
+      }
+      return null;
+    },
+    [interactionRoots],
+  );
   useEffect(() => setAddMenuOpen(false), [selectedVisualTarget]);
   useEffect(() => {
     const previous = lastSelectionRef.current;
@@ -14452,6 +14367,56 @@ function BuilderInteractionLayer({
     }
     lastSelectionRef.current = selectedVisualTarget;
   }, [selectedVisualTarget]);
+  useEffect(() => {
+    const root = externalInteractionRootRef?.current;
+    if (!root) return;
+    const updateHover = (target: BuilderInteractionTarget | null) => {
+      const frame = hoverFrameRef.current;
+      const element = findInteractionElement(target);
+      if (!frame || !target || !element) {
+        if (frame) frame.style.display = "none";
+        return;
+      }
+      const rect = element.getBoundingClientRect();
+      frame.className = `builder-shared-interaction-frame is-hovered is-${target.type}`;
+      frame.style.display = "block";
+      frame.style.left = `${rect.left}px`;
+      frame.style.top = `${rect.top}px`;
+      frame.style.width = `${rect.width}px`;
+      frame.style.height = `${rect.height}px`;
+    };
+    const handlePointerOver = (event: MouseEvent) => {
+      const target = builderTargetFromElement(event.target instanceof Element ? event.target : null);
+      const previous = builderTargetFromElement(
+        event.relatedTarget instanceof Element ? event.relatedTarget : null,
+      );
+      if (!builderTargetsEqual(target, previous)) updateHover(target);
+    };
+    const handlePointerOut = (event: MouseEvent) => {
+      const current = builderTargetFromElement(event.target instanceof Element ? event.target : null);
+      const next = builderTargetFromElement(
+        event.relatedTarget instanceof Element ? event.relatedTarget : null,
+      );
+      if (!builderTargetsEqual(current, next)) updateHover(next);
+    };
+    const handleClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      if (resolveBuilderOpenLinkIntent(event.target)) return;
+      const target = builderTargetFromElement(event.target);
+      if (!target) return;
+      updateHover(null);
+      onSelectTarget(target);
+      onOpenInspector();
+    };
+    root.addEventListener("mouseover", handlePointerOver);
+    root.addEventListener("mouseout", handlePointerOut);
+    root.addEventListener("click", handleClick);
+    return () => {
+      root.removeEventListener("mouseover", handlePointerOver);
+      root.removeEventListener("mouseout", handlePointerOut);
+      root.removeEventListener("click", handleClick);
+    };
+  }, [externalInteractionRootRef, findInteractionElement, hoverFrameRef, onOpenInspector, onSelectTarget]);
   const selectedHierarchy = useMemo(() => {
     if (!selectedVisualTarget) return null;
     const section = sections.find(
@@ -14474,37 +14439,15 @@ function BuilderInteractionLayer({
   }, [sections, selectedVisualTarget]);
 
   useLayoutEffect(() => {
-    const root = canvasRef.current;
-    if (!root) return;
-    const findElement = (target: BuilderInteractionTarget | null) => {
-      if (!target) return null;
-      const sectionId = CSS.escape(target.sectionId);
-      if (target.type === "section") {
-        return root.querySelector<HTMLElement>(
-          `.builder-preview-section[data-builder-object-type="section"][data-builder-section-id="${sectionId}"]`,
-        );
+    const roots = interactionRoots();
+    if (roots.length === 0) return;
+    const selectedElement = findInteractionElement(selectedVisualTarget);
+    for (const root of roots) {
+      for (const owner of root.querySelectorAll<HTMLElement>(
+        '[draggable], [data-builder-object-type="section"], [data-builder-object-type="block"]',
+      )) {
+        owner.draggable = false;
       }
-      if (target.type === "row") {
-        return root.querySelector<HTMLElement>(
-          `.builder-preview-content-row[data-builder-object-type="row"][data-builder-section-id="${sectionId}"][data-builder-row-index="${target.rowIndex}"]`,
-        );
-      }
-      const columnKey = CSS.escape(target.columnKey);
-      if (target.type === "column") {
-        return root.querySelector<HTMLElement>(
-          `[data-builder-object-type="column"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"]`,
-        );
-      }
-      const blockKey = CSS.escape(target.blockKey);
-      return root.querySelector<HTMLElement>(
-        `[data-builder-object-type="block"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"][data-builder-block-key="${blockKey}"]`,
-      );
-    };
-    const selectedElement = findElement(selectedVisualTarget);
-    for (const owner of root.querySelectorAll<HTMLElement>(
-      '[draggable], [data-builder-object-type="section"], [data-builder-object-type="block"]',
-    )) {
-      owner.draggable = false;
     }
     if (
       selectedElement &&
@@ -14570,7 +14513,7 @@ function BuilderInteractionLayer({
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll, true);
     };
-  }, [canvasRef, hoverFrameRef, hoverSuppressedByScrollRef, sections, selectedVisualTarget]);
+  }, [findInteractionElement, hoverFrameRef, hoverSuppressedByScrollRef, interactionRoots, sections, selectedVisualTarget]);
 
   const renderToolbar = (target: BuilderInteractionTarget) => {
     const section = sections.find((candidate) => candidate.id === target.sectionId);
@@ -14599,6 +14542,11 @@ function BuilderInteractionLayer({
         onMoveUp={() => onMoveRow(section.id, target.rowIndex, -1)} onMoveDown={() => onMoveRow(section.id, target.rowIndex, 1)}
         onSave={() => onSaveRowTemplate(section.id, target.rowIndex)} onDuplicate={() => onDuplicateRow(section.id, target.rowIndex)}
         onDelete={() => onDeleteRow(section.id, target.rowIndex)} />;
+    }
+    if (target.type === "column") {
+      return <BuilderContextToolbar context="layout" label="Column"
+        canMoveUp={false} canMoveDown={false} canDelete={false}
+        onSettings={() => { onSelectColumn(section.id, target.columnKey); onOpenInspector(); }} />;
     }
     if (target.type !== "block") return null;
     const column = findLayoutColumn(section, target.columnKey);

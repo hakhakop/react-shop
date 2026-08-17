@@ -4326,7 +4326,7 @@
         "contentMode": "large",
         "maxWidth": "large",
         "sectionPadding": "large",
-        "removeBottomPadding": false,
+        "removeBottomPadding": true,
         "sectionTitlePosition": "top-left",
         "sectionTitleRotation": "left",
         "sectionTitleBreakpoint": "xl",
@@ -4568,15 +4568,16 @@
         ],
         "backgroundMode": "full",
         "colorScheme": "dark",
-        "topSpacing": "sm"
+        "topSpacing": "sm",
+        "bottomSpacing": "sm"
       },
       {
         "id": "contentLayout-msxa1wmz-84i54",
         "kind": "contentLayout",
         "title": "Footer",
         "background": "transparent",
-        "backgroundRole": "secondary",
-        "sectionVariant": "secondary",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
         "contentMode": "large",
         "maxWidth": "large",
         "sectionPadding": "large",
@@ -5207,7 +5208,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-17T14:12:41.217Z"
+    "updatedAt": "2026-08-17T13:44:18.943Z"
   },
   "page:slider-tests": {
     "version": 1,
