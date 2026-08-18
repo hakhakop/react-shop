@@ -79,7 +79,6 @@ test("Enterprise8 has a registry-backed disposition for every encountered source
   expect(report.entries.find((entry) => entry.capabilityKey === "panel.title_hover_style")).toMatchObject({ status: "DEFERRED" });
   expect(report.entries.find((entry) => entry.capabilityKey === "button_item.dialog_layout")).toMatchObject({ status: "INTENTIONALLY_UNSUPPORTED" });
   expect(report.entries.find((entry) => entry.capabilityKey === "image.animation.parallax")).toMatchObject({
-    status: "DEFERRED",
-    futureOwnerOrPhase: "Future canonical Parallax / Animation runtime",
+    status: "SUPPORTED",
   });
 });

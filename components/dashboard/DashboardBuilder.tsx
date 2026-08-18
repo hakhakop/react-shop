@@ -13022,7 +13022,7 @@ function PreviewCanvas({
           aria-label={`${pageLabel} preview`}
         >
           <AnimatePresence mode="sync">
-            {visibleSections.map((section) => {
+            {visibleSections.map((section, sectionIndex) => {
               const sourceIndex = sections.findIndex(
                 (item) => item.id === section.id,
               );
@@ -13082,6 +13082,10 @@ function PreviewCanvas({
                   transition={{
                     duration: 0,
                   }}
+                  style={{
+                    position: "relative",
+                    zIndex: Math.max(1, 100 - sectionIndex),
+                  }}
                 >
                   <div
                     id={section.anchorId || section.id}
@@ -13116,6 +13120,7 @@ function PreviewCanvas({
                           : ""
                     } ${isSectionActive ? "is-selected" : ""}`}
                     style={{
+                      zIndex: Math.max(1, 100 - sectionIndex),
                       background: resolveSectionBackground(section).override,
                         "--builder-preview-padding-top": getPreviewSpacing(
                           section.topSpacing,

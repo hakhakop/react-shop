@@ -1216,8 +1216,8 @@ const sourceSliderItem = (
     // Width and Height are Panel Slider element media defaults. Retain these
     // on an item only when the source item explicitly authored its own value;
     // copying a parent value here would mask later element-level edits.
-    ...(sourceCssDimension(itemProps.image_width) ? { imageWidth: sourceCssDimension(itemProps.image_width)! } : {}),
-    ...(sourceCssDimension(itemProps.image_height) ? { imageHeight: sourceCssDimension(itemProps.image_height)! } : {}),
+    ...(asString(itemProps.image_width) ? { imageWidth: asString(itemProps.image_width)! } : {}),
+    ...(asString(itemProps.image_height) ? { imageHeight: asString(itemProps.image_height)! } : {}),
     ...(Object.prototype.hasOwnProperty.call(itemProps, "image_border")
       ? { imageShape: sourceImageBorder(itemProps.image_border) ?? "none" }
       : {}),
@@ -1586,14 +1586,18 @@ const mapStaticElement = (
       imageShape: props.image_border === "rounded" || props.image_border === "circle" || props.image_border === "pill"
         ? props.image_border
         : "none",
-      ...(["none", "small", "medium", "large", "xlarge"].includes(asString(props.image_box_shadow) ?? "")
+      ...(["none", "small", "medium", "large", "xlarge", "bottom"].includes(asString(props.image_box_shadow) ?? "")
         ? {
-          imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge",
-          imageBoxShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge",
+          imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" | "bottom",
+          imageBoxShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" | "bottom",
         }
         : {}),
-      ...(["none", "default", "primary", "secondary"].includes(asString(props.image_box_decoration) ?? "")
-        ? { imageBoxDecoration: asString(props.image_box_decoration) as "none" | "default" | "primary" | "secondary" }
+      ...(["none", "default", "primary", "secondary", "shadow", "floating-shadow", "mask"].includes(asString(props.image_box_decoration) ?? "")
+        ? {
+          imageBoxDecoration: (asString(props.image_box_decoration) === "floating-shadow"
+            ? "shadow"
+            : asString(props.image_box_decoration)) as "none" | "default" | "primary" | "secondary" | "shadow" | "mask",
+        }
         : {}),
     }, props);
   }
@@ -1670,8 +1674,8 @@ const mapStaticElement = (
       ...normalizeYoothemeMedia(props),
       imageMaxWidth: sourceImageMaxWidth(props),
       imageShape: sourceImageBorder(props.image_border) ?? "none",
-      ...(["none", "small", "medium", "large", "xlarge"].includes(asString(props.image_box_shadow) ?? "")
-        ? { imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" }
+      ...(["none", "small", "medium", "large", "xlarge", "bottom"].includes(asString(props.image_box_shadow) ?? "")
+        ? { imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" | "bottom" }
         : {}),
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
       imageHoverTransition: asString(props.image_transition) ?? "none",
@@ -2168,6 +2172,8 @@ const mapStaticElement = (
         variant: "panel",
         slideMode: "panel",
         ...panelSliderMedia,
+        ...(asString(props.image_width) ? { imageWidth: asString(props.image_width) } : {}),
+        ...(asString(props.image_height) ? { imageHeight: asString(props.image_height) } : {}),
         ...(Object.prototype.hasOwnProperty.call(props, "image_border")
           ? { imageShape: sourceImageBorder(props.image_border) ?? "none" }
           : {}),
@@ -2725,6 +2731,12 @@ export const mapYoothemeStaticContent = (
         structureSection.layoutColumns ||
         rows[0]?.columns.length || 0,
       layoutRows: structureSection.layoutRows,
+      layoutItems: rows.flatMap((row) => row.columns.map((col) => ({
+        id: col.id,
+        rowId: row.id,
+        rowLayout: row.layout,
+        blocks: col.elements,
+      }))),
       rows,
     });
   });

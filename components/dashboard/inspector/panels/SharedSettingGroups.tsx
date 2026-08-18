@@ -706,6 +706,7 @@ export function ImageSettingsGroup({
             { value: "medium", label: "Medium" },
             { value: "large", label: "Large" },
             { value: "xlarge", label: "X-Large" },
+            { value: "bottom", label: "Bottom" },
           ]}
           onChange={(value) => update({ [keys.shadow]: value, imageBoxShadow: value })}
         />
@@ -719,7 +720,10 @@ export function ImageSettingsGroup({
       >
         <InspectorSelect
           value={String(values.imageHoverBoxShadow ?? "none")}
-          options={["none", "small", "medium", "large", "xlarge"].map((value) => ({ value, label: value === "none" ? "None" : value.charAt(0).toUpperCase() + value.slice(1) }))}
+          options={["none", "small", "medium", "large", "xlarge", "bottom"].map((value) => ({
+            value,
+            label: value === "none" ? "None" : value === "xlarge" ? "X-Large" : value.charAt(0).toUpperCase() + value.slice(1),
+          }))}
           onChange={(value) => update({ imageHoverBoxShadow: value === "none" ? undefined : value })}
           ariaLabel="Image hover box shadow"
         />
@@ -738,6 +742,8 @@ export function ImageSettingsGroup({
             { value: "default", label: "Default" },
             { value: "primary", label: "Primary" },
             { value: "secondary", label: "Secondary" },
+            { value: "shadow", label: "Floating Shadow" },
+            { value: "mask", label: "Mask" },
           ]}
           onChange={(value) => update({ [decorationKey]: value })}
         />

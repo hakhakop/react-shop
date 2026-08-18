@@ -329,7 +329,9 @@ export function GridCardsClient({
             // but those are read fallbacks only.
             const imageBorderClass = getUikitImageBorderClass(rawBlock.imageShape ?? rawBlock.imageBorder);
             const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageShadow ?? rawBlock.imageBoxShadow);
-            const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
+            const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
+              ? (rawBlock.imageBoxDecoration === "shadow" ? "uk-box-shadow-bottom" : `uk-background-${rawBlock.imageBoxDecoration}`)
+              : "";
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
             const isFrameless = rawBlock.panelImageNoPadding === true || rawBlock.alignImageWithoutPadding === true || imagePaddingClass === "frameless";
             const panelExpand = rawBlock.panelExpand === "image" || rawBlock.panelExpand === "content" || rawBlock.panelExpand === "both"

@@ -141,11 +141,11 @@ const strictStatusCounts = (
 
 function strictBaselineForFixture(id: string): YoothemeFixtureStrictBaseline | null {
   const counts = ({
-    enterprise3: strictStatusCounts(277, 54),
-    enterprise4: strictStatusCounts(278, 54),
-    enterprise5: strictStatusCounts(283, 54),
-    enterprise6: strictStatusCounts(312, 64),
-    enterprise7: strictStatusCounts(339, 73),
+    enterprise3: strictStatusCounts(277, 55, 3),
+    enterprise4: strictStatusCounts(278, 55, 3),
+    enterprise5: strictStatusCounts(283, 55, 3),
+    enterprise6: strictStatusCounts(312, 65, 3),
+    enterprise7: strictStatusCounts(339, 74, 3),
     enterprise8: strictStatusCounts(356, 75, 3),
   } as const)[id];
   return counts
@@ -336,7 +336,7 @@ const ENTERPRISE8_SUPPORTED_FIELDS: Readonly<Record<string, readonly string[]>> 
   slideshow_item: ["content", "image", "link", "link_text", "meta", "text_color", "title"],
   slideshow: ["link_style", "link_text", "margin", "meta_align", "meta_element", "meta_style", "nav_align", "nav_breakpoint", "nav_position", "nav_position_margin", "show_content", "show_link", "show_meta", "show_thumbnail", "show_title", "slidenav", "slidenav_breakpoint", "slidenav_margin", "slidenav_outside_breakpoint", "slideshow_autoplay_pause", "slideshow_min_height", "thumbnav_height", "thumbnav_svg_color", "thumbnav_width", "title_hover_style"],
   table_item: ["content", "image", "link", "meta", "title"],
-  table: ["content_style", "image_svg_color", "link_style", "link_text", "meta_color", "meta_style", "show_content", "show_meta", "show_title", "table_hover", "table_justify", "table_order", "table_responsive", "table_width_content", "table_width_meta", "table_width_title", "title_color", "title_font_family", "title_style"],
+  table: ["content_style", "image_svg_color", "link_style", "link_text", "meta_color", "show_content", "show_meta", "show_title", "table_hover", "table_justify", "table_order", "table_responsive", "table_width_content", "table_width_meta", "table_width_title", "title_color", "title_font_family", "title_style"],
   text: ["animation", "block_align", "block_align_breakpoint", "block_align_fallback", "column_breakpoint", "content", "margin", "margin_remove_bottom", "maxwidth", "position", "position_z_index", "text_align", "text_align_breakpoint", "text_align_fallback", "text_style"],
 };
 

@@ -186,9 +186,9 @@ export type BuilderLayoutBlock = {
   imageFit?: "contain" | "cover" | "fill";
   imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
   imageShape?: "none" | "rounded" | "circle" | "pill";
-  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
-  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
-  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | (string & {});
+  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | "shadow" | "mask" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;

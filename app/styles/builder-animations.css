@@ -250,9 +250,9 @@
     transform: none !important;
   }
 
-  /* Preserve the full-width section's centering while removing motion. */
+  /* Preserve the full-width section without motion. */
   .shop-builder-section--full[data-builder-animate] {
-    transform: translateX(-50%) !important;
+    transform: none !important;
   }
 }
 
@@ -298,7 +298,7 @@
 
 /* Backward compat: full-width section variant */
 .shop-builder-section--full[data-builder-animate] {
-  transform: translateX(-50%) translate3d(0, var(--builder-animate-distance), 0);
+  transform: translate3d(0, var(--builder-animate-distance), 0);
 }
 .shop-builder-section--full[data-builder-animate="fade-in"],
 .shop-builder-section--full[data-builder-animate="stagger-up"],
@@ -307,22 +307,22 @@
 .shop-builder-section--full[data-builder-animate="scroll-progress-horizontal"],
 .shop-builder-section--full[data-builder-animate="scroll-progress-vertical"],
 .shop-builder-section--full[data-builder-animate="princity-gradient"] {
-  transform: translateX(-50%);
+  transform: none;
 }
 .shop-builder-section--full[data-builder-animate="slide-left"] {
-  transform: translateX(-50%) translate3d(-44px, 0, 0);
+  transform: translate3d(-44px, 0, 0);
 }
 .shop-builder-section--full[data-builder-animate="slide-right"] {
-  transform: translateX(-50%) translate3d(44px, 0, 0);
+  transform: translate3d(44px, 0, 0);
 }
 .shop-builder-section--full[data-builder-animate="scale-soft"] {
-  transform: translateX(-50%) scale(0.965);
+  transform: scale(0.965);
 }
 .shop-builder-section--full[data-builder-animate="blur-reveal"] {
-  transform: translateX(-50%) translate3d(0, 18px, 0);
+  transform: translate3d(0, 18px, 0);
 }
 .shop-builder-section--full[data-builder-animate].is-builder-animated-in {
-  transform: translateX(-50%);
+  transform: none;
 }
 
 /* --- Progress line for Grid, Badge, and Column-Badge sections --- */

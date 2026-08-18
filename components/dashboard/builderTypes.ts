@@ -503,10 +503,10 @@ export type BuilderLayoutBlock = {
   imageMaxWidth?: number;
   imageBorderRadius?: number;
   imageShape?: "none" | "rounded" | "circle" | "pill";
-  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
-  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
-  imageHoverBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
-  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | (string & {});
+  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageHoverBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | "shadow" | "mask" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;

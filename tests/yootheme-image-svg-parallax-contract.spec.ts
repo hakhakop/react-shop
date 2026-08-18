@@ -6,6 +6,9 @@ import {
   getUikitSvgColor,
   getUikitSvgColorClass,
   UIKIT_YOOTHEME_SVG_COLOR_OPTIONS,
+  resolveUikitImageSemantics,
+  getUikitImageClass,
+  getUikitImageWrapperClass,
 } from "@/lib/uikitTokens";
 import {
   formatFreshImportAcceptanceResult,
@@ -42,7 +45,7 @@ test("YOOtheme Image keeps its SVG vocabulary and canonical media presentation v
       }],
     }],
   });
-  const image = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as Record<string, unknown> | undefined;
+  const image = (mapped.sections[0]?.rows?.[0]?.columns?.[0]?.elements?.[0] ?? mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0]) as Record<string, unknown> | undefined;
 
   expect(image).toMatchObject({
     kind: "image",
@@ -58,6 +61,72 @@ test("YOOtheme Image keeps its SVG vocabulary and canonical media presentation v
   expect(getUikitSvgColorClass("danger")).toBe("uk-text-danger");
   expect(getUikitSvgColor("none")).toBeUndefined();
   expect(getUikitSvgColor("danger")).toContain("--uk-global-danger-background");
+
+  // Shadow and box decoration parity
+  const bottomMapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [{
+            type: "image",
+            props: {
+              image: "wp-content/uploads/yootheme/example.svg",
+              image_box_shadow: "bottom",
+              image_box_decoration: "shadow",
+            },
+          }],
+        }],
+      }],
+    }],
+  });
+  const bottomImage = (bottomMapped.sections[0]?.rows?.[0]?.columns?.[0]?.elements?.[0] ?? bottomMapped.sections[0]?.layoutItems?.[0]?.blocks?.[0]) as Record<string, unknown> | undefined;
+  expect(bottomImage).toMatchObject({
+    kind: "image",
+    imageShadow: "bottom",
+    imageBoxShadow: "bottom",
+    imageBoxDecoration: "shadow",
+  });
+
+  // Floating shadow alias normalizes to shadow
+  const floatingMapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [{
+            type: "image",
+            props: {
+              image: "wp-content/uploads/yootheme/example.svg",
+              image_box_decoration: "floating-shadow",
+            },
+          }],
+        }],
+      }],
+    }],
+  });
+  const floatingImage = (floatingMapped.sections[0]?.rows?.[0]?.columns?.[0]?.elements?.[0] ?? floatingMapped.sections[0]?.layoutItems?.[0]?.blocks?.[0]) as Record<string, unknown> | undefined;
+  expect(floatingImage).toMatchObject({
+    kind: "image",
+    imageBoxDecoration: "shadow",
+  });
+
+  // UIkit shadow semantics and class generation
+  for (const shadowVal of ["small", "medium", "large", "xlarge", "bottom"]) {
+    const semantics = resolveUikitImageSemantics({
+      imageShadow: shadowVal,
+      imageShape: "rounded",
+    });
+    expect(semantics.shadow).toBe(shadowVal);
+    expect(getUikitImageClass(semantics)).toContain(`uk-box-shadow-${shadowVal}`);
+    expect(getUikitImageWrapperClass(semantics)).toContain(`uk-box-shadow-${shadowVal}`);
+  }
 });
 
 test("YOOtheme inline SVG accepts only asset-authored drop-shadow filters", () => {
@@ -77,29 +146,20 @@ async function signIn(page: Page) {
 }
 
 function importedBlocks(): Array<Record<string, any>> {
-  return mapYoothemeStaticContent(enterprise8).sections.flatMap((section) =>
-    (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
+  return mapYoothemeStaticContent(enterprise8).sections.flatMap((section: any) =>
+    (section.rows ?? []).flatMap((row: any) =>
+      (row.columns ?? []).flatMap((col: any) => col.elements ?? [])
+    ).concat((section.layoutItems ?? []).flatMap((item: any) => item.blocks ?? []))
   ).filter(Boolean) as Array<Record<string, any>>;
 }
 
-test("Enterprise8 parallax is deferred instead of persisted as a generic animation", () => {
+test("Enterprise8 parallax is imported with its compound parallax settings", () => {
   const floatingSvg = importedBlocks().find((block) =>
     block.kind === "image" && block.imageUrl?.includes("enterprise-feature-efficient-workflow-floating-icon.svg"),
   );
   expect(floatingSvg).toBeTruthy();
-  expect("animation" in (floatingSvg ?? {})).toBe(false);
-  expect((floatingSvg?.visualStyle?.effects as Record<string, unknown> | undefined)?.animation).toBeUndefined();
-
-  const parallax = createYoothemePageImportReport(enterprise8).entries.find(
-    (entry) => entry.capabilityKey === "image.animation.parallax",
-  );
-  expect(parallax).toMatchObject({
-    status: "DEFERRED",
-    canonicalOwner: null,
-    persistedDestination: null,
-    runtimeConsumer: null,
-    futureOwnerOrPhase: "Future canonical Parallax / Animation runtime",
-    occurrenceCount: 4,
+  expect(floatingSvg?.animation).toMatchObject({
+    preset: "parallax",
   });
 });
 

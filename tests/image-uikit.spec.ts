@@ -69,10 +69,11 @@ test("Image uses semantic UIkit presentation in builder and frontend", async ({ 
   await expect(imageBlock.locator(".uk-border-circle").first()).toBeVisible();
   await shape.getByRole("radio", { name: "Pill" }).click();
   await expect(imageBlock.locator(".uk-border-pill").first()).toBeVisible();
-  for (const value of ["small", "medium", "large", "xlarge"]) {
+  for (const value of ["small", "medium", "large", "xlarge", "bottom"]) {
     await shadow.selectOption(value);
     await expect(imageBlock.locator(`.uk-box-shadow-${value}`).first()).toBeVisible();
   }
+  await shadow.selectOption("xlarge");
   await alignment.getByRole("radio", { name: "Right" }).click();
   await expect(imageBlock.locator(".uk-align-right").first()).toBeVisible();
   await width.selectOption("full");

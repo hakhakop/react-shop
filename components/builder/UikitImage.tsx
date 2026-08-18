@@ -73,9 +73,25 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
     ["left", "center", "right"].includes(imageSemantics.alignment)
     ? `uk-align-${imageSemantics.alignment}`
     : "";
-  const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
-    ? `uk-background-${rawBlock.imageBoxDecoration}`
-    : "";
+  const isBottomShadow =
+    imageSemantics.shadow === "bottom" ||
+    rawBlock.imageShadow === "bottom" ||
+    rawBlock.imageBoxShadow === "bottom" ||
+    rawBlock.imageBoxDecoration === "shadow" ||
+    rawBlock.boxDecoration === "shadow" ||
+    rawBlock.visualStyle?.effects?.shadow === "bottom" ||
+    rawBlock.visualStyle?.effects?.boxDecoration === "shadow";
+  const imageDecorationClass =
+    rawBlock.imageBoxDecoration &&
+    rawBlock.imageBoxDecoration !== "none" &&
+    rawBlock.imageBoxDecoration !== "shadow"
+      ? `uk-background-${rawBlock.imageBoxDecoration}`
+      : "";
+  const imageHoverShadow = rawBlock.imageHoverBoxShadow ?? rawBlock.imageHoverShadow;
+  const imageHoverShadowClass =
+    imageHoverShadow && imageHoverShadow !== "none"
+      ? `uk-box-shadow-hover-${imageHoverShadow}`
+      : "";
   const isPlaceholder = !rawBlock.imageUrl || !rawBlock.imageUrl.trim();
   // Framed media deliberately clips cover/ratio content. An explicit element
   // Advanced stylesheet may intentionally move `.el-image` outside that frame
@@ -161,9 +177,9 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
         }}
       >
         <div
-          className={`shop-builder-image-media ${imageDecorationClass} ${hasAdvancedCss ? "has-advanced-css" : ""} ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
+          className={`shop-builder-image-media ${imageDecorationClass} ${isBottomShadow ? "uk-box-shadow-bottom" : ""} ${imageHoverShadowClass} ${hasAdvancedCss ? "has-advanced-css" : ""} ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
             isPlaceholder ? "is-empty" : ""
-          }`}
+          }`.trim()}
           data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
           style={{
             aspectRatio: imageStyle.aspectRatio,

@@ -721,7 +721,7 @@ export type UikitImageSemantics = {
   fit?: "contain" | "cover" | "fill" | string;
   ratio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait" | string;
   shape?: "none" | "rounded" | "circle" | "pill" | string;
-  shadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
+  shadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | string;
   alignment?: "left" | "center" | "right" | string;
   width?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | string;
   height?: string | number | null;
@@ -742,8 +742,8 @@ export type UikitImageDocumentFields = {
   imageSvgInline?: boolean;
   /** Semantic color used when the SVG is rendered as a stylable icon. */
   imageSvgColor?: string;
-  /** UIkit background surface behind the image media. */
-  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | string;
+  /** UIkit background surface behind the image media or floating shadow. */
+  imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | "shadow" | "mask" | string;
 };
 
 /**
@@ -759,8 +759,6 @@ export const UIKIT_YOOTHEME_SVG_COLOR_OPTIONS = [
   { value: "success", label: "Success" },
   { value: "warning", label: "Warning" },
   { value: "danger", label: "Danger" },
-  { value: "default", label: "Default" },
-  { value: "inverse", label: "Inverse" },
 ] as const;
 
 /** Resolves stored Image fields into the shared UIkit Image semantic contract. */
