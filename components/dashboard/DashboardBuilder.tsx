@@ -27,10 +27,11 @@ import {
   Plus,
   ShoppingBag,
   LockKeyhole,
+  Laptop,
+  Monitor,
   Redo2,
   Save,
   Settings2,
-  MonitorSmartphone,
   Undo2,
   Sliders,
   Sparkles,
@@ -44,6 +45,8 @@ import {
   Upload,
   X,
   Sun,
+  Smartphone,
+  Tablet,
   Moon,
   AlertCircle,
   AlignLeft,
@@ -995,11 +998,28 @@ function builderDocumentOwnershipLabel(context: BuilderEditorContext | null) {
 }
 
 function builderFrontendActionLabel(context: BuilderEditorContext | null) {
-  if (!context) return "Open Frontend";
+  if (!context) return "View Page";
   if (context.document.kind === "routing-template" || context.document.kind === "individual") {
     return context.content.family === "product" ? "View Product" : "View Post";
   }
   return context.document.kind === "page" ? "View Page" : "Open Frontend";
+}
+
+function ordinaryBuilderFrontendHref(
+  page: BuilderLayoutKey,
+  customPages: BuilderCustomPage[],
+) {
+  if (page === "home") return "/";
+  if (page === "shop") return "/shop";
+  if (page === "client") return "/client";
+  if (page === "page:cart") return "/cart";
+  if (page === "page:checkout") return "/checkout";
+  if (page === "page:my-account") return "/my-account";
+  if (isBuilderCustomPageKey(page)) {
+    const slug = customPages.find((item) => item.key === page)?.slug;
+    return slug ? `/${encodeURIComponent(slug)}` : null;
+  }
+  return null;
 }
 
 const lightScheme = {
@@ -2485,6 +2505,7 @@ export default function DashboardBuilder({
     };
   }, []);
   const [device, setDevice] = useState<PreviewDevice>("desktop");
+  const laptopPreviewWidth = 1280;
   const [customMobileWidth, setCustomMobileWidth] = useState(390);
   const [customTabletWidth, setCustomTabletWidth] = useState(820);
   const [isResizingDevice, setIsResizingDevice] = useState(false);
@@ -3145,6 +3166,7 @@ export default function DashboardBuilder({
     [builderState.page],
   );
   const frontendHref = builderEditorContext?.navigation.frontendHref;
+  const viewPageHref = frontendHref ?? ordinaryBuilderFrontendHref(builderState.page, customPages);
   const handleScopedBuilderNavigate = useCallback(
     (href: string) => {
       // A strict routing-template document already owns the live preview
@@ -3389,7 +3411,9 @@ export default function DashboardBuilder({
     const shellWidth = shell.clientWidth || window.innerWidth;
 
     let targetWidth = shellWidth;
-    if (device === "tablet") {
+    if (device === "laptop") {
+      targetWidth = laptopPreviewWidth;
+    } else if (device === "tablet") {
       targetWidth = customTabletWidth;
     } else if (device === "mobile") {
       targetWidth = customMobileWidth;
@@ -10758,132 +10782,146 @@ export default function DashboardBuilder({
             <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : getLayoutLabel(builderState.page, customPages))}</h1>
             <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : publishStatus}</p>
           </div>
-          {sidebarTab === "globalStyles" ? (
-            <button
-              type="button"
-              className="builder-canvas-control is-primary"
-              onClick={publishShellSettings}
-              title={`Publish ${shellSettingsLabel}`}
-            >
-              <CloudUpload size={14} />
-              Publish Settings
-            </button>
-          ) : (hasPendingChanges || Boolean(websiteId)) ? (
-            <button
-              type="button"
-              className="builder-canvas-control is-primary"
-              onClick={() => void publishLayout()}
-            >
-              <CloudUpload size={14} />
-              {t("builder.toolbar.publish")}
-            </button>
-          ) : null}
+          <div className="builder-document-actions" aria-label="Document actions">
+            {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
+              <label className="builder-template-preview-select">
+                <span>Preview {builderEditorContext.content.family === "product" ? "Product" : "Post"}</span>
+                {templatePreviewCandidates.length ? (
+                  <select
+                    value={templatePreviewIdentity?.contentId ?? builderEditorContext.content.identity?.contentId ?? ""}
+                    onChange={(event) => {
+                      const candidate = templatePreviewCandidates.find((item) => item.identity.contentId === event.target.value);
+                      if (candidate) setTemplatePreviewIdentity(candidate.identity);
+                    }}
+                  >
+                    {templatePreviewCandidates.map((candidate) => (
+                      <option key={`${candidate.identity.provider}:${candidate.identity.contentType}:${candidate.identity.contentId}`} value={candidate.identity.contentId}>{candidate.label}</option>
+                    ))}
+                  </select>
+                ) : <small>No live {builderEditorContext.content.family === "product" ? "products" : "posts"} available</small>}
+              </label>
+            ) : null}
+            {sidebarTab !== "globalStyles" ? (
+              <label className="builder-content-language-select builder-document-language-top">
+                <span>{t("builder.contentLanguage.editing")}</span>
+                <select value={contentLanguage} onChange={(event) => setContentLanguage(event.target.value)}>
+                  {enabledContentLanguages.map((language) => (
+                    <option key={language} value={language}>
+                      {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
+                    </option>
+                  ))}
+                </select>
+                {isUsingPrimaryFallback(rawSelectedSection, contentLanguage, primaryContentLanguage) ? (
+                  <small>{t("builder.contentLanguage.fallback")}</small>
+                ) : null}
+              </label>
+            ) : null}
+            {sidebarTab !== "globalStyles" && viewPageHref ? (
+              <button
+                type="button"
+                className="builder-canvas-control"
+                onClick={() => window.open(viewPageHref, "_blank", "noopener,noreferrer")}
+                title={builderFrontendActionLabel(builderEditorContext)}
+              >
+                <ExternalLink size={14} />
+                {builderFrontendActionLabel(builderEditorContext)}
+              </button>
+            ) : null}
+            {sidebarTab !== "globalStyles" ? (
+              <>
+                <button
+                  type="button"
+                  className="builder-canvas-control builder-icon-only-control"
+                  onClick={undoBuilder}
+                  disabled={undoHistoryRef.current.length <= 1}
+                  title={t("builder.toolbar.undo")}
+                  aria-label={t("builder.toolbar.undo")}
+                >
+                  <Undo2 size={14} />
+                </button>
+                <button
+                  type="button"
+                  className="builder-canvas-control builder-icon-only-control"
+                  onClick={redoBuilder}
+                  disabled={redoHistoryRef.current.length === 0}
+                  title={t("builder.toolbar.redo")}
+                  aria-label={t("builder.toolbar.redo")}
+                >
+                  <Redo2 size={14} />
+                </button>
+              </>
+            ) : null}
+            {sidebarTab === "globalStyles" ? (
+              <button
+                type="button"
+                className="builder-canvas-control is-primary"
+                onClick={publishShellSettings}
+                title={`Publish ${shellSettingsLabel}`}
+              >
+                <CloudUpload size={14} />
+                Publish Settings
+              </button>
+            ) : (hasPendingChanges || Boolean(websiteId)) ? (
+              <button
+                type="button"
+                className="builder-canvas-control is-primary"
+                onClick={() => void publishLayout()}
+              >
+                <CloudUpload size={14} />
+                {t("builder.toolbar.publish")}
+              </button>
+            ) : null}
+          </div>
         </div>
       </header>
 
-      <div className="builder-canvas-controls" aria-label="Canvas controls">
-        <span className="builder-canvas-controls-label">Canvas controls</span>
-        {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
-          <label className="builder-template-preview-select">
-            <span>Preview {builderEditorContext.content.family === "product" ? "Product" : "Post"}</span>
-            {templatePreviewCandidates.length ? (
-              <select
-                value={templatePreviewIdentity?.contentId ?? builderEditorContext.content.identity?.contentId ?? ""}
-                onChange={(event) => {
-                  const candidate = templatePreviewCandidates.find((item) => item.identity.contentId === event.target.value);
-                  if (candidate) setTemplatePreviewIdentity(candidate.identity);
-                }}
-              >
-                {templatePreviewCandidates.map((candidate) => (
-                  <option key={`${candidate.identity.provider}:${candidate.identity.contentId}`} value={candidate.identity.contentId}>{candidate.label}</option>
-                ))}
-              </select>
-            ) : <small>No live {builderEditorContext.content.family === "product" ? "products" : "posts"} available</small>}
-          </label>
-        ) : null}
-        <label className="builder-content-language-select">
-          <span>{t("builder.contentLanguage.editing")}</span>
-          <select value={contentLanguage} onChange={(event) => setContentLanguage(event.target.value)}>
-            {enabledContentLanguages.map((language) => (
-              <option key={language} value={language}>
-                {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
-              </option>
-            ))}
-          </select>
-          {isUsingPrimaryFallback(rawSelectedSection, contentLanguage, primaryContentLanguage) ? (
-            <small>{t("builder.contentLanguage.fallback")}</small>
-          ) : null}
-        </label>
-        <div className="builder-device-toggle" aria-label={t("builder.toolbar.previewDevice")}>
-          {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={device === item ? "is-active" : ""}
-              onClick={() => setDevice(item)}
-              title={t(`builder.devices.${item}` as "builder.devices.desktop" | "builder.devices.tablet" | "builder.devices.mobile")}
-            >
-              <MonitorSmartphone size={15} />
-            </button>
-          ))}
-        </div>
-        {builderEditorContext?.capabilities.canOpenFrontend && frontendHref ? (
-          <button
-            type="button"
-            className="builder-canvas-control"
-            onClick={() => window.open(frontendHref, "_blank", "noopener,noreferrer")}
-            title={builderFrontendActionLabel(builderEditorContext)}
-          >
-            <ExternalLink size={14} />
-            {builderFrontendActionLabel(builderEditorContext)}
-          </button>
-        ) : null}
-        <button
-          type="button"
-          className="builder-canvas-control"
-          onClick={undoBuilder}
-          disabled={undoHistoryRef.current.length <= 1}
-          title={t("builder.toolbar.undo")}
-        >
-          <Undo2 size={14} />
-          {t("builder.toolbar.undo")}
-        </button>
-        <button
-          type="button"
-          className="builder-canvas-control"
-          onClick={redoBuilder}
-          disabled={redoHistoryRef.current.length === 0}
-          title={t("builder.toolbar.redo")}
-        >
-          <Redo2 size={14} />
-        </button>
-      </div>
     </div>
   );
 
   const sidebarUtilityControls = (
     <>
-      <button
-        ref={inspectorToggleRef}
-        type="button"
-        className={`builder-sidebar-utility-button builder-sidebar-inspector-toggle${
-          inspectorOpen ? " is-active" : selectedSection ? " is-highlighted" : ""
-        }`}
-        onClick={toggleInspectorVisibility}
-        disabled={!selectedSection}
-        title={
-          selectedSection
-            ? inspectorOpen
-              ? "Hide Inspector"
-              : "Open Inspector"
-            : "Select an object to use Inspector"
-        }
-        aria-label={inspectorOpen ? "Hide Inspector" : "Open Inspector"}
-        aria-pressed={inspectorOpen}
-      >
-        <PanelRightOpen size={18} />
-        <span>Inspector</span>
-      </button>
+      <div className="builder-responsive-mode-group" role="group" aria-label={t("builder.toolbar.previewDevice")}>
+        <button
+          type="button"
+          className={`builder-responsive-mode-button${device === "desktop" ? " is-active" : ""}`}
+          onClick={() => setDevice("desktop")}
+          title="Desktop preview"
+          aria-label="Desktop preview"
+          aria-pressed={device === "desktop"}
+        >
+          <Monitor size={17} />
+        </button>
+        <button
+          type="button"
+          className={`builder-responsive-mode-button${device === "laptop" ? " is-active" : ""}`}
+          onClick={() => setDevice("laptop")}
+          title="Laptop preview"
+          aria-label="Laptop preview"
+          aria-pressed={device === "laptop"}
+        >
+          <Laptop size={17} />
+        </button>
+        <button
+          type="button"
+          className={`builder-responsive-mode-button${device === "tablet" ? " is-active" : ""}`}
+          onClick={() => setDevice("tablet")}
+          title="Tablet preview"
+          aria-label="Tablet preview"
+          aria-pressed={device === "tablet"}
+        >
+          <Tablet size={17} />
+        </button>
+        <button
+          type="button"
+          className={`builder-responsive-mode-button${device === "mobile" ? " is-active" : ""}`}
+          onClick={() => setDevice("mobile")}
+          title="Phone preview"
+          aria-label="Phone preview"
+          aria-pressed={device === "mobile"}
+        >
+          <Smartphone size={17} />
+        </button>
+      </div>
       <button
         type="button"
         className="builder-sidebar-utility-button"
@@ -11630,6 +11668,7 @@ export default function DashboardBuilder({
                 selectedLayoutColumnKey={selectedLayoutColumnKey}
                 selectedLayoutRowIndex={selectedLayoutRowIndex}
                 selectedLayoutBlockKey={selectedLayoutBlockKey}
+                externalHoveredTarget={hoveredBuilderTarget}
                 draggingSectionId={draggingSectionId}
                 draggingLayoutBlockKey={draggingLayoutBlockKey}
                 onSelect={selectSection}
@@ -11747,7 +11786,7 @@ export default function DashboardBuilder({
                   onSettings={() => selectShellRoot("footer", true)}
                 />
             </div>
-            {device !== "desktop" && (
+            {(device === "tablet" || device === "mobile") && (
               <>
                 <div
                   className="builder-device-resize-handle handle-left"
@@ -11991,6 +12030,7 @@ function PreviewCanvas({
   selectedLayoutColumnKey,
   selectedLayoutRowIndex,
   selectedLayoutBlockKey,
+  externalHoveredTarget,
   draggingSectionId,
   draggingLayoutBlockKey,
   onSelect,
@@ -12075,6 +12115,7 @@ function PreviewCanvas({
   selectedLayoutColumnKey: string | null;
   selectedLayoutRowIndex: number | null;
   selectedLayoutBlockKey: string | null;
+  externalHoveredTarget: BuilderHoverTarget | null;
   draggingSectionId: string | null;
   draggingLayoutBlockKey: string | null;
   onSelect: (id: string, openInspector?: boolean) => void;
@@ -12375,6 +12416,9 @@ function PreviewCanvas({
     },
     [editingTarget, findCanvasTargetElement],
   );
+  useEffect(() => {
+    onHoverTarget(externalHoveredTarget);
+  }, [externalHoveredTarget, onHoverTarget]);
   const selectedTarget = useMemo(
     () =>
       selectedBuilderTarget({

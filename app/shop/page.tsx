@@ -10,6 +10,7 @@ import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import type { SaaSWebsite } from "@/lib/websites";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 
 export const dynamic = "force-dynamic";
 
@@ -91,10 +92,15 @@ export default async function ShopPage() {
     getBuilderShellSettings(),
   ]);
 
-  if (layout?.sections?.some((section) => section.visible)) {
+  const materialization = layout
+    ? await materializeBuilderDynamicContent(layout, { website })
+    : null;
+  const renderLayout = materialization?.renderLayout ?? layout;
+
+  if (renderLayout?.sections?.some((section) => section.visible)) {
     return (
       <StorefrontBuilderRenderer
-        layout={layout}
+        layout={renderLayout}
         page="shop"
         shellSettings={shellSettings}
       />

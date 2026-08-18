@@ -17,8 +17,17 @@ export default function UikitHeading({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
   const Tag = (rawBlock.headingLevel ?? rawBlock.headingElement ?? "h2") as any;
   const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
+  // YOOtheme's unstyled div titles use the compact muted/meta presentation.
+  // Preserve that semantic when an older/local Builder document has lost the
+  // explicit text-meta token during normalization.
+  const isYoothemeMetaTitle =
+    Tag === "div" &&
+    (styleVal === undefined || styleVal === "none") &&
+    rawBlock.headingColor === "muted";
   const uikitHeadingClass =
-    styleVal === "none" || styleVal === "inherit"
+    isYoothemeMetaTitle
+      ? getUikitTextClass("text-meta")
+      : styleVal === "none" || styleVal === "inherit"
       ? ""
       : styleVal
       ? styleVal.startsWith("text-")

@@ -70,7 +70,7 @@ export type SectionKind =
   | "embed"
   | "scrollPinnedDemo"
   | (string & {});
-export type PreviewDevice = "desktop" | "tablet" | "mobile";
+export type PreviewDevice = "desktop" | "laptop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
 export type BuilderListItem = {
@@ -505,6 +505,7 @@ export type BuilderLayoutBlock = {
   imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
   imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
+  imageHoverBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
@@ -628,7 +629,7 @@ export type BuilderLayoutBlock = {
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   headingAlign?: "left" | "center" | "right";
-  headingSize?: "none" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | "3xlarge";
+  headingSize?: "none" | "text-meta" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | "3xlarge";
   textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
   textAlign?: "left" | "center" | "right";
   /** Canonical YOOtheme Text element presentation fields. */

@@ -647,9 +647,17 @@ body:has(.builder-dashboard) .site-header--service {
 }
 
 .builder-document-header {
+  position: relative;
   display: grid;
   gap: 8px;
   padding: 10px 12px;
+}
+
+.builder-document-header .builder-document-language-top {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 1;
 }
 
 .builder-document-breadcrumb {
@@ -684,6 +692,15 @@ body:has(.builder-dashboard) .site-header--service {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+}
+
+.builder-document-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .builder-document-identity {
@@ -760,6 +777,11 @@ body:has(.builder-dashboard) .site-header--service {
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.builder-icon-only-control {
+  width: 28px;
+  padding: 0;
 }
 
 .builder-canvas-control:hover:not(:disabled) {
@@ -2817,7 +2839,7 @@ body:has(.builder-dashboard) .site-header--service {
 
 .builder-layout-picker-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
@@ -4653,7 +4675,7 @@ body:has(.builder-dashboard) .site-header--service {
 }
 
 .builder-page-template-categories button {
-  min-height: 30px;
+  min-height: 26px;
   border: 1px solid var(--builder-ui-border);
   border-radius: 999px;
   padding: 0 10px;
@@ -13654,6 +13676,46 @@ article.is-selected-column > .builder-preview-box-spacing,
   border-top: 1px solid var(--builder-ui-border);
 }
 
+.builder-responsive-mode-group {
+  width: calc(100% - 8px);
+  margin: 0 4px 2px;
+  padding: 3px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 9px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 88%, transparent);
+}
+
+.builder-responsive-mode-button {
+  min-width: 0;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--builder-ui-muted);
+  cursor: pointer;
+}
+
+.builder-responsive-mode-button:hover,
+.builder-responsive-mode-button:focus-visible {
+  border-color: var(--builder-ui-border-strong);
+  background: var(--builder-ui-surface-hover);
+  color: var(--builder-ui-text-strong);
+  outline: none;
+}
+
+.builder-responsive-mode-button.is-active {
+  border-color: color-mix(in srgb, var(--builder-ui-accent) 52%, transparent);
+  background: var(--builder-ui-accent-soft);
+  color: #a5b4fc;
+}
+
 .builder-sidebar-utility-button,
 .builder-sidebar-utility-language {
   position: relative;
@@ -18617,18 +18679,12 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 .builder-dashboard .builder-wireframe-section-slot {
   position: relative;
-  gap: 0;
-  padding-bottom: 10px;
+  gap: 5px;
+  padding-bottom: 5px;
 }
 
 .builder-dashboard .builder-wireframe-section-slot::after {
-  content: "";
-  position: absolute;
-  right: 14px;
-  bottom: 10px;
-  left: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--builder-ui-border-strong) 70%, transparent);
-  pointer-events: none;
+  display: none;
 }
 
 .builder-dashboard .builder-wireframe-insert-section {
@@ -18638,7 +18694,7 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   min-width: 22px !important;
   height: 22px;
   min-height: 22px;
-  margin: 0 auto -1px;
+  margin: 0 auto;
   border-radius: 50%;
   background: var(--builder-ui-panel-solid);
   opacity: .78;
@@ -18647,16 +18703,47 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .builder-dashboard .builder-wireframe-section {
   gap: 3px;
   padding: 6px 6px 10px;
-  border: 1px solid rgba(99, 102, 241, .32);
+  border: 0;
   border-radius: 6px;
-  background: rgba(99, 102, 241, .14);
+  background: rgba(99, 102, 241, .07);
   box-shadow: none;
 }
 
 .builder-dashboard .builder-wireframe-section.is-selected {
-  border-color: rgba(99, 102, 241, .46) !important;
-  background: rgba(99, 102, 241, .11);
+  border: 0 !important;
+  background: rgba(99, 102, 241, .12);
   box-shadow: none !important;
+}
+
+/* Structure panel section grouping: the panel itself is the local owner. */
+.builder-wireframe-panel .builder-wireframe-tree {
+  gap: 0;
+}
+
+.builder-wireframe-panel .builder-wireframe-section-slot {
+  gap: 5px;
+  padding-bottom: 5px;
+}
+
+.builder-wireframe-panel .builder-wireframe-section-slot::after {
+  display: none;
+}
+
+.builder-wireframe-panel .builder-wireframe-section {
+  border: 0;
+  border-radius: 7px;
+  background: rgba(99, 102, 241, .07);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .035);
+}
+
+.builder-wireframe-panel .builder-wireframe-section.is-selected {
+  border: 0 !important;
+  background: rgba(99, 102, 241, .12);
+  box-shadow: inset 0 0 0 1px rgba(129, 140, 248, .18) !important;
+}
+
+.builder-wireframe-panel .builder-wireframe-insert-section {
+  margin: 0 auto;
 }
 
 .builder-dashboard .builder-wireframe-row {
@@ -19307,4 +19394,37 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
    handle over the element surface in Structure. */
 .builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
   display: none !important;
+}
+
+/* Final Structure panel grouping: keep sections distinct without divider rules. */
+.builder-wireframe-panel .builder-wireframe-tree {
+  gap: 0;
+  padding: 3px 4px;
+}
+
+.builder-wireframe-panel .builder-wireframe-section-slot {
+  gap: 5px;
+  padding-bottom: 5px;
+}
+
+.builder-wireframe-panel .builder-wireframe-section-slot::after {
+  display: none !important;
+}
+
+.builder-wireframe-panel .builder-wireframe-section {
+  gap: 3px;
+  padding: 6px 6px 10px;
+  border: 0 !important;
+  border-radius: 7px;
+  background: rgba(99, 102, 241, .07) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .035) !important;
+}
+
+.builder-wireframe-panel .builder-wireframe-section.is-selected {
+  background: rgba(99, 102, 241, .12) !important;
+  box-shadow: inset 0 0 0 1px rgba(129, 140, 248, .18) !important;
+}
+
+.builder-wireframe-panel .builder-wireframe-insert-section {
+  margin: 0 auto;
 }

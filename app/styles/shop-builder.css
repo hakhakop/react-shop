@@ -1925,6 +1925,7 @@ body.dark {
 .shop-builder-grid--yootheme-column-center {
   display: flex;
   justify-content: center;
+  flex-wrap: nowrap;
 }
 
 .shop-builder-grid--yootheme-column-center > .shop-builder-grid-card {
@@ -6065,6 +6066,10 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .uk-box-shadow-medium { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important; }
 .uk-box-shadow-large { box-shadow: 0 14px 25px rgba(0, 0, 0, 0.16) !important; }
 .uk-box-shadow-xlarge { box-shadow: 0 28px 50px rgba(0, 0, 0, 0.22) !important; }
+.uk-box-shadow-hover-small:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important; }
+.uk-box-shadow-hover-medium:hover { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important; }
+.uk-box-shadow-hover-large:hover { box-shadow: 0 14px 25px rgba(0, 0, 0, 0.16) !important; }
+.uk-box-shadow-hover-xlarge:hover { box-shadow: 0 28px 50px rgba(0, 0, 0, 0.22) !important; }
 
 .uk-transition-scale-up { transition: transform 300ms ease-in-out !important; }
 .uk-transition-scale-up:hover, .shop-builder-grid-image:hover .uk-transition-scale-up { transform: scale(1.08) !important; }

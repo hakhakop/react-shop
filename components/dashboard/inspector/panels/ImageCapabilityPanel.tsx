@@ -180,6 +180,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
         showDimensions={false}
         showFrameControls={false}
         showAlignment
+        showHoverShadow
         showSvgControls
         svgColorLabel="SVG Color"
         svgColorOptions={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}

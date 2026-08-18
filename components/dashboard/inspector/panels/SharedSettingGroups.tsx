@@ -452,6 +452,7 @@ export function ImageSettingsGroup({
   showTransition = false,
   showBorder = true,
   showShadow = true,
+  showHoverShadow = false,
   showDecoration = true,
   showSvgControls = false,
   svgColorLabel = "SVG Style",
@@ -492,6 +493,7 @@ export function ImageSettingsGroup({
   showBorder?: boolean;
   /** Keep shared shadow semantics available without forcing them into every composition. */
   showShadow?: boolean;
+  showHoverShadow?: boolean;
   /** Keep shared decoration semantics available without forcing them into every composition. */
   showDecoration?: boolean;
   /** Compose the canonical YOOtheme stylable-SVG controls where the parent element exposes them. */
@@ -706,6 +708,20 @@ export function ImageSettingsGroup({
             { value: "xlarge", label: "X-Large" },
           ]}
           onChange={(value) => update({ [keys.shadow]: value, imageBoxShadow: value })}
+        />
+      </InspectorFieldRow>}
+
+      {showHoverShadow && <InspectorFieldRow
+        label="Hover Box Shadow"
+        isOverridden={values.imageHoverBoxShadow !== undefined}
+        inheritedValueText="None"
+        onReset={() => update({ imageHoverBoxShadow: undefined })}
+      >
+        <InspectorSelect
+          value={String(values.imageHoverBoxShadow ?? "none")}
+          options={["none", "small", "medium", "large", "xlarge"].map((value) => ({ value, label: value === "none" ? "None" : value.charAt(0).toUpperCase() + value.slice(1) }))}
+          onChange={(value) => update({ imageHoverBoxShadow: value === "none" ? undefined : value })}
+          ariaLabel="Image hover box shadow"
         />
       </InspectorFieldRow>}
 

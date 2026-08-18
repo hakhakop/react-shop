@@ -101,7 +101,7 @@ export const UIKIT_COLUMN_CAPABILITY = {
 export const UIKIT_HEADING_CAPABILITY = {
   properties: {
     level: { values: ["h1", "h2", "h3", "h4", "h5", "h6", "div"] as const, owner: "webpages" },
-    visualPreset: { values: ["h1", "h2", "h3", "h4", "h5", "h6", "article-title", "small", "medium", "large", "xlarge", "2xlarge", "3xlarge"] as const, owner: "uikit" },
+    visualPreset: { values: ["none", "text-meta", "h1", "h2", "h3", "h4", "h5", "h6", "article-title", "small", "medium", "large", "xlarge", "2xlarge", "3xlarge"] as const, owner: "uikit" },
     alignment: { values: ["left", "center", "right"] as const, owner: "uikit" },
     typography: { values: ["fontFamily", "fontWeight", "lineHeight", "letterSpacing", "textTransform", "textDecoration", "textShadow", "color"] as const, owner: "webpages" },
     gradient: { values: ["none", "indigo-purple", "cyan-blue", "emerald-teal", "sunset-orange", "indigo-purple-cyan", "sunset-pink", "gold-amber", "custom"] as const, owner: "webpages" },
