@@ -19,6 +19,21 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Architecture and compatibility work
+
+Before changing the Builder, document model, Inspector, Global Styles,
+rendering, or YOOtheme/UIkit compatibility, start with
+[`docs/README.md`](docs/README.md). It defines the documentation authority
+order, current capability ledger, permanent ownership law, composition
+contracts, and required live acceptance workflow.
+
+Key authorities:
+
+- [`docs/architecture/CANONICAL_OWNERSHIP.md`](docs/architecture/CANONICAL_OWNERSHIP.md)
+- [`docs/WEBPAGES_CAPABILITY_ARCHITECTURE.md`](docs/WEBPAGES_CAPABILITY_ARCHITECTURE.md)
+- [`docs/architecture/CAPABILITY_LEDGER.md`](docs/architecture/CAPABILITY_LEDGER.md)
+- [`docs/architecture/YOOTHEME_EXECUTION_CONTRACT.md`](docs/architecture/YOOTHEME_EXECUTION_CONTRACT.md)
+
 ## Scripts
 
 | Command | Description |

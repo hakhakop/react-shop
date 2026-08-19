@@ -3805,6 +3805,9 @@ export default function DashboardBuilder({
             ...payload.settings,
           };
           setShellSettings(nextShellSettings);
+          setCommittedShellSettingsSignature(
+            JSON.stringify(nextShellSettings),
+          );
         }
       } catch {
         if (!cancelled) setShellStatus("Shell settings unavailable");
@@ -3976,12 +3979,6 @@ export default function DashboardBuilder({
     if (committedBuilderStateSignature) return;
     setCommittedBuilderStateSignature(JSON.stringify(builderState));
   }, [builderState, committedBuilderStateSignature, draftReady]);
-
-  useEffect(() => {
-    if (!draftReady) return;
-    if (committedShellSettingsSignature) return;
-    setCommittedShellSettingsSignature(JSON.stringify(shellSettings));
-  }, [shellSettings, committedShellSettingsSignature, draftReady]);
 
   useEffect(() => {
     const active = activeShellEntry;
@@ -10780,7 +10777,7 @@ export default function DashboardBuilder({
               {builderEditorContext ? builderDocumentKindLabel(builderEditorContext) : "Page"}
             </span>
             <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : getLayoutLabel(builderState.page, customPages))}</h1>
-            <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : publishStatus}</p>
+            <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : statusText}</p>
           </div>
           <div className="builder-document-actions" aria-label="Document actions">
             {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
@@ -10861,7 +10858,7 @@ export default function DashboardBuilder({
                 <CloudUpload size={14} />
                 Publish Settings
               </button>
-            ) : (hasPendingChanges || Boolean(websiteId)) ? (
+            ) : hasPendingChanges ? (
               <button
                 type="button"
                 className="builder-canvas-control is-primary"
