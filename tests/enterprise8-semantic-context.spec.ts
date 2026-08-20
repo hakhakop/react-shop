@@ -121,13 +121,13 @@ async function probeTextAndGridGeometry(page: Page): Promise<GeometryProbe> {
     })() : null;
 
     const gridCandidates = Array.from(document.querySelectorAll<HTMLElement>(
-      ".shop-builder-grid--yootheme-column-center",
+      ".shop-builder-uikit-grid--column-center",
     )).map((candidate) => ({
       directCards: candidate.querySelectorAll(":scope > .shop-builder-grid-card").length,
       descendantCards: candidate.querySelectorAll(".shop-builder-grid-card").length,
     }));
     const grid = Array.from(document.querySelectorAll<HTMLElement>(
-      ".shop-builder-grid--yootheme-column-center",
+      ".shop-builder-uikit-grid--column-center",
     )).find((candidate) => candidate.querySelectorAll(".shop-builder-grid-card").length === 5);
     const gridMetrics = grid ? (() => {
       const cards = Array.from(grid.querySelectorAll<HTMLElement>(".shop-builder-grid-card"));

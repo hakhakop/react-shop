@@ -26,6 +26,7 @@ import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/
 import { Plus, ImagePlus } from "lucide-react";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
+import UikitGridStructureSettingsGroup from "@/components/dashboard/inspector/panels/UikitGridStructureSettingsGroup";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 
 type Props = {
@@ -340,22 +341,7 @@ export default function GalleryCapabilityPanel({
       <div className="builder-inspector-stack" data-uikit-capability="gallery-style">
         {/* GALLERY SECTION */}
         <InspectorDivision title="GALLERY">
-          <InspectorFieldRow
-            label="Masonry"
-            isOverridden={rawBlock.masonry !== undefined && rawBlock.masonry !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ masonry: undefined } as any)}
-          >
-            <InspectorSelect
-              value={rawBlock.masonry ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "pack", label: "Pack" },
-                { value: "next", label: "Next" },
-              ]}
-              onChange={(masonry) => update({ masonry } as any)}
-            />
-          </InspectorFieldRow>
+          <UikitGridStructureSettingsGroup block={rawBlock} update={update as any} keys={{ masonry: "masonry", parallax: "parallax", parallaxJustify: "parallaxJustify", parallaxStart: "parallaxStart", parallaxEnd: "parallaxEnd" }} />
 
           <InspectorFieldRow
             label="Column Gap"

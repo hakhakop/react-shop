@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
@@ -23,6 +23,8 @@ import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
 import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
+import { resolveUikitGridStructure, uikitGridAttribute, uikitGridGapCss, uikitGridStructureClassName } from "@/lib/uikitGridStructure";
+import { useUikitGridRuntime } from "@/components/builder/useUikitGridRuntime";
 
 function getUikitMarginClass(val?: string) {
   if (!val || val === "default" || val === "none") return "";
@@ -30,7 +32,10 @@ function getUikitMarginClass(val?: string) {
 }
 
 function getUikitTextStyleClass(val?: string) {
-  return getUikitTextClass(val);
+  // Grid's Meta and Content fields accept both Text and Heading presets in
+  // YOOtheme. Reuse the shared token adapters instead of a Grid-only
+  // typography vocabulary.
+  return getUikitTextClass(val) || getUikitHeadingClass(val, val);
 }
 
 function getUikitTitleHeadingClass(val?: string) {
@@ -95,6 +100,8 @@ export function GridCardsClient({
   itemProps?: (item: any, index: number) => React.HTMLAttributes<HTMLElement>;
 }) {
   const rawBlock = block as any;
+  const gridRef = useRef<HTMLDivElement>(null);
+  const gridStructure = resolveUikitGridStructure(rawBlock);
   const sharedCard = rawBlock.visualStyle?.card ?? {};
   // YOOtheme Grid owns one General alignment value for the complete item
   // contract. The shared resolver keeps legacy aliases read-compatible while
@@ -146,17 +153,8 @@ export function GridCardsClient({
   const canShowImage = (rawBlock.gridShowImage ?? rawBlock.showImage ?? true) !== false;
   const canShowLink = (rawBlock.gridShowButton ?? rawBlock.showLink ?? true) !== false;
 
-  const parseGapPx = (val?: string) => {
-    if (val === "small") return "var(--uk-grid-gutter-small, 15px)";
-    if (val === "medium" || val === "default") return "var(--uk-grid-gutter-medium, 40px)";
-    if (val === "large") return "var(--uk-grid-gutter-large, 70px)";
-    if (val === "collapse" || val === "none") return "0px";
-    return "var(--uk-grid-gutter-medium, 40px)";
-  };
-
-  const columnGapCss = parseGapPx(colGapValue);
-  const rowGapCss = parseGapPx(rowGapValue);
-  const usesYoothemeColumnCentering = rawBlock.spacingContract === "yootheme" && Boolean(rawBlock.centerColumns);
+  const columnGapCss = uikitGridGapCss(colGapValue);
+  const rowGapCss = uikitGridGapCss(rowGapValue);
   const itemBasisForColumns = (columns: GridColumns) => {
     if (columns === "auto") return "auto";
     const gapCount = Math.max(0, columns - 1);
@@ -170,6 +168,16 @@ export function GridCardsClient({
     event.stopPropagation();
     setActiveFilter(filter);
   };
+
+  useUikitGridRuntime(gridRef, {
+    enabled: Boolean(gridStructure.masonry || gridStructure.parallax !== undefined),
+    masonry: gridStructure.masonry,
+    parallax: gridStructure.parallax,
+    parallaxJustify: gridStructure.parallaxJustify,
+    parallaxStart: gridStructure.parallaxStart,
+    parallaxEnd: gridStructure.parallaxEnd,
+    revision: filteredItems.map(({ item }) => `${item.id}:${item.imageUrl ?? ""}`).join("|"),
+  });
 
   return (
     <div
@@ -210,7 +218,9 @@ export function GridCardsClient({
       )}
 
       <div
-        className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} ${rawBlock.showDividers ? "uk-grid-divider" : ""} ${usesYoothemeColumnCentering ? "shop-builder-grid--yootheme-column-center uk-flex-center" : ""}`}
+        ref={gridRef}
+        className={`shop-builder-grid ${uikitGridStructureClassName(gridStructure)} shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)}`}
+        data-uk-grid={uikitGridAttribute(gridStructure)}
         style={
           {
             "--shop-builder-grid-template": gridTemplate(phonePortraitColumns),
@@ -240,8 +250,6 @@ export function GridCardsClient({
             "--shop-builder-grid-item-basis-xlarge": itemBasisForColumns(largeScreenColumns),
             columnGap: columnGapCss,
             rowGap: rowGapCss,
-            alignItems: rawBlock.justifyColumns ? "end" : rawBlock.centerRows ? "center" : undefined,
-            justifyItems: rawBlock.centerColumns ? "center" : undefined,
           } as CSSProperties
         }
       >
@@ -554,6 +562,7 @@ export function GridCardsClient({
                   {metaAlign === "above-title" && renderMeta()}
                   {renderTitle()}
                   {metaAlign === "below-title" && renderMeta()}
+                  {metaAlign === "above-content" && renderMeta()}
                   {renderContent()}
                   {metaAlign === "below-content" && renderMeta()}
 

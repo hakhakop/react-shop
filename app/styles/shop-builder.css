@@ -1918,13 +1918,13 @@ body.dark {
    collection track. It centers incomplete rows; CSS Grid's justify-items
    would only center content inside fixed tracks. Native WebPages Grids retain
    their existing grid presentation. */
-.shop-builder-grid--yootheme-column-center {
+.shop-builder-uikit-grid--column-center {
   display: flex;
   justify-content: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
-.shop-builder-grid--yootheme-column-center > .shop-builder-grid-card {
+.shop-builder-uikit-grid--column-center > * {
   flex: 0 0 var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
   width: var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
 }

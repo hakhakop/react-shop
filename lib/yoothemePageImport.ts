@@ -1618,14 +1618,14 @@ const mapStaticElement = (
       warnings.push(`${path}: panel style '${String(props.panel_style)}' has no canonical WebPages equivalent.`);
     }
     warnUnsupported(path, props, [
-      "block_align", "grid_column_gap", "grid_default", "grid_medium", "grid_small",
-      "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align",
+      "block_align", "grid_column_gap", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge",
+      "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "grid_masonry", "grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end",
       "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border",
-      "image_box_shadow", "image_box_decoration", "image_transition", "link_image", "image_grid_width",
+      "image_box_shadow", "image_box_decoration", "image_transition", "image_link", "image_grid_width", "image_svg_inline", "image_svg_color",
       "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
-      "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
-      "title_element", "title_style", "title_align", "meta_align", "meta_element",
-      "title_margin", "link_margin", "margin", "margin_remove_bottom",
+      "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
+      "title_element", "title_style", "title_align", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style",
+      "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       // Filter navigation has an existing Grid owner. More detailed filter
       // layout options remain unsupported until the responsive runtime owns
       // them, but the source enablement/style must reach item tags.
@@ -1654,15 +1654,23 @@ const mapStaticElement = (
         ? props.panel_expand
         : "none",
       gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
-      gridGap: typeof props.grid_column_gap === "string" ? props.grid_column_gap : undefined,
-      gridRowGap: ["none", "small", "medium", "large"].includes(String(props.grid_row_gap))
-        ? (props.grid_row_gap as "none" | "small" | "medium" | "large")
+      // UIkit serializes an omitted gap as an empty string and "None" as
+      // "collapse".  Preserve the semantic distinction at the Grid owner;
+      // rendering resolves the default gutter from the shared global tokens.
+      gridGap: props.grid_column_gap === "collapse" ? "none" : typeof props.grid_column_gap === "string" && props.grid_column_gap !== "" ? props.grid_column_gap : undefined,
+      gridRowGap: props.grid_row_gap === "collapse" ? "none" : ["small", "medium", "large"].includes(String(props.grid_row_gap))
+        ? (props.grid_row_gap as "small" | "medium" | "large")
         : undefined,
-      showDividers: Boolean(props.grid_divider),
+      showDividers: sourceBoolean(props.grid_divider) ?? false,
       // YOOtheme emits these independently on the Grid track:
       // `grid_column_align` -> uk-flex-center, `grid_row_align` -> uk-flex-middle.
-      centerColumns: Boolean(props.grid_column_align),
-      centerRows: Boolean(props.grid_row_align),
+      centerColumns: sourceBoolean(props.grid_column_align) ?? false,
+      centerRows: sourceBoolean(props.grid_row_align) ?? false,
+      gridMasonry: props.grid_masonry === "pack" || props.grid_masonry === "next" ? props.grid_masonry : undefined,
+      gridParallax: Number.isFinite(Number(props.grid_parallax)) && Number(props.grid_parallax) !== 0 ? Number(props.grid_parallax) : undefined,
+      gridParallaxJustify: sourceBoolean(props.grid_parallax_justify) ?? false,
+      gridParallaxStart: asString(props.grid_parallax_start) || undefined,
+      gridParallaxEnd: asString(props.grid_parallax_end) || undefined,
       columnsPhonePortrait: typeof props.grid_default === "string" ? props.grid_default : undefined,
       columnsPhoneLandscape: typeof props.grid_small === "string" ? props.grid_small : undefined,
       // UIkit's `grid_medium` is the Tablet Landscape tier. Keep it on the
@@ -1670,7 +1678,11 @@ const mapStaticElement = (
       columnsTabletLandscape: typeof props.grid_medium === "string" && props.grid_medium !== ""
         ? props.grid_medium
         : undefined,
-      gridMediaWidth: props.image_grid_width === "1-3" ? "small" : props.image_grid_width === "1-2" ? "medium" : "large",
+      columnsDesktop: typeof props.grid_large === "string" && props.grid_large !== "" ? props.grid_large : undefined,
+      columnsLargeScreens: typeof props.grid_xlarge === "string" && props.grid_xlarge !== "" ? props.grid_xlarge : undefined,
+      // The shared media-width adapter has exact owners for these two UIkit
+      // fractions. The YOOtheme default is 1-2, not a fabricated large width.
+      gridMediaWidth: props.image_grid_width === "1-3" ? "small" : "medium",
       ...normalizeYoothemeMedia(props),
       imageMaxWidth: sourceImageMaxWidth(props),
       imageShape: sourceImageBorder(props.image_border) ?? "none",
@@ -1679,7 +1691,21 @@ const mapStaticElement = (
         : {}),
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
       imageHoverTransition: asString(props.image_transition) ?? "none",
-      linkImage: Boolean(props.image_link),
+      linkImage: sourceBoolean(props.image_link) ?? false,
+      enableLightbox: sourceBoolean(props.lightbox) ?? false,
+      linkTitle: sourceBoolean(props.title_link) ?? false,
+      gridTitleSize: sourceHeadingSize(props.title_style),
+      titleDecoration: asString(props.title_decoration) ?? undefined,
+      titleColor: asString(props.title_color) ?? undefined,
+      titleTypographyRole: ["default", "primary", "secondary", "tertiary"].includes(String(props.title_font_family))
+        ? props.title_font_family as "default" | "primary" | "secondary" | "tertiary"
+        : undefined,
+      metaStyle: asString(props.meta_style) ?? undefined,
+      metaColor: asString(props.meta_color) ?? undefined,
+      contentStyle: asString(props.content_style) ?? undefined,
+      titleMarginTop: props.title_margin === "remove" ? "remove" : sourceMargin(props.title_margin),
+      metaMarginTop: props.meta_margin === "remove" ? "remove" : sourceMargin(props.meta_margin),
+      contentMarginTop: props.content_margin === "remove" ? "remove" : sourceMargin(props.content_margin),
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
       buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
@@ -2025,7 +2051,7 @@ const mapStaticElement = (
           } : {}),
         };
       });
-    ["grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end", "grid_small", "grid_large", "grid_xlarge", "filter", "filter_animation", "filter_order", "filter_reverse", "filter_order_manual", "filter_style", "filter_all", "filter_all_label", "filter_position", "filter_style_primary", "filter_align", "filter_margin", "filter_grid_width", "filter_grid_column_gap", "filter_grid_row_gap", "filter_grid_breakpoint", "lightbox_controls", "lightbox_counter", "lightbox_bg_close", "lightbox_animation", "lightbox_nav", "lightbox_image_width", "lightbox_image_height", "lightbox_image_orientation", "lightbox_video_autoplay", "lightbox_text_color", "title_display", "content_display", "image_expand", "overlay_padding", "item_animation"].forEach((key) => {
+    ["grid_small", "grid_large", "grid_xlarge", "filter", "filter_animation", "filter_order", "filter_reverse", "filter_order_manual", "filter_style", "filter_all", "filter_all_label", "filter_position", "filter_style_primary", "filter_align", "filter_margin", "filter_grid_width", "filter_grid_column_gap", "filter_grid_row_gap", "filter_grid_breakpoint", "lightbox_controls", "lightbox_counter", "lightbox_bg_close", "lightbox_animation", "lightbox_nav", "lightbox_image_width", "lightbox_image_height", "lightbox_image_orientation", "lightbox_video_autoplay", "lightbox_text_color", "title_display", "content_display", "image_expand", "overlay_padding", "item_animation"].forEach((key) => {
       if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Gallery has no exact canonical runtime for this YOOtheme semantic yet.");
     });
     warnUnsupported(path, props, [
@@ -2043,7 +2069,11 @@ const mapStaticElement = (
       showDividers: props.grid_divider === true || props.grid_divider === "true",
       columnsPhonePortrait: asString(props.grid_default) || undefined,
       columnsTabletLandscape: asString(props.grid_medium) || undefined,
-      masonry: asString(props.grid_masonry) === "pack" ? "pack" : undefined,
+      masonry: props.grid_masonry === "pack" || props.grid_masonry === "next" ? props.grid_masonry : undefined,
+      parallax: Number.isFinite(Number(props.grid_parallax)) && Number(props.grid_parallax) !== 0 ? Number(props.grid_parallax) : undefined,
+      parallaxJustify: sourceBoolean(props.grid_parallax_justify) ?? false,
+      parallaxStart: asString(props.grid_parallax_start) || undefined,
+      parallaxEnd: asString(props.grid_parallax_end) || undefined,
       overlayMode: asString(props.overlay_mode) === "caption" ? "caption" : "cover",
       overlayStyle: asString(props.overlay_style) || undefined,
       overlayPosition: asString(props.overlay_position) || undefined,

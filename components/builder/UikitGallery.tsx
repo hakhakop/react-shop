@@ -18,6 +18,7 @@ import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { sanitizeHtml, isRichText } from "@/lib/safeHtml";
 import { useUikitGridRuntime } from "@/components/builder/useUikitGridRuntime";
 import { useUikitLightboxRuntime } from "@/components/builder/useUikitLightboxRuntime";
+import { resolveUikitGridStructure, uikitGridAttribute, uikitGridStructureClassName } from "@/lib/uikitGridStructure";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -60,6 +61,7 @@ const escapeCaptionText = (value: string) => value
 
 export default function UikitGallery({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
+  const gridStructure = resolveUikitGridStructure(rawBlock);
   // Imported YOOtheme Galleries retain their own UIkit presentation contract.
   // Native WebPages Galleries continue through the Card/modal presentation.
   const isYoothemeGallery = rawBlock.spacingContract === "yootheme";
@@ -127,11 +129,9 @@ export default function UikitGallery({ block }: Props) {
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
 
   const gridClass = [
-    "uk-grid",
+    uikitGridStructureClassName(gridStructure),
     gap !== "none" ? `uk-grid-${gap}` : "uk-grid-collapse",
     rowGap !== gap && rowGap !== "none" ? `uk-grid-row-${rowGap}` : "",
-    rawBlock.masonry && rawBlock.masonry !== "none" ? "uk-grid-masonry" : "",
-    rawBlock.showDividers ? "uk-grid-divider" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -178,8 +178,12 @@ export default function UikitGallery({ block }: Props) {
   };
 
   useUikitGridRuntime(gridRef, {
-    enabled: isYoothemeGallery && rawBlock.masonry === "pack",
-    masonry: rawBlock.masonry === "pack" ? "pack" : false,
+    enabled: isYoothemeGallery && Boolean(gridStructure.masonry || gridStructure.parallax !== undefined),
+    masonry: gridStructure.masonry,
+    parallax: gridStructure.parallax,
+    parallaxJustify: gridStructure.parallaxJustify,
+    parallaxStart: gridStructure.parallaxStart,
+    parallaxEnd: gridStructure.parallaxEnd,
     revision: items.map((item: any) => `${item.id}:${item.imageUrl}`).join("|"),
   });
   useUikitLightboxRuntime(gridRef, {
@@ -196,7 +200,7 @@ export default function UikitGallery({ block }: Props) {
       <div
         ref={gridRef}
         className={gridClass}
-        data-uk-grid={rawBlock.masonry && rawBlock.masonry !== "none" ? `masonry: ${rawBlock.masonry}` : ""}
+        data-uk-grid={uikitGridAttribute(gridStructure)}
         data-uk-lightbox={usesYoothemeLightbox ? "toggle: a[data-type];" : undefined}
       >
         {items.map((item: any, index: number) => {

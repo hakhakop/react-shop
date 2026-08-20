@@ -734,6 +734,10 @@ export type BuilderLayoutBlock = {
   showHoverImage?: boolean;
   showHoverVideo?: boolean;
   gridMasonry?: string;
+  gridParallax?: number;
+  gridParallaxJustify?: boolean;
+  gridParallaxStart?: string;
+  gridParallaxEnd?: string;
   columnGap?: string;
   rowGap?: string;
   showDividers?: boolean;

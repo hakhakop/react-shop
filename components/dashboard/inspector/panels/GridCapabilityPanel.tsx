@@ -34,6 +34,7 @@ import {
 import { sanitizeHtml } from "@/lib/safeHtml";
 import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import UikitGridStructureSettingsGroup from "@/components/dashboard/inspector/panels/UikitGridStructureSettingsGroup";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -62,11 +63,11 @@ const breakpointOptions = [
 ];
 
 const gapOptions = [
-  { value: "default", label: "Default" },
   { value: "small", label: "Small" },
   { value: "medium", label: "Medium" },
+  { value: "default", label: "Default" },
   { value: "large", label: "Large" },
-  { value: "collapse", label: "Collapse" },
+  { value: "none", label: "None" },
 ];
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
@@ -512,30 +513,16 @@ export default function GridCapabilityPanel({
       <div className="builder-inspector-stack" data-uikit-capability="grid-settings">
         {/* GRID SECTION */}
         <InspectorDivision title="GRID">
-          <InspectorFieldRow
-            label="Justify columns"
-            isOverridden={Boolean((block as any).justifyColumns)}
-            inheritedValueText="Off"
-            onReset={() => update({ justifyColumns: false } as any)}
-          >
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={Boolean((block as any).justifyColumns)}
-                onChange={(e) => update({ justifyColumns: e.target.checked } as any)}
-              />
-              <span>Justify columns at the bottom</span>
-            </label>
-          </InspectorFieldRow>
+          <UikitGridStructureSettingsGroup block={block as any} update={update} keys={{ masonry: "gridMasonry", parallax: "gridParallax", parallaxJustify: "gridParallaxJustify", parallaxStart: "gridParallaxStart", parallaxEnd: "gridParallaxEnd" }} />
 
           <InspectorFieldRow
             label="Column Gap"
-            isOverridden={block.gridGap !== undefined && block.gridGap !== "large"}
-            inheritedValueText="Large"
+            isOverridden={block.gridGap !== undefined}
+            inheritedValueText="Default"
             onReset={() => update({ gridGap: undefined })}
           >
             <InspectorSelect
-              value={block.gridGap ?? "large"}
+              value={block.gridGap ?? "default"}
               options={gapOptions}
               onChange={(value) => update({ gridGap: value })}
               ariaLabel="Column Gap"
@@ -556,6 +543,7 @@ export default function GridCapabilityPanel({
             />
           </InspectorFieldRow>
 
+          {(block as any).gridGap !== "none" && (block as any).gridGap !== "collapse" && (
           <InspectorFieldRow
             label="Divider"
             isOverridden={Boolean((block as any).showDividers)}
@@ -571,7 +559,9 @@ export default function GridCapabilityPanel({
               <span>Show dividers</span>
             </label>
           </InspectorFieldRow>
+          )}
 
+          {!(block as any).gridMasonry && (
           <InspectorFieldRow
             label="Alignment"
             isOverridden={Boolean((block as any).centerColumns) || Boolean((block as any).centerRows)}
@@ -597,6 +587,7 @@ export default function GridCapabilityPanel({
               </label>
             </div>
           </InspectorFieldRow>
+          )}
         </InspectorDivision>
 
         {/* COLUMNS SECTION */}
@@ -796,8 +787,9 @@ export default function GridCapabilityPanel({
           showAlignment={false}
           showDecoration
           showColor
+          showLink
           defaultSize="none"
-          keys={{ role: "titleTypographyRole", size: "gridTitleSize", align: "textAlignment", level: "gridTitleLevel", decoration: "titleDecoration", color: "titleColor" }}
+          keys={{ role: "titleTypographyRole", size: "gridTitleSize", align: "textAlignment", level: "gridTitleLevel", decoration: "titleDecoration", color: "titleColor", link: "linkTitle" }}
         />
 
         <MetaSettingsGroup
