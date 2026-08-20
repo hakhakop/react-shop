@@ -11072,6 +11072,7 @@ export default function DashboardBuilder({
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
         websiteId={websiteId}
+        dashboardTheme={dashboardTheme}
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}

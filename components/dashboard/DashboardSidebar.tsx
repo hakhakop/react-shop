@@ -70,6 +70,7 @@ const corePages = [
 
 type DashboardSidebarProps = {
   websiteId?: string;
+  dashboardTheme: "light" | "dark";
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
@@ -135,6 +136,7 @@ type DashboardSidebarProps = {
 
 export default function DashboardSidebar({
   websiteId,
+  dashboardTheme,
   availableLayoutBlockKinds,
   builderState,
   customPages,
@@ -385,7 +387,8 @@ export default function DashboardSidebar({
 
   const pageTemplateLibraryModal = pageTemplateLibraryOpen ? (
     <div
-      className="builder-layout-modal builder-page-template-modal"
+      className="builder-layout-modal builder-dashboard-modal builder-page-template-modal"
+      data-theme={dashboardTheme}
       role="dialog"
       aria-modal="true"
       aria-labelledby="builder-page-template-library-title"
@@ -477,7 +480,8 @@ export default function DashboardSidebar({
 
   const yoothemeImportPreviewModal = yoothemeImportPreview ? (
     <div
-      className="builder-layout-modal"
+      className="builder-layout-modal builder-dashboard-modal"
+      data-theme={dashboardTheme}
       role="dialog"
       aria-modal="true"
       aria-labelledby="yootheme-import-preview-title"
@@ -523,10 +527,10 @@ export default function DashboardSidebar({
             <article
               key={section.id}
               style={{
-                border: "1px solid var(--builder-border, #d9dce5)",
+                border: "1px solid var(--builder-ui-border)",
                 borderRadius: "10px",
                 padding: "12px",
-                background: "var(--builder-surface-muted, #f7f8fb)",
+                background: "var(--builder-ui-surface)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
@@ -557,8 +561,8 @@ export default function DashboardSidebar({
                           style={{
                             borderRadius: "999px",
                             padding: "3px 8px",
-                            background: "var(--builder-accent-soft, #e9e7ff)",
-                            color: "var(--builder-accent, #5548e8)",
+                            background: "var(--builder-ui-accent-soft)",
+                            color: "var(--builder-ui-accent)",
                             fontWeight: 600,
                           }}
                         >
@@ -1157,7 +1161,9 @@ export default function DashboardSidebar({
     {pageTemplateLibraryModal && typeof document !== "undefined"
       ? createPortal(pageTemplateLibraryModal, document.body)
       : null}
-    {yoothemeImportPreviewModal}
+    {yoothemeImportPreviewModal && typeof document !== "undefined"
+      ? createPortal(yoothemeImportPreviewModal, document.body)
+      : null}
     </>
   );
 }

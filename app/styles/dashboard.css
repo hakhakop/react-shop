@@ -1,4 +1,5 @@
-.builder-dashboard {
+.builder-dashboard,
+.builder-dashboard-modal {
   --builder-ui-bg: #09090b;
   --builder-ui-panel: rgba(18, 18, 22, 0.7);
   --builder-ui-panel-solid: #121216;
@@ -27,6 +28,9 @@
   --motion-panel: 260ms cubic-bezier(0.4, 0, 0.2, 1);
   --motion-preview: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.builder-dashboard {
   min-height: calc(100vh - 160px);
   padding: 0;
   display: grid;
@@ -2755,6 +2759,7 @@ body:has(.builder-dashboard) .site-header--service {
   align-items: center;
   justify-content: center;
   background: rgba(10, 10, 10, 0.44);
+  color: var(--builder-ui-text);
   backdrop-filter: blur(12px);
 }
 
@@ -2766,10 +2771,10 @@ body:has(.builder-dashboard) .site-header--service {
   flex-direction: column;
   gap: 16px;
   overflow: hidden;
-  border: 1px solid rgba(17, 17, 17, 0.08);
+  border: 1px solid var(--builder-ui-border);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 24px 60px rgba(17, 17, 17, 0.22);
+  background: var(--builder-ui-panel-solid);
+  box-shadow: var(--builder-ui-shadow);
 }
 
 .builder-layout-header {
@@ -2777,7 +2782,7 @@ body:has(.builder-dashboard) .site-header--service {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  border-bottom: 1px solid var(--builder-ui-border);
   padding-bottom: 14px;
 }
 
@@ -2790,11 +2795,11 @@ body:has(.builder-dashboard) .site-header--service {
 .builder-layout-header strong {
   font-size: 17px;
   font-weight: 700;
-  color: #151515;
+  color: var(--builder-ui-text-strong);
 }
 
 .builder-layout-header span {
-  color: #6a6a63;
+  color: var(--builder-ui-muted);
   font-size: 13px;
 }
 
@@ -2803,8 +2808,8 @@ body:has(.builder-dashboard) .site-header--service {
   height: 34px;
   border: 0;
   border-radius: 999px;
-  background: #f2f2ef;
-  color: #151515;
+  background: var(--builder-ui-surface-strong);
+  color: var(--builder-ui-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12499,7 +12504,10 @@ article.is-selected-column > .builder-preview-box-spacing,
 /* Sleek Translucent Indigo Notes */
 .builder-dashboard .builder-element-inspector-note,
 .builder-dashboard .builder-template-note,
-.builder-dashboard .builder-contrast-note {
+.builder-dashboard .builder-contrast-note,
+.builder-dashboard-modal .builder-element-inspector-note,
+.builder-dashboard-modal .builder-template-note,
+.builder-dashboard-modal .builder-contrast-note {
   margin: 0 0 var(--builder-ui-gap);
   padding: 12px;
   border-radius: var(--builder-ui-radius-sm) !important;
@@ -12514,7 +12522,10 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 .builder-dashboard .builder-element-inspector-note strong,
 .builder-dashboard .builder-template-note strong,
-.builder-dashboard .builder-contrast-note strong {
+.builder-dashboard .builder-contrast-note strong,
+.builder-dashboard-modal .builder-element-inspector-note strong,
+.builder-dashboard-modal .builder-template-note strong,
+.builder-dashboard-modal .builder-contrast-note strong {
   font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -12524,7 +12535,10 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 .builder-dashboard .builder-element-inspector-note span,
 .builder-dashboard .builder-template-note span,
-.builder-dashboard .builder-contrast-note span {
+.builder-dashboard .builder-contrast-note span,
+.builder-dashboard-modal .builder-element-inspector-note span,
+.builder-dashboard-modal .builder-template-note span,
+.builder-dashboard-modal .builder-contrast-note span {
   color: var(--builder-ui-note-muted) !important;
   font-size: 11px;
   line-height: 1.45;
@@ -13152,7 +13166,8 @@ article.is-selected-column > .builder-preview-box-spacing,
 }
 
 /* Light Theme overrides */
-.builder-dashboard[data-theme="light"] {
+.builder-dashboard[data-theme="light"],
+.builder-dashboard-modal[data-theme="light"] {
   color-scheme: light;
   --builder-ui-bg: #f3f2ed;
   --builder-ui-panel: rgba(255, 255, 255, 0.94);
