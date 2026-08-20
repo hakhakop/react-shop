@@ -170,6 +170,7 @@ import {
   getUikitPanelMediaClass,
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
+  UIKIT_YOOTHEME_BUTTON_VARIANTS,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import { getGeneralElementShellClassName, getGeneralElementShellStyle } from "@/lib/builderElementShell";
@@ -1654,7 +1655,9 @@ function normalizeBuilderState(
               panelTitleStyle: block.panelTitleStyle === "h3" || block.panelTitleStyle === "h4" || block.panelTitleStyle === "h5" ? block.panelTitleStyle : "inherit",
               panelContentWidth: block.panelContentWidth === "small" || block.panelContentWidth === "medium" || block.panelContentWidth === "large" || block.panelContentWidth === "full" ? block.panelContentWidth : "auto",
               panelActionVisible: block.panelActionVisible ?? true,
-              panelActionStyle: block.panelActionStyle === "default" || block.panelActionStyle === "secondary" || block.panelActionStyle === "text" ? block.panelActionStyle : "primary",
+              panelActionStyle: UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(block.panelActionStyle as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number])
+                ? block.panelActionStyle
+                : "primary",
               panelActionSize: block.panelActionSize === "small" || block.panelActionSize === "large" ? block.panelActionSize : "default",
               panelActionAlign: block.panelActionAlign === "left" || block.panelActionAlign === "center" || block.panelActionAlign === "right" ? block.panelActionAlign : "inherit",
               panelImageNoPadding: block.panelImageNoPadding,

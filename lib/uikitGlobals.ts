@@ -13,6 +13,11 @@ import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 const YOOTHEME_PRIMARY_SECTION_GRADIENT =
   "linear-gradient(40deg, #7141f1 0%, #4d6bd8 70%, #3183e2 100%)";
 
+function yoothemeButtonTextArrow(color: string) {
+  const svg = `<svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><polyline fill="none" stroke="${color}" stroke-width="1.2" points="13 1 18 5.5 13 10"/><line fill="none" stroke="${color}" stroke-width="1.2" x1="0" y1="5.5" x2="18.4" y2="5.5"/></svg>`;
+  return `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}")`;
+}
+
 export type UikitGlobalsConfig = {
   // Spacing Scale
   marginSmall?: string;
@@ -376,6 +381,8 @@ export function getUikitGlobalsCssVars(
     "--uk-button-disabled-text": value("buttonDisabledText", "#999"),
     "--uk-button-disabled-border": value("buttonDisabledBorder", "transparent"),
     "--uk-button-text-background": buttonValue("buttonTextBackground", "transparent"),
+    "--uk-button-text-arrow-image": yoothemeButtonTextArrow(primary),
+    "--uk-button-text-arrow-inverse-image": yoothemeButtonTextArrow(globalInverse),
     "--uk-button-text-hover-color": buttonValue("buttonTextHoverColor", primary),
     "--uk-button-text-border": buttonValue("buttonTextBorder", "transparent"),
     "--uk-button-text-hover-border": buttonValue("buttonTextHoverBorder", primary),

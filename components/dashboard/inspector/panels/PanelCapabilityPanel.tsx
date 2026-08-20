@@ -147,6 +147,7 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           block={block}
           update={updateSemantic}
           title="LINK"
+          terminology="link"
           showFullWidth
           showMargin
           keys={{

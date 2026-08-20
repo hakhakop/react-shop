@@ -177,7 +177,7 @@ export const UIKIT_PANEL_CAPABILITY = {
     titleStyle: { values: ["inherit", "h3", "h4", "h5"] as const, owner: "uikit" },
     contentWidth: { values: ["auto", "small", "medium", "large", "full"] as const, owner: "webpages" },
     actionVisible: { values: ["enabled", "disabled"] as const, owner: "webpages" },
-    actionStyle: { values: ["default", "primary", "secondary", "text"] as const, owner: "uikit" },
+    actionStyle: { values: UIKIT_YOOTHEME_BUTTON_VARIANTS, owner: "uikit" },
     actionSize: { values: ["small", "default", "large"] as const, owner: "uikit" },
     actionAlign: { values: ["inherit", "left", "center", "right"] as const, owner: "webpages" },
   },

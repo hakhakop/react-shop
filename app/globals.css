@@ -1601,28 +1601,37 @@ a {
 }
 
 .shop-builder-main .uk-button-text {
-  padding: 0;
+  padding: 0 25px 0 0;
   line-height: 1.5;
   background: var(--uk-button-text-background, transparent);
   color: var(--uk-button-text-color, #333) !important;
-  border: var(--uk-button-border-width, 1px) var(--uk-button-border-mode, solid) var(--uk-button-text-border, transparent);
+  border: none;
+  border-radius: 0;
   position: relative;
 }
 .shop-builder-main .uk-button-text::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 100%;
-  border-bottom: 1px solid currentColor;
-  transition: right 0.3s ease-out;
+  content: none;
 }
-.shop-builder-main .uk-button-text:hover::before {
+.shop-builder-main .uk-button-text::after {
+  content: "";
+  top: 50%;
+  transform: translateY(-50%);
+  bottom: 0;
   right: 0;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  transition: 0.2s ease-out;
+  transition-property: height, width, background-position;
+  background-image: var(--uk-button-text-arrow-image);
+  background-repeat: no-repeat;
+  background-position: calc(100% - 5px) 50%;
+}
+.shop-builder-main .uk-button-text:hover:not(:disabled)::after {
+  background-position: 100% 50%;
 }
 .shop-builder-main .uk-button-text:hover {
   color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)) !important;
-  border-color: var(--uk-button-text-hover-border, var(--uk-button-text-border, transparent)) !important;
 }
 .shop-builder-main .uk-button-text:active,
 .shop-builder-main .uk-button-text.uk-active {
@@ -1630,6 +1639,16 @@ a {
 }
 .shop-builder-main .uk-button-link { color: var(--uk-button-link-color, var(--uk-button-text-color, #333)); }
 .shop-builder-main .uk-button-link:hover { color: var(--uk-button-link-hover-color, var(--uk-button-link-color, #333)); }
+
+.shop-builder-main .uk-light .uk-button-text::after,
+.shop-builder-main .uk-card-primary .uk-button-text::after,
+.shop-builder-main .uk-card-secondary .uk-button-text::after,
+.shop-builder-main .uk-section-primary .uk-button-text::after,
+.shop-builder-main .uk-section-secondary .uk-button-text::after,
+.shop-builder-main .uk-tile-primary .uk-button-text::after,
+.shop-builder-main .uk-tile-secondary .uk-button-text::after {
+  background-image: var(--uk-button-text-arrow-inverse-image);
+}
 
 /* Element-local Action/Button colors are canonical UIkit overrides. They are
    intentionally narrower than the inherited semantic context above: an
