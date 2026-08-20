@@ -1620,11 +1620,11 @@ const mapStaticElement = (
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge",
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "grid_masonry", "grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end",
-      "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border",
+      "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin",
       "image_box_shadow", "image_box_decoration", "image_transition", "image_link", "image_grid_width", "image_svg_inline", "image_svg_color",
       "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
-      "title_element", "title_style", "title_align", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style",
+      "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style",
       "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       // Filter navigation has an existing Grid owner. More detailed filter
       // layout options remain unsupported until the responsive runtime owns
@@ -1653,7 +1653,14 @@ const mapStaticElement = (
       panelExpand: props.panel_expand === "image" || props.panel_expand === "content" || props.panel_expand === "both"
         ? props.panel_expand
         : "none",
-      gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
+      panelContentWidth: props.panel_content_width === "xsmall" || props.panel_content_width === "small" ? props.panel_content_width : "auto",
+      gridItemMaxWidth: ["small", "medium", "large", "xlarge", "2xlarge"].includes(String(props.item_maxwidth)) ? props.item_maxwidth as any : "none",
+      gridTitlePlacement: props.title_align === "left" ? "left" : "top",
+      gridTitleWidth: asString(props.title_grid_width) || "1-2",
+      gridTitleColumnGap: props.title_grid_column_gap === "collapse" ? "none" : asString(props.title_grid_column_gap) || "default",
+      gridTitleRowGap: props.title_grid_row_gap === "collapse" ? "none" : asString(props.title_grid_row_gap) || "default",
+      gridTitleBreakpoint: ["s", "m", "l", "xl"].includes(String(props.title_grid_breakpoint)) ? props.title_grid_breakpoint as any : "always",
+      gridMediaPlacement: ["top", "bottom", "left", "right", "between"].includes(String(props.image_align)) ? props.image_align as any : "top",
       // UIkit serializes an omitted gap as an empty string and "None" as
       // "collapse".  Preserve the semantic distinction at the Grid owner;
       // rendering resolves the default gutter from the shared global tokens.
@@ -1682,8 +1689,16 @@ const mapStaticElement = (
       columnsLargeScreens: typeof props.grid_xlarge === "string" && props.grid_xlarge !== "" ? props.grid_xlarge : undefined,
       // The shared media-width adapter has exact owners for these two UIkit
       // fractions. The YOOtheme default is 1-2, not a fabricated large width.
-      gridMediaWidth: props.image_grid_width === "1-3" ? "small" : "medium",
+      gridMediaWidth: asString(props.image_grid_width) || "1-2",
+      gridMediaColumnGap: props.image_grid_column_gap === "collapse" ? "none" : asString(props.image_grid_column_gap) || "default",
+      gridMediaRowGap: props.image_grid_row_gap === "collapse" ? "none" : asString(props.image_grid_row_gap) || "default",
+      gridMediaBreakpoint: ["s", "m", "l", "xl"].includes(String(props.image_grid_breakpoint)) ? props.image_grid_breakpoint as any : "m",
+      gridMediaVerticalAlign: sourceBoolean(props.image_vertical_align) ?? false,
       ...normalizeYoothemeMedia(props),
+      // `image_margin: remove` is YOOtheme's explicit zero-spacing token.
+      // Keep the value at the shared media owner; Grid only decides the
+      // structural placements where this margin is rendered.
+      imageMarginTop: props.image_margin === "remove" ? "none" : asString(props.image_margin) || "default",
       imageMaxWidth: sourceImageMaxWidth(props),
       imageShape: sourceImageBorder(props.image_border) ?? "none",
       ...(["none", "small", "medium", "large", "xlarge", "bottom"].includes(asString(props.image_box_shadow) ?? "")

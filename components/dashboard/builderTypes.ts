@@ -510,6 +510,8 @@ export type BuilderLayoutBlock = {
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
+  /** Shared media spacing token. Structural consumers decide when it applies. */
+  imageMarginTop?: "default" | "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageLoading?: "lazy" | "eager";
   imageSvgInline?: boolean;
   imageSvgColor?: string;
@@ -542,7 +544,7 @@ export type BuilderLayoutBlock = {
   panelVerticalAlign?: "top" | "center" | "bottom";
   panelTitleElement?: "h2" | "h3" | "h4" | "div";
   panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
-  panelContentWidth?: "auto" | "small" | "medium" | "large" | "full";
+  panelContentWidth?: "auto" | "xsmall" | "small" | "medium" | "large" | "full";
   panelActionVisible?: boolean;
   panelActionStyle?: BuilderButtonStyle;
   panelActionSize?: "small" | "default" | "large";
@@ -765,8 +767,19 @@ export type BuilderLayoutBlock = {
   gridCardVariant?: "default" | "primary" | "secondary" | "blank" | "card-hover" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
   gridCardSize?: "none" | "small" | "default" | "large";
   gridCardHover?: boolean;
-  gridMediaPlacement?: "top" | "left" | "right";
-  gridMediaWidth?: "small" | "medium" | "large";
+  /** Grid-owned item composition; shared Panel/Media primitives supply its surfaces and media. */
+  gridItemMaxWidth?: "none" | "small" | "medium" | "large" | "xlarge" | "2xlarge";
+  gridTitlePlacement?: "top" | "left";
+  gridTitleWidth?: string;
+  gridTitleColumnGap?: string;
+  gridTitleRowGap?: string;
+  gridTitleBreakpoint?: "always" | "s" | "m" | "l" | "xl";
+  gridMediaPlacement?: "top" | "bottom" | "left" | "right" | "between";
+  gridMediaWidth?: string;
+  gridMediaColumnGap?: string;
+  gridMediaRowGap?: string;
+  gridMediaBreakpoint?: "always" | "s" | "m" | "l" | "xl";
+  gridMediaVerticalAlign?: boolean;
   gridMediaAlignment?: "left" | "center" | "right";
   gridItemAlign?: "left" | "center" | "right";
   gridStacking?: "inherit" | "stack";
@@ -792,7 +805,8 @@ export type BuilderLayoutBlock = {
     cardVariant?: "default" | "primary" | "secondary" | "blank";
     cardSize?: "small" | "default" | "large";
     cardHover?: boolean;
-    mediaPlacement?: "top" | "left" | "right";
+    mediaPlacement?: "top" | "bottom" | "left" | "right" | "between";
+    mediaWidth?: string;
     mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
     mediaFit?: "natural" | "cover" | "contain" | "fill";
     imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";

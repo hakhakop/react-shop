@@ -151,6 +151,42 @@ const itemPanelStyleOptions = [
 const tagsToText = (tags?: string[]) => tags?.join(", ") ?? "";
 const parseTags = (value: string) => Array.from(new Set(value.split(",").map((tag) => tag.trim()).filter(Boolean)));
 
+const compositionWidthOptions = [
+  ["auto", "Auto"], ["expand", "Expand"], ["4-5", "80%"], ["3-4", "75%"], ["2-3", "66%"], ["3-5", "60%"], ["1-2", "50%"], ["2-5", "40%"], ["1-3", "33%"], ["1-4", "25%"], ["1-5", "20%"], ["small", "Small"], ["medium", "Medium"], ["large", "Large"], ["xlarge", "X-Large"], ["2xlarge", "2X-Large"],
+].map(([value, label]) => ({ value, label }));
+const compositionBreakpointOptions = [{ value: "always", label: "Always" }, ...breakpointOptions.slice(1)];
+
+function GridCompositionSettings({ block, update }: Pick<Props, "block" | "update">) {
+  const values = block as any;
+  const sideMedia = values.gridMediaPlacement === "left" || values.gridMediaPlacement === "right";
+  const hasPanelSurface = values.gridCardVariant !== undefined && values.gridCardVariant !== "blank" && values.gridCardVariant !== "none";
+  const mediaNeedsTopMargin = values.gridMediaPlacement === "between"
+    || (values.gridMediaPlacement === "bottom" && !(hasPanelSurface && values.panelImageNoPadding === true));
+  const oneColumnTrack = ["columnsPhonePortrait", "columnsPhoneLandscape", "columnsTabletLandscape", "columnsDesktop", "columnsLargeScreens"]
+    .every((key) => values[key] === undefined || values[key] === "" || values[key] === "1");
+  const canConstrainOneColumnContent = (values.gridMediaPlacement ?? "top") === "top" && oneColumnTrack && !values.gridItemMaxWidth && (values.gridCardVariant === undefined || values.gridCardVariant === "blank");
+  return <InspectorDivision title="COMPOSITION">
+    <InspectorFieldRow label="Item Max Width"><InspectorSelect value={values.gridItemMaxWidth ?? "none"} options={[{ value: "none", label: "None" }, ...compositionWidthOptions.filter((option) => option.value !== "auto" && option.value !== "expand")]} onChange={(value) => update({ gridItemMaxWidth: value === "none" ? undefined : value })} /></InspectorFieldRow>
+    {canConstrainOneColumnContent && <InspectorFieldRow label="1 Column Content Width"><InspectorSelect value={values.panelContentWidth ?? "auto"} options={[{ value: "auto", label: "Auto" }, { value: "xsmall", label: "X-Small" }, { value: "small", label: "Small" }]} onChange={(value) => update({ panelContentWidth: value === "auto" ? undefined : value })} /></InspectorFieldRow>}
+    <InspectorFieldRow label="Title Alignment"><InspectorSelect value={values.gridTitlePlacement ?? "top"} options={[{ value: "top", label: "Top" }, { value: "left", label: "Left" }]} onChange={(value) => update({ gridTitlePlacement: value })} /></InspectorFieldRow>
+    {values.gridTitlePlacement === "left" && <>
+      <InspectorFieldRow label="Title Grid Width"><InspectorSelect value={values.gridTitleWidth ?? "1-2"} options={compositionWidthOptions} onChange={(value) => update({ gridTitleWidth: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Title Grid Column Gap"><InspectorSelect value={values.gridTitleColumnGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridTitleColumnGap: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Title Grid Row Gap"><InspectorSelect value={values.gridTitleRowGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridTitleRowGap: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Title Grid Breakpoint"><InspectorSelect value={values.gridTitleBreakpoint ?? "always"} options={compositionBreakpointOptions} onChange={(value) => update({ gridTitleBreakpoint: value })} /></InspectorFieldRow>
+    </>}
+    <InspectorFieldRow label="Media Alignment"><InspectorSelect value={values.gridMediaPlacement ?? "top"} options={[{ value: "top", label: "Top" }, { value: "bottom", label: "Bottom" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }, { value: "between", label: "Between" }]} onChange={(value) => update({ gridMediaPlacement: value })} /></InspectorFieldRow>
+    {mediaNeedsTopMargin && <InspectorFieldRow label="Media Margin Top" isOverridden={values.imageMarginTop !== undefined} inheritedValueText="Default" onReset={() => update({ imageMarginTop: undefined })}><InspectorSelect value={values.imageMarginTop ?? "default"} options={[{ value: "default", label: "Default" }, { value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} onChange={(value) => update({ imageMarginTop: value })} /></InspectorFieldRow>}
+    {sideMedia && <>
+      <InspectorFieldRow label="Media Grid Width"><InspectorSelect value={values.gridMediaWidth ?? "1-2"} options={compositionWidthOptions.filter((option) => option.value !== "expand")} onChange={(value) => update({ gridMediaWidth: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Media Grid Column Gap"><InspectorSelect value={values.gridMediaColumnGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridMediaColumnGap: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Media Grid Row Gap"><InspectorSelect value={values.gridMediaRowGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridMediaRowGap: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Media Grid Breakpoint"><InspectorSelect value={values.gridMediaBreakpoint ?? "m"} options={compositionBreakpointOptions} onChange={(value) => update({ gridMediaBreakpoint: value })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Vertical Alignment"><InspectorSwitch checked={Boolean(values.gridMediaVerticalAlign)} onChange={(checked) => update({ gridMediaVerticalAlign: checked })} label="Center" /></InspectorFieldRow>
+    </>}
+  </InspectorDivision>;
+}
+
 export default function GridCapabilityPanel({
   block,
   tab,
@@ -751,6 +787,8 @@ export default function GridCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
+        <GridCompositionSettings block={block} update={update} />
+
         <CardSettingsGroup
           block={block}
           update={update}
@@ -772,6 +810,7 @@ export default function GridCapabilityPanel({
           ]}
           defaultSize="none"
           showImageNoPadding
+          showHeight={!Boolean((block as any).gridMasonry)}
           imageNoPaddingLabel="Align image without padding"
           sizeOptions={[
             { value: "none", label: "None" },

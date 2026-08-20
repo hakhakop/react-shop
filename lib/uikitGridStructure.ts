@@ -56,6 +56,9 @@ export function uikitGridAttribute(structure: UikitGridStructure): string | unde
 export function uikitGridStructureClassName(structure: UikitGridStructure): string {
   return [
     "uk-grid",
+    // YOOtheme applies UIkit's equal-height match to every non-masonry Grid.
+    // The item composition may then decide which inner surface expands.
+    !structure.masonry ? "uk-grid-match" : "",
     structure.showDividers ? "uk-grid-divider" : "",
     structure.centerColumns ? "uk-flex-center shop-builder-uikit-grid--column-center" : "",
     structure.centerRows ? "uk-flex-middle" : "",

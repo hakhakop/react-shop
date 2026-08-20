@@ -10,6 +10,7 @@ import {
   getUikitButtonClass,
   getUikitCardClass,
   getUikitHeadingClass,
+  getUikitMarginClass,
   getUikitPanelLayoutClass,
   getUikitPanelMediaClass,
   getUikitPanelMediaStyle,
@@ -25,11 +26,6 @@ import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 import { resolveUikitGridStructure, uikitGridAttribute, uikitGridGapCss, uikitGridStructureClassName } from "@/lib/uikitGridStructure";
 import { useUikitGridRuntime } from "@/components/builder/useUikitGridRuntime";
-
-function getUikitMarginClass(val?: string) {
-  if (!val || val === "default" || val === "none") return "";
-  return `uk-margin-${val}`;
-}
 
 function getUikitTextStyleClass(val?: string) {
   // Grid's Meta and Content fields accept both Text and Heading presets in
@@ -69,6 +65,19 @@ function getUikitLinkStyleClass(val?: string, size?: string, fullWidth?: boolean
   const normalized = val?.replace(/^button-/, "").replace(/^link-/, "text") || "default";
   return `${getUikitButtonClass(normalized, size)} ${fullWidth ? "uk-width-1-1" : ""}`.trim();
 }
+
+const compositionGapClass = (columnGap: unknown, rowGap: unknown) => {
+  const column = columnGap === "none" || columnGap === "collapse" ? "collapse" : columnGap || "default";
+  const row = rowGap === "none" || rowGap === "collapse" ? "collapse" : rowGap || "default";
+  return column === row ? `uk-grid-${column}` : `uk-grid-column-${column} uk-grid-row-${row}`;
+};
+
+const compositionWidthClass = (width: unknown, breakpoint: unknown, expand = false) => {
+  const tier = breakpoint && breakpoint !== "always" ? `@${breakpoint}` : "";
+  if (width === "expand") return `uk-width-expand${tier}`;
+  if (width === "auto") return `uk-width-auto${tier}`;
+  return `${expand ? "uk-width-expand" : `uk-width-${width || "1-2"}`}${tier}`;
+};
 
 export function GridCardsClient({
   block,
@@ -365,7 +374,14 @@ export function GridCardsClient({
 
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
-            const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "medium";
+            // The shared Image/Media spacing token supplies the value. Grid
+            // owns only the source-defined placement condition below.
+            const hasPanelSurface = panelStyle !== "blank" && panelStyle !== "none";
+            const mediaMarginTopClass = mediaPlacement === "between"
+              || (mediaPlacement === "bottom" && !(hasPanelSurface && rawBlock.panelImageNoPadding === true))
+              ? getUikitMarginClass(rawBlock.imageMarginTop ?? "default", "top")
+              : "";
+            const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "1-2";
             // Explicit media alignment has higher precedence than Grid text
             // alignment. Without one, media participates in the same item
             // alignment contract as YOOtheme's inline Grid image.
@@ -379,6 +395,12 @@ export function GridCardsClient({
             const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
             const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
             const itemUrl = action.url;
+            const titlePlacement = rawBlock.gridTitlePlacement === "left" ? "left" : "top";
+            const titleBreakpoint = rawBlock.gridTitleBreakpoint ?? "always";
+            const mediaBreakpoint = rawBlock.gridMediaBreakpoint ?? "m";
+            const itemMaxWidth = rawBlock.gridItemMaxWidth && rawBlock.gridItemMaxWidth !== "none"
+              ? `var(--uk-container-${rawBlock.gridItemMaxWidth === "2xlarge" ? "xlarge" : rawBlock.gridItemMaxWidth}-max-width, 100%)`
+              : undefined;
 
             const renderMeta = () => (
               canShowMeta && item.meta ? (
@@ -479,7 +501,7 @@ export function GridCardsClient({
 
               return (
                 <div
-                  className={`${mediaClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
+                  className={`${mediaClass} ${mediaMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
                   data-image-ratio={hasCropFrame ? "true" : undefined}
                   style={{
                     maxWidth: imageMaxWidth,
@@ -514,6 +536,46 @@ export function GridCardsClient({
               ...builderItemEventProps
             } = builderItemProps;
 
+            const renderActions = () => canShowLink && itemUrl && buttonText ? (
+              <div className={`shop-builder-grid-button ${linkMarginTopClass} shop-builder-grid-button--${item.buttonAlign ?? "left"}`}>
+                <a className={`shop-builder-grid-action ${linkStyleClass}`.trim()} style={action.fullWidth ? { width: "100%" } : undefined} href={itemUrl} {...builderLinkTargetProps(linkTarget)}>{buttonText}</a>
+              </div>
+            ) : null;
+            const renderTitleCluster = () => <>
+              {metaAlign === "above-title" && renderMeta()}
+              {renderTitle()}
+              {metaAlign === "below-title" && renderMeta()}
+            </>;
+            const renderContentCluster = () => <>
+              {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
+              {block.gridShowEyebrow !== false && item.eyebrow && <Typog as="span" className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`} typography={item.typography ?? block.typography} area="eyebrow">{item.eyebrow}</Typog>}
+              {mediaPlacement === "between" && renderImage()}
+              {metaAlign === "above-content" && renderMeta()}
+              {renderContent()}
+              {metaAlign === "below-content" && renderMeta()}
+              <RenderChecklist items={item.items} iconName={item.listIcon} colorScheme={item.listIconColorScheme} typography={item.typography ?? block.typography} iconSize={item.listIconSize} />
+              {renderActions()}
+            </>;
+            const renderBody = () => {
+              const contents = titlePlacement === "left" && safeTitle ? (
+                <div className={`shop-builder-grid-title-layout uk-grid ${compositionGapClass(rawBlock.gridTitleColumnGap, rawBlock.gridTitleRowGap)}`} data-uk-grid>
+                  <div className={compositionWidthClass(rawBlock.gridTitleWidth ?? "1-2", titleBreakpoint)}>{renderTitleCluster()}</div>
+                  <div className={compositionWidthClass(rawBlock.gridTitleWidth === "expand" ? "auto" : "expand", titleBreakpoint, rawBlock.gridTitleWidth !== "expand")}>{renderContentCluster()}</div>
+                </div>
+              ) : <>{renderTitleCluster()}{renderContentCluster()}</>;
+              const constrainOneColumnContent = isYoothemeGrid && mediaPlacement === "top" && !panelStyle && rawBlock.panelContentWidth && rawBlock.panelContentWidth !== "auto";
+              return <div className={`${bodyPaddingClass} shop-builder-grid-content`.trim()}>
+                {mediaPlacement === "top" && !isFrameless && renderImage()}
+                {constrainOneColumnContent ? <div className={`uk-container uk-container-${rawBlock.panelContentWidth} shop-builder-grid-one-column-content`}>{contents}</div> : contents}
+                {mediaPlacement === "bottom" && renderImage()}
+              </div>;
+            };
+            const composedBody = isSideMedia ? (
+              <div className={`shop-builder-grid-media-layout uk-grid ${compositionGapClass(rawBlock.gridMediaColumnGap, rawBlock.gridMediaRowGap)} ${rawBlock.gridMediaVerticalAlign ? "uk-flex-middle" : ""}`} data-uk-grid>
+                <div className={`${compositionWidthClass(mediaWidth, mediaBreakpoint)} ${mediaPlacement === "right" ? `uk-flex-last@${mediaBreakpoint}` : ""}`.trim()}>{renderImage()}</div>
+                <div className="uk-width-expand">{renderBody()}</div>
+              </div>
+            ) : renderBody();
             return (
               <article
                 key={item.id}
@@ -523,6 +585,7 @@ export function GridCardsClient({
                 style={
                   {
                     textAlign: itemContentAlignment,
+                    ...(itemMaxWidth ? { maxWidth: itemMaxWidth, marginInline: "auto", width: "100%" } : {}),
                     ...colorSemantics.style,
                     ...(imagePaddingCustom ? { "--shop-builder-grid-image-padding": imagePaddingCustom } : {}),
                     ...(contentPaddingCustom ? { "--shop-builder-grid-content-padding": contentPaddingCustom } : {}),
@@ -540,57 +603,8 @@ export function GridCardsClient({
                     {...builderLinkTargetProps(linkTarget)}
                   />
                 )}
-                {/* Frameless (Flush) image rendered outside card body */}
-                {isFrameless && renderImage()}
-
-                <div className={`${bodyPaddingClass} shop-builder-grid-content`.trim()}>
-                  {/* Padded image rendered inside card body */}
-                  {!isFrameless && renderImage()}
-
-                  {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
-                  {block.gridShowEyebrow !== false && item.eyebrow && (
-                    <Typog
-                      as="span"
-                      className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
-                      typography={item.typography ?? block.typography}
-                      area="eyebrow"
-                    >
-                      {item.eyebrow}
-                    </Typog>
-                  )}
-
-                  {metaAlign === "above-title" && renderMeta()}
-                  {renderTitle()}
-                  {metaAlign === "below-title" && renderMeta()}
-                  {metaAlign === "above-content" && renderMeta()}
-                  {renderContent()}
-                  {metaAlign === "below-content" && renderMeta()}
-
-                  <RenderChecklist
-                    items={item.items}
-                    iconName={item.listIcon}
-                    colorScheme={item.listIconColorScheme}
-                    typography={item.typography ?? block.typography}
-                    iconSize={item.listIconSize}
-                  />
-
-                  {canShowLink && itemUrl && buttonText && (
-                    <div
-                      className={`shop-builder-grid-button ${linkMarginTopClass} shop-builder-grid-button--${
-                        item.buttonAlign ?? "left"
-                      }`}
-                    >
-                      <a
-                        className={`shop-builder-grid-action ${linkStyleClass}`.trim()}
-                        style={action.fullWidth ? { width: "100%" } : undefined}
-                        href={itemUrl}
-                        {...builderLinkTargetProps(linkTarget)}
-                      >
-                        {buttonText}
-                      </a>
-                    </div>
-                  )}
-                </div>
+                {isFrameless && mediaPlacement === "top" && renderImage()}
+                {composedBody}
               </article>
             );
           })()
