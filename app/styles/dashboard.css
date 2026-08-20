@@ -16054,6 +16054,126 @@ body:has([data-scoped-builder-root])
   pointer-events: auto;
 }
 
+/* Compact element chrome: the existing action structure remains intact, but
+   ordinary actions are icon-only and visually subordinate to the canvas. */
+.builder-fixed-selection-toolbar.is-element {
+  min-height: 32px;
+  gap: 4px;
+  padding: 3px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(39, 43, 51, 0.9);
+  color: rgba(238, 240, 245, 0.86);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(10px) saturate(120%);
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-actions {
+  flex: 0 0 auto;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-back {
+  width: 26px;
+  min-height: 26px;
+  padding: 3px;
+  font-size: 0;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: rgba(238, 240, 245, 0.9);
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb {
+  gap: 2px;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb button,
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb span {
+  min-height: 26px;
+  padding: 3px 4px;
+  font-size: 9px;
+  color: rgba(238, 240, 245, 0.86);
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb button::after {
+  content: "/";
+  margin-left: 6px;
+  opacity: 0.42;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb span[aria-current="page"] {
+  color: #b8ceff;
+  background: rgba(79, 125, 219, 0.34);
+  border-radius: 8px;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools {
+  min-height: 24px;
+  gap: 2px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools span {
+  display: none;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools button {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: rgba(220, 224, 232, 0.74) !important;
+  transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-fixed-add-control > button {
+  width: 26px;
+  height: 26px;
+  min-height: 26px;
+  padding: 3px;
+  border-radius: 50%;
+  font-size: 0;
+  justify-content: center;
+  background: #1677e8;
+  color: #fff;
+}
+
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element {
+  border-color: rgba(31, 31, 27, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  color: #181815;
+  box-shadow: 0 10px 28px rgba(31, 31, 27, 0.12);
+}
+
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element .builder-fixed-selection-back,
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb button,
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb span {
+  color: #4b4d54;
+}
+
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element .builder-fixed-selection-breadcrumb span[aria-current="page"] {
+  color: #1d63c8;
+  background: rgba(79, 125, 219, 0.12);
+}
+
+body:has(.builder-dashboard[data-theme="light"]) .builder-fixed-selection-toolbar.is-element .builder-preview-block-tools button {
+  color: #5b606b !important;
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools button:hover:not(:disabled),
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools button:focus-visible {
+  background: rgba(122, 162, 255, 0.14) !important;
+  color: #a9c3ff !important;
+  box-shadow: 0 0 0 1px rgba(122, 162, 255, 0.2);
+}
+
+.builder-fixed-selection-toolbar.is-element .builder-preview-block-tools button:disabled {
+  opacity: 0.28;
+}
+
 .builder-fixed-selection-toolbar.is-anchored {
   transform: translateX(-50%);
   max-width: calc(100vw - 32px);

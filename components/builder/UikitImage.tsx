@@ -12,18 +12,17 @@ import {
   getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
-import { Image as ImageIcon, Upload } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 
 type Props = {
   block: any;
   isCanvas?: boolean;
-  onUploadImage?: () => void;
   shellSettings?: Partial<BuilderShellSettings>;
 };
 
-export default function UikitImage({ block, isCanvas, onUploadImage, shellSettings }: Props) {
+export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
   const resolveString = (
     local: unknown,
@@ -197,22 +196,11 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
               ) : (
                 renderImage()
               )}
-              {isCanvas && (
-                <button
-                  type="button"
-                  className="builder-preview-image-upload"
-                  onClick={onUploadImage}
-                >
-                  <ImageIcon size={13} />
-                  <span>Change image</span>
-                </button>
-              )}
             </>
           ) : isCanvas ? (
             <div
               className="builder-media-placeholder-container"
               style={{ minHeight: "180px" }}
-              onClick={onUploadImage}
             >
               <div className="builder-media-placeholder-content">
                 <div className="builder-media-placeholder-icon-frame">
@@ -222,10 +210,6 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
                 <p className="builder-media-placeholder-subtitle">
                   Upload or select from media library
                 </p>
-                <button type="button" className="builder-media-placeholder-btn">
-                  <Upload size={14} />
-                  <span>Choose Image</span>
-                </button>
               </div>
             </div>
           ) : null}

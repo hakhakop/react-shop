@@ -16,7 +16,6 @@ import {
   Grid3X3,
   GripVertical,
   Heart,
-  ImageIcon,
   Layers3,
   ListChecks,
   Navigation,
@@ -42,7 +41,6 @@ import {
   Truck,
   UserRound,
   Trash2,
-  Upload,
   X,
   Sun,
   Smartphone,
@@ -11678,6 +11676,11 @@ export default function DashboardBuilder({
                 onSelectRow={selectLayoutRow}
                 onSelectBlock={selectLayoutBlock}
                 onOpenInspector={openInspectorPanel}
+                onFollowLink={(href) => {
+                  if (!handleScopedBuilderNavigate(href)) {
+                    window.location.assign(href);
+                  }
+                }}
                 onDragStart={setDraggingSectionId}
                 onDragEnd={() => setDraggingSectionId(null)}
                 onReorder={reorderSection}
@@ -12040,6 +12043,7 @@ function PreviewCanvas({
   onSelectRow,
   onSelectBlock,
   onOpenInspector,
+  onFollowLink,
   onDragStart,
   onDragEnd,
   onReorder,
@@ -12130,6 +12134,7 @@ function PreviewCanvas({
     openInspector?: boolean,
   ) => void;
   onOpenInspector: () => void;
+  onFollowLink: (href: string) => void;
   onDragStart: (sectionId: string) => void;
   onDragEnd: () => void;
   onReorder: (
@@ -12616,9 +12621,10 @@ function PreviewCanvas({
     (event: ReactMouseEvent<HTMLDivElement>) => {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest('[contenteditable="true"]')) return;
-      // Deliberate website anchors are owned by the scoped preview router (or
-      // by the browser for external destinations), not by canvas selection.
-      if (resolveBuilderOpenLinkIntent(event.target)) return;
+      // In Builder, an authored link is still part of the selectable canvas
+      // object. Keep the live destination for the explicit Follow Link action,
+      // but do not navigate on the normal element click.
+      if (resolveBuilderOpenLinkIntent(event.target)) event.preventDefault();
       const target = builderTargetFromElement(event.target);
       if (target) {
         onHoverTarget(null);
@@ -13475,6 +13481,7 @@ function PreviewCanvas({
         onDuplicateBlock={onDuplicateBlock}
         onDeleteBlock={onDeleteBlock}
         onSaveElementTemplate={onSaveElementTemplate}
+        onFollowLink={onFollowLink}
       />
       </div>
     </BuilderCarouselGeometryCoordinator>
@@ -14262,6 +14269,8 @@ function BuilderElementToolbar({
   onSave,
   onDuplicate,
   onDelete,
+  linkHref,
+  onFollowLink,
 }: {
   label: string;
   canMoveUp: boolean;
@@ -14272,6 +14281,8 @@ function BuilderElementToolbar({
   onSave: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  linkHref?: string | null;
+  onFollowLink?: () => void;
 }) {
   return (
     <div
@@ -14298,6 +14309,9 @@ function BuilderElementToolbar({
       </button>
       <button type="button" onClick={onDelete} title="Delete element">
         <Trash2 size={13} />
+      </button>
+      <button type="button" onClick={() => onFollowLink?.()} disabled={!linkHref || !onFollowLink} title="Follow link" aria-label="Follow link">
+        <ExternalLink size={13} />
       </button>
     </div>
   );
@@ -14339,6 +14353,7 @@ function BuilderInteractionLayer({
   onDuplicateBlock,
   onDeleteBlock,
   onSaveElementTemplate,
+  onFollowLink,
 }: {
   canvasRef: { current: HTMLDivElement | null };
   externalInteractionRootRef?: { current: HTMLDivElement | null };
@@ -14368,6 +14383,7 @@ function BuilderInteractionLayer({
   onDuplicateBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
   onDeleteBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
   onSaveElementTemplate: (sectionId: string, columnKey: string, blockKey: string) => void;
+  onFollowLink: (href: string) => void;
 }) {
   const selectedVisualTarget = editingTarget ?? selectedTarget;
   // This layer is portaled to document.body. Keep its first client render
@@ -14626,13 +14642,20 @@ function BuilderInteractionLayer({
     const blockIndex = blocks.findIndex((block, index) => (block.id ?? `${target.columnKey}-block-${index}`) === target.blockKey);
     const block = blocks[blockIndex];
     if (!block) return null;
+    const interactionElement = findInteractionElement(target);
+    const linkElement = interactionElement?.matches("a[href]")
+      ? interactionElement
+      : interactionElement?.querySelector<HTMLAnchorElement>("a[href]");
+    const linkHref = linkElement?.getAttribute("href") ?? null;
     return <BuilderElementToolbar label={layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
       canMoveUp={blockIndex > 0} canMoveDown={blockIndex < blocks.length - 1}
       onSettings={() => { onSelectBlock(section.id, target.columnKey, target.blockKey); onOpenInspector(); }}
       onMoveUp={() => onMoveBlockWithinColumn({ ...target, direction: -1 })}
       onMoveDown={() => onMoveBlockWithinColumn({ ...target, direction: 1 })}
       onSave={() => onSaveElementTemplate(section.id, target.columnKey, target.blockKey)}
-      onDuplicate={() => onDuplicateBlock(target)} onDelete={() => onDeleteBlock(target)} />;
+      onDuplicate={() => onDuplicateBlock(target)} onDelete={() => onDeleteBlock(target)}
+      linkHref={linkHref}
+      onFollowLink={() => { if (linkHref) onFollowLink(linkHref); }} />;
   };
 
   if (!isMounted || typeof document === "undefined") return null;
@@ -14654,7 +14677,7 @@ function BuilderInteractionLayer({
       </div>
       {selectedVisualTarget && selectedHierarchy && !editingTarget ? (
         <div
-          className={`builder-fixed-selection-toolbar${selectedRect ? " is-anchored" : ""}`}
+          className={`builder-fixed-selection-toolbar${selectedRect ? " is-anchored" : ""}${selectedVisualTarget.type === "block" ? " is-element" : ""}`}
           role="toolbar"
           aria-label="Selected Builder object"
           style={(() => {
@@ -17309,20 +17332,6 @@ const PreviewSection = memo(function PreviewSection({
                               !block.imageUrl ||
                               !block.imageUrl.trim();
 
-                            const handlePanelImageClick = (event: React.MouseEvent) => {
-                              event.stopPropagation();
-                              if (onUploadBlockImage) {
-                                onUploadBlockImage(
-                                  section.id,
-                                  columnKey,
-                                  blockKey,
-                                  block.imageUrl,
-                                );
-                              } else {
-                                onSelectBlock(section.id, columnKey, blockKey);
-                              }
-                            };
-
                             const panelTitleStyle = {
                               color: "var(--builder-card-title-color, inherit)",
                               textAlign:
@@ -17395,7 +17404,6 @@ const PreviewSection = memo(function PreviewSection({
                                     aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
                                     overflow: !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
-                                    cursor: "pointer",
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
                                     width: panelImageDimension((block as any).imageWidth) ?? "100%",
@@ -17406,7 +17414,6 @@ const PreviewSection = memo(function PreviewSection({
                                       ? { backgroundImage: `url(${block.imageUrl})` }
                                       : {}),
                                   }}
-                                  onClick={handlePanelImageClick}
                                 >
                                   {!isPanelImagePlaceholder ? (
                                     <>
@@ -17428,14 +17435,6 @@ const PreviewSection = memo(function PreviewSection({
                                           style={{ display: "block", width: "100%", height: "100%", objectFit: panelMediaPresentation.objectFit ?? "cover", objectPosition: panelMediaPresentation.backgroundPosition, pointerEvents: "none" }}
                                         />
                                       )}
-                                      <button
-                                        type="button"
-                                        className="builder-preview-image-upload"
-                                        onClick={handlePanelImageClick}
-                                      >
-                                        <ImageIcon size={13} />
-                                        <span>Change image</span>
-                                      </button>
                                     </>
                                   ) : (
                                     <div className="builder-media-placeholder-container">
@@ -17477,10 +17476,6 @@ const PreviewSection = memo(function PreviewSection({
                                         </div>
                                         <h4 className="builder-media-placeholder-title">Select an image</h4>
                                         <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
-                                        <button type="button" className="builder-media-placeholder-btn">
-                                          <Upload size={14} />
-                                          <span>Choose Image</span>
-                                        </button>
                                 </div>
                               </div>
                             )}
@@ -17696,18 +17691,6 @@ const PreviewSection = memo(function PreviewSection({
                             block={block}
                             isCanvas
                             shellSettings={shellSettings}
-                            onUploadImage={() => {
-                              if (onUploadBlockImage) {
-                                onUploadBlockImage(
-                                  section.id,
-                                  columnKey,
-                                  blockKey,
-                                  block.imageUrl,
-                                );
-                              } else {
-                                onSelectBlock(section.id, columnKey, blockKey);
-                              }
-                            }}
                           />
                         ) : block.kind === "table" ? (
                           <UikitTable block={block} />
