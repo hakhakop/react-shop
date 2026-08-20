@@ -8971,7 +8971,7 @@ body[data-storefront-preset="princity"]
 }
 
 .shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
-.uk-card-media-top {
+.shop-builder-grid-card .uk-card-media-top {
   margin-top: -30px !important;
   margin-left: -30px !important;
   margin-right: -30px !important;
@@ -8984,7 +8984,7 @@ body[data-storefront-preset="princity"]
 }
 
 .shop-builder-grid-card.uk-card-small.is-image-frameless .shop-builder-grid-image,
-.uk-card-small .uk-card-media-top {
+.shop-builder-grid-card.uk-card-small .uk-card-media-top {
   margin-top: -20px !important;
   margin-left: -20px !important;
   margin-right: -20px !important;
@@ -8992,7 +8992,7 @@ body[data-storefront-preset="princity"]
 }
 
 .shop-builder-grid-card.uk-card-large.is-image-frameless .shop-builder-grid-image,
-.uk-card-large .uk-card-media-top {
+.shop-builder-grid-card.uk-card-large .uk-card-media-top {
   margin-top: -40px !important;
   margin-left: -40px !important;
   margin-right: -40px !important;

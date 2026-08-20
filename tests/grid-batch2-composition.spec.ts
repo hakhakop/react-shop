@@ -34,6 +34,12 @@ test("Grid renderer composes title and media structurally rather than with posit
   expect(renderer).toContain('mediaPlacement === "bottom" && renderImage()');
 });
 
+test("flush Grid media cannot wrap expanded Panel content into a clipped column", () => {
+  const styles = readFileSync(resolve(process.cwd(), "app/styles/shop-builder.css"), "utf8");
+  expect(styles).toContain(".shop-builder-grid-card.shop-builder-panel--expand-content {\n  display: flex;\n  flex-direction: column;");
+  expect(styles).toContain("flex-wrap: nowrap;");
+});
+
 test("Grid applies the shared media margin only at YOOtheme's between/bottom placements", () => {
   const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
   expect(renderer).toContain('mediaPlacement === "between"');

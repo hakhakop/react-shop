@@ -2022,6 +2022,10 @@ body.dark {
 .shop-builder-grid-card.shop-builder-panel--expand-content {
   display: flex;
   flex-direction: column;
+  /* UIkit Grid Match supplies flex-wrap: wrap. Flush media becomes a direct
+     sibling of the content body, so retaining that wrap moves the body into
+     a clipped second column when the panel expands. */
+  flex-wrap: nowrap;
 }
 
 
