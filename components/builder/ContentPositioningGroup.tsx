@@ -58,7 +58,10 @@ export function ContentPositioningGroup({ blocks, children }: Props) {
       data-builder-positioning-group="column-content"
       style={
         {
-          position: "relative",
+          // The column content owns the containing block. Keeping the group
+          // itself unpositioned matches YOOtheme's absolute-element origin at
+          // the outer column/panel top while the group still owns flow height.
+          position: "static",
           // The group mirrors YOOtheme's column panel. Its flow height must
           // come from the authored children themselves, not WebPages' legacy
           // implicit element-padding defaults. Explicit element padding is an

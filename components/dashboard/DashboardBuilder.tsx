@@ -17336,7 +17336,7 @@ const PreviewSection = memo(function PreviewSection({
                               color: "var(--builder-card-title-color, inherit)",
                               textAlign:
                                 "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
-                              margin: "var(--builder-card-title-margin, 0)",
+                              margin: "var(--builder-card-title-margin, 0) 0 0",
                             } as React.CSSProperties;
                             const panelMetaStyle = {
                               color: "var(--builder-card-meta-color, inherit)",
@@ -17368,7 +17368,7 @@ const PreviewSection = memo(function PreviewSection({
                               (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
                               (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
                             ].filter(Boolean).join(" ");
-                            const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)) : "";
+                            const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
                             const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
                             const panelAnimationClass = (block.animation && typeof block.animation === "string" && block.animation !== "none") ? `uk-animation-${block.animation}` : "";
                             const panelVisibilityClass = ((block as any).visibility && (block as any).visibility !== "always") ? `uk-${(block as any).visibility}` : "";
@@ -17572,6 +17572,7 @@ const PreviewSection = memo(function PreviewSection({
                                     (block.typewriterEnabled && !block.title ? (
                                       <DashboardTypog
                                         as="p"
+                                        className="shop-builder-panel-content-text"
                                         area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
@@ -17631,6 +17632,7 @@ const PreviewSection = memo(function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as="p"
+                                        className="shop-builder-panel-content-text"
                                         area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
@@ -17662,20 +17664,15 @@ const PreviewSection = memo(function PreviewSection({
                                         block.elementAlign,
                                         block.buttonGap,
                                       ),
-                                      justifyContent: `var(--builder-card-button-align, ${
-                                        block.elementAlign === "center"
-                                          ? "center"
-                                          : block.elementAlign === "right"
-                                            ? "flex-end"
-                                            : "flex-start"
-                                      })`,
+                                      width: "100%",
+                                      justifyContent: "var(--builder-card-button-align, center)",
                                     }}
                                   >
                                     {!panelPresentation.linked && block.panelActionVisible !== false && block.buttonLabel && (
                                       <DashboardTypog
                                         as="span"
                                         area="button"
-                                        className={`${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
+                                        className={`shop-builder-panel-action ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
                                         typography={block.typography}
                                       >
                                         {block.buttonLabel}

@@ -111,7 +111,9 @@ body.dark {
 
 /* Canonical UIkit container gutters, shared by Builder and storefront. */
 .shop-builder-section-content.uk-container {
-  box-sizing: border-box;
+  /* UIkit/YOOtheme containers use a content-box max width; the responsive
+     horizontal gutters extend the border box beyond the 1200px content track. */
+  box-sizing: content-box;
   max-width: var(--uk-container-default-max-width, 1200px);
   padding-left: var(--uk-container-padding-horizontal, 15px);
   padding-right: var(--uk-container-padding-horizontal, 15px);
@@ -3055,6 +3057,20 @@ body.dark {
   gap: var(--builder-card-gap, 10px);
 }
 
+/* YOOtheme's no-card Panel keeps media/content edge-to-edge and applies its
+   spacing directionally (title/link margins are top margins, not all-sides). */
+.shop-builder-column-block--panel.uk-card-none > .uk-card-body {
+  padding: 0 !important;
+  display: block;
+}
+
+.shop-builder-column-block--panel.uk-card-none > .shop-builder-panel-media {
+  margin: 0 auto !important;
+  width: fit-content !important;
+  max-width: 100%;
+  line-height: 0;
+}
+
 /* The legacy panel body stack is useful for ordinary cards, but expansion is
    a semantic Panel state and needs a flex column so its content can consume
    the available height. Keep this after the legacy stack rule so Builder and
@@ -3068,7 +3084,7 @@ body.dark {
 
 .shop-builder-column-block--panel h3,
 .shop-builder-column-block--panel .shop-builder-title {
-  margin: var(--builder-card-title-margin, 0);
+  margin: var(--builder-card-title-margin, 0) 0 0 !important;
   color: var(--builder-card-title-color, inherit);
   text-align: var(--builder-card-title-align, inherit);
 }
@@ -3089,8 +3105,25 @@ body.dark {
 }
 
 .shop-builder-column-block--panel .shop-builder-buttons {
-  margin: var(--builder-card-button-margin, 0);
-  justify-content: var(--builder-card-button-align, inherit);
+  width: 100%;
+  margin: var(--builder-card-button-margin, 0) 0 0;
+  justify-content: var(--builder-card-button-align, center);
+}
+
+.shop-builder-column-block--panel.uk-card-none > .uk-card-body > .builder-inline-editable:not(.shop-builder-title) {
+  margin-top: var(--uk-global-margin, 20px);
+}
+
+.shop-builder-column-block--panel .shop-builder-panel-content-text:not(:first-child) {
+  margin-top: var(--uk-global-margin, 20px) !important;
+}
+
+.shop-builder-column-block--panel > .uk-card-body > .shop-builder-panel-action {
+  margin: var(--uk-global-margin-medium, 40px) 0 0 !important;
+}
+
+.shop-builder-column-block--panel .shop-builder-buttons .shop-builder-panel-action {
+  margin-bottom: 0 !important;
 }
 
 .shop-builder-column-block--image {
@@ -3247,27 +3280,6 @@ body.dark {
   gap: clamp(22px, 4vw, 48px);
 }
 
-/* Content-layout sections already own their responsive horizontal gutters.
-   Keep the shared UIkit container marker for parity, but prevent its
-   content-box padding and grid's negative gutter from offsetting the row. */
-.shop-builder-main[data-builder-page-root]
-  .shop-builder-section--boxed.shop-builder-content-layout
-  > .shop-builder-section-content.uk-container {
-  box-sizing: border-box;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.shop-builder-main[data-builder-page-root]
-  .shop-builder-section--boxed.shop-builder-content-layout
-  > .shop-builder-section-content.uk-container
-  > .shop-builder-content-layout-rows-wrapper
-  > div
-  > .shop-builder-content-row {
-  margin-left: 0;
-}
-
-
 .shop-builder-content-layout-grid {
   display: grid;
   grid-template-columns: repeat(var(--builder-layout-columns, 2), minmax(0, 1fr));
@@ -3285,7 +3297,8 @@ body.dark {
 
 .shop-builder-content-layout-card {
   min-width: 0;
-  padding: 0;
+  padding: 0 0 0 var(--uk-container-padding-horizontal-m, 40px) !important;
+  box-sizing: border-box;
   border-radius: 0;
   background: transparent;
   display: flex;
@@ -3294,6 +3307,28 @@ body.dark {
      second vertical rhythm between otherwise normal-flow siblings. */
   gap: 0;
   transition: box-shadow 0.14s ease, background 0.14s ease;
+}
+
+/* Imported absolute elements use the outer column content as their
+   containing block, matching YOOtheme's panel origin. */
+.shop-builder-column-content:has(> .shop-builder-content-positioning-group) {
+  position: relative;
+}
+
+.shop-builder-content-layout-card .shop-builder-element-shell.yootheme-imported-spacing {
+  margin-bottom: 0 !important;
+}
+
+@media (min-width: 640px) {
+  .shop-builder-content-layout-card {
+    padding-left: var(--uk-container-padding-horizontal-s, 30px) !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-content-layout-card {
+    padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
+  }
 }
 
 .shop-builder-content-layout-card.is-drag-over {

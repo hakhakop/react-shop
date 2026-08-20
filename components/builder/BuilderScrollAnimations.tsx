@@ -290,6 +290,9 @@ export default function BuilderScrollAnimations() {
         const startOffset = resolveParallaxOffset(parallax.start, target, viewportHeight, viewportWidth);
         const endOffset = resolveParallaxOffset(parallax.end, target, viewportHeight, viewportWidth);
         const start = Math.max(0, targetTop - scrollViewportHeight + startOffset);
+        // UIkit's default parallax interval runs from the target entering at
+        // the viewport bottom until the target's bottom reaches the viewport
+        // top. Keep the target height in the endpoint exactly as UIkit does.
         const end = Math.min(maxScroll, targetTop + target.offsetHeight - endOffset);
         const progress = start < end
           ? Math.min(1, Math.max(0, (scrollTop - start) / (end - start)))

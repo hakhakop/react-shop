@@ -2055,7 +2055,7 @@ export function ContentLayoutBlock({
       (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
       (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
     ].filter(Boolean).join(" ");
-    const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
+    const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
     const panelShowMedia = block.panelShowMedia !== false;
     const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
     const panelMeta = block.eyebrow ? (
@@ -2162,6 +2162,7 @@ export function ContentLayoutBlock({
           {block.body && (
             <Typog
               as="p"
+              className="shop-builder-panel-content-text"
               area="body"
               typography={block.typography}
               style={panelBodyStyle}
@@ -2210,7 +2211,7 @@ export function ContentLayoutBlock({
             <Typog
               as="a"
               area="button"
-              className={`shop-builder-cta ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
+              className={`shop-builder-cta shop-builder-panel-action ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
               href={block.buttonUrl}
               {...builderLinkTargetProps(block.buttonTarget)}
               typography={block.typography}

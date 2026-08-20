@@ -19,6 +19,36 @@ export function extractSafeSvgDropShadow(source: string) {
   return new RegExp(`^${dropShadow}(?:\\s+${dropShadow})*$`, "i").test(value) ? value : undefined;
 }
 
+/** Preserve the small, presentation-only surface contract used by YOOtheme
+ * inline SVG assets without re-enabling arbitrary embedded SVG CSS. */
+function extractSafeSvgSurfaceStyle(source: string) {
+  const styleBlock = source.match(/<style[^>]*>([\s\S]*?)<\/style>/i)?.[1] ?? "";
+  if (!styleBlock) return undefined;
+  const read = (property: string, pattern: RegExp) => {
+    const value = styleBlock.match(pattern)?.[1]?.trim();
+    return value && !/[{};]/.test(value) ? value : undefined;
+  };
+  const backgroundColor = read("background-color", /background-color\s*:\s*([^;}{]+)/i);
+  const backdropFilter = read("backdrop-filter", /(?:-webkit-)?backdrop-filter\s*:\s*([^;}{]+)/i);
+  const borderRadius = read("border-radius", /border-radius\s*:\s*([^;}{]+)/i);
+  const safeBlur = backdropFilter && /^blur\(\s*\d+(?:\.\d+)?(?:px|rem|em|%)\s*\)$/i.test(backdropFilter)
+    ? backdropFilter
+    : undefined;
+  const safeRadius = borderRadius && /^\d+(?:\.\d+)?(?:px|rem|em|%)$/i.test(borderRadius)
+    ? borderRadius
+    : undefined;
+  const safeBackground = backgroundColor && /^(?:transparent|#[\da-f]{3,8}|rgba?\([^)]*\))$/i.test(backgroundColor)
+    ? backgroundColor
+    : undefined;
+  if (!safeBlur && !safeRadius && !safeBackground) return undefined;
+  return {
+    backgroundColor: safeBackground,
+    backdropFilter: safeBlur,
+    WebkitBackdropFilter: safeBlur,
+    borderRadius: safeRadius,
+  };
+}
+
 export function sanitizeStylableSvg(
   source: string,
   fit: "contain" | "cover" | "fill" = "contain",
@@ -26,6 +56,7 @@ export function sanitizeStylableSvg(
   preserveIntrinsicSize = false,
 ) {
   const safeDropShadow = extractSafeSvgDropShadow(source);
+  const safeSurfaceStyle = extractSafeSvgSurfaceStyle(source);
   const clean = DOMPurify.sanitize(source, {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ["script", "style", "foreignObject", "iframe", "object", "embed", "animate", "set"],
@@ -81,6 +112,12 @@ export function sanitizeStylableSvg(
   svg.setAttribute("preserveAspectRatio", fit === "fill" ? "none" : fit === "cover" ? "xMidYMid slice" : "xMidYMid meet");
   svg.setAttribute("class", [svg.getAttribute("class"), svgClassName, "uk-svg"].filter(Boolean).join(" "));
   if (safeDropShadow) svg.style.setProperty("filter", safeDropShadow);
+  if (safeSurfaceStyle?.backgroundColor) svg.style.setProperty("background-color", safeSurfaceStyle.backgroundColor);
+  if (safeSurfaceStyle?.backdropFilter) {
+    svg.style.setProperty("backdrop-filter", safeSurfaceStyle.backdropFilter);
+    svg.style.setProperty("-webkit-backdrop-filter", safeSurfaceStyle.backdropFilter);
+  }
+  if (safeSurfaceStyle?.borderRadius) svg.style.setProperty("border-radius", safeSurfaceStyle.borderRadius);
   return new XMLSerializer().serializeToString(svg);
 }
 
