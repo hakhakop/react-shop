@@ -19,6 +19,7 @@ import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitImage from "@/components/builder/UikitImage";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
 import {
   ContentPositioningGroup,
@@ -2070,7 +2071,7 @@ export function ContentLayoutBlock({
     ) : null;
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ ...panelPresentation.colorStyle }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ ...panelPresentation.colorStyle, ...(block.imageUrl && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? { overflow: "visible" } : {}) }}>
         {panelPresentation.linked && (
           <a
             className="shop-builder-panel-link-overlay"
@@ -2087,7 +2088,7 @@ export function ContentLayoutBlock({
             style={{
               aspectRatio: panelMediaPresentation.aspectRatio,
               position: "relative",
-              overflow: "hidden",
+              overflow: block.imageUrl && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
               backgroundSize: panelMediaPresentation.backgroundSize,
               backgroundPosition: panelMediaPresentation.backgroundPosition,
               width: panelImageDimension((block as any).imageWidth) ?? "100%",
@@ -2096,7 +2097,26 @@ export function ContentLayoutBlock({
               borderRadius: panelImageRadius,
               ...(block.imageUrl ? { backgroundImage: `url(${block.imageUrl})` } : {}),
             }}
-          />
+          >
+            {block.imageUrl && (/\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
+              <UikitStylableSvg
+                src={block.imageUrl}
+                alt={block.imageAlt || ""}
+                loading="lazy"
+                fit={panelMediaPresentation.objectFit === "fill" ? "fill" : panelMediaPresentation.objectFit === "contain" ? "contain" : "cover"}
+                fallback={<img src={block.imageUrl} alt={block.imageAlt || ""} />}
+                style={{ width: panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
+              />
+            ) : (
+              <img
+                src={block.imageUrl}
+                alt={block.imageAlt || ""}
+                loading="lazy"
+                aria-hidden="true"
+                style={{ display: "block", width: "100%", height: "100%", objectFit: panelMediaPresentation.objectFit ?? "cover", objectPosition: panelMediaPresentation.backgroundPosition, pointerEvents: "none" }}
+              />
+            ))}
+          </div>
         )}
         <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
           {panelPresentation.metaPosition === "above-title" && panelMeta}

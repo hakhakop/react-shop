@@ -69,6 +69,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { GridCardsClient } from "@/components/builder/GridCardsClient";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import { isLocale, localeLabels } from "@/lib/i18n";
@@ -17357,7 +17358,7 @@ const PreviewSection = memo(function PreviewSection({
                             ) : null;
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ ...panelPresentation.colorStyle }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ ...panelPresentation.colorStyle, ...(!isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? { overflow: "visible" } : {}) }}>
                                 {panelPresentation.linked && (
                                   <a
                                     className="shop-builder-panel-link-overlay"
@@ -17372,7 +17373,7 @@ const PreviewSection = memo(function PreviewSection({
                                   style={{
                                     aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
-                                    overflow: "hidden",
+                                    overflow: !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
                                     cursor: "pointer",
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
@@ -17387,14 +17388,34 @@ const PreviewSection = memo(function PreviewSection({
                                   onClick={handlePanelImageClick}
                                 >
                                   {!isPanelImagePlaceholder ? (
-                                    <button
-                                      type="button"
-                                      className="builder-preview-image-upload"
-                                      onClick={handlePanelImageClick}
-                                    >
-                                      <ImageIcon size={13} />
-                                      <span>Change image</span>
-                                    </button>
+                                    <>
+                                      {/\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
+                                        <UikitStylableSvg
+                                          src={block.imageUrl}
+                                          alt={block.imageAlt || ""}
+                                          loading="eager"
+                                          fit={panelMediaPresentation.objectFit === "fill" ? "fill" : panelMediaPresentation.objectFit === "contain" ? "contain" : "cover"}
+                                          fallback={<img src={block.imageUrl} alt={block.imageAlt || ""} />}
+                                          style={{ width: panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
+                                        />
+                                      ) : (
+                                        <img
+                                          src={block.imageUrl}
+                                          alt={block.imageAlt || ""}
+                                          loading="eager"
+                                          aria-hidden="true"
+                                          style={{ display: "block", width: "100%", height: "100%", objectFit: panelMediaPresentation.objectFit ?? "cover", objectPosition: panelMediaPresentation.backgroundPosition, pointerEvents: "none" }}
+                                        />
+                                      )}
+                                      <button
+                                        type="button"
+                                        className="builder-preview-image-upload"
+                                        onClick={handlePanelImageClick}
+                                      >
+                                        <ImageIcon size={13} />
+                                        <span>Change image</span>
+                                      </button>
+                                    </>
                                   ) : (
                                     <div className="builder-media-placeholder-container">
                                       <svg
