@@ -282,6 +282,7 @@ export function getUikitGlobalsCssVars(
     "--uk-card-transition-duration": value("cardTransitionDuration", "0.1s"),
     "--uk-card-shadow": value("cardShadow", "0 8px 24px rgba(0,0,0,.08)"),
     "--uk-card-hover-shadow": value("cardHoverShadow", value("cardShadowHover", "0 8px 24px rgba(0,0,0,.08)")),
+    "--uk-card-hover-transform": value("cardHoverTransform", "translateY(3px)"),
     "--uk-card-default-hover-background": cardDefaultHoverBackground,
     "--uk-card-primary-hover-background": cardPrimaryHoverBackground,
     "--uk-card-secondary-hover-background": cardSecondaryHoverBackground,
@@ -300,6 +301,10 @@ export function getUikitGlobalsCssVars(
     "--uk-card-default-hover-border": value("cardDefaultHoverBorder", value("cardDefaultBorder", "#e5e7eb")),
     "--uk-card-primary-hover-border": value("cardPrimaryHoverBorder", value("cardPrimaryBorder", "transparent")),
     "--uk-card-secondary-hover-border": value("cardSecondaryHoverBorder", value("cardSecondaryBorder", "transparent")),
+    // `card-default-hover-box-shadow` has a distinct YOOtheme token. It
+    // must win over the generic Card-hover shadow so default Cards visibly
+    // respond when Add hover style is enabled.
+    "--uk-card-default-hover-shadow": value("cardDefaultHoverShadow", value("cardShadowHover", value("cardHoverShadow", "none"))),
     "--uk-card-primary-shadow": value("cardPrimaryShadow", value("cardShadow", "none")),
     "--uk-card-primary-hover-shadow": value("cardPrimaryHoverShadow", value("cardHoverShadow", "none")),
     "--uk-card-secondary-shadow": value("cardSecondaryShadow", value("cardShadow", "none")),

@@ -456,6 +456,8 @@ export type BuilderShellSettings = {
   cardHeaderSpacing?: string;
   cardFooterSpacing?: string;
   cardHoverShadow?: string;
+  /** Shared Card hover movement. YOOtheme's DevStack surface uses a pressed 3px offset. */
+  cardHoverTransform?: string;
   cardDefaultShadow?: string;
   cardDefaultHoverShadow?: string;
   cardPrimaryShadow?: string;
@@ -678,6 +680,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   cardBorderWidth: "1px",
   cardShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
   cardShadowHover: "0 12px 30px rgba(0, 0, 0, 0.12)",
+  cardHoverTransform: "translateY(3px)",
   cardDefaultHoverBackground: "#ffffff",
   cardPrimaryHoverBackground: "#1991ee",
   cardSecondaryHoverBackground: "#0c273a",
