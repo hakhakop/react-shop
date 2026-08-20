@@ -15963,8 +15963,11 @@ body:has([data-scoped-builder-root])
 /* Phase 1 shared interaction chrome. Canonical Builder objects keep identity
    and drag/drop behavior; hover/selection outlines and toolbars live here. */
 .builder-shared-interaction-layer {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
   z-index: 10000;
   pointer-events: none;
 }
@@ -15985,7 +15988,7 @@ body:has([data-scoped-builder-root])
 }
 
 .builder-shared-interaction-frame {
-  position: fixed;
+  position: absolute;
   box-sizing: border-box;
   pointer-events: none;
   outline: 1px solid color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 38%, transparent);
@@ -16033,7 +16036,7 @@ body:has([data-scoped-builder-root])
 }
 
 .builder-fixed-selection-toolbar {
-  position: fixed;
+  position: absolute;
   z-index: 10060;
   right: max(24px, calc((100vw - min(1180px, 100vw - 48px)) / 2));
   bottom: 24px;

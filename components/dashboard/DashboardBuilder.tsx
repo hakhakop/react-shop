@@ -14511,6 +14511,32 @@ function BuilderInteractionLayer({
       const rect = element.getBoundingClientRect();
       return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     };
+    const applyRectToPortal = (next: BuilderInteractionLayerRect | null) => {
+      if (!next) return;
+      const frame = layerRef.current?.querySelector<HTMLElement>(
+        ".builder-shared-interaction-frame.is-selected, .builder-shared-interaction-frame.is-editing",
+      );
+      if (frame) {
+        frame.style.left = `${next.left + window.scrollX}px`;
+        frame.style.top = `${next.top + window.scrollY}px`;
+        frame.style.width = `${next.width}px`;
+        frame.style.height = `${next.height}px`;
+      }
+      const toolbar = document.querySelector<HTMLElement>(".builder-fixed-selection-toolbar.is-anchored");
+      if (!toolbar) return;
+      const toolbarY = next.top + next.height + 8;
+      const top = toolbarY > window.innerHeight - 64
+        ? Math.max(12, next.top - 52)
+        : toolbarY;
+      const left = Math.min(
+        Math.max(next.left + next.width / 2, 180),
+        window.innerWidth - 180,
+      );
+      toolbar.style.left = `${left + window.scrollX}px`;
+      toolbar.style.top = `${top + window.scrollY}px`;
+      toolbar.style.right = "auto";
+      toolbar.style.bottom = "auto";
+    };
     const rectsEqual = (
       left: BuilderInteractionLayerRect | null,
       right: BuilderInteractionLayerRect | null,
@@ -14525,6 +14551,7 @@ function BuilderInteractionLayer({
       );
     const updateRect = () => {
       const next = readRect(selectedElement);
+      applyRectToPortal(next);
       setSelectedRect((current) => rectsEqual(current, next) ? current : next);
     };
     updateRect();
@@ -14540,20 +14567,14 @@ function BuilderInteractionLayer({
     const handleResize = () => scheduleUpdate();
     const handleScroll = () => {
       hoverSuppressedByScrollRef.current = true;
-      if (layerRef.current) layerRef.current.style.visibility = "hidden";
       if (hoverFrameRef.current) hoverFrameRef.current.style.display = "none";
-      if (animationFrame !== null) {
-        window.cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-      }
-      setSelectedRect(null);
+      // Keep the last anchored rect while scrolling. Clearing it here drops
+      // the fixed toolbar back to its legacy bottom-position fallback.
+      updateRect();
       if (scrollEndTimeout !== null) window.clearTimeout(scrollEndTimeout);
       scrollEndTimeout = window.setTimeout(() => {
         scrollEndTimeout = null;
         scheduleUpdate();
-        window.requestAnimationFrame(() => {
-          if (layerRef.current) layerRef.current.style.visibility = "";
-        });
       }, 180);
     };
     window.addEventListener("resize", handleResize);
@@ -14619,7 +14640,7 @@ function BuilderInteractionLayer({
     state: "selected" | "hovered" | "editing") => {
     if (!target || !rect) return null;
     return <div className={`builder-shared-interaction-frame is-${state} is-${target.type}`}
-      style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }} />;
+      style={{ left: rect.left + window.scrollX, top: rect.top + window.scrollY, width: rect.width, height: rect.height }} />;
   };
   return createPortal(
     <>
@@ -14647,7 +14668,7 @@ function BuilderInteractionLayer({
               Math.max(selectedRect.left + selectedRect.width / 2, 180),
               window.innerWidth - 180,
             );
-            return { left, top, right: "auto", bottom: "auto" };
+            return { left: left + window.scrollX, top: top + window.scrollY, right: "auto", bottom: "auto" };
           })()}
         >
           {previousSelection ? (
