@@ -1506,7 +1506,7 @@ a {
   backdrop-filter: var(--uk-button-backdrop-filter, none);
   border-radius: var(--uk-button-border-radius, 0);
   transition: var(--uk-button-transition-duration, 0.1s) ease-in-out;
-  transition-property: color, background-color, border-color;
+  transition-property: color, background-color, background-position, background-size, border-color, box-shadow;
 }
 
 .shop-builder-main .uk-button-default {
@@ -1637,8 +1637,27 @@ a {
 .shop-builder-main .uk-button-text.uk-active {
   color: var(--uk-button-text-active-color, var(--uk-button-text-hover-color, var(--uk-button-text-color, #333))) !important;
 }
-.shop-builder-main .uk-button-link { color: var(--uk-button-link-color, var(--uk-button-text-color, #333)); }
-.shop-builder-main .uk-button-link:hover { color: var(--uk-button-link-hover-color, var(--uk-button-link-color, #333)); }
+.shop-builder-main .uk-link {
+  color: var(--uk-global-link-color, var(--uk-button-link-color, var(--uk-button-text-color, #333)));
+  text-decoration: none;
+}
+.shop-builder-main .uk-link:hover {
+  color: var(--uk-global-link-hover-color, var(--uk-global-link-color, var(--uk-button-link-color, #333)));
+  text-decoration: none;
+}
+
+/* A linked Panel uses a full-card anchor above its contents. Keep that
+ * canonical navigation overlay, and mirror action hover presentation from
+ * the real hover target (the card) to its visible CTA. */
+.shop-builder-main .shop-builder-panel--linked:hover .uk-link {
+  color: var(--uk-global-link-hover-color, var(--uk-global-link-color, var(--uk-button-link-color, #333)));
+}
+.shop-builder-main .shop-builder-panel--linked:hover .uk-button-text {
+  color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)) !important;
+}
+.shop-builder-main .shop-builder-panel--linked:hover .uk-button-text::after {
+  background-position: 100% 50%;
+}
 
 .shop-builder-main .uk-light .uk-button-text::after,
 .shop-builder-main .uk-card-primary .uk-button-text::after,

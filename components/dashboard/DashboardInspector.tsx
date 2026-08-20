@@ -6356,6 +6356,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                             <select
                                                                               value={
                                                                                 gridItem.buttonStyle ??
+                                                                                block.buttonStyle ??
                                                                                 "primary"
                                                                               }
                                                                               onChange={(
@@ -6376,22 +6377,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                                 )
                                                                               }
                                                                             >
-                                                                              <option value="primary">
-                                                                                Primary
-                                                                              </option>
-                                                                              <option value="secondary">
-                                                                                Secondary
-                                                                              </option>
-                                                                              <option value="outline">
-                                                                                Outline
-                                                                              </option>
-                                                                              <option value="ghost">
-                                                                                Ghost
-                                                                              </option>
-                                                                              <option value="link">
-                                                                                Text
-                                                                                link
-                                                                              </option>
+                                                                              <option value="default">Button Default</option>
+                                                                              <option value="primary">Button Primary</option>
+                                                                              <option value="secondary">Button Secondary</option>
+                                                                              <option value="danger">Button Danger</option>
+                                                                              <option value="text">Button Text</option>
+                                                                              <option value="link">Button Link</option>
+                                                                              <option value="link-muted">Button Link Muted</option>
+                                                                              <option value="link-text">Button Link Text</option>
                                                                             </select>
                                                                           </label>
                                                                           <div className="builder-field">

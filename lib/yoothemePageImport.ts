@@ -844,7 +844,7 @@ const sourcePanelVariant = (
 const sourceGridButtonStyle = (
   value: unknown,
 ): NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]> | undefined => {
-  if (value === undefined || value === null || value === "") return undefined;
+  if (value === undefined || value === null) return undefined;
   const style = sourceButtonStyle(value);
   return style as NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]>;
 };
@@ -1124,6 +1124,7 @@ const sourceGridItem = (
   const media = normalizeYoothemeMedia({ ...parentProps, ...props });
   const panelStyle = sourcePanelStyle(props.panel_style ?? parentProps.panel_style);
   const hasItemPanelStyle = Object.prototype.hasOwnProperty.call(props, "panel_style");
+  const hasItemLinkStyle = Object.prototype.hasOwnProperty.call(props, "link_style");
   if (Object.prototype.hasOwnProperty.call(props, "image") && !resolveYoothemeAssetUrl(props.image)) {
     warnings.push(`${path}: image asset could not be resolved and was left empty.`);
   }
@@ -1143,7 +1144,13 @@ const sourceGridItem = (
     tags: sourceGridTags(props.tags),
     buttonLabel: asString(props.link_text) ?? asString(parentProps.link_text) ?? undefined,
     buttonUrl: asString(props.link) ?? undefined,
-    buttonStyle: sourceGridButtonStyle(props.link_style),
+    // Grid owns its default Link presentation. Persist an item override only
+    // when the source item explicitly authored `link_style`; otherwise the
+    // canonical resolver inherits the Grid setting at render time.
+    ...(hasItemLinkStyle ? {
+      buttonStyle: sourceGridButtonStyle(props.link_style),
+      buttonStyleSource: "item" as const,
+    } : {}),
     buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
     // The Grid owns its default Card surface. Retain an item value only when
     // YOOtheme explicitly set one, otherwise future Grid style changes inherit.
@@ -1722,7 +1729,9 @@ const mapStaticElement = (
       metaMarginTop: props.meta_margin === "remove" ? "remove" : sourceMargin(props.meta_margin),
       contentMarginTop: props.content_margin === "remove" ? "remove" : sourceMargin(props.content_margin),
       buttonLabel: asString(props.link_text) ?? undefined,
-      buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+      buttonStyle: Object.prototype.hasOwnProperty.call(props, "link_style")
+        ? sourceButtonStyle(props.link_style)
+        : undefined,
       buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
       size: sourceButtonSize(props.link_size),
       fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",

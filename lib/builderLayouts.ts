@@ -493,6 +493,8 @@ export type BuilderLayoutBlock = {
     buttonLabel?: string;
     buttonUrl?: string;
     buttonStyle?: BuilderButtonStyle;
+    /** Source provenance for an item-specific YOOtheme link style. */
+    buttonStyleSource?: "item";
     buttonTarget?: "_self" | "_blank";
     buttonAlign?: "left" | "center" | "right";
     renderer?: "plain" | "card";

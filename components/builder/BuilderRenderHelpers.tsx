@@ -63,7 +63,11 @@ export function Typog({
   const resolvedArea = area ?? inferTypographyArea(String(As), className);
   const tp = typographyProps(typography, resolvedArea);
   const isHeading = /^h[1-6]$/i.test(String(As)) || resolvedArea === "title";
-  const uikitHeading = isHeading ? getUikitHeadingClass(As, typography?.preset) : "";
+  // A YOOtheme element can use semantic `<h3>` markup with a separate
+  // presentation class such as `uk-h5`. Do not append a second heading
+  // class from the semantic tag: the imported visual style is authoritative.
+  const hasHeadingPresentation = /(?:^|\s)uk-(?:h[1-6]|heading-[\w-]+)/.test(String(className ?? ""));
+  const uikitHeading = isHeading && !hasHeadingPresentation ? getUikitHeadingClass(As, typography?.preset) : "";
   const uikitText = resolvedArea === "eyebrow" ? getUikitTextClass("meta") : resolvedArea === "lead" ? getUikitTextClass("lead") : "";
   const isCta = String(className || "").includes("cta");
   // Renderers that already selected a semantic UIkit button variant must not

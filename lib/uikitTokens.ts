@@ -423,9 +423,16 @@ export type CanonicalButtonVariant = UikitYoothemeButtonVariant | WebPagesNative
  * muted/text link styles use UIkit link modifiers rather than button-text.
  */
 export function getUikitButtonClass(preset?: string, size?: string): string {
-  const classes = ["uk-button"];
-
   const p = preset?.toLowerCase() || "solid";
+  // YOOtheme's three Link variants are UIkit links, not buttons. In
+  // particular an empty source `link_style` emits `uk-link`; adding the
+  // generic `uk-button` base changes its line box, padding and therefore the
+  // geometry of every imported Grid/Panel card.
+  if (p === "link") return "uk-link";
+  if (p === "link-muted") return "uk-link-muted";
+  if (p === "link-text") return "uk-link-text";
+
+  const classes = ["uk-button"];
 
   if (p === "primary" || p === "solid") {
     classes.push("uk-button-primary");
@@ -435,12 +442,6 @@ export function getUikitButtonClass(preset?: string, size?: string): string {
     classes.push("uk-button-danger");
   } else if (p === "text" || p === "native-link") {
     classes.push("uk-button-text");
-  } else if (p === "link-muted") {
-    classes.push("uk-link-muted");
-  } else if (p === "link-text") {
-    classes.push("uk-link-text");
-  } else if (p === "link") {
-    // YOOtheme Link: intentionally bare `uk-button`.
   } else {
     classes.push("uk-button-default");
   }

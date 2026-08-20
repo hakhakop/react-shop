@@ -1916,6 +1916,13 @@ body.dark {
   gap: var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px));
 }
 
+/* The rendered WebPages Grid is CSS Grid and owns its gutters through `gap`.
+   UIkit's runtime still marks its second-row children with `uk-grid-margin`;
+   leaving that flex-grid margin in place doubles the visual row gap. */
+.shop-builder-grid > .uk-grid-margin {
+  margin-top: 0 !important;
+}
+
 /* YOOtheme Grid's “Center columns” is UIkit's `uk-flex-center` on the
    collection track. It centers incomplete rows; CSS Grid's justify-items
    would only center content inside fixed tracks. Native WebPages Grids retain
@@ -2347,7 +2354,7 @@ body.dark {
 
 .shop-builder-grid-button {
   margin: var(--builder-card-button-margin, initial);
-  justify-content: var(--builder-card-button-align, inherit);
+  justify-content: var(--builder-card-button-align, var(--shop-builder-grid-button-align, flex-start));
   /* Grid link_margin owns vertical rhythm only. UIkit's generic margin
      utility must not push a full-width CTA outside the padded card body. */
   margin-inline: 0 !important;
@@ -2936,6 +2943,20 @@ body.dark {
 .shop-builder-grid-card:not(.is-image-frameless) .shop-builder-grid-image:not(.uk-card-media-top) {
   margin: 0 0 20px 0 !important;
   border-radius: 4px !important;
+}
+
+/* YOOtheme's default-card Grid places the image directly in the card body;
+   its title's own `uk-margin-top` supplies the single 20px separation.
+   Native WebPages cards retain their existing image rhythm above. */
+.shop-builder-grid-card--yootheme:not(.is-image-frameless) .shop-builder-grid-image:not(.uk-card-media-top) {
+  margin-bottom: 0 !important;
+  /* Inline SVG hosts otherwise retain a 6px text-line descender that the
+     source YOOtheme `el-image` does not have. */
+  line-height: 0;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-grid-button.uk-margin-top {
+  margin-top: var(--uk-margin, 20px);
 }
 
 .shop-builder-grid-card.is-image-small .shop-builder-grid-image {
@@ -6064,7 +6085,7 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h5 { font-size: 1.1rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, 1.0625rem) !important; line-height: 1.4 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 
 .shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }

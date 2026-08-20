@@ -1,0 +1,1631 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: panel-inspector.spec.ts >> Panel inspector exposes semantic instance controls and keeps builder/frontend parity
+- Location: tests/panel-inspector.spec.ts:18:5
+
+# Error details
+
+```
+Error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received:   0
+
+Call Log:
+- Timeout 5000ms exceeded while waiting on the predicate
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e4]:
+      - complementary [ref=f1e5]:
+        - generic [ref=f1e6]:
+          - generic [ref=f1e7]: BUILDER
+          - generic [ref=f1e8]:
+            - button "Structure" [ref=f1e9] [cursor=pointer]
+            - button "Blocks" [ref=f1e15] [cursor=pointer]
+            - button "Library" [ref=f1e27] [cursor=pointer]
+            - button "Templates" [ref=f1e33] [cursor=pointer]
+            - button "Content" [ref=f1e39] [cursor=pointer]
+            - button "Website" [ref=f1e44] [cursor=pointer]
+            - button "Pages" [ref=f1e47] [cursor=pointer]
+            - button "History" [ref=f1e52] [cursor=pointer]
+            - button "Menu" [ref=f1e58] [cursor=pointer]
+          - generic "Builder utilities" [ref=f1e61]:
+            - group "Preview device" [ref=f1e62]:
+              - button "Desktop preview" [pressed] [ref=f1e63] [cursor=pointer]
+              - button "Laptop preview" [ref=f1e66] [cursor=pointer]
+              - button "Tablet preview" [ref=f1e69] [cursor=pointer]
+              - button "Phone preview" [ref=f1e72] [cursor=pointer]
+            - button "Switch to light mode" [ref=f1e75] [cursor=pointer]:
+              - generic [ref=f1e82]: Theme
+            - generic "Language" [ref=f1e83] [cursor=pointer]:
+              - generic [ref=f1e89]:
+                - generic [ref=f1e90]: Language
+                - combobox "Language" [ref=f1e91]:
+                  - option "English" [selected]
+                  - option "Հայերեն"
+                  - option "Русский"
+            - button "Close Builder panel" [ref=f1e92] [cursor=pointer]:
+              - generic [ref=f1e95]: Close
+        - generic [ref=f1e96]:
+          - generic "Builder document and canvas controls" [ref=f1e98]:
+            - generic [ref=f1e99]:
+              - generic "Builder breadcrumb" [ref=f1e100]:
+                - generic [ref=f1e101] [cursor=pointer]: Builder
+                - generic [ref=f1e102]: /
+                - generic [ref=f1e103]: Home
+              - generic [ref=f1e104]:
+                - generic [ref=f1e105]:
+                  - generic [ref=f1e106]: Page
+                  - heading "Home" [level=1] [ref=f1e107]
+                  - paragraph [ref=f1e108]: Local draft matches published
+                - generic "Document actions" [ref=f1e109]:
+                  - generic [ref=f1e110]:
+                    - generic [ref=f1e111]: "Editing content:"
+                    - combobox "Editing content:" [ref=f1e112]:
+                      - option "Հայերեն" [selected]
+                  - button "View Page" [ref=f1e113] [cursor=pointer]
+                  - button "Undo last change" [disabled] [ref=f1e118]
+                  - button "Redo last change" [disabled] [ref=f1e122]
+          - generic [ref=f1e128]:
+            - generic [ref=f1e129]:
+              - generic [ref=f1e130]:
+                - strong [ref=f1e135]: Home
+                - generic [ref=f1e136]: Page
+              - generic [ref=f1e137]:
+                - generic [ref=f1e138]: Page structure
+                - generic [ref=f1e139]: 10 sections
+            - tree "Page structure" [ref=f1e140]:
+              - generic [ref=f1e141]:
+                - generic [ref=f1e142]:
+                  - generic [ref=f1e143]:
+                    - button "Collapse section" [ref=f1e144] [cursor=pointer]
+                    - treeitem "Hero Section" [ref=f1e147] [cursor=pointer]:
+                      - generic [ref=f1e159]:
+                        - strong [ref=f1e160]: Hero
+                        - generic [ref=f1e161]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up" [disabled]
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e163]:
+                    - generic:
+                      - treeitem:
+                        - generic:
+                          - generic:
+                            - button "Open row settings"
+                            - button "Move row up" [disabled]
+                            - button "Move row down"
+                            - button "Duplicate row"
+                            - button "Remove elements before deleting this row" [disabled]
+                    - generic [ref=f1e166]:
+                      - treeitem [selected] [ref=f1e167] [cursor=pointer]:
+                        - 'generic "Heading: Endless Possibilities With DevStack Enterprise" [ref=f1e177]':
+                          - strong [ref=f1e178]: Heading
+                        - generic [ref=f1e179]:
+                          - button "Open element settings" [ref=f1e180]
+                          - button "Move element up" [disabled] [ref=f1e184]
+                          - button "Move element down" [ref=f1e187]
+                          - button "Duplicate element" [ref=f1e190]
+                          - button "Delete element" [ref=f1e194]
+                      - treeitem [ref=f1e198] [cursor=pointer]:
+                        - generic "Text 2" [ref=f1e208]:
+                          - strong [ref=f1e209]: Text
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up"
+                            - button "Move element down"
+                            - button "Duplicate element"
+                            - button "Delete element"
+                      - treeitem [ref=f1e210] [cursor=pointer]:
+                        - generic "Button 3" [ref=f1e224]:
+                          - strong [ref=f1e225]: Button
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up"
+                            - button "Move element down"
+                            - button "Duplicate element"
+                            - button "Delete element"
+                      - treeitem [ref=f1e226] [cursor=pointer]:
+                        - generic "Panel Slider 4" [ref=f1e235]:
+                          - strong [ref=f1e236]: Panel Slider
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up"
+                            - button "Move element down" [disabled]
+                            - button "Duplicate element"
+                            - button "Delete element"
+                - button "Add section after Hero" [ref=f1e237] [cursor=pointer]
+              - generic [ref=f1e239]:
+                - generic [ref=f1e240]:
+                  - generic [ref=f1e241]:
+                    - button "Collapse section" [ref=f1e242] [cursor=pointer]
+                    - treeitem "Imported Section 2 Section" [ref=f1e245] [cursor=pointer]:
+                      - generic [ref=f1e257]:
+                        - strong [ref=f1e258]: Imported Section 2
+                        - generic [ref=f1e259]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e261]:
+                    - generic:
+                      - treeitem:
+                        - generic:
+                          - generic:
+                            - button "Open row settings"
+                            - button "Move row up" [disabled]
+                            - button "Move row down"
+                            - button "Duplicate row"
+                            - button "Remove elements before deleting this row" [disabled]
+                    - generic [ref=f1e264]:
+                      - treeitem [ref=f1e265] [cursor=pointer]:
+                        - generic "Slideshow 1" [ref=f1e274]:
+                          - strong [ref=f1e275]: Slideshow
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up" [disabled]
+                            - button "Move element down"
+                            - button "Duplicate element"
+                            - button "Delete element"
+                      - treeitem [ref=f1e276] [cursor=pointer]:
+                        - generic "Overlay Slider 2" [ref=f1e285]:
+                          - strong [ref=f1e286]: Overlay Slider
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up"
+                            - button "Move element down" [disabled]
+                            - button "Duplicate element"
+                            - button "Delete element"
+                - button "Add section after Imported Section 2" [ref=f1e287] [cursor=pointer]
+              - generic [ref=f1e289]:
+                - generic [ref=f1e290]:
+                  - generic [ref=f1e291]:
+                    - button "Collapse section" [ref=f1e292] [cursor=pointer]
+                    - treeitem "Feature API Section" [ref=f1e295] [cursor=pointer]:
+                      - generic [ref=f1e307]:
+                        - strong [ref=f1e308]: Feature API
+                        - generic [ref=f1e309]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e310]:
+                    - generic [ref=f1e311]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e314]:
+                        - treeitem [ref=f1e315] [cursor=pointer]:
+                          - 'generic "Heading: Powerful API for Clean Code" [ref=f1e325]':
+                            - strong [ref=f1e326]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e327] [cursor=pointer]:
+                          - generic "Text 2" [ref=f1e337]:
+                            - strong [ref=f1e338]: Text
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e339]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e340]:
+                        - treeitem [ref=f1e343] [cursor=pointer]:
+                          - 'generic "Grid: Read more" [ref=f1e356]':
+                            - strong [ref=f1e357]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e360] [cursor=pointer]:
+                          - generic "Image 1" [ref=f1e372]:
+                            - strong [ref=f1e373]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e376] [cursor=pointer]:
+                          - 'generic "Grid: Read more" [ref=f1e389]':
+                            - strong [ref=f1e390]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                - button "Add section after Feature API" [ref=f1e391] [cursor=pointer]
+              - generic [ref=f1e393]:
+                - generic [ref=f1e394]:
+                  - generic [ref=f1e395]:
+                    - button "Collapse section" [ref=f1e396] [cursor=pointer]
+                    - treeitem "Feature Efficient Workflow Section" [ref=f1e399] [cursor=pointer]:
+                      - generic [ref=f1e411]:
+                        - strong [ref=f1e412]: Feature Efficient Workflow
+                        - generic [ref=f1e413]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e414]:
+                    - generic [ref=f1e415]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e416]:
+                        - generic [ref=f1e418]:
+                          - treeitem [ref=f1e419] [cursor=pointer]:
+                            - 'generic "Heading: Fast and Efficient Way to Create" [ref=f1e429]':
+                              - strong [ref=f1e430]: Heading
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up" [disabled]
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e431] [cursor=pointer]:
+                            - generic "Text 2" [ref=f1e441]:
+                              - strong [ref=f1e442]: Text
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e443] [cursor=pointer]:
+                            - generic "Button 3" [ref=f1e457]:
+                              - strong [ref=f1e458]: Button
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down" [disabled]
+                                - button "Duplicate element"
+                                - button "Delete element"
+                        - generic [ref=f1e460]:
+                          - treeitem [ref=f1e461] [cursor=pointer]:
+                            - generic "Image 1" [ref=f1e473]:
+                              - strong [ref=f1e474]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up" [disabled]
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e475] [cursor=pointer]:
+                            - generic "Image 2" [ref=f1e487]:
+                              - strong [ref=f1e488]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down" [disabled]
+                                - button "Duplicate element"
+                                - button "Delete element"
+                    - generic [ref=f1e489]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e492]:
+                        - treeitem [ref=f1e493] [cursor=pointer]:
+                          - 'generic "Grid: Read more" [ref=f1e506]':
+                            - strong [ref=f1e507]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e508] [cursor=pointer]:
+                          - generic "Image 2" [ref=f1e520]:
+                            - strong [ref=f1e521]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                - button "Add section after Feature Efficient Workflow" [ref=f1e522] [cursor=pointer]
+              - generic [ref=f1e524]:
+                - generic [ref=f1e525]:
+                  - generic [ref=f1e526]:
+                    - button "Collapse section" [ref=f1e527] [cursor=pointer]
+                    - treeitem "Feature Project Management Section" [ref=f1e530] [cursor=pointer]:
+                      - generic [ref=f1e542]:
+                        - strong [ref=f1e543]: Feature Project Management
+                        - generic [ref=f1e544]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e545]:
+                    - generic [ref=f1e546]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e549]:
+                        - treeitem [ref=f1e550] [cursor=pointer]:
+                          - 'generic "Heading: Keep All Work in One Place" [ref=f1e560]':
+                            - strong [ref=f1e561]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e562] [cursor=pointer]:
+                          - generic "Text 2" [ref=f1e572]:
+                            - strong [ref=f1e573]: Text
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e574]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e577]:
+                        - treeitem [ref=f1e578] [cursor=pointer]:
+                          - generic "Image 1" [ref=f1e590]:
+                            - strong [ref=f1e591]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e592] [cursor=pointer]:
+                          - generic "Image 2" [ref=f1e604]:
+                            - strong [ref=f1e605]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e606]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e609]:
+                        - treeitem [ref=f1e610] [cursor=pointer]:
+                          - 'generic "Grid: Read more" [ref=f1e623]':
+                            - strong [ref=f1e624]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e625] [cursor=pointer]:
+                          - generic "Button 2" [ref=f1e639]:
+                            - strong [ref=f1e640]: Button
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                - button "Add section after Feature Project Management" [ref=f1e641] [cursor=pointer]
+              - generic [ref=f1e643]:
+                - generic [ref=f1e644]:
+                  - generic [ref=f1e645]:
+                    - button "Collapse section" [ref=f1e646] [cursor=pointer]
+                    - treeitem "Collaboration Section" [ref=f1e649] [cursor=pointer]:
+                      - generic [ref=f1e661]:
+                        - strong [ref=f1e662]: Collaboration
+                        - generic [ref=f1e663]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e664]:
+                    - generic [ref=f1e665]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e668]:
+                        - treeitem [ref=f1e669] [cursor=pointer]:
+                          - 'generic "Heading: Empower Your Team and Scale Your Business" [ref=f1e679]':
+                            - strong [ref=f1e680]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e681] [cursor=pointer]:
+                          - generic "Text 2" [ref=f1e691]:
+                            - strong [ref=f1e692]: Text
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e693]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e694]:
+                        - generic [ref=f1e696]:
+                          - treeitem [ref=f1e697] [cursor=pointer]:
+                            - generic "Image 1" [ref=f1e709]:
+                              - strong [ref=f1e710]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up" [disabled]
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e711] [cursor=pointer]:
+                            - generic "Image 2" [ref=f1e723]:
+                              - strong [ref=f1e724]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e725] [cursor=pointer]:
+                            - 'generic "Panel: Team Collaboration" [ref=f1e736]':
+                              - strong [ref=f1e737]: Panel
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down" [disabled]
+                                - button "Duplicate element"
+                                - button "Delete element"
+                        - generic [ref=f1e739]:
+                          - treeitem [ref=f1e740] [cursor=pointer]:
+                            - generic "Image 1" [ref=f1e752]:
+                              - strong [ref=f1e753]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up" [disabled]
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e754] [cursor=pointer]:
+                            - generic "Image 2" [ref=f1e766]:
+                              - strong [ref=f1e767]: Image
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e768] [cursor=pointer]:
+                            - 'generic "Panel: Enterprise Cloud" [ref=f1e779]':
+                              - strong [ref=f1e780]: Panel
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down" [disabled]
+                                - button "Duplicate element"
+                                - button "Delete element"
+                - button "Add section after Collaboration" [ref=f1e781] [cursor=pointer]
+              - generic [ref=f1e783]:
+                - generic [ref=f1e784]:
+                  - generic [ref=f1e785]:
+                    - button "Collapse section" [ref=f1e786] [cursor=pointer]
+                    - treeitem "Customer Stories Section" [ref=f1e789] [cursor=pointer]:
+                      - generic [ref=f1e801]:
+                        - strong [ref=f1e802]: Customer Stories
+                        - generic [ref=f1e803]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e804]:
+                    - generic [ref=f1e805]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e808]:
+                        - treeitem [ref=f1e809] [cursor=pointer]:
+                          - 'generic "Heading: Trusted By Clients and Industry Experts Alike" [ref=f1e819]':
+                            - strong [ref=f1e820]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e821] [cursor=pointer]:
+                          - generic "Button 2" [ref=f1e835]:
+                            - strong [ref=f1e836]: Button
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e837]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Delete empty row"
+                      - button "Empty row" [ref=f1e841] [cursor=pointer]
+                - button "Add section after Customer Stories" [ref=f1e843] [cursor=pointer]
+              - generic [ref=f1e845]:
+                - generic [ref=f1e846]:
+                  - generic [ref=f1e847]:
+                    - button "Collapse section" [ref=f1e848] [cursor=pointer]
+                    - treeitem "Community Section" [ref=f1e851] [cursor=pointer]:
+                      - generic [ref=f1e863]:
+                        - strong [ref=f1e864]: Community
+                        - generic [ref=f1e865]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e866]:
+                    - generic [ref=f1e867]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e870]:
+                        - treeitem [ref=f1e871] [cursor=pointer]:
+                          - 'generic "Heading: Our Community" [ref=f1e881]':
+                            - strong [ref=f1e882]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e883] [cursor=pointer]:
+                          - generic "Text 2" [ref=f1e893]:
+                            - strong [ref=f1e894]: Text
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e895] [cursor=pointer]:
+                          - generic "Grid 3" [ref=f1e908]:
+                            - strong [ref=f1e909]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e910]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - treeitem [ref=f1e914] [cursor=pointer]:
+                        - generic "Image 1" [ref=f1e926]:
+                          - strong [ref=f1e927]: Image
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up" [disabled]
+                            - button "Move element down" [disabled]
+                            - button "Duplicate element"
+                            - button "Delete element"
+                - button "Add section after Community" [ref=f1e928] [cursor=pointer]
+              - generic [ref=f1e930]:
+                - generic [ref=f1e931]:
+                  - generic [ref=f1e932]:
+                    - button "Collapse section" [ref=f1e933] [cursor=pointer]
+                    - treeitem "Feature Grid Section" [ref=f1e936] [cursor=pointer]:
+                      - generic [ref=f1e948]:
+                        - strong [ref=f1e949]: Feature Grid
+                        - generic [ref=f1e950]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down"
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e951]:
+                    - generic [ref=f1e952]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e953]:
+                        - generic [ref=f1e955]:
+                          - treeitem [ref=f1e956] [cursor=pointer]:
+                            - 'generic "Heading: We’ll Set You up for Success" [ref=f1e966]':
+                              - strong [ref=f1e967]: Heading
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up" [disabled]
+                                - button "Move element down"
+                                - button "Duplicate element"
+                                - button "Delete element"
+                          - treeitem [ref=f1e968] [cursor=pointer]:
+                            - generic "Text 2" [ref=f1e978]:
+                              - strong [ref=f1e979]: Text
+                            - generic:
+                              - generic:
+                                - button "Open element settings"
+                                - button "Move element up"
+                                - button "Move element down" [disabled]
+                                - button "Duplicate element"
+                                - button "Delete element"
+                        - treeitem [ref=f1e982] [cursor=pointer]:
+                          - 'generic "Grid: Read more" [ref=f1e995]':
+                            - strong [ref=f1e996]: Grid
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e997]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e1000]:
+                        - treeitem [ref=f1e1001] [cursor=pointer]:
+                          - generic "Image 1" [ref=f1e1013]:
+                            - strong [ref=f1e1014]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e1015] [cursor=pointer]:
+                          - generic "Image 2" [ref=f1e1027]:
+                            - strong [ref=f1e1028]: Image
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                - button "Add section after Feature Grid" [ref=f1e1029] [cursor=pointer]
+              - generic [ref=f1e1031]:
+                - generic [ref=f1e1032]:
+                  - generic [ref=f1e1033]:
+                    - button "Collapse section" [ref=f1e1034] [cursor=pointer]
+                    - treeitem "Pricing Section" [ref=f1e1037] [cursor=pointer]:
+                      - generic [ref=f1e1049]:
+                        - strong [ref=f1e1050]: Pricing
+                        - generic [ref=f1e1051]: Section
+                      - generic:
+                        - generic:
+                          - button "Open section settings"
+                          - button "Rename section"
+                          - button "Move section up"
+                          - button "Move section down" [disabled]
+                          - button "Duplicate section"
+                          - button "Delete section"
+                  - generic [ref=f1e1052]:
+                    - generic [ref=f1e1053]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up" [disabled]
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - generic [ref=f1e1056]:
+                        - treeitem [ref=f1e1057] [cursor=pointer]:
+                          - 'generic "Heading: Simple, flexible pricing. Unlimited repositories and deployments." [ref=f1e1067]':
+                            - strong [ref=f1e1068]: Heading
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up" [disabled]
+                              - button "Move element down"
+                              - button "Duplicate element"
+                              - button "Delete element"
+                        - treeitem [ref=f1e1069] [cursor=pointer]:
+                          - generic "Text 2" [ref=f1e1079]:
+                            - strong [ref=f1e1080]: Text
+                          - generic:
+                            - generic:
+                              - button "Open element settings"
+                              - button "Move element up"
+                              - button "Move element down" [disabled]
+                              - button "Duplicate element"
+                              - button "Delete element"
+                    - generic [ref=f1e1081]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - treeitem [ref=f1e1085] [cursor=pointer]:
+                        - 'generic "Grid: Read more" [ref=f1e1098]':
+                          - strong [ref=f1e1099]: Grid
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up" [disabled]
+                            - button "Move element down" [disabled]
+                            - button "Duplicate element"
+                            - button "Delete element"
+                    - generic [ref=f1e1100]:
+                      - generic:
+                        - treeitem:
+                          - generic:
+                            - generic:
+                              - button "Open row settings"
+                              - button "Move row up"
+                              - button "Move row down"
+                              - button "Duplicate row"
+                              - button "Remove elements before deleting this row" [disabled]
+                      - treeitem [ref=f1e1104] [cursor=pointer]:
+                        - generic "Button 1" [ref=f1e1118]:
+                          - strong [ref=f1e1119]: Button
+                        - generic:
+                          - generic:
+                            - button "Open element settings"
+                            - button "Move element up" [disabled]
+                            - button "Move element down" [disabled]
+                            - button "Duplicate element"
+                            - button "Delete element"
+                - button "Add section after Pricing" [ref=f1e1120] [cursor=pointer]
+        - button "Resize dashboard panel" [ref=f1e1122]
+      - main [ref=f1e1123]:
+        - generic [ref=f1e1125]:
+          - generic [ref=f1e1126]:
+            - generic [ref=f1e1127]:
+              - generic [ref=f1e1131]:
+                - generic "Website language" [ref=f1e1136]:
+                  - generic [ref=f1e1137]: 文
+                  - combobox "Website language" [ref=f1e1138] [cursor=pointer]:
+                    - option "Հայերեն" [selected]
+                    - option "English"
+                    - option "Русский"
+                - generic [ref=f1e1140]:
+                  - link "Dashboard, signed in as Header Parity Tester" [ref=f1e1145] [cursor=pointer]:
+                    - /url: /app
+                    - generic [ref=f1e1150]:
+                      - strong [ref=f1e1151]: Header Parity Tester
+                      - generic [ref=f1e1152]: Signed in
+                  - button "Search" [ref=f1e1158] [cursor=pointer]
+              - generic [ref=f1e1163]:
+                - link [ref=f1e1169] [cursor=pointer]:
+                  - /url: /app/websites/header-parity-site/builder?page=home
+                  - figure [ref=f1e1170]:
+                    - img "Header Parity Site logo" [ref=f1e1172]
+                - navigation [ref=f1e1178]:
+                  - link "Home" [ref=f1e1180] [cursor=pointer]:
+                    - /url: /app/websites/header-parity-site/builder?page=home
+                  - link "Shop" [ref=f1e1182] [cursor=pointer]:
+                    - /url: /app/websites/header-parity-site/builder?page=shop
+                  - link "Pricing" [ref=f1e1184] [cursor=pointer]:
+                    - /url: /app/websites/header-parity-site/builder?page=pricing
+                - generic [ref=f1e1186]:
+                  - link "Contact Us" [ref=f1e1191] [cursor=pointer]:
+                    - /url: /contact
+                  - button "Toggle dark mode" [ref=f1e1196] [cursor=pointer]
+                  - button "Cart" [ref=f1e1207] [cursor=pointer]
+            - generic [ref=f1e1212]:
+              - button "Header" [ref=f1e1213] [cursor=pointer]
+              - button "Header settings" [ref=f1e1214] [cursor=pointer]
+          - generic "Home preview" [ref=f1e1221]:
+            - button [ref=f1e1223] [cursor=pointer]:
+              - generic "Row 1" [active] [ref=f1e1226]:
+                - article [ref=f1e1228]:
+                  - generic [ref=f1e1229]:
+                    - heading "Endless Possibilities With DevStack Enterprise" [level=1] [ref=f1e1232]
+                    - generic [ref=f1e1233]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenan commodo ligula eget dolor. Aenean massa.
+                    - generic [ref=f1e1238]:
+                      - link "Buy Now" [ref=f1e1239]:
+                        - /url: "?page_id=21"
+                      - link "Contact Sales" [ref=f1e1240]:
+                        - /url: mailto:info@example.com
+                    - generic [ref=f1e1245]:
+                      - article [ref=f1e1247]:
+                        - link "Powerful API" [ref=f1e1248]:
+                          - /url: "?page_id=2#powerful-api"
+                        - img "Powerful API" [ref=f1e1250]
+                        - generic [ref=f1e1253]: Powerful API
+                      - article [ref=f1e1256]:
+                        - link "Efficient Workflow" [ref=f1e1257]:
+                          - /url: "?page_id=2#efficient-workflow"
+                        - img "Efficient Workflow" [ref=f1e1259]
+                        - generic [ref=f1e1262]: Efficient Workflow
+                      - article [ref=f1e1265]:
+                        - link "Project Management" [ref=f1e1266]:
+                          - /url: "?page_id=2#project-management"
+                        - img "Project Management" [ref=f1e1268]
+                        - generic [ref=f1e1271]: Project Management
+                      - article [ref=f1e1274]:
+                        - link "Collaboration" [ref=f1e1275]:
+                          - /url: "?page_id=2#collaboration"
+                        - img "Collaboration" [ref=f1e1277]
+                        - generic [ref=f1e1280]: Collaboration
+                      - article [ref=f1e1283]:
+                        - link "Customer Stories" [ref=f1e1284]:
+                          - /url: "?page_id=2#testimonials"
+                        - img "Customer Stories" [ref=f1e1286]
+                        - generic [ref=f1e1289]: Customer Stories
+                      - article [ref=f1e1292]:
+                        - link "Community" [ref=f1e1293]:
+                          - /url: "?page_id=2#community"
+                        - img "Community" [ref=f1e1295]
+                        - generic [ref=f1e1298]: Community
+            - button [ref=f1e1301] [cursor=pointer]:
+              - generic "Row 1" [ref=f1e1304]:
+                - article [ref=f1e1306]:
+                  - generic [ref=f1e1307]:
+                    - generic [ref=f1e1310]:
+                      - generic [ref=f1e1312]:
+                        - article [ref=f1e1314]:
+                          - img "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro" [ref=f1e1316]
+                          - heading "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro" [level=3] [ref=f1e1318]
+                        - article [ref=f1e1320]:
+                          - img "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [ref=f1e1322]
+                          - heading "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [level=3] [ref=f1e1324]
+                        - article [ref=f1e1326]:
+                          - img "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro" [ref=f1e1328]
+                          - heading "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro" [level=3] [ref=f1e1330]
+                        - article [ref=f1e1332]:
+                          - img "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro" [ref=f1e1334]
+                          - heading "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro" [level=3] [ref=f1e1336]
+                      - list [ref=f1e1339]:
+                        - listitem [ref=f1e1340]:
+                          - button "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro" [ref=f1e1341]:
+                            - img "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro" [ref=f1e1342]
+                        - listitem [ref=f1e1343]:
+                          - button "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [ref=f1e1344]:
+                            - img "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [ref=f1e1345]
+                        - listitem [ref=f1e1346]:
+                          - button "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro" [ref=f1e1347]:
+                            - img "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro" [ref=f1e1348]
+                        - listitem [ref=f1e1349]:
+                          - button "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro" [ref=f1e1350]:
+                            - img "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro" [ref=f1e1351]
+                    - generic [ref=f1e1354]:
+                      - generic [ref=f1e1356]:
+                        - article [ref=f1e1358]:
+                          - img "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [ref=f1e1359]
+                          - heading "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [level=3] [ref=f1e1361]
+                        - article [ref=f1e1363]:
+                          - img "Author Image" [ref=f1e1364]
+                          - heading "Author Image" [level=3] [ref=f1e1366]
+                        - article [ref=f1e1368]:
+                          - img "Blog Post Customer Stories Icon Intro" [ref=f1e1369]
+                          - heading "Blog Post Customer Stories Icon Intro" [level=3] [ref=f1e1371]
+                        - article [ref=f1e1373]:
+                          - img "Blog Post Customer Stories Icon Teaser" [ref=f1e1374]
+                          - heading "Blog Post Customer Stories Icon Teaser" [level=3] [ref=f1e1376]
+                      - list [ref=f1e1380]:
+                        - listitem [ref=f1e1381]:
+                          - button "Blog Post 14 Super Smart Ways To Save Time On Automation Intro" [ref=f1e1382]
+                        - listitem [ref=f1e1383]:
+                          - button "Author Image" [ref=f1e1384]
+                        - listitem [ref=f1e1385]:
+                          - button "Blog Post Customer Stories Icon Intro" [ref=f1e1386]
+                        - listitem [ref=f1e1387]:
+                          - button "Blog Post Customer Stories Icon Teaser" [ref=f1e1388]
+            - button [ref=f1e1390] [cursor=pointer]:
+              - generic [ref=f1e1392]:
+                - generic "Row 1" [ref=f1e1393]:
+                  - article [ref=f1e1395]:
+                    - generic [ref=f1e1396]:
+                      - heading "Powerful API for Clean Code" [level=2] [ref=f1e1399]
+                      - generic [ref=f1e1400]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+                - generic "Row 2" [ref=f1e1403]:
+                  - generic [ref=f1e1404]:
+                    - article [ref=f1e1405]:
+                      - generic [ref=f1e1409]:
+                        - article [ref=f1e1410]:
+                          - generic [ref=f1e1411]:
+                            - button "Edit grid item 1" [ref=f1e1412]
+                            - button "Duplicate grid item 1" [ref=f1e1416]
+                            - button "Delete grid item 1" [ref=f1e1420]
+                          - generic: "::"
+                          - generic [ref=f1e1424]:
+                            - heading "Fast Code Delivery" [level=3] [ref=f1e1425]
+                            - generic [ref=f1e1426]: Lorem ipsum dolor sit amet, urna nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida
+                        - article [ref=f1e1427]:
+                          - generic [ref=f1e1428]:
+                            - button "Edit grid item 2" [ref=f1e1429]
+                            - button "Duplicate grid item 2" [ref=f1e1433]
+                            - button "Delete grid item 2" [ref=f1e1437]
+                          - generic: "::"
+                          - generic [ref=f1e1441]:
+                            - heading "Scale Testing" [level=3] [ref=f1e1442]
+                            - generic [ref=f1e1443]: Lorem ipsum dolor sit amet, urna nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida
+                    - article [ref=f1e1444]:
+                      - figure [ref=f1e1448]:
+                        - generic [ref=f1e1449]:
+                          - button "Change image"
+                    - article [ref=f1e1450]:
+                      - generic [ref=f1e1454]:
+                        - article [ref=f1e1455]:
+                          - generic [ref=f1e1456]:
+                            - button "Edit grid item 1" [ref=f1e1457]
+                            - button "Duplicate grid item 1" [ref=f1e1461]
+                            - button "Delete grid item 1" [ref=f1e1465]
+                          - generic: "::"
+                          - generic [ref=f1e1469]:
+                            - heading "Private Repositories" [level=3] [ref=f1e1470]
+                            - generic [ref=f1e1471]: Lorem ipsum dolor sit amet, urna nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida
+                        - article [ref=f1e1472]:
+                          - generic [ref=f1e1473]:
+                            - button "Edit grid item 2" [ref=f1e1474]
+                            - button "Duplicate grid item 2" [ref=f1e1478]
+                            - button "Delete grid item 2" [ref=f1e1482]
+                          - generic: "::"
+                          - generic [ref=f1e1486]:
+                            - heading "Live Code Previews" [level=3] [ref=f1e1487]
+                            - generic [ref=f1e1488]: Lorem ipsum dolor sit amet, urna nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida
+            - button [ref=f1e1490] [cursor=pointer]:
+              - generic [ref=f1e1492]:
+                - generic "Row 1" [ref=f1e1493]:
+                  - generic [ref=f1e1494]:
+                    - article [ref=f1e1495]:
+                      - generic [ref=f1e1496]:
+                        - heading "Fast and Efficient Way to Create" [level=2] [ref=f1e1499]
+                        - generic [ref=f1e1500]: Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla consequat massa quis enim.
+                        - link "See More Features" [ref=f1e1506]:
+                          - /url: "?page_id=20#DevOps"
+                    - article [ref=f1e1507]:
+                      - generic [ref=f1e1509]:
+                        - generic [ref=f1e1511]:
+                          - figure:
+                            - generic:
+                              - button "Change image"
+                        - generic [ref=f1e1512]:
+                          - generic:
+                            - figure:
+                              - generic:
+                                - button "Change image"
+                - generic "Row 2" [ref=f1e1513]:
+                  - article [ref=f1e1515]:
+                    - generic [ref=f1e1517]:
+                      - generic [ref=f1e1520]:
+                        - article [ref=f1e1521]:
+                          - generic [ref=f1e1522]:
+                            - button "Edit grid item 1" [ref=f1e1523]
+                            - button "Duplicate grid item 1" [ref=f1e1527]
+                            - button "Delete grid item 1" [ref=f1e1531]
+                          - generic: "::"
+                          - generic [ref=f1e1535]:
+                            - heading "Unlimited Deployments" [level=3] [ref=f1e1536]
+                            - generic [ref=f1e1537]: Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus.
+                        - article [ref=f1e1538]:
+                          - generic [ref=f1e1539]:
+                            - button "Edit grid item 2" [ref=f1e1540]
+                            - button "Duplicate grid item 2" [ref=f1e1544]
+                            - button "Delete grid item 2" [ref=f1e1548]
+                          - generic: "::"
+                          - generic [ref=f1e1552]:
+                            - heading "Quick Rollbacks" [level=3] [ref=f1e1553]
+                            - generic [ref=f1e1554]: In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus.
+                        - article [ref=f1e1555]:
+                          - generic [ref=f1e1556]:
+                            - button "Edit grid item 3" [ref=f1e1557]
+                            - button "Duplicate grid item 3" [ref=f1e1561]
+                            - button "Delete grid item 3" [ref=f1e1565]
+                          - generic: "::"
+                          - generic [ref=f1e1569]:
+                            - heading "Flexible Pipelines" [level=3] [ref=f1e1570]
+                            - generic [ref=f1e1571]: Aenean vulputate eleifend tellus. Aenean leo, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis.
+                        - article [ref=f1e1572]:
+                          - generic [ref=f1e1573]:
+                            - button "Edit grid item 4" [ref=f1e1574]
+                            - button "Duplicate grid item 4" [ref=f1e1578]
+                            - button "Delete grid item 4" [ref=f1e1582]
+                          - generic: "::"
+                          - generic [ref=f1e1586]:
+                            - heading "Enterprise Security" [level=3] [ref=f1e1587]
+                            - generic [ref=f1e1588]: Lorem ipsum dolor sit amet, sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et sed diam voluptua.
+                        - article [ref=f1e1589]:
+                          - generic [ref=f1e1590]:
+                            - button "Edit grid item 5" [ref=f1e1591]
+                            - button "Duplicate grid item 5" [ref=f1e1595]
+                            - button "Delete grid item 5" [ref=f1e1599]
+                          - generic: "::"
+                          - generic [ref=f1e1603]:
+                            - heading "Powerful API" [level=3] [ref=f1e1604]
+                            - generic [ref=f1e1605]: Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.
+                        - article [ref=f1e1606]:
+                          - generic [ref=f1e1607]:
+                            - button "Edit grid item 6" [ref=f1e1608]
+                            - button "Duplicate grid item 6" [ref=f1e1612]
+                            - button "Delete grid item 6" [ref=f1e1616]
+                          - generic: "::"
+                          - generic [ref=f1e1620]:
+                            - heading "Cutting Edge Software" [level=3] [ref=f1e1621]
+                            - generic [ref=f1e1622]: Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.
+                      - generic:
+                        - generic:
+                          - figure:
+                            - generic:
+                              - button "Change image"
+            - button [ref=f1e1624] [cursor=pointer]:
+              - generic [ref=f1e1626]:
+                - generic "Row 1" [ref=f1e1627]:
+                  - article [ref=f1e1629]:
+                    - generic [ref=f1e1630]:
+                      - heading "Keep All Work in One Place" [level=2] [ref=f1e1633]
+                      - generic [ref=f1e1634]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+                - generic "Row 2" [ref=f1e1637]:
+                  - article [ref=f1e1639]:
+                    - generic [ref=f1e1641]:
+                      - generic [ref=f1e1643]:
+                        - figure:
+                          - generic:
+                            - button "Change image"
+                      - generic [ref=f1e1645]:
+                        - figure:
+                          - generic:
+                            - button "Change image"
+                - generic "Row 3" [ref=f1e1646]:
+                  - article [ref=f1e1648]:
+                    - generic [ref=f1e1649]:
+                      - generic [ref=f1e1652]:
+                        - article [ref=f1e1653]:
+                          - generic [ref=f1e1654]:
+                            - button "Edit grid item 1" [ref=f1e1655]
+                            - button "Duplicate grid item 1" [ref=f1e1659]
+                            - button "Delete grid item 1" [ref=f1e1663]
+                          - generic: "::"
+                          - generic [ref=f1e1667]:
+                            - generic:
+                              - img "Coordinate Progress"
+                            - heading "Coordinate Progress" [level=3] [ref=f1e1668]
+                            - generic [ref=f1e1669]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+                        - article [ref=f1e1670]:
+                          - generic [ref=f1e1671]:
+                            - button "Edit grid item 2" [ref=f1e1672]
+                            - button "Duplicate grid item 2" [ref=f1e1676]
+                            - button "Delete grid item 2" [ref=f1e1680]
+                          - generic: "::"
+                          - generic [ref=f1e1684]:
+                            - generic:
+                              - img "Monitor Activity"
+                            - heading "Monitor Activity" [level=3] [ref=f1e1685]
+                            - generic [ref=f1e1686]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+                        - article [ref=f1e1687]:
+                          - generic [ref=f1e1688]:
+                            - button "Edit grid item 3" [ref=f1e1689]
+                            - button "Duplicate grid item 3" [ref=f1e1693]
+                            - button "Delete grid item 3" [ref=f1e1697]
+                          - generic: "::"
+                          - generic [ref=f1e1701]:
+                            - generic:
+                              - img "Report Changes in Real Time"
+                            - heading "Report Changes in Real Time" [level=3] [ref=f1e1702]
+                            - generic [ref=f1e1703]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+                      - link "See All Features" [ref=f1e1707]:
+                        - /url: "?page_id=20#Projectmanagement"
+            - button [ref=f1e1709] [cursor=pointer]:
+              - generic [ref=f1e1711]:
+                - generic "Row 1" [ref=f1e1712]:
+                  - article [ref=f1e1714]:
+                    - generic [ref=f1e1715]:
+                      - heading "Empower Your Team and Scale Your Business" [level=2] [ref=f1e1718]
+                      - generic [ref=f1e1719]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+                - generic "Row 2" [ref=f1e1722]:
+                  - generic [ref=f1e1723]:
+                    - article [ref=f1e1724]:
+                      - generic [ref=f1e1726]:
+                        - figure [ref=f1e1729]:
+                          - generic [ref=f1e1730]:
+                            - button "Change image"
+                        - generic [ref=f1e1731]:
+                          - generic:
+                            - figure:
+                              - generic:
+                                - button "Change image"
+                        - generic [ref=f1e1734]:
+                          - heading "Team Collaboration" [level=3] [ref=f1e1735]
+                          - generic [ref=f1e1736]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+                          - generic [ref=f1e1737]: Learn More
+                    - article [ref=f1e1739]:
+                      - generic [ref=f1e1741]:
+                        - figure [ref=f1e1744]:
+                          - generic [ref=f1e1745]:
+                            - button "Change image"
+                        - generic [ref=f1e1746]:
+                          - generic:
+                            - figure:
+                              - generic:
+                                - button "Change image"
+                        - generic [ref=f1e1749]:
+                          - heading "Enterprise Cloud" [level=3] [ref=f1e1750]
+                          - generic [ref=f1e1751]: Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam voluptua.
+                          - generic [ref=f1e1752]: Learn More
+            - button [ref=f1e1755] [cursor=pointer]:
+              - generic [ref=f1e1757]:
+                - generic "Row 1" [ref=f1e1758]:
+                  - article [ref=f1e1760]:
+                    - generic [ref=f1e1761]:
+                      - heading "Trusted By Clients and Industry Experts Alike" [level=2] [ref=f1e1764]
+                      - link "See All Custumer Stories" [ref=f1e1768]:
+                        - /url: "?post_type=post"
+                - generic "Row 2" [ref=f1e1769]:
+                  - article [ref=f1e1771]:
+                    - generic "Drop element into row 2, column 1" [ref=f1e1773]:
+                      - generic [ref=f1e1776]:
+                        - strong [ref=f1e1777]: Column 1
+                        - generic [ref=f1e1778]: Add element
+            - button [ref=f1e1780] [cursor=pointer]:
+              - generic [ref=f1e1782]:
+                - generic "Row 1" [ref=f1e1783]:
+                  - article [ref=f1e1785]:
+                    - generic [ref=f1e1786]:
+                      - heading "Our Community" [level=2] [ref=f1e1789]
+                      - generic [ref=f1e1790]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+                      - generic [ref=f1e1795]:
+                        - article [ref=f1e1796]:
+                          - generic [ref=f1e1797]:
+                            - button "Edit grid item 1" [ref=f1e1798]
+                            - button "Duplicate grid item 1" [ref=f1e1802]
+                            - button "Delete grid item 1" [ref=f1e1806]
+                          - generic: "::"
+                          - generic [ref=f1e1810]:
+                            - generic:
+                              - img "Meetups &<br class=\"uk-visible@m\"> Events"
+                            - heading "Meetups & Events" [level=3] [ref=f1e1811]
+                            - generic [ref=f1e1813]: Lorem ipsum dolor sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.
+                        - article [ref=f1e1814]:
+                          - generic [ref=f1e1815]:
+                            - button "Edit grid item 2" [ref=f1e1816]
+                            - button "Duplicate grid item 2" [ref=f1e1820]
+                            - button "Delete grid item 2" [ref=f1e1824]
+                          - generic: "::"
+                          - generic [ref=f1e1828]:
+                            - generic:
+                              - img "Workshops & Trainings"
+                            - heading "Workshops &amp; Trainings" [level=3] [ref=f1e1829]
+                            - generic [ref=f1e1830]: Lorem ipsum dolor sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.
+                        - article [ref=f1e1831]:
+                          - generic [ref=f1e1832]:
+                            - button "Edit grid item 3" [ref=f1e1833]
+                            - button "Duplicate grid item 3" [ref=f1e1837]
+                            - button "Delete grid item 3" [ref=f1e1841]
+                          - generic: "::"
+                          - generic [ref=f1e1845]:
+                            - generic:
+                              - img "Community<br class=\"uk-visible@m\"> Chat"
+                            - heading "Community Chat" [level=3] [ref=f1e1846]
+                            - generic [ref=f1e1848]: Lorem ipsum dolor sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.
+                        - article [ref=f1e1849]:
+                          - generic [ref=f1e1850]:
+                            - button "Edit grid item 4" [ref=f1e1851]
+                            - button "Duplicate grid item 4" [ref=f1e1855]
+                            - button "Delete grid item 4" [ref=f1e1859]
+                          - generic: "::"
+                          - generic [ref=f1e1863]:
+                            - generic:
+                              - img "Help Guides"
+                            - heading "Help Guides" [level=3] [ref=f1e1864]
+                            - generic [ref=f1e1865]: Lorem ipsum dolor sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.
+                        - article [ref=f1e1866]:
+                          - generic [ref=f1e1867]:
+                            - button "Edit grid item 5" [ref=f1e1868]
+                            - button "Duplicate grid item 5" [ref=f1e1872]
+                            - button "Delete grid item 5" [ref=f1e1876]
+                          - generic: "::"
+                          - generic [ref=f1e1880]:
+                            - generic:
+                              - img "24/7 Support"
+                            - heading "24/7 Support" [level=3] [ref=f1e1881]
+                            - generic [ref=f1e1882]: Lorem ipsum dolor sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.
+                - generic "Row 2" [ref=f1e1883]:
+                  - generic:
+                    - article:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - figure:
+                                - generic:
+                                  - button "Change image"
+            - button [ref=f1e1885] [cursor=pointer]:
+              - generic [ref=f1e1887]:
+                - generic "Row 1" [ref=f1e1888]:
+                  - generic [ref=f1e1889]:
+                    - article [ref=f1e1890]:
+                      - generic [ref=f1e1891]:
+                        - heading "We’ll Set You up for Success" [level=2] [ref=f1e1894]
+                        - generic [ref=f1e1895]: In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus.
+                    - article [ref=f1e1898]:
+                      - generic [ref=f1e1902]:
+                        - article [ref=f1e1903]:
+                          - generic [ref=f1e1904]:
+                            - button "Edit grid item 1" [ref=f1e1905]
+                            - button "Duplicate grid item 1" [ref=f1e1909]
+                            - button "Delete grid item 1" [ref=f1e1913]
+                          - generic: "::"
+                          - generic [ref=f1e1917]:
+                            - generic:
+                              - img "Around the Clock Support"
+                            - heading "Around the Clock Support" [level=3] [ref=f1e1918]
+                            - generic [ref=f1e1919]: Lorem ipsum dolor sit amet, pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer.
+                        - article [ref=f1e1920]:
+                          - generic [ref=f1e1921]:
+                            - button "Edit grid item 2" [ref=f1e1922]
+                            - button "Duplicate grid item 2" [ref=f1e1926]
+                            - button "Delete grid item 2" [ref=f1e1930]
+                          - generic: "::"
+                          - generic [ref=f1e1934]:
+                            - generic:
+                              - img "Project Dashboard"
+                            - heading "Project Dashboard" [level=3] [ref=f1e1935]
+                            - generic [ref=f1e1936]: Lorem ipsum dolor sit amet, pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer.
+                        - article [ref=f1e1937]:
+                          - generic [ref=f1e1938]:
+                            - button "Edit grid item 3" [ref=f1e1939]
+                            - button "Duplicate grid item 3" [ref=f1e1943]
+                            - button "Delete grid item 3" [ref=f1e1947]
+                          - generic: "::"
+                          - generic [ref=f1e1951]:
+                            - generic:
+                              - img "Dedicated Account Manager"
+                            - heading "Dedicated Account Manager" [level=3] [ref=f1e1952]
+                            - generic [ref=f1e1953]: Lorem ipsum dolor sit amet, pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer.
+                        - article [ref=f1e1954]:
+                          - generic [ref=f1e1955]:
+                            - button "Edit grid item 4" [ref=f1e1956]
+                            - button "Duplicate grid item 4" [ref=f1e1960]
+                            - button "Delete grid item 4" [ref=f1e1964]
+                          - generic: "::"
+                          - generic [ref=f1e1968]:
+                            - generic:
+                              - img "Short Implementation Time"
+                            - heading "Short Implementation Time" [level=3] [ref=f1e1969]
+                            - generic [ref=f1e1970]: Lorem ipsum dolor sit amet, pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer.
+                - generic "Row 2" [ref=f1e1971]:
+                  - generic:
+                    - article:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - figure:
+                                - generic:
+                                  - button "Change image"
+                          - generic:
+                            - generic:
+                              - figure:
+                                - generic:
+                                  - button "Change image"
+            - button [ref=f1e1973] [cursor=pointer]:
+              - generic [ref=f1e1975]:
+                - generic "Row 1" [ref=f1e1976]:
+                  - article [ref=f1e1978]:
+                    - generic [ref=f1e1979]:
+                      - heading "Simple, flexible pricing. Unlimited repositories and deployments." [level=2] [ref=f1e1982]
+                      - generic [ref=f1e1983]: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+                - generic "Row 2" [ref=f1e1986]:
+                  - article [ref=f1e1988]:
+                    - generic [ref=f1e1992]:
+                      - article [ref=f1e1993]:
+                        - generic [ref=f1e1994]:
+                          - button "Edit grid item 1" [ref=f1e1995]
+                          - button "Duplicate grid item 1" [ref=f1e1999]
+                          - button "Delete grid item 1" [ref=f1e2003]
+                        - generic: "::"
+                        - generic [ref=f1e2007]:
+                          - heading "Free" [level=3] [ref=f1e2008]
+                          - generic [ref=f1e2010]:
+                            - paragraph [ref=f1e2011]: $0
+                            - paragraph [ref=f1e2012]: Per user / per month
+                          - list [ref=f1e2014]:
+                            - listitem [ref=f1e2015]:
+                              - generic [ref=f1e2016]: Unlimited Public Repositories
+                            - listitem [ref=f1e2020]:
+                              - generic [ref=f1e2024]:
+                                - generic [ref=f1e2025]: Code and Productivity Analysis
+                                - generic [ref=f1e2026]: Lorem ipsum dolor sit amet
+                            - listitem [ref=f1e2027]:
+                              - generic [ref=f1e2031]:
+                                - generic [ref=f1e2032]: Time Tracking
+                                - generic [ref=f1e2033]: Lorem ipsum dolor sit amet
+                            - listitem [ref=f1e2034]:
+                              - generic [ref=f1e2035]: Access to Documentation
+                          - link "Try for Free" [ref=f1e2040]:
+                            - /url: "?page_id=21"
+                      - article [ref=f1e2041]:
+                        - generic [ref=f1e2042]:
+                          - button "Edit grid item 2" [ref=f1e2043]
+                          - button "Duplicate grid item 2" [ref=f1e2047]
+                          - button "Delete grid item 2" [ref=f1e2051]
+                        - generic: "::"
+                        - generic [ref=f1e2055]:
+                          - heading "Professional" [level=3] [ref=f1e2056]
+                          - generic [ref=f1e2058]:
+                            - paragraph [ref=f1e2059]: $120
+                            - paragraph [ref=f1e2060]: Per user / per month
+                          - list [ref=f1e2062]:
+                            - listitem [ref=f1e2063]:
+                              - generic [ref=f1e2064]: Unlimited Private Repositories
+                            - listitem [ref=f1e2068]:
+                              - generic [ref=f1e2072]:
+                                - generic [ref=f1e2073]: Vulnerability Management
+                                - generic [ref=f1e2074]: Lorem ipsum dolor sit amet
+                            - listitem [ref=f1e2075]:
+                              - generic [ref=f1e2079]:
+                                - generic [ref=f1e2080]: Compliance Automation
+                                - generic [ref=f1e2081]: Lorem ipsum dolor sit amet
+                            - listitem [ref=f1e2082]:
+                              - generic [ref=f1e2083]: 24/7 Community Support
+                          - link "Get Started" [ref=f1e2088]:
+                            - /url: "?page_id=21"
+                - generic "Row 3" [ref=f1e2089]:
+                  - article [ref=f1e2091]:
+                    - link "See All Our Plans and Features" [ref=f1e2096]:
+                      - /url: "?page_id=21"
+          - generic "Footer preview" [ref=f1e2097]:
+            - generic [ref=f1e2099]:
+              - generic [ref=f1e2100]:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - article
+                        - article
+                        - article
+              - generic [ref=f1e2105]:
+                - article [ref=f1e2106]:
+                  - generic [ref=f1e2109]:
+                    - generic [ref=f1e2110]: Header Parity Site
+                    - generic [ref=f1e2111]: A concise closing statement that reinforces what you offer and who you help.
+                - article [ref=f1e2112]:
+                  - generic [ref=f1e2115]:
+                    - heading "Explore" [level=3] [ref=f1e2116]
+                    - list [ref=f1e2117]:
+                      - listitem [ref=f1e2118]:
+                        - generic [ref=f1e2119]: About
+                      - listitem [ref=f1e2120]:
+                        - generic [ref=f1e2121]: Services
+                      - listitem [ref=f1e2122]:
+                        - generic [ref=f1e2123]: Testimonials
+                      - listitem [ref=f1e2124]:
+                        - generic [ref=f1e2125]: Contact
+                - article [ref=f1e2126]:
+                  - generic [ref=f1e2129]:
+                    - generic [ref=f1e2130]: Contact
+                    - generic [ref=f1e2131]: Start a conversation
+                    - generic [ref=f1e2132]: hello@example.com +1 000 000 0000
+            - button "Edit Footer" [ref=f1e2133] [cursor=pointer]
+            - generic [ref=f1e2134]:
+              - button "Footer" [ref=f1e2135] [cursor=pointer]
+              - button "Footer settings" [ref=f1e2136] [cursor=pointer]
+      - button "Open Inspector" [ref=f1e2140] [cursor=pointer]:
+        - generic [ref=f1e2144]: Inspector
+  - alert [ref=f1e2145]
+  - toolbar "Selected Builder object" [ref=f1e2146]:
+    - button "Back to Row" [ref=f1e2147] [cursor=pointer]
+    - navigation "Builder object hierarchy" [ref=f1e2150]:
+      - button "Section›" [ref=f1e2151] [cursor=pointer]
+      - button "Row 1›" [ref=f1e2152] [cursor=pointer]
+      - button "Column›" [ref=f1e2153] [cursor=pointer]
+      - generic [ref=f1e2154]: Block
+    - generic [ref=f1e2156]:
+      - generic [ref=f1e2157]: Heading
+      - button "Edit element" [ref=f1e2158] [cursor=pointer]
+      - button "Move element up" [disabled] [ref=f1e2162]
+      - button "Move element down" [ref=f1e2165] [cursor=pointer]
+      - button "Save element as template" [ref=f1e2168] [cursor=pointer]
+      - button "Duplicate element" [ref=f1e2173] [cursor=pointer]
+      - button "Delete element" [ref=f1e2177] [cursor=pointer]
+    - button "Add" [ref=f1e2182] [cursor=pointer]
+```
+
+# Test source
+
+```ts
+  1  | import { expect, type Page } from "@playwright/test";
+  2  | 
+  3  | export async function waitForSeededBuilderLayout(page: Page) {
+  4  |   await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  5  |   await expect
+  6  |     .poll(() => page.locator(".builder-preview-layout-block").count())
+  7  |     .toBeGreaterThan(0);
+  8  | 
+  9  |   // Library insertion targets the currently selected layout section/column.
+  10 |   // Select a real seeded block first so the fixture exercises the same add
+  11 |   // path as an editor user and the newly added block becomes selected.
+  12 |   const seededBlock = page.locator(".builder-preview-layout-block").first();
+  13 |   const selectedBlock = page.locator(".builder-preview-layout-block.is-selected-block");
+  14 |   await expect
+  15 |     .poll(async () => {
+  16 |       if (await selectedBlock.count()) return 1;
+  17 |       await seededBlock.click({ position: { x: 10, y: 10 } });
+  18 |       await page.waitForTimeout(100);
+  19 |       return await selectedBlock.count();
+  20 |     })
+> 21 |     .toBeGreaterThan(0);
+     |      ^ Error: expect(received).toBeGreaterThan(expected)
+  22 | }
+  23 | 
+```

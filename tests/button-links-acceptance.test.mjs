@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { getUikitButtonClass } from "../lib/uikitTokens.ts";
+import { resolveCanonicalGridAction } from "../lib/builderActions.ts";
 import { mapYoothemeStaticContent } from "../lib/yoothemePageImport.ts";
 import { resolveYoothemeLess } from "../lib/yoothemeLessImporter.ts";
+import { getUikitGlobalsCssString } from "../lib/uikitGlobals.ts";
 
 const fixture = {
   type: "layout",
@@ -50,9 +52,11 @@ test("YOOtheme Button variants remain lossless through the shared UIkit resolver
     ["secondary", "uk-button uk-button-secondary"],
     ["danger", "uk-button uk-button-danger"],
     ["text", "uk-button uk-button-text"],
-    ["", "uk-button"],
-    ["link-muted", "uk-button uk-link-muted"],
-    ["link-text", "uk-button uk-link-text"],
+    // YOOtheme persists its Link selection as an empty value. It remains a
+    // bare action link and must not inherit the Button Text arrow treatment.
+    ["", "uk-link"],
+    ["link-muted", "uk-link-muted"],
+    ["link-text", "uk-link-text"],
   ];
 
   const mapping = mapYoothemeStaticContent({
@@ -84,6 +88,59 @@ test("YOOtheme Button variants remain lossless through the shared UIkit resolver
       expectedClass,
       `button_style=${JSON.stringify(sourceStyle)} should retain its YOOtheme UIkit treatment`,
     );
+  });
+});
+
+test("Grid Link ownership stays on the Grid unless a source item explicitly overrides it", () => {
+  const mapping = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "grid",
+      props: { link_text: "Learn More", link_style: "" },
+      children: [
+        { type: "grid_item", props: { title: "Inherited", link: "/inherited" } },
+        { type: "grid_item", props: { title: "Overridden", link: "/overridden", link_style: "danger" } },
+      ],
+    }] }] }] }],
+  });
+  const grid = mapping.sections[0].layoutItems[0].blocks[0];
+
+  assert.equal(grid.buttonStyle, "link");
+  assert.equal(grid.gridItems[0].buttonStyle, undefined);
+  assert.equal(grid.gridItems[1].buttonStyle, "danger");
+  assert.equal(grid.gridItems[1].buttonStyleSource, "item");
+  assert.equal(resolveCanonicalGridAction(grid, grid.gridItems[0]).style, "link");
+  assert.equal(resolveCanonicalGridAction({ ...grid, buttonStyle: "primary" }, grid.gridItems[0]).style, "primary");
+  assert.equal(resolveCanonicalGridAction({ ...grid, buttonStyle: "primary" }, grid.gridItems[1]).style, "danger");
+});
+
+test("legacy imported Grid copies no longer override the Grid Link control", () => {
+  const block = {
+    id: "yootheme-grid-legacy",
+    kind: "grid",
+    buttonStyle: "secondary",
+    gridItems: [
+      { id: "a", buttonLabel: "A", buttonUrl: "/a", buttonStyle: "link" },
+      { id: "b", buttonLabel: "B", buttonUrl: "/b", buttonStyle: "link" },
+    ],
+  };
+  assert.equal(resolveCanonicalGridAction(block, block.gridItems[0]).style, "secondary");
+});
+
+test("the shared Grid action resolver preserves every YOOtheme Link variant", () => {
+  const variants = ["default", "primary", "secondary", "danger", "text", "link", "link-muted", "link-text"];
+  variants.forEach((variant) => {
+    const block = {
+      id: "grid-canonical-variants",
+      kind: "grid",
+      buttonStyle: variant,
+      gridItems: [{ id: "item", buttonLabel: "Learn More", buttonUrl: "/learn-more" }],
+    };
+    const action = resolveCanonicalGridAction(block, block.gridItems[0]);
+    assert.equal(action.style, variant, `Grid style ${variant} must not collapse to another variant`);
+    if (variant !== "default") {
+      assert.notEqual(getUikitButtonClass(action.style), "uk-button uk-button-default", `${variant} must keep its own UIkit treatment`);
+    }
   });
 });
 
@@ -133,4 +190,14 @@ test("YOOtheme inverse Button tokens preserve their own global semantic owner", 
   assert.equal(preset.shellSettings.buttonInverseSecondaryHoverBackground, "#ffffff");
   assert.equal(preset.shellSettings.buttonInverseSecondaryActiveBackground, "rgba(255, 255, 255, 0.8)");
   assert.equal(preset.shellSettings.buttonInverseSecondaryBorder, "#ffffff");
+});
+
+test("YOOtheme Link uses the global Link color at rest and its own hover token", () => {
+  const style = getUikitGlobalsCssString({
+    emphasisColor: "#0D0A46",
+    linkColor: "#6F40F1",
+    linkHoverColor: "#828FFF",
+  });
+  assert.match(style, /--uk-button-link-color:\s*#6F40F1/);
+  assert.match(style, /--uk-button-link-hover-color:\s*#828FFF/);
 });

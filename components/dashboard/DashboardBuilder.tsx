@@ -1594,6 +1594,43 @@ function normalizeBuilderState(
       layoutItems: section.layoutItems?.map((item) => ({
         ...item,
         blocks: (item.blocks ?? []).map((block) => {
+          if (block.kind === "grid") {
+            const gridStyle = UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(
+              block.buttonStyle as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number],
+            )
+              ? block.buttonStyle
+              : undefined;
+            const legacyImportedItemStyles = (block.gridItems ?? [])
+              .filter((gridItem) => gridItem.buttonStyleSource !== "item")
+              .map((gridItem) => gridItem.buttonStyle)
+              .filter((style): style is typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number] => UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(
+                style as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number],
+              ));
+            const hasUniformLegacyImportedStyle = block.id.startsWith("yootheme-grid-")
+              && legacyImportedItemStyles.length === (block.gridItems ?? []).length
+              && new Set(legacyImportedItemStyles).size === 1;
+            const gridItems = (block.gridItems ?? []).map((gridItem) => {
+              const itemStyleIsValid = UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(
+                gridItem.buttonStyle as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number],
+              );
+              // Recover documents created by the short-lived importer bug:
+              // it copied the Grid-owned style onto every item. Equal values
+              // without explicit source provenance are inherited, not item
+              // overrides, so the Grid Link control remains authoritative.
+              if (gridItem.buttonStyleSource !== "item" && itemStyleIsValid && (
+                gridItem.buttonStyle === gridStyle || hasUniformLegacyImportedStyle
+              )) {
+                const { buttonStyle: _inheritedCopy, ...inheritedItem } = gridItem;
+                return inheritedItem;
+              }
+              return gridItem;
+            });
+            return {
+              ...block,
+              ...(gridStyle ? { buttonStyle: gridStyle } : {}),
+              gridItems,
+            } as BuilderLayoutBlock;
+          }
           if (block.kind === "panel") {
             const {
               panelStyle,

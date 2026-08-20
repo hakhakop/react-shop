@@ -6,17 +6,25 @@ export type CanonicalGridAction = {
   label: string;
   url: string;
   target: string;
-  style: "primary" | "secondary" | "default" | "text";
+  style: "primary" | "secondary" | "danger" | "default" | "text" | "link" | "link-muted" | "link-text";
   size: "small" | "default" | "large";
   fullWidth: boolean;
   margin: string | undefined;
 };
 
 function normalizeActionStyle(value: unknown): CanonicalGridAction["style"] {
-  const style = String(value ?? "").trim().toLowerCase().replace(/^(button|link)-/, "");
+  const rawStyle = String(value ?? "").trim().toLowerCase();
+  // `link-muted` and `link-text` are complete canonical values, not a
+  // `link-` prefix followed by a button variant.
+  if (rawStyle === "link-muted" || rawStyle === "link-text") return rawStyle;
+  const style = rawStyle.replace(/^button-/, "").replace(/^link-/, "");
   if (style === "primary" || style === "solid") return "primary";
   if (style === "secondary" || style === "dark") return "secondary";
-  if (style === "text" || style === "link") return "text";
+  if (style === "danger") return "danger";
+  if (style === "text") return "text";
+  if (style === "link") return "link";
+  if (style === "link-muted") return "link-muted";
+  if (style === "link-text") return "link-text";
   return "default";
 }
 
@@ -43,7 +51,22 @@ export function resolveCanonicalGridAction(
   // for an item with no canonical URL.
   const itemUrl = rawItem.buttonUrl ?? rawItem.linkUrl ?? rawItem.link;
   const cardVariant = String(rawItem.cardVariant ?? raw.gridCardVariant ?? raw.panelVariant ?? "").toLowerCase();
-  const itemStyle = rawItem.buttonStyle ?? rawItem.actionStyle ?? rawItem.linkStyle;
+  const allLegacyItemStyles = (block.gridItems ?? [])
+    .filter((entry) => entry.buttonStyleSource !== "item")
+    .map((entry) => entry.buttonStyle)
+    .filter((style): style is NonNullable<GridActionItem["buttonStyle"]> => typeof style === "string");
+  // A previous importer version copied one Grid-owned YOOtheme `link_style`
+  // onto every imported child. When all legacy children agree, treat that
+  // value as the copied default rather than an item override. This keeps
+  // existing documents responsive to their canonical Grid Link control while
+  // preserving explicit item styles imported by the corrected path.
+  const ignoresLegacyCopiedItemStyle = block.id.startsWith("yootheme-grid-")
+    && allLegacyItemStyles.length === (block.gridItems ?? []).length
+    && new Set(allLegacyItemStyles).size === 1
+    && rawItem.buttonStyleSource !== "item";
+  const itemStyle = ignoresLegacyCopiedItemStyle
+    ? undefined
+    : rawItem.buttonStyle ?? rawItem.actionStyle ?? rawItem.linkStyle;
   let style = normalizeActionStyle(itemStyle ?? raw.buttonStyle ?? raw.linkStyle);
   // YOOtheme's primary card uses the default (solid) button unless the item
   // explicitly authors a button style. Do not let a Grid-level fallback

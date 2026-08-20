@@ -1018,8 +1018,13 @@ export function ActionSettingsGroup({
   const resolvedSize = values[sizeKey] ?? inherited[sizeKey] ?? "default";
   const resolvedFullWidth = values[widthKey ?? ""] ?? inherited[widthKey ?? ""] ?? false;
   const resolvedMargin = values[marginKey ?? ""] ?? inherited[marginKey ?? ""] ?? "none";
+  // This follows the actual YOOtheme Link control vocabulary: the Button
+  // variants retain their Button prefix, while Link, Link Muted and Link Text
+  // remain link semantics rather than being relabelled as buttons.
   const styleOptions = labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values).map((option) => (
-    terminology === "link" ? { ...option, label: `Button ${option.label}` } : option
+    terminology === "link" && !option.value.startsWith("link")
+      ? { ...option, label: `Button ${option.label}` }
+      : option
   ));
 
   const targetField = showTarget && targetKey ? (

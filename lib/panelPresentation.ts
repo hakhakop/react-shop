@@ -22,11 +22,24 @@ function hasExplicitColor(value: unknown) {
  */
 export function resolvePanelColorSemantics(block: PanelLike) {
   const role = cardColorRole(block.panelVariant ?? block.panelStyle ?? block.cardVariant);
-  if (!role) return {
+  const variant = String(block.panelVariant ?? block.panelStyle ?? block.cardVariant ?? "").trim().toLowerCase();
+  const isDefaultCard = ["default", "card-default"].includes(variant);
+  if (!role && !isDefaultCard) return {
     className: "",
     style: {} as Record<string, string>,
     metaStyle: {} as Record<string, string>,
   };
+
+  // UIkit's default Card body is muted, but its title inherits the global
+  // emphasis color. Keep this distinction in the shared panel resolver so a
+  // YOOtheme Grid and a standalone Panel cannot diverge.
+  if (!role) {
+    const style: Record<string, string> = {};
+    if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
+      style["--builder-card-title-color"] = "var(--uk-card-default-title, var(--uk-global-emphasis-color, inherit))";
+    }
+    return { className: "", style, metaStyle: {} as Record<string, string> };
+  }
 
   const text = `var(--uk-card-${role}-text, var(--uk-global-inverse-color, var(--uk-global-color, currentColor)))`;
   const title = `var(--uk-card-${role}-title, ${text})`;

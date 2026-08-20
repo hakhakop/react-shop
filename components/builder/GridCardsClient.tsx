@@ -62,7 +62,10 @@ function getUikitHoverTransitionClass(val?: string) {
 }
 
 function getUikitLinkStyleClass(val?: string, size?: string, fullWidth?: boolean) {
-  const normalized = val?.replace(/^button-/, "").replace(/^link-/, "text") || "default";
+  // The shared Button resolver owns the complete YOOtheme vocabulary. In
+  // particular, `link`, `link-muted`, and `link-text` are distinct canonical
+  // semantics and must not be rewritten into Grid-local aliases.
+  const normalized = val?.replace(/^button-/, "") || "default";
   return `${getUikitButtonClass(normalized, size)} ${fullWidth ? "uk-width-1-1" : ""}`.trim();
 }
 
@@ -369,7 +372,13 @@ export function GridCardsClient({
             const action = resolveCanonicalGridAction(block, item);
             const buttonText = action.label;
             const linkStyleClass = getUikitLinkStyleClass(action.style, action.size, action.fullWidth);
-            const linkMarginTopClass = getUikitMarginClass(action.margin);
+            // An omitted YOOtheme `link_margin` resolves to its UIkit default
+            // (`uk-margin-top`), not zero. Native blocks keep their existing
+            // no-fallback behavior.
+            const linkMarginTopClass = getUikitMarginClass(
+              action.margin ?? (rawBlock.spacingContract === "yootheme" ? "medium" : undefined),
+              "top",
+            );
             const linkTarget = action.target;
 
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
@@ -536,8 +545,17 @@ export function GridCardsClient({
               ...builderItemEventProps
             } = builderItemProps;
 
+            const actionAlignment = item.buttonAlign ?? itemContentAlignment;
+            const actionJustify = actionAlignment === "center"
+              ? "center"
+              : actionAlignment === "right"
+                ? "flex-end"
+                : "flex-start";
             const renderActions = () => canShowLink && itemUrl && buttonText ? (
-              <div className={`shop-builder-grid-button ${linkMarginTopClass} shop-builder-grid-button--${item.buttonAlign ?? "left"}`}>
+              <div
+                className={`shop-builder-grid-button ${linkMarginTopClass} shop-builder-grid-button--${actionAlignment}`}
+                style={{ "--shop-builder-grid-button-align": actionJustify } as CSSProperties}
+              >
                 <a className={`shop-builder-grid-action ${linkStyleClass}`.trim()} style={action.fullWidth ? { width: "100%" } : undefined} href={itemUrl} {...builderLinkTargetProps(linkTarget)}>{buttonText}</a>
               </div>
             ) : null;
@@ -589,6 +607,15 @@ export function GridCardsClient({
                     ...colorSemantics.style,
                     ...(imagePaddingCustom ? { "--shop-builder-grid-image-padding": imagePaddingCustom } : {}),
                     ...(contentPaddingCustom ? { "--shop-builder-grid-content-padding": contentPaddingCustom } : {}),
+                    // DevStack's imported `card-default` has no border. A
+                    // generic WebPages fallback border narrows the 270px
+                    // source card's text column from 190px to 188px and
+                    // changes line wrapping/row height.
+                    ...(isYoothemeGrid && ["default", "card-default"].includes(panelStyle) ? { "--uk-card-border-width": "0px" } : {}),
+                    // The YOOtheme Grid source leaves `title_color` empty,
+                    // which means global emphasis — not the muted Card body
+                    // color or a WebPages Card-default fallback.
+                    ...(isYoothemeGrid && !titleColorVal ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
                     ...(builderItemStyle ?? {}),
                   } as CSSProperties
                 }

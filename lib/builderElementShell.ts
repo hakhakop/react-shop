@@ -134,6 +134,10 @@ export function getGeneralElementShellStyle(
   const style: CSSProperties = {};
   const localPadding = block.elementPadding?.trim().toLowerCase();
   const localMargin = (block.elementMargin ?? block.gridMargin)?.trim().toLowerCase();
+  const sourceVerticalMarginOnly = usesYoothemeSpacingContract(block)
+    && Boolean(visual?.margin)
+    && !visual?.margin?.left
+    && !visual?.margin?.right;
 
   if (!hasBuilderVisualSpacing(visual?.padding)) {
     if (usesYoothemeSpacingContract(block)) {
@@ -174,6 +178,11 @@ export function getGeneralElementShellStyle(
   return {
     ...style,
     ...visualStyleToCss(visual),
+    // YOOtheme's General `margin` is a vertical UIkit margin. Older imported
+    // visual margin objects contain only `top`; do not let absent horizontal
+    // sides inherit WebPages' global element margins and narrow the source
+    // Grid/card geometry.
+    ...(sourceVerticalMarginOnly ? { marginLeft: 0, marginRight: 0 } : {}),
     ...(textAlign ? { textAlign } : {}),
   };
 }

@@ -122,6 +122,7 @@ export function getUikitGlobalsCssVars(
   );
   const backgroundSecondaryImage = resolveBackgroundPaint(shellSettings?.backgroundSecondaryImage, "none");
   const globalText = value("textColor", "#111827");
+  const globalEmphasis = value("emphasisColor", globalText);
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
   const globalBorder = value("borderColor", "transparent");
@@ -387,8 +388,13 @@ export function getUikitGlobalsCssVars(
     "--uk-button-text-border": buttonValue("buttonTextBorder", "transparent"),
     "--uk-button-text-hover-border": buttonValue("buttonTextHoverBorder", primary),
     "--uk-button-text-active-color": buttonValue("buttonTextActiveColor", primary),
+    // Link owns the theme's global Link color. It remains distinct from
+    // Button Text by presentation (no arrow), not by a substituted palette.
     "--uk-button-link-color": buttonValue("buttonLinkColor", globalLink),
-    "--uk-button-link-hover-color": buttonValue("buttonLinkHoverColor", value("linkHoverColor", globalLink)),
+    // The Link variant follows the global Link interaction token, not the
+    // Button Text/Button Link token family. DevStack resolves this to its
+    // muted purple hover color.
+    "--uk-button-link-hover-color": value("linkHoverColor", globalLink),
     "--uk-button-backdrop-filter": value("buttonBackdropFilter", "none"),
     "--uk-button-transition-duration": value("buttonTransitionDuration", "0.2s"),
     "--uk-button-primary-gradient": buttonValue("buttonPrimaryGradient", "none"),
