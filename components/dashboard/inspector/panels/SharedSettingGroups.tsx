@@ -65,6 +65,7 @@ export function TitleSettingsGroup({
   showFontRole = true,
   showDecoration = false,
   showColor = false,
+  showLink = false,
   defaultSize = "medium",
   defaultLevel = "h2",
   visualPresetOptions,
@@ -76,6 +77,7 @@ export function TitleSettingsGroup({
     level: "headingLevel",
     decoration: "titleDecoration",
     color: "titleColor",
+    link: "linkTitle",
   },
 }: {
   block: BuilderLayoutBlock;
@@ -85,6 +87,7 @@ export function TitleSettingsGroup({
   showAlignment?: boolean;
   showDecoration?: boolean;
   showColor?: boolean;
+  showLink?: boolean;
   defaultSize?: string;
   defaultLevel?: string;
   visualPresetOptions?: Array<{ value: string; label: string }>;
@@ -96,11 +99,13 @@ export function TitleSettingsGroup({
     level: string;
     decoration?: string;
     color?: string;
+    link?: string;
   };
 }) {
   const values = block as any;
   const decorationKey = keys.decoration ?? "titleDecoration";
   const colorKey = keys.color ?? "titleColor";
+  const linkKey = keys.link ?? "linkTitle";
   return (
     <InspectorDivision title="TITLE">
       <InspectorFieldRow
@@ -174,6 +179,21 @@ export function TitleSettingsGroup({
               { value: "background", label: "Background" },
             ]}
             onChange={(value) => update({ [colorKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showLink && (
+        <InspectorFieldRow
+          label="Link"
+          isOverridden={values[linkKey] !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ [linkKey]: undefined })}
+        >
+          <InspectorSwitch
+            checked={values[linkKey] === true}
+            onChange={(value) => update({ [linkKey]: value || undefined })}
+            label="Link title"
           />
         </InspectorFieldRow>
       )}
@@ -311,6 +331,7 @@ export function MetaSettingsGroup({
             options={[
               { value: "above-title", label: "Above Title" },
               { value: "below-title", label: "Below Title" },
+              { value: "above-content", label: "Above Content" },
               { value: "below-content", label: "Below Content" },
             ]}
             onChange={(value) => update({ [positionKey]: value })}
