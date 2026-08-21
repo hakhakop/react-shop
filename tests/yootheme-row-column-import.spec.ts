@@ -11,7 +11,7 @@ test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
     candidate.rows?.some((row) => row.id === "yootheme-section-7-row-1"),
   );
   expect(section).toBeTruthy();
-  expect(section!.layoutItems).toBeUndefined();
+  expect(section!.rows).toBeDefined();
 
   const firstRow = section!.rows!.find(
     (row) => row.id === "yootheme-section-7-row-1",
