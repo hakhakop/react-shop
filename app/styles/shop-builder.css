@@ -6254,8 +6254,8 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   padding-bottom: var(--uk-section-padding-default, 70px) !important;
 }
 .uk-section-large {
-  padding-top: var(--uk-global-margin-large, 70px) !important;
-  padding-bottom: var(--uk-global-margin-large, 70px) !important;
+  padding-top: var(--uk-section-padding-large, 100px) !important;
+  padding-bottom: var(--uk-section-padding-large, 100px) !important;
 }
 .uk-section-xlarge {
   padding-top: var(--uk-section-padding-xlarge, 140px) !important;
@@ -6264,18 +6264,18 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 @media (min-width: 960px) {
   .uk-section,
   .uk-section-medium {
-    padding-top: var(--uk-global-margin-large, var(--uk-section-padding-default, 70px)) !important;
-    padding-bottom: var(--uk-global-margin-large, var(--uk-section-padding-default, 70px)) !important;
+    padding-top: var(--uk-section-padding-default, 70px) !important;
+    padding-bottom: var(--uk-section-padding-default, 70px) !important;
   }
   .uk-section-large {
-    padding-top: var(--uk-global-margin-xlarge, var(--uk-section-padding-xlarge, 140px)) !important;
-    padding-bottom: var(--uk-global-margin-xlarge, var(--uk-section-padding-xlarge, 140px)) !important;
+    padding-top: var(--uk-section-padding-large, 100px) !important;
+    padding-bottom: var(--uk-section-padding-large, 100px) !important;
   }
   .uk-section-xlarge {
-    /* UIkit's desktop xlarge tier is large + xlarge global margin, not the
-       mobile xlarge value repeated. */
-    padding-top: calc(var(--uk-global-margin-large, 70px) + var(--uk-global-margin-xlarge, 140px)) !important;
-    padding-bottom: calc(var(--uk-global-margin-large, 70px) + var(--uk-global-margin-xlarge, 140px)) !important;
+    /* Section scale is owned by imported/canonical Section tokens. Do not
+       combine it with the independent global-margin scale on desktop. */
+    padding-top: var(--uk-section-padding-xlarge, 140px) !important;
+    padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
   }
 }
 .uk-padding-remove-top {
