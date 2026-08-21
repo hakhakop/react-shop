@@ -155,7 +155,7 @@ export function getUikitGlobalsCssVars(
     "--uk-section-padding-small": value("sectionPaddingSmall", "40px"),
     "--uk-section-padding-default": value("sectionPaddingDefault", "70px"),
     "--uk-section-padding-medium": value("sectionPaddingMedium", "80px"),
-    "--uk-section-padding-large": value("sectionPaddingLarge", "100px"),
+    "--uk-section-padding-large": value("sectionPaddingLarge", "140px"),
     "--uk-section-padding-xlarge": value("sectionPaddingXLarge", "140px"),
 
     // Container max-widths

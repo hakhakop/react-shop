@@ -976,8 +976,11 @@ export type BuilderSection = {
   layout?: string;
   topSpacing?: SectionSpacing;
   bottomSpacing?: SectionSpacing;
+  margin?: SectionSpacing;
   topMargin?: SectionSpacing;
   bottomMargin?: SectionSpacing;
+  removeTopMargin?: boolean;
+  removeBottomMargin?: boolean;
   buttonLabel?: string;
   buttonUrl?: string;
   buttonTarget?: "_self" | "_blank";

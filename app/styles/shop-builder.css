@@ -26,18 +26,46 @@
   display: flow-root;
   width: 100%;
   margin: var(--builder-section-margin-top, var(--builder-global-section-margin-top, 0px)) auto var(--builder-section-margin-bottom, var(--builder-global-section-margin-bottom, 0px));
-  /* UIkit Sections own vertical rhythm only. Horizontal containment belongs
-     to the nested uk-container, whose responsive gutters are shared by the
-     Builder and storefront. */
-  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, 64px)) 0 var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 64px));
   border: 0;
   border-radius: 0;
   box-shadow: none;
   color: var(--builder-section-text, var(--uk-global-text-color, var(--builder-text, #111111)));
-  --builder-active-muted: var(--builder-section-muted, var(--builder-muted, #55554f));
-  --builder-active-surface: var(--builder-section-surface, var(--builder-surface, #f5f5f3));
+  --context-bg: transparent;
+  --context-text: var(--uk-global-text-color, #111827);
+  --context-muted: var(--uk-global-muted-text-color, #6b7280);
+  --context-emphasis: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --context-surface: var(--webpages-background-default, var(--uk-global-background-color, #fff));
+  --uikit-text-default-color: var(--uk-global-text-color, #111827);
+  --uikit-text-lead-color: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --uikit-text-meta-color: var(--uk-global-muted-text-color, #6b7280);
+  --uikit-text-muted-color: var(--uk-global-muted-text-color, #6b7280);
+  --uikit-text-emphasis-color: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --uikit-text-primary-color: var(--uk-global-primary-color, #1e87f0);
+  --uikit-text-secondary-color: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --uikit-accordion-title-color: var(--uk-accordion-title-color, var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827)));
+  --uikit-accordion-content-color: var(--uk-global-text-color, #111827);
+  --uikit-accordion-icon-color: var(--uk-accordion-icon-color, currentColor);
+  --uikit-accordion-divider-color: var(--uk-accordion-item-border, var(--uk-global-border-color, rgba(0,0,0,.12)));
+  --uikit-accordion-title-hover-color: var(--uk-accordion-title-hover-color, var(--uk-global-primary-color, #1e87f0));
+  --builder-section-text: var(--uk-global-text-color, #111827);
+  --builder-section-muted: var(--uk-global-muted-text-color, #6b7280);
+  --builder-section-button-bg: var(--uk-button-primary-background, var(--uk-global-primary-color, #111111));
+  --builder-section-button-text: var(--uk-button-primary-text, #fff);
+  --builder-active-text: var(--uk-global-text-color, #111827);
+  --builder-active-muted: var(--uk-global-muted-text-color, #6b7280);
+  --builder-active-heading: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --builder-active-surface: var(--webpages-background-default, var(--uk-global-background-color, #fff));
   --builder-active-button-bg: var(--button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)));
   --builder-active-button-text: var(--button-text-color, var(--builder-section-button-text, var(--builder-button-text, #ffffff)));
+}
+
+.shop-builder-section:not(.uk-section) {
+  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, 64px)) 0 var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 64px));
+}
+
+.shop-builder-section.uk-section {
+  margin-top: var(--builder-section-margin-top, 0px);
+  margin-bottom: var(--builder-section-margin-bottom, 0px);
 }
 
 .builder-preview-shell[data-theme="dark"],
@@ -60,13 +88,70 @@ body.dark {
 .shop-builder-section[data-theme="dark"],
 .shop-builder-section.shop-builder-section--scheme-dark,
 .shop-builder-section.shop-builder-section--dark,
+.shop-builder-section.uk-section-primary,
+.shop-builder-section.uk-section-secondary,
+.shop-builder-section.uk-light,
 .builder-preview-section[data-theme="dark"],
 .builder-preview-section.shop-builder-section--scheme-dark {
-  --builder-section-text: #f4f4f5;
-  --builder-section-muted: #a1a1aa;
-  --builder-section-surface: #27272a;
-  --builder-section-button-bg: #ffffff;
-  --builder-section-button-text: #09090b;
+  --context-bg: transparent;
+  --context-text: var(--uk-global-inverse-color, #fff);
+  --context-muted: var(--uk-global-inverse-color, #fff);
+  --context-emphasis: var(--uk-global-inverse-color, #fff);
+  --context-surface: var(--webpages-background-secondary, #111827);
+  --uikit-text-default-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-lead-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-meta-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-muted-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-emphasis-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-primary-color: var(--uk-global-inverse-color, #fff);
+  --uikit-text-secondary-color: var(--uk-global-inverse-color, #fff);
+  --uikit-accordion-title-color: var(--uk-global-inverse-color, #fff);
+  --uikit-accordion-content-color: var(--uk-global-inverse-color, #fff);
+  --uikit-accordion-icon-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
+  --uikit-accordion-divider-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 24%, transparent);
+  --uikit-accordion-title-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
+  --builder-section-text: var(--uk-global-inverse-color, #fff);
+  --builder-section-muted: var(--uk-global-inverse-color, #fff);
+  --builder-section-button-bg: var(--uk-button-primary-background, var(--uk-global-primary-color, #111111));
+  --builder-section-button-text: var(--uk-button-primary-text, #fff);
+  --builder-active-text: var(--uk-global-inverse-color, #fff);
+  --builder-active-muted: var(--uk-global-inverse-color, #fff);
+  --builder-active-heading: var(--uk-global-inverse-color, #fff);
+  --builder-active-surface: var(--webpages-background-secondary, #111827);
+  --builder-active-button-bg: var(--uk-button-primary-background, var(--uk-global-primary-color, #111111));
+  --builder-active-button-text: var(--uk-button-primary-text, #fff);
+  --uk-button-default-background: var(--uk-button-inverse-default-background, var(--uk-global-inverse-color, #fff));
+  --uk-button-default-text: var(--uk-button-inverse-default-text, var(--uk-global-text-color, #111827));
+  --uk-button-default-border: var(--uk-button-inverse-default-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-default-shadow: var(--uk-button-inverse-default-shadow, none);
+  --uk-button-default-hover-shadow: var(--uk-button-inverse-default-shadow, none);
+  --uk-button-default-hover-background: var(--uk-button-inverse-default-hover-background, color-mix(in srgb, var(--uk-global-inverse-color, #fff) 95%, #000));
+  --uk-button-default-hover-text: var(--uk-button-inverse-default-hover-text, var(--uk-global-text-color, #111827));
+  --uk-button-default-hover-border: var(--uk-button-inverse-default-hover-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-default-active-background: var(--uk-button-inverse-default-active-background, color-mix(in srgb, var(--uk-global-inverse-color, #fff) 90%, #000));
+  --uk-button-default-active-text: var(--uk-button-inverse-default-active-text, var(--uk-global-text-color, #111827));
+  --uk-button-default-active-border: var(--uk-button-inverse-default-active-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-primary-shadow: var(--uk-button-inverse-primary-shadow, none);
+  --uk-button-secondary-background: var(--uk-button-inverse-secondary-background, transparent);
+  --uk-button-secondary-text: var(--uk-button-inverse-secondary-text, var(--uk-global-inverse-color, #fff));
+  --uk-button-secondary-border: var(--uk-button-inverse-secondary-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-secondary-hover-background: var(--uk-button-inverse-secondary-hover-background, var(--uk-global-inverse-color, #fff));
+  --uk-button-secondary-hover-gradient: none;
+  --uk-button-secondary-hover-text: var(--uk-button-inverse-secondary-hover-text, var(--uk-global-text-color, #111827));
+  --uk-button-secondary-hover-border: var(--uk-button-inverse-secondary-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-secondary-active-background: var(--uk-button-inverse-secondary-active-background, color-mix(in srgb, var(--uk-global-inverse-color, #fff) 80%, transparent));
+  --uk-button-secondary-active-gradient: none;
+  --uk-button-secondary-active-text: var(--uk-button-inverse-secondary-active-text, var(--uk-global-text-color, #111827));
+  --uk-button-secondary-active-border: var(--uk-button-inverse-secondary-border, var(--uk-global-inverse-color, #fff));
+  --uk-button-secondary-shadow: none;
+  --uk-button-secondary-hover-shadow: none;
+  --uk-button-secondary-active-shadow: none;
+  --uk-button-text-color: var(--uk-global-inverse-color, #fff);
+  --uk-button-text-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
+  --uk-button-text-active-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
+  --uk-button-link-color: var(--uk-global-inverse-color, #fff);
+  --uk-button-link-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
+  --uk-global-link-color: var(--uk-global-inverse-color, #fff);
 }
 
 .shop-builder-main[data-gsap-home] .shop-builder-section-content {
@@ -3297,8 +3382,7 @@ body.dark {
 }
 
 .shop-builder-content-layout .shop-builder-section-content {
-  display: grid;
-  gap: clamp(22px, 4vw, 48px);
+  display: block;
 }
 
 .shop-builder-content-layout-grid {
@@ -6236,10 +6320,10 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   z-index: 1;
 }
 .uk-section {
-  /* UIkit Section is responsive: medium global margin on phones, large
-     global margin at the medium breakpoint. */
-  padding-top: var(--uk-global-margin-medium, 40px) !important;
-  padding-bottom: var(--uk-global-margin-medium, 40px) !important;
+  display: flow-root;
+  box-sizing: border-box;
+  padding-top: var(--uk-section-padding-small, 40px) !important;
+  padding-bottom: var(--uk-section-padding-small, 40px) !important;
 }
 .uk-section-xsmall {
   padding-top: var(--uk-section-padding-xsmall, 20px) !important;
@@ -6248,10 +6332,6 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .uk-section-small {
   padding-top: var(--uk-section-padding-small, 40px) !important;
   padding-bottom: var(--uk-section-padding-small, 40px) !important;
-}
-.uk-section-medium {
-  padding-top: var(--uk-section-padding-default, 70px) !important;
-  padding-bottom: var(--uk-section-padding-default, 70px) !important;
 }
 .uk-section-large {
   padding-top: var(--uk-section-padding-large, 100px) !important;
@@ -6284,6 +6364,14 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .uk-padding-remove-bottom {
   padding-bottom: 0 !important;
 }
+.uk-padding-remove-vertical {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.uk-padding-remove-horizontal {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 .uk-container-no-padding {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -6300,4 +6388,30 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
    controls remain interactive; storefront retains the same UIkit panel. */
 body.is-visual-builder-active .uk-lightbox {
   z-index: 1000000 !important;
+}
+
+/* UIkit standard margin suppression on container & column boundaries */
+.uk-margin-remove-adjacent + *,
+.uk-margin-remove-first-child > :first-child,
+.shop-builder-section-content > :first-child,
+.shop-builder-content-layout-rows-wrapper > :first-child,
+.shop-builder-content-layout-grid > :first-child,
+.builder-preview-content-layout-grid > :first-child,
+.builder-main-row-frame:first-child,
+.builder-main-row-frame:first-child > .shop-builder-content-row,
+.shop-builder-content-row > :first-child,
+[class*="uk-width-"] > :first-child:not([class*="uk-position-absolute"]) {
+  margin-top: 0 !important;
+}
+
+.uk-margin-remove-last-child > :last-child,
+.shop-builder-section-content > :last-child,
+.shop-builder-content-layout-rows-wrapper > :last-child,
+.shop-builder-content-layout-grid > :last-child,
+.builder-preview-content-layout-grid > :last-child,
+.builder-main-row-frame:last-child,
+.builder-main-row-frame:last-child > .shop-builder-content-row,
+.shop-builder-content-row > :last-child,
+[class*="uk-width-"] > :last-child:not([class*="uk-position-absolute"]) {
+  margin-bottom: 0 !important;
 }

@@ -30,7 +30,7 @@ const parallaxScrollParent = (element: HTMLElement): HTMLElement => {
     }
     parent = parent.parentElement;
   }
-  return document.scrollingElement ?? document.documentElement;
+  return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
 };
 
 const layoutOffsetTop = (element: HTMLElement): number => {

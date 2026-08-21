@@ -118,8 +118,10 @@ import { BuilderCarouselGeometryCoordinator } from "@/components/builder/Builder
 import StorefrontBuilderRenderer, {
   BodyText,
   ContentLayoutBlock,
+  designStyle,
   getBuilderSectionClassName,
   isRichPreviewText,
+  sectionStyle,
 } from "@/components/builder/StorefrontBuilderRenderer";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
@@ -1606,7 +1608,7 @@ function normalizeBuilderState(
               .filter((style): style is typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number] => UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(
                 style as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number],
               ));
-            const hasUniformLegacyImportedStyle = block.id.startsWith("yootheme-grid-")
+            const hasUniformLegacyImportedStyle = Boolean(block.id?.startsWith("yootheme-grid-"))
               && legacyImportedItemStyles.length === (block.gridItems ?? []).length
               && new Set(legacyImportedItemStyles).size === 1;
             const gridItems = (block.gridItems ?? []).map((gridItem) => {
@@ -6490,22 +6492,28 @@ export default function DashboardBuilder({
         }
 
         if (section.rows !== undefined) {
-          const targetRow = section.rows[rowIndex];
-          const insertIndex = targetRow
-            ? rowIndex + (placement === "after" ? 1 : 0)
-            : section.rows.length;
-          const rowId = newItems[0]?.rowId ?? `layout-row-${Date.now().toString(36)}`;
-          const nextRow: BuilderRow = {
-            id: rowId,
-            layout: preset.key,
-            columns: newItems.map((item, index) => ({
-              id: item.id ?? `${rowId}-column-${index + 1}`,
-              elements: item.blocks ?? [],
-            })),
-          };
-          const rows = [...section.rows];
-          rows.splice(insertIndex, 0, nextRow);
-          return { ...section, rows, layoutRows: rows.length };
+          let foundRowIndex = -1;
+          let foundColumnIndex = -1;
+          if (anchorColumnKey) {
+            section.rows.forEach((row, rIdx) => {
+              const cIdx = row.columns.findIndex((c) => c.id === anchorColumnKey);
+              if (cIdx >= 0) {
+                foundRowIndex = rIdx;
+                foundColumnIndex = cIdx;
+              }
+            });
+          }
+          const targetRowIndex = foundRowIndex >= 0 ? foundRowIndex : section.rows.length - 1;
+          if (targetRowIndex < 0) return section;
+          const targetRow = section.rows[targetRowIndex];
+          if (!targetRow || targetRow.columns.length >= 6) return section;
+          const insertColIndex = foundColumnIndex >= 0 ? foundColumnIndex + 1 : targetRow.columns.length;
+          const colId = `layout-column-${Date.now().toString(36)}`;
+          const nextCols = [...targetRow.columns];
+          nextCols.splice(insertColIndex, 0, { id: colId, elements: [] });
+          const nextRows = [...section.rows];
+          nextRows[targetRowIndex] = { ...targetRow, columns: nextCols };
+          return { ...section, rows: nextRows };
         }
 
         const layoutItems = section.layoutItems ?? [];
@@ -11099,7 +11107,6 @@ export default function DashboardBuilder({
       data-theme={dashboardTheme}
       style={
         {
-          ...getUikitGlobalsCssVars(shellSettings),
           "--builder-dashboard-bg":
             builderState.design.pageBackground ?? "#dfdfd7",
           "--builder-preview-real-bg": previewPageBackground,
@@ -13037,10 +13044,7 @@ function PreviewCanvas({
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         data-theme={layoutScheme}
         style={{
-          ...previewDesignStyle(design, layoutScheme),
-          ...(hasYoothemeImportContract({ sections })
-            ? getYoothemeImportGlobalAliases()
-            : {}),
+          ...designStyle({ design, sections }),
         }}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
@@ -13156,7 +13160,7 @@ function PreviewCanvas({
                     )} ${getBuilderSectionClassName(
                       section,
                       layoutScheme,
-                      `${getStorefrontPreviewClass(section)} builder-preview-${section.kind}`,
+                      getStorefrontPreviewClass(section),
                     )} ${
                       isFullTheme
                         ? "shop-builder-section--effect-antigravity"
@@ -13166,44 +13170,13 @@ function PreviewCanvas({
                     } ${isSectionActive ? "is-selected" : ""}`}
                     style={{
                       zIndex: Math.max(1, 100 - sectionIndex),
-                      background: resolveSectionBackground(section).override,
-                        "--builder-preview-padding-top": getPreviewSpacing(
-                          section.topSpacing,
-                        ),
-                        "--builder-preview-padding-bottom": getPreviewSpacing(
-                          section.bottomSpacing,
-                        ),
-                        "--builder-section-padding-top": getPreviewSpacing(
-                          section.topSpacing,
-                        ),
-                        "--builder-section-padding-bottom": getPreviewSpacing(
-                          section.bottomSpacing,
-                        ),
-                        "--builder-section-margin-top": getPreviewSectionMargin(
-                          section.topMargin,
-                        ),
-                        "--builder-section-margin-bottom":
-                          getPreviewSectionMargin(section.bottomMargin),
-                        "--builder-radius":
-                          section.borderRadius !== undefined
-                            ? `${section.borderRadius}px`
-                            : undefined,
-                        "--builder-card-radius":
-                          section.borderRadius !== undefined
-                            ? `${section.borderRadius}px`
-                            : undefined,
-                        "--shop-builder-section-height-offset":
-                          section.heightOffset === undefined
-                            ? undefined
-                            : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
-                        ...sectionSchemeStyle(section),
-                        ...sectionBackgroundImageVariables(section),
-                        ...visualStyleToCss(
-                          section.visualStyle as BuilderVisualStyle | undefined,
-                        ),
-                        ...animationAttrs.style,
-                      } as CSSProperties
-                    }
+                      ...sectionStyle(section, layoutScheme),
+                      "--shop-builder-section-height-offset":
+                        section.heightOffset === undefined
+                          ? undefined
+                          : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
+                      ...animationAttrs.style,
+                    } as CSSProperties}
                     {...animationAttrs.data}
                     data-section-title-breakpoint={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
                     data-builder-html-element={section.htmlElement || "section"}
@@ -16807,9 +16780,23 @@ const PreviewSection = memo(function PreviewSection({
                     const blockAnimationAttrs = previewAnimationAttrs(
                       block.animation,
                     );
-                    const legacySurfaceClass = ["panel", "grid", "hero"].includes(block.kind ?? "")
-                      ? ""
-                      : `shop-card-preset--${block.panelStyle ?? "default"}`;
+                    const legacySurfaceClass =
+                      ["panel", "grid", "hero"].includes(block.kind ?? "") ||
+                      !block.panelStyle ||
+                      block.panelStyle === "default"
+                        ? ""
+                        : `shop-card-preset--${block.panelStyle}`;
+                    const blockPaddingClass =
+                      !hasBuilderVisualSpacing(block.visualStyle?.padding) &&
+                      block.elementPadding &&
+                      block.elementPadding !== "inherit" &&
+                      block.elementPadding !== "none"
+                        ? `is-padding-${block.elementPadding}`
+                        : "";
+                    const blockAlignClass =
+                      block.elementAlign && block.elementAlign !== "left"
+                        ? `is-align-${block.elementAlign}`
+                        : "";
                     const isElementActive =
                       selectedSectionId === section.id &&
                       selectedLayoutColumnKey === columnKey &&
@@ -16862,7 +16849,7 @@ const PreviewSection = memo(function PreviewSection({
                         } ${legacySurfaceClass} ${
                           block.kind === "scrollPinnedDemo"
                             ? ""
-                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                            : `${blockPaddingClass} ${blockAlignClass} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                         } ${
                           selectedLayoutBlockKey === blockKey
                             ? "is-selected-block"
@@ -17425,7 +17412,7 @@ const PreviewSection = memo(function PreviewSection({
                             ) : null;
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ ...panelPresentation.colorStyle, ...(!isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? { overflow: "visible" } : {}) }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ ...panelPresentation.colorStyle, ...(block.imageUrl && !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? { overflow: "visible" } : {}) }}>
                                 {panelPresentation.linked && (
                                   <a
                                     className="shop-builder-panel-link-overlay"
@@ -17440,7 +17427,7 @@ const PreviewSection = memo(function PreviewSection({
                                   style={{
                                     aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
-                                    overflow: !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
+                                    overflow: block.imageUrl && !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
                                     width: panelImageDimension((block as any).imageWidth) ?? "100%",
@@ -17454,7 +17441,7 @@ const PreviewSection = memo(function PreviewSection({
                                 >
                                   {!isPanelImagePlaceholder ? (
                                     <>
-                                      {/\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
+                                      {block.imageUrl && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
                                         <UikitStylableSvg
                                           src={block.imageUrl}
                                           alt={block.imageAlt || ""}
@@ -17465,7 +17452,7 @@ const PreviewSection = memo(function PreviewSection({
                                         />
                                       ) : (
                                         <img
-                                          src={block.imageUrl}
+                                          src={block.imageUrl || ""}
                                           alt={block.imageAlt || ""}
                                           loading="eager"
                                           aria-hidden="true"

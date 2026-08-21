@@ -530,8 +530,6 @@ export function visualStyleVisibilityClassName(
     const value = visibility?.[device];
     if (value === false) {
       classes.push(`builder-hide-${device}`);
-    } else if (value === undefined) {
-      classes.push(`builder-visibility-inherit-${device}`);
     }
   }
 

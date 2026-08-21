@@ -150,7 +150,7 @@ export default function UikitProducts({ block, productContexts, categoryTree }: 
       result = result.filter((p) => {
         // 1. Canonical category matching helper
         if (categoryTree && categoryTree.length > 0) {
-          if (productMatchesCategorySelection(p, targetCat, categoryTree)) return true;
+          if (productMatchesCategorySelection(p as any, targetCat, categoryTree)) return true;
         }
 
         // 2. Direct productCategories nodes match (WooCommerce standard)
@@ -182,15 +182,15 @@ export default function UikitProducts({ block, productContexts, categoryTree }: 
 
     // Sort
     result.sort((a, b) => {
-      if (sortOption === "price-asc") return a.priceAmount - b.priceAmount;
-      if (sortOption === "price-desc") return b.priceAmount - a.priceAmount;
+      if (sortOption === "price-asc") return Number(a.priceAmount || 0) - Number(b.priceAmount || 0);
+      if (sortOption === "price-desc") return Number(b.priceAmount || 0) - Number(a.priceAmount || 0);
       if (sortOption === "popularity" || sortOption === "rating") {
         // Fallback: sort featured first then by id
         if (b.featured !== a.featured) return b.featured ? 1 : -1;
         return b.id.localeCompare(a.id);
       }
       // date-desc (default)
-      return String(b.date).localeCompare(String(a.date));
+      return String((b as any).date || "").localeCompare(String((a as any).date || ""));
     });
 
     return result;
@@ -588,13 +588,13 @@ export default function UikitProducts({ block, productContexts, categoryTree }: 
                             display: "block",
                           }}
                         />
-                        {rawBlock.showBadges !== false && product.badge && (
+                        {rawBlock.showBadges !== false && (product as any).badge && (
                           <span
                             style={{
                               position: "absolute",
                               top: "8px",
                               left: "8px",
-                              background: product.badge === "Sale" ? "#f0506e" : product.badge === "Featured" ? "#1e87f0" : "#32d296",
+                              background: (product as any).badge === "Sale" ? "#f0506e" : (product as any).badge === "Featured" ? "#1e87f0" : "#32d296",
                               color: "#fff",
                               fontSize: "10px",
                               fontWeight: 700,
@@ -604,7 +604,7 @@ export default function UikitProducts({ block, productContexts, categoryTree }: 
                               letterSpacing: "0.5px",
                             }}
                           >
-                            {product.badge}
+                            {(product as any).badge}
                           </span>
                         )}
                       </div>
@@ -678,10 +678,10 @@ export default function UikitProducts({ block, productContexts, categoryTree }: 
                       {showCartButton && (
                         <AddToCartButton
                           id={product.id}
-                          productId={product.databaseId ?? product.id}
+                          productId={String(product.databaseId ?? product.id)}
                           slug={product.slug}
                           name={product.name}
-                          priceNumber={product.priceAmount}
+                          priceNumber={Number(product.priceAmount || 0)}
                           imageUrl={product.image}
                           className={cartButtonClass}
                         />

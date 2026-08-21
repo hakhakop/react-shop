@@ -117,10 +117,8 @@ function blockIcon(kind: string) {
   return <Box {...props} />;
 }
 
-function hasDynamicContent(value: {
-  dynamicContext?: unknown;
-  dynamicBindings?: Record<string, unknown>;
-}) {
+function hasDynamicContent(value: any) {
+  if (!value) return false;
   return Boolean(
     value.dynamicContext ||
       (value.dynamicBindings && Object.keys(value.dynamicBindings).length > 0),

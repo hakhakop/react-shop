@@ -98,7 +98,7 @@ export function getUikitSectionPaddingClass(token: SpacingScaleToken): string {
     return "uk-section uk-section-small";
   }
   if (value === "md" || value === "medium" || value === "default") {
-    return "uk-section uk-section-medium";
+    return "uk-section";
   }
   if (value === "lg" || value === "large" || value === "xl") {
     return "uk-section uk-section-large";
@@ -108,6 +108,32 @@ export function getUikitSectionPaddingClass(token: SpacingScaleToken): string {
   }
 
   return "uk-section";
+}
+
+/**
+ * Maps WebPages section margin tokens to UIkit margin utility classes.
+ */
+export function getUikitSectionMarginClass(
+  margin?: string,
+  removeTop?: boolean,
+  removeBottom?: boolean,
+): string {
+  const classes: string[] = [];
+  if (removeTop) classes.push("uk-margin-remove-top");
+  if (removeBottom) classes.push("uk-margin-remove-bottom");
+  if (margin && margin !== "inherit") {
+    const val = margin.trim().toLowerCase();
+    if (val === "remove-top") classes.push("uk-margin-remove-top");
+    else if (val === "remove-bottom") classes.push("uk-margin-remove-bottom");
+    else if (val === "remove-vertical") classes.push("uk-margin-remove-vertical");
+    else if (val === "none" || val === "0" || val === "0px") classes.push("uk-margin-remove");
+    else if (val === "small" || val === "sm") classes.push("uk-margin-small");
+    else if (val === "medium" || val === "md") classes.push("uk-margin-medium");
+    else if (val === "large" || val === "lg") classes.push("uk-margin-large");
+    else if (val === "xlarge" || val === "xl") classes.push("uk-margin-xlarge");
+    else if (val === "default") classes.push("uk-margin");
+  }
+  return classes.filter(Boolean).join(" ");
 }
 
 /**
