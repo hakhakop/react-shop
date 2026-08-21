@@ -309,6 +309,7 @@ export function GridCardsClient({
               metaColor: rawBlock.metaColor,
               contentColor: rawBlock.contentColor,
             });
+            const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
 
             // Title styling & level
             const TitleTag = (rawBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
@@ -316,7 +317,22 @@ export function GridCardsClient({
             const titleHeadingClass = getUikitTitleHeadingClass(titleStyleVal) || (titleStyleVal && titleStyleVal !== "inherit" ? getUikitHeadingClass(titleStyleVal, titleStyleVal) : "");
             const titleDecorationClass = getUikitTitleDecorationClass(rawBlock.titleDecoration);
             const titleColorVal = rawBlock.titleColor ?? rawBlock.gridTitleColor ?? sharedCard.titleColor;
-            const titleColorClass = titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
+            const hasExplicitTitleColor = [rawBlock.titleColor, rawBlock.gridTitleColor, sharedCard.titleColor].some(
+              (value) => typeof value === "string" && !["", "inherit", "default", "none"].includes(value.trim().toLowerCase()),
+            );
+            const sourceTypography = item.typography ?? block.typography;
+            const titleTypography = isYoothemeGrid && !hasExplicitTitleColor && sourceTypography
+              ? ("title" in (sourceTypography as any)
+                ? {
+                    ...(sourceTypography as any),
+                    title: sourceTypography.title ? { ...sourceTypography.title, color: undefined } : sourceTypography.title,
+                  }
+                : (() => {
+                    const { color: _ignoredColor, ...withoutColor } = sourceTypography as any;
+                    return withoutColor;
+                  })())
+              : sourceTypography;
+            const titleColorClass = !(isYoothemeGrid && !hasExplicitTitleColor) && titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
               ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
               : "";
             const titleMarginTopClass = getUikitMarginClass(rawBlock.titleMarginTop);
@@ -341,8 +357,6 @@ export function GridCardsClient({
             // Content styling
             const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
             const contentMarginTopClass = getUikitMarginClass(rawBlock.contentMarginTop);
-            const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
-
             // Image styling
             // `imageShape` and `imageShadow` are the canonical shared Image
             // owners. Older Grid documents may retain the previous aliases,
@@ -438,11 +452,11 @@ export function GridCardsClient({
                   className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "uk-margin-remove-bottom" : ""} ${typographyRoleClass(
                     rawBlock.titleTypographyRole ?? block.titleTypographyRole,
                   )}`.trim()}
-                  typography={item.typography ?? block.typography}
+                  typography={titleTypography}
                   area="title"
                   style={{ ...gridTitleStyle, textAlign: sharedCard.titleAlign ?? gridTitleStyle.textAlign, margin: isYoothemeGrid ? undefined : sharedCard.titleMargin ?? gridTitleStyle.margin }}
                 >
-                  {rawBlock.linkTitle || rawBlock.linkPanel ? (
+                  {rawBlock.linkTitle ? (
                     <a href={itemUrl} {...builderLinkTargetProps(linkTarget)}>
                       {titleContent}
                     </a>
@@ -615,7 +629,7 @@ export function GridCardsClient({
                     // The YOOtheme Grid source leaves `title_color` empty,
                     // which means global emphasis — not the muted Card body
                     // color or a WebPages Card-default fallback.
-                    ...(isYoothemeGrid && !titleColorVal ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
+                    ...(isYoothemeGrid && !hasExplicitTitleColor ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
                     ...(builderItemStyle ?? {}),
                   } as CSSProperties
                 }
