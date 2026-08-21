@@ -2824,6 +2824,7 @@
             },
             "maxWidth": "default",
             "spacingContract": "yootheme",
+            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-5-row-1-column-1",
@@ -3281,6 +3282,7 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
+            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
@@ -4002,7 +4004,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-20T22:04:55.536Z"
+    "updatedAt": "2026-08-21T05:48:02.512Z"
   },
   "shop": {
     "version": 1,
