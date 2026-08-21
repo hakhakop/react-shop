@@ -59,6 +59,20 @@ test("Phase 12 LESS reporting uses the same registry vocabulary and exposes bloc
   expect(blocked.report.entries.find((entry) => entry.capabilityKey === "global-styles.breakpoint-small")).toMatchObject({ status: "BLOCKED" });
 });
 
+test("LESS imports inherit Woolberry's global radius for buttons", () => {
+  const mapped = resolveYoothemeLess([{
+    name: "master-woolberry/_import.less",
+    precedence: 1,
+    content: "@global-border-radius: 2px; @global-primary-background: #DE3155;",
+  }]);
+  expect(mapped.shellSettings).toMatchObject({
+    borderRadius: "2px",
+    buttonRadius: "2px",
+    buttonSmallRadius: "2px",
+    buttonLargeRadius: "2px",
+  });
+});
+
 test("Phase 12 report grouping never combines different capability semantics", () => {
   const report = createYoothemePageImportReport(pageFixture);
   const regrouped = groupYoothemeImportReportEntries([...report.entries, ...report.entries]);

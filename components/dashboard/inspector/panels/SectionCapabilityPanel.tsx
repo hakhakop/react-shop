@@ -36,6 +36,13 @@ function attributesValue(attributes: BuilderLayoutAdvancedSettings["attributes"]
     : Object.entries(attributes).map(([name, value]) => `${name}=${value}`).join("\n");
 }
 
+function normalizeVideoUrl(value: string) {
+  const trimmed = value.trim();
+  return /^wp-content\/uploads(?:\/|$)/i.test(trimmed)
+    ? `/${trimmed}`
+    : trimmed;
+}
+
 function Group({ title, children }: { title?: string; children: ReactNode }) {
   return <section className="builder-inspector-section">{title && <h3>{title}</h3>}{children}</section>;
 }
@@ -74,8 +81,8 @@ export default function SectionCapabilityPanel({ section, tab, update, openWordP
           <InspectorFieldRow label="Image Size"><InspectorSelect value={background?.imageSize ?? "auto"} options={[{ value: "auto", label: "Auto" }, { value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} onChange={(imageSize) => updateBackgroundImage({ imageSize })} ariaLabel="Section image size" /></InspectorFieldRow>
           <InspectorFieldRow label="Image Position"><InspectorSelect value={background?.imagePosition ?? "center-center"} options={["top-left", "top-center", "top-right", "center-left", "center-center", "center-right", "bottom-left", "bottom-center", "bottom-right"].map((value) => ({ value, label: value.replace(/-/g, " ").replace(/(^| )([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`) }))} onChange={(imagePosition) => updateBackgroundImage({ imagePosition })} ariaLabel="Section image position" /></InspectorFieldRow>
           <InspectorFieldRow label="Image Repeat"><InspectorSelect value={background?.imageRepeat ?? "no-repeat"} options={[{ value: "no-repeat", label: "No Repeat" }, { value: "repeat", label: "Repeat" }, { value: "repeat-x", label: "Repeat X" }, { value: "repeat-y", label: "Repeat Y" }]} onChange={(imageRepeat) => updateBackgroundImage({ imageRepeat })} ariaLabel="Section image repeat" /></InspectorFieldRow>
-          <InspectorFieldRow label="Video" description="Video backgrounds are not currently supported by the canonical Section owner.">
-            <InspectorTextField value="" placeholder="Deferred" disabled onChange={() => undefined} ariaLabel="Section video (deferred)" />
+          <InspectorFieldRow label="Video" description="Select a video file or enter a YouTube or Vimeo link.">
+            <BuilderImageUrlControl value={background?.videoUrl ?? ""} placeholder="http://" chooseLabel="Select Video" onChange={(event) => { const videoUrl = normalizeVideoUrl(event.target.value); updateBackgroundImage({ videoUrl: videoUrl || undefined, type: videoUrl ? "video" : "image" }); }} onChoose={() => openWordPressMediaPicker?.({ title: "Section Background Video", currentUrl: background?.videoUrl, onSelect: (media) => updateBackgroundImage({ videoUrl: media.sourceUrl, type: "video" }) })} />
           </InspectorFieldRow>
           <InspectorFieldRow label="Title" description="Decorative Section title source field.">
             <InspectorTextField value={section.title ?? ""} onChange={(title) => update({ title })} ariaLabel="Section title" />

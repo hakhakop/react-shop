@@ -95,8 +95,18 @@ const bool = (value: unknown) => value === true || value === "true" || value ===
 export function normalizeYoothemeSection(props: Record<string, unknown>): Partial<BuilderSection> {
   const style = string(props.style);
   const role = style === "default" || style === "muted" || style === "primary" || style === "secondary" ? style : undefined;
-  const width = string(props.width);
-  const contentMode = width === "none" || width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge" || width === "expand" ? width : width === "full" ? "full" : undefined;
+  const width = typeof props.width === "string" ? props.width.trim() : undefined;
+  const isUnboxedWidth = width === "none" || width === "expand" || width === "full" || width === "";
+  const contentMode = isUnboxedWidth
+    ? "expand"
+    : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
+    ? width
+    : undefined;
+  const maxWidth = isUnboxedWidth
+    ? "expand"
+    : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
+    ? width
+    : undefined;
   const height = string(props.height);
   const sectionHeight = height === "viewport" && bool(props.height_offset_top) ? "viewport-percent" : height === "viewport" ? "viewport" : height === "viewport-20" ? "viewport-20" : height === "viewport-percent" ? "viewport-percent" : height === "none" || height === "auto" ? "auto" : undefined;
   const padding = string(props.padding);

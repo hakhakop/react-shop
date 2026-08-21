@@ -376,11 +376,13 @@ export function InspectorChoiceGroup<T extends string>({
 export function BuilderImageUrlControl({
   value,
   placeholder = "https://... or /uploads/image.jpg",
+  chooseLabel = "Library",
   onChange,
   onChoose,
 }: {
   value: string;
   placeholder?: string;
+  chooseLabel?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onChoose: () => void;
 }) {
@@ -407,7 +409,7 @@ export function BuilderImageUrlControl({
       </div>
       <button type="button" onClick={onChoose} className="builder-media-url-choose-btn">
         <GalleryHorizontal size={14} />
-        Library
+        {chooseLabel}
       </button>
     </div>
   );

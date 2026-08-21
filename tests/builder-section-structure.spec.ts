@@ -89,10 +89,11 @@ test("projects independent canonical Row and responsive Column semantics", () =>
     rows: [{
       id: "canonical-row",
       layout: "2-col-equal",
+      spacingContract: "yootheme",
       columnGap: "large",
       rowGap: "small",
       horizontalDistribution: "center",
-      topMargin: "40px",
+      topMargin: "medium",
       columns: [
         {
           id: "canonical-one",
@@ -111,7 +112,7 @@ test("projects independent canonical Row and responsive Column semantics", () =>
   expect(row.className).toContain("uk-grid-column-large");
   expect(row.className).toContain("uk-grid-row-small");
   expect(row.className).toContain("uk-flex-center");
-  expect(row.style.marginTop).toBe("40px");
+  expect(row.style.marginTop).toBe("0px");
   expect(row.columns[0].className).toContain("uk-width-1-1");
   expect(row.columns[0].className).toContain("uk-width-1-3@m");
   expect(row.columns[0].className).toContain("uk-flex-first@m");

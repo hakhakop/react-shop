@@ -16,6 +16,7 @@ import {
   type BuilderRowStyleInput,
 } from "@/lib/builderRowStyles";
 import {
+  getUikitCardClass,
   getUikitColumnClass,
   getUikitGridClass,
 } from "@/lib/uikitTokens";
@@ -162,7 +163,46 @@ function columnStyle(column: BuilderColumn): CSSProperties {
     ...(column.verticalAlign === "middle" || column.verticalAlign === "bottom"
       ? { flexDirection: "row" }
       : {}),
+    ...(column.background?.color ? { backgroundColor: column.background.color } : {}),
+    ...(column.background?.imageUrl
+      ? {
+          backgroundImage: column.background.gradient
+            ? `${column.background.gradient}, url(${JSON.stringify(column.background.imageUrl)})`
+            : `url(${JSON.stringify(column.background.imageUrl)})`,
+          backgroundPosition: column.background.position,
+          backgroundSize: column.background.size,
+          backgroundRepeat: column.background.repeat,
+        }
+      : column.background?.gradient
+        ? { backgroundImage: column.background.gradient }
+        : {}),
   };
+}
+
+function columnSurfaceClass(column: BuilderColumn) {
+  const rawStyle = column.style?.trim().toLowerCase();
+  const style = rawStyle === "muted" ? "tile-muted" : rawStyle === "hover" ? "card-hover" : rawStyle;
+  const surface = style && style !== "none" ? style : undefined;
+  const padding = column.padding?.trim().toLowerCase();
+  const paddingClass = padding === "none"
+    ? "uk-padding-remove"
+    : padding === "small" || padding === "sm"
+      ? "uk-padding-small"
+      : padding === "medium" || padding === "md" || padding === "default"
+        ? ""
+        : padding === "large" || padding === "lg"
+          ? "uk-padding-large"
+          : padding === "xlarge" || padding === "xl"
+            ? "uk-padding-xlarge"
+            : "";
+  const classes = surface
+    ? getUikitCardClass(surface, { padding: column.padding })
+    : paddingClass;
+  return compactClasses(
+    classes,
+    column.textColor === "light" ? "uk-light" : column.textColor === "dark" ? "uk-dark" : undefined,
+    column.preserveColor ? "uk-preserve-color" : undefined,
+  );
 }
 
 function columnClassName(
@@ -180,6 +220,7 @@ function columnClassName(
       responsiveWidth: legacyItem?.columnResponsiveWidth,
     }),
     columnOrderClasses(column),
+    columnSurfaceClass(column),
   );
 }
 
@@ -190,6 +231,7 @@ function rowStyleInput(
   return {
     ...legacyItem,
     spacingContract: row.spacingContract ?? (legacyItem as any)?.spacingContract,
+    rowHeight: row.height,
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,
     rowBottomMargin: row.bottomMargin ?? legacyItem?.rowBottomMargin,
     rowGap: row.rowGap ?? legacyItem?.rowGap,

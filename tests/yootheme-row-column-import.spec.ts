@@ -4,6 +4,7 @@ import enterprise8 from "@/tests/fixtures/yootheme-compatibility/sources/enterpr
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import { findYoothemeCapability } from "@/lib/yoothemeCompatibilityRegistry";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import { resolveBuilderRowStyle } from "@/lib/builderRowStyles";
 
 test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
   const imported = mapYoothemeStaticContent(enterprise8);
@@ -18,7 +19,7 @@ test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
   )!;
   expect(firstRow.layout).toBe("thirds-1-2");
   expect(firstRow.customLayout?.template).toBe("1-3,2-3");
-  expect(firstRow.topMargin).toBe("40px");
+  expect(firstRow.topMargin).toBe("medium");
   expect(firstRow.columns).toHaveLength(2);
   expect(firstRow.columns[0]).toMatchObject({
     id: "yootheme-section-7-row-1-column-1",
@@ -38,10 +39,54 @@ test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
     "yootheme-image-6-0-1-1",
   ]);
 
+  const importedDividers = imported.sections
+    .flatMap((candidate) => candidate.rows ?? [])
+    .flatMap((row) => row.columns)
+    .flatMap((column) => column.elements)
+    .filter((element) => element.kind === "divider");
+  expect(importedDividers).toHaveLength(2);
+  expect(importedDividers[0]).toMatchObject({
+    kind: "divider",
+    dividerStyle: "default",
+    margin: "xlarge",
+  });
+
   const distinctGapRow = imported.sections
     .flatMap((candidate) => candidate.rows ?? [])
     .find((row) => row.columnGap === "small" && row.rowGap === "large");
   expect(distinctGapRow).toBeTruthy();
+});
+
+test("does not invent a 40px top margin for an unconfigured YOOtheme row", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [
+        { type: "row", children: [{ type: "column", children: [] }] },
+        { type: "row", children: [{ type: "column", children: [] }] },
+      ],
+    }],
+  });
+
+  expect(imported.sections[0]?.rows?.[1]?.topMargin).toBeUndefined();
+});
+
+test("keeps YOOtheme xlarge row margins on the global token", () => {
+  expect(resolveBuilderRowStyle({
+    spacingContract: "yootheme",
+    rowBottomMargin: "xlarge",
+  }).marginBottom).toBe("var(--uk-global-margin-xlarge, 140px)");
+});
+
+test("projects YOOtheme row viewport height into the shared row style", () => {
+  expect(resolveBuilderRowStyle({
+    spacingContract: "yootheme",
+    rowHeight: { mode: "viewport" },
+  }).minHeight).toBe("80vh");
+  expect(resolveBuilderRowStyle({
+    rowHeight: { mode: "pixels", value: "640px" },
+  }).minHeight).toBe("640px");
 });
 
 test("imports extended structural ownership without repeating Row state on Columns", () => {
@@ -138,6 +183,7 @@ test("legacy documents still use the pure layoutItems compatibility boundary", (
     kind: "contentLayout",
     title: "Legacy",
     background: "transparent",
+    visible: true,
     layout: "2-col-equal",
     layoutItems: [{
       id: "legacy-one",
@@ -159,6 +205,38 @@ test("legacy documents still use the pure layoutItems compatibility boundary", (
     verticalAlign: "middle",
     elements: [{ id: "legacy-element" }],
   });
+});
+
+test("imports 3-4,1-4 / 3-1 row layout to quarters-3-1 canonical preset", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        props: {
+          layout: "3-4,1-4",
+        },
+        children: [{
+          type: "column",
+          props: { width_medium: "3-4" },
+          children: [],
+        }, {
+          type: "column",
+          props: { width_medium: "1-4", vertical_align: "middle" },
+          children: [],
+        }],
+      }],
+    }],
+  });
+
+  const section = imported.sections[0];
+  const row = section.rows![0];
+  expect(row.layout).toBe("quarters-3-1");
+  expect(row.columns).toHaveLength(2);
+  expect(row.columns[0].responsiveWidths?.medium).toBe("3-4");
+  expect(row.columns[1].responsiveWidths?.medium).toBe("1-4");
+  expect(row.columns[1].verticalAlign).toBe("middle");
 });
 
 test("registry distinguishes persisted structural fields from runtime support", () => {

@@ -61,19 +61,22 @@ export function resolveCarouselPresentation(
       paginationPosition: resolveString(settings.paginationPosition, shell.sliderDotnavPosition, "bottom"),
     },
     slides: (slides ?? []).map((slide) => {
-      // Panel Slider source-level Image settings are component defaults, not
+      // Component source-level Image settings are element defaults, not
       // synthetic per-item values. Resolve them here so CarouselBlock consumes
       // the same parent → item inheritance in Builder and storefront while a
       // genuine item value still wins.
-      const panelMediaDefaults = presentation === "panel-slider" ? settings : {};
+      const parentMediaDefaults =
+        presentation === "panel-slider" || presentation === "overlay-slider" || presentation === "slideshow"
+          ? settings
+          : {};
       return {
       ...slide,
-      imageWidth: slide.imageWidth ?? panelMediaDefaults.imageWidth,
-      imageHeight: slide.imageHeight ?? panelMediaDefaults.imageHeight,
-      imageRatio: resolveString(slide.imageRatio, panelMediaDefaults.imageRatio ?? shell.imageDefaultRatio, "natural"),
-      imageFit: resolveString(slide.imageFit, panelMediaDefaults.imageFit ?? shell.imageDefaultFit, "natural"),
-      imageShape: resolveString(slide.imageShape, panelMediaDefaults.imageShape ?? shell.imageDefaultBorder, "none"),
-      imageShadow: resolveString(slide.imageShadow, panelMediaDefaults.imageShadow ?? shell.imageDefaultShadow, "none"),
+      imageWidth: slide.imageWidth ?? parentMediaDefaults.imageWidth,
+      imageHeight: slide.imageHeight ?? parentMediaDefaults.imageHeight,
+      imageRatio: resolveString(slide.imageRatio, parentMediaDefaults.imageRatio ?? shell.imageDefaultRatio, "natural"),
+      imageFit: resolveString(slide.imageFit, parentMediaDefaults.imageFit ?? shell.imageDefaultFit, "natural"),
+      imageShape: resolveString(slide.imageShape, parentMediaDefaults.imageShape ?? shell.imageDefaultBorder, "none"),
+      imageShadow: resolveString(slide.imageShadow, parentMediaDefaults.imageShadow ?? shell.imageDefaultShadow, "none"),
       // Panel Slider's structural `image_align` is not equivalent to the
       // shared Image left/center/right control and remains deferred. In the
       // meantime it must not inherit a generic image alignment which produces
@@ -82,7 +85,7 @@ export function resolveCarouselPresentation(
         presentation === "panel-slider"
           ? (typeof slide.imageAlignment === "string" && slide.imageAlignment.trim() ? slide.imageAlignment : undefined)
           : resolveString(slide.imageAlignment, shell.imageDefaultAlignment, "center"),
-      imageLoading: resolveString(slide.imageLoading, panelMediaDefaults.imageLoading ?? shell.imageDefaultLoading, "lazy"),
+      imageLoading: resolveString(slide.imageLoading, parentMediaDefaults.imageLoading ?? shell.imageDefaultLoading, "lazy"),
       };
     }),
   };

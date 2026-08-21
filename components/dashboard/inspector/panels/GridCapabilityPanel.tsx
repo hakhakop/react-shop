@@ -835,6 +835,7 @@ export default function GridCapabilityPanel({
           block={block}
           update={update}
           showAlignment={false}
+          showRole={block.spacingContract !== "yootheme"}
           showStyle
           showColor
           showPosition

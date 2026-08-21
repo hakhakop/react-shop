@@ -1933,6 +1933,7 @@
           {
             "id": "yootheme-section-8-row-1-column-1",
             "rowId": "yootheme-section-8-row-1",
+            "rowBottomMargin": "xlarge",
             "rowLayout": "1-col",
             "blocks": [
               {
@@ -2123,6 +2124,7 @@
           {
             "id": "yootheme-section-8-row-2-column-1",
             "rowId": "yootheme-section-8-row-2",
+            "rowBottomMargin": "xlarge",
             "rowLayout": "1-col",
             "blocks": [
               {
@@ -2668,7 +2670,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-20T22:48:57.238Z"
+    "updatedAt": "2026-08-21T10:57:16.622Z"
   },
   "header": {
     "version": 1,
@@ -5646,6 +5648,7 @@
           {
             "id": "yootheme-section-8-row-1-column-1",
             "rowId": "yootheme-section-8-row-1",
+            "rowBottomMargin": "xlarge",
             "rowLayout": "1-col",
             "blocks": [
               {
@@ -5836,6 +5839,7 @@
           {
             "id": "yootheme-section-8-row-2-column-1",
             "rowId": "yootheme-section-8-row-2",
+            "rowBottomMargin": "xlarge",
             "rowLayout": "1-col",
             "blocks": [
               {

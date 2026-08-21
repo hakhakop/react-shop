@@ -256,7 +256,9 @@ function isPlaceholderSvgUrl(url?: string | null): boolean {
 
 function toCssDimension(value?: string | number | null): string | undefined {
   if (value === undefined || value === null || value === "" || value === "auto") return undefined;
-  return typeof value === "number" ? `${value}px` : value;
+  if (typeof value === "number") return `${value}px`;
+  const str = String(value).trim();
+  return /^\d+(?:\.\d+)?$/.test(str) ? `${str}px` : str;
 }
 
 function toCssObjectPosition(value?: string | null): string | undefined {
@@ -433,13 +435,18 @@ export default function CarouselBlock({
   const isHeroOrFadeMode = swiperVariant === "hero" || swiperVariant === "fade";
   const isMarquee = swiperVariant === "marquee";
   const isFreeMode = swiperVariant === "free-mode";
+  const isOverlaySlider = settings?.presentation === "overlay-slider";
+  const isFixedItemWidth =
+    isOverlaySlider ||
+    settings?.itemWidthMode === "fixed" ||
+    Boolean(toCssDimension(settings?.imageWidth) || slides.some((s) => toCssDimension(s.imageWidth)));
 
   const swiperSlidesPerView =
     is3DEffect || isHeroOrFadeMode
       ? 1
       : panelSliderRuntime
       ? panelSliderRuntime.slidesPerView
-      : isMarquee
+      : isFixedItemWidth || isMarquee
       ? "auto"
       : isFreeMode || swiperVariant === "multi-card"
       ? cardsPerView
@@ -759,22 +766,30 @@ export default function CarouselBlock({
                   [breakpointPolicy.xlarge]: { ...panelSliderRuntime.breakpoints[breakpointPolicy.xlarge], spaceBetween: swiperSpaceBetween },
                 }
               : undefined
+            : isFixedItemWidth
+              ? {
+                0: { slidesPerView: "auto", spaceBetween: swiperSpaceBetween },
+                [breakpointPolicy.small]: { slidesPerView: "auto", spaceBetween: swiperSpaceBetween },
+                [breakpointPolicy.medium]: { slidesPerView: "auto", spaceBetween: swiperSpaceBetween },
+                [breakpointPolicy.large]: { slidesPerView: "auto", spaceBetween: swiperSpaceBetween },
+                [breakpointPolicy.xlarge]: { slidesPerView: "auto", spaceBetween: swiperSpaceBetween },
+              }
             : !is3DEffect && !isHeroOrFadeMode && !isMarquee
               ? {
                 0: {
                   slidesPerView: responsiveCardsPerView.phone,
-                  spaceBetween: 12,
+                  spaceBetween: swiperSpaceBetween,
                 },
                 [breakpointPolicy.small]: {
                   slidesPerView: responsiveCardsPerView.small,
-                  spaceBetween: Math.min(spaceBetween, 16),
+                  spaceBetween: swiperSpaceBetween,
                 },
                 [breakpointPolicy.medium]: {
                   slidesPerView: responsiveCardsPerView.medium,
-                  spaceBetween,
+                  spaceBetween: swiperSpaceBetween,
                 },
-                [breakpointPolicy.large]: { slidesPerView: responsiveCardsPerView.large, spaceBetween },
-                [breakpointPolicy.xlarge]: { slidesPerView: responsiveCardsPerView.xlarge, spaceBetween },
+                [breakpointPolicy.large]: { slidesPerView: responsiveCardsPerView.large, spaceBetween: swiperSpaceBetween },
+                [breakpointPolicy.xlarge]: { slidesPerView: responsiveCardsPerView.xlarge, spaceBetween: swiperSpaceBetween },
               }
               : undefined
         }
@@ -1182,26 +1197,63 @@ export default function CarouselBlock({
                     btn: "bg-white text-slate-900 hover:bg-slate-100 shadow-lg px-4 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition",
                   };
 
+            const overlayShapeClass =
+              slide.imageShape === "rounded" || settings?.imageShape === "rounded"
+                ? "rounded-2xl"
+                : slide.imageShape === "circle" || settings?.imageShape === "circle"
+                ? "rounded-full"
+                : "";
+
+            const cardRatio = (() => {
+              const explicitRatio = toCssAspectRatio(settings?.aspectRatio) ?? toCssAspectRatio(slide.imageRatio);
+              if (explicitRatio) return explicitRatio;
+              const w = slide.imageWidth ?? settings?.imageWidth;
+              const h = slide.imageHeight ?? settings?.imageHeight;
+              if (w && h) {
+                const numW = parseFloat(String(w));
+                const numH = parseFloat(String(h));
+                if (numW > 0 && numH > 0) return `${numW} / ${numH}`;
+              }
+              return undefined;
+            })();
+
+            const overlaySlideWidth =
+              toCssDimension(slide.imageWidth ?? settings?.imageWidth) ??
+              (isOverlaySlider ? "800px" : undefined);
+
             return (
-              <SwiperSlide key={slide.id || idx}>
+              <SwiperSlide
+                key={slide.id || idx}
+                className={isOverlaySlider ? "shop-builder-overlay-slide" : undefined}
+                style={
+                  overlaySlideWidth
+                    ? {
+                      // Swiper writes a calculated inline `width` after it
+                      // initializes. Preserve the imported YOOtheme media
+                      // width as a CSS variable so the overlay-item rule can
+                      // remain authoritative.
+                      "--shop-builder-overlay-slide-width": overlaySlideWidth,
+                      width: overlaySlideWidth,
+                      maxWidth: "min(85vw, 100%)",
+                    } as React.CSSProperties
+                    : undefined
+                }
+              >
                 <article
-                  className={`shop-builder-overlay-slide-card group relative w-full ${settings?.aspectRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden rounded-2xl`}
-                  style={(() => {
-                    const ratio = toCssAspectRatio(settings?.aspectRatio) ?? toCssAspectRatio(slide.imageRatio);
-                    return ratio ? { aspectRatio: ratio } : undefined;
-                  })()}
+                  className={`shop-builder-overlay-slide-card group relative w-full ${cardRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden ${overlayShapeClass}`.trim()}
+                  style={cardRatio ? { aspectRatio: cardRatio } : undefined}
                 >
                   {hasRealImage ? (
                     <>
                       <img
                         src={slide.imageUrl!}
                         alt={slide.imageAlt ?? slide.title ?? ""}
-                        className={`block w-full ${slide.imageHeight || settings?.aspectRatio || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
+                        className={`block w-full ${cardRatio || slide.imageHeight || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
                         style={{
-                          width: toCssDimension(slide.imageWidth) ?? "100%",
+                          width: "100%",
+                          height: cardRatio ? "100%" : undefined,
                           maxWidth: "100%",
                           objectPosition: toCssObjectPosition(slide.imagePosition),
-                          ...(slide.imageHeight && !settings?.aspectRatio ? { height: toCssDimension(slide.imageHeight), objectFit: "cover" as const } : {}),
                         }}
                         sizes="(min-width: 1180px) 50vw, 100vw"
                         loading={resolveImageLoading(slide.imageLoading ?? settings?.imageLoading, idx === 0 ? "eager" : "lazy")}

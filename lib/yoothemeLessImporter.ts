@@ -759,6 +759,16 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
     shellSettings.alertColor = shellSettings.textColor;
   }
 
+  // UIkit's button radius inherits the global surface radius unless the
+  // theme explicitly overrides it. Do not let WebPages' historical pill
+  // default (999px) survive a Woolberry-style import that only declares
+  // @global-border-radius.
+  if (!latest.has("button-border-radius") && typeof shellSettings.borderRadius === "string") {
+    shellSettings.buttonRadius = shellSettings.borderRadius;
+    if (!latest.has("button-small-border-radius")) shellSettings.buttonSmallRadius = shellSettings.borderRadius;
+    if (!latest.has("button-large-border-radius")) shellSettings.buttonLargeRadius = shellSettings.borderRadius;
+  }
+
   // Persist authored-versus-inherited provenance for the complete shared
   // Button vocabulary. A missing LESS declaration means “inherit the UIkit
   // semantic token”, not “reuse whichever WebPages Button default happened

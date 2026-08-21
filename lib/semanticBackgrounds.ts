@@ -7,7 +7,7 @@ type SectionBackgroundInput = {
   sectionVariant?: unknown;
   backgroundOverride?: unknown;
   background?: unknown;
-  visualStyle?: { background?: { imageUrl?: unknown; imageSize?: unknown; imagePosition?: unknown; imageRepeat?: unknown } };
+  visualStyle?: { background?: { imageUrl?: unknown; videoUrl?: unknown; imageSize?: unknown; imagePosition?: unknown; imageRepeat?: unknown } };
 };
 
 function semanticRole(value: unknown): SemanticBackgroundRole | undefined {

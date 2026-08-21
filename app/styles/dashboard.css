@@ -35,10 +35,20 @@
 
 .builder-dashboard {
   min-height: calc(100vh - 160px);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
   padding: 0;
   display: grid;
   grid-template-columns: var(--builder-sidebar-width, 390px) minmax(0, 1fr);
   gap: 0;
+}
+
+.builder-workspace {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 /* The application shell Header is not the website Header being edited. Keep
@@ -5649,7 +5659,8 @@ body:has(.builder-dashboard) .site-header--service {
   display: flex;
   flex-direction: column;
   gap: var(--builder-ui-gap);
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
   background: var(--builder-preview-real-bg, transparent);
 }
 
@@ -6476,8 +6487,11 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 }
 
 .builder-preview-section.shop-builder-section--height-viewport,
-.builder-preview-section.shop-builder-section--height-viewport-80 {
+.builder-preview-section.shop-builder-section--height-viewport-80,
+.builder-preview-section.shop-builder-section--height-viewport-20,
+.builder-preview-section.shop-builder-section--height-viewport-percent {
   display: flex;
+  flex-direction: column;
 }
 
 .builder-preview-canvas .shop-builder-section--full {

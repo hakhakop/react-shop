@@ -355,29 +355,31 @@ ${explicitWordPressProductVars}
                 <SearchProvider>
                   <ProductCategoryFilterProvider>
                    <RecentlyViewedProvider>
-                  {!isDomainWebsiteRequest && (
+                  {!isDomainWebsiteRequest && !isDashboardWorkspaceRequest && (
                     <RootHeaderVisibility initialPathname={pathname}>
                       <HeaderShell layoutOverride={shellSettings.headerLayout} />
                     </RootHeaderVisibility>
                   )}
 
-                  <main className="site-main">{children}</main>
+                  <main className="site-main" suppressHydrationWarning>{children}</main>
 
-                  {/* Scroll to top + Floating cart bubble */}
-                    <FrontendAdminBar
-                      domainWebsite={
-                        domainWebsite
-                          ? {
-                              ownerId: domainWebsite.ownerId,
-                              routeSegment: getWebsiteRouteSegment(domainWebsite),
-                            }
-                          : undefined
-                      }
-                    />
-                    <ScrollToTopButton />
-                  {/* Floating cart bubble */}
-                    <FloatingCartSummary />
-                  <MiniCart />
+                  {!isDashboardWorkspaceRequest && (
+                    <>
+                      <FrontendAdminBar
+                        domainWebsite={
+                          domainWebsite
+                            ? {
+                                ownerId: domainWebsite.ownerId,
+                                routeSegment: getWebsiteRouteSegment(domainWebsite),
+                              }
+                            : undefined
+                        }
+                      />
+                      <ScrollToTopButton />
+                      <FloatingCartSummary />
+                      <MiniCart />
+                    </>
+                  )}
 
                   {!isDomainWebsiteRequest && !isDashboardWorkspaceRequest && (
                     <RootFooterVisibility initialPathname={pathname}>

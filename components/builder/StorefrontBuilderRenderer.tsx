@@ -361,7 +361,10 @@ function resolveDesignColors(layout: BuilderLayout) {
   return design;
 }
 
-export function designStyle(layout: BuilderLayout): BuilderStyle {
+export function designStyle(
+  layout: BuilderLayout,
+  shellSettings?: Partial<BuilderShellSettings>,
+): BuilderStyle {
   const design = layout.design;
   const colors = resolveDesignColors(layout);
   const styleObj: Record<string, string | undefined> = {};
@@ -429,6 +432,10 @@ export function designStyle(layout: BuilderLayout): BuilderStyle {
   if (design?.cardImagePadding) {
     styleObj["--builder-card-image-padding"] = design.cardImagePadding;
   }
+  // Keep the published renderer on the same live semantic token surface as
+  // the Builder preview. This is especially important when a global preset
+  // changes button radii or other UIkit variables before publish.
+  Object.assign(styleObj, getUikitGlobalsCssVars(shellSettings, design));
 
   return styleObj as BuilderStyle;
 }
@@ -673,9 +680,18 @@ export function getBuilderSectionClassName(
     section.sectionHeight && section.sectionHeight !== "auto" && section.sectionHeight !== "none"
       ? `shop-builder-section--height-${section.sectionHeight}`
       : "";
+  // Older imported YOOtheme documents can lose the explicit alignment field
+  // when passing through the legacy draft boundary. A viewport-height
+  // yootheme section's `vertical_align` default is middle, so recover that
+  // semantic instead of silently placing its hero content at the top.
+  const verticalAlign = section.contentVerticalAlign ?? (
+    section.id.startsWith("yootheme-") && section.sectionHeight?.startsWith("viewport")
+      ? "center"
+      : undefined
+  );
   const verticalAlignClass =
-    section.contentVerticalAlign && section.contentVerticalAlign !== "top"
-      ? `shop-builder-section--align-${section.contentVerticalAlign}`
+    verticalAlign && verticalAlign !== "top"
+      ? `shop-builder-section--align-${verticalAlign}`
       : "";
   const uikitSectionPad = getUikitSectionPaddingClass(
     section.sectionPadding ?? section.topSpacing ?? (section as any).sectionPaddingTop,
@@ -716,6 +732,9 @@ export function getBuilderSectionClassName(
   const imageClass = section.visualStyle?.background?.imageUrl
     ? "shop-builder-section--has-background-image"
     : "";
+  const videoClass = section.visualStyle?.background?.videoUrl
+    ? "shop-builder-section--has-background-video"
+    : "";
   const modeClass = mode ? `shop-builder-section--${mode}` : "";
   const maxWidthClass = maxWidth && maxWidth !== "boxed" && maxWidth !== "default" ? `shop-builder-section--content-${maxWidth}` : "";
   const schemeClass = scheme && scheme !== "light" && scheme !== "auto" ? `shop-builder-section--scheme-${scheme}` : "";
@@ -734,6 +753,7 @@ export function getBuilderSectionClassName(
     titlePositionClass,
     titleRotationClass,
     imageClass,
+    videoClass,
     "shop-builder-section",
     modeClass,
     maxWidthClass,
@@ -781,6 +801,14 @@ function SectionFrame({
     isAntigravity &&
     (section.antigravityVisualMode === undefined ||
       section.antigravityVisualMode === "full");
+  const backgroundVideoUrl = section.visualStyle?.background?.videoUrl;
+  const youtubeVideo = backgroundVideoUrl?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]+)/i);
+  const vimeoVideo = backgroundVideoUrl?.match(/vimeo\.com\/(\d+)/i);
+  const backgroundVideoEmbed = youtubeVideo
+    ? `https://www.youtube.com/embed/${youtubeVideo[1]}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideo[1]}&controls=0&playsinline=1`
+    : vimeoVideo
+      ? `https://player.vimeo.com/video/${vimeoVideo[1]}?autoplay=1&muted=1&loop=1&background=1`
+      : undefined;
 
   return (
     <ComponentTag
@@ -845,6 +873,13 @@ function SectionFrame({
           )}
         </>
       )}
+      {backgroundVideoUrl ? (
+        backgroundVideoEmbed ? (
+          <iframe className="shop-builder-section-background-video" src={backgroundVideoEmbed} title="Background video" allow="autoplay; fullscreen" aria-hidden="true" />
+        ) : (
+          <video className="shop-builder-section-background-video" src={backgroundVideoUrl} autoPlay muted loop playsInline aria-hidden="true" />
+        )
+      ) : null}
       <div
         className={`shop-builder-section-content ${getUikitContainerClass(section.contentMode)}`}
         data-gsap-stagger={
@@ -3145,7 +3180,7 @@ function StorefrontBuilderRendererBase({
       {isPageDocument ? <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} /> : null}
       <RootElement
         className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
-        style={designStyle(layout) as CSSProperties}
+        style={designStyle(layout, shellSettings) as CSSProperties}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
         data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}

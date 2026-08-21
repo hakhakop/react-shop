@@ -35,7 +35,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className={`toast-root ${visible ? "toast-visible" : ""}`}>
+      <div
+        className={`toast-root ${visible ? "toast-visible" : ""}`}
+        suppressHydrationWarning
+      >
         {message}
       </div>
     </ToastContext.Provider>

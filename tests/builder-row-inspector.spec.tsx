@@ -24,15 +24,18 @@ test("Row inspector exposes canonical imported layout, independent gaps, and mar
     "utf8",
   );
 
-  expect(importedRow).toMatchObject({ layout: "thirds-1-2", topMargin: "40px" });
+  expect(importedRow).toMatchObject({ layout: "thirds-1-2", topMargin: "medium" });
   expect(panelSource).toContain('data-canonical-owner="BuilderRow"');
-  expect(panelSource).toContain('ariaLabel="Edit Row layout"');
+  expect(panelSource).toContain('aria-label="Edit Layout"');
   expect(panelSource).toContain('value={row.layout}');
   expect(panelSource).toContain('value={row.columnGap ?? "inherit"}');
   expect(panelSource).toContain('onChange={(columnGap) => update({ columnGap })}');
   expect(panelSource).toContain('value={row.rowGap ?? "inherit"}');
   expect(panelSource).toContain('onChange={(rowGap) => update({ rowGap })}');
-  expect(panelSource).toContain('value={row.topMargin ?? ""}');
+  expect(panelSource).toContain('value={row.topMargin ?? "inherit"}');
+  expect(panelSource).toContain('ariaLabel="Row margin"');
+  expect(panelSource).not.toContain('label="Top Margin"');
+  expect(panelSource).not.toContain('label="Bottom Margin"');
 });
 
 test("canonical Row edits keep gaps, margins, and Columns independent", () => {

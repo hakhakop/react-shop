@@ -219,12 +219,13 @@ export function TitleSettingsGroup({
 
 /**
  * Reusable Meta Settings Group.
- * Displays Font role, Alignment, and HTML Element.
+ * Displays optional legacy Font role plus YOOtheme-compatible meta controls.
  */
 export function MetaSettingsGroup({
   block,
   update,
   showAlignment = true,
+  showRole = true,
   showStyle = false,
   showColor = false,
   showPosition = false,
@@ -242,6 +243,7 @@ export function MetaSettingsGroup({
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   showAlignment?: boolean;
+  showRole?: boolean;
   showStyle?: boolean;
   showColor?: boolean;
   showPosition?: boolean;
@@ -263,18 +265,20 @@ export function MetaSettingsGroup({
   const positionKey = keys.position ?? "gridMetaAlign";
   return (
     <InspectorDivision title="META">
-      <InspectorFieldRow
-        label="Font role"
-        isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
-        inheritedValueText="Inherit"
-        onReset={() => update({ [keys.role]: undefined })}
-      >
-        <InspectorSelect
-          value={String(values[keys.role] ?? "inherit")}
-          options={roleOptions}
-          onChange={(value) => update({ [keys.role]: value === "inherit" ? undefined : value })}
-        />
-      </InspectorFieldRow>
+      {showRole && (
+        <InspectorFieldRow
+          label="Font role"
+          isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
+          inheritedValueText="Inherit"
+          onReset={() => update({ [keys.role]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.role] ?? "inherit")}
+            options={roleOptions}
+            onChange={(value) => update({ [keys.role]: value === "inherit" ? undefined : value })}
+          />
+        </InspectorFieldRow>
+      )}
 
       {showStyle && (
         <InspectorFieldRow
@@ -568,7 +572,7 @@ export function ImageSettingsGroup({
           <InspectorTextField
             value={String(values[keys.width] ?? "")}
             placeholder="auto"
-            onChange={(val) => update({ [keys.width]: normalizeDimensionInput(val) || undefined })}
+            onChange={(val) => update({ [keys.width]: val.trim() || undefined })}
           />
         </InspectorFieldRow>
         <InspectorFieldRow
@@ -580,7 +584,7 @@ export function ImageSettingsGroup({
           <InspectorTextField
             value={String(values[keys.height] ?? "")}
             placeholder="auto"
-            onChange={(val) => update({ [keys.height]: normalizeDimensionInput(val) || undefined })}
+            onChange={(val) => update({ [keys.height]: val.trim() || undefined })}
           />
         </InspectorFieldRow>
       </div>}

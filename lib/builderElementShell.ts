@@ -88,10 +88,14 @@ function getYoothemeWidthClass(
 export function getGeneralElementShellClassName(block: GeneralElementShellBlock) {
   if (!usesYoothemeSpacingContract(block)) return "";
   const layout = block.visualStyle?.layout;
+  const isPositioned = layout?.position === "absolute" || layout?.position === "fixed";
   return [
     "yootheme-imported-spacing",
     getYoothemeWidthClass(layout?.maxWidth, layout?.maxWidthBreakpoint),
-    getYoothemeMarginClass(layout?.marginMode),
+    // Flow margins do not participate in YOOtheme's positioned-element
+    // origin. Applying `uk-margin` here adds 20px to authored offsets such as
+    // `top: -388px` and makes the Builder image visibly lower than YOOtheme.
+    isPositioned ? "" : getYoothemeMarginClass(layout?.marginMode),
     layout?.removeTopMargin ? "uk-margin-remove-top" : "",
     layout?.removeBottomMargin ? "uk-margin-remove-bottom" : "",
   ].filter(Boolean).join(" ");

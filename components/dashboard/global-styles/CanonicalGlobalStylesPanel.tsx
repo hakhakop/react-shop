@@ -230,6 +230,11 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
     const resolved = resolveBundledYoothemeDevstackPreset(preset.id);
     const patch: Partial<BuilderShellSettings> = {
       ...resolved.shellSettings,
+      // Presets are replacements for the previous semantic theme. Clear
+      // size-specific radii that the prior theme may have authored so the
+      // active preset can inherit its own main button radius immediately.
+      buttonSmallRadius: resolved.shellSettings.buttonSmallRadius,
+      buttonLargeRadius: resolved.shellSettings.buttonLargeRadius,
       globalStylePresetName: preset.name,
     };
     setDraft({ ...draft, ...patch });

@@ -10,6 +10,7 @@ type RootHeaderVisibilityProps = {
 
 function shouldHideRootHeader(pathname: string) {
   return (
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/app") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/login") ||

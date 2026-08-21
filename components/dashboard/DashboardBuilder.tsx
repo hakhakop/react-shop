@@ -11112,6 +11112,7 @@ export default function DashboardBuilder({
           "--builder-preview-real-bg": previewPageBackground,
           "--builder-sidebar-width": `${sidebarWidth}px`,
           "--builder-inspector-width": `${clampedInspectorWidth}px`,
+          ...getUikitGlobalsCssVars(shellSettings, builderState.design),
         } as CSSProperties
       }
     >
@@ -13044,7 +13045,7 @@ function PreviewCanvas({
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         data-theme={layoutScheme}
         style={{
-          ...designStyle({ design, sections }),
+          ...designStyle({ design, sections }, shellSettings),
         }}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
@@ -13311,6 +13312,17 @@ function PreviewCanvas({
                           )}
                       </>
                     )}
+                    {section.visualStyle?.background?.videoUrl ? (
+                      <video
+                        className="shop-builder-section-background-video"
+                        src={section.visualStyle.background.videoUrl}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        aria-hidden="true"
+                      />
+                    ) : null}
                     <div
                       className="builder-preview-section-insert builder-preview-section-insert--top"
                       data-builder-object-type="section"

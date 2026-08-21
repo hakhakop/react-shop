@@ -26,10 +26,11 @@ export type BuilderSpacingSides = {
 };
 
 export type BuilderBackgroundStyle = {
-  type?: "none" | "color" | "gradient" | "image";
+  type?: "none" | "color" | "gradient" | "image" | "video";
   color?: string;
   gradient?: string;
   imageUrl?: string;
+  videoUrl?: string;
   imageSize?: "cover" | "contain" | "auto";
   imagePosition?: string;
   imageRepeat?: "no-repeat" | "repeat" | "repeat-x" | "repeat-y";

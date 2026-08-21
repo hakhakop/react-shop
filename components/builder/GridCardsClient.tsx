@@ -274,7 +274,7 @@ export function GridCardsClient({
             let panelClass = "";
 
             if (panelStyle === "card-hover") {
-              panelClass = "uk-card uk-card-default";
+              panelClass = "uk-card uk-card-default uk-flex uk-flex-column";
             } else if (
               panelStyle.startsWith("card-") ||
               panelStyle === "default" ||
@@ -282,10 +282,10 @@ export function GridCardsClient({
               panelStyle === "secondary"
             ) {
               const variant = panelStyle.replace("card-", "");
-              panelClass = `uk-card uk-card-${variant || "default"}`.trim();
+              panelClass = `uk-card uk-card-${variant || "default"} uk-flex uk-flex-column`.trim();
             } else if (panelStyle.startsWith("tile-")) {
               const variant = panelStyle.replace("tile-", "");
-              panelClass = `uk-tile uk-tile-${variant || "default"}`.trim();
+              panelClass = `uk-tile uk-tile-${variant || "default"} uk-flex uk-flex-column`.trim();
             } else {
               panelClass = "shop-builder-panel-plain";
             }
@@ -348,14 +348,19 @@ export function GridCardsClient({
             const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop);
             const rawMetaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below-title";
             const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
-            const MetaTag = (rawBlock.gridMetaHtmlElement ?? (rawBlock.spacingContract === "yootheme" ? "h3" : "div")) as any;
-            const metaElement = String(rawBlock.gridMetaHtmlElement ?? (rawBlock.spacingContract === "yootheme" ? "h3" : "div"));
+            // YOOtheme's Grid meta is a plain `div` (its visual size comes
+            // from the text/color token), never an implicit heading. The old
+            // h3 fallback promoted dates/categories to `uk-h2` in Latest News.
+            const MetaTag = (rawBlock.gridMetaHtmlElement ?? "div") as any;
+            const metaElement = String(rawBlock.gridMetaHtmlElement ?? "div");
             const metaElementClass = /^h[1-6]$/.test(metaElement)
               ? `uk-${metaElement}`
               : "";
 
             // Content styling
-            const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
+            const contentStyleClass = isYoothemeGrid
+              ? getUikitTextStyleClass(rawBlock.contentStyle).replace(/\buk-h[1-6]\b/g, "").trim()
+              : getUikitTextStyleClass(rawBlock.contentStyle);
             const contentMarginTopClass = getUikitMarginClass(rawBlock.contentMarginTop);
             // Image styling
             // `imageShape` and `imageShadow` are the canonical shared Image
@@ -429,7 +434,7 @@ export function GridCardsClient({
               canShowMeta && item.meta ? (
                 <Typog
                   as={MetaTag}
-                  className={`${metaStyleClass} ${metaElementClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
+                  className={`shop-builder-grid-meta ${metaStyleClass} ${metaElementClass} ${metaColorClass} ${metaMarginTopClass} ${isYoothemeGrid ? "" : typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
                   style={colorSemantics.metaStyle}
@@ -471,10 +476,12 @@ export function GridCardsClient({
               canShowContent && safeContent ? (
                 <Typog
                   as="div"
-                  className={`${contentStyleClass} ${contentMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${typographyRoleClass(
+                  className={`${isYoothemeGrid ? "uk-panel uk-flex-1" : ""} ${contentStyleClass} ${contentMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "" : typographyRoleClass(
                     block.contentTypographyRole,
                   )}`.trim()}
-                  typography={item.typography ?? block.typography}
+                  typography={isYoothemeGrid && !rawBlock.contentStyle && !block.contentTypographyRole
+                    ? undefined
+                    : item.typography ?? block.typography}
                   area="body"
                 >
                   {safeContent}
@@ -596,7 +603,10 @@ export function GridCardsClient({
                 </div>
               ) : <>{renderTitleCluster()}{renderContentCluster()}</>;
               const constrainOneColumnContent = isYoothemeGrid && mediaPlacement === "top" && !panelStyle && rawBlock.panelContentWidth && rawBlock.panelContentWidth !== "auto";
-              return <div className={`${bodyPaddingClass} shop-builder-grid-content`.trim()}>
+              const cardBodyClass = panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary" || panelStyle === "card-hover" || panelStyle.startsWith("card-")
+                ? "uk-card-body"
+                : "";
+              return <div className={`${cardBodyClass} ${bodyPaddingClass} shop-builder-grid-content`.trim()}>
                 {mediaPlacement === "top" && !isFrameless && renderImage()}
                 {constrainOneColumnContent ? <div className={`uk-container uk-container-${rawBlock.panelContentWidth} shop-builder-grid-one-column-content`}>{contents}</div> : contents}
                 {mediaPlacement === "bottom" && renderImage()}
@@ -613,7 +623,7 @@ export function GridCardsClient({
                 key={item.id}
                 className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
-                } ${panelHeightClass} ${panelExpandClass} ${panelLinkClass} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
+                } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     textAlign: itemContentAlignment,
@@ -629,7 +639,7 @@ export function GridCardsClient({
                     // The YOOtheme Grid source leaves `title_color` empty,
                     // which means global emphasis — not the muted Card body
                     // color or a WebPages Card-default fallback.
-                    ...(isYoothemeGrid && !hasExplicitTitleColor ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
+                    ...(isYoothemeGrid && !hasExplicitTitleColor && ["blank", "default", "card-default"].includes(panelStyle) ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
                     ...(builderItemStyle ?? {}),
                   } as CSSProperties
                 }

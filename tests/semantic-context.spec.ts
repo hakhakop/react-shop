@@ -154,3 +154,14 @@ test("legacy DevStack imports do not retain generic WebPages Button defaults", (
     "--uk-button-link-color": "#6F40F1",
   });
 });
+
+test("button size variants inherit the active theme radius when not explicitly authored", () => {
+  const globals = getUikitGlobalsCssVars({
+    buttonRadius: "500px",
+    borderRadius: "2px",
+  });
+
+  expect(globals["--uk-button-border-radius"]).toBe("500px");
+  expect(globals["--uk-button-small-radius"]).toBe("500px");
+  expect(globals["--uk-button-large-radius"]).toBe("500px");
+});

@@ -19,6 +19,16 @@ function findZipEntry(files: Record<string, Uint8Array>, suffix: string) {
   return entry ? strFromU8(entry[1]) : "";
 }
 
+function findDirectEntry(files: Map<string, string>, suffix: string) {
+  const normalizedSuffix = suffix.toLowerCase();
+  const exact = files.get(normalizedSuffix);
+  if (exact !== undefined) return exact;
+  const entry = [...files.entries()].find(([name]) =>
+    name.endsWith(`/${normalizedSuffix}`) || name.endsWith(normalizedSuffix),
+  );
+  return entry?.[1] ?? "";
+}
+
 async function readSources(fileList: File[], presetId: YoothemeDevstackPresetId): Promise<YoothemeLessSource[]> {
   if (!fileList?.length) return [];
   const direct = new Map<string, string>();
@@ -32,7 +42,8 @@ async function readSources(fileList: File[], presetId: YoothemeDevstackPresetId)
   }
   const preset = YOOTHEME_DEVSTACK_PRESETS.find((entry) => entry.id === presetId) ?? YOOTHEME_DEVSTACK_PRESETS[2];
   const presetFileName = preset.styleFile.split("/").pop() ?? "light-blue.less";
-  const source = (name: string, fallbackSuffix: string) => direct.get(name) ?? findZipEntry(zipFiles, fallbackSuffix);
+  const source = (name: string, fallbackSuffix: string) =>
+    findDirectEntry(direct, name) || findDirectEntry(direct, fallbackSuffix) || findZipEntry(zipFiles, fallbackSuffix);
   const entries = [
     ["master-devstack/_import.less", source("_import.less", "master-devstack/_import.less"), 1],
     [preset.styleFile, source(presetFileName, preset.styleFile), 2],

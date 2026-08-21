@@ -24,6 +24,7 @@
 
 .shop-builder-section {
   display: flow-root;
+  position: relative;
   width: 100%;
   margin: var(--builder-section-margin-top, var(--builder-global-section-margin-top, 0px)) auto var(--builder-section-margin-bottom, var(--builder-global-section-margin-bottom, 0px));
   border: 0;
@@ -57,6 +58,26 @@
   --builder-active-surface: var(--webpages-background-default, var(--uk-global-background-color, #fff));
   --builder-active-button-bg: var(--button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)));
   --builder-active-button-text: var(--button-text-color, var(--builder-section-button-text, var(--builder-button-text, #ffffff)));
+}
+
+.shop-builder-section--has-background-video {
+  overflow: hidden;
+}
+
+.shop-builder-section-background-video {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  border: 0;
+}
+
+.shop-builder-section--has-background-video > .shop-builder-section-content {
+  position: relative;
+  z-index: 1;
 }
 
 .shop-builder-section:not(.uk-section) {
@@ -251,6 +272,10 @@ body.dark {
 .shop-builder-section--height-viewport.shop-builder-section--align-top
   > .shop-builder-section-content,
 .shop-builder-section--height-viewport-80.shop-builder-section--align-top
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-20.shop-builder-section--align-top
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-percent.shop-builder-section--align-top
   > .shop-builder-section-content {
   margin-top: 0;
   margin-bottom: auto;
@@ -259,6 +284,19 @@ body.dark {
 .shop-builder-section--height-viewport.shop-builder-section--align-center
   > .shop-builder-section-content,
 .shop-builder-section--height-viewport-80.shop-builder-section--align-center
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-20.shop-builder-section--align-center
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-percent.shop-builder-section--align-center
+  > .shop-builder-section-content {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/* Legacy YOOtheme hero drafts may retain the viewport-percent height but lose
+   the explicit alignment field at the draft boundary. YOOtheme's default for
+   that full-viewport hero is middle alignment. */
+.shop-builder-section--height-viewport-percent:not(.shop-builder-section--align-top):not(.shop-builder-section--align-bottom)
   > .shop-builder-section-content {
   margin-top: auto;
   margin-bottom: auto;
@@ -267,6 +305,10 @@ body.dark {
 .shop-builder-section--height-viewport.shop-builder-section--align-bottom
   > .shop-builder-section-content,
 .shop-builder-section--height-viewport-80.shop-builder-section--align-bottom
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-20.shop-builder-section--align-bottom
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-percent.shop-builder-section--align-bottom
   > .shop-builder-section-content {
   margin-top: auto;
   margin-bottom: 0;
@@ -1403,6 +1445,13 @@ body.dark {
   min-height: 0;
 }
 
+/* Swiper's auto-width mode writes the measured viewport width directly on
+   each slide. Overlay Slider items are sized by YOOtheme's `image_width`,
+   so retain that authored width instead of letting the item fill the canvas. */
+.shop-builder-swiper--overlay .swiper-slide.shop-builder-overlay-slide {
+  width: min(var(--shop-builder-overlay-slide-width, 800px), 85vw) !important;
+}
+
 /* A missing YOOtheme overlay_style is deliberately transparent. The source
    controls whether content gets an Overlay or Tile surface; the renderer must
    not introduce a generic dark gradient as a component default. */
@@ -2089,7 +2138,9 @@ body.dark {
 }
 
 .shop-builder-grid-card .shop-builder-grid-content {
-  width: var(--shop-builder-grid-card-width, var(--shop-builder-grid-card-width-base, auto));
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .shop-builder-grid-card.shop-builder-panel--expand-content,
@@ -2101,7 +2152,31 @@ body.dark {
    contract scoped to imported YOOtheme panels; ordinary WebPages cards retain
    their existing default padding token. */
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-default {
-  padding: 40px !important;
+  padding: 30px !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-small {
+  padding: 15px !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-large {
+  padding: 0 70px 70px !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-default,
+.shop-builder-grid-card--yootheme.uk-card-hover {
+  background: var(--uk-card-default-background, var(--global-background, #f7f8fc)) !important;
+  box-shadow: var(--uk-card-default-box-shadow, -15px -15px 20px rgba(255, 255, 255, 0.8), 15px 15px 20px rgba(57, 65, 124, 0.08)) !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-primary {
+  background: var(--uk-card-primary-background, var(--global-primary-background, #6f40f1)) !important;
+  box-shadow: var(--uk-card-primary-box-shadow, -5px -5px 20px rgba(255, 255, 255, 0.9), 5px 5px 20px rgba(60, 14, 189, 0.3)) !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-secondary {
+  background: var(--uk-card-secondary-background, var(--global-secondary-background, #171258)) !important;
+  box-shadow: var(--uk-card-secondary-box-shadow, -5px -5px 20px rgba(255, 255, 255, 0.9), 5px 5px 20px rgba(23, 18, 88, 0.3)) !important;
 }
 
 /* In the source template the title is the flexible track in an expanded
@@ -2320,9 +2395,19 @@ body.dark {
 
 .shop-builder-grid-card .shop-builder-grid-image {
   position: relative;
+  min-width: 0;
+  width: 100% !important;
+  max-width: 100% !important;
   aspect-ratio: var(--builder-card-image-ratio, auto);
   border-radius: var(--builder-card-image-radius, inherit);
   overflow: visible;
+}
+
+.shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
+.shop-builder-grid-card .uk-card-media-top {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 .shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
@@ -2754,7 +2839,7 @@ body.dark {
   border-bottom: 2px solid rgba(17, 17, 17, 0.12);
 }
 
-.shop-builder-grid-card:not(.uk-card):hover {
+.shop-builder-grid-card--hover-enabled:not(.uk-card):hover {
   transform: translateY(-3px);
   box-shadow: 0 22px 48px rgba(17, 17, 17, 0.1);
 }
@@ -2762,8 +2847,8 @@ body.dark {
 /* Canonical Grid Panel hover is opt-in. This explicit disabled state also
    prevents old generic builder hover presets from reviving a false setting. */
 .shop-builder-grid-card--hover-disabled:hover {
-  transform: none !important;
-  box-shadow: inherit !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* Hero/Grid instance actions use the canonical UIkit button contract. */
@@ -3041,7 +3126,10 @@ body.dark {
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-grid-button.uk-margin-top {
-  margin-top: var(--uk-margin, 20px);
+  /* YOOtheme's CTA import uses `uk-margin-medium-top` for the link
+     wrapper.  The importer stores that as the canonical medium token while
+     the shared adapter emits the base `uk-margin-top` utility. */
+  margin-top: var(--uk-global-margin-medium, var(--uk-margin-medium, 40px));
 }
 
 .shop-builder-grid-card.is-image-small .shop-builder-grid-image {
@@ -3412,6 +3500,37 @@ body.dark {
      second vertical rhythm between otherwise normal-flow siblings. */
   gap: 0;
   transition: box-shadow 0.14s ease, background 0.14s ease;
+}
+
+/* The structural column baseline above is intentionally transparent and
+   guttered. Once a YOOtheme column surface is selected, the surface token
+   must own those pixels instead of being hidden by the content-layout shell. */
+.shop-builder-content-layout-card.uk-card,
+.shop-builder-content-layout-card.uk-tile {
+  padding-left: 0 !important;
+  border-radius: var(--uk-card-border-radius, var(--builder-card-radius, 8px));
+}
+.shop-builder-content-layout-card.uk-card-default,
+.shop-builder-content-layout-card.uk-card-hover {
+  background: var(--uk-card-default-background, var(--builder-card-background, #fff));
+}
+.shop-builder-content-layout-card.uk-card-primary {
+  background: var(--uk-card-primary-background, var(--builder-primary, #1e87f0));
+}
+.shop-builder-content-layout-card.uk-card-secondary {
+  background: var(--uk-card-secondary-background, var(--builder-secondary, #222));
+}
+.shop-builder-content-layout-card.uk-tile-default {
+  background: var(--uk-tile-default-background, var(--builder-card-background, #fff));
+}
+.shop-builder-content-layout-card.uk-tile-muted {
+  background: var(--uk-tile-muted-background, var(--builder-muted-background, #f5f5f5));
+}
+.shop-builder-content-layout-card.uk-tile-primary {
+  background: var(--uk-tile-primary-background, var(--builder-primary, #1e87f0));
+}
+.shop-builder-content-layout-card.uk-tile-secondary {
+  background: var(--uk-tile-secondary-background, var(--builder-secondary, #222));
 }
 
 /* Imported absolute elements use the outer column content as their
@@ -6414,4 +6533,149 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-content-row > :last-child,
 [class*="uk-width-"] > :last-child:not([class*="uk-position-absolute"]) {
   margin-bottom: 0 !important;
+}
+
+/* Keep YOOtheme Grid media inside its card track. UIkit's media utility can
+   otherwise size an intrinsic SVG to its max-content width in the builder. */
+.shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
+.shop-builder-grid-card .uk-card-media-top {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Final YOOtheme Grid parity overrides.  These intentionally live at the
+   end of the stylesheet so native card presets cannot re-introduce their
+   padding or hover behavior after the imported YOOtheme contract applies. */
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-small {
+  padding: 15px !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-default {
+  padding: 30px !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-panel-padding-large {
+  padding: 0 70px 70px !important;
+}
+
+/* YOOtheme keeps the title's bottom edge flush, then gives the content its
+   own global-margin separation. Generic builder card typography resets
+   heading margins, so restore both semantic utilities explicitly here. */
+.shop-builder-grid-card--yootheme .shop-builder-title.uk-margin-top {
+  margin-top: var(--uk-global-margin, 20px) !important;
+  margin-bottom: 0 !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-grid-content > .uk-panel.uk-margin-top {
+  margin-top: var(--uk-global-margin, 20px) !important;
+}
+
+/* YOOtheme's linked-panel behavior makes the whole card clickable but does
+   not decorate the title/content as legacy WebPages links. */
+.shop-builder-grid-card--yootheme.uk-link-toggle .shop-builder-title a,
+.shop-builder-grid-card--yootheme.uk-link-toggle .shop-builder-grid-content a:not(.shop-builder-grid-button),
+.shop-builder-grid-card--yootheme.uk-link-toggle:hover .shop-builder-title a,
+.shop-builder-grid-card--yootheme.uk-link-toggle:hover .shop-builder-grid-content a:not(.shop-builder-grid-button) {
+  text-decoration: none !important;
+}
+
+/* Grid meta is body text in YOOtheme, even when an older document persisted
+   a heading-style HTML/Font Role alias. Keep the visual token at body size
+   while preserving the authored color and margin utilities. */
+.shop-builder-grid-card--yootheme .shop-builder-grid-meta {
+  font-size: var(--uk-global-font-size, 16px) !important;
+  line-height: var(--uk-global-line-height, 1.5) !important;
+  font-weight: var(--uk-global-font-weight, 400) !important;
+}
+
+/* A YOOtheme `default` section is a light surface even when the surrounding
+   Footer layout carries a dark scheme. Keep the Title panel tied to the
+   actual section background instead of inheriting the footer's inverse text
+   context. */
+.shop-builder-section.uk-section-default.shop-builder-section--scheme-dark,
+.builder-preview-section.uk-section-default.shop-builder-section--scheme-dark {
+  --builder-section-text: var(--uk-global-emphasis-color, #0d0a46);
+  --builder-active-heading: var(--uk-global-emphasis-color, #0d0a46);
+  --builder-active-text: var(--uk-global-text-color, #555371);
+  --builder-active-muted: var(--uk-global-muted-color, #747a96);
+  --context-text: var(--uk-global-text-color, #555371);
+  --context-emphasis: var(--uk-global-emphasis-color, #0d0a46);
+}
+
+.shop-builder-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--heading > .shop-builder-title,
+.builder-preview-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--heading > .shop-builder-title {
+  color: var(--uk-global-emphasis-color, #0d0a46) !important;
+}
+
+.shop-builder-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--text,
+.shop-builder-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--text p,
+.builder-preview-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--text,
+.builder-preview-section.uk-section-default.shop-builder-section--scheme-dark .shop-builder-column-block--text p {
+  color: var(--uk-global-text-color, #555371) !important;
+}
+
+.shop-builder-grid-card--hover-disabled,
+.shop-builder-grid-card--hover-disabled:hover,
+.shop-builder-grid-card--hover-disabled:focus,
+.shop-builder-grid-card--hover-disabled:focus-within,
+.shop-builder-grid-card--hover-disabled:active {
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+}
+
+.shop-builder-grid-card--hover-disabled:hover,
+.shop-builder-grid-card--hover-disabled:focus,
+.shop-builder-grid-card--hover-disabled:focus-within,
+.shop-builder-grid-card--hover-disabled:active {
+  /* Hover-only motion and filters are cancelled above. Surface-specific
+     shadows are restored below for imported YOOtheme cards. */
+}
+
+/* UIkit's runtime stylesheet is not loaded in the builder shell, so the
+   `uk-card-hover` marker alone cannot provide its interaction. Restore the
+   canonical opt-in Grid hover for both native and imported card surfaces. */
+.shop-builder-grid-card--hover-enabled:hover {
+  /* YOOtheme card hover changes the surface only; parallax owns movement. */
+  box-shadow: var(--uk-card-hover-box-shadow, 0 22px 48px rgba(17, 17, 17, 0.1)) !important;
+}
+
+.shop-builder-grid-card.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
+  box-shadow: var(--uk-card-hover-box-shadow, 0 22px 48px rgba(17, 17, 17, 0.1)) !important;
+}
+
+/* Exact YOOtheme UIkit hover tokens for imported Grid cards. These are
+   intentionally surface-specific: YOOtheme uses a small downward motion for
+   default/primary/secondary cards and a different shadow per surface. */
+.shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
+  background-color: var(--uk-card-default-background, #f7f8fc) !important;
+  box-shadow: var(--uk-card-default-hover-box-shadow, -2px -2px 5px rgba(255,255,255,.9), 2px 2px 4px rgba(57,65,124,.2)) !important;
+  translate: 0 3px !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
+  background-color: var(--uk-card-primary-background, #6f40f1) !important;
+  box-shadow: var(--uk-card-primary-hover-box-shadow, -2px -2px 10px rgba(255,255,255,.8), 2px 2px 5px rgba(60,14,189,.3)) !important;
+  translate: 0 3px !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-secondary.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
+  background-color: var(--uk-card-secondary-background, #171258) !important;
+  box-shadow: var(--uk-card-secondary-hover-box-shadow, -2px -2px 10px rgba(255,255,255,.8), 2px 2px 5px rgba(1,1,3,.3)) !important;
+  translate: 0 3px !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:hover,
+.shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:focus,
+.shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:focus-within,
+.shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:active {
+  box-shadow: var(--uk-card-default-box-shadow, -15px -15px 20px rgba(255,255,255,.8), 15px 15px 20px rgba(57,65,124,.08)) !important;
+}
+
+.shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:hover,
+.shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus,
+.shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus-within,
+.shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:active {
+  box-shadow: var(--uk-card-primary-box-shadow, -5px -5px 20px rgba(255,255,255,.9), 5px 5px 20px rgba(60,14,189,.3)) !important;
 }

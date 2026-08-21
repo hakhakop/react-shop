@@ -14,12 +14,44 @@ export type BuilderRowLayoutPreset = {
   ratios: number[];
 };
 
+const PRESET_RATIOS: Partial<Record<UikitLayoutPresetKey, number[]>> = {
+  "1-col": [1],
+  "2-col-equal": [1, 1],
+  "3-col-equal": [1, 1, 1],
+  "4-col-equal": [1, 1, 1, 1],
+  "5-col-equal": [1, 1, 1, 1, 1],
+  "6-col-equal": [1, 1, 1, 1, 1, 1],
+  "thirds-2-1": [2, 1],
+  "thirds-1-2": [1, 2],
+  "quarters-3-1": [3, 1],
+  "quarters-1-3": [1, 3],
+  "quarters-2-1-1": [2, 1, 1],
+  "quarters-1-1-2": [1, 1, 2],
+  "quarters-1-2-1": [1, 2, 1],
+  "fifths-2-3": [2, 3],
+  "fifths-3-2": [3, 2],
+  "fifths-1-4": [1, 4],
+  "fifths-4-1": [4, 1],
+  "fifths-3-1-1": [3, 1, 1],
+  "fifths-1-1-3": [1, 1, 3],
+  "fifths-1-3-1": [1, 3, 1],
+  "fifths-2-1-1-1": [2, 1, 1, 1],
+  "fifths-1-1-1-2": [1, 1, 1, 2],
+  "sixths-1-5": [1, 5],
+  "sixths-5-1": [5, 1],
+  "fixed-left": [1, 3],
+  "fixed-right": [3, 1],
+  "fixed-inner": [1, 2, 1],
+  "fixed-outer": [2, 1, 2],
+  "auto-expand": [1, 2],
+};
+
 export const builderRowLayoutPresets: BuilderRowLayoutPreset[] = UIKIT_LAYOUT_PRESET_LIST.map(
   (preset) => ({
     key: preset.key,
     label: preset.label,
     description: preset.description,
-    ratios: preset.columnClasses.map(() => 1),
+    ratios: PRESET_RATIOS[preset.key] ?? preset.columnClasses.map(() => 1),
   })
 );
 
@@ -30,7 +62,7 @@ export function getBuilderRowLayoutPreset(key: string | null | undefined) {
     key: uikitPreset.key,
     label: uikitPreset.label,
     description: uikitPreset.description,
-    ratios: uikitPreset.columnClasses.map(() => 1),
+    ratios: PRESET_RATIOS[uikitPreset.key] ?? uikitPreset.columnClasses.map(() => 1),
   };
 }
 

@@ -24,6 +24,10 @@ import {
 } from "@/lib/yoothemeImportContract";
 import { createYoothemePageImportReport, formatYoothemeImportWarnings, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
 import type { UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
+import {
+  UIKIT_LAYOUT_PRESETS,
+  normalizeLayoutToUikitPreset,
+} from "@/lib/uikitLayoutEngine";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBinding,
@@ -164,15 +168,21 @@ const LAYOUT_BY_COLUMN_COUNT: Record<number, string> = {
   6: "6-col-equal",
 };
 
-/** Preserve the weighted two-column layouts that YOOtheme authors explicitly.
- * Equal two-column rows continue to use the existing count-based fallback. */
+/** Preserve weighted layouts (e.g. 3-4,1-4 / 3-1, 1-3, 2-1) that YOOtheme authors explicitly.
+ * Equal column rows continue to use the count-based fallback. */
 const sourceRowLayout = (
   rowNode: YoothemeSourceNode,
   columns: YoothemeSourceNode[],
 ): string | undefined => {
   const sourceLayout = asString(sourceProps(rowNode).layout)?.replace(/\s+/g, "");
-  if (columns.length === 2 && sourceLayout === "1-3,2-3") {
-    return "thirds-1-2";
+  if (sourceLayout) {
+    const normalized = normalizeLayoutToUikitPreset(sourceLayout);
+    if (
+      normalized in UIKIT_LAYOUT_PRESETS &&
+      UIKIT_LAYOUT_PRESETS[normalized].columnCount === columns.length
+    ) {
+      return normalized;
+    }
   }
   return LAYOUT_BY_COLUMN_COUNT[columns.length];
 };
@@ -1609,6 +1619,24 @@ const mapStaticElement = (
     }, props);
   }
 
+  if (type === "divider") {
+    const sourceStyle = asString(props.divider_element)?.toLowerCase();
+    const dividerStyle = sourceStyle === "icon" || sourceStyle === "small"
+      ? sourceStyle
+      : "default";
+    warnUnsupported(path, props, [
+      "animation", "divider_element", "margin", "margin_remove_top", "margin_remove_bottom",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "divider"),
+      kind: "divider",
+      dividerStyle,
+      preset: dividerStyle,
+      margin: sourceMargin(props.margin) ?? "default",
+    }, props);
+  }
+
   if (type === "grid") {
     const items = sourceChildren(node)
       .filter((child) => child.type === "grid_item")
@@ -1724,7 +1752,10 @@ const mapStaticElement = (
         : undefined,
       metaStyle: asString(props.meta_style) ?? undefined,
       metaColor: asString(props.meta_color) ?? undefined,
-      contentStyle: asString(props.content_style) ?? undefined,
+      // Grid content accepts YOOtheme text presets only. Do not leak a
+      // heading-style alias (for example `h2`) into the body renderer; the
+      // source Grid body is a plain `uk-panel` unless a text preset is set.
+      contentStyle: sourceTextVariant(props.content_style),
       titleMarginTop: props.title_margin === "remove" ? "remove" : sourceMargin(props.title_margin),
       metaMarginTop: props.meta_margin === "remove" ? "remove" : sourceMargin(props.meta_margin),
       contentMarginTop: props.content_margin === "remove" ? "remove" : sourceMargin(props.content_margin),
@@ -2575,19 +2606,18 @@ const sourceBuilderColumn = (
 
 const sourceRowMargin = (
   props: Record<string, unknown>,
-  rowIndex: number,
 ): Pick<BuilderRow, "spacingContract" | "topMargin" | "bottomMargin"> => {
   const margin = sourceStructuralSpacing(props.margin);
   const removeTop = sourceBoolean(props.margin_remove_top) === true;
   const removeBottom = sourceBoolean(props.margin_remove_bottom) === true;
-  const topMargin = removeTop
-    ? "none"
-    : margin === "medium"
-      ? "40px"
-      : margin ?? (rowIndex > 0 ? "40px" : undefined);
+  const topMargin = removeTop ? "none" : margin;
+  // YOOtheme's row `margin` is a flow margin on both sides. The first-row
+  // renderer intentionally suppresses top margin at the section boundary, so
+  // dropping the bottom half here makes multi-row sections collapse (the
+  // Feature Project Management section lost its 140px xlarge separation).
   const bottomMargin = removeBottom || asString(props.margin)?.toLowerCase() === "remove-vertical"
     ? "none"
-    : undefined;
+    : margin;
   return {
     spacingContract: "yootheme",
     ...(topMargin ? { topMargin } : {}),
@@ -2662,7 +2692,7 @@ const sourceBuilderRow = (
     ...(sourceBoolean(props.padding_remove_horizontal) !== undefined ? { removeHorizontalPadding: sourceBoolean(props.padding_remove_horizontal) } : {}),
     ...(props.expand === "left" || props.expand === "right" ? { expandOneSide: props.expand } : {}),
     ...(Object.keys(height).length ? { height } : {}),
-    ...sourceRowMargin(props, rowIndex),
+    ...sourceRowMargin(props),
     ...(sourceLayoutHtmlElement(props.html_element) ? { htmlElement: sourceLayoutHtmlElement(props.html_element) } : {}),
     ...(Object.keys(columnParallax).length ? { columnParallax } : {}),
     ...(advanced ? { advanced } : {}),
@@ -2735,13 +2765,16 @@ export const mapYoothemeStaticContent = (
     const importedSectionImage = asString(sectionProps.image)
       ? resolveYoothemeAssetUrl(sectionProps.image)
       : undefined;
-    const importedSectionVisualStyle = importedSectionImage
+    const importedSectionVideo = asString(sectionProps.video)
+      ? resolveYoothemeAssetUrl(sectionProps.video)
+      : undefined;
+    const importedSectionVisualStyle = importedSectionImage || importedSectionVideo
       ? {
           ...(normalizedSection.visualStyle ?? {}),
           background: {
             ...(normalizedSection.visualStyle?.background ?? {}),
-            type: "image" as const,
-            imageUrl: importedSectionImage,
+            ...(importedSectionImage ? { type: "image" as const, imageUrl: importedSectionImage } : {}),
+            ...(importedSectionVideo ? { type: "video" as const, videoUrl: importedSectionVideo } : {}),
           },
         }
       : normalizedSection.visualStyle;

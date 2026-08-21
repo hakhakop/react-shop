@@ -292,24 +292,35 @@ export const UIKIT_LAYOUT_PRESET_LIST: UikitLayoutPreset[] = Object.values(
  */
 export function normalizeLayoutToUikitPreset(layoutKey?: string): UikitLayoutPresetKey {
   if (!layoutKey) return "1-col";
-  const key = layoutKey.toLowerCase().trim();
+  const key = layoutKey.toLowerCase().trim().replace(/\s+/g, "");
 
   if (key in UIKIT_LAYOUT_PRESETS) return key as UikitLayoutPresetKey;
 
-  // Legacy mappings
-  if (key === "whole" || key === "12" || key === "1") return "1-col";
-  if (key === "halves" || key === "6-6" || key === "2-col") return "2-col-equal";
-  if (key === "thirds-1-2" || key === "4-8" || key === "1-2") return "thirds-1-2";
-  if (key === "thirds-2-1" || key === "8-4" || key === "2-1") return "thirds-2-1";
-  if (key === "thirds" || key === "4-4-4" || key === "1-1-1" || key === "3-col") return "3-col-equal";
-  if (key === "quarters" || key === "3-3-3-3" || key === "1-1-1-1" || key === "4-col") return "4-col-equal";
-  if (key === "quarters-3-1" || key === "9-3") return "quarters-3-1";
-  if (key === "quarters-1-3" || key === "3-9") return "quarters-1-3";
-  if (key === "quarters-2-1-1" || key === "6-3-3") return "quarters-2-1-1";
-  if (key === "quarters-1-1-2" || key === "3-3-6") return "quarters-1-1-2";
-  if (key === "quarters-1-2-1" || key === "3-6-3") return "quarters-1-2-1";
-  if (key === "fifths" || key === "5-col") return "5-col-equal";
-  if (key === "sixths" || key === "6-col") return "6-col-equal";
+  // Exact fraction / dash / ratio mappings matching YOOtheme & WebPages canonical presets
+  if (key === "whole" || key === "12" || key === "1" || key === "1-1" || key === "1/1") return "1-col";
+  if (key === "halves" || key === "6-6" || key === "2-col" || key === "1-2,1-2" || key === "1/2,1/2") return "2-col-equal";
+  if (key === "thirds-1-2" || key === "4-8" || key === "1-2" || key === "1-3,2-3" || key === "1/3,2/3") return "thirds-1-2";
+  if (key === "thirds-2-1" || key === "8-4" || key === "2-1" || key === "2-3,1-3" || key === "2/3,1/3") return "thirds-2-1";
+  if (key === "thirds" || key === "4-4-4" || key === "1-1-1" || key === "3-col" || key === "1-3,1-3,1-3" || key === "1/3,1/3,1/3") return "3-col-equal";
+  if (key === "quarters" || key === "3-3-3-3" || key === "1-1-1-1" || key === "4-col" || key === "1-4,1-4,1-4,1-4" || key === "1/4,1/4,1/4,1/4") return "4-col-equal";
+  if (key === "quarters-3-1" || key === "9-3" || key === "3-1" || key === "3-4,1-4" || key === "3/4,1/4") return "quarters-3-1";
+  if (key === "quarters-1-3" || key === "3-9" || key === "1-3" || key === "1-4,3-4" || key === "1/4,3/4") return "quarters-1-3";
+  if (key === "quarters-2-1-1" || key === "6-3-3" || key === "2-1-1" || key === "1-2,1-4,1-4" || key === "1/2,1/4,1/4") return "quarters-2-1-1";
+  if (key === "quarters-1-1-2" || key === "3-3-6" || key === "1-1-2" || key === "1-4,1-4,1-2" || key === "1/4,1/4,1/2") return "quarters-1-1-2";
+  if (key === "quarters-1-2-1" || key === "3-6-3" || key === "1-2-1" || key === "1-4,1-2,1-4" || key === "1/4,1/2,1/4") return "quarters-1-2-1";
+  if (key === "fifths-2-3" || key === "2-5,3-5" || key === "2/5,3/5") return "fifths-2-3";
+  if (key === "fifths-3-2" || key === "3-5,2-5" || key === "3/5,2/5") return "fifths-3-2";
+  if (key === "fifths-1-4" || key === "1-5,4-5" || key === "1/5,4/5") return "fifths-1-4";
+  if (key === "fifths-4-1" || key === "4-5,1-5" || key === "4/5,1/5") return "fifths-4-1";
+  if (key === "fifths-3-1-1" || key === "3-5,1-5,1-5" || key === "3/5,1/5,1/5") return "fifths-3-1-1";
+  if (key === "fifths-1-1-3" || key === "1-5,1-5,3-5" || key === "1/5,1/5,3/5") return "fifths-1-1-3";
+  if (key === "fifths-1-3-1" || key === "1-5,3-5,1-5" || key === "1/5,3/5,1/5") return "fifths-1-3-1";
+  if (key === "fifths-2-1-1-1" || key === "2-5,1-5,1-5,1-5" || key === "2/5,1/5,1/5,1/5") return "fifths-2-1-1-1";
+  if (key === "fifths-1-1-1-2" || key === "1-5,1-5,1-5,2-5" || key === "1/5,1/5,1/5,2/5") return "fifths-1-1-1-2";
+  if (key === "sixths-1-5" || key === "1-6,5-6" || key === "1/6,5/6") return "sixths-1-5";
+  if (key === "sixths-5-1" || key === "5-6,1-6" || key === "5/6,1/6") return "sixths-5-1";
+  if (key === "fifths" || key === "5-col" || key === "1-5,1-5,1-5,1-5,1-5" || key === "1/5,1/5,1/5,1/5,1/5") return "5-col-equal";
+  if (key === "sixths" || key === "6-col" || key === "1-6,1-6,1-6,1-6,1-6,1-6" || key === "1/6,1/6,1/6,1/6,1/6,1/6") return "6-col-equal";
   if (key === "auto" || key === "expand") return "auto-expand";
 
   return "1-col";

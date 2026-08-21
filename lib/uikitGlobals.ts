@@ -94,6 +94,12 @@ export function getUikitGlobalsCssVars(
   };
   const globalRadius = value("borderRadius", design?.radius || "8px");
   const cardRadius = value("cardBorderRadius", shellSettings?.productCardRadius || globalRadius);
+  // Small and large controls inherit the main YOOtheme button radius unless
+  // the theme explicitly declares separate values. This prevents a previous
+  // theme's legacy 2px values from surviving a live switch back to DevStack.
+  const buttonRadius = value("buttonRadius", cardRadius);
+  const buttonSmallRadius = shellSettings?.buttonSmallRadius || buttonRadius;
+  const buttonLargeRadius = shellSettings?.buttonLargeRadius || buttonRadius;
   const inheritedFamily = (family: string, fallback: string) => family.trim().toLowerCase() === "inherit" ? fallback : family;
   const bodyFamily = value("fontFamilyBody", "system-ui");
   const headingFamily = inheritedFamily(value("fontFamilyHeading", "inherit"), bodyFamily);
@@ -278,7 +284,7 @@ export function getUikitGlobalsCssVars(
     // Controls & Radii
     "--uk-global-border-radius": typeof globalRadius === "number" ? `${globalRadius}px` : globalRadius,
     "--uk-card-border-radius": typeof cardRadius === "number" ? `${cardRadius}px` : cardRadius,
-    "--uk-button-border-radius": value("buttonRadius", cardRadius),
+    "--uk-button-border-radius": buttonRadius,
     "--uk-button-border-width": buttonBorderWidth,
     "--uk-card-border-width": value("cardBorderWidth", value("borderWidth", "1px")),
     "--uk-card-border-color": value("cardBorderColor", "#e5e7eb"),
@@ -339,11 +345,11 @@ export function getUikitGlobalsCssVars(
     "--uk-button-small-font-size": value("buttonSmallFontSize", "14px"),
     "--uk-button-small-line-height": value("buttonSmallLineHeight", value("controlHeightSmall", "40px")),
     "--uk-button-small-padding-x": value("buttonSmallPaddingX", "20px"),
-    "--uk-button-small-radius": value("buttonSmallRadius", value("buttonRadius", cardRadius)),
+    "--uk-button-small-radius": buttonSmallRadius,
     "--uk-button-large-font-size": value("buttonLargeFontSize", value("baseFontSize", "16px")),
     "--uk-button-large-line-height": value("buttonLargeLineHeight", controlLineHeight(buttonLargeControlHeight, "52px")),
     "--uk-button-large-padding-x": value("buttonLargePaddingX", value("gridGutterMedium", value("buttonPaddingX", "40px"))),
-    "--uk-button-large-radius": value("buttonLargeRadius", value("buttonRadius", cardRadius)),
+    "--uk-button-large-radius": buttonLargeRadius,
     "--uk-button-letter-spacing": value("buttonLetterSpacing", "0px"),
     "--uk-button-default-hover-background": buttonValue("buttonDefaultHoverBackground", buttonValue("buttonDefaultBackground", backgroundDefault)),
     "--uk-button-default-hover-text": buttonValue("buttonDefaultHoverText", buttonValue("buttonDefaultText", globalText)),
