@@ -96,6 +96,7 @@ import {
 import {
   getUikitMarginClass,
   getUikitSectionPaddingClass,
+  getUikitSectionMarginClass,
   getUikitContainerClass,
   getUikitWidthClass,
   getUikitCardClass,
@@ -360,34 +361,76 @@ function resolveDesignColors(layout: BuilderLayout) {
   return design;
 }
 
-function designStyle(layout: BuilderLayout): BuilderStyle {
+export function designStyle(layout: BuilderLayout): BuilderStyle {
   const design = layout.design;
   const colors = resolveDesignColors(layout);
-  return {
-    background: colors.pageBackground,
-    color: "var(--uk-global-text-color, #111827)",
-    "--builder-text": "var(--uk-global-text-color, #111827)",
-    "--builder-muted": "var(--uk-global-muted-text-color, #6b7280)",
-    "--builder-accent": colors.accentColor,
-    "--builder-surface": colors.surfaceColor,
-    "--builder-button-bg": colors.buttonBackground,
-    "--builder-button-text": colors.buttonTextColor,
-    "--builder-radius": design?.radius,
-    "--builder-max-width": design?.sectionMaxWidth,
-    "--builder-gutter": design?.sectionGutter,
-    "--builder-heading-font-family": design?.headingFontFamily,
-    "--builder-heading-size": design?.headingSize,
-    "--builder-heading-weight": design?.headingWeight,
-    "--builder-heading-line-height": design?.headingLineHeight,
-    "--builder-heading-color": "var(--builder-active-heading, var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827)))",
-    "--builder-card-bg": design?.cardBg,
-    "--builder-card-radius": design?.cardRadius,
-    "--builder-card-border": design?.cardBorder,
-    "--builder-card-shadow": design?.cardShadow,
-    "--builder-card-shadow-hover": design?.cardShadowHover,
-    "--builder-card-image-bg": design?.cardImageBg,
-    "--builder-card-image-padding": design?.cardImagePadding,
-  } as BuilderStyle;
+  const styleObj: Record<string, string | undefined> = {};
+
+  if (colors.pageBackground) {
+    styleObj.background = colors.pageBackground;
+  }
+  if (colors.textColor) {
+    styleObj["--builder-text"] = colors.textColor;
+  }
+  if (colors.mutedTextColor) {
+    styleObj["--builder-muted"] = colors.mutedTextColor;
+  }
+  if (colors.accentColor) {
+    styleObj["--builder-accent"] = colors.accentColor;
+  }
+  if (colors.surfaceColor) {
+    styleObj["--builder-surface"] = colors.surfaceColor;
+  }
+  if (colors.buttonBackground) {
+    styleObj["--builder-button-bg"] = colors.buttonBackground;
+  }
+  if (colors.buttonTextColor) {
+    styleObj["--builder-button-text"] = colors.buttonTextColor;
+  }
+  if (design?.radius) {
+    styleObj["--builder-radius"] = design.radius;
+  }
+  if (design?.sectionMaxWidth) {
+    styleObj["--builder-max-width"] = design.sectionMaxWidth;
+  }
+  if (design?.sectionGutter) {
+    styleObj["--builder-gutter"] = design.sectionGutter;
+  }
+  if (design?.headingFontFamily) {
+    styleObj["--builder-heading-font-family"] = design.headingFontFamily;
+  }
+  if (design?.headingSize) {
+    styleObj["--builder-heading-size"] = design.headingSize;
+  }
+  if (design?.headingWeight) {
+    styleObj["--builder-heading-weight"] = design.headingWeight;
+  }
+  if (design?.headingLineHeight) {
+    styleObj["--builder-heading-line-height"] = design.headingLineHeight;
+  }
+  if (design?.cardBg) {
+    styleObj["--builder-card-bg"] = design.cardBg;
+  }
+  if (design?.cardRadius) {
+    styleObj["--builder-card-radius"] = design.cardRadius;
+  }
+  if (design?.cardBorder) {
+    styleObj["--builder-card-border"] = design.cardBorder;
+  }
+  if (design?.cardShadow) {
+    styleObj["--builder-card-shadow"] = design.cardShadow;
+  }
+  if (design?.cardShadowHover) {
+    styleObj["--builder-card-shadow-hover"] = design.cardShadowHover;
+  }
+  if (design?.cardImageBg) {
+    styleObj["--builder-card-image-bg"] = design.cardImageBg;
+  }
+  if (design?.cardImagePadding) {
+    styleObj["--builder-card-image-padding"] = design.cardImagePadding;
+  }
+
+  return styleObj as BuilderStyle;
 }
 
 function designClassName(layout: BuilderLayout) {
@@ -571,14 +614,19 @@ function getSpacingValue(
   return resolveBuilderSpacing(value, context).css;
 }
 
-function sectionStyle(
+export function sectionStyle(
   section: BuilderSection,
   layoutScheme: "light" | "dark" | "auto" = "light",
 ): BuilderStyle {
   const colorScheme = resolveSectionColorScheme(section, layoutScheme);
   const visual = section.visualStyle as BuilderVisualStyle | undefined;
   const resolvedBackground = resolveSectionBackground(section);
-  const contextVars = getContextVars(colorScheme, resolvedBackground.override);
+  // Default light and inverse/dark semantic contexts are owned canonically by CSS
+  // (.shop-builder-section and .shop-builder-section--scheme-dark / .uk-light).
+  // Only serialize custom background context variables when an explicit paint override is authored.
+  const contextVars = resolvedBackground.override
+    ? getContextVars(colorScheme, resolvedBackground.override)
+    : {};
   const styleObj: BuilderStyle = {
     background: resolvedBackground.override,
     "--builder-section-padding-top": getSpacingValue(
@@ -615,16 +663,27 @@ export function getBuilderSectionClassName(
   layoutScheme: "light" | "dark" | "auto" = "light",
   extra?: string,
 ) {
-  const mode = section.backgroundMode === "boxed" ? "boxed" : "full";
-  const maxWidth = section.maxWidth ?? section.contentMode ?? "boxed";
+  const mode = section.backgroundMode === "boxed" ? "boxed" : undefined;
+  const maxWidth = section.maxWidth ?? section.contentMode;
   const scheme = resolveSectionColorScheme(section, layoutScheme);
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
-  const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
-  const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
+  const heightClass =
+    section.sectionHeight && section.sectionHeight !== "auto" && section.sectionHeight !== "none"
+      ? `shop-builder-section--height-${section.sectionHeight}`
+      : "";
+  const verticalAlignClass =
+    section.contentVerticalAlign && section.contentVerticalAlign !== "top"
+      ? `shop-builder-section--align-${section.contentVerticalAlign}`
+      : "";
   const uikitSectionPad = getUikitSectionPaddingClass(
     section.sectionPadding ?? section.topSpacing ?? (section as any).sectionPaddingTop,
+  );
+  const uikitSectionMargin = getUikitSectionMarginClass(
+    section.margin ?? section.topMargin,
+    section.removeTopMargin,
+    section.removeBottomMargin,
   );
   const uikitSectionStyle = sectionBackgroundClass(resolveSectionBackground(section).role);
   const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
@@ -639,20 +698,56 @@ export function getBuilderSectionClassName(
     section.expandOneSide && section.expandOneSide !== "none"
       ? `shop-builder-section--expand-${section.expandOneSide}`
       : "";
-  const titlePosition = normalizeSectionTitlePosition(section.sectionTitlePosition);
+  const hasStandaloneSectionHeading =
+    section.kind === "promo" && Boolean(section.title?.trim() || section.body?.trim());
+  const titlePosition = hasStandaloneSectionHeading
+    ? normalizeSectionTitlePosition(section.sectionTitlePosition)
+    : undefined;
   const titlePositionClass =
-    titlePosition !== "none"
+    titlePosition && titlePosition !== "none"
       ? `shop-builder-section--title-${titlePosition}`
       : "";
   const titleRotationClass =
-    section.sectionTitleRotation && section.sectionTitleRotation !== "none"
+    hasStandaloneSectionHeading &&
+    section.sectionTitleRotation &&
+    section.sectionTitleRotation !== "none"
       ? `shop-builder-section--title-rotate-${section.sectionTitleRotation}`
       : "";
   const imageClass = section.visualStyle?.background?.imageUrl
     ? "shop-builder-section--has-background-image"
     : "";
+  const modeClass = mode ? `shop-builder-section--${mode}` : "";
+  const maxWidthClass = maxWidth && maxWidth !== "boxed" && maxWidth !== "default" ? `shop-builder-section--content-${maxWidth}` : "";
+  const schemeClass = scheme && scheme !== "light" && scheme !== "auto" ? `shop-builder-section--scheme-${scheme}` : "";
 
-  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${removeTopPadClass} ${removeBottomPadClass} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} ${imageClass} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${maxWidth} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
+  return [
+    uikitSectionPad,
+    uikitSectionMargin,
+    uikitSectionStyle,
+    preserveColorClass,
+    overlapClass,
+    textColorClass,
+    removeTopPadClass,
+    removeBottomPadClass,
+    removeHorizontalPadClass,
+    expandSideClass,
+    titlePositionClass,
+    titleRotationClass,
+    imageClass,
+    "shop-builder-section",
+    modeClass,
+    maxWidthClass,
+    schemeClass,
+    heightClass,
+    verticalAlignClass,
+    visualClass,
+    animationClassName(section.animation),
+    extra,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function SectionFrame({
@@ -2339,25 +2434,19 @@ function blockSurfaceStyle(
   parentScheme: "light" | "dark" = "light",
 ): CSSProperties {
   const visual = block.visualStyle as BuilderVisualStyle | undefined;
-  const visualCss = visualStyleToCss(visual);
 
   const { scheme, bg } = resolveBlockColorSchemeAndBg(block, parentScheme);
-  const contextVars = getContextVars(scheme, bg);
-
-  const legacy: BuilderStyle = {};
-  // Only set --builder-element-bg when the user explicitly chose a custom
-  // element background.  Panel-style presets (dark, light, princity, …)
-  // already have their own CSS card-level rules; painting the shell bg here
-  // would create a solid-color rectangle around the entire block.
+  // Default and parent section semantic contexts are inherited directly.
+  // Only serialize contextVars when the block explicitly defines a custom surface/background.
   const isCustomBg =
     block.elementBackgroundMode === "custom" ||
     block.elementBackgroundMode === "transparent";
-  const hasSurface =
-    block.elementBackgroundMode === "custom" ||
-    (block.panelStyle !== undefined && block.panelStyle !== "default") ||
-    (block.premiumCardStyle !== undefined &&
-      block.premiumCardStyle !== "none") ||
-    Boolean(visual?.background);
+  const hasCustomSurface =
+    isCustomBg ||
+    (block.panelStyle !== undefined && block.panelStyle !== "default");
+  const contextVars = hasCustomSurface ? getContextVars(scheme, bg) : {};
+
+  const legacy: BuilderStyle = {};
   if (bg !== undefined && isCustomBg) {
     legacy["--builder-element-bg"] = bg;
   }
@@ -2379,22 +2468,42 @@ function blockShellClassName(block: BuilderLayoutBlock) {
       ? `shop-builder-card--${block.premiumCardStyle}`
       : "";
   const uikitMarginClass = getUikitMarginClass((block as any).elementMargin ?? block.gridMargin);
-  const legacySurfaceClass = ["panel", "grid", "hero"].includes(block.kind ?? "")
-    ? ""
-    : `shop-card-preset--${block.panelStyle ?? "default"}`;
+  const legacySurfaceClass =
+    ["panel", "grid", "hero"].includes(block.kind ?? "") ||
+    !block.panelStyle ||
+    block.panelStyle === "default"
+      ? ""
+      : `shop-card-preset--${block.panelStyle}`;
   const advancedClass = resolveElementAdvanced(block).customClass ?? "";
   const generalSpacingClass = getGeneralElementShellClassName(block);
-  return `${uikitMarginClass} ${generalSpacingClass} shop-builder-element-shell ${legacySurfaceClass} is-padding-${
-    hasBuilderVisualSpacing(
-      (block.visualStyle as BuilderVisualStyle | undefined)?.padding,
-    )
-      ? "none"
-      : block.elementPadding && block.elementPadding !== "inherit"
-        ? block.elementPadding
-        : "none"
-  } is-align-${
-    block.elementAlign ?? "left"
-  } ${visualClass} ${advancedClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
+  const paddingClass =
+    !hasBuilderVisualSpacing((block.visualStyle as BuilderVisualStyle | undefined)?.padding) &&
+    block.elementPadding &&
+    block.elementPadding !== "inherit" &&
+    block.elementPadding !== "none"
+      ? `is-padding-${block.elementPadding}`
+      : "";
+  const alignClass =
+    block.elementAlign && block.elementAlign !== "left"
+      ? `is-align-${block.elementAlign}`
+      : "";
+
+  return [
+    uikitMarginClass,
+    generalSpacingClass,
+    "shop-builder-element-shell",
+    legacySurfaceClass,
+    paddingClass,
+    alignClass,
+    visualClass,
+    advancedClass,
+    animationClassName(block.animation),
+    premiumCardClass,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
@@ -3036,16 +3145,7 @@ function StorefrontBuilderRendererBase({
       {isPageDocument ? <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} /> : null}
       <RootElement
         className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
-        style={
-          {
-            ...getUikitGlobalsCssVars(shellSettings),
-            ...designStyle(layout),
-            ...(hasYoothemeImportContract(layout)
-              ? getYoothemeImportGlobalAliases()
-              : {}),
-            ...builderGeometryCssVariables(),
-          } as CSSProperties
-        }
+        style={designStyle(layout) as CSSProperties}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
         data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}

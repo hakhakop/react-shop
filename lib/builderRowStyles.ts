@@ -54,13 +54,28 @@ function explicitSpacing(
   return resolveBuilderSpacing(value, context).css;
 }
 
+export type BuilderRowStyleOptions = {
+  global?: BuilderRowGlobalSpacing;
+  isFirstRow?: boolean;
+};
+
 export function resolveBuilderRowStyle(
   row: BuilderRowStyleInput | undefined,
-  global: BuilderRowGlobalSpacing = {},
+  globalOrOptions: BuilderRowGlobalSpacing | BuilderRowStyleOptions = {},
 ): CSSProperties {
+  const options: BuilderRowStyleOptions =
+    "global" in globalOrOptions || "isFirstRow" in globalOrOptions
+      ? (globalOrOptions as BuilderRowStyleOptions)
+      : { global: globalOrOptions as BuilderRowGlobalSpacing };
+  const global = options.global ?? {};
+  const isFirstRow = options.isFirstRow ?? false;
   const hasSurface = Boolean(
     row?.rowBackground || row?.rowVisualStyle?.background,
   );
+  const topMargin = isFirstRow && row?.spacingContract === "yootheme"
+    ? "0px"
+    : explicitSpacing(row?.rowTopMargin, "rowMargin", row?.spacingContract);
+
   return {
     background: row?.rowBackground || undefined,
     paddingTop: hasSurface
@@ -79,7 +94,7 @@ export function resolveBuilderRowStyle(
       : "0px",
     // Global row margins are intentionally not inherited. Row siblings use
     // rowGap; an explicit local margin replaces that boundary's gap.
-    marginTop: explicitSpacing(row?.rowTopMargin, "rowMargin", row?.spacingContract),
+    marginTop: topMargin,
     marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
     ...(row?.maxWidth && row.maxWidth !== "default" && row.maxWidth !== "inherit"
       ? {

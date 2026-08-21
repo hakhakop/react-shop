@@ -189,7 +189,7 @@ function rowStyleInput(
 ): BuilderRowStyleInput {
   return {
     ...legacyItem,
-    spacingContract: row.spacingContract,
+    spacingContract: row.spacingContract ?? (legacyItem as any)?.spacingContract,
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,
     rowBottomMargin: row.bottomMargin ?? legacyItem?.rowBottomMargin,
     rowGap: row.rowGap ?? legacyItem?.rowGap,
@@ -236,7 +236,10 @@ export function resolveBuilderSectionStructure(
     ).css;
     const style = resolveBuilderRowStyle(
       structuralInput,
-      options.rowGlobalSpacing,
+      {
+        global: options.rowGlobalSpacing,
+        isFirstRow: rowIndex === 0,
+      },
     );
     previousRowInput = structuralInput;
 

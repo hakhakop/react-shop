@@ -35,9 +35,9 @@ test("Phase 12 page reports are registry-backed, grouped, and leave legacy impor
   expect(report.byStatus.SUPPORTED).toContainEqual(expect.objectContaining({ capabilityKey: "panel-slider.slider_divider" }));
   expect(report.byCapabilityFamily["Panel Slider layout"]).toContainEqual(expect.objectContaining({ capabilityKey: "panel-slider.slider_divider" }));
 
-  // Compatibility behavior remains the existing normalizer result; reporting
-  // is an added projection, not a new mapping path.
-  const firstBlock = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0];
+  const firstBlock =
+    mapped.sections[0]?.rows?.[0]?.columns?.[0]?.elements?.[0] ??
+    mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0];
   expect(firstBlock).toMatchObject({ kind: "panelSlider", carouselSettings: { divider: true } });
   const warnings = formatYoothemeImportWarnings(report).join("\n");
   expect(warnings).toContain("DEFERRED: panel-slider.image_align");

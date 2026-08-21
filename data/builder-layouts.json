@@ -121,6 +121,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -132,8 +133,7 @@
                   "customCss": "@media (max-width: 639px) {\n    .el-item a {min-width: 203px;}\n}",
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -1257,14 +1257,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1360,14 +1354,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1463,14 +1451,8 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -2691,6 +2673,7 @@
                 "fullWidthButton": false,
                 "textAlign": "right",
                 "headingAlign": "right",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -2701,9 +2684,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -2843,7 +2824,6 @@
             },
             "maxWidth": "default",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-5-row-1-column-1",
@@ -3301,7 +3281,6 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
@@ -3639,6 +3618,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -3647,9 +3627,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -4024,7 +4002,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-20T17:41:28.981Z"
+    "updatedAt": "2026-08-20T22:04:55.536Z"
   },
   "shop": {
     "version": 1,
@@ -6963,7 +6941,6 @@
             },
             "rowGap": "small",
             "spacingContract": "yootheme",
-            "topMargin": "xlarge",
             "bottomMargin": "none",
             "columns": [
               {
@@ -10967,7 +10944,6 @@
             "id": "yootheme-section-1-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-1-row-1-column-1",
@@ -12093,7 +12069,6 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
@@ -12509,7 +12484,6 @@
               ]
             },
             "spacingContract": "yootheme",
-            "topMargin": "40px",
             "columns": [
               {
                 "id": "yootheme-section-7-row-1-column-1",
@@ -12919,7 +12893,6 @@
             "layout": "1-col",
             "maxWidth": "default",
             "spacingContract": "yootheme",
-            "topMargin": "xlarge",
             "columns": [
               {
                 "id": "yootheme-section-8-row-1-column-1",
@@ -16231,7 +16204,6 @@
             },
             "maxWidth": "default",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-5-row-1-column-1",
@@ -16482,7 +16454,6 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
@@ -17073,7 +17044,6 @@
             "id": "yootheme-section-1-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-1-row-1-column-1",
@@ -18295,7 +18265,6 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
@@ -18711,7 +18680,6 @@
               ]
             },
             "spacingContract": "yootheme",
-            "topMargin": "40px",
             "columns": [
               {
                 "id": "yootheme-section-7-row-1-column-1",
@@ -19121,7 +19089,6 @@
             "layout": "1-col",
             "maxWidth": "default",
             "spacingContract": "yootheme",
-            "topMargin": "xlarge",
             "columns": [
               {
                 "id": "yootheme-section-8-row-1-column-1",
@@ -22375,7 +22342,6 @@
             },
             "maxWidth": "default",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-5-row-1-column-1",
@@ -22626,7 +22592,6 @@
             "id": "yootheme-section-6-row-1",
             "layout": "1-col",
             "spacingContract": "yootheme",
-            "topMargin": "large",
             "columns": [
               {
                 "id": "yootheme-section-6-row-1-column-1",
