@@ -43,6 +43,14 @@ function getEnvSiteUrl(): string {
   }
 }
 
+function getRootBuilderShellPath(path: typeof import("node:path")) {
+  const configuredDir = process.env.WEBPAGES_DATA_DIR?.trim();
+  const dataDir = configuredDir
+    ? path.resolve(process.cwd(), configuredDir)
+    : path.join(process.cwd(), "data");
+  return path.join(dataDir, "builder-shell.json");
+}
+
 export function getEnvCmsConnection(): CmsConnection {
   const siteUrl = getEnvSiteUrl();
   const graphqlUrl = normalizeUrl(
@@ -84,10 +92,33 @@ export function getEnvCmsConnection(): CmsConnection {
   };
 }
 
+function readPersistedRootCmsConnection(): Partial<CmsConnection> | null {
+  try {
+    if (typeof window !== "undefined") return null;
+    const fs = process.getBuiltinModule?.("fs") as typeof import("node:fs") | undefined;
+    const path = process.getBuiltinModule?.("path") as typeof import("node:path") | undefined;
+    if (!fs || !path) return null;
+    const raw = JSON.parse(fs.readFileSync(getRootBuilderShellPath(path), "utf8")) as {
+      cmsConnection?: unknown;
+    };
+    return raw.cmsConnection && typeof raw.cmsConnection === "object"
+      ? (raw.cmsConnection as Partial<CmsConnection>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export function getCmsConnection(
   website?: { cmsConnection?: Partial<CmsConnection> | null } | null,
 ): CmsConnection {
-  if (!website || !website.cmsConnection) {
+  if (website === undefined) {
+    return {
+      ...getEnvCmsConnection(),
+      ...(readPersistedRootCmsConnection() ?? {}),
+    };
+  }
+  if (website === null || !website.cmsConnection) {
     return getEnvCmsConnection();
   }
 

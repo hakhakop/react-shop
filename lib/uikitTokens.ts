@@ -53,31 +53,24 @@ export function getUikitMarginClass(
     }
   }
 
-  const prefix =
-    direction === "top"
-      ? "uk-margin-top"
-      : direction === "bottom"
-      ? "uk-margin-bottom"
-      : direction === "left"
-      ? "uk-margin-left"
-      : direction === "right"
-      ? "uk-margin-right"
-      : "uk-margin";
+  const prefix = direction === "all" ? "uk-margin" : "uk-margin";
+  const directionalSuffix = direction === "all" ? "" : `-${direction}`;
+  const sized = (size: string) => `${prefix}-${size}${directionalSuffix}`;
 
   if (value === "xs" || value === "sm" || value === "small") {
-    return `${prefix}-small`;
+    return sized("small");
   }
   if (value === "md" || value === "medium") {
-    return prefix;
+    return sized("medium");
   }
   if (value === "lg" || value === "large") {
-    return `${prefix}-large`;
+    return sized("large");
   }
   if (value === "xl" || value === "2xl" || value === "3xl") {
-    return `${prefix}-xlarge`;
+    return sized("xlarge");
   }
 
-  return prefix;
+  return direction === "all" ? prefix : `${prefix}${directionalSuffix}`;
 }
 
 /**

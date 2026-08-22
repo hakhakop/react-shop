@@ -56,10 +56,41 @@ export default function HeaderFrame({
     context: EffectiveHeaderBackgroundContext;
     textMode: EffectiveHeaderTextMode;
   } | null>(null);
+  const [sectionHeaderState, setSectionHeaderState] = React.useState({
+    transparent: false,
+    pullUnder: false,
+  });
   const scheduleUpdateRef = React.useRef<() => void>(() => {});
 
   React.useEffect(() => {
     setBuilderSurface(Boolean(document.querySelector(".builder-dashboard")));
+  }, []);
+
+  React.useEffect(() => {
+    const updateSectionHeaderState = () => {
+      const pageRoot = document.querySelector<HTMLElement>(
+        "[data-builder-page-root], [data-builder-page]",
+      );
+      const nextState = {
+        transparent: pageRoot?.dataset.sectionHeaderTransparent === "true",
+        pullUnder: pageRoot?.dataset.sectionPullUnderHeader === "true",
+      };
+      setSectionHeaderState((current) =>
+        current.transparent === nextState.transparent && current.pullUnder === nextState.pullUnder
+          ? current
+          : nextState,
+      );
+    };
+
+    updateSectionHeaderState();
+    const observer = new MutationObserver(updateSectionHeaderState);
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-section-header-transparent", "data-section-pull-under-header"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   React.useLayoutEffect(() => {
@@ -353,11 +384,13 @@ export default function HeaderFrame({
 
   const resolvedTextMode =
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
+  const sectionTransparent = sectionHeaderState.transparent;
+  const effectiveOverlapHeader = overlapHeader || sectionHeaderState.pullUnder;
   return (
       <header
         id={id}
         ref={headerRef}
-        className={`${base} ${state} ${className} ${effectiveHidden ? "site-header--scroll-hidden" : ""}`}
+        className={`${base} ${state} ${className} ${sectionTransparent ? "site-header--section-transparent" : ""} ${effectiveHidden ? "site-header--scroll-hidden" : ""}`}
         style={{
           ...(hideBuilderServiceHeader ? { display: "none" } : {}),
           ...(isSticky ? { borderBottomColor: effectiveScrolled ? accentColor : "transparent" } : {}),
@@ -365,7 +398,8 @@ export default function HeaderFrame({
         }}
         data-header-behavior={behavior}
         data-scrolled={scrolled ? "true" : "false"}
-        data-overlap-header={overlapHeader ? "true" : "false"}
+        data-overlap-header={effectiveOverlapHeader ? "true" : "false"}
+        data-section-header-transparent={sectionTransparent ? "true" : "false"}
         data-header-text-mode={resolvedTextMode}
         data-header-background-context={
           textMode === "auto" ? autoTextState?.context : undefined

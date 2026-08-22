@@ -28,6 +28,7 @@ import { normalizeButtonStyleFields } from "../lib/builderButtons";
 import { getUikitGlobalsCssVars } from "../lib/uikitGlobals";
 import {
   getWebsiteByDomainHost,
+  getWebsiteByIdOrSlug,
   getWebsiteRouteSegment,
 } from "../lib/websites";
 import { builderGlobalVisibilityClassName } from "../lib/builderVisualStyle";
@@ -46,18 +47,44 @@ export default async function RootLayout({
   const requestHeaders = await headers();
   const pathname = requestHeaders.get("x-current-path") ?? "/";
   const host = requestHeaders.get("host");
-  const [themeSettingsRaw, shellSettings, domainWebsite] = await Promise.all([
-    getThemeSettings(),
-    getBuilderShellSettings(),
+  const pathTenantSlug = pathname.match(/^\/([^/]+)/)?.[1];
+  const isWorkspacePath = ["app", "admin", "login", "register", "account", "dashboard"].includes(
+    pathTenantSlug ?? "",
+  );
+  const scopedWebsiteId = pathname.match(
+    /^\/app\/websites\/([^/]+)\/(?:builder|preview)(?:\/|$)/,
+  )?.[1];
+  const [domainWebsite, pathTenantCandidate, scopedWebsiteCandidate] = await Promise.all([
     getWebsiteByDomainHost(host),
+    pathTenantSlug && !isWorkspacePath ? getWebsiteByIdOrSlug(pathTenantSlug) : null,
+    scopedWebsiteId ? getWebsiteByIdOrSlug(scopedWebsiteId) : null,
   ]);
-  const isDomainWebsiteRequest = Boolean(domainWebsite);
+  const pathTenantWebsite =
+    pathTenantCandidate?.slug === pathTenantSlug ? pathTenantCandidate : null;
+  const scopedWebsite = scopedWebsiteCandidate;
+  // A tenant request owns the entire Global Styles surface. Do not load the
+  // root ACF/theme settings as a fallback: incomplete tenant shell settings
+  // must resolve through canonical WebPages/UIkit defaults instead.
+  const styleWebsite = domainWebsite ?? pathTenantWebsite ?? scopedWebsite;
+  const styleScope = styleWebsite ? { websiteId: styleWebsite.id } : {};
+  const [themeSettingsRaw, shellSettings] = await Promise.all([
+    styleWebsite ? Promise.resolve<Record<string, any>>({}) : getThemeSettings(),
+    getBuilderShellSettings(styleScope),
+  ]);
+  const isDomainWebsiteRequest = Boolean(domainWebsite || pathTenantWebsite);
   const isDashboardWorkspaceRequest =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/app") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register");
+  // Tenant preview is rendered inside the authenticated /app route, but it
+  // is still a storefront surface and must retain the frontend Builder bar.
+  // Keep the SaaS workspace chrome hidden while allowing FrontendAdminBar to
+  // resolve the scoped tenant from its preview path.
+  const isTenantPreviewRequest = /^\/app\/websites\/[^/]+\/preview(?:\/|$)/.test(
+    pathname,
+  );
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -363,14 +390,14 @@ ${explicitWordPressProductVars}
 
                   <main className="site-main" suppressHydrationWarning>{children}</main>
 
-                  {!isDashboardWorkspaceRequest && (
+                  {(!isDashboardWorkspaceRequest || isTenantPreviewRequest) && (
                     <>
                       <FrontendAdminBar
                         domainWebsite={
-                          domainWebsite
+                          (domainWebsite ?? pathTenantWebsite)
                             ? {
-                                ownerId: domainWebsite.ownerId,
-                                routeSegment: getWebsiteRouteSegment(domainWebsite),
+                                ownerId: (domainWebsite ?? pathTenantWebsite)!.ownerId,
+                                routeSegment: getWebsiteRouteSegment((domainWebsite ?? pathTenantWebsite)!),
                               }
                             : undefined
                         }

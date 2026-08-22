@@ -221,33 +221,37 @@
   height: calc(var(--header-builder-height, 72px) + 36px);
 }
 
-/* When NOT scrolled (top position or data-scrolled="false") and data-overlap-header is active,
-   remove background/borders and position absolutely over the top of section 1 on frontend */
+/* Pulling a section behind the Header changes layout only. A section-owned
+   transparent header keeps the Header's configured visual treatment, as in
+   YOOtheme; only the legacy overlay mode clears its surface. */
 .site-header[data-overlap-header="true"]:not([data-scrolled="true"]) {
   position: absolute !important;
   left: 0;
   right: 0;
   width: 100%;
   z-index: 40;
+}
+
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) {
   background: transparent !important;
   border-bottom-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-top,
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-main,
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-main-inner {
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) .site-header-top,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) .site-header-main,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) .site-header-main-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-/* For pill layouts inside overlap headers, make transparent at top position */
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-top,
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner {
+/* Legacy overlay only: clear pill layouts at the top of the page. */
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) #site-header-pill .site-header-top,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) #site-header-pill .site-header-pill-main,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) #site-header-pill .site-header-pill-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -259,6 +263,10 @@
 .site-header[data-overlap-header="true"] .site-header-princity-spacer {
   display: none !important;
 }
+
+/* Section "Transparent Header" is intentionally visual-neutral. It allows
+   the first section to coordinate Header placement while preserving the
+   Header's selected background (including glass). */
 
 
 

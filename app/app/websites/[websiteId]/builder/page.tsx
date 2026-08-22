@@ -117,6 +117,7 @@ export default async function WebsiteBuilderPage({
         <DashboardBuilder
           websiteId={website.id}
           websiteRouteSegment={getWebsiteRouteSegment(website)}
+          websitePrimaryDomain={website.primaryDomain}
           saasUserRole={user.role}
           primaryContentLanguage={website.primaryLanguage}
           enabledContentLanguages={website.enabledLanguages}

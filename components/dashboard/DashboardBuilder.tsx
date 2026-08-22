@@ -341,7 +341,11 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
-import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import {
+  builderLinkTargetProps,
+  resolveWebsiteStorefrontHref,
+} from "@/lib/websiteBuilderLinks";
+import { resolveTenantPathHref } from "@/lib/scopedPreviewLinks";
 import {
   builderAnimationClassName as previewAnimationClassName,
   builderAnimationDataAttributes as previewAnimationAttrs,
@@ -1339,27 +1343,26 @@ function inferTypographyArea(
 
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
   if (key === "header") {
+    const defaultHeaderSection = headerPresets.find((preset) => preset.key === "minimal")?.sections[0];
     return {
       ...structuredClone(defaultState),
       page: "header",
       targetType: "header",
       template: undefined,
-      sections: [
-        {
-          id: "header-document",
-          kind: "contentLayout",
-          title: "Header",
-          background: "transparent",
-          backgroundMode: "full",
-          contentMode: "boxed",
-          colorScheme: "inherit",
-          layout: "header-row",
-          layoutColumns: 1,
-          headerUtilityMigrationVersion: 3,
-          layoutItems: [],
-          visible: true,
-        },
-      ],
+      sections: [structuredClone(defaultHeaderSection ?? {
+        id: "header-document",
+        kind: "contentLayout",
+        title: "Header",
+        background: "transparent",
+        backgroundMode: "full",
+        contentMode: "boxed",
+        colorScheme: "inherit",
+        layout: "header-row",
+        layoutColumns: 1,
+        headerUtilityMigrationVersion: 3,
+        layoutItems: [],
+        visible: true,
+      })],
     };
   }
 
@@ -1529,6 +1532,7 @@ function hydrateDocumentBuilderState(
   }
   const [header, ...rest] = normalized.sections;
   if (!header) return normalized;
+  const shouldSeedLegacyBranding = header.headerArchitectureVersion === undefined;
   return {
     ...normalized,
     sections: [{
@@ -1549,7 +1553,29 @@ function hydrateDocumentBuilderState(
       headerTopToolbarText: header.headerTopToolbarText ?? settings.topToolbarText,
       headerTopToolbarPhone: header.headerTopToolbarPhone ?? settings.topToolbarPhone,
       headerTopToolbarMeta: header.headerTopToolbarMeta ?? settings.topToolbarMeta,
-    }, ...rest],
+      ...(shouldSeedLegacyBranding
+        ? {
+            layoutItems: (header.layoutItems ?? []).map((item) => ({
+              ...item,
+              blocks: (item.blocks ?? []).map((block) =>
+                block.kind === "image" || block.id === "header-logo"
+                  ? {
+                      ...block,
+                      imageUrl: block.imageUrl ?? settings.headerLogoUrl,
+                      imageAlt: block.imageAlt ?? settings.headerLogoAlt,
+                      imageMaxWidth: block.imageMaxWidth ?? settings.headerLogoMaxWidth,
+                      headerBrandMode: block.headerBrandMode ?? settings.headerBrandMode,
+                      headerBrandText:
+                        block.headerBrandText === "WebPages" || !block.headerBrandText
+                          ? settings.headerBrandText
+                          : block.headerBrandText,
+                    }
+                  : block,
+              ),
+            })),
+          }
+        : {}),
+    } as BuilderSection, ...rest],
   };
 }
 
@@ -2102,6 +2128,7 @@ export type DashboardBuilderProps = {
   menuTree?: MenuItem[];
   websiteId?: string;
   websiteRouteSegment?: string;
+  websitePrimaryDomain?: string | null;
   saasUserRole?: SaaSUserRole;
   primaryContentLanguage?: string;
   enabledContentLanguages?: string[];
@@ -2118,6 +2145,7 @@ export default function DashboardBuilder({
   menuTree = [],
   websiteId,
   websiteRouteSegment = websiteId,
+  websitePrimaryDomain,
   saasUserRole,
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
@@ -2264,9 +2292,11 @@ export default function DashboardBuilder({
   const canEditShellSettings =
     isWebsiteScopedBuilder || saasUserRole === "super_admin";
   const shellSettingsLabel = isWebsiteScopedBuilder
-    ? "Website Settings"
+    ? "Global Styles"
     : "Style Customizer";
-  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Style";
+  const shellSettingsShortLabel = isWebsiteScopedBuilder
+    ? "Global Styles"
+    : "Style";
   const shellSettingsStatusLabel = isWebsiteScopedBuilder
     ? "Website settings"
     : "Style customizer";
@@ -3207,7 +3237,19 @@ export default function DashboardBuilder({
     [builderState.page],
   );
   const frontendHref = builderEditorContext?.navigation.frontendHref;
-  const viewPageHref = frontendHref ?? ordinaryBuilderFrontendHref(builderState.page, customPages);
+  const rawViewPageHref =
+    frontendHref ?? ordinaryBuilderFrontendHref(builderState.page, customPages);
+  const localTenantHref = websiteId
+    ? resolveTenantPathHref(rawViewPageHref, {
+        websiteId: websiteRouteSegment ?? websiteId,
+        pages: customPages.map((page) => ({ key: page.key, slug: page.slug })),
+      })
+    : undefined;
+  const viewPageHref = resolveWebsiteStorefrontHref(
+    rawViewPageHref,
+    websitePrimaryDomain,
+    localTenantHref,
+  );
   const handleScopedBuilderNavigate = useCallback(
     (href: string) => {
       // A strict routing-template document already owns the live preview
@@ -5036,10 +5078,31 @@ export default function DashboardBuilder({
     const targetState = shellType === "footer"
       ? footerDocumentPreviewState ?? await loadFooterDocumentPreview()
       : null;
-    const nextState = targetState ?? hydrateDocumentBuilderState(
+    let nextState = targetState ?? hydrateDocumentBuilderState(
       loadDraftForKey(shellType, storageKeys),
       shellSettings,
     );
+    // A newly-created website can have an empty Header document.  Seed it
+    // with the canonical minimal Header preset on first entry so owners can
+    // immediately add/edit rows, while retaining any authored header that
+    // already contains elements.
+    if (
+      shellType === "header" &&
+      !nextState.sections.some((section) =>
+        (section.layoutItems ?? []).some((item) => (item.blocks ?? []).length > 0),
+      )
+    ) {
+      const defaultHeaderPreset = headerPresets.find((preset) => preset.key === "minimal");
+      if (defaultHeaderPreset) {
+        nextState = {
+          ...nextState,
+          sections: mergeBrandingIntoPreset(
+            nextState.sections,
+            defaultHeaderPreset.sections,
+          ),
+        };
+      }
+    }
     const shellRootId =
       nextState.sections[0]?.id ??
       (shellType === "header" ? "header-document" : "footer-document");
@@ -5064,6 +5127,28 @@ export default function DashboardBuilder({
 
   const selectHeader = () => {
     enterShellEdit("header");
+  };
+
+  // The Header toolbar's edit action must target the Header document root,
+  // not the generic section-settings panel. Keep this separate from
+  // selectSection because HeaderDocumentSettings is document-scoped.
+  const openHeaderDocumentInspector = () => {
+    if (builderState.page !== "header") {
+      enterShellEdit("header");
+      return;
+    }
+    const rootId = builderState.sections[0]?.id ?? "header-document";
+    setHeaderSelected(true);
+    setFooterSelected(false);
+    setSelectedId(rootId);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setInspectorTab("layout");
+    setSectionSettingsOpen(true);
+    openInspectorPanel();
+    revealCanvasTarget(rootId);
   };
 
   const selectFooter = () => {
@@ -5928,7 +6013,10 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+        if (
+          section.id !== sectionId ||
+          (!isLayoutContainerSection(section) && section.id !== "header-document")
+        ) {
           return section;
         }
 
@@ -7877,6 +7965,16 @@ export default function DashboardBuilder({
     status?: string,
     revision = shellSaveRevision.current,
   ) => {
+    // A tenant route without its canonical website id must fail closed. It
+    // must never downgrade a Global Styles write to the Root shell.
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/app/websites/") && !websiteId) {
+      setShellStatus("Website scope unavailable; Global Styles were not saved.");
+      console.error("[global-settings-scope] blocked unscoped tenant shell write", {
+        pathname: window.location.pathname,
+        websiteId: null,
+      });
+      return false;
+    }
     if (!canEditShellSettings) {
       setShellStatus("Platform global settings require super admin access.");
       return false;
@@ -7894,6 +7992,9 @@ export default function DashboardBuilder({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        // Keep the write scope explicit. The API rejects a missing or
+        // mismatched tenant scope before it can resolve the root file.
+        "X-Builder-Website-Id": websiteId ?? "root",
       },
       body: JSON.stringify(nextSettings),
     });
@@ -9334,6 +9435,7 @@ export default function DashboardBuilder({
       selectedLayoutBlock={selectedLayoutBlockForInspector}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
+      headerDocumentRoot={builderState.page === "header"}
       footerDocumentRoot={footerSelected}
       anchorIdEntries={composedAnchorIdEntries}
       selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
@@ -9358,6 +9460,7 @@ export default function DashboardBuilder({
       duplicateSelectedRow={duplicateSelectedRow}
       savedTemplates={savedTemplates}
       templateStatus={templateStatus}
+      onApplyHeaderPreset={executeApplyHeaderPreset}
       onSaveContextualLayout={(layoutType) => {
         if (layoutType === "header" || layoutType === "footer") {
           void saveTemplate(layoutType);
@@ -9440,6 +9543,8 @@ export default function DashboardBuilder({
         undefined,
         "section",
       ),
+    addRow: (sectionId, rowIndex, presetKey) => addRowNear(sectionId, rowIndex, "after", presetKey),
+    openElements: openElementsPanel,
     selectSection: (sectionId) => selectSection(sectionId, true),
     selectRow: (sectionId, rowIndex) => selectLayoutRow(sectionId, rowIndex, true),
     selectColumn: (sectionId, columnKey) => selectLayoutColumn(sectionId, columnKey, true),
@@ -11313,7 +11418,7 @@ export default function DashboardBuilder({
                     canMoveDown={false}
                     canDelete={false}
                     onSelect={() => selectShellRoot("header")}
-                    onSettings={() => selectShellRoot("header", true)}
+                    onSettings={openHeaderDocumentInspector}
                     onBackToPage={builderState.page === "header" ? exitShellEdit : undefined}
                   />
                   <HeaderShellView
@@ -11644,7 +11749,7 @@ export default function DashboardBuilder({
                     canMoveDown={false}
                     canDelete={false}
                     onSelect={() => selectShellRoot("header")}
-                    onSettings={() => selectShellRoot("header", true)}
+                    onSettings={openHeaderDocumentInspector}
                     onBackToPage={undefined}
                   />
                 </div>
@@ -13062,8 +13167,14 @@ function PreviewCanvas({
         data-responsive-preview-tier={device === "desktop" ? undefined : previewResponsiveTier}
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
+        data-section-header-transparent={
+          visibleSections[0]?.headerTransparent ? "true" : undefined
+        }
+        data-section-pull-under-header={
+          visibleSections[0]?.pullUnderHeader ? "true" : undefined
+        }
         data-overlap-header={
-          (visibleSections[0]?.pullUnderHeader || visibleSections[0]?.headerTransparent || headerOverlay) ? "true" : undefined
+          (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined
         }
       >
         <BuilderScrollAnimations key={animationSignature} />

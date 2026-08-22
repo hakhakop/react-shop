@@ -3188,7 +3188,11 @@ function StorefrontBuilderRendererBase({
         data-responsive-breakpoint-large={responsiveBreakpointPolicy.large}
         data-responsive-breakpoint-xlarge={responsiveBreakpointPolicy.xlarge}
         data-gsap-home={isHomePage ? true : undefined}
-        data-overlap-header={isPageDocument && (pullUnderHeader || transparentSectionHeader || headerOverlay) ? "true" : undefined}
+        data-section-header-transparent={
+          transparentSectionHeader ? "true" : undefined
+        }
+        data-section-pull-under-header={pullUnderHeader ? "true" : undefined}
+        data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
       >
         <BuilderScrollAnimations />
         <div className="shop-builder-inner">

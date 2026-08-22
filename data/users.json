@@ -227,5 +227,14 @@
     "createdAt": "2026-07-22T19:07:02.187Z",
     "updatedAt": "2026-08-03T19:22:03.936Z",
     "language": "en"
+  },
+  {
+    "id": "87aa206d-ad3e-470f-ab4f-a3cc9e21e000",
+    "email": "circle@circle.am",
+    "passwordHash": "$2b$12$2kLieej1d3sJCG4.Fc.AIeFS4lvr9GYSkyFaG5K/rWXVDY.ZXhaf6",
+    "name": "Circle",
+    "role": "user",
+    "createdAt": "2026-08-21T15:23:25.323Z",
+    "updatedAt": "2026-08-21T15:23:25.323Z"
   }
 ]

@@ -104,6 +104,27 @@ const WORDPRESS_POST_SINGLE_QUERY = WORDPRESS_POST_COLLECTION_QUERY
 const WORDPRESS_POST_SINGLE_BY_ID_QUERY = WORDPRESS_POST_SINGLE_QUERY
   .replace("post(id: $id, idType: SLUG)", "post(id: $id, idType: ID)");
 
+function withoutOptionalAcfProjection(query: string) {
+  return query.replace(
+    /\n        acfFields: postAcfFields \{[\s\S]*?\n        \}\n/,
+    "\n",
+  );
+}
+
+async function fetchWordPressPosts<T>(
+  query: string,
+  variables: Record<string, unknown>,
+  endpoint: string,
+) {
+  try {
+    return await graphqlFetch<T>(query, variables, { endpoint });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/postAcfFields|acfFields/i.test(message)) throw error;
+    return graphqlFetch<T>(withoutOptionalAcfProjection(query), variables, { endpoint });
+  }
+}
+
 const WORDPRESS_TERM_RESOLUTION_QUERY = `
   query DynamicContentWordPressTerms(
     $where: RootQueryToTermNodeConnectionWhereArgs
@@ -477,6 +498,12 @@ async function resolveRawWordPressTerms(
     { endpoint },
   );
   const nodes = data.terms?.nodes ?? [];
+  // YOOtheme term IDs are site-local. A freshly connected WordPress site may
+  // have no matching categories/tags at all (for example, every post is still
+  // Uncategorized). In that case, keep the collection usable by broadening
+  // the imported filter to all posts. A partial match remains an error so we
+  // do not silently change an intentional taxonomy selection.
+  if (nodes.length === 0) return [];
   const seen = new Set<string>();
   const resolved = nodes.map((node) => {
     const id = identifierValue(node.databaseId);
@@ -653,10 +680,10 @@ export async function resolveWordPressPostContexts(input: {
 
   if (descriptor.mode === "single") {
     const compiled = compileWordPressPostSingleQuery(descriptor.query);
-    const data = await graphqlFetch<WordPressPostResponse>(
+    const data = await fetchWordPressPosts<WordPressPostResponse>(
       compiled.query,
       compiled.variables,
-      { endpoint },
+      endpoint,
     );
     return data.post ? [normalizeWordPressPostContext(data.post)] : [];
   }
@@ -668,10 +695,10 @@ export async function resolveWordPressPostContexts(input: {
     ? await resolveRawWordPressTerms(rawTermIds, endpoint)
     : undefined;
   const compiled = compileWordPressPostCollectionQuery(descriptor.query, { resolvedRawTerms });
-  const data = await graphqlFetch<WordPressPostsResponse>(
+  const data = await fetchWordPressPosts<WordPressPostsResponse>(
     compiled.query,
     compiled.variables,
-    { endpoint },
+    endpoint,
   );
   const posts = data.posts?.nodes ?? [];
   return posts

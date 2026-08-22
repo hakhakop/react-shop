@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import {
   resolveScopedBuilderHref,
   resolveScopedPreviewHref,
+  resolveTenantPathHref,
   type ScopedPreviewPage,
 } from "@/lib/scopedPreviewLinks";
 
@@ -11,7 +12,7 @@ type ScopedPreviewLinkRouterProps = {
   websiteId?: string;
   pages?: ScopedPreviewPage[];
   /** The same router is used by the standalone preview and the Builder shell. */
-  mode?: "preview" | "builder";
+  mode?: "preview" | "builder" | "tenant-path";
   /** Limit interception to a rendered preview boundary when mounted in Builder. */
   scopeSelector?: string;
   /** Optional owner hook for a destination that can be rendered in-place. */
@@ -63,7 +64,9 @@ export default function ScopedPreviewLinkRouter({
       const resolvedHref = websiteId
         ? mode === "builder"
           ? resolveScopedBuilderHref(href, { websiteId, pages })
-          : resolveScopedPreviewHref(href, { websiteId, pages })
+          : mode === "tenant-path"
+            ? resolveTenantPathHref(href, { websiteId, pages })
+            : resolveScopedPreviewHref(href, { websiteId, pages })
         : href;
       const navigationHandled = onNavigate?.(href, resolvedHref) === true;
       if (navigationHandled) {

@@ -5,21 +5,26 @@ import {
 import { getWebsiteRouteSegment, type SaaSWebsite } from "@/lib/websites";
 import {
   getDefaultWebsiteBuilderPageKey,
-  scopedPreviewHref,
+  resolveWebsiteStorefrontHref,
   scopedBuilderHref,
   type WebsiteBuilderPages,
 } from "@/lib/websiteBuilderLinks";
+import {
+  getPreviewActivePathForPageKey,
+  resolveTenantPathHref,
+} from "@/lib/scopedPreviewLinks";
 
-type WebsiteLinkTarget = string | Pick<SaaSWebsite, "id" | "slug">;
+type WebsiteLinkTarget = string | Pick<SaaSWebsite, "id" | "slug" | "primaryDomain">;
 
 function resolveWebsiteLinkTarget(target: WebsiteLinkTarget) {
   if (typeof target === "string") {
-    return { websiteId: target, routeSegment: target };
+    return { websiteId: target, routeSegment: target, primaryDomain: undefined };
   }
 
   return {
     websiteId: target.id,
     routeSegment: getWebsiteRouteSegment(target),
+    primaryDomain: target.primaryDomain,
   };
 }
 
@@ -43,11 +48,17 @@ export async function getDefaultWebsiteBuilderHref(target: WebsiteLinkTarget) {
 }
 
 export async function getDefaultWebsiteBuilderLinks(target: WebsiteLinkTarget) {
-  const { websiteId, routeSegment } = resolveWebsiteLinkTarget(target);
+  const { websiteId, routeSegment, primaryDomain } = resolveWebsiteLinkTarget(target);
   const pageKey = await getDefaultWebsitePageKey(websiteId);
+  const previewPath = getPreviewActivePathForPageKey(pageKey as import("@/lib/builderLayouts").BuilderLayoutKey);
 
   return {
     builderHref: scopedBuilderHref(routeSegment, pageKey),
-    previewHref: scopedPreviewHref(routeSegment, pageKey),
+    previewHref:
+      resolveWebsiteStorefrontHref(
+        previewPath,
+        primaryDomain,
+        resolveTenantPathHref(previewPath, routeSegment),
+      ) ?? resolveTenantPathHref(previewPath, routeSegment),
   };
 }

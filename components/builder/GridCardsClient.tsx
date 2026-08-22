@@ -269,12 +269,17 @@ export function GridCardsClient({
           (() => {
             // Grid Card Style is canonical. Legacy Panel aliases may only fill
             // an absent value; they can never override an explicit `None`.
-            const panelStyle = item.cardVariant ?? block.gridCardVariant ?? rawBlock.panelVariant ?? rawBlock.panelStyle ?? rawBlock.cardVariant ?? "blank";
+            const inheritedPanelStyle = item.cardVariant ?? block.gridCardVariant ?? rawBlock.panelVariant ?? rawBlock.panelStyle ?? rawBlock.cardVariant ?? "blank";
+            const panelStyle = inheritedPanelStyle === "default" &&
+              rawBlock.spacingContract === "yootheme" &&
+              (rawBlock.gridCardHover === true || item.cardHover === true)
+              ? "card-hover"
+              : inheritedPanelStyle;
             const panelPadding = rawBlock.gridCardSize ?? rawBlock.panelSize ?? rawBlock.panelPadding ?? "none";
             let panelClass = "";
 
             if (panelStyle === "card-hover") {
-              panelClass = "uk-card uk-card-default uk-flex uk-flex-column";
+              panelClass = "uk-card uk-flex uk-flex-column";
             } else if (
               panelStyle.startsWith("card-") ||
               panelStyle === "default" ||
@@ -340,12 +345,14 @@ export function GridCardsClient({
             // Meta styling
             const metaStyleClass = getUikitTextStyleClass(
               rawBlock.metaStyle ?? (rawBlock.spacingContract === "yootheme" ? undefined : "text-meta"),
-            );
+            ).replace(/\buk-margin-remove-top\b/g, "").trim();
             const metaColorVal = rawBlock.metaColor;
+            const hasExplicitMetaColor = typeof metaColorVal === "string" && !["", "inherit", "default", "none"].includes(metaColorVal.trim().toLowerCase());
             const metaColorClass = metaColorVal && metaColorVal !== "none" && metaColorVal !== "default"
               ? (metaColorVal.startsWith("uk-text-") ? metaColorVal : `uk-text-${metaColorVal}`)
               : "";
-            const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop);
+            const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop, "top");
+            const hasHeadingMetaStyle = metaStyleClass.split(/\s+/).some((token) => /^uk-h[1-6]$/.test(token));
             const rawMetaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below-title";
             const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
             // YOOtheme's Grid meta is a plain `div` (its visual size comes
@@ -368,10 +375,17 @@ export function GridCardsClient({
             // but those are read fallbacks only.
             const imageBorderClass = getUikitImageBorderClass(rawBlock.imageShape ?? rawBlock.imageBorder);
             const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageShadow ?? rawBlock.imageBoxShadow);
+            const imageHoverBoxShadow = rawBlock.imageHoverBoxShadow && rawBlock.imageHoverBoxShadow !== "none"
+              ? `uk-box-shadow-hover-${rawBlock.imageHoverBoxShadow}`
+              : "";
             const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
               ? (rawBlock.imageBoxDecoration === "shadow" ? "uk-box-shadow-bottom" : `uk-background-${rawBlock.imageBoxDecoration}`)
               : "";
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
+            const imageHoverBorderClass = rawBlock.imageHoverBorder === true ? "shop-builder-grid-image--hover-border" : "";
+            const imageTextColorClass = rawBlock.imageTextColor && rawBlock.imageTextColor !== "none" ? `uk-text-${rawBlock.imageTextColor}` : "";
+            const imageInverseClass = rawBlock.imageInverse === true ? "uk-light" : "";
+            const imageSvgAnimateClass = rawBlock.imageSvgAnimate === true ? "uk-animation-stroke" : "";
             const isFrameless = rawBlock.panelImageNoPadding === true || rawBlock.alignImageWithoutPadding === true || imagePaddingClass === "frameless";
             const panelExpand = rawBlock.panelExpand === "image" || rawBlock.panelExpand === "content" || rawBlock.panelExpand === "both"
               ? rawBlock.panelExpand
@@ -400,15 +414,18 @@ export function GridCardsClient({
             );
             const linkTarget = action.target;
 
-            const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
+            // Parent Grid Image alignment owns the default. Older imports may
+            // have materialized a synthetic item `top`; let the parent value
+            // supersede that legacy default while preserving real item-side
+            // placements such as left/right/bottom/between.
+            const mediaPlacement = item.mediaPlacement && item.mediaPlacement !== "top"
+              ? item.mediaPlacement
+              : (block as any).gridMediaPlacement ?? item.mediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
-            // The shared Image/Media spacing token supplies the value. Grid
-            // owns only the source-defined placement condition below.
-            const hasPanelSurface = panelStyle !== "blank" && panelStyle !== "none";
-            const mediaMarginTopClass = mediaPlacement === "between"
-              || (mediaPlacement === "bottom" && !(hasPanelSurface && rawBlock.panelImageNoPadding === true))
-              ? getUikitMarginClass(rawBlock.imageMarginTop ?? "default", "top")
-              : "";
+            // YOOtheme's Image > Margin Top is a shared image owner, not a
+            // placement-specific toggle. Apply the authored top margin for
+            // every Grid image alignment, including the default top track.
+            const mediaMarginTopClass = getUikitMarginClass(rawBlock.imageMarginTop ?? "default", "top");
             const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "1-2";
             // Explicit media alignment has higher precedence than Grid text
             // alignment. Without one, media participates in the same item
@@ -437,7 +454,18 @@ export function GridCardsClient({
                   className={`shop-builder-grid-meta ${metaStyleClass} ${metaElementClass} ${metaColorClass} ${metaMarginTopClass} ${isYoothemeGrid ? "" : typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
-                  style={colorSemantics.metaStyle}
+                  style={{
+                    ...colorSemantics.metaStyle,
+                    // YOOtheme's uncoloured Grid meta inherits its card text
+                    // context. Do not let the WebPages legacy muted fallback
+                    // override authored heading styles or the card surface.
+                    ...(isYoothemeGrid && !hasExplicitMetaColor && !metaStyleClass
+                      ? { color: "inherit" }
+                      : {}),
+                    ...(isYoothemeGrid && !hasExplicitMetaColor && hasHeadingMetaStyle
+                      ? { color: "var(--uk-global-emphasis-color, inherit)" }
+                      : {}),
+                  }}
                 >
                   {item.meta}
                 </Typog>
@@ -454,7 +482,7 @@ export function GridCardsClient({
               canShowTitle && safeTitle ? (
                 <Typog
                   as={TitleTag}
-                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "uk-margin-remove-bottom" : ""} ${typographyRoleClass(
+                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass} ${isYoothemeGrid ? "uk-margin-remove-bottom" : ""} ${typographyRoleClass(
                     rawBlock.titleTypographyRole ?? block.titleTypographyRole,
                   )}`.trim()}
                   typography={titleTypography}
@@ -491,7 +519,9 @@ export function GridCardsClient({
 
             const renderImage = () => {
               if (!canShowImage || !item.imageUrl) return null;
-              const placement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
+              const placement = item.mediaPlacement && item.mediaPlacement !== "top"
+                ? item.mediaPlacement
+                : (block as any).gridMediaPlacement ?? item.mediaPlacement ?? "top";
               const mediaClass = isFrameless ? (placement === "left" || placement === "right" ? `uk-card-media-${placement}` : "uk-card-media-top") : "";
               const imageElementStyle = {
                 // `Auto` columns use UIkit's natural-width semantics.
@@ -503,35 +533,36 @@ export function GridCardsClient({
                 objectPosition: mediaStyle.backgroundPosition,
                 borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
               } as CSSProperties;
+              const isSvgAsset = /\.svg(?:[?#].*)?$/i.test(item.imageUrl);
               const fallbackImage = (
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   className={imageHoverTransitionClass}
-                  style={imageElementStyle}
+                  style={{ ...imageElementStyle, ...(rawBlock.imageIconWidth && isSvgAsset ? { width: imageDimension(rawBlock.imageIconWidth) } : {}) }}
                 />
               );
-              const isStylableSvg = rawBlock.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(item.imageUrl);
-              const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
+              const isStylableSvg = rawBlock.imageSvgInline === true && isSvgAsset;
+              const svgColorClass = getUikitSvgColorClass(rawBlock.imageIconColor ?? rawBlock.imageSvgColor);
               const preserveIntrinsicSvgSize = isStylableSvg && !imageWidth && !imageHeight && !hasCropFrame;
               const imageEl = isStylableSvg ? (
                 <UikitStylableSvg
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
-                  className={`${imageHoverTransitionClass} ${svgColorClass} el-image`.trim()}
-                  color={svgColorClass ? undefined : getUikitSvgColor(rawBlock.imageSvgColor)}
+                  className={`${imageHoverTransitionClass} ${imageSvgAnimateClass} ${svgColorClass} el-image`.trim()}
+                  color={svgColorClass ? undefined : getUikitSvgColor(rawBlock.imageIconColor ?? rawBlock.imageSvgColor)}
                   fit={mediaStyle.objectFit === "cover" ? "cover" : "contain"}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   preserveIntrinsicSize={preserveIntrinsicSvgSize}
                   fallback={fallbackImage}
-                  style={preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle}
+                  style={{ ...(preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle), ...(rawBlock.imageIconWidth ? { width: imageDimension(rawBlock.imageIconWidth) } : {}) }}
                 />
               ) : fallbackImage;
 
               return (
                 <div
-                  className={`${mediaClass} ${mediaMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
+                  className={`${mediaClass} ${mediaMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageHoverBoxShadow} ${imageDecorationClass} ${imageHoverBorderClass} ${imageTextColorClass} ${imageInverseClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
                   data-image-ratio={hasCropFrame ? "true" : undefined}
                   style={{
                     maxWidth: imageMaxWidth,
@@ -623,7 +654,7 @@ export function GridCardsClient({
                 key={item.id}
                 className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
-                } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
+                } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${isYoothemeGrid ? "uk-flex-1 uk-margin-remove-first-child" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     textAlign: itemContentAlignment,
@@ -639,7 +670,7 @@ export function GridCardsClient({
                     // The YOOtheme Grid source leaves `title_color` empty,
                     // which means global emphasis — not the muted Card body
                     // color or a WebPages Card-default fallback.
-                    ...(isYoothemeGrid && !hasExplicitTitleColor && ["blank", "default", "card-default"].includes(panelStyle) ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
+                    ...(isYoothemeGrid && !hasExplicitTitleColor && ["blank", "default", "card-default", "card-hover"].includes(panelStyle) ? { "--builder-card-title-color": "var(--uk-global-emphasis-color, inherit)" } : {}),
                     ...(builderItemStyle ?? {}),
                   } as CSSProperties
                 }

@@ -24,6 +24,7 @@ type Props = {
 
 export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
+  const isImportedYoothemeImage = rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
   const resolveString = (
     local: unknown,
     global: string | undefined,
@@ -84,7 +85,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     rawBlock.imageBoxDecoration &&
     rawBlock.imageBoxDecoration !== "none" &&
     rawBlock.imageBoxDecoration !== "shadow"
-      ? `uk-background-${rawBlock.imageBoxDecoration}`
+      ? `tm-box-decoration-${rawBlock.imageBoxDecoration} uk-inline`
       : "";
   const imageHoverShadow = rawBlock.imageHoverBoxShadow ?? rawBlock.imageHoverShadow;
   const imageHoverShadowClass =
@@ -114,6 +115,9 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     && !imageStyle.aspectRatio;
   const svgColor = getUikitSvgColor(rawBlock.imageSvgColor);
   const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
+  const imageTextColorClass = rawBlock.imageTextColor && rawBlock.imageTextColor !== "none" ? `uk-text-${rawBlock.imageTextColor}` : "";
+  const imageInverseClass = rawBlock.imageInverse === true ? "uk-light" : "";
+  const imageSvgAnimateClass = rawBlock.imageSvgAnimate === true ? "uk-animation-stroke" : "";
   const usesContextualSvgColor = Boolean(svgColorClass);
   const fallbackImage = usesIntrinsicGeometry ? (
     <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: preserveIntrinsicImageSize ? "auto" : "100%", maxWidth: preserveIntrinsicImageSize ? "100%" : undefined, height: imageStyle.height ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
@@ -124,7 +128,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     <UikitStylableSvg
       src={rawBlock.imageUrl!}
       alt={rawBlock.imageAlt}
-      className={`${imageClass} ${svgColorClass}`.trim()}
+      className={`${imageClass} ${svgColorClass} ${imageSvgAnimateClass}`.trim()}
       color={usesContextualSvgColor ? undefined : svgColor}
       fit={preserveIntrinsicSvgSize
         ? "contain"
@@ -155,11 +159,11 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
-      className={`shop-builder-column-block shop-builder-column-block--image ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      className={`shop-builder-column-block shop-builder-column-block--image ${isImportedYoothemeImage ? "shop-builder-column-block--image-yootheme" : ""} ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
       style={{ display: "block" }}
     >
       <figure
-        className={`shop-builder-image-figure ${imageAlignmentClass}`.trim()}
+        className={`shop-builder-image-figure ${isBottomShadow ? "uk-box-shadow-bottom" : ""} ${imageAlignmentClass} ${imageTextColorClass} ${imageInverseClass}`.trim()}
         style={{
           display: "inline-block",
           maxWidth: allowsPositionedOverflow
@@ -172,7 +176,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
             : imageStyle.width
               ? `min(${imageStyle.width}, 100%)`
               : (!imageStyle.aspectRatio ? "fit-content" : undefined),
-          height: imageStyle.height,
+          height: rawBlock.imageHeight === "viewport" ? "100vh" : rawBlock.imageHeight === "column" ? "100%" : imageStyle.height,
         }}
       >
         <div
@@ -183,7 +187,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
           style={{
             aspectRatio: imageStyle.aspectRatio,
             width: "100%",
-            height: imageStyle.height,
+            height: rawBlock.imageHeight === "viewport" ? "100vh" : rawBlock.imageHeight === "column" ? "100%" : imageStyle.height,
             position: imageStyle.aspectRatio ? "relative" : undefined,
           }}
         >

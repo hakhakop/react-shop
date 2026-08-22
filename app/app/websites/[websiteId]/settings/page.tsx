@@ -5,7 +5,7 @@ import AccessDenied from "@/components/saas/AccessDenied";
 import DomainConnectionStatus from "@/components/saas/DomainConnectionStatus";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { T } from "@/components/i18n/LanguageProvider";
-import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
+import { getCurrentUser, isSaaSAdmin, isSaaSSuperAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   createStoredWebsiteBackup,
@@ -13,13 +13,18 @@ import {
   restoreStoredWebsiteBackup,
   restoreWebsiteBackup,
 } from "@/lib/websiteBackup";
-import { getCmsConnection, type CmsConnection } from "@/lib/cmsConnection";
+import {
+  getCmsConnection,
+  type CmsConnection,
+} from "@/lib/cmsConnection";
+import { savePersistedRootCmsConnection } from "@/lib/cmsConnectionRoot.server";
 import {
   addWebsiteDomain,
   canAccessWebsiteBuilder,
   getWebsiteById,
   getWebsiteByIdOrSlug,
   getWebsiteRouteSegment,
+  isRootWebsiteIdentifier,
   removeWebsiteDomain,
   setWebsitePrimaryDomain,
   updateWebsiteDomain,
@@ -29,6 +34,7 @@ import {
   validateWebsiteSettingsInput,
   type WebsiteStatus,
   type WebsiteType,
+  type SaaSWebsite,
 } from "@/lib/websites";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +78,28 @@ const futureCards = [
   { title: "SEO", description: "Default metadata and search appearance." },
   { title: "Members", description: "Invite teammates and manage access." },
 ];
+
+function rootWebsiteSettingsView(): SaaSWebsite {
+  return {
+    id: "root",
+    ownerId: "root",
+    name: "WebPages Root Website",
+    slug: "root-website",
+    type: "business",
+    domain: "webpages.am",
+    primaryDomain: "webpages.am",
+    domains: ["webpages.am"],
+    description: "The public WebPages platform website.",
+    timeZone: "Asia/Yerevan",
+    language: "hy",
+    primaryLanguage: "hy",
+    enabledLanguages: ["hy", "en", "ru"],
+    status: "active",
+    createdAt: "",
+    updatedAt: "",
+    cmsConnection: getCmsConnection(),
+  };
+}
 
 function formatBackupSize(sizeBytes: number) {
   if (sizeBytes < 1024) return `${sizeBytes} B`;
@@ -201,6 +229,31 @@ async function saveWebsiteCmsConnectionAction(formData: FormData) {
 
   if (!user) {
     redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  if (isRootWebsiteIdentifier(websiteId)) {
+    if (!isSaaSSuperAdmin(user)) return errorRedirect("Access denied.");
+    const existingConnection = getCmsConnection();
+    const submittedSecret = String(formData.get("wooCommerceConsumerSecret") ?? "").trim();
+    const clearSecret = formData.get("clearWooCommerceConsumerSecret") === "on";
+    const submittedPassword = String(formData.get("wordpressApplicationPassword") ?? "").trim();
+    const clearPassword = formData.get("clearWordpressApplicationPassword") === "on";
+    const parsed = validateWebsiteCmsConnectionInput({
+      provider: formData.get("provider") || "wordpress",
+      siteUrl: formData.get("siteUrl") || formData.get("wordpressCmsUrl"),
+      graphqlUrl: formData.get("graphqlUrl") || formData.get("wordpressGraphqlUrl"),
+      adminUrl: formData.get("adminUrl") || formData.get("wordpressAdminUrl"),
+      wooCommerceApiUrl: formData.get("wooCommerceApiUrl") || formData.get("wooCommerceRestApiUrl"),
+      wordpressUsername: formData.get("wordpressUsername") || formData.get("wordpressAdminUser"),
+      wordpressApplicationPassword: clearPassword ? "" : submittedPassword || existingConnection.wordpressApplicationPassword,
+      wooCommerceConsumerKey: formData.get("wooCommerceConsumerKey"),
+      wooCommerceConsumerSecret: clearSecret ? "" : submittedSecret || existingConnection.wooCommerceConsumerSecret,
+      storeStatusNotes: formData.get("storeStatusNotes"),
+      technicalNotes: formData.get("technicalNotes"),
+    });
+    if ("error" in parsed && parsed.error) return errorRedirect(parsed.error);
+    await savePersistedRootCmsConnection(parsed as CmsConnection);
+    redirect("/app/websites/root/settings?cmsSaved=1#cms-connection");
   }
 
   const targetWebsite = await getWebsiteById(websiteId);
@@ -524,22 +577,26 @@ export default async function WebsiteSettingsPage({
     redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
   }
 
-  const website = await getWebsiteByIdOrSlug(websiteId);
-  if (!website || !canAccessWebsiteBuilder(user, website)) {
+  const isRootWebsite = isRootWebsiteIdentifier(websiteId);
+  const website = isRootWebsite
+    ? rootWebsiteSettingsView()
+    : await getWebsiteByIdOrSlug(websiteId);
+  if (!website || (isRootWebsite
+    ? !isSaaSSuperAdmin(user)
+    : !canAccessWebsiteBuilder(user, website))) {
     return <AccessDenied />;
   }
-  const backups = await listWebsiteBackups(website.id);
-  const isEcommerceWebsite = website.type === "e-commerce";
-  const settingsSections = isEcommerceWebsite
-    ? [
+  const backups = isRootWebsite ? [] : await listWebsiteBackups(website.id);
+  const settingsSections = isRootWebsite
+    ? [{ title: "CMS Connection", id: "cms-connection", available: true }]
+    : [
         ...baseSettingsSections.slice(0, 3),
         { title: "CMS Connection", id: "cms-connection", available: true },
         ...baseSettingsSections.slice(3),
-      ]
-    : baseSettingsSections;
+      ];
   const websiteRouteSegment = getWebsiteRouteSegment(website);
   const restoreSource = query?.restoreSource === "upload" ? "upload" : "existing";
-  const cmsConnection = getCmsConnection(website);
+  const cmsConnection = getCmsConnection(isRootWebsite ? undefined : website);
   const cmsActionLinks = getCmsActionLinks(cmsConnection).filter(
     (item) => item.href,
   );
@@ -577,6 +634,8 @@ export default async function WebsiteSettingsPage({
         </aside>
 
         <div className="saas-settings-content">
+          {!isRootWebsite && (
+          <div>
           <section className="saas-panel" id="general">
             <div className="saas-panel-heading">
               <div>
@@ -795,8 +854,9 @@ export default async function WebsiteSettingsPage({
               </button>
             </form>
           </section>
+          </div>
+          )}
 
-          {isEcommerceWebsite && (
             <details
               className="saas-settings-disclosure"
               id="cms-connection"
@@ -964,9 +1024,8 @@ export default async function WebsiteSettingsPage({
               </form>
               </div>
             </details>
-          )}
 
-          <details
+          {!isRootWebsite && <details
             className="saas-settings-disclosure"
             id="advanced"
             open={Boolean(query?.backupCreated || query?.backupRestored || query?.restoreSource)}
@@ -1148,7 +1207,7 @@ export default async function WebsiteSettingsPage({
               of your current data will be created automatically.
             </p>
             </div>
-          </details>
+          </details>}
 
           <section className="saas-settings-future-list" aria-label="Future settings">
             {futureCards.map((card) => (

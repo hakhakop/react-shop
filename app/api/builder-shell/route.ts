@@ -38,6 +38,25 @@ export async function POST(request: NextRequest) {
   const user = "user" in access ? access.user : await getCurrentUser(request.cookies);
   const websiteId = access.scope.websiteId ?? null;
 
+  const requestedScope = request.headers.get("x-builder-website-id")?.trim() || null;
+  const expectedScope = websiteId ?? "root";
+  // Older API clients may omit the diagnostic scope header, so the query
+  // scope remains authoritative when the header is absent. A present header
+  // must always agree; this prevents a tenant client from silently resolving
+  // the root file after losing its query parameter.
+  if (requestedScope && requestedScope !== expectedScope) {
+    console.error("[global-settings-scope] rejected builder-shell write scope", {
+      websiteId,
+      requestedScope,
+      expectedScope,
+      apiUrl: request.nextUrl.toString(),
+    });
+    return NextResponse.json(
+      { error: "Builder shell write scope does not match the authorized website." },
+      { status: 409 },
+    );
+  }
+
   if (!websiteId && user?.role !== "super_admin") {
     return NextResponse.json(
       { error: "Super admin access is required for platform global settings." },

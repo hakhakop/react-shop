@@ -5736,10 +5736,19 @@ body:has(.builder-dashboard) .site-header--service {
 
 .builder-header-presets-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
   margin-top: 6px;
   margin-bottom: 12px;
+}
+
+.builder-header-layout-preset {
+  align-items: center;
+  padding: 8px;
+}
+
+.builder-header-layout-preset > span {
+  text-align: center;
 }
 
 .builder-preset-btn {
@@ -5790,6 +5799,34 @@ body:has(.builder-dashboard) .site-header--service {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.builder-yootheme-layout-diagram {
+  width: 100%;
+  display: block;
+  height: auto;
+  aspect-ratio: 180 / 92;
+  margin-bottom: 7px;
+  color: color-mix(in srgb, var(--builder-ui-text) 56%, transparent);
+}
+
+.builder-yootheme-layout-diagram rect,
+.builder-yootheme-layout-diagram path,
+.builder-yootheme-layout-diagram circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-width: 2;
+}
+
+.builder-yootheme-layout-diagram path {
+  stroke-width: 3;
+}
+
+@media (max-width: 420px) {
+  .builder-header-presets-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .builder-header-icon-grid {
@@ -9037,7 +9074,9 @@ body[data-storefront-preset="princity"]
 }
 
 .shop-builder-grid-card:not(.is-image-frameless) .shop-builder-grid-image:not(.uk-card-media-top) {
-  margin: 0 0 20px 0 !important;
+  /* Keep the shared Grid Image Margin Top utility effective; this rule owns
+     only the legacy bottom rhythm. */
+  margin-bottom: 20px !important;
   width: 100% !important;
   border-radius: 8px !important;
 }
@@ -18974,6 +19013,35 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 .builder-wireframe-panel .builder-wireframe-insert-section {
   margin: 0 auto;
+}
+
+/* Section-owned transparent headers must be visible in the Builder canvas.
+   The editable Header slot normally keeps its Header in document flow, which
+   would otherwise mask the pull-behind setting used on the first Section. */
+body:has([data-scoped-builder-root])
+  .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot {
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+body:has([data-scoped-builder-root])
+  .builder-preview-header-slot
+  .site-header[data-overlap-header="true"]:not([data-scrolled="true"]) {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+body:has([data-scoped-builder-root])
+  .builder-preview-header-slot
+  .site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-section-header-transparent="true"]) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
 .builder-dashboard .builder-wireframe-row {

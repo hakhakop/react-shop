@@ -231,6 +231,9 @@ export function MetaSettingsGroup({
   showPosition = false,
   showHtmlElement = true,
   positionLabel = "Position",
+  showMargin = false,
+  styleOptions,
+  htmlElementOptions = ["div", "span", "p"],
   keys = {
     role: "metaTypographyRole",
     align: "metaAlign",
@@ -238,6 +241,7 @@ export function MetaSettingsGroup({
     style: "metaStyle",
     color: "metaColor",
     position: "gridMetaAlign",
+    margin: "metaMarginTop",
   },
 }: {
   block: BuilderLayoutBlock;
@@ -250,6 +254,12 @@ export function MetaSettingsGroup({
   showHtmlElement?: boolean;
   /** Some YOOtheme components name their content-order choice Alignment. */
   positionLabel?: string;
+  /** Expose the source component's canonical margin owner when it has one. */
+  showMargin?: boolean;
+  /** Element-specific YOOtheme style vocabulary. */
+  styleOptions?: ReadonlyArray<{ value: string; label: string }>;
+  /** Element-specific HTML element vocabulary. */
+  htmlElementOptions?: ReadonlyArray<string>;
   keys?: {
     role: string;
     align: string;
@@ -257,6 +267,7 @@ export function MetaSettingsGroup({
     style?: string;
     color?: string;
     position?: string;
+    margin?: string;
   };
 }) {
   const values = block as any;
@@ -289,7 +300,7 @@ export function MetaSettingsGroup({
         >
           <InspectorSelect
             value={String(values[styleKey] ?? "text-meta")}
-            options={[
+            options={styleOptions ?? [
               { value: "text-meta", label: "Text Meta" },
               { value: "text-lead", label: "Text Lead" },
               { value: "heading-small", label: "Heading Small" },
@@ -364,12 +375,37 @@ export function MetaSettingsGroup({
         >
           <InspectorSelect
             value={String(values[keys.level] ?? "div")}
-            options={["div", "span", "p"].map((v) => ({
+            options={(htmlElementOptions ?? ["div", "span", "p"]).map((v) => ({
               value: v,
-              label: v.toUpperCase(),
+              // YOOtheme displays the authored HTML element value verbatim
+              // (for example `h3`, not an invented `H3` label).
+              label: v,
             }))}
             onChange={(value) => update({ [keys.level]: value })}
             ariaLabel="Title HTML element"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showMargin && (
+        <InspectorFieldRow
+          label="Margin Top"
+          isOverridden={values[keys.margin ?? "metaMarginTop"] !== undefined}
+          inheritedValueText="Default"
+          onReset={() => update({ [keys.margin ?? "metaMarginTop"]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.margin ?? "metaMarginTop"] ?? "default")}
+            options={[
+              { value: "small", label: "Small" },
+              { value: "default", label: "Default" },
+              { value: "medium", label: "Medium" },
+              { value: "large", label: "Large" },
+              { value: "xlarge", label: "X-Large" },
+              { value: "none", label: "None" },
+            ]}
+            onChange={(value) => update({ [keys.margin ?? "metaMarginTop"]: value })}
+            ariaLabel="Meta margin top"
           />
         </InspectorFieldRow>
       )}
@@ -478,8 +514,16 @@ export function ImageSettingsGroup({
   showBorder = true,
   showShadow = true,
   showHoverShadow = false,
+  disableHoverShadow = false,
+  hoverShadowOptions,
   showDecoration = true,
+  showInverse = false,
+  showSvgAnimate = false,
+  showHeightControls = false,
+  showTextColor = false,
+  loadingCheckbox = false,
   showSvgControls = false,
+  showSvgColorWhenInlineDisabled = false,
   svgColorLabel = "SVG Style",
   svgColorOptions,
   mediaLayout,
@@ -519,10 +563,21 @@ export function ImageSettingsGroup({
   /** Keep shared shadow semantics available without forcing them into every composition. */
   showShadow?: boolean;
   showHoverShadow?: boolean;
+  /** Some YOOtheme elements expose hover shadow only once their link is active. */
+  disableHoverShadow?: boolean;
+  /** The standalone Image element omits the shared Bottom shadow variant. */
+  hoverShadowOptions?: ReadonlyArray<{ value: string; label: string }>;
+  showInverse?: boolean;
+  showSvgAnimate?: boolean;
+  showHeightControls?: boolean;
+  showTextColor?: boolean;
+  loadingCheckbox?: boolean;
   /** Keep shared decoration semantics available without forcing them into every composition. */
   showDecoration?: boolean;
   /** Compose the canonical YOOtheme stylable-SVG controls where the parent element exposes them. */
   showSvgControls?: boolean;
+  /** Preserve YOOtheme's disabled SVG Color control before Inline SVG is enabled. */
+  showSvgColorWhenInlineDisabled?: boolean;
   /** Components may use YOOtheme's semantic label while sharing the same color owner. */
   svgColorLabel?: string;
   /** Source-specific vocabulary for the shared SVG color owner. */
@@ -651,7 +706,15 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
-      <InspectorFieldRow
+      {loadingCheckbox ? (
+        <InspectorFieldRow label="Loading" isOverridden={values[keys.loading] !== undefined} inheritedValueText="Lazy" onReset={() => update({ [keys.loading]: undefined })}>
+          <InspectorSwitch
+            checked={values[keys.loading] === "eager" || values[keys.loading] === true}
+            onChange={(checked) => update({ [keys.loading]: checked ? "eager" : undefined })}
+            label="Load image eagerly"
+          />
+        </InspectorFieldRow>
+      ) : <InspectorFieldRow
         label="Loading"
         isOverridden={values[keys.loading] !== undefined}
         inheritedValueText="Lazy"
@@ -665,7 +728,7 @@ export function ImageSettingsGroup({
           ]}
           onChange={(value) => update({ [keys.loading]: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
       {showTransition && <InspectorFieldRow
         label="Transition"
@@ -745,10 +808,11 @@ export function ImageSettingsGroup({
       >
         <InspectorSelect
           value={String(values.imageHoverBoxShadow ?? "none")}
-          options={["none", "small", "medium", "large", "xlarge", "bottom"].map((value) => ({
+          options={hoverShadowOptions ?? ["none", "small", "medium", "large", "xlarge", "bottom"].map((value) => ({
             value,
             label: value === "none" ? "None" : value === "xlarge" ? "X-Large" : value.charAt(0).toUpperCase() + value.slice(1),
           }))}
+          disabled={disableHoverShadow}
           onChange={(value) => update({ imageHoverBoxShadow: value === "none" ? undefined : value })}
           ariaLabel="Image hover box shadow"
         />
@@ -774,6 +838,10 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
+      {showInverse && <InspectorFieldRow label="" isOverridden={values.imageInverse !== undefined} inheritedValueText="Off" onReset={() => update({ imageInverse: undefined })}>
+        <InspectorSwitch checked={values.imageInverse === true} onChange={(checked) => update({ imageInverse: checked || undefined })} label="Inverse style" />
+      </InspectorFieldRow>}
+
       {showSvgControls && <InspectorFieldRow
         label="Inline SVG"
         isOverridden={values[svgInlineKey] !== undefined}
@@ -787,7 +855,7 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
-      {showSvgControls && values[svgInlineKey] === true && <InspectorFieldRow
+      {showSvgControls && (values[svgInlineKey] === true || showSvgColorWhenInlineDisabled) && <InspectorFieldRow
         label={svgColorLabel}
         isOverridden={values[svgColorKey] !== undefined}
         inheritedValueText={svgColorOptions ? "None" : "Primary"}
@@ -803,9 +871,27 @@ export function ImageSettingsGroup({
             { value: "emphasis", label: "Emphasis" },
             { value: "inverse", label: "Inverse" },
           ]}
+          disabled={values[svgInlineKey] !== true}
           onChange={(value) => update({ [svgColorKey]: value === "none" ? undefined : value })}
           ariaLabel={svgColorLabel}
         />
+      </InspectorFieldRow>}
+
+      {showSvgAnimate && <InspectorFieldRow label="" isOverridden={values.imageSvgAnimate !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgAnimate: undefined })}>
+        <InspectorSwitch checked={values.imageSvgAnimate === true} onChange={(checked) => update({ imageSvgAnimate: checked || undefined })} label="Animate strokes" disabled={values[svgInlineKey] !== true} />
+      </InspectorFieldRow>}
+
+      {showHeightControls && <>
+        <InspectorFieldRow label="Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="Auto" onReset={() => update({ imageHeight: undefined })}>
+          <InspectorSwitch checked={values.imageHeight === "column"} onChange={(checked) => update({ imageHeight: checked ? "column" : undefined })} label="Fill the available column space" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="" isOverridden={values.imageHeight === "viewport"} inheritedValueText="Off" onReset={() => update({ imageHeight: undefined })}>
+          <InspectorSwitch checked={values.imageHeight === "viewport"} onChange={(checked) => update({ imageHeight: checked ? "viewport" : undefined })} label="Force viewport height" />
+        </InspectorFieldRow>
+      </>}
+
+      {showTextColor && <InspectorFieldRow label="Text Color" isOverridden={values.imageTextColor !== undefined} inheritedValueText="None" onReset={() => update({ imageTextColor: undefined })}>
+        <InspectorSelect value={String(values.imageTextColor ?? "none")} options={[{ value: "none", label: "None" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} onChange={(value) => update({ imageTextColor: value === "none" ? undefined : value })} />
       </InspectorFieldRow>}
 
       {showAlignment && (
@@ -858,7 +944,7 @@ export function ImageSettingsGroup({
 
       {showFrameless && (
         <InspectorFieldRow
-          label="Image"
+          label=""
           isOverridden={values[framelessKey] !== undefined}
           inheritedValueText="Off"
           onReset={() => update({ [framelessKey]: undefined })}
@@ -1238,6 +1324,8 @@ export function CardSettingsGroup({
   sizeLabel = "Size",
   hoverLabel = "Enable hover effect",
   showHeight = false,
+  showExpandContent = false,
+  showMaxWidth = false,
   showImageNoPadding = false,
   heightLabel = "Fill the available column space",
   imageNoPaddingLabel = "Image without padding",
@@ -1260,6 +1348,10 @@ export function CardSettingsGroup({
   hoverLabel?: string;
   /** Panel-only YOOtheme height/expansion semantics belong to its Panel group. */
   showHeight?: boolean;
+  /** Expose YOOtheme's Panel expand control without requiring height expansion. */
+  showExpandContent?: boolean;
+  /** Expose the Grid item max-width owner. */
+  showMaxWidth?: boolean;
   /** Panel-only image padding semantics belong to its Panel group. */
   showImageNoPadding?: boolean;
   heightLabel?: string;
@@ -1269,6 +1361,7 @@ export function CardSettingsGroup({
     size: string;
     hover: string;
     link?: string;
+    maxWidth?: string;
   };
 }) {
   const values = block as any;
@@ -1311,14 +1404,14 @@ export function CardSettingsGroup({
           <InspectorSwitch
             checked={Boolean(values[linkKey])}
             onChange={(checked) => update({ [linkKey]: checked })}
-            label="Link entire panel"
+            label="Link panel"
           />
         </InspectorFieldRow>
       )}
 
       {linkFirst && (
         <InspectorFieldRow
-          label="Hover effect"
+          label=""
           isOverridden={values[keys.hover] !== undefined}
           inheritedValueText="None"
           onReset={() => update({ [keys.hover]: undefined })}
@@ -1338,12 +1431,21 @@ export function CardSettingsGroup({
         inheritedValueText={defaultSize === "none" ? "None" : "Default"}
         onReset={() => update({ [keys.size]: undefined })}
       >
-        <InspectorPillGroup
-          value={String(values[keys.size] ?? defaultSize)}
-          options={sizeOptions ?? labels(sizeValues)}
-          onChange={(value) => update({ [keys.size]: value })}
-          ariaLabel="Card size"
-        />
+        {showMaxWidth ? (
+          <InspectorSelect
+            value={String(values[keys.size] ?? defaultSize)}
+            options={sizeOptions ?? labels(sizeValues)}
+            onChange={(value) => update({ [keys.size]: value })}
+            ariaLabel="Panel padding"
+          />
+        ) : (
+          <InspectorPillGroup
+            value={String(values[keys.size] ?? defaultSize)}
+            options={sizeOptions ?? labels(sizeValues)}
+            onChange={(value) => update({ [keys.size]: value })}
+            ariaLabel="Card size"
+          />
+        )}
       </InspectorFieldRow>
 
       {!linkFirst && (
@@ -1363,7 +1465,7 @@ export function CardSettingsGroup({
 
       {showImageNoPadding && (
         <InspectorFieldRow
-          label="Image"
+          label=""
           isOverridden={values.panelImageNoPadding !== undefined}
           inheritedValueText="With padding"
           onReset={() => update({ panelImageNoPadding: undefined })}
@@ -1397,6 +1499,40 @@ export function CardSettingsGroup({
             />
           </InspectorFieldRow>
         </>
+      )}
+
+      {showMaxWidth && (
+        <InspectorFieldRow
+          label="Max Width"
+          isOverridden={values[keys.maxWidth ?? "gridItemMaxWidth"] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [keys.maxWidth ?? "gridItemMaxWidth"]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.maxWidth ?? "gridItemMaxWidth"] ?? "none")}
+            options={[
+              { value: "none", label: "None" }, { value: "small", label: "Small" },
+              { value: "medium", label: "Medium" }, { value: "large", label: "Large" },
+              { value: "xlarge", label: "X-Large" }, { value: "2xlarge", label: "2X-Large" },
+            ]}
+            onChange={(value) => update({ [keys.maxWidth ?? "gridItemMaxWidth"]: value })}
+            ariaLabel="Panel max width"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {!showHeight && showExpandContent && (
+        <InspectorFieldRow label="Expand Content">
+          <InspectorSelect
+            value={String(values.panelExpand ?? "none")}
+            options={[
+              { value: "none", label: "None" }, { value: "image", label: "Image" },
+              { value: "content", label: "Content" }, { value: "both", label: "Image and Content" },
+            ]}
+            onChange={(value) => update({ panelExpand: value })}
+            ariaLabel="Panel expand content"
+          />
+        </InspectorFieldRow>
       )}
 
       {showLink && !linkFirst && (

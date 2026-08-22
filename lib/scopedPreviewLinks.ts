@@ -140,6 +140,31 @@ export function resolveScopedBuilderHref(
   return resolveScopedWebsiteHref(href, context, "builder");
 }
 
+/** Resolve an internal storefront link beneath a tenant's local slug prefix. */
+export function resolveTenantPathHref(
+  href: string | null | undefined,
+  context: ScopedWebsiteLinkContext | string,
+) {
+  const websiteId = typeof context === "string" ? context : context.websiteId;
+  const pages = typeof context === "string" ? [] : context.pages ?? [];
+  if (!href) return "#";
+
+  const trimmed = href.trim();
+  if (!trimmed || trimmed === "#" || trimmed.startsWith("#")) return href;
+  if (isExternalOrSpecialHref(trimmed) || !getBuilderPageKeyForHref(trimmed, pages)) {
+    return href;
+  }
+
+  try {
+    const url = new URL(trimmed, "https://webpages.local");
+    const path = url.pathname.replace(/^\/+/, "");
+    const prefix = encodeURIComponent(websiteId);
+    return `/${prefix}${path ? `/${path}` : ""}${url.search}${url.hash}`;
+  } catch {
+    return href;
+  }
+}
+
 function resolveScopedWebsiteHref(
   href: string | null | undefined,
   context: ScopedWebsiteLinkContext | string,

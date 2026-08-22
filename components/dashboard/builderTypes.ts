@@ -455,6 +455,8 @@ export type BuilderLayoutBlock = {
   secondaryButtonSize?: "small" | "default" | "large";
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
+  buttonColumnGap?: "none" | "small" | "medium" | "large" | string;
+  buttonRowGap?: "none" | "small" | "medium" | "large" | string;
   fullWidthButton?: boolean;
   linkMarginTop?: string;
   buttons?: {
@@ -506,6 +508,11 @@ export type BuilderLayoutBlock = {
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
   imageBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
   imageHoverBoxShadow?: "none" | "small" | "medium" | "large" | "xlarge" | "bottom" | (string & {});
+  imageHoverBorder?: boolean;
+  imageInverse?: boolean;
+  imageIconWidth?: string | number;
+  imageIconColor?: string;
+  imageTextColor?: string;
   imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | "shadow" | "mask" | (string & {});
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
@@ -514,7 +521,9 @@ export type BuilderLayoutBlock = {
   imageMarginTop?: "default" | "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageLoading?: "lazy" | "eager";
   imageSvgInline?: boolean;
+  imageSvgAnimate?: boolean;
   imageSvgColor?: string;
+  gridMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   imageLinkUrl?: string;
   imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
@@ -527,7 +536,7 @@ export type BuilderLayoutBlock = {
   spacingContract?: "yootheme";
   elementAlign?: "left" | "center" | "right";
   panelStyle?: BuilderPanelStyle;
-  panelVariant?: "default" | "primary" | "secondary" | "blank" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
+  panelVariant?: "default" | "primary" | "secondary" | "blank" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | "tile-checked";
   panelHover?: boolean;
   panelSize?: "none" | "small" | "default" | "large";
   panelImageNoPadding?: boolean;
@@ -764,7 +773,7 @@ export type BuilderLayoutBlock = {
   gridShowButton?: boolean;
   gridRowGap?: "none" | "small" | "medium" | "large";
   gridItemRenderer?: "plain" | "card";
-  gridCardVariant?: "default" | "primary" | "secondary" | "blank" | "card-hover" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
+  gridCardVariant?: "default" | "primary" | "secondary" | "blank" | "card-hover" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | "tile-checked";
   gridCardSize?: "none" | "small" | "default" | "large";
   gridCardHover?: boolean;
   /** Grid-owned item composition; shared Panel/Media primitives supply its surfaces and media. */

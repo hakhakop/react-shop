@@ -11,7 +11,10 @@ import {
   type BuilderCustomPageKey,
 } from "../../lib/builderLayouts";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
-import { getWebsiteByDomainHost } from "../../lib/websites";
+import {
+  getWebsiteByDomainHost,
+  getWebsiteByIdOrSlug,
+} from "../../lib/websites";
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
 import { getPublishedHeaderDocumentSettings } from "../../lib/publishedHeaderDocumentSettings";
@@ -135,6 +138,22 @@ export default async function WPPage({
         mode="domain"
       />
     );
+  }
+
+  // A local path can address a tenant without needing a custom domain:
+  // `/circle` is its home page and `/circle/about` is its `about` page.
+  const [tenantSlug, ...tenantPath] = slugSegments ?? [];
+  if (tenantSlug) {
+    const tenantWebsite = await getWebsiteByIdOrSlug(tenantSlug);
+    if (tenantWebsite?.slug === tenantSlug) {
+      return (
+        <WebsiteFrontend
+          website={tenantWebsite}
+          requestedPage={tenantPath.join("/") || "home"}
+          mode="tenant-path"
+        />
+      );
+    }
   }
 
   // Special-case: /shop → redirect to main store (home)

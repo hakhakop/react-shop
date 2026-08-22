@@ -35,7 +35,7 @@ import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
 
-type WebsiteFrontendMode = "preview" | "domain";
+type WebsiteFrontendMode = "preview" | "domain" | "tenant-path";
 
 type WebsiteFrontendProps = {
   website: SaaSWebsite;
@@ -193,18 +193,20 @@ export default async function WebsiteFrontend({
   }
 
   const isPreview = mode === "preview";
+  const isTenantPath = mode === "tenant-path";
 
   return (
     <div className={builderGlobalVisibilityClassName({
       desktop: shellSettings.visibilityDesktop,
       tablet: shellSettings.visibilityTablet,
       mobile: shellSettings.visibilityMobile,
-    })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined}>
+    })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined} data-tenant-website-root={isTenantPath ? websiteRouteSegment : undefined}>
       <WebPagesFontLoader settings={shellSettings} />
-      {isPreview && (
+      {(isPreview || isTenantPath) && (
         <ScopedPreviewLinkRouter
           websiteId={websiteRouteSegment}
           pages={scopedPreviewPages}
+          mode={isTenantPath ? "tenant-path" : "preview"}
         />
       )}
       <style

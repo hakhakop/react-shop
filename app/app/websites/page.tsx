@@ -15,7 +15,7 @@ import { redirect } from "next/navigation";
 import DeleteWebsiteButton from "@/components/saas/DeleteWebsiteButton";
 import GoLiveButton from "@/components/saas/GoLiveButton";
 import SaaSShell from "@/components/saas/SaaSShell";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isSaaSSuperAdmin } from "@/lib/auth";
 import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
@@ -65,7 +65,7 @@ export default async function WebsitesPage() {
     getWebsitesForOwner(user.id),
     readActiveSubscriptionPackages(),
   ]);
-  const showRootWebsite = user.role === "super_admin";
+  const showRootWebsite = isSaaSSuperAdmin(user);
   const singleLegacyLiveWebsite =
     websites.filter((website) => website.status === "active").length === 1
       ? websites.find((website) => website.status === "active")
@@ -153,6 +153,7 @@ export default async function WebsitesPage() {
                   <div className="saas-premium-website-actions">
                     <Link className="is-primary" href="/dashboard?page=home"><LayoutDashboard size={15} /> Builder</Link>
                     <Link href="/"><ExternalLink size={15} /> Preview</Link>
+                    <Link href="/app/websites/root/settings"><Settings2 size={15} /> Settings</Link>
                   </div>
                 </div>
               </article>

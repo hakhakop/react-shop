@@ -131,6 +131,8 @@ export type BuilderShellSettings = {
   backgroundMutedImage?: string;
   backgroundPrimaryImage?: string;
   backgroundSecondaryImage?: string;
+  backgroundDefaultGradient?: string;
+  backgroundPrimaryGradient?: string;
   /** Legacy aliases retained only for document migration. */
   backgroundColor?: string;
   fontFamilyBody?: string;
@@ -366,6 +368,27 @@ export type BuilderShellSettings = {
   buttonPrimaryActiveGradient?: string;
   buttonSecondaryHoverGradient?: string;
   buttonSecondaryActiveGradient?: string;
+  buttonDefaultMode?: string;
+  buttonDefaultGlowGradient?: string;
+  buttonDefaultGlowFilter?: string;
+  buttonDefaultHoverGlowFilter?: string;
+  buttonPrimaryMode?: string;
+  buttonPrimaryGlowGradient?: string;
+  buttonPrimaryGlowFilter?: string;
+  buttonPrimaryHoverGlowFilter?: string;
+  buttonSecondaryMode?: string;
+  buttonSecondaryGlowGradient?: string;
+  buttonSecondaryGlowFilter?: string;
+  buttonSecondaryHoverGlowFilter?: string;
+  themeBoxDecorationBorderRadius?: string;
+  themeBoxDecorationDefaultGradient?: string;
+  themeBoxDecorationPrimaryGlowFilter?: string;
+  themeBoxDecorationPrimaryGlowGradient?: string;
+  themeBoxDecorationPrimaryBackground?: string;
+  themeBoxDecorationPrimaryBorder?: string;
+  themeBoxDecorationSecondaryGlowFilter?: string;
+  themeBoxDecorationSecondaryBackground?: string;
+  themeBoxDecorationSecondaryBorder?: string;
   buttonDefaultShadow?: string;
   buttonDefaultHoverShadow?: string;
   buttonPrimaryShadow?: string;
@@ -914,6 +937,8 @@ export function normalizeBuilderShellSettings(
     backgroundMutedImage: normalizeOptionalString(value?.backgroundMutedImage),
     backgroundPrimaryImage: normalizeOptionalString(value?.backgroundPrimaryImage),
     backgroundSecondaryImage: normalizeOptionalString(value?.backgroundSecondaryImage),
+    backgroundDefaultGradient: normalizeOptionalString(value?.backgroundDefaultGradient),
+    backgroundPrimaryGradient: normalizeOptionalString(value?.backgroundPrimaryGradient),
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible

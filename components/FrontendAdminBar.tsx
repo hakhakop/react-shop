@@ -46,20 +46,6 @@ type DomainWebsiteContext = {
   routeSegment: string;
 };
 
-function isLocalHost() {
-  if (typeof window === "undefined") return false;
-  const hostname = window.location.hostname;
-  return (
-    process.env.NODE_ENV === "development" ||
-    ["localhost", "127.0.0.1", "::1"].includes(hostname) ||
-    hostname.endsWith(".local") ||
-    hostname.startsWith("192.168.") ||
-    hostname.startsWith("10.") ||
-    hostname.startsWith("172.") ||
-    process.env.NEXT_PUBLIC_SHOW_FRONTEND_ADMIN_BAR === "true"
-  );
-}
-
 function getBuilderPageKeyForPath(pathname: string) {
   if (pathname === "/") return "home";
   if (pathname === "/shop") return "shop";
@@ -337,7 +323,10 @@ export default function FrontendAdminBar({
     };
   }, [pathname]);
 
-  const shouldShow = ready && target && isLocalHost() && Boolean(saasUser);
+  // Authorization is established by the resolved target (owner/admin/root
+  // super-admin) and the authenticated SaaS session. Do not hide the tenant
+  // storefront toolbar merely because the storefront uses a real domain.
+  const shouldShow = ready && target && Boolean(saasUser);
 
   if (!ready || pathname?.startsWith("/dashboard")) return null;
 

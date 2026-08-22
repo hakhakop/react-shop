@@ -186,6 +186,10 @@ export default function DashboardSidebar({
   requestedLayoutType = null,
   requestedLayoutTypeRequestKey = 0,
 }: DashboardSidebarProps) {
+  // The scoped Builder route/API already authorizes the tenant. Keep root
+  // platform visibility controlled by the existing capability flag, while
+  // ensuring an authorized website Builder can reach the canonical editor.
+  const canShowShellSettings = Boolean(websiteId) || canUseShellSettings;
   const { t } = useTranslation();
   const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
@@ -277,7 +281,7 @@ export default function DashboardSidebar({
       description: "Add blocks to the selected layout column.",
       count: availableLayoutBlockKinds.length,
     },
-    ...(canUseShellSettings
+    ...(canShowShellSettings
       ? [
           {
             tab: "globalStyles" as SidebarTab,
@@ -358,7 +362,7 @@ export default function DashboardSidebar({
     { tab: "templates" as SidebarTab, label: t("builder.navigation.layouts"), icon: <LayoutTemplate size={18} /> },
     { tab: "routingTemplates" as SidebarTab, label: "Templates", icon: <Route size={18} /> },
     { tab: "content" as SidebarTab, label: "Content", icon: <FileText size={18} /> },
-    ...(canUseShellSettings
+    ...(canShowShellSettings
       ? [
           {
             tab: "globalStyles" as SidebarTab,
@@ -703,7 +707,7 @@ export default function DashboardSidebar({
               </motion.div>
             )}
 
-            {canUseShellSettings && sidebarTab === "globalStyles" && (
+            {canShowShellSettings && sidebarTab === "globalStyles" && (
               <motion.div
                 key="globalStyles"
                 initial={{ opacity: 0, scale: 0.985 }}

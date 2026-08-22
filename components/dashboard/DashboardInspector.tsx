@@ -70,6 +70,7 @@ import {
   resolveBuilderSpacing,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
+import { headerPresets } from "./headerPresets";
 import {
   resolveTypographyInput,
   updateTypographyArea,
@@ -515,6 +516,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
+  headerDocumentRoot?: boolean;
   footerDocumentRoot?: boolean;
   anchorIdEntries?: Array<{ sectionId: string; anchorId: string }>;
   selectedSectionIsFirstVisible?: boolean;
@@ -538,6 +540,7 @@ type DashboardInspectorProps = {
   duplicateSelected: LooseHandler;
   duplicateSelectedRow?: LooseHandler;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
+  onApplyHeaderPreset?: (presetKey: string) => void;
   savedTemplates: BuilderSavedTemplate[];
   templateStatus?: string;
   onSaveContextualLayout?: (layoutType: LayoutLibraryType) => void | Promise<unknown>;
@@ -723,8 +726,6 @@ function HeaderHeightControl({
 type HeaderDocumentSettingsValues = Pick<
   BuilderSection,
   | "headerVisible"
-  | "headerTransparent"
-  | "headerOverlay"
   | "headerHeight"
   | "headerCustomHeight"
   | "headerBehavior"
@@ -740,21 +741,100 @@ type HeaderDocumentSettingsValues = Pick<
 
 type HeaderDocumentPatch = Partial<HeaderDocumentSettingsValues>;
 
+/**
+ * The names and ordering mirror Yootheme's Header layout chooser.  They are
+ * intentionally backed by the existing WebPages header preset pipeline; the
+ * inspector is only exposing the canonical choices, not creating a second
+ * header model.
+ */
+const YOOTHEME_HEADER_LAYOUT_PRESETS = [
+  { key: "minimal", label: "Horizontal Left", description: "Logo, navigation, and actions aligned from the left." },
+  { key: "centered-logo", label: "Horizontal Center", description: "Balanced single-row navigation with centered branding." },
+  { key: "business", label: "Horizontal Right", description: "Navigation and actions weighted toward the right." },
+  { key: "wordpress", label: "Horizontal Justify", description: "Full-width single row with space between positions." },
+  { key: "centered-logo", label: "Horizontal Center Logo", description: "Centered logo composition with navigation around it." },
+  { key: "two-row", label: "Stacked Center A", description: "Two-row header with centered primary navigation." },
+  { key: "business", label: "Stacked Center B", description: "Two-level business header with utility actions." },
+  { key: "ecommerce", label: "Stacked Center C", description: "Two-level commerce-ready header composition." },
+  { key: "two-row", label: "Stacked Center Split A", description: "Stacked header with split utility positions." },
+  { key: "compact", label: "Stacked Center Split B", description: "Compact stacked composition for dense navigation." },
+  { key: "simple", label: "Stacked Left", description: "Stacked header with left-aligned content." },
+  { key: "wordpress", label: "Stacked Justify", description: "Stacked header preserving justified positions." },
+] as const;
+
+function YoothemeHeaderLayoutDiagram({ label }: { label: string }) {
+  const search = (x: number, y: number) => (
+    <g>
+      <circle cx={x} cy={y} r="4" />
+      <path d={`M${x + 3} ${y + 3}l4 4`} />
+    </g>
+  );
+  const menu = (positions: number[], y: number) =>
+    positions.map((x) => <path key={`${x}-${y}`} d={`M${x} ${y}h11`} />);
+  const logo = (x: number, y: number) => <path d={`M${x} ${y}h18`} />;
+  const more = (x: number, y: number) => <path d={`M${x} ${y}h1m4 0h1m3 0h1`} />;
+
+  let marks: React.ReactNode;
+  switch (label) {
+    case "Horizontal Left":
+      marks = <>{logo(15, 22)}{menu([48, 65, 82], 22)}{search(157, 21)}</>;
+      break;
+    case "Horizontal Center":
+      marks = <>{logo(16, 22)}{menu([77, 94, 111], 22)}{search(157, 21)}</>;
+      break;
+    case "Horizontal Right":
+      marks = <>{logo(16, 22)}{menu([105, 122, 139], 22)}{search(157, 21)}</>;
+      break;
+    case "Horizontal Justify":
+      marks = <>{logo(15, 22)}{menu([59, 92, 125], 22)}{search(157, 21)}</>;
+      break;
+    case "Horizontal Center Logo":
+      marks = <>{menu([15, 32, 49], 22)}{logo(82, 22)}{search(157, 21)}</>;
+      break;
+    case "Stacked Center A":
+      marks = <>{search(90, 18)}{menu([70, 87, 104], 30)}</>;
+      break;
+    case "Stacked Center B":
+      marks = <>{logo(82, 17)}{menu([70, 87, 104], 29)}{search(90, 34)}</>;
+      break;
+    case "Stacked Center C":
+      marks = <>{search(18, 18)}{menu([83, 100, 117], 30)}{more(147, 18)}</>;
+      break;
+    case "Stacked Center Split A":
+      marks = <>{menu([43, 60, 94, 111], 18)}{logo(76, 30)}{search(90, 34)}</>;
+      break;
+    case "Stacked Center Split B":
+      marks = <>{menu([15, 32, 76, 127, 144], 18)}{search(90, 34)}</>;
+      break;
+    case "Stacked Left":
+      marks = <>{menu([15, 32], 18)}{search(157, 18)}{more(149, 30)}{menu([15, 32, 49], 30)}</>;
+      break;
+    default:
+      marks = <>{menu([15, 32, 65, 82, 115], 18)}{search(157, 18)}{menu([15, 49, 82, 115, 148], 30)}</>;
+  }
+
+  return (
+    <svg className="builder-yootheme-layout-diagram" viewBox="0 0 180 92" aria-hidden="true">
+      <rect x="4" y="4" width="172" height="82" />
+      <path d="M4 40h172" />
+      {marks}
+    </svg>
+  );
+}
+
 function HeaderDocumentSettings({
   headerSettings,
   headerVisible,
-  headerTransparent,
-  headerOverlay,
   headerHeight,
   headerCustomHeight,
+  onApplyHeaderPreset,
   onHeaderDocumentChange,
 }: {
   headerSettings: HeaderDocumentSettingsValues;
   headerVisible: boolean;
-  headerTransparent: boolean;
-  headerOverlay: boolean;
   headerHeight?: string;
   headerCustomHeight?: number;
+  onApplyHeaderPreset?: (presetKey: string) => void;
   onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
 }) {
   return (
@@ -767,6 +847,25 @@ function HeaderDocumentSettings({
             meta="Builder"
           />
         </summary>
+        <div className="builder-header-presets-grid" aria-label="Yootheme header layouts">
+          {YOOTHEME_HEADER_LAYOUT_PRESETS.map((layout) => {
+            const preset = headerPresets.find((candidate) => candidate.key === layout.key);
+            if (!preset || !onApplyHeaderPreset) return null;
+            return (
+              <button
+                key={layout.label}
+                type="button"
+                className="builder-preset-btn builder-header-layout-preset"
+                onClick={() => onApplyHeaderPreset(preset.key)}
+                title={layout.description}
+              >
+                <YoothemeHeaderLayoutDiagram label={layout.label} />
+                <span>{layout.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <small>These layouts use the existing Header Builder presets and preserve website branding and global tokens.</small>
       </details>
 
       <details className="builder-collapse" open>
@@ -797,24 +896,6 @@ function HeaderDocumentSettings({
             <option value="sticky-on-scroll-up">Sticky on scroll up</option>
             <option value="pill-on-scroll">Pill on scroll</option>
           </select>
-        </label>
-        <label className="builder-check">
-          <input
-            data-testid="header-transparent-checkbox"
-            type="checkbox"
-            checked={headerTransparent}
-            onChange={(event) => onHeaderDocumentChange({ headerTransparent: event.target.checked })}
-          />
-          <span>Transparent mode</span>
-        </label>
-        <label className="builder-check">
-          <input
-            data-testid="header-overlay-checkbox"
-            type="checkbox"
-            checked={headerOverlay}
-            onChange={(event) => onHeaderDocumentChange({ headerOverlay: event.target.checked })}
-          />
-          <span>Pull page content under Header</span>
         </label>
         <div className="builder-two-column">
           <label className="builder-field">
@@ -996,6 +1077,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedLayoutRowIndex,
     setSelectedLayoutRowIndex,
     selectedSection,
+    headerDocumentRoot = false,
     footerDocumentRoot = false,
     anchorIdEntries = [],
     selectedSectionIsFirstVisible = false,
@@ -1017,6 +1099,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     duplicateSelected,
     duplicateSelectedRow = () => undefined,
     applySelectedRowLayoutPreset = () => undefined,
+    onApplyHeaderPreset = () => undefined,
     savedTemplates,
     templateStatus,
     onSaveContextualLayout,
@@ -1046,6 +1129,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     uploadSelectedLayoutBlockSlideImage,
     uploadSelectedSlideImage,
   } = props;
+  const isHeaderDocumentSection =
+    headerDocumentRoot || selectedSection?.id === "header-document";
   const hasLocalButtonStyles = (block: BuilderLayoutBlock) =>
     selectedSection?.id === "header-document" &&
     (block.id === "header-button" || block.kind === "button")
@@ -1119,11 +1204,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedCanonicalColumnLocation &&
       !selectedLayoutBlock &&
       !selectedLayoutRow &&
-      selectedSection?.id !== "header-document",
+      !isHeaderDocumentSection,
   );
   const isCanonicalRowSelection = Boolean(
     selectedInspectorRow &&
-      selectedSection?.id !== "header-document",
+      !isHeaderDocumentSection,
   );
   const supportedAreas = selectedLayoutBlock
     ? getSupportedTypographyAreas(
@@ -1194,7 +1279,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             ["settings", "Settings"],
             ["advanced", t("builder.inspector.advanced")],
           ]
-      : (selectedSection?.id === "header-document" ||
+      : (isHeaderDocumentSection ||
           selectedSection?.id === "footer-document") &&
           !selectedLayoutColumnKey &&
           !selectedLayoutRow &&
@@ -1789,10 +1874,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       !selectedLayoutBlock &&
       !selectedLayoutRow &&
       !selectedLayoutColumnKey &&
-      selectedSection.id !== "header-document",
+      !isHeaderDocumentSection,
   );
   const isHeaderDocumentRoot = Boolean(
-    selectedSection?.id === "header-document" &&
+    selectedSection &&
+    isHeaderDocumentSection &&
       !selectedLayoutBlock &&
       !selectedLayoutRow &&
       !selectedLayoutColumnKey,
@@ -2146,15 +2232,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           ) : null}
 
-          {selectedSection.id === "header-document" &&
+          {isHeaderDocumentRoot &&
             inspectorTab !== "library" &&
             !selectedLayoutBlock &&
             !selectedLayoutRow ? (
               <HeaderDocumentSettings
                 headerSettings={{
                   headerVisible: selectedSection.headerVisible ?? shellSettings.headerVisible ?? true,
-                  headerTransparent: selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false,
-                  headerOverlay: selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false,
                   headerHeight: selectedSection.headerHeight ?? shellSettings.headerHeight,
                   headerCustomHeight: selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight,
                   headerBehavior: selectedSection.headerBehavior ?? shellSettings.headerBehavior,
@@ -2168,10 +2252,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   headerTopToolbarMeta: selectedSection.headerTopToolbarMeta ?? shellSettings.topToolbarMeta,
                 }}
                 headerVisible={selectedSection.headerVisible ?? shellSettings.headerVisible ?? true}
-                headerTransparent={selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false}
-                headerOverlay={selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false}
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
+                onApplyHeaderPreset={onApplyHeaderPreset}
                 onHeaderDocumentChange={updateSelected}
               />
             ) : null}
@@ -2211,7 +2294,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   </small>
                 </label>
 
-                {selectedSection?.id === "header-document" ? (
+                {isHeaderDocumentRoot ? (
                   <>
                     <div className="builder-two-column">
                       <label className="builder-field">
@@ -2530,6 +2613,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               section={selectedSection!}
               shellSettings={shellSettings}
               tab={inspectorTab}
+              isFirstVisible={selectedSectionIsFirstVisible ?? false}
               update={updateSelected}
               openWordPressMediaPicker={openWordPressMediaPicker}
             />
@@ -2563,7 +2647,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           {!isDocumentRoot && !isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
-            selectedSection.id !== "header-document") ||
+            !isHeaderDocumentRoot) ||
             (selectedLayoutBlock &&
               (isLayoutContainerSection(selectedSection) ||
                 selectedLayoutBlock.kind === "accordion") &&
@@ -2727,21 +2811,44 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         <small>Uses the matching Global Styles › Section padding token.</small>
                       </label>
 
+                      <div className="builder-inspector-subgroup">
+                        <strong>Transparent Header</strong>
+                        <small>Applies only when this is the first visible section.</small>
+                      </div>
+                      <label className="builder-check">
+                        <input
+                          type="checkbox"
+                          checked={selectedSection.headerTransparent ?? false}
+                          disabled={!selectedSectionIsFirstVisible}
+                          onChange={(event) =>
+                            updateSelected({
+                              headerTransparent: event.target.checked,
+                              ...(!event.target.checked ? { pullUnderHeader: false } : {}),
+                            })
+                          }
+                        />
+                        <span>Make header transparent</span>
+                        <small>
+                          {selectedSectionIsFirstVisible
+                            ? "Use this section as the Header background at the top of the page."
+                            : "Available when this is the first visible section."}
+                        </small>
+                      </label>
                       <label className="builder-check">
                         <input
                           type="checkbox"
                           checked={selectedSection.pullUnderHeader ?? false}
-                          disabled={!selectedSectionIsFirstVisible}
+                          disabled={!selectedSectionIsFirstVisible || !selectedSection.headerTransparent}
                           onChange={(event) =>
                             updateSelected({
                               pullUnderHeader: event.target.checked,
                             })
                           }
                         />
-                        <span>Pull underneath header</span>
+                        <span>Pull content behind header</span>
                         <small>
                           {selectedSectionIsFirstVisible
-                            ? "Start this section behind a transparent header."
+                            ? "Overlay this section behind the transparent Header."
                             : "Available when this is the first visible section."}
                         </small>
                       </label>

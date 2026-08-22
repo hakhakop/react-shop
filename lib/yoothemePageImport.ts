@@ -828,7 +828,8 @@ const sourceCardVariant = (
   // An omitted YOOtheme panel_style means Grid Panel Style = None. It must
   // remain distinct from Card Default through import and rendering.
   if (normalized === "" || normalized === "none" || normalized === "blank") return "blank";
-  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary"].includes(source)) {
+  if (source === "card-hover" || normalized === "hover") return "card-hover";
+  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary", "tile-checked"].includes(source)) {
     return source as NonNullable<BuilderLayoutBlock["gridCardVariant"]>;
   }
   return normalized === "primary" || normalized === "secondary" || normalized === "blank" ? normalized : "default";
@@ -845,7 +846,7 @@ const sourcePanelVariant = (
   if (["card-primary", "primary"].includes(normalized)) return "primary";
   if (["card-secondary", "secondary"].includes(normalized)) return "secondary";
   if (["", "blank", "none"].includes(normalized)) return "blank";
-  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary"].includes(normalized)) {
+  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary", "tile-checked"].includes(normalized)) {
     return normalized as NonNullable<BuilderLayoutBlock["panelVariant"]>;
   }
   return "default";
@@ -1165,11 +1166,17 @@ const sourceGridItem = (
     // The Grid owns its default Card surface. Retain an item value only when
     // YOOtheme explicitly set one, otherwise future Grid style changes inherit.
     ...(hasItemPanelStyle ? {
-      renderer: panelStyle ? "card" : "plain",
+      renderer: panelStyle || props.panel_style === "card-hover" ? "card" : "plain",
       cardVariant: sourceCardVariant(props.panel_style),
       ...(props.panel_style === "card-hover" ? { cardHover: true } : {}),
     } : {}),
-    mediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
+    // Parent Grid Image alignment owns the default. Do not materialize a
+    // synthetic `top` on every item, otherwise changing the parent Image
+    // control can never affect imported items. Preserve only an explicit
+    // item-level alignment override.
+    ...(Object.prototype.hasOwnProperty.call(props, "image_align") && ["top", "bottom", "left", "right", "between"].includes(String(props.image_align))
+      ? { mediaPlacement: props.image_align as "top" | "bottom" | "left" | "right" | "between" }
+      : {}),
     mediaFit: media.imageFit ?? "natural",
     imagePosition: media.imagePosition,
     titleElement: sourceHeadingLevel(props.title_element ?? parentProps.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
@@ -1564,6 +1571,8 @@ const mapStaticElement = (
       kind: "button",
       buttons: items,
       size: sourceButtonSize(props.button_size),
+      buttonColumnGap: props.grid_column_gap === "collapse" ? "none" : sourceMargin(props.grid_column_gap),
+      buttonRowGap: props.grid_row_gap === "collapse" ? "none" : sourceMargin(props.grid_row_gap),
       fullWidthButton: props.fullwidth === true || props.fullwidth === "true",
       elementAlign: sourceAlignment(props.block_align),
     }, props);
@@ -1616,6 +1625,9 @@ const mapStaticElement = (
             : asString(props.image_box_decoration)) as "none" | "default" | "primary" | "secondary" | "shadow" | "mask",
         }
         : {}),
+      imageInverse: sourceBoolean(props.image_inverse) ?? undefined,
+      imageSvgAnimate: sourceBoolean(props.image_svg_animate) ?? undefined,
+      imageTextColor: ["light", "dark"].includes(String(props.text_color)) ? props.text_color as "light" | "dark" : undefined,
     }, props);
   }
 
@@ -1638,6 +1650,7 @@ const mapStaticElement = (
   }
 
   if (type === "grid") {
+    const gridMedia = normalizeYoothemeMedia(props);
     const items = sourceChildren(node)
       .filter((child) => child.type === "grid_item")
       .flatMap((child, index) => {
@@ -1655,11 +1668,11 @@ const mapStaticElement = (
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge",
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "grid_masonry", "grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end",
-      "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin",
-      "image_box_shadow", "image_box_decoration", "image_transition", "image_link", "image_grid_width", "image_svg_inline", "image_svg_color",
+      "image_align", "image_width", "image_height", "image_fit", "image_ratio", "image_loading", "image_border", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin",
+      "image_box_shadow", "image_box_decoration", "image_transition", "image_hover_box_shadow", "image_hover_border", "image_inverse", "image_link", "image_grid_width", "image_svg_inline", "image_svg_animate", "image_svg_color", "icon_width", "icon_color",
       "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
-      "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style",
+      "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style", "text_color",
       "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       // Filter navigation has an existing Grid owner. More detailed filter
       // layout options remain unsupported until the responsive runtime owns
@@ -1678,7 +1691,7 @@ const mapStaticElement = (
       gridShowButton: props.show_link !== false,
       enableFilter: props.filter === true || props.filter === "true",
       filterStyle: props.filter_style === "subnav-pill" ? "pill" : props.filter_style === "tab" ? "tabs" : "subnav",
-      gridItemRenderer: panelStyle ? "card" : "plain",
+      gridItemRenderer: panelStyle || props.panel_style === "card-hover" ? "card" : "plain",
       gridCardVariant: sourceCardVariant(props.panel_style),
       gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
       gridCardHover: props.panel_style === "card-hover",
@@ -1696,6 +1709,7 @@ const mapStaticElement = (
       gridTitleRowGap: props.title_grid_row_gap === "collapse" ? "none" : asString(props.title_grid_row_gap) || "default",
       gridTitleBreakpoint: ["s", "m", "l", "xl"].includes(String(props.title_grid_breakpoint)) ? props.title_grid_breakpoint as any : "always",
       gridMediaPlacement: ["top", "bottom", "left", "right", "between"].includes(String(props.image_align)) ? props.image_align as any : "top",
+      imagePosition: gridMedia.imagePosition,
       // UIkit serializes an omitted gap as an empty string and "None" as
       // "collapse".  Preserve the semantic distinction at the Grid owner;
       // rendering resolves the default gutter from the shared global tokens.
@@ -1741,6 +1755,13 @@ const mapStaticElement = (
         : {}),
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
       imageHoverTransition: asString(props.image_transition) ?? "none",
+      imageHoverBoxShadow: asString(props.image_hover_box_shadow) || undefined,
+      imageHoverBorder: sourceBoolean(props.image_hover_border) ?? undefined,
+      imageInverse: sourceBoolean(props.image_inverse) ?? undefined,
+      imageIconWidth: typeof props.icon_width === "number" ? String(props.icon_width) : asString(props.icon_width) || undefined,
+      imageIconColor: asString(props.icon_color) || undefined,
+      imageSvgAnimate: sourceBoolean(props.image_svg_animate) ?? undefined,
+      imageTextColor: ["light", "dark"].includes(String(props.text_color)) ? props.text_color as "light" | "dark" : undefined,
       linkImage: sourceBoolean(props.image_link) ?? false,
       enableLightbox: sourceBoolean(props.lightbox) ?? false,
       linkTitle: sourceBoolean(props.title_link) ?? false,
@@ -1752,6 +1773,10 @@ const mapStaticElement = (
         : undefined,
       metaStyle: asString(props.meta_style) ?? undefined,
       metaColor: asString(props.meta_color) ?? undefined,
+      gridMetaAlign: ["above-title", "below-title", "above-content", "below-content"].includes(String(props.meta_align))
+        ? props.meta_align as "above-title" | "below-title" | "above-content" | "below-content"
+        : undefined,
+      gridMetaHtmlElement: sourceMetaElement(props.meta_element) ?? "div",
       // Grid content accepts YOOtheme text presets only. Do not leak a
       // heading-style alias (for example `h2`) into the body renderer; the
       // source Grid body is a plain `uk-panel` unless a text preset is set.

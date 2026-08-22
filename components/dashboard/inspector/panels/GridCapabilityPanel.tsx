@@ -73,70 +73,56 @@ const gapOptions = [
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
 
 /**
- * Grid owns media composition. It deliberately reuses only the canonical
- * Image primitives that YOOtheme exposes for Grid, rather than inheriting the
- * standalone Image element's framing and alignment controls.
+ * Grid's parent Image settings. This is intentionally one canonical Image
+ * division in Grid Settings, matching YOOtheme's control order. Grid-only
+ * layout fields live here because they describe the image track, not the
+ * repeatable item content or a separate invented composition panel.
  */
-function GridMediaSettingsGroup({ block, update }: Pick<Props, "block" | "update">) {
+function GridImageSettingsGroup({ block, update }: Pick<Props, "block" | "update">) {
   const values = block as any;
-  const imageShape = values.imageShape ?? values.imageBorder ?? "none";
-  const imageShadow = values.imageShadow ?? values.imageBoxShadow ?? "none";
-
-  return (
-    <InspectorDivision title="IMAGE">
-      <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-        <InspectorFieldRow label="Width" isOverridden={values.imageWidth !== undefined} inheritedValueText="auto" onReset={() => update({ imageWidth: undefined })}>
-          <InspectorTextField value={String(values.imageWidth ?? "")} placeholder="auto" onChange={(value) => update({ imageWidth: value || undefined })} />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="auto" onReset={() => update({ imageHeight: undefined })}>
-          <InspectorTextField value={String(values.imageHeight ?? "")} placeholder="auto" onChange={(value) => update({ imageHeight: value || undefined })} />
-        </InspectorFieldRow>
-      </div>
-
-      <InspectorFieldRow label="Loading" isOverridden={values.imageLoading !== undefined} inheritedValueText="Lazy" onReset={() => update({ imageLoading: undefined })}>
-        <InspectorSelect
-          value={values.imageLoading === "eager" || values.imageLoading === true ? "eager" : "lazy"}
-          options={[{ value: "lazy", label: "Lazy (Default)" }, { value: "eager", label: "Eager (Immediate)" }]}
-          onChange={(value) => update({ imageLoading: value })}
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow label="Link" isOverridden={values.linkImage !== undefined} inheritedValueText="Off" onReset={() => update({ linkImage: undefined })}>
-        <InspectorSwitch checked={Boolean(values.linkImage)} onChange={(checked) => update({ linkImage: checked })} label="Link image" />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow label="Border" isOverridden={values.imageShape !== undefined} inheritedValueText="None" onReset={() => update({ imageShape: undefined })}>
-        <InspectorSelect
-          value={String(imageShape)}
-          options={[{ value: "none", label: "None" }, { value: "rounded", label: "Rounded" }, { value: "circle", label: "Circle" }, { value: "pill", label: "Pill" }]}
-          onChange={(value) => update({ imageShape: value })}
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow label="Box Shadow" isOverridden={values.imageShadow !== undefined} inheritedValueText="None" onReset={() => update({ imageShadow: undefined })}>
-        <InspectorSelect
-          value={String(imageShadow)}
-          options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]}
-          onChange={(value) => update({ imageShadow: value })}
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow label="Inline SVG" isOverridden={values.imageSvgInline !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgInline: undefined })}>
-        <InspectorSwitch checked={values.imageSvgInline === true} onChange={(checked) => update({ imageSvgInline: checked || undefined })} label="Make SVG stylable with CSS" />
-      </InspectorFieldRow>
-
-      {values.imageSvgInline === true && (
-        <InspectorFieldRow label="SVG Color" isOverridden={values.imageSvgColor !== undefined} inheritedValueText="None" onReset={() => update({ imageSvgColor: undefined })}>
-          <InspectorSelect
-            value={String(values.imageSvgColor ?? "none")}
-            options={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}
-            onChange={(value) => update({ imageSvgColor: value === "none" ? undefined : value })}
-            ariaLabel="SVG Color"
-          />
-        </InspectorFieldRow>
-      )}
-    </InspectorDivision>
+  const select = (key: string, fallback: string, options: ReadonlyArray<{ value: string; label: string }>, label: string) => (
+    <InspectorSelect
+      value={String(values[key] ?? fallback)}
+      options={options}
+      onChange={(value) => update({ [key]: value })}
+      ariaLabel={label}
+    />
   );
+  const shapeOptions = [{ value: "none", label: "None" }, { value: "rounded", label: "Rounded" }, { value: "circle", label: "Circle" }, { value: "pill", label: "Pill" }];
+  const shadowOptions = [{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }];
+  const widthOptions = [{ value: "auto", label: "Auto" }, { value: "1-1", label: "Expand" }, { value: "4-5", label: "80%" }, { value: "3-4", label: "75%" }, { value: "2-3", label: "66%" }, { value: "3-5", label: "60%" }, { value: "1-2", label: "50%" }, { value: "2-5", label: "40%" }, { value: "1-3", label: "33%" }, { value: "1-4", label: "25%" }, { value: "1-5", label: "20%" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "2xlarge", label: "2X-Large" }];
+  const placementOptions = [{ value: "top", label: "Top" }, { value: "bottom", label: "Bottom" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }, { value: "between", label: "Between" }];
+  const colorOptions = [{ value: "none", label: "None" }, { value: "muted", label: "Muted" }, { value: "emphasis", label: "Emphasis" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }, { value: "success", label: "Success" }, { value: "warning", label: "Warning" }, { value: "danger", label: "Danger" }];
+  return <InspectorDivision title="IMAGE">
+    <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+      <InspectorFieldRow label="Width" isOverridden={values.imageWidth !== undefined} inheritedValueText="auto" onReset={() => update({ imageWidth: undefined })}><InspectorTextField value={String(values.imageWidth ?? "")} placeholder="auto" onChange={(value) => update({ imageWidth: value.trim() || undefined })} /></InspectorFieldRow>
+      <InspectorFieldRow label="Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="auto" onReset={() => update({ imageHeight: undefined })}><InspectorTextField value={String(values.imageHeight ?? "")} placeholder="auto" onChange={(value) => update({ imageHeight: value.trim() || undefined })} /></InspectorFieldRow>
+    </div>
+    <InspectorFieldRow label="Loading" isOverridden={values.imageLoading !== undefined} inheritedValueText="Lazy" onReset={() => update({ imageLoading: undefined })}>{select("imageLoading", "lazy", [{ value: "lazy", label: "Lazy (Default)" }, { value: "eager", label: "Eager (Immediate)" }], "Image loading")}</InspectorFieldRow>
+    <InspectorFieldRow label="Border" isOverridden={values.imageShape !== undefined} inheritedValueText="None" onReset={() => update({ imageShape: undefined })}>{select("imageShape", "none", shapeOptions, "Image border")}</InspectorFieldRow>
+    <InspectorFieldRow label="Box Shadow" isOverridden={values.imageShadow !== undefined} inheritedValueText="None" onReset={() => update({ imageShadow: undefined })}>{select("imageShadow", "none", shadowOptions, "Image box shadow")}</InspectorFieldRow>
+    <InspectorFieldRow label="Box Decoration" isOverridden={values.imageBoxDecoration !== undefined} inheritedValueText="None" onReset={() => update({ imageBoxDecoration: undefined })}>{select("imageBoxDecoration", "none", [{ value: "none", label: "None" }, { value: "default", label: "Default" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }, { value: "shadow", label: "Floating Shadow" }, { value: "mask", label: "Mask" }], "Image box decoration")}</InspectorFieldRow>
+    <InspectorFieldRow label="Inverse style" isOverridden={values.imageInverse !== undefined} inheritedValueText="Off" onReset={() => update({ imageInverse: undefined })}><InspectorSwitch checked={values.imageInverse === true} onChange={(checked) => update({ imageInverse: checked || undefined })} label="Inverse style" /></InspectorFieldRow>
+    <InspectorFieldRow label="Link" isOverridden={values.linkImage !== undefined} inheritedValueText="Off" onReset={() => update({ linkImage: undefined })}><InspectorSwitch checked={Boolean(values.linkImage)} onChange={(checked) => update({ linkImage: checked })} label="Link image" /></InspectorFieldRow>
+    <InspectorFieldRow label="Hover Transition" isOverridden={values.imageHoverTransition !== undefined} inheritedValueText="None" onReset={() => update({ imageHoverTransition: undefined })}>{select("imageHoverTransition", "none", [{ value: "none", label: "None" }, { value: "scale-up", label: "Scale Up" }, { value: "scale-down", label: "Scale Down" }], "Image hover transition")}</InspectorFieldRow>
+    <InspectorFieldRow label="Border" isOverridden={values.imageHoverBorder !== undefined} inheritedValueText="Off" onReset={() => update({ imageHoverBorder: undefined })}><InspectorSwitch checked={values.imageHoverBorder === true} onChange={(checked) => update({ imageHoverBorder: checked || undefined })} label="Border" /></InspectorFieldRow>
+    <InspectorFieldRow label="Hover Box Shadow" isOverridden={values.imageHoverBoxShadow !== undefined} inheritedValueText="None" onReset={() => update({ imageHoverBoxShadow: undefined })}>{select("imageHoverBoxShadow", "none", shadowOptions, "Image hover box shadow")}</InspectorFieldRow>
+    <InspectorFieldRow label="Icon Width" isOverridden={values.imageIconWidth !== undefined} inheritedValueText="auto" onReset={() => update({ imageIconWidth: undefined })}><InspectorTextField value={String(values.imageIconWidth ?? "")} placeholder="auto" onChange={(value) => update({ imageIconWidth: value.trim() || undefined })} /></InspectorFieldRow>
+    <InspectorFieldRow label="Icon Color" isOverridden={values.imageIconColor !== undefined} inheritedValueText="None" onReset={() => update({ imageIconColor: undefined })}>{select("imageIconColor", "none", colorOptions, "Image icon color")}</InspectorFieldRow>
+    <InspectorFieldRow label="Alignment" isOverridden={values.gridMediaPlacement !== undefined} inheritedValueText="Top" onReset={() => update({ gridMediaPlacement: undefined })}>{select("gridMediaPlacement", "top", placementOptions, "Image alignment")}</InspectorFieldRow>
+    <InspectorFieldRow label="Grid Width" isOverridden={values.gridMediaWidth !== undefined} inheritedValueText="50%" onReset={() => update({ gridMediaWidth: undefined })}>{select("gridMediaWidth", "1-2", widthOptions, "Image grid width")}</InspectorFieldRow>
+    <InspectorFieldRow label="Grid Column Gap" isOverridden={values.gridMediaColumnGap !== undefined} inheritedValueText="Default" onReset={() => update({ gridMediaColumnGap: undefined })}>{select("gridMediaColumnGap", "default", gapOptions, "Image grid column gap")}</InspectorFieldRow>
+    <InspectorFieldRow label="Grid Row Gap" isOverridden={values.gridMediaRowGap !== undefined} inheritedValueText="Default" onReset={() => update({ gridMediaRowGap: undefined })}>{select("gridMediaRowGap", "default", gapOptions, "Image grid row gap")}</InspectorFieldRow>
+    <InspectorFieldRow label="Grid Breakpoint" isOverridden={values.gridMediaBreakpoint !== undefined} inheritedValueText="Medium (Tablet Landscape)" onReset={() => update({ gridMediaBreakpoint: undefined })}>{select("gridMediaBreakpoint", "m", breakpointOptions, "Image grid breakpoint")}</InspectorFieldRow>
+    <InspectorFieldRow label="Vertical Alignment" isOverridden={values.gridMediaVerticalAlign !== undefined} inheritedValueText="Off" onReset={() => update({ gridMediaVerticalAlign: undefined })}><InspectorSwitch checked={values.gridMediaVerticalAlign === true} onChange={(checked) => update({ gridMediaVerticalAlign: checked || undefined })} label="Center" /></InspectorFieldRow>
+    <InspectorFieldRow label="Margin Top" isOverridden={values.imageMarginTop !== undefined} inheritedValueText="Default" onReset={() => update({ imageMarginTop: undefined })}>{select("imageMarginTop", "default", [{ value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "none", label: "None" }], "Image margin top")}</InspectorFieldRow>
+    <InspectorFieldRow label="Inline SVG" isOverridden={values.imageSvgInline !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgInline: undefined })}><InspectorSwitch checked={values.imageSvgInline === true} onChange={(checked) => update({ imageSvgInline: checked || undefined })} label="Make SVG stylable with CSS" /></InspectorFieldRow>
+    <InspectorFieldRow label="Animate strokes" isOverridden={values.imageSvgAnimate !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgAnimate: undefined })}><InspectorSwitch checked={values.imageSvgAnimate === true} onChange={(checked) => update({ imageSvgAnimate: checked || undefined })} label="Animate strokes" /></InspectorFieldRow>
+    <InspectorFieldRow label="SVG Color" isOverridden={values.imageSvgColor !== undefined} inheritedValueText="None" onReset={() => update({ imageSvgColor: undefined })}>
+      <InspectorSelect value={String(values.imageSvgColor ?? "none")} options={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS} disabled={values.imageSvgInline !== true} onChange={(value) => update({ imageSvgColor: value === "none" ? undefined : value })} ariaLabel="SVG color" />
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Text Color" isOverridden={values.imageTextColor !== undefined} inheritedValueText="None" onReset={() => update({ imageTextColor: undefined })}>{select("imageTextColor", "none", colorOptions, "Image text color")}</InspectorFieldRow>
+  </InspectorDivision>;
 }
 
 const itemPanelStyleOptions = [
@@ -150,42 +136,6 @@ const itemPanelStyleOptions = [
 
 const tagsToText = (tags?: string[]) => tags?.join(", ") ?? "";
 const parseTags = (value: string) => Array.from(new Set(value.split(",").map((tag) => tag.trim()).filter(Boolean)));
-
-const compositionWidthOptions = [
-  ["auto", "Auto"], ["expand", "Expand"], ["4-5", "80%"], ["3-4", "75%"], ["2-3", "66%"], ["3-5", "60%"], ["1-2", "50%"], ["2-5", "40%"], ["1-3", "33%"], ["1-4", "25%"], ["1-5", "20%"], ["small", "Small"], ["medium", "Medium"], ["large", "Large"], ["xlarge", "X-Large"], ["2xlarge", "2X-Large"],
-].map(([value, label]) => ({ value, label }));
-const compositionBreakpointOptions = [{ value: "always", label: "Always" }, ...breakpointOptions.slice(1)];
-
-function GridCompositionSettings({ block, update }: Pick<Props, "block" | "update">) {
-  const values = block as any;
-  const sideMedia = values.gridMediaPlacement === "left" || values.gridMediaPlacement === "right";
-  const hasPanelSurface = values.gridCardVariant !== undefined && values.gridCardVariant !== "blank" && values.gridCardVariant !== "none";
-  const mediaNeedsTopMargin = values.gridMediaPlacement === "between"
-    || (values.gridMediaPlacement === "bottom" && !(hasPanelSurface && values.panelImageNoPadding === true));
-  const oneColumnTrack = ["columnsPhonePortrait", "columnsPhoneLandscape", "columnsTabletLandscape", "columnsDesktop", "columnsLargeScreens"]
-    .every((key) => values[key] === undefined || values[key] === "" || values[key] === "1");
-  const canConstrainOneColumnContent = (values.gridMediaPlacement ?? "top") === "top" && oneColumnTrack && !values.gridItemMaxWidth && (values.gridCardVariant === undefined || values.gridCardVariant === "blank");
-  return <InspectorDivision title="COMPOSITION">
-    <InspectorFieldRow label="Item Max Width"><InspectorSelect value={values.gridItemMaxWidth ?? "none"} options={[{ value: "none", label: "None" }, ...compositionWidthOptions.filter((option) => option.value !== "auto" && option.value !== "expand")]} onChange={(value) => update({ gridItemMaxWidth: value === "none" ? undefined : value })} /></InspectorFieldRow>
-    {canConstrainOneColumnContent && <InspectorFieldRow label="1 Column Content Width"><InspectorSelect value={values.panelContentWidth ?? "auto"} options={[{ value: "auto", label: "Auto" }, { value: "xsmall", label: "X-Small" }, { value: "small", label: "Small" }]} onChange={(value) => update({ panelContentWidth: value === "auto" ? undefined : value })} /></InspectorFieldRow>}
-    <InspectorFieldRow label="Title Alignment"><InspectorSelect value={values.gridTitlePlacement ?? "top"} options={[{ value: "top", label: "Top" }, { value: "left", label: "Left" }]} onChange={(value) => update({ gridTitlePlacement: value })} /></InspectorFieldRow>
-    {values.gridTitlePlacement === "left" && <>
-      <InspectorFieldRow label="Title Grid Width"><InspectorSelect value={values.gridTitleWidth ?? "1-2"} options={compositionWidthOptions} onChange={(value) => update({ gridTitleWidth: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title Grid Column Gap"><InspectorSelect value={values.gridTitleColumnGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridTitleColumnGap: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title Grid Row Gap"><InspectorSelect value={values.gridTitleRowGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridTitleRowGap: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title Grid Breakpoint"><InspectorSelect value={values.gridTitleBreakpoint ?? "always"} options={compositionBreakpointOptions} onChange={(value) => update({ gridTitleBreakpoint: value })} /></InspectorFieldRow>
-    </>}
-    <InspectorFieldRow label="Media Alignment"><InspectorSelect value={values.gridMediaPlacement ?? "top"} options={[{ value: "top", label: "Top" }, { value: "bottom", label: "Bottom" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }, { value: "between", label: "Between" }]} onChange={(value) => update({ gridMediaPlacement: value })} /></InspectorFieldRow>
-    {mediaNeedsTopMargin && <InspectorFieldRow label="Media Margin Top" isOverridden={values.imageMarginTop !== undefined} inheritedValueText="Default" onReset={() => update({ imageMarginTop: undefined })}><InspectorSelect value={values.imageMarginTop ?? "default"} options={[{ value: "default", label: "Default" }, { value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} onChange={(value) => update({ imageMarginTop: value })} /></InspectorFieldRow>}
-    {sideMedia && <>
-      <InspectorFieldRow label="Media Grid Width"><InspectorSelect value={values.gridMediaWidth ?? "1-2"} options={compositionWidthOptions.filter((option) => option.value !== "expand")} onChange={(value) => update({ gridMediaWidth: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media Grid Column Gap"><InspectorSelect value={values.gridMediaColumnGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridMediaColumnGap: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media Grid Row Gap"><InspectorSelect value={values.gridMediaRowGap ?? "default"} options={gapOptions} onChange={(value) => update({ gridMediaRowGap: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media Grid Breakpoint"><InspectorSelect value={values.gridMediaBreakpoint ?? "m"} options={compositionBreakpointOptions} onChange={(value) => update({ gridMediaBreakpoint: value })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Vertical Alignment"><InspectorSwitch checked={Boolean(values.gridMediaVerticalAlign)} onChange={(checked) => update({ gridMediaVerticalAlign: checked })} label="Center" /></InspectorFieldRow>
-    </>}
-  </InspectorDivision>;
-}
 
 export default function GridCapabilityPanel({
   block,
@@ -442,7 +392,7 @@ export default function GridCapabilityPanel({
                                   return inherited;
                                 }
                                 if (value === "card-hover") {
-                                  return { ...entry, renderer: "card", cardVariant: "default", cardHover: true };
+                                  return { ...entry, renderer: "card", cardVariant: "card-hover", cardHover: true };
                                 }
                                 return {
                                   ...entry,
@@ -787,7 +737,7 @@ export default function GridCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
-        <GridCompositionSettings block={block} update={update} />
+        <GridImageSettingsGroup block={block} update={update} />
 
         <CardSettingsGroup
           block={block}
@@ -796,7 +746,6 @@ export default function GridCapabilityPanel({
           showLink
           linkFirst
           hoverLabel="Add hover style"
-          keys={{ variant: "gridCardVariant", size: "gridCardSize", hover: "panelHover", link: "linkPanel" }}
           surfaceOptions={[
             { value: "blank", label: "None" },
             { value: "default", label: "Card Default" },
@@ -807,10 +756,13 @@ export default function GridCapabilityPanel({
             { value: "tile-muted", label: "Tile Muted" },
             { value: "tile-primary", label: "Tile Primary" },
             { value: "tile-secondary", label: "Tile Secondary" },
+            { value: "tile-checked", label: "Tile Checked" },
           ]}
           defaultSize="none"
+          sizeLabel="Padding"
           showImageNoPadding
-          showHeight={!Boolean((block as any).gridMasonry)}
+          showExpandContent
+          showMaxWidth
           imageNoPaddingLabel="Align image without padding"
           sizeOptions={[
             { value: "none", label: "None" },
@@ -818,6 +770,7 @@ export default function GridCapabilityPanel({
             { value: "default", label: "Default" },
             { value: "large", label: "Large" },
           ]}
+          keys={{ variant: "gridCardVariant", size: "gridCardSize", hover: "panelHover", link: "linkPanel", maxWidth: "gridItemMaxWidth" }}
         />
 
         <TitleSettingsGroup
@@ -839,6 +792,27 @@ export default function GridCapabilityPanel({
           showStyle
           showColor
           showPosition
+          positionLabel="Alignment"
+          showMargin
+          styleOptions={[
+            { value: "text-meta", label: "Text Meta" },
+            { value: "text-lead", label: "Text Lead" },
+            { value: "text-small", label: "Text Small" },
+            { value: "text-large", label: "Text Large" },
+            { value: "3xlarge", label: "Heading 3X-Large" },
+            { value: "2xlarge", label: "Heading 2X-Large" },
+            { value: "xlarge", label: "Heading X-Large" },
+            { value: "large", label: "Heading Large" },
+            { value: "medium", label: "Heading Medium" },
+            { value: "small", label: "Heading Small" },
+            { value: "h1", label: "Heading H1" },
+            { value: "h2", label: "Heading H2" },
+            { value: "h3", label: "Heading H3" },
+            { value: "h4", label: "Heading H4" },
+            { value: "h5", label: "Heading H5" },
+            { value: "h6", label: "Heading H6" },
+          ]}
+          htmlElementOptions={["h1", "h2", "h3", "h4", "h5", "h6", "div"]}
           keys={{ role: "metaTypographyRole", align: "textAlignment", level: "gridMetaHtmlElement", style: "metaStyle", color: "metaColor", position: "gridMetaAlign" }}
         />
 
@@ -849,8 +823,6 @@ export default function GridCapabilityPanel({
           showStyle
           keys={{ role: "contentTypographyRole", align: "textAlignment", style: "contentStyle" }}
         />
-
-        <GridMediaSettingsGroup block={block} update={update} />
 
         <ActionSettingsGroup
           block={block}

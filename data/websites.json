@@ -288,26 +288,6 @@
     "updatedAt": "2026-07-15T10:37:56.093Z"
   },
   {
-    "id": "88576d88-81fb-4040-a963-d9cafb355ddd",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "new modern",
-    "slug": "new-modern",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "createdAt": "2026-07-15T10:48:40.508Z",
-    "updatedAt": "2026-07-15T10:48:40.508Z"
-  },
-  {
     "id": "aae40cbf-8dab-4f4d-b50a-781dda893f64",
     "ownerId": "3d5db4fd-c1a6-41c9-870a-ab05d889cbb0",
     "name": "rrrr",
@@ -454,14 +434,16 @@
     "lastPublishedAt": "2026-08-14T18:36:12.760Z"
   },
   {
-    "id": "afa2e947-4df5-4117-88e2-d678dbceff4b",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "new new new",
-    "slug": "new-new-new",
+    "id": "27079c03-3661-4c23-bf79-790cc8d73320",
+    "ownerId": "87aa206d-ad3e-470f-ab4f-a3cc9e21e000",
+    "name": "Circle",
+    "slug": "circle",
     "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
+    "domain": "circle.webpages.am",
+    "primaryDomain": "circle.webpages.am",
+    "domains": [
+      "circle.webpages.am"
+    ],
     "description": "",
     "websiteCategory": "Business",
     "companyName": "",
@@ -476,96 +458,24 @@
     "enabledLanguages": [
       "hy"
     ],
-    "status": "creating",
-    "creationRequestId": "55b4e840-0881-4800-bf95-d960b6bf0119",
-    "createdAt": "2026-07-22T19:18:00.024Z",
-    "updatedAt": "2026-07-22T19:37:37.347Z",
-    "lastPublishedAt": "2026-07-22T19:37:37.347Z"
-  },
-  {
-    "id": "fd56a805-50ad-45c6-8d1b-4b733ff2f172",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "header test",
-    "slug": "header-test",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "c79fefd6-5d67-40b5-be44-945ce2074043",
-    "createdAt": "2026-07-22T19:38:32.407Z",
-    "updatedAt": "2026-07-23T05:32:52.433Z",
-    "lastPublishedAt": "2026-07-23T05:32:52.433Z"
-  },
-  {
-    "id": "051c8048-93c9-4a8b-b73b-c7022a1e910e",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "header test 5",
-    "slug": "header-test-5",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "ea57f2e5-3312-4d73-8b34-1915a183f230",
-    "createdAt": "2026-07-23T06:06:22.800Z",
-    "updatedAt": "2026-07-23T07:16:52.723Z",
-    "lastPublishedAt": "2026-07-23T07:16:52.723Z"
-  },
-  {
-    "id": "0d9e4271-6eee-4c08-a70a-6b02ab708e4d",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "swiper",
-    "slug": "swiper",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "bfceeeaf-588a-44cc-bf90-58c396496d9d",
-    "createdAt": "2026-07-30T21:25:35.426Z",
-    "updatedAt": "2026-07-30T21:25:35.426Z"
+    "status": "maintenance",
+    "creationRequestId": "eb7e0384-62f2-4c88-b866-2d836df014df",
+    "createdAt": "2026-08-21T15:24:17.584Z",
+    "updatedAt": "2026-08-22T10:15:01.277Z",
+    "cmsConnection": {
+      "provider": "wordpress",
+      "siteUrl": "https://circle.webpages.am",
+      "adminUrl": "https://circle.webpages.am/wp-admin",
+      "graphqlUrl": "https://circle.webpages.am/graphql",
+      "wooCommerceApiUrl": "https://circle.webpages.am/wp-json/wc/v3",
+      "wooCommerceConsumerKey": "",
+      "wooCommerceConsumerSecret": "cs_e554a05a4784a776c88c54a181ebf62b5f65764f",
+      "wordpressUsername": "hakhakop",
+      "wordpressApplicationPassword": "lQmr qGFa FLhN 8IUP Jr4U QqYU",
+      "storeStatusNotes": "",
+      "technicalNotes": "",
+      "updatedAt": "2026-08-21T18:02:10.824Z"
+    },
+    "lastPublishedAt": "2026-08-22T10:15:01.277Z"
   }
 ]

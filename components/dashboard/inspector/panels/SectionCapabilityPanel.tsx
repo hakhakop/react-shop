@@ -25,6 +25,7 @@ type Props = {
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
   tab: InspectorTab;
+  isFirstVisible: boolean;
   update: (patch: Partial<BuilderSection>) => void;
   openWordPressMediaPicker?: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
 };
@@ -48,7 +49,7 @@ function Group({ title, children }: { title?: string; children: ReactNode }) {
 }
 
 /** Canonical Section inspector following YOOtheme's Content / Settings / Advanced contract. */
-export default function SectionCapabilityPanel({ section, tab, update, openWordPressMediaPicker }: Props) {
+export default function SectionCapabilityPanel({ section, tab, isFirstVisible, update, openWordPressMediaPicker }: Props) {
   const resolvedBackground = resolveSectionBackground(section);
   const background = section.visualStyle?.background;
   const legacyImageUrl = section.backgroundOverride?.trim().match(/^(?:https?:\/\/|\/|[\w.-]+\/)/) ? section.backgroundOverride : undefined;
@@ -138,7 +139,25 @@ export default function SectionCapabilityPanel({ section, tab, update, openWordP
       </Group>
       <Group title="Behavior">
         <InspectorFieldRow label="Overlap Following Section"><InspectorSwitch checked={section.overlap === true} onChange={(overlap) => update({ overlap })} label="Overlap the next section" /></InspectorFieldRow>
-        <InspectorFieldRow label="Header Transparent"><InspectorSwitch checked={section.headerTransparent === true} onChange={(headerTransparent) => update({ headerTransparent })} label="Overlay section beneath the header" /></InspectorFieldRow>
+        <InspectorFieldRow label="Transparent Header" description={isFirstVisible ? "Make the Header transparent over this section." : "Available only on the first visible section."}>
+          <InspectorSwitch
+            checked={section.headerTransparent === true}
+            disabled={!isFirstVisible}
+            onChange={(headerTransparent) => update({
+              headerTransparent,
+              ...(!headerTransparent ? { pullUnderHeader: false } : {}),
+            })}
+            label="Make header transparent"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Pull Content Behind Header" description={isFirstVisible ? "Overlay this section behind the transparent Header." : "Available only on the first visible section."}>
+          <InspectorSwitch
+            checked={section.pullUnderHeader === true}
+            disabled={!isFirstVisible || section.headerTransparent !== true}
+            onChange={(pullUnderHeader) => update({ pullUnderHeader })}
+            label="Pull content behind header"
+          />
+        </InspectorFieldRow>
         <InspectorFieldRow label="Sticky"><InspectorSelect value={section.stickyEffect ?? "none"} options={[{ value: "none", label: "None" }, { value: "cover", label: "Sticky Cover" }, { value: "reveal", label: "Sticky Reveal" }]} onChange={(stickyEffect) => update({ stickyEffect: stickyEffect as BuilderSection["stickyEffect"] })} ariaLabel="Section sticky behavior" /></InspectorFieldRow>
         <InspectorFieldRow label="Animation"><AnimationControl value={section.animation} onChange={(animation) => update({ animation })} allowPause allowScrub /></InspectorFieldRow>
         <InspectorFieldRow label="Visibility"><InspectorSelect value={section.visualStyle?.visibility?.desktop === true ? "visible" : section.visualStyle?.visibility?.desktop === false ? "hidden" : "inherit"} options={[{ value: "inherit", label: "Inherit" }, { value: "visible", label: "Visible" }, { value: "hidden", label: "Hidden" }]} onChange={(value) => updateVisualStyle({ visibility: { ...(section.visualStyle?.visibility ?? {}), desktop: value === "inherit" ? undefined : value === "visible" } })} ariaLabel="Section visibility" /></InspectorFieldRow>

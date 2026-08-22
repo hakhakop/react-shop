@@ -2152,15 +2152,15 @@ body.dark {
    contract scoped to imported YOOtheme panels; ordinary WebPages cards retain
    their existing default padding token. */
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-default {
-  padding: 30px !important;
+  padding: 40px 30px !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-small {
-  padding: 15px !important;
+  padding: 20px !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-large {
-  padding: 0 70px 70px !important;
+  padding: 70px !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-default,
@@ -3111,7 +3111,10 @@ body.dark {
 }
 
 .shop-builder-grid-card:not(.is-image-frameless) .shop-builder-grid-image:not(.uk-card-media-top) {
-  margin: 0 0 20px 0 !important;
+  /* Preserve the shared Image > Margin Top utility. This rule owns only the
+     legacy bottom rhythm; a shorthand `margin: 0` would silently cancel the
+     imported YOOtheme margin token. */
+  margin-bottom: 20px !important;
   border-radius: 4px !important;
 }
 
@@ -3152,6 +3155,12 @@ body.dark {
   width: 100%;
   height: 100%;
   object-fit: var(--builder-card-image-fit, initial);
+}
+
+/* YOOtheme Grid Image panel: optional hover border belongs to the image,
+   rather than the parent card surface. */
+.shop-builder-grid-image--hover-border:hover {
+  box-shadow: 0 0 0 1px currentColor;
 }
 
 .shop-builder-grid-card.is-image-small .shop-builder-grid-image img,
@@ -6397,7 +6406,7 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 /* UIkit Canonical Section Variants & Modifiers */
 .uk-section-default {
   background: var(--uikit-section-default-bg, transparent);
-  background-image: var(--uikit-section-default-bg-image, none);
+  background-image: var(--uikit-section-default-bg-image, var(--uikit-section-default-gradient, none));
   color: var(--uikit-section-default-color, inherit);
 }
 .uk-section-muted {
@@ -6407,7 +6416,7 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 }
 .uk-section-primary {
   background: var(--uikit-section-primary-bg, #0f172a) !important;
-  background-image: var(--uikit-section-primary-bg-image, none) !important;
+  background-image: var(--uikit-section-primary-bg-image, var(--uikit-section-primary-gradient, none)) !important;
   color: var(--uikit-section-primary-color, #ffffff) !important;
 }
 .uk-section-secondary {
@@ -6456,10 +6465,10 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   padding-top: var(--uk-section-padding-large, 100px) !important;
   padding-bottom: var(--uk-section-padding-large, 100px) !important;
 }
-.uk-section-xlarge {
-  padding-top: var(--uk-section-padding-xlarge, 140px) !important;
-  padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
-}
+  .uk-section-xlarge {
+    padding-top: var(--uk-section-padding-xlarge, 140px) !important;
+    padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
+  }
 @media (min-width: 960px) {
   .uk-section,
   .uk-section-medium {
@@ -6473,8 +6482,8 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   .uk-section-xlarge {
     /* Section scale is owned by imported/canonical Section tokens. Do not
        combine it with the independent global-margin scale on desktop. */
-    padding-top: var(--uk-section-padding-xlarge, 140px) !important;
-    padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
+    padding-top: calc(var(--uk-global-margin-large, 70px) + var(--uk-section-padding-xlarge, 140px)) !important;
+    padding-bottom: calc(var(--uk-global-margin-large, 70px) + var(--uk-section-padding-xlarge, 140px)) !important;
   }
 }
 .uk-padding-remove-top {
@@ -6548,15 +6557,15 @@ body.is-visual-builder-active .uk-lightbox {
    end of the stylesheet so native card presets cannot re-introduce their
    padding or hover behavior after the imported YOOtheme contract applies. */
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-small {
-  padding: 15px !important;
+  padding: 20px !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-default {
-  padding: 30px !important;
+  padding: 40px 30px !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-large {
-  padding: 0 70px 70px !important;
+  padding: 70px !important;
 }
 
 /* YOOtheme keeps the title's bottom edge flush, then gives the content its
@@ -6585,8 +6594,9 @@ body.is-visual-builder-active .uk-lightbox {
    while preserving the authored color and margin utilities. */
 .shop-builder-grid-card--yootheme .shop-builder-grid-meta {
   font-size: var(--uk-global-font-size, 16px) !important;
-  line-height: var(--uk-global-line-height, 1.5) !important;
-  font-weight: var(--uk-global-font-weight, 400) !important;
+  /* Preserve the canonical YOOtheme heading token (uk-h5/uk-h3).  Those
+     tokens own the 700 weight and 1.4 line-height used by Grid meta/title
+     rows; forcing body weight here makes the imported card visibly lighter. */
 }
 
 /* A YOOtheme `default` section is a light surface even when the surrounding
@@ -6643,6 +6653,31 @@ body.is-visual-builder-active .uk-lightbox {
 
 .shop-builder-grid-card.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
   box-shadow: var(--uk-card-hover-box-shadow, 0 22px 48px rgba(17, 17, 17, 0.1)) !important;
+}
+
+/* YOOtheme Grid Card Hover is a modifier-only card in tenant previews and
+   storefronts: transparent surface, 40px body, and color-only interaction. */
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover,
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--builder-section-text, var(--uk-global-emphasis-color, inherit)) !important;
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out, background-size 0.1s ease-in-out, border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out, transform 0.1s ease-in-out !important;
+}
+
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover .shop-builder-panel-padding-default,
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover .shop-builder-panel-padding-default {
+  padding: 40px 30px !important;
+}
+
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover.shop-builder-grid-card--hover-enabled:hover,
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover.shop-builder-grid-card--hover-enabled:hover {
+  background-color: var(--uk-card-default-hover-background, rgba(255, 255, 255, 0.1)) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: translateY(-2px) !important;
+  translate: none !important;
 }
 
 /* Exact YOOtheme UIkit hover tokens for imported Grid cards. These are

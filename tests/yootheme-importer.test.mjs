@@ -12,6 +12,13 @@ const layers = [
     @global-secondary-background: #17104E;
     @global-small-box-shadow: 0 1px 2px rgba(0,0,0,.1);
     @button-border-radius: 500px;
+    @internal-button-primary-mode: glow;
+    @internal-button-primary-glow-gradient: conic-gradient(from 60deg, red, blue);
+    @internal-button-primary-glow-filter: blur(10px);
+    @internal-button-primary-hover-glow-filter: blur(16px);
+    @theme-box-decoration-border-radius: 10px;
+    @theme-box-decoration-default-gradient: conic-gradient(red, blue);
+    @internal-section-default-gradient: radial-gradient(red, transparent);
     @breakpoint-small: 640px;
     @breakpoint-medium: 960px;
     @breakpoint-large: 1200px;
@@ -38,6 +45,13 @@ test("YOOtheme resolver honors layer precedence and evaluates supported color fu
   assert.equal(preset.shellSettings.fontFamilyBody, "Manrope");
   assert.equal(preset.shellSettings.pageContainerMaxWidth, "1500px");
   assert.equal(preset.shellSettings.buttonRadius, "500px");
+  assert.equal(preset.shellSettings.buttonPrimaryMode, "glow");
+  assert.equal(preset.shellSettings.buttonPrimaryGlowGradient, "conic-gradient(from 60deg, red, blue)");
+  assert.equal(preset.shellSettings.buttonPrimaryGlowFilter, "blur(10px)");
+  assert.equal(preset.shellSettings.buttonPrimaryHoverGlowFilter, "blur(16px)");
+  assert.equal(preset.shellSettings.themeBoxDecorationBorderRadius, "10px");
+  assert.equal(preset.shellSettings.themeBoxDecorationDefaultGradient, "conic-gradient(red, blue)");
+  assert.equal(preset.shellSettings.backgroundDefaultGradient, "radial-gradient(red, transparent)");
   assert.match(String(preset.shellSettings.linkHoverColor), /^#/);
   assert.ok(preset.conflicts.some((row) => row.variable === "@global-primary-background"));
   assert.equal(preset.shellSettings.accordionTitleFontSize, "18px");

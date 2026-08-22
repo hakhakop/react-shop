@@ -10,9 +10,6 @@ import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 import { fontFamilyStack } from "@/lib/webFonts";
 import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 
-const YOOTHEME_PRIMARY_SECTION_GRADIENT =
-  "linear-gradient(40deg, #7141f1 0%, #4d6bd8 70%, #3183e2 100%)";
-
 function yoothemeButtonTextArrow(color: string) {
   const svg = `<svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><polyline fill="none" stroke="${color}" stroke-width="1.2" points="13 1 18 5.5 13 10"/><line fill="none" stroke="${color}" stroke-width="1.2" x1="0" y1="5.5" x2="18.4" y2="5.5"/></svg>`;
   return `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}")`;
@@ -119,14 +116,28 @@ export function getUikitGlobalsCssVars(
   const backgroundMuted = resolveBackgroundPaint(value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")), "#f8fafc");
   const backgroundPrimary = resolveBackgroundPaint(value("backgroundPrimary", primary), primary);
   const backgroundSecondary = resolveBackgroundPaint(value("backgroundSecondary", value("secondaryColor", "#64748b")), "#64748b");
-  const hasPrimaryImage = typeof shellSettings?.backgroundPrimaryImage === "string";
   const backgroundDefaultImage = resolveBackgroundPaint(shellSettings?.backgroundDefaultImage, "none");
   const backgroundMutedImage = resolveBackgroundPaint(shellSettings?.backgroundMutedImage, "none");
-  const backgroundPrimaryImage = resolveBackgroundPaint(
-    hasPrimaryImage ? shellSettings?.backgroundPrimaryImage : YOOTHEME_PRIMARY_SECTION_GRADIENT,
+  const backgroundPrimaryImage = resolveBackgroundPaint(shellSettings?.backgroundPrimaryImage, "none");
+  const backgroundSecondaryImage = resolveBackgroundPaint(shellSettings?.backgroundSecondaryImage, "none");
+  // These are tenant/theme-owned tokens. Missing or null values stay absent;
+  // a YOOtheme paint must never become a global fallback for other tenants.
+  const explicitSectionGradient = (key: "backgroundDefaultGradient" | "backgroundPrimaryGradient") =>
+    resolveBackgroundPaint(shellSettings?.[key] ?? design?.[key], "none");
+  const backgroundDefaultGradient = resolveBackgroundPaint(
+    explicitSectionGradient("backgroundDefaultGradient"),
     "none",
   );
-  const backgroundSecondaryImage = resolveBackgroundPaint(shellSettings?.backgroundSecondaryImage, "none");
+  const backgroundPrimaryGradient = resolveBackgroundPaint(
+    explicitSectionGradient("backgroundPrimaryGradient"),
+    "none",
+  );
+  const sectionDefaultBackgroundImage = backgroundDefaultImage === "none"
+    ? (backgroundDefaultGradient === "none" ? "none" : `var(--uikit-section-default-gradient, ${backgroundDefaultGradient})`)
+    : backgroundDefaultImage;
+  const sectionPrimaryBackgroundImage = backgroundPrimaryImage === "none"
+    ? (backgroundPrimaryGradient === "none" ? "none" : `var(--uikit-section-primary-gradient, ${backgroundPrimaryGradient})`)
+    : backgroundPrimaryImage;
   const globalText = value("textColor", "#111827");
   const globalEmphasis = value("emphasisColor", globalText);
   const globalInverse = value("inverseColor", "#fff");
@@ -206,9 +217,11 @@ export function getUikitGlobalsCssVars(
     "--webpages-background-muted-image": backgroundMutedImage,
     "--webpages-background-primary-image": backgroundPrimaryImage,
     "--webpages-background-secondary-image": backgroundSecondaryImage,
-    "--uikit-section-default-bg-image": backgroundDefaultImage,
+    "--uikit-section-default-bg-image": sectionDefaultBackgroundImage,
     "--uikit-section-muted-bg-image": backgroundMutedImage,
-    "--uikit-section-primary-bg-image": backgroundPrimaryImage,
+    "--uikit-section-primary-bg-image": sectionPrimaryBackgroundImage,
+    "--uikit-section-default-gradient": backgroundDefaultGradient,
+    "--uikit-section-primary-gradient": backgroundPrimaryGradient,
     "--uikit-section-secondary-bg-image": backgroundSecondaryImage,
     "--uk-global-font-family": fontFamilyStack(bodyFamily, "system-ui, sans-serif"),
     "--uk-heading-font-family": fontFamilyStack(headingFamily, "system-ui, sans-serif"),
@@ -408,6 +421,40 @@ export function getUikitGlobalsCssVars(
     "--uk-button-primary-active-gradient": buttonValue("buttonPrimaryActiveGradient", buttonValue("buttonPrimaryGradient", "none")),
     "--uk-button-secondary-hover-gradient": buttonValue("buttonSecondaryHoverGradient", "none"),
     "--uk-button-secondary-active-gradient": buttonValue("buttonSecondaryActiveGradient", "none"),
+    "--uk-button-default-mode": buttonValue("buttonDefaultMode", "none"),
+    "--uk-button-default-glow-display": buttonValue("buttonDefaultMode", "none") === "glow" ? "block" : "none",
+    "--uk-button-default-glow-gradient": buttonValue("buttonDefaultGlowGradient", "none"),
+    "--uk-button-default-glow-filter": buttonValue("buttonDefaultGlowFilter", "none"),
+    "--uk-button-default-hover-glow-filter": buttonValue("buttonDefaultHoverGlowFilter", buttonValue("buttonDefaultGlowFilter", "none")),
+    "--uk-button-default-render-background": buttonValue("buttonDefaultMode", "none") === "glow" ? "transparent" : buttonValue("buttonDefaultBackground", backgroundDefault),
+    "--uk-button-default-render-gradient": buttonValue("buttonDefaultMode", "none") === "glow" ? "none" : "none",
+    "--uk-button-primary-mode": buttonValue("buttonPrimaryMode", "none"),
+    "--uk-button-primary-glow-display": buttonValue("buttonPrimaryMode", "none") === "glow" ? "block" : "none",
+    "--uk-button-primary-glow-gradient": buttonValue("buttonPrimaryGlowGradient", "none"),
+    "--uk-button-primary-glow-filter": buttonValue("buttonPrimaryGlowFilter", "none"),
+    "--uk-button-primary-hover-glow-filter": buttonValue("buttonPrimaryHoverGlowFilter", buttonValue("buttonPrimaryGlowFilter", "none")),
+    "--uk-button-primary-render-background": buttonValue("buttonPrimaryMode", "none") === "glow" ? "transparent" : buttonValue("buttonPrimaryBackground", primary),
+    "--uk-button-primary-render-hover-background": buttonValue("buttonPrimaryMode", "none") === "glow" ? "transparent" : buttonValue("buttonHoverBg", buttonValue("buttonPrimaryBackground", primary)),
+    "--uk-button-primary-render-active-background": buttonValue("buttonPrimaryMode", "none") === "glow" ? "transparent" : buttonValue("buttonPrimaryActiveBackground", buttonValue("buttonPrimaryBackground", primary)),
+    "--uk-button-primary-render-gradient": buttonValue("buttonPrimaryMode", "none") === "glow" ? "none" : buttonValue("buttonPrimaryGradient", "none"),
+    "--uk-button-primary-render-hover-gradient": buttonValue("buttonPrimaryMode", "none") === "glow" ? "none" : buttonValue("buttonPrimaryHoverGradient", buttonValue("buttonPrimaryGradient", "none")),
+    "--uk-button-primary-render-active-gradient": buttonValue("buttonPrimaryMode", "none") === "glow" ? "none" : buttonValue("buttonPrimaryActiveGradient", buttonValue("buttonPrimaryGradient", "none")),
+    "--uk-button-secondary-mode": buttonValue("buttonSecondaryMode", "none"),
+    "--uk-button-secondary-glow-display": buttonValue("buttonSecondaryMode", "none") === "glow" ? "block" : "none",
+    "--uk-button-secondary-glow-gradient": buttonValue("buttonSecondaryGlowGradient", "none"),
+    "--uk-button-secondary-glow-filter": buttonValue("buttonSecondaryGlowFilter", "none"),
+    "--uk-button-secondary-hover-glow-filter": buttonValue("buttonSecondaryHoverGlowFilter", buttonValue("buttonSecondaryGlowFilter", "none")),
+    "--uk-button-secondary-render-background": buttonValue("buttonSecondaryMode", "none") === "glow" ? "transparent" : buttonValue("buttonSecondaryBackground", "#e5e7eb"),
+    "--uk-button-secondary-render-gradient": buttonValue("buttonSecondaryMode", "none") === "glow" ? "none" : "none",
+    "--uk-theme-box-decoration-border-radius": value("themeBoxDecorationBorderRadius", "10px"),
+    "--uk-theme-box-decoration-default-gradient": value("themeBoxDecorationDefaultGradient", "conic-gradient(from 70deg, #FD3D8F, #B823C3, #4901AC, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)"),
+    "--uk-theme-box-decoration-primary-glow-filter": value("themeBoxDecorationPrimaryGlowFilter", "blur(7px)"),
+    "--uk-theme-box-decoration-primary-glow-gradient": value("themeBoxDecorationPrimaryGlowGradient", "conic-gradient(from 70deg, #FD3D8F, #B823C3, #4901AC, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)"),
+    "--uk-theme-box-decoration-primary-background": value("themeBoxDecorationPrimaryBackground", "rgba(255,255,255,0.1)"),
+    "--uk-theme-box-decoration-primary-border": value("themeBoxDecorationPrimaryBorder", "rgba(255,255,255,0.1)"),
+    "--uk-theme-box-decoration-secondary-glow-filter": value("themeBoxDecorationSecondaryGlowFilter", "blur(7px)"),
+    "--uk-theme-box-decoration-secondary-background": value("themeBoxDecorationSecondaryBackground", "rgba(255,255,255,0.1)"),
+    "--uk-theme-box-decoration-secondary-border": value("themeBoxDecorationSecondaryBorder", "rgba(255,255,255,0.1)"),
     // Inverse Button tokens remain aliases at the Global Styles layer. The
     // semantic surface context consumes them only for dark/inverse sections,
     // so the normal Button presentation retains its authored values.

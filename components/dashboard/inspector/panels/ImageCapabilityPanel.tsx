@@ -179,9 +179,23 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
         update={update}
         showDimensions={false}
         showFrameControls={false}
-        showAlignment
+        showAlignment={false}
+        loadingCheckbox
+        showInverse
+        showSvgAnimate
+        showHeightControls
+        showTextColor
         showHoverShadow
+        disableHoverShadow={!image.imageLinkUrl}
+        hoverShadowOptions={[
+          { value: "none", label: "None" },
+          { value: "small", label: "Small" },
+          { value: "medium", label: "Medium" },
+          { value: "large", label: "Large" },
+          { value: "xlarge", label: "X-Large" },
+        ]}
         showSvgControls
+        showSvgColorWhenInlineDisabled
         svgColorLabel="SVG Color"
         svgColorOptions={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}
       />

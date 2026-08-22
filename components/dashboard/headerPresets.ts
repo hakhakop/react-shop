@@ -998,6 +998,12 @@ const visiblePresetKeys = new Set([
   "pill",
   "princity",
   "hero",
+  // Yootheme-compatible Header inspector choices. These are mature presets
+  // retained by the canonical apply/persistence pipeline, not a second model.
+  "compact",
+  "simple",
+  "two-row",
+  "wordpress",
 ]);
 
 function completeHeaderPreset(preset: HeaderPreset): HeaderPreset {

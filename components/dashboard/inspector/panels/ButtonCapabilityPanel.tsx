@@ -4,7 +4,6 @@ import type { InspectorTab, BuilderLayoutBlock } from "@/components/dashboard/bu
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import {
   InspectorDivision,
-  InspectorAlignmentControl,
   InspectorFieldRow,
   InspectorSelect,
   InspectorSwitch,
@@ -46,6 +45,13 @@ const buttonStyleOptions = UIKIT_BUTTON_CAPABILITY.properties.variant.values.map
 const nativeButtonStyleOptions = buttonStyleOptions.filter(({ value }) =>
   value === "default" || value === "primary" || value === "secondary" || value === "text",
 );
+
+const gapOptions = [
+  { value: "small", label: "Small" },
+  { value: "medium", label: "Medium" },
+  { value: "large", label: "Large" },
+  { value: "none", label: "None" },
+];
 
 function isImportedYoothemeButton(block: BuilderLayoutBlock) {
   return block.spacingContract === "yootheme" || block.id?.startsWith("yootheme-");
@@ -206,6 +212,32 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
               label="Full width"
             />
           </InspectorFieldRow>
+          <InspectorFieldRow
+            label="Column gap"
+            isOverridden={block.buttonColumnGap !== undefined}
+            inheritedValueText="Default"
+            onReset={() => update({ buttonColumnGap: undefined })}
+          >
+            <InspectorSelect
+              value={block.buttonColumnGap ?? "small"}
+              options={gapOptions}
+              onChange={(buttonColumnGap) => update({ buttonColumnGap })}
+              ariaLabel="Button column gap"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow
+            label="Row gap"
+            isOverridden={block.buttonRowGap !== undefined}
+            inheritedValueText="Default"
+            onReset={() => update({ buttonRowGap: undefined })}
+          >
+            <InspectorSelect
+              value={block.buttonRowGap ?? "small"}
+              options={gapOptions}
+              onChange={(buttonRowGap) => update({ buttonRowGap })}
+              ariaLabel="Button row gap"
+            />
+          </InspectorFieldRow>
         </InspectorDivision>
       ) : (
         <ActionSettingsGroup
@@ -216,15 +248,6 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
           showFullWidth
         />
       )}
-      <InspectorDivision title="LAYOUT">
-        <InspectorFieldRow label="Alignment">
-          <InspectorAlignmentControl
-            value={(block as any).buttonAlign ?? block.textAlign ?? "left"}
-            onChange={(value) => update({ buttonAlign: value, textAlign: value } as any)}
-            ariaLabel="Button alignment"
-          />
-        </InspectorFieldRow>
-      </InspectorDivision>
     </div>
   );
 }

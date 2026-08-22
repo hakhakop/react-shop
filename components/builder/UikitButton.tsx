@@ -5,6 +5,7 @@ import { getUikitButtonClass, getUikitButtonLocalOverride } from "@/lib/uikitTok
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 import { typographyProps } from "@/lib/builderTypography";
+import { uikitGridGapCss } from "@/lib/uikitGridStructure";
 
 type Props = {
   block: any;
@@ -37,6 +38,18 @@ export default function UikitButton({ block, scopeClassName }: Props) {
   const localOverride = getUikitButtonLocalOverride(rawBlock);
   const localTypography = typographyProps(rawBlock.typography, "button");
   const isImportedYoothemeButton = rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
+  // Imported YOOtheme Button groups use the UIkit small gutter when older
+  // persisted blocks have only the pre-token `buttonGap` field.
+  const legacyGap = isImportedYoothemeButton ? uikitGridGapCss("small") : rawBlock.buttonGap || "0.75rem";
+  const columnGap = rawBlock.buttonColumnGap ? uikitGridGapCss(rawBlock.buttonColumnGap) : legacyGap;
+  const rowGap = rawBlock.buttonRowGap ? uikitGridGapCss(rawBlock.buttonRowGap) : legacyGap;
+  const defaultYoothemeButtonTokens = isImportedYoothemeButton && !rawBlock.size
+    ? {
+        "--uk-button-font-size": "var(--uk-base-font-size, 16px)",
+        "--uk-button-line-height": "var(--uk-global-control-height, 48px)",
+        "--uk-button-font-weight": "400",
+      }
+    : {};
   const actionClassName = (style: string | undefined, size: string | undefined) =>
     `${getUikitButtonClass(
       // Historic native documents used `link` as a Text-button alias before
@@ -54,13 +67,13 @@ export default function UikitButton({ block, scopeClassName }: Props) {
     >
       <div
         className={`uk-flex uk-flex-wrap ${alignFlexClass} ${isStacked ? "uk-flex-column" : "uk-flex-middle"} ${isFullWidth ? "uk-child-width-1-1" : ""}`.trim()}
-        style={{ gap: rawBlock.buttonGap || "0.75rem" }}
+        style={{ columnGap, rowGap }}
       >
         {!hasCanonicalItems && rawBlock.buttonLabel && (
           <a
             className={actionClassName(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
             href={rawBlock.buttonUrl || "#"}
-            style={{ ...localOverride.style, ...localTypography.style }}
+            style={{ ...localOverride.style, ...defaultYoothemeButtonTokens, ...localTypography.style }}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
           >
             {rawBlock.buttonLabel}
@@ -71,7 +84,7 @@ export default function UikitButton({ block, scopeClassName }: Props) {
             key={btn.id ?? btnIdx}
             className={actionClassName(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)}
             href={btn.url || "#"}
-            style={{ ...localOverride.style, ...localTypography.style }}
+            style={{ ...localOverride.style, ...defaultYoothemeButtonTokens, ...localTypography.style }}
             {...builderLinkTargetProps(btn.target)}
           >
             {btn.label || btn.text || `Button ${btnIdx + 1}`}

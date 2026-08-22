@@ -112,6 +112,8 @@ test("Home.json static content maps to existing WebPages block fields", async ()
 
   const button = firstColumn.blocks[2];
   assert.equal(button.buttons.length, 2);
+  assert.equal(button.buttonColumnGap, "small");
+  assert.equal(button.buttonRowGap, "small");
   assert.equal(button.buttons[0].label, "Sign up for Free");
   assert.equal(button.buttons[0].url, "?page_id=21");
   assert.equal(button.buttons[1].style, "outline");

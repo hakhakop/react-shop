@@ -14,6 +14,15 @@ export async function getCmsConnectionForRequest(
     request.headers.get("x-forwarded-host") ||
     request.headers.get("host") ||
     "";
-  const website = await getWebsiteByDomainHost(normalizeWebsiteDomain(host));
+  const normalizedHost = normalizeWebsiteDomain(host);
+  const rootHost = normalizeWebsiteDomain(
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
+      process.env.WEBPAGES_ROOT_DOMAIN ||
+      "webpages.am",
+  );
+  if (normalizedHost && normalizedHost === rootHost) {
+    return getCmsConnection(undefined);
+  }
+  const website = await getWebsiteByDomainHost(normalizedHost);
   return getCmsConnection(website);
 }
