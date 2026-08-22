@@ -596,6 +596,18 @@ body:has(.builder-dashboard) .site-header--service {
   width: 326px !important;
 }
 
+/* Keep the panel surface mounted and visible while the grid track is moving.
+   The track clips it progressively; collapse visibility only after the
+   dashboard's 220ms grid transition has emitted transitionend. */
+.builder-dashboard.is-sidebar-transitioning .builder-sidebar-panel-container {
+  opacity: 1;
+  pointer-events: none;
+  visibility: visible;
+  width: 326px !important;
+  overflow: hidden;
+  transition: none !important;
+}
+
 .builder-dashboard.is-sidebar-collapsed .builder-sidebar-resize-handle {
   opacity: 0;
   pointer-events: none;

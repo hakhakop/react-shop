@@ -96,11 +96,11 @@ import type {
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
   ReactNode,
+  TransitionEvent as ReactTransitionEvent,
 } from "react";
 import {
   Fragment,
   memo,
-  startTransition,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -2642,6 +2642,7 @@ export default function DashboardBuilder({
   );
   const [inspectorFloatingRect, setInspectorFloatingRect] =
     useState<InspectorFloatingRect>(readInspectorFloatingRectPreference);
+  const inspectorFloatingRectRef = useRef(inspectorFloatingRect);
   const [inspectorDragging, setInspectorDragging] = useState(false);
   const [inspectorWorkspaceWidth, setInspectorWorkspaceWidth] = useState(0);
   const [inspectorDesktopLayout, setInspectorDesktopLayout] = useState(false);
@@ -2663,10 +2664,18 @@ export default function DashboardBuilder({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     loadSidebarCollapsedPreference(storageKeys.sidebarCollapsed),
   );
+  const [sidebarTransitioning, setSidebarTransitioning] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(480);
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
+  const previewScaleRef = useRef(previewScale);
+  const previewCanvasWidthRef = useRef(previewCanvasWidth);
+  const previewViewportFrameRef = useRef<number | null>(null);
+  const workspaceWidthRef = useRef(0);
+  const inspectorDesktopLayoutRef = useRef(false);
+  const sidebarTransitionUntilRef = useRef(0);
+  const sidebarViewportTimerRef = useRef<number | null>(null);
   const [spacingOverlayEnabled, setSpacingOverlayEnabled] = useState(false);
   const [spacingFocusRequest, setSpacingFocusRequest] = useState<{
     id: number;
@@ -2687,15 +2696,29 @@ export default function DashboardBuilder({
   const [menuIconSearch, setMenuIconSearch] = useState("");
   const setSidebarCollapsedPreference = useCallback(
     (next: boolean) => {
+      sidebarTransitionUntilRef.current = performance.now() + 280;
+      setSidebarTransitioning(true);
       setSidebarCollapsed(next);
       window.localStorage.setItem(storageKeys.sidebarCollapsed, String(next));
     },
     [storageKeys.sidebarCollapsed],
   );
+  const handleDashboardTransitionEnd = useCallback(
+    (event: ReactTransitionEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return;
+      if (event.propertyName !== "grid-template-columns") return;
+      setSidebarTransitioning(false);
+    },
+    [],
+  );
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
   const shellSaveRevision = useRef(0);
   const spacingFocusRequestId = useRef(0);
+
+  useEffect(() => {
+    inspectorFloatingRectRef.current = inspectorFloatingRect;
+  }, [inspectorFloatingRect]);
 
   useEffect(() => {
     if (sidebarTab === "globalStyles" && !canEditShellSettings) {
@@ -2904,16 +2927,22 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     const behavior = currentHeaderDocumentSettings.behavior;
-    const getScrollY = () => {
+    let scrollSource: HTMLElement | null = null;
+    const resolveScrollSource = () => {
       const previewShell = previewShellRef.current;
-      if (previewShell) {
-        const previewStyle = window.getComputedStyle(previewShell);
-        const previewOwnsScroll =
-          previewShell.scrollHeight > previewShell.clientHeight + 1 &&
-          (previewStyle.overflowY === "auto" || previewStyle.overflowY === "scroll");
-        if (previewOwnsScroll) return previewShell.scrollTop;
+      if (!previewShell) {
+        scrollSource = null;
+        return;
       }
-      return window.scrollY;
+      const previewStyle = window.getComputedStyle(previewShell);
+      const previewOwnsScroll =
+        previewShell.scrollHeight > previewShell.clientHeight + 1 &&
+        (previewStyle.overflowY === "auto" || previewStyle.overflowY === "scroll");
+      scrollSource = previewOwnsScroll ? previewShell : null;
+    };
+    resolveScrollSource();
+    const getScrollY = () => {
+      return scrollSource?.scrollTop ?? window.scrollY;
     };
 
     const onScroll = () => {
@@ -2931,10 +2960,12 @@ export default function DashboardBuilder({
 
     const onWheel = (event: WheelEvent) => {
       if (behavior !== "sticky-on-scroll-up" || Math.abs(event.deltaY) <= 2) return;
-      setBuilderHeaderScrollState((current) => ({
-        ...current,
-        hidden: event.deltaY > 0,
-      }));
+      const nextHidden = event.deltaY > 0;
+      setBuilderHeaderScrollState((current) =>
+        current.hidden === nextHidden
+          ? current
+          : { ...current, hidden: nextHidden },
+      );
     };
 
     const initialScrollY = getScrollY();
@@ -2944,9 +2975,15 @@ export default function DashboardBuilder({
     });
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     window.addEventListener("wheel", onWheel, { capture: true, passive: true });
+    const onResize = () => {
+      resolveScrollSource();
+      onScroll();
+    };
+    window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("scroll", onScroll, { capture: true });
       window.removeEventListener("wheel", onWheel, { capture: true });
+      window.removeEventListener("resize", onResize);
     };
   }, [currentHeaderDocumentSettings.behavior]);
   const composedAnchorIdEntries = useMemo(() => {
@@ -3075,33 +3112,63 @@ export default function DashboardBuilder({
     const workspace = builderWorkspaceRef.current;
     if (!workspace) return;
 
-    const updateWorkspaceSize = () => {
+    let frameId: number | null = null;
+    let finalMeasurementTimer: number | null = null;
+    const measureWorkspaceSize = () => {
+      frameId = null;
       const workspaceRect = workspace.getBoundingClientRect();
       const dashboardRect = workspace.parentElement?.getBoundingClientRect();
       // The Inspector occupies a sibling grid track. Measuring only the
       // remaining canvas makes the Inspector's maximum depend on its current
       // width, creating a resize/clamp feedback loop. Measure the stable area
       // from the workspace's left edge through the dashboard's right edge.
-      setInspectorWorkspaceWidth(
-        dashboardRect
-          ? Math.max(0, dashboardRect.right - workspaceRect.left)
-          : workspaceRect.width,
-      );
-      setInspectorDesktopLayout(
-        window.innerWidth >= INSPECTOR_RESIZE_BREAKPOINT,
-      );
-      setInspectorFloatingRect((current) =>
-        clampInspectorFloatingRect(current),
-      );
+      const nextWorkspaceWidth = dashboardRect
+        ? Math.max(0, dashboardRect.right - workspaceRect.left)
+        : workspaceRect.width;
+      if (nextWorkspaceWidth !== workspaceWidthRef.current) {
+        workspaceWidthRef.current = nextWorkspaceWidth;
+        setInspectorWorkspaceWidth(nextWorkspaceWidth);
+      }
+      const nextDesktopLayout = window.innerWidth >= INSPECTOR_RESIZE_BREAKPOINT;
+      if (nextDesktopLayout !== inspectorDesktopLayoutRef.current) {
+        inspectorDesktopLayoutRef.current = nextDesktopLayout;
+        setInspectorDesktopLayout(nextDesktopLayout);
+      }
+      const currentFloatingRect = inspectorFloatingRectRef.current;
+      const nextFloatingRect = clampInspectorFloatingRect(currentFloatingRect);
+      const floatingRectChanged =
+        nextFloatingRect.x !== currentFloatingRect.x ||
+        nextFloatingRect.y !== currentFloatingRect.y ||
+        nextFloatingRect.width !== currentFloatingRect.width ||
+        nextFloatingRect.height !== currentFloatingRect.height;
+      if (floatingRectChanged) {
+        inspectorFloatingRectRef.current = nextFloatingRect;
+        setInspectorFloatingRect(nextFloatingRect);
+      }
     };
-    updateWorkspaceSize();
+    const scheduleWorkspaceMeasurement = () => {
+      const remainingTransition = sidebarTransitionUntilRef.current - performance.now();
+      if (remainingTransition > 0) {
+        if (finalMeasurementTimer === null) {
+          finalMeasurementTimer = window.setTimeout(() => {
+            finalMeasurementTimer = null;
+            scheduleWorkspaceMeasurement();
+          }, remainingTransition);
+        }
+        return;
+      }
+      if (frameId === null) frameId = window.requestAnimationFrame(measureWorkspaceSize);
+    };
+    scheduleWorkspaceMeasurement();
 
-    const resizeObserver = new ResizeObserver(updateWorkspaceSize);
+    const resizeObserver = new ResizeObserver(scheduleWorkspaceMeasurement);
     resizeObserver.observe(workspace);
-    window.addEventListener("resize", updateWorkspaceSize);
+    window.addEventListener("resize", scheduleWorkspaceMeasurement);
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener("resize", updateWorkspaceSize);
+      window.removeEventListener("resize", scheduleWorkspaceMeasurement);
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      if (finalMeasurementTimer !== null) window.clearTimeout(finalMeasurementTimer);
     };
   }, []);
 
@@ -3488,7 +3555,7 @@ export default function DashboardBuilder({
     setMenuIconSearch("");
   }, [selectedMenuItemId]);
 
-  const updatePreviewViewport = useCallback(() => {
+  const measurePreviewViewport = useCallback(() => {
     const shell = previewShellRef.current;
     if (!shell) return;
     const shellWidth = shell.clientWidth || window.innerWidth;
@@ -3510,24 +3577,57 @@ export default function DashboardBuilder({
       scale = availableWidth / targetWidth;
     }
 
-    setPreviewCanvasWidth(targetWidth);
-    setPreviewScale(scale);
+    if (previewCanvasWidthRef.current !== targetWidth) {
+      previewCanvasWidthRef.current = targetWidth;
+      setPreviewCanvasWidth(targetWidth);
+    }
+    if (previewScaleRef.current !== scale) {
+      previewScaleRef.current = scale;
+      setPreviewScale(scale);
+    }
   }, [device, customMobileWidth, customTabletWidth]);
+
+  const schedulePreviewViewport = useCallback(() => {
+    const remainingTransition = sidebarTransitionUntilRef.current - performance.now();
+    if (remainingTransition > 0) {
+      if (sidebarViewportTimerRef.current === null) {
+        sidebarViewportTimerRef.current = window.setTimeout(() => {
+          sidebarViewportTimerRef.current = null;
+          schedulePreviewViewport();
+        }, remainingTransition);
+      }
+      return;
+    }
+    if (previewViewportFrameRef.current === null) {
+      previewViewportFrameRef.current = window.requestAnimationFrame(() => {
+        previewViewportFrameRef.current = null;
+        measurePreviewViewport();
+      });
+    }
+  }, [measurePreviewViewport]);
 
   useEffect(() => {
     const shell = previewShellRef.current;
     if (!shell) return;
 
-    updatePreviewViewport();
-    const observer = new ResizeObserver(updatePreviewViewport);
+    schedulePreviewViewport();
+    const observer = new ResizeObserver(schedulePreviewViewport);
     observer.observe(shell);
-    window.addEventListener("resize", updatePreviewViewport);
+    window.addEventListener("resize", schedulePreviewViewport);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updatePreviewViewport);
+      window.removeEventListener("resize", schedulePreviewViewport);
+      if (previewViewportFrameRef.current !== null) {
+        window.cancelAnimationFrame(previewViewportFrameRef.current);
+        previewViewportFrameRef.current = null;
+      }
+      if (sidebarViewportTimerRef.current !== null) {
+        window.clearTimeout(sidebarViewportTimerRef.current);
+        sidebarViewportTimerRef.current = null;
+      }
     };
-  }, [device, sidebarCollapsed, sidebarWidth, updatePreviewViewport]);
+  }, [device, sidebarCollapsed, sidebarWidth, schedulePreviewViewport]);
 
   const handleDeviceResizeStart = (
     e: React.MouseEvent,
@@ -9240,6 +9340,7 @@ export default function DashboardBuilder({
     event.currentTarget.setPointerCapture(event.pointerId);
     document.documentElement.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
+    window.dispatchEvent(new CustomEvent("builder:layout-transition-start"));
     setInspectorResizing(true);
   };
 
@@ -9399,6 +9500,7 @@ export default function DashboardBuilder({
       String(Math.round(persistedWidth)),
     );
     restoreInspectorResizeDocumentStyles();
+    window.dispatchEvent(new CustomEvent("builder:layout-transition-end"));
     setInspectorResizing(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -11204,7 +11306,7 @@ export default function DashboardBuilder({
         mobile: shellSettings.visibilityMobile,
       })} ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
-      }${inspectorOpen ? ` is-inspector-${effectiveInspectorMode}` : " is-inspector-collapsed"}${
+      }${sidebarTransitioning ? " is-sidebar-transitioning" : ""}${inspectorOpen ? ` is-inspector-${effectiveInspectorMode}` : " is-inspector-collapsed"}${
         sidebarResizing ? " is-sidebar-resizing" : ""
       } builder-preview-scheme-${
         builderState.design.colorScheme ?? "auto"
@@ -11220,6 +11322,7 @@ export default function DashboardBuilder({
           ...getUikitGlobalsCssVars(shellSettings, builderState.design),
         } as CSSProperties
       }
+      onTransitionEnd={handleDashboardTransitionEnd}
     >
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
@@ -12594,7 +12697,6 @@ function PreviewCanvas({
   const [optimisticSelectedTarget, setOptimisticSelectedTarget] =
     useState<BuilderInteractionTarget | null>(null);
   const selectionCommitFrameRef = useRef<number | null>(null);
-  const selectionCommitTimeoutRef = useRef<number | null>(null);
   const interactionSelectedTarget = optimisticSelectedTarget ?? selectedTarget;
   useEffect(() => {
     if (
@@ -12607,9 +12709,6 @@ function PreviewCanvas({
   useEffect(() => () => {
     if (selectionCommitFrameRef.current !== null) {
       window.cancelAnimationFrame(selectionCommitFrameRef.current);
-    }
-    if (selectionCommitTimeoutRef.current !== null) {
-      window.clearTimeout(selectionCommitTimeoutRef.current);
     }
   }, []);
   const onChangeSectionLayout = useCallback(
@@ -12694,15 +12793,9 @@ function PreviewCanvas({
       if (selectionCommitFrameRef.current !== null) {
         window.cancelAnimationFrame(selectionCommitFrameRef.current);
       }
-      if (selectionCommitTimeoutRef.current !== null) {
-        window.clearTimeout(selectionCommitTimeoutRef.current);
-      }
       selectionCommitFrameRef.current = window.requestAnimationFrame(() => {
         selectionCommitFrameRef.current = null;
-        selectionCommitTimeoutRef.current = window.setTimeout(() => {
-          selectionCommitTimeoutRef.current = null;
-          startTransition(() => selectDelegatedTarget(target, openInspector));
-        }, 0);
+        selectDelegatedTarget(target, openInspector);
       });
     },
     [selectDelegatedTarget],
@@ -13177,7 +13270,7 @@ function PreviewCanvas({
           (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined
         }
       >
-        <BuilderScrollAnimations key={animationSignature} />
+        <BuilderScrollAnimations key={animationSignature} dashboardMode />
         <div
           className="shop-builder-inner builder-preview-inner"
           aria-label={`${pageLabel} preview`}
@@ -14526,10 +14619,14 @@ function BuilderInteractionLayer({
   const [selectedRect, setSelectedRect] =
     useState<BuilderInteractionLayerRect | null>(null);
   const layerRef = useRef<HTMLDivElement>(null);
+  const selectedFrameRef = useRef<HTMLDivElement>(null);
+  const selectedToolbarRef = useRef<HTMLDivElement>(null);
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const [previousSelection, setPreviousSelection] =
     useState<BuilderInteractionTarget | null>(null);
   const lastSelectionRef = useRef<BuilderInteractionTarget | null>(null);
+  const draggableElementRef = useRef<HTMLElement | null>(null);
+  const draggableScanInitializedRef = useRef(false);
   const interactionRoots = useCallback(
     () => [canvasRef.current, externalInteractionRootRef?.current].filter(
       (root): root is HTMLDivElement => Boolean(root),
@@ -14642,18 +14739,26 @@ function BuilderInteractionLayer({
     const roots = interactionRoots();
     if (roots.length === 0) return;
     const selectedElement = findInteractionElement(selectedVisualTarget);
-    for (const root of roots) {
-      for (const owner of root.querySelectorAll<HTMLElement>(
-        '[draggable], [data-builder-object-type="section"], [data-builder-object-type="block"]',
-      )) {
-        owner.draggable = false;
+    if (!draggableScanInitializedRef.current) {
+      for (const root of roots) {
+        for (const owner of root.querySelectorAll<HTMLElement>(
+          '[draggable], [data-builder-object-type="section"], [data-builder-object-type="block"]',
+        )) {
+          owner.draggable = false;
+        }
       }
+      draggableScanInitializedRef.current = true;
+    } else if (draggableElementRef.current && draggableElementRef.current !== selectedElement) {
+      draggableElementRef.current.draggable = false;
     }
     if (
       selectedElement &&
       (selectedVisualTarget?.type === "section" || selectedVisualTarget?.type === "block")
     ) {
       selectedElement.draggable = true;
+      draggableElementRef.current = selectedElement;
+    } else {
+      draggableElementRef.current = null;
     }
     const readRect = (element: HTMLElement | null): BuilderInteractionLayerRect | null => {
       if (!element) return null;
@@ -14662,16 +14767,14 @@ function BuilderInteractionLayer({
     };
     const applyRectToPortal = (next: BuilderInteractionLayerRect | null) => {
       if (!next) return;
-      const frame = layerRef.current?.querySelector<HTMLElement>(
-        ".builder-shared-interaction-frame.is-selected, .builder-shared-interaction-frame.is-editing",
-      );
+      const frame = selectedFrameRef.current;
       if (frame) {
         frame.style.left = `${next.left + window.scrollX}px`;
         frame.style.top = `${next.top + window.scrollY}px`;
         frame.style.width = `${next.width}px`;
         frame.style.height = `${next.height}px`;
       }
-      const toolbar = document.querySelector<HTMLElement>(".builder-fixed-selection-toolbar.is-anchored");
+      const toolbar = selectedToolbarRef.current;
       if (!toolbar) return;
       const toolbarY = next.top + next.height + 8;
       const top = toolbarY > window.innerHeight - 64
@@ -14698,39 +14801,32 @@ function BuilderInteractionLayer({
         left.width === right.width &&
         left.height === right.height,
       );
-    const updateRect = () => {
+    const updateRect = (commitSelectionRect: boolean) => {
       const next = readRect(selectedElement);
       applyRectToPortal(next);
-      setSelectedRect((current) => rectsEqual(current, next) ? current : next);
+      if (commitSelectionRect) {
+        setSelectedRect((current) => rectsEqual(current, next) ? current : next);
+      }
     };
-    updateRect();
+    updateRect(true);
     let animationFrame: number | null = null;
-    let scrollEndTimeout: number | null = null;
     const scheduleUpdate = () => {
       if (animationFrame !== null) return;
       animationFrame = window.requestAnimationFrame(() => {
         animationFrame = null;
-        updateRect();
+        updateRect(false);
       });
     };
     const handleResize = () => scheduleUpdate();
     const handleScroll = () => {
       hoverSuppressedByScrollRef.current = true;
       if (hoverFrameRef.current) hoverFrameRef.current.style.display = "none";
-      // Keep the last anchored rect while scrolling. Clearing it here drops
-      // the fixed toolbar back to its legacy bottom-position fallback.
-      updateRect();
-      if (scrollEndTimeout !== null) window.clearTimeout(scrollEndTimeout);
-      scrollEndTimeout = window.setTimeout(() => {
-        scrollEndTimeout = null;
-        scheduleUpdate();
-      }, 180);
+      scheduleUpdate();
     };
     window.addEventListener("resize", handleResize);
     window.addEventListener("scroll", handleScroll, true);
     return () => {
       if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
-      if (scrollEndTimeout !== null) window.clearTimeout(scrollEndTimeout);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll, true);
     };
@@ -14796,7 +14892,7 @@ function BuilderInteractionLayer({
     state: "selected" | "hovered" | "editing") => {
     if (!target || !rect) return null;
     return <div className={`builder-shared-interaction-frame is-${state} is-${target.type}`}
-      style={{ left: rect.left + window.scrollX, top: rect.top + window.scrollY, width: rect.width, height: rect.height }} />;
+      ref={state === "selected" || state === "editing" ? selectedFrameRef : undefined} />;
   };
   return createPortal(
     <>
@@ -14811,21 +14907,9 @@ function BuilderInteractionLayer({
       {selectedVisualTarget && selectedHierarchy && !editingTarget ? (
         <div
           className={`builder-fixed-selection-toolbar${selectedRect ? " is-anchored" : ""}${selectedVisualTarget.type === "block" ? " is-element" : ""}`}
+          ref={selectedToolbarRef}
           role="toolbar"
           aria-label="Selected Builder object"
-          style={(() => {
-            if (!selectedRect) return undefined;
-            const toolbarY = selectedRect.top + selectedRect.height + 8;
-            const viewportHeight = window.innerHeight;
-            const top = toolbarY > viewportHeight - 64
-              ? Math.max(12, selectedRect.top - 52)
-              : toolbarY;
-            const left = Math.min(
-              Math.max(selectedRect.left + selectedRect.width / 2, 180),
-              window.innerWidth - 180,
-            );
-            return { left: left + window.scrollX, top: top + window.scrollY, right: "auto", bottom: "auto" };
-          })()}
         >
           {previousSelection ? (
             <button
@@ -15674,6 +15758,39 @@ function elementSpacingOverlayLabels(
 
   return labels;
 }
+
+const previewTargetTouchesSection = (target: BuilderInteractionTarget | null | undefined, sectionId: string) =>
+  target?.sectionId === sectionId;
+
+const previewSectionPropsEqual = (
+  previous: any,
+  next: any,
+) => {
+  const sectionId = previous.section.id;
+  if (previous.section !== next.section || previous.device !== next.device) return false;
+  if (previous.selectedSectionId !== next.selectedSectionId) {
+    return previous.selectedSectionId !== sectionId && next.selectedSectionId !== sectionId;
+  }
+  if (previous.selectedLayoutColumnKey !== next.selectedLayoutColumnKey ||
+      previous.selectedLayoutRowIndex !== next.selectedLayoutRowIndex ||
+      previous.selectedLayoutBlockKey !== next.selectedLayoutBlockKey) return false;
+  if (previewTargetTouchesSection(previous.selectedTarget, sectionId) || previewTargetTouchesSection(next.selectedTarget, sectionId)) {
+    if (!builderTargetsEqual(previous.selectedTarget, next.selectedTarget)) return false;
+  }
+  if (previewTargetTouchesSection(previous.editingTarget, sectionId) || previewTargetTouchesSection(next.editingTarget, sectionId)) {
+    if (!builderTargetsEqual(previous.editingTarget, next.editingTarget)) return false;
+  }
+  if (previewTargetTouchesSection(previous.hoveredTarget, sectionId) || previewTargetTouchesSection(next.hoveredTarget, sectionId)) {
+    if (!builderTargetsEqual(previous.hoveredTarget, next.hoveredTarget)) return false;
+  }
+  if (previewTargetTouchesSection(previous.hoverToolbarTarget, sectionId) || previewTargetTouchesSection(next.hoverToolbarTarget, sectionId)) {
+    if (!builderTargetsEqual(previous.hoverToolbarTarget, next.hoverToolbarTarget)) return false;
+  }
+  if (previous.rowInsertRequest?.sectionId === sectionId || next.rowInsertRequest?.sectionId === sectionId) {
+    if (previous.rowInsertRequest !== next.rowInsertRequest) return false;
+  }
+  return true;
+};
 
 const PreviewSection = memo(function PreviewSection({
   device,
@@ -18228,4 +18345,4 @@ const PreviewSection = memo(function PreviewSection({
       )}
     </div>
   );
-});
+}, previewSectionPropsEqual);

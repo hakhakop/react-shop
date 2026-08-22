@@ -33,15 +33,20 @@ const parallaxScrollParent = (element: HTMLElement): HTMLElement => {
   return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
 };
 
-const layoutOffsetTop = (element: HTMLElement): number => {
+const layoutOffsetTop = (
+  element: HTMLElement,
+  styleCache?: Map<HTMLElement, CSSStyleDeclaration>,
+): number => {
   let current: HTMLElement | null = element;
   let top = 0;
   while (current) {
     top += current.offsetTop;
     const parent = current.offsetParent as HTMLElement | null;
     if (!parent) break;
-    top += Number.parseFloat(getComputedStyle(parent).borderTopWidth) || 0;
-    if (getComputedStyle(parent).position === "fixed") {
+    const parentStyle = styleCache?.get(parent) ?? getComputedStyle(parent);
+    styleCache?.set(parent, parentStyle);
+    top += Number.parseFloat(parentStyle.borderTopWidth) || 0;
+    if (parentStyle.position === "fixed") {
       top += window.scrollY;
       break;
     }
@@ -79,7 +84,7 @@ const resolveParallaxTarget = (node: HTMLElement, selector?: string): HTMLElemen
   }
 };
 
-const resolveParallaxOffset = (value: string | undefined, target: HTMLElement, viewportHeight: number, viewportWidth: number) => {
+const resolveParallaxOffset = (value: string | undefined, target: HTMLElement, viewportHeight: number, viewportWidth: number, targetHeight = target.offsetHeight) => {
   if (!value) return 0;
   return value.replace(/\s+/g, "").replace(/-/g, "+-").split("+").reduce((sum, term) => {
     if (!term) return sum;
@@ -87,7 +92,7 @@ const resolveParallaxOffset = (value: string | undefined, target: HTMLElement, v
     if (!match) return sum;
     const amount = Number(match[1]);
     const unit = match[2] ?? "px";
-    return sum + (unit === "vh" ? amount * viewportHeight / 100 : unit === "vw" ? amount * viewportWidth / 100 : unit === "%" ? amount * target.offsetHeight / 100 : amount);
+    return sum + (unit === "vh" ? amount * viewportHeight / 100 : unit === "vw" ? amount * viewportWidth / 100 : unit === "%" ? amount * targetHeight / 100 : amount);
   }, 0);
 };
 
@@ -96,7 +101,7 @@ const stopParts = (stop: BuilderParallaxStop) => {
   return match ? { value: Number(match[1]), unit: match[2] || "" } : undefined;
 };
 
-const interpolateStops = (stops: BuilderParallaxStop[] | undefined, progress: number, property: string, node: HTMLElement, viewportHeight: number, viewportWidth: number): string | undefined => {
+const interpolateStops = (stops: BuilderParallaxStop[] | undefined, progress: number, property: string, node: HTMLElement, viewportHeight: number, viewportWidth: number, nodeWidth = node.offsetWidth || 1): string | undefined => {
   if (!stops?.length) return undefined;
   const parsed = stops.map((stop) => ({ stop, parts: stopParts(stop) })).filter((item): item is { stop: BuilderParallaxStop; parts: { value: number; unit: string } } => Boolean(item.parts));
   if (!parsed.length) return undefined;
@@ -132,7 +137,7 @@ const interpolateStops = (stops: BuilderParallaxStop[] | undefined, progress: nu
   let rightValue = right.parts.value;
   const unit = left.parts.unit || right.parts.unit;
   if (property === "scale" && unit) {
-    const dimension = node.offsetWidth || 1;
+    const dimension = nodeWidth;
     const toScale = (value: number, authoredUnit: string) => authoredUnit === "%" ? value / 100 : authoredUnit === "vw" ? value * viewportWidth / 100 / dimension : authoredUnit === "vh" ? value * viewportHeight / 100 / dimension : value;
     leftValue = toScale(leftValue, left.parts.unit);
     rightValue = toScale(rightValue, right.parts.unit);
@@ -162,7 +167,29 @@ const parseParallaxNode = (node: HTMLElement) => {
   } as BuilderAnimationLike);
 };
 
-export default function BuilderScrollAnimations() {
+type Props = {
+  /** Enables dashboard-only pause/resume around editor layout churn. */
+  dashboardMode?: boolean;
+};
+
+type ParallaxRuntime = {
+  parallax: BuilderParallaxSettings;
+  scrollElement: HTMLElement;
+  target: HTMLElement;
+  geometry?: ParallaxGeometry;
+};
+
+type ParallaxGeometry = {
+  viewportHeight: number;
+  viewportWidth: number;
+  scrollViewportHeight: number;
+  maxScroll: number;
+  targetTop: number;
+  targetHeight: number;
+  nodeWidth: number;
+};
+
+export default function BuilderScrollAnimations({ dashboardMode = false }: Props) {
   useEffect(() => {
     const animatedNodes = Array.from(
       document.querySelectorAll<HTMLElement>("[data-builder-animate]"),
@@ -183,6 +210,111 @@ export default function BuilderScrollAnimations() {
     );
 
     if (!animatedNodes.length && !parallaxNodes.length) return;
+
+    const parallaxRuntime = new Map<HTMLElement, ParallaxRuntime>();
+    const breakpointCache = new Map<string, number>();
+    const layoutOffsetCache = new Map<HTMLElement, number>();
+    const styleCache = new Map<HTMLElement, CSSStyleDeclaration>();
+    let dashboardPaused = false;
+    const activeLayoutTransitions = new Set<EventTarget | string>();
+    let requestProgressUpdate: (() => void) | null = null;
+    const dashboardRoot = dashboardMode
+      ? document.querySelector<HTMLElement>(".builder-dashboard")
+      : null;
+    const dashboardPreview = dashboardMode
+      ? document.querySelector<HTMLElement>(".builder-preview-page")
+      : null;
+    const invalidateLayout = (pauseDashboard = false) => {
+      parallaxRuntime.forEach((runtime) => {
+        runtime.geometry = undefined;
+      });
+      layoutOffsetCache.clear();
+      styleCache.clear();
+      breakpointCache.clear();
+      if (pauseDashboard) dashboardPaused = true;
+      requestProgressUpdate?.();
+    };
+    const invalidateDashboardLayout = () => invalidateLayout(false);
+    const dashboardResizeObserver = dashboardPreview
+      ? new ResizeObserver(invalidateDashboardLayout)
+      : null;
+    if (dashboardResizeObserver && dashboardPreview) {
+      dashboardResizeObserver.observe(dashboardPreview);
+    }
+    const dashboardMutationObserver = dashboardRoot
+      ? new MutationObserver((records) => {
+          const layoutClassNames = new Set([
+            "is-sidebar-collapsed",
+            "is-inspector-docked",
+            "is-inspector-floating",
+            "is-inspector-closed",
+            "is-inspector-collapsed",
+            "is-sidebar-resizing",
+          ]);
+          if (records.some((record) => {
+            const target = record.target as HTMLElement;
+            if (target === dashboardRoot) {
+              const oldClasses = new Set((record.oldValue ?? "").split(/\s+/));
+              const newClasses = new Set(target.className.split(/\s+/));
+              return Array.from(layoutClassNames).some(
+                (name) => oldClasses.has(name) !== newClasses.has(name),
+              );
+            }
+            return Boolean(target.closest?.(".builder-sidebar, .builder-floating-inspector"));
+          })) {
+            // Class/layout churn starts the pause before the first transition
+            // frame. The transition boundary below is the only place that
+            // resumes the runtime.
+            invalidateLayout(true);
+          }
+        })
+      : null;
+    dashboardMutationObserver?.observe(dashboardRoot as HTMLElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+      attributeOldValue: true,
+      subtree: true,
+    });
+
+    const isLayoutTransition = (event: TransitionEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target || !dashboardRoot) return false;
+      const property = event.propertyName;
+      if (target === dashboardRoot) {
+        return property === "grid-template-columns" || property === "width";
+      }
+      return Boolean(
+        target.closest?.(".builder-floating-inspector") &&
+          (property === "width" || property === "grid-template-columns"),
+      );
+    };
+    const handleTransitionStart = (event: Event) => {
+      if (!isLayoutTransition(event as TransitionEvent)) return;
+      if (!event.target) return;
+      activeLayoutTransitions.add(event.target);
+      invalidateLayout(true);
+    };
+    const handleTransitionEnd = (event: Event) => {
+      if (!isLayoutTransition(event as TransitionEvent)) return;
+      if (event.target) activeLayoutTransitions.delete(event.target);
+      if (activeLayoutTransitions.size > 0) return;
+      dashboardPaused = false;
+      invalidateLayout(false);
+    };
+    const handleExternalTransitionStart = () => {
+      activeLayoutTransitions.add("inspector-resize");
+      invalidateLayout(true);
+    };
+    const handleExternalTransitionEnd = () => {
+      activeLayoutTransitions.delete("inspector-resize");
+      if (activeLayoutTransitions.size > 0) return;
+      dashboardPaused = false;
+      invalidateLayout(false);
+    };
+    dashboardRoot?.addEventListener("transitionstart", handleTransitionStart, true);
+    dashboardRoot?.addEventListener("transitionend", handleTransitionEnd, true);
+    window.addEventListener("builder:layout-transition-start", handleExternalTransitionStart);
+    window.addEventListener("builder:layout-transition-end", handleExternalTransitionEnd);
 
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -263,37 +395,67 @@ export default function BuilderScrollAnimations() {
     };
 
     const updateParallax = () => {
+      if (dashboardPaused) return;
       const viewportHeight = window.innerHeight || 1;
       const viewportWidth = window.innerWidth || 1;
+      const cachedLayoutOffsetTop = (element: HTMLElement) => {
+        const cached = layoutOffsetCache.get(element);
+        if (cached !== undefined) return cached;
+        const offset = layoutOffsetTop(element, styleCache);
+        layoutOffsetCache.set(element, offset);
+        return offset;
+      };
+      const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; clear?: boolean }> = [];
       parallaxNodes.forEach((node) => {
-        const parallax = parseParallaxNode(node);
+        let runtime = parallaxRuntime.get(node);
+        if (!runtime) {
+          const parallax = parseParallaxNode(node);
+          if (!parallax) return;
+          runtime = {
+            parallax,
+            scrollElement: parallaxScrollParent(node),
+            target: resolveParallaxTarget(node, parallax.target),
+          };
+          parallaxRuntime.set(node, runtime);
+        }
+        const { parallax, scrollElement, target } = runtime;
         if (!parallax) return;
-        if (parallax.breakpoint && viewportWidth < breakpointPixels(parallax.breakpoint)) {
-          node.style.removeProperty("transform");
-          node.style.removeProperty("opacity");
-          node.style.removeProperty("filter");
+        const breakpoint = parallax.breakpoint
+          ? (breakpointCache.get(parallax.breakpoint) ?? breakpointPixels(parallax.breakpoint))
+          : 0;
+        if (parallax.breakpoint) breakpointCache.set(parallax.breakpoint, breakpoint);
+        if (parallax.breakpoint && viewportWidth < breakpoint) {
+          writes.push({ node, clear: true });
           return;
         }
 
-        const scrollElement = parallaxScrollParent(node);
         const scrollTop = scrollElement.scrollTop;
         const isDocumentScroll = scrollElement === document.scrollingElement || scrollElement === document.documentElement;
-        const scrollViewportHeight = isDocumentScroll
-          ? viewportHeight
-          : scrollElement.getBoundingClientRect().height;
-        const target = resolveParallaxTarget(node, parallax.target);
-        const maxScroll = Math.max(0, scrollElement.scrollHeight - scrollViewportHeight);
-        const scrollViewportTop = isDocumentScroll
-          ? 0
-          : scrollElement.getBoundingClientRect().top;
-        const targetTop = layoutOffsetTop(target) - (isDocumentScroll ? 0 : layoutOffsetTop(scrollElement));
-        const startOffset = resolveParallaxOffset(parallax.start, target, viewportHeight, viewportWidth);
-        const endOffset = resolveParallaxOffset(parallax.end, target, viewportHeight, viewportWidth);
+        let geometry = runtime.geometry;
+        if (!geometry || geometry.viewportHeight !== viewportHeight || geometry.viewportWidth !== viewportWidth) {
+          const scrollViewportHeight = isDocumentScroll
+            ? viewportHeight
+            : scrollElement.getBoundingClientRect().height;
+          const targetHeight = target.offsetHeight;
+          geometry = {
+            viewportHeight,
+            viewportWidth,
+            scrollViewportHeight,
+            maxScroll: Math.max(0, scrollElement.scrollHeight - scrollViewportHeight),
+            targetTop: cachedLayoutOffsetTop(target) - (isDocumentScroll ? 0 : cachedLayoutOffsetTop(scrollElement)),
+            targetHeight,
+            nodeWidth: node.offsetWidth || 1,
+          };
+          runtime.geometry = geometry;
+        }
+        const { scrollViewportHeight, maxScroll, targetTop, targetHeight, nodeWidth } = geometry;
+        const startOffset = resolveParallaxOffset(parallax.start, target, viewportHeight, viewportWidth, targetHeight);
+        const endOffset = resolveParallaxOffset(parallax.end, target, viewportHeight, viewportWidth, targetHeight);
         const start = Math.max(0, targetTop - scrollViewportHeight + startOffset);
         // UIkit's default parallax interval runs from the target entering at
         // the viewport bottom until the target's bottom reaches the viewport
         // top. Keep the target height in the endpoint exactly as UIkit does.
-        const end = Math.min(maxScroll, targetTop + target.offsetHeight - endOffset);
+        const end = Math.min(maxScroll, targetTop + targetHeight - endOffset);
         const progress = start < end
           ? Math.min(1, Math.max(0, (scrollTop - start) / (end - start)))
           : 1;
@@ -303,24 +465,40 @@ export default function BuilderScrollAnimations() {
             ? Math.pow(progress, easing + 1)
             : 1 - Math.pow(1 - progress, 1 - easing)
           : progress;
-        const x = interpolateStops(parallax.x, eased, "x", node, viewportHeight, viewportWidth);
-        const y = interpolateStops(parallax.y, eased, "y", node, viewportHeight, viewportWidth);
-        const scale = interpolateStops(parallax.scale, eased, "scale", node, viewportHeight, viewportWidth);
-        const rotate = interpolateStops(parallax.rotate, eased, "rotate", node, viewportHeight, viewportWidth);
-        const opacity = interpolateStops(parallax.opacity, eased, "opacity", node, viewportHeight, viewportWidth);
-        const blur = interpolateStops(parallax.blur, eased, "blur", node, viewportHeight, viewportWidth);
+        const x = interpolateStops(parallax.x, eased, "x", node, viewportHeight, viewportWidth, nodeWidth);
+        const y = interpolateStops(parallax.y, eased, "y", node, viewportHeight, viewportWidth, nodeWidth);
+        const scale = interpolateStops(parallax.scale, eased, "scale", node, viewportHeight, viewportWidth, nodeWidth);
+        const rotate = interpolateStops(parallax.rotate, eased, "rotate", node, viewportHeight, viewportWidth, nodeWidth);
+        const opacity = interpolateStops(parallax.opacity, eased, "opacity", node, viewportHeight, viewportWidth, nodeWidth);
+        const blur = interpolateStops(parallax.blur, eased, "blur", node, viewportHeight, viewportWidth, nodeWidth);
         const transform = [
           x !== undefined ? `translateX(${x}${x.endsWith("%") || x.endsWith("vw") || x.endsWith("vh") || x.endsWith("px") ? "" : "px"})` : "",
           y !== undefined ? `translateY(${y}${y.endsWith("%") || y.endsWith("vw") || y.endsWith("vh") || y.endsWith("px") ? "" : "px"})` : "",
           rotate !== undefined ? `rotate(${rotate}deg)` : "",
           scale !== undefined ? `scale(${scale})` : "",
         ].filter(Boolean).join(" ");
+        writes.push({
+          node,
+          transform,
+          ...(opacity !== undefined ? { opacity } : {}),
+          ...(blur !== undefined ? { filter: `blur(${blur}${blur.endsWith("px") ? "" : "px"})` } : {}),
+          ...(parallax.transformOrigin ? { origin: parallax.transformOrigin.replaceAll("-", " ") } : {}),
+          ...(parallax.zIndex ? { zIndex: "1" } : {}),
+        });
+      });
+      writes.forEach(({ node, clear, transform, opacity, filter, origin, zIndex }) => {
+        if (clear) {
+          node.style.removeProperty("transform");
+          node.style.removeProperty("opacity");
+          node.style.removeProperty("filter");
+          return;
+        }
         node.style.willChange = "transform";
-        node.style.transform = transform;
+        node.style.transform = transform ?? "";
         if (opacity !== undefined) node.style.opacity = opacity;
-        if (blur !== undefined) node.style.filter = `blur(${blur}${blur.endsWith("px") ? "" : "px"})`;
-        if (parallax.transformOrigin) node.style.transformOrigin = parallax.transformOrigin.replaceAll("-", " ");
-        if (parallax.zIndex) node.style.zIndex = "1";
+        if (filter !== undefined) node.style.filter = filter;
+        if (origin !== undefined) node.style.transformOrigin = origin;
+        if (zIndex !== undefined) node.style.zIndex = zIndex;
       });
     };
 
@@ -392,7 +570,7 @@ export default function BuilderScrollAnimations() {
 
     animatedNodes.forEach((node) => observer.observe(node));
     let rafId = 0;
-    const requestProgressUpdate = () => {
+    requestProgressUpdate = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         updatePinnedProgress();
@@ -401,21 +579,31 @@ export default function BuilderScrollAnimations() {
       });
     };
 
+    const handleResize = () => {
+      invalidateLayout(false);
+    };
+
     updatePinnedProgress();
     updateScrollProgress();
     updateParallax();
     window.addEventListener("scroll", requestProgressUpdate, { passive: true });
-    window.addEventListener("resize", requestProgressUpdate);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       observer.disconnect();
+      dashboardResizeObserver?.disconnect();
+      dashboardMutationObserver?.disconnect();
+      dashboardRoot?.removeEventListener("transitionstart", handleTransitionStart, true);
+      dashboardRoot?.removeEventListener("transitionend", handleTransitionEnd, true);
+      window.removeEventListener("builder:layout-transition-start", handleExternalTransitionStart);
+      window.removeEventListener("builder:layout-transition-end", handleExternalTransitionEnd);
       cancelAnimationFrame(rafId);
       parallaxNodes.forEach((node) => {
         node.style.removeProperty("transform");
         node.style.removeProperty("will-change");
       });
       window.removeEventListener("scroll", requestProgressUpdate);
-      window.removeEventListener("resize", requestProgressUpdate);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
