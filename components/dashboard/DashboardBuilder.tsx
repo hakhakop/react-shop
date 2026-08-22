@@ -171,6 +171,8 @@ import {
   getUikitPanelMediaClass,
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
+  getUikitSvgColor,
+  getUikitSvgColorClass,
   UIKIT_YOOTHEME_BUTTON_VARIANTS,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
@@ -1710,13 +1712,16 @@ function normalizeBuilderState(
               panelHover: block.panelHover ?? hoverPreset !== "none",
               panelSize,
               panelShowMedia: block.panelShowMedia ?? true,
-              panelMediaPlacement: block.panelMediaPlacement === "left" || block.panelMediaPlacement === "right" ? block.panelMediaPlacement : "top",
+              panelMediaPlacement: ["top", "bottom", "left", "right", "between"].includes(block.panelMediaPlacement ?? "")
+                ? block.panelMediaPlacement
+                : "top",
               panelMediaFit: block.imageFit ?? block.panelMediaFit,
-              panelMediaWidth: block.panelMediaWidth === "small" || block.panelMediaWidth === "large" ? block.panelMediaWidth : "medium",
+              panelMediaWidth: ["small", "medium", "large", "1-2", "2-5", "3-5"].includes(block.panelMediaWidth as string) ? block.panelMediaWidth : "medium",
               panelMediaAlignment: (block.imageAlignment ?? block.panelMediaAlignment) === "left" || (block.imageAlignment ?? block.panelMediaAlignment) === "right" ? (block.imageAlignment ?? block.panelMediaAlignment) : "center",
               panelVerticalAlign: block.panelVerticalAlign === "center" || block.panelVerticalAlign === "bottom" ? block.panelVerticalAlign : "top",
-              panelTitleElement: block.panelTitleElement === "h2" || block.panelTitleElement === "h4" || block.panelTitleElement === "div" ? block.panelTitleElement : "h3",
-              panelTitleStyle: block.panelTitleStyle === "h3" || block.panelTitleStyle === "h4" || block.panelTitleStyle === "h5" ? block.panelTitleStyle : "inherit",
+              panelMediaVerticalAlign: block.panelMediaVerticalAlign === "center" || block.panelMediaVerticalAlign === "bottom" ? block.panelMediaVerticalAlign : "top",
+              panelTitleElement: ["h1", "h2", "h3", "h4", "h5", "h6", "div"].includes(block.panelTitleElement as string) ? block.panelTitleElement : "h3",
+              panelTitleStyle: typeof block.panelTitleStyle === "string" && block.panelTitleStyle.length > 0 ? block.panelTitleStyle : "inherit",
               panelContentWidth: block.panelContentWidth === "small" || block.panelContentWidth === "medium" || block.panelContentWidth === "large" || block.panelContentWidth === "full" ? block.panelContentWidth : "auto",
               panelActionVisible: block.panelActionVisible ?? true,
               panelActionStyle: UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(block.panelActionStyle as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number])
@@ -2707,6 +2712,8 @@ export default function DashboardBuilder({
     (event: ReactTransitionEvent<HTMLDivElement>) => {
       if (event.target !== event.currentTarget) return;
       if (event.propertyName !== "grid-template-columns") return;
+      sidebarTransitionUntilRef.current = 0;
+      window.dispatchEvent(new Event("builder:sidebar-transition-end"));
       setSidebarTransitioning(false);
     },
     [],
@@ -3159,14 +3166,24 @@ export default function DashboardBuilder({
       }
       if (frameId === null) frameId = window.requestAnimationFrame(measureWorkspaceSize);
     };
+    const handleSidebarTransitionEnd = () => {
+      sidebarTransitionUntilRef.current = 0;
+      if (finalMeasurementTimer !== null) {
+        window.clearTimeout(finalMeasurementTimer);
+        finalMeasurementTimer = null;
+      }
+      scheduleWorkspaceMeasurement();
+    };
     scheduleWorkspaceMeasurement();
 
     const resizeObserver = new ResizeObserver(scheduleWorkspaceMeasurement);
     resizeObserver.observe(workspace);
     window.addEventListener("resize", scheduleWorkspaceMeasurement);
+    window.addEventListener("builder:sidebar-transition-end", handleSidebarTransitionEnd);
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", scheduleWorkspaceMeasurement);
+      window.removeEventListener("builder:sidebar-transition-end", handleSidebarTransitionEnd);
       if (frameId !== null) window.cancelAnimationFrame(frameId);
       if (finalMeasurementTimer !== null) window.clearTimeout(finalMeasurementTimer);
     };
@@ -3611,13 +3628,23 @@ export default function DashboardBuilder({
     if (!shell) return;
 
     schedulePreviewViewport();
+    const handleSidebarTransitionEnd = () => {
+      sidebarTransitionUntilRef.current = 0;
+      if (sidebarViewportTimerRef.current !== null) {
+        window.clearTimeout(sidebarViewportTimerRef.current);
+        sidebarViewportTimerRef.current = null;
+      }
+      schedulePreviewViewport();
+    };
     const observer = new ResizeObserver(schedulePreviewViewport);
     observer.observe(shell);
     window.addEventListener("resize", schedulePreviewViewport);
+    window.addEventListener("builder:sidebar-transition-end", handleSidebarTransitionEnd);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", schedulePreviewViewport);
+      window.removeEventListener("builder:sidebar-transition-end", handleSidebarTransitionEnd);
       if (previewViewportFrameRef.current !== null) {
         window.cancelAnimationFrame(previewViewportFrameRef.current);
         previewViewportFrameRef.current = null;
@@ -14223,7 +14250,7 @@ function InlineEditableText({
   typography,
   style,
 }: {
-  as: "span" | "em" | "strong" | "p" | "h2" | "h3" | "h4" | "div";
+  as: "span" | "em" | "strong" | "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   area?: TypographyArea;
   value: string;
   className?: string;
@@ -17625,12 +17652,21 @@ const PreviewSection = memo(function PreviewSection({
                             const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.imageFit ?? block.panelMediaFit, alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center", position: (block as any).imagePosition });
                             const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
                             const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+                            const panelSideMedia = panelMediaPlacement === "left" || panelMediaPlacement === "right";
+                            const panelImageLink = block.linkImage ?? ((block.yoothemeSource as any)?.props?.image_link === true || (block.yoothemeSource as any)?.props?.image_link === "true");
+                            const panelMediaVerticalAlign = block.panelMediaVerticalAlign ?? "top";
+                            const panelSvgColorClass = getUikitSvgColorClass(block.imageSvgColor);
+                            const panelSvgColor = getUikitSvgColor(block.imageSvgColor);
+                            const panelSvgAnimateClass = block.imageSvgAnimate === true ? "uk-animation-stroke" : "";
                             const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
                             const panelImageShape = (block as any).imageShape ?? (block as any).imageBorder ?? "none";
                             const panelImageRadius = panelImageShape === "circle" ? "50%" : panelImageShape === "pill" ? "9999px" : panelImageShape === "rounded" ? "6px" : undefined;
                             const panelImageClass = [
                               (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
                               (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
+                              (block as any).imageHoverTransition && (block as any).imageHoverTransition !== "none" ? `uk-transition-${(block as any).imageHoverTransition} uk-transition-opaque` : "",
+                              (block as any).imageTextColor && (block as any).imageTextColor !== "none" ? `uk-text-${(block as any).imageTextColor}` : "",
+                              (block as any).imageInverse === true ? "uk-light" : "",
                             ].filter(Boolean).join(" ");
                             const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
                             const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
@@ -17641,7 +17677,7 @@ const PreviewSection = memo(function PreviewSection({
                               <InlineEditableText
                                 as="span"
                                 area="eyebrow"
-                                className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
+                                className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
                                 typography={block.typography}
                                 style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
                                 value={block.eyebrow}
@@ -17668,27 +17704,32 @@ const PreviewSection = memo(function PreviewSection({
                                     aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
                                     overflow: block.imageUrl && !isPanelImagePlaceholder && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
+                                    backgroundColor: "transparent",
+                                    alignSelf: panelMediaVerticalAlign === "center" ? "center" : panelMediaVerticalAlign === "bottom" ? "end" : "start",
+                                    minHeight: (block as any).imageHeight ? "0" : undefined,
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
-                                    width: panelImageDimension((block as any).imageWidth) ?? "100%",
+                                    width: panelSideMedia ? "100%" : panelImageDimension((block as any).imageWidth) ?? "100%",
                                     maxWidth: typeof (block as any).imageMaxWidth === "number" ? `${(block as any).imageMaxWidth}px` : undefined,
                                     height: panelImageDimension((block as any).imageHeight),
                                     borderRadius: panelImageRadius,
-                                    ...(!isPanelImagePlaceholder
-                                      ? { backgroundImage: `url(${block.imageUrl})` }
-                                      : {}),
                                   }}
                                 >
+                                  {panelImageLink && block.buttonUrl && (
+                                    <a className="shop-builder-panel-image-link" href={block.buttonUrl} {...builderLinkTargetProps(block.buttonTarget)} aria-label={block.imageAlt || block.title || "Open panel image"} />
+                                  )}
                                   {!isPanelImagePlaceholder ? (
                                     <>
                                       {block.imageUrl && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
                                         <UikitStylableSvg
                                           src={block.imageUrl}
                                           alt={block.imageAlt || ""}
+                                          className={`${panelSvgColorClass} ${panelSvgAnimateClass} el-image`.trim()}
+                                          color={panelSvgColorClass ? undefined : panelSvgColor}
                                           loading="eager"
                                           fit={panelMediaPresentation.objectFit === "fill" ? "fill" : panelMediaPresentation.objectFit === "contain" ? "contain" : "cover"}
                                           fallback={<img src={block.imageUrl} alt={block.imageAlt || ""} />}
-                                          style={{ width: panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
+                                          style={{ width: panelSideMedia ? "100%" : panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
                                         />
                                       ) : (
                                         <img
@@ -17756,7 +17797,7 @@ const PreviewSection = memo(function PreviewSection({
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
+                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -17816,7 +17857,7 @@ const PreviewSection = memo(function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
+                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -17836,7 +17877,7 @@ const PreviewSection = memo(function PreviewSection({
                                     (block.typewriterEnabled && !block.title ? (
                                       <DashboardTypog
                                         as="p"
-                                        className="shop-builder-panel-content-text"
+                                        className={`shop-builder-panel-content-text ${getUikitTextClass((block as any).contentStyle)} ${getUikitMarginClass((block as any).contentMarginTop)}`}
                                         area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
@@ -17896,7 +17937,7 @@ const PreviewSection = memo(function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as="p"
-                                        className="shop-builder-panel-content-text"
+                                        className={`shop-builder-panel-content-text ${getUikitTextClass((block as any).contentStyle)} ${getUikitMarginClass((block as any).contentMarginTop)}`}
                                         area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
@@ -17929,7 +17970,7 @@ const PreviewSection = memo(function PreviewSection({
                                         block.buttonGap,
                                       ),
                                       width: "100%",
-                                      justifyContent: "var(--builder-card-button-align, center)",
+                                      justifyContent: "var(--builder-card-button-align, flex-start)",
                                     }}
                                   >
                                     {!panelPresentation.linked && block.panelActionVisible !== false && block.buttonLabel && (

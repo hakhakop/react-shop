@@ -34,9 +34,19 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   // emphasis color. Keep this distinction in the shared panel resolver so a
   // YOOtheme Grid and a standalone Panel cannot diverge.
   if (!role) {
-    const style: Record<string, string> = {};
+    const style: Record<string, string> = {
+      // Default Cards inherit the page's emphasis/text/link palette in
+      // YOOtheme. Do not freeze Circle's dark-surface text to the light-mode
+      // fallback token (`#111827`).
+      "--builder-card-content-color": "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
+      "--builder-card-meta-color": "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
+      "--uk-global-link-color": "var(--uk-global-emphasis-color, inherit)",
+      "--uk-global-link-hover-color": "var(--uk-global-emphasis-color, inherit)",
+      "--uk-button-text-color": "var(--uk-global-emphasis-color, inherit)",
+      "--uk-button-link-color": "var(--uk-global-emphasis-color, inherit)",
+    };
     if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
-      style["--builder-card-title-color"] = "var(--uk-card-default-title, var(--uk-global-emphasis-color, inherit))";
+      style["--builder-card-title-color"] = "var(--uk-global-emphasis-color, var(--uk-card-default-title, inherit))";
     }
     return { className: "", style, metaStyle: {} as Record<string, string> };
   }

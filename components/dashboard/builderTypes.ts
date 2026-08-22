@@ -420,6 +420,11 @@ export type BuilderRow = {
 
 
 export type BuilderLayoutBlock = {
+  /** Original YOOtheme Panel props retained for parity phases beyond import. */
+  yoothemeSource?: {
+    type: "panel";
+    props: Record<string, unknown>;
+  };
   contentTranslations?: BuilderContentTranslations;
   id?: string;
   /** Legacy Advanced aliases retained for existing documents. */
@@ -525,6 +530,8 @@ export type BuilderLayoutBlock = {
   imageSvgColor?: string;
   gridMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   imageLinkUrl?: string;
+  /** YOOtheme Panel image-link toggle; uses the Panel link URL. */
+  linkImage?: boolean;
   imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
   imageCaption?: string;
@@ -545,14 +552,22 @@ export type BuilderLayoutBlock = {
   panelMetaPosition?: "above-title" | "below-title" | "above-content" | "below-content";
   linkPanel?: boolean;
   panelShowMedia?: boolean;
-  panelMediaPlacement?: "top" | "left" | "right";
+  panelMediaPlacement?: "top" | "bottom" | "left" | "right" | "between";
+  panelMediaVerticalAlign?: "top" | "center" | "bottom";
   panelMediaFit?: "natural" | "cover" | "contain" | "fill";
-  panelMediaWidth?: "small" | "medium" | "large";
+  panelMediaWidth?: "small" | "medium" | "large" | "1-2" | "2-5" | "3-5";
   panelMediaAlignment?: "left" | "center" | "right";
   panelTextAlign?: "left" | "center" | "right";
+  /** YOOtheme Panel text presets for meta and body content. */
+  metaStyle?: string;
+  contentStyle?: string;
+  panelMetaHtmlElement?: "div" | "span" | "p";
   panelVerticalAlign?: "top" | "center" | "bottom";
-  panelTitleElement?: "h2" | "h3" | "h4" | "div";
-  panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
+  panelTitleElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
+  panelTitleStyle?: string;
+  titleMarginTop?: string;
+  metaMarginTop?: string;
+  contentMarginTop?: string;
   panelContentWidth?: "auto" | "xsmall" | "small" | "medium" | "large" | "full";
   panelActionVisible?: boolean;
   panelActionStyle?: BuilderButtonStyle;

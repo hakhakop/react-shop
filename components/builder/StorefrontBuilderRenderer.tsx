@@ -115,6 +115,8 @@ import {
   getUikitPanelMediaClass,
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
+  getUikitSvgColor,
+  getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import {
@@ -2178,12 +2180,21 @@ export function ContentLayoutBlock({
     const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.imageFit ?? block.panelMediaFit, alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center", position: (block as any).imagePosition });
     const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
     const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+    const panelSideMedia = panelMediaPlacement === "left" || panelMediaPlacement === "right";
+    const panelImageLink = block.linkImage ?? ((block.yoothemeSource as any)?.props?.image_link === true || (block.yoothemeSource as any)?.props?.image_link === "true");
+    const panelMediaVerticalAlign = block.panelMediaVerticalAlign ?? "top";
+    const panelSvgColorClass = getUikitSvgColorClass(block.imageSvgColor);
+    const panelSvgColor = getUikitSvgColor(block.imageSvgColor);
+    const panelSvgAnimateClass = block.imageSvgAnimate === true ? "uk-animation-stroke" : "";
     const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
     const panelImageShape = (block as any).imageShape ?? (block as any).imageBorder ?? "none";
     const panelImageRadius = panelImageShape === "circle" ? "50%" : panelImageShape === "pill" ? "9999px" : panelImageShape === "rounded" ? "6px" : undefined;
     const panelImageClass = [
       (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
       (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
+      (block as any).imageHoverTransition && (block as any).imageHoverTransition !== "none" ? `uk-transition-${(block as any).imageHoverTransition} uk-transition-opaque` : "",
+      (block as any).imageTextColor && (block as any).imageTextColor !== "none" ? `uk-text-${(block as any).imageTextColor}` : "",
+      (block as any).imageInverse === true ? "uk-light" : "",
     ].filter(Boolean).join(" ");
     const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
     const panelShowMedia = block.panelShowMedia !== false;
@@ -2193,7 +2204,7 @@ export function ContentLayoutBlock({
         as="span"
         area="eyebrow"
         typography={block.typography}
-        className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
+        className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
         style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
       >
         {block.eyebrow}
@@ -2219,23 +2230,30 @@ export function ContentLayoutBlock({
               aspectRatio: panelMediaPresentation.aspectRatio,
               position: "relative",
               overflow: block.imageUrl && /\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? "visible" : "hidden",
+              backgroundColor: "transparent",
+              alignSelf: panelMediaVerticalAlign === "center" ? "center" : panelMediaVerticalAlign === "bottom" ? "end" : "start",
+              minHeight: (block as any).imageHeight ? "0" : undefined,
               backgroundSize: panelMediaPresentation.backgroundSize,
               backgroundPosition: panelMediaPresentation.backgroundPosition,
-              width: panelImageDimension((block as any).imageWidth) ?? "100%",
+              width: panelSideMedia ? "100%" : panelImageDimension((block as any).imageWidth) ?? "100%",
               maxWidth: typeof (block as any).imageMaxWidth === "number" ? `${(block as any).imageMaxWidth}px` : undefined,
               height: panelImageDimension((block as any).imageHeight),
               borderRadius: panelImageRadius,
-              ...(block.imageUrl ? { backgroundImage: `url(${block.imageUrl})` } : {}),
             }}
           >
+            {panelImageLink && block.buttonUrl && (
+              <a className="shop-builder-panel-image-link" href={block.buttonUrl} {...builderLinkTargetProps(block.buttonTarget)} aria-label={block.imageAlt || block.title || "Open panel image"} />
+            )}
             {block.imageUrl && (/\.svg(?:[?#].*)?$/i.test(block.imageUrl) ? (
               <UikitStylableSvg
                 src={block.imageUrl}
                 alt={block.imageAlt || ""}
+                className={`${panelSvgColorClass} ${panelSvgAnimateClass} el-image`.trim()}
+                color={panelSvgColorClass ? undefined : panelSvgColor}
                 loading="lazy"
                 fit={panelMediaPresentation.objectFit === "fill" ? "fill" : panelMediaPresentation.objectFit === "contain" ? "contain" : "cover"}
                 fallback={<img src={block.imageUrl} alt={block.imageAlt || ""} />}
-                style={{ width: panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
+                style={{ width: panelSideMedia ? "100%" : panelImageDimension((block as any).imageWidth) ?? "100%", height: panelImageDimension((block as any).imageHeight) ?? panelImageDimension((block as any).imageWidth) ?? "100%", pointerEvents: "none" }}
               />
             ) : (
               <img
@@ -2253,7 +2271,7 @@ export function ContentLayoutBlock({
           {block.title && (
             <Typog
               as={block.panelTitleElement ?? "h3"}
-              className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
+              className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`}
               area="title"
               typography={undefined}
               style={panelTitleStyle}
@@ -2292,7 +2310,7 @@ export function ContentLayoutBlock({
           {block.body && (
             <Typog
               as="p"
-              className="shop-builder-panel-content-text"
+              className={`shop-builder-panel-content-text ${getUikitTextClass((block as any).contentStyle)} ${getUikitMarginClass((block as any).contentMarginTop)}`}
               area="body"
               typography={block.typography}
               style={panelBodyStyle}

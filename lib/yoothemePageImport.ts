@@ -1801,14 +1801,18 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta", "meta_style",
-      "text_align", "title", "title_element", "panel_style", "panel_padding", "panel_link", "panel_link_hover", "panel_image_no_padding", "height_expand", "panel_expand", "image_align", "image_grid_width",
-      "title_align", "meta_align", "meta_element", "title_margin", "link_margin", "margin", "margin_remove_bottom",
+      "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_link", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta", "meta_style",
+      "text_align", "title", "title_element", "panel_style", "panel_padding", "panel_link", "panel_link_hover", "panel_image_no_padding", "height_expand", "panel_expand", "image_align", "image_grid_width", "image_grid_breakpoint", "image_vertical_align",
+      "title_align", "title_grid_breakpoint", "title_grid_width", "meta_align", "meta_element", "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "panel"),
       kind: "panel",
+      // Preserve the exact source contract for later Panel parity phases.
+      // Canonical fields below remain the current compatibility projection;
+      // this provenance is intentionally inert in the Phase 1 pass.
+      yoothemeSource: { type: "panel", props: { ...props } },
       title: asString(props.title) ?? "",
       eyebrow: asString(props.meta) ?? "",
       body: asString(props.content) ?? "",
@@ -1847,9 +1851,25 @@ const mapStaticElement = (
         ? props.meta_align
         : undefined,
       panelShowMedia: Boolean(props.image),
-      panelMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
-      panelMediaWidth: props.image_grid_width === "1-2" ? "medium" : "large",
-      panelTitleElement: sourceHeadingLevel(props.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
+      panelMediaPlacement: ["top", "bottom", "left", "right", "between"].includes(String(props.image_align))
+        ? props.image_align as "top" | "bottom" | "left" | "right" | "between"
+        : "top",
+      panelMediaWidth: props.image_grid_width === "1-2" || props.image_grid_width === "2-5" || props.image_grid_width === "3-5"
+        ? props.image_grid_width
+        : "large",
+      // YOOtheme's Vertical Alignment control aligns the panel content when
+      // media is placed beside it; it is not the image's object-position.
+      panelVerticalAlign: props.image_vertical_align === true || props.image_vertical_align === "true" ? "center" : "top",
+      panelTitleStyle: sourceHeadingSize(props.title_style) as string | undefined,
+      panelTitleElement: sourceHeadingLevel(props.title_element) as "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | undefined,
+      panelTextAlign: props.text_align === "left" || props.text_align === "center" || props.text_align === "right" ? props.text_align : undefined,
+      metaStyle: asString(props.meta_style) ?? undefined,
+      contentStyle: sourceTextVariant(props.content_style),
+      panelMetaHtmlElement: sourceMetaElement(props.meta_element),
+      titleMarginTop: props.title_margin === "remove" ? "none" : sourceMargin(props.title_margin),
+      metaMarginTop: props.meta_margin === "remove" ? "none" : sourceMargin(props.meta_margin),
+      contentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin),
+      linkImage: sourceBoolean(props.image_link) ?? false,
       ...normalizeYoothemeGridPanelPresentation(props),
     }, props);
   }

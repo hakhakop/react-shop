@@ -328,19 +328,21 @@ export function getUikitCardClass(
   return classes.join(" ");
 }
 
-export type UikitPanelMediaPlacement = "top" | "left" | "right";
+export type UikitPanelMediaPlacement = "top" | "bottom" | "left" | "right" | "between";
 
 export function getUikitPanelMediaClass(
   placement: UikitPanelMediaPlacement = "top",
 ): string {
   if (placement === "left") return "uk-card-media-left";
   if (placement === "right") return "uk-card-media-right";
+  if (placement === "bottom") return "uk-card-media-bottom";
+  if (placement === "between") return "uk-card-media-between";
   return "uk-card-media-top";
 }
 
 export function getUikitPanelLayoutClass(
   placement: UikitPanelMediaPlacement = "top",
-  mediaWidth: "small" | "medium" | "large" = "medium",
+  mediaWidth: "small" | "medium" | "large" | "1-2" | "2-5" | "3-5" = "medium",
 ): string {
   return `shop-builder-panel--media-${placement} shop-builder-panel--media-width-${mediaWidth}`;
 }
@@ -625,7 +627,9 @@ export function getUikitTextClass(variant?: string): string {
   if (v === "muted") return "uk-text-muted";
   if (v === "small" || v === "sm") return "uk-text-small";
   if (v === "large" || v === "lg") return "uk-text-large";
-  if (v === "heading-small") return "uk-heading-small";
+  if (["heading-small", "heading-medium", "heading-large", "heading-xlarge", "heading-2xlarge", "heading-3xlarge"].includes(v)) {
+    return `uk-${v}`;
+  }
   if (/^heading-h[1-6]$/.test(v)) return `uk-${v.slice("heading-".length)}`;
   return "";
 }

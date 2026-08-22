@@ -1589,6 +1589,23 @@ body.dark {
   overflow: hidden;
 }
 
+.shop-builder-column-block--panel.uk-card-default {
+  border: none !important;
+}
+
+.shop-builder-column-block--panel.uk-card-small > .uk-card-body {
+  padding: var(--uk-global-margin, 20px) !important;
+}
+
+.shop-builder-column-block--panel.uk-card-default:not(.uk-card-small):not(.uk-card-large) > .uk-card-body {
+  padding: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-column-block--panel.uk-card-large > .uk-card-body {
+  padding: var(--uk-global-large-gutter, 40px) !important;
+}
+
+
 /* Panel and Grid card media layout styling */
 .shop-builder-column-block--panel.shop-builder-panel--media-left,
 .shop-builder-column-block--panel.shop-builder-panel--media-right,
@@ -1607,6 +1624,9 @@ body.dark {
 .shop-builder-panel--media-width-small { --builder-panel-media-width: 28%; }
 .shop-builder-panel--media-width-medium { --builder-panel-media-width: 36%; }
 .shop-builder-panel--media-width-large { --builder-panel-media-width: 45%; }
+.shop-builder-panel--media-width-1-2 { --builder-panel-media-width: 50%; }
+.shop-builder-panel--media-width-2-5 { --builder-panel-media-width: 40%; }
+.shop-builder-panel--media-width-3-5 { --builder-panel-media-width: 60%; }
 
 .shop-builder-column-block--panel.shop-builder-panel--media-left > .shop-builder-panel-media,
 .shop-builder-column-block--panel.shop-builder-panel--media-right > .shop-builder-panel-media,
@@ -1643,6 +1663,39 @@ body.dark {
   grid-column: 1;
 }
 
+/* YOOtheme's bottom image alignment keeps the card as one vertical stack and
+   places the media after the body.  The source DOM remains media-first so the
+   linked overlay and inspector hooks stay stable. */
+.shop-builder-column-block--panel.shop-builder-panel--media-bottom,
+.shop-builder-grid-card.shop-builder-panel--media-bottom {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-builder-column-block--panel.shop-builder-panel--media-bottom > .uk-card-body,
+.shop-builder-grid-card.shop-builder-panel--media-bottom > .shop-builder-grid-content {
+  order: 1;
+}
+
+.shop-builder-column-block--panel.shop-builder-panel--media-bottom > .shop-builder-panel-media,
+.shop-builder-grid-card.shop-builder-panel--media-bottom > .shop-builder-grid-image {
+  order: 2;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: var(--builder-card-image-ratio, auto);
+  margin: 0;
+  border-radius: 0 0 var(--uk-card-border-radius, var(--builder-card-radius, var(--builder-radius, 8px))) var(--uk-card-border-radius, var(--builder-card-radius, var(--builder-radius, 8px)));
+}
+
+/* Keep the control available for imported documents while allowing a future
+   content-slot renderer to provide the exact between placement. */
+.shop-builder-column-block--panel.shop-builder-panel--media-between,
+.shop-builder-grid-card.shop-builder-panel--media-between {
+  display: flex;
+  flex-direction: column;
+}
+
 .shop-builder-panel-content-width-small > * { max-width: 32rem; }
 .shop-builder-panel-content-width-medium > * { max-width: 42rem; }
 .shop-builder-panel-content-width-large > * { max-width: 56rem; }
@@ -1660,6 +1713,13 @@ body.dark {
   position: absolute;
   inset: 0;
   z-index: 1;
+  border-radius: inherit;
+}
+
+.shop-builder-panel-image-link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   border-radius: inherit;
 }
 
@@ -1704,6 +1764,16 @@ body.dark {
 
 .shop-builder-panel--height-expand {
   min-height: 100%;
+  height: 100%;
+}
+
+/* The Panel control expands against its column's matched height. The
+   element-shell must participate in that height chain; otherwise `100%`
+   resolves against the panel's own intrinsic content height and the toggle
+   appears to do nothing. */
+.shop-builder-element-shell:has(> .shop-builder-panel--height-expand),
+.builder-preview-layout-block.is-panel:has(> .shop-builder-panel--height-expand) {
+  height: 100%;
 }
 .shop-builder-panel--height-expand.shop-builder-panel--media-top {
   display: flex;
@@ -3310,7 +3380,7 @@ body.dark {
 .shop-builder-column-block--panel .shop-builder-buttons {
   width: 100%;
   margin: var(--builder-card-button-margin, 0) 0 0;
-  justify-content: var(--builder-card-button-align, center);
+  justify-content: var(--builder-card-button-align, flex-start);
 }
 
 .shop-builder-column-block--panel.uk-card-none > .uk-card-body > .builder-inline-editable:not(.shop-builder-title) {
@@ -3550,6 +3620,66 @@ body.dark {
 
 .shop-builder-content-layout-card .shop-builder-element-shell.yootheme-imported-spacing {
   margin-bottom: 0 !important;
+}
+
+/* UIkit grid modifiers own horizontal gutters through column padding. Keep
+   the published storefront and Builder projection on the same token path;
+   the content-layout baseline must not add a second fixed 40px gutter. */
+.shop-builder-content-row > .shop-builder-content-layout-card {
+  padding-left: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card {
+  padding-left: 0 !important;
+}
+
+.shop-builder-content-row.uk-grid-small > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-small > .shop-builder-content-layout-card {
+  padding-left: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.shop-builder-content-row.uk-grid-medium > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-medium > .shop-builder-content-layout-card {
+  padding-left: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-content-row.uk-grid-large > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-large > .shop-builder-content-layout-card {
+  padding-left: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+/* UIkit's row modifiers use the same gutter scale for wrapped tracks. */
+.shop-builder-content-row.uk-grid-collapse,
+.shop-builder-content-row.uk-grid-row-collapse {
+  row-gap: 0 !important;
+}
+
+.shop-builder-content-row.uk-grid-small,
+.shop-builder-content-row.uk-grid-row-small {
+  row-gap: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.shop-builder-content-row.uk-grid-medium,
+.shop-builder-content-row.uk-grid-row-medium {
+  row-gap: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-content-row.uk-grid-large,
+.shop-builder-content-row.uk-grid-row-large {
+  row-gap: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+@media (min-width: 1200px) {
+  .shop-builder-content-row.uk-grid-large,
+  .shop-builder-content-row.uk-grid-row-large {
+    row-gap: var(--uk-global-large-gutter, 70px) !important;
+  }
+
+  .shop-builder-content-row.uk-grid-large > .shop-builder-content-layout-card,
+  .shop-builder-content-row.uk-grid-column-large > .shop-builder-content-layout-card {
+    padding-left: var(--uk-global-large-gutter, 70px) !important;
+  }
 }
 
 @media (min-width: 640px) {

@@ -440,7 +440,7 @@ export function ContentSettingsGroup({
   showStyle?: boolean;
   showRole?: boolean;
   defaultStyle?: string;
-  styleOptions?: Array<{ value: string; label: string }>;
+  styleOptions?: ReadonlyArray<{ value: string; label: string }>;
   keys?: {
     role: string;
     align: string;
@@ -583,7 +583,7 @@ export function ImageSettingsGroup({
   /** Source-specific vocabulary for the shared SVG color owner. */
   svgColorOptions?: ReadonlyArray<{ value: string; label: string }>;
   /** Structural Panel media placement remains a Panel owner but is presented in YOOtheme's Image group. */
-  mediaLayout?: { placement: string; width: string };
+  mediaLayout?: { placement: string; width: string; verticalAlign?: string; widthOptions?: ReadonlyArray<{ value: string; label: string }>; alignmentOptions?: readonly string[] };
   keys?: {
     width: string;
     height: string;
@@ -917,7 +917,8 @@ export function ImageSettingsGroup({
             onReset={() => update({ [mediaLayout.placement]: undefined })}
           >
             <InspectorMediaPlacementControl
-              value={(values[mediaLayout.placement] ?? "top") as "top" | "left" | "right"}
+              value={(values[mediaLayout.placement] ?? "top") as string}
+              options={mediaLayout.alignmentOptions}
               onChange={(value) => update({ [mediaLayout.placement]: value })}
               ariaLabel="Panel media alignment"
             />
@@ -930,7 +931,7 @@ export function ImageSettingsGroup({
           >
             <InspectorSelect
               value={String(values[mediaLayout.width] ?? "medium")}
-              options={[
+              options={mediaLayout.widthOptions ?? [
                 { value: "small", label: "Small" },
                 { value: "medium", label: "Medium" },
                 { value: "large", label: "Large" },
@@ -939,6 +940,15 @@ export function ImageSettingsGroup({
               ariaLabel="Panel media grid width"
             />
           </InspectorFieldRow>
+          {mediaLayout.verticalAlign && (
+            <InspectorFieldRow label="Vertical alignment">
+              <InspectorSwitch
+                checked={values[mediaLayout.verticalAlign] === "center"}
+                onChange={(checked) => update({ [mediaLayout.verticalAlign!]: checked ? "center" : "top" })}
+                label="Center"
+              />
+            </InspectorFieldRow>
+          )}
         </>
       )}
 

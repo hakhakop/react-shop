@@ -177,6 +177,14 @@ type ParallaxRuntime = {
   scrollElement: HTMLElement;
   target: HTMLElement;
   geometry?: ParallaxGeometry;
+  applied: AppliedParallaxStyle;
+};
+
+type AppliedParallaxStyle = {
+  transform?: string;
+  opacity?: string;
+  filter?: string;
+  willChange?: string;
 };
 
 type ParallaxGeometry = {
@@ -411,10 +419,16 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         if (!runtime) {
           const parallax = parseParallaxNode(node);
           if (!parallax) return;
+          const willChange = "transform";
+          const applied: AppliedParallaxStyle = { willChange };
+          if (node.style.willChange !== willChange) {
+            node.style.willChange = willChange;
+          }
           runtime = {
             parallax,
             scrollElement: parallaxScrollParent(node),
             target: resolveParallaxTarget(node, parallax.target),
+            applied,
           };
           parallaxRuntime.set(node, runtime);
         }
@@ -487,16 +501,36 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         });
       });
       writes.forEach(({ node, clear, transform, opacity, filter, origin, zIndex }) => {
+        const applied = parallaxRuntime.get(node)?.applied;
+        if (!applied) return;
         if (clear) {
-          node.style.removeProperty("transform");
-          node.style.removeProperty("opacity");
-          node.style.removeProperty("filter");
+          if (applied.transform !== undefined) {
+            node.style.removeProperty("transform");
+            applied.transform = undefined;
+          }
+          if (applied.opacity !== undefined) {
+            node.style.removeProperty("opacity");
+            applied.opacity = undefined;
+          }
+          if (applied.filter !== undefined) {
+            node.style.removeProperty("filter");
+            applied.filter = undefined;
+          }
           return;
         }
-        node.style.willChange = "transform";
-        node.style.transform = transform ?? "";
-        if (opacity !== undefined) node.style.opacity = opacity;
-        if (filter !== undefined) node.style.filter = filter;
+        const nextTransform = transform ?? "";
+        if (applied.transform !== nextTransform) {
+          node.style.transform = nextTransform;
+          applied.transform = nextTransform;
+        }
+        if (opacity !== undefined && applied.opacity !== opacity) {
+          node.style.opacity = opacity;
+          applied.opacity = opacity;
+        }
+        if (filter !== undefined && applied.filter !== filter) {
+          node.style.filter = filter;
+          applied.filter = filter;
+        }
         if (origin !== undefined) node.style.transformOrigin = origin;
         if (zIndex !== undefined) node.style.zIndex = zIndex;
       });

@@ -191,6 +191,12 @@ export function getUikitGlobalsCssVars(
     "--uk-grid-gutter-small": value("gridGutterSmall", "15px"),
     "--uk-grid-gutter-medium": value("gridGutterMedium", value("gridGutterDefault", "30px")),
     "--uk-grid-gutter-large": value("gridGutterLarge", "40px"),
+    // UIkit component spacing aliases used by Card/Panel tokens. These stay
+    // tenant-provided rather than baking one theme's numeric gutters into
+    // shared component CSS.
+    "--uk-global-gutter": value("gridGutterDefault", "30px"),
+    "--uk-global-medium-gutter": value("gridGutterMedium", value("gridGutterDefault", "30px")),
+    "--uk-global-large-gutter": value("gridGutterLarge", "40px"),
 
     // Colors & Surfaces
     "--uk-global-primary-color": primary,

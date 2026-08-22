@@ -1,6 +1,9 @@
 import type { CSSProperties } from "react";
 
-import { resolveBuilderSpacing } from "@/lib/builderSpacing";
+import {
+  resolveBuilderSpacing,
+  resolveBuilderSpacingCssValue,
+} from "@/lib/builderSpacing";
 import { visualStyleToCss } from "@/lib/builderVisualStyle";
 
 export type BuilderRowStyleInput = {
@@ -154,6 +157,27 @@ export function resolveBuilderRowGap(
       previousRow.rowBottomMargin !== "inherit");
   if (ownsBoundaryWithMargin) {
     return resolveBuilderSpacing("none", "rowGap");
+  }
+  // UIkit's row modifiers use the imported gutter values, not the generic
+  // Builder spacing scale (32/64/96px). Keep the inter-row boundary in the
+  // same contract as the rendered uk-grid-row-* modifier.
+  const rawValue = row?.rowGap && row.rowGap !== "inherit"
+    ? row.rowGap
+    : globalRowGap;
+  const value = rawValue?.trim().toLowerCase();
+  if (value === "small") {
+    return resolveBuilderSpacingCssValue("15px", "rowGap", "Local", value);
+  }
+  if (value === "medium") {
+    return resolveBuilderSpacingCssValue("30px", "rowGap", "Local", value);
+  }
+  if (value === "large") {
+    return resolveBuilderSpacingCssValue(
+      "var(--builder-yootheme-row-gap-large, 40px)",
+      "rowGap",
+      "Local",
+      value,
+    );
   }
   return resolveBuilderSpacing(
     row?.rowGap ?? "inherit",

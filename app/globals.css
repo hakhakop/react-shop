@@ -1766,6 +1766,25 @@ a {
 .shop-builder-main .uk-button-text:hover:not(:disabled)::after {
   background-position: 100% 50%;
 }
+
+/* Panel text actions inherit their semantic card/link color.  The global
+ * UIkit arrow is a pre-colored SVG (and therefore stayed pink on inverse
+ * panels); use the same canonical shape as a mask so the arrow follows the
+ * action's computed color in both Builder and storefront. */
+.shop-builder-main .shop-builder-panel-action.uk-button-text::after {
+  background-image: none;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='20' height='11' viewBox='0 0 20 11' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline fill='none' stroke='white' stroke-width='1.2' points='13 1 18 5.5 13 10'/%3E%3Cline fill='none' stroke='white' stroke-width='1.2' x1='0' y1='5.5' x2='18.4' y2='5.5'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='20' height='11' viewBox='0 0 20 11' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline fill='none' stroke='white' stroke-width='1.2' points='13 1 18 5.5 13 10'/%3E%3Cline fill='none' stroke='white' stroke-width='1.2' x1='0' y1='5.5' x2='18.4' y2='5.5'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: calc(100% - 5px) 50%;
+  mask-position: calc(100% - 5px) 50%;
+}
+.shop-builder-main .shop-builder-panel-action.uk-button-text:hover:not(:disabled)::after {
+  -webkit-mask-position: 100% 50%;
+  mask-position: 100% 50%;
+}
 .shop-builder-main .uk-button-text:hover {
   color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)) !important;
 }

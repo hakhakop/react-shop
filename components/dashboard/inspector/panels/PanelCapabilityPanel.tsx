@@ -2,7 +2,6 @@
 
 import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import { InspectorFieldRow, InspectorTextField, InspectorTextarea, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import {
@@ -13,6 +12,7 @@ import {
   MetaSettingsGroup,
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import { UIKIT_YOOTHEME_SVG_COLOR_OPTIONS } from "@/lib/uikitTokens";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -41,10 +41,39 @@ const legacyPanelFields = {
 const selectOptions = <T extends string>(values: readonly T[], labels?: Partial<Record<T, string>>) =>
   values.map((value) => ({ value, label: labels?.[value] ?? value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
+const PANEL_TEXT_STYLE_OPTIONS = [
+  { value: "inherit", label: "None" },
+  { value: "text-meta", label: "Text Meta" },
+  { value: "text-lead", label: "Text Lead" },
+  { value: "text-small", label: "Text Small" },
+  { value: "text-large", label: "Text Large" },
+  { value: "heading-3xlarge", label: "Heading 3X-Large" },
+  { value: "heading-2xlarge", label: "Heading 2X-Large" },
+  { value: "heading-xlarge", label: "Heading X-Large" },
+  { value: "heading-large", label: "Heading Large" },
+  { value: "heading-medium", label: "Heading Medium" },
+  { value: "heading-small", label: "Heading Small" },
+  { value: "heading-h1", label: "Heading H1" },
+  { value: "heading-h2", label: "Heading H2" },
+  { value: "heading-h3", label: "Heading H3" },
+  { value: "heading-h4", label: "Heading H4" },
+  { value: "heading-h5", label: "Heading H5" },
+  { value: "heading-h6", label: "Heading H6" },
+  { value: "link", label: "Link" },
+];
+
+const PANEL_HTML_ELEMENT_OPTIONS = ["h1", "h2", "h3", "h4", "h5", "h6", "div"];
+
 export default function PanelCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => update({ ...legacyPanelFields, ...patch });
-  const properties = UIKIT_PANEL_CAPABILITY.properties;
-
+  const dimensionValue = (value: unknown) => {
+    const normalized = String(value ?? "").trim();
+    return normalized.replace(/px$/i, "");
+  };
+  const updateDimension = (key: "imageWidth" | "imageHeight", value: string) => {
+    const normalized = value.trim();
+    updateSemantic({ [key]: !normalized || normalized === "auto" ? undefined : /^\d+(?:\.\d+)?$/.test(normalized) ? `${normalized}px` : normalized });
+  };
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="panel-content">
@@ -66,9 +95,38 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Alt text" dynamicBinding={inspectorDynamicBinding(block, update, "imageAlt")}><InspectorTextField value={block.imageAlt ?? ""} onChange={(value) => updateSemantic({ imageAlt: value })} ariaLabel="Panel image alt text" /></InspectorFieldRow>
+          <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <InspectorFieldRow label="Width" isOverridden={block.imageWidth !== undefined} inheritedValueText="auto" onReset={() => updateSemantic({ imageWidth: undefined })}>
+              <InspectorTextField value={dimensionValue(block.imageWidth)} placeholder="auto" onChange={(value) => updateDimension("imageWidth", value)} ariaLabel="Panel image width" />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Height" isOverridden={block.imageHeight !== undefined} inheritedValueText="auto" onReset={() => updateSemantic({ imageHeight: undefined })}>
+              <InspectorTextField value={dimensionValue(block.imageHeight)} placeholder="auto" onChange={(value) => updateDimension("imageHeight", value)} ariaLabel="Panel image height" />
+            </InspectorFieldRow>
+          </div>
           <InspectorFieldRow label="Meta" dynamicBinding={inspectorDynamicBinding(block, update, "eyebrow")}><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => updateSemantic({ eyebrow: value })} ariaLabel="Panel meta" /></InspectorFieldRow>
           <InspectorFieldRow label="Title" dynamicBinding={inspectorDynamicBinding(block, update, "title")}><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
           <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}><InspectorTextarea value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} ariaLabel="Panel content" /></InspectorFieldRow>
+          <ActionSettingsGroup
+            block={block}
+            update={updateSemantic}
+            title="LINK"
+            terminology="link"
+            showFullWidth
+            showMargin
+            keys={{
+              visible: "panelActionVisible",
+              label: "buttonLabel",
+              url: "buttonUrl",
+              target: "buttonTarget",
+              style: "panelActionStyle",
+              size: "panelActionSize",
+              width: "fullWidthButton",
+              margin: "linkMarginTop",
+            }}
+            dynamicContext={block.dynamicContext}
+            dynamicBindings={block.dynamicBindings}
+            onDynamicBindingChange={inspectorDynamicBinding(block, update, "buttonLabel").onChange}
+          />
         </section>
       </div>
     );
@@ -113,21 +171,26 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           keys={{ role: "titleTypographyRole", size: "panelTitleStyle", align: "panelTextAlign", level: "panelTitleElement" }}
           defaultSize="inherit"
           defaultLevel="h3"
-          visualPresetOptions={selectOptions(properties.titleStyle.values, { inherit: "Inherit", h3: "Heading H3", h4: "Heading H4", h5: "Heading H5" })}
+          visualPresetOptions={PANEL_TEXT_STYLE_OPTIONS}
         />
         <MetaSettingsGroup
           block={block}
           update={updateSemantic}
           showAlignment={false}
-          showHtmlElement={false}
+          showStyle
+          showHtmlElement
           showPosition
           positionLabel="Alignment"
+          styleOptions={PANEL_TEXT_STYLE_OPTIONS.filter(({ value }) => value !== "inherit").map((option) => option)}
+          htmlElementOptions={PANEL_HTML_ELEMENT_OPTIONS}
           keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement", position: "panelMetaPosition" }}
         />
         <ContentSettingsGroup
           block={block}
           update={updateSemantic}
           showAlignment={false}
+          showStyle
+          styleOptions={PANEL_TEXT_STYLE_OPTIONS}
           keys={{ role: "contentTypographyRole", align: "panelTextAlign" }}
         />
         <ImageSettingsGroup
@@ -136,33 +199,33 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           showDimensions={false}
           showFrameControls={false}
           showAlignment={false}
-          mediaLayout={{ placement: "panelMediaPlacement", width: "panelMediaWidth" }}
+          loadingCheckbox
+          showLinkImage
+          showTransition
+          showHoverShadow
+          showInverse
+          showSvgControls
+          showSvgAnimate
+          showSvgColorWhenInlineDisabled
+          svgColorLabel="SVG Color"
+          svgColorOptions={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS}
+          showTextColor
+          mediaLayout={{
+            placement: "panelMediaPlacement",
+            width: "panelMediaWidth",
+            verticalAlign: "panelVerticalAlign",
+            alignmentOptions: ["top", "bottom", "left", "right", "between"],
+            widthOptions: [
+              { value: "2-5", label: "40%" },
+              { value: "1-2", label: "50%" },
+              { value: "3-5", label: "60%" },
+            ],
+          }}
           keys={{
             width: "imageWidth", height: "imageHeight", ratio: "imageRatio", fit: "imageFit",
             loading: "imageLoading", shape: "imageShape", shadow: "imageShadow",
             decoration: "imageBoxDecoration", align: "imageAlignment",
           }}
-        />
-        <ActionSettingsGroup
-          block={block}
-          update={updateSemantic}
-          title="LINK"
-          terminology="link"
-          showFullWidth
-          showMargin
-          keys={{
-            visible: "panelActionVisible",
-            label: "buttonLabel",
-            url: "buttonUrl",
-            target: "buttonTarget",
-            style: "panelActionStyle",
-            size: "panelActionSize",
-            width: "fullWidthButton",
-            margin: "linkMarginTop",
-          }}
-          dynamicContext={block.dynamicContext}
-          dynamicBindings={block.dynamicBindings}
-          onDynamicBindingChange={inspectorDynamicBinding(block, update, "buttonLabel").onChange}
         />
       </div>
     );

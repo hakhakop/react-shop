@@ -68,11 +68,28 @@ function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
         id: column.id,
         rowId: row.id,
         rowLayout: row.layout,
+        responsiveWidths: column.responsiveWidths,
         blocks: column.elements,
       })),
     }));
   }
   return getBuilderLayoutRows(section, section.layoutItems ?? []);
+}
+
+function wireframeLayout(row: BuilderLayoutRow, fallback: number[]) {
+  const mediumWidths = row.items.map((item) =>
+    item.responsiveWidths?.medium ??
+    item.columnWidthMedium ??
+    item.widthMedium ??
+    item.width_medium,
+  );
+  if (
+    mediumWidths.length > 1 &&
+    mediumWidths.every((width: string | undefined) => width === "1-1" || width === "full")
+  ) {
+    return { ratios: mediumWidths.map(() => 1), stacked: true };
+  }
+  return { ratios: fallback, stacked: false };
 }
 
 function structureKey(target: BuilderHoverTarget | null | undefined) {
@@ -171,27 +188,28 @@ function sameColumn(a: Readonly<{ item: NonNullable<BuilderSection["layoutItems"
   return a.item === b.item && a.index === b.index && a.flatIndex === b.flatIndex && a.ratio === b.ratio && a.totalRatio === b.totalRatio && a.actions === b.actions && selected(a) === selected(b) && hovered(a) === hovered(b);
 }
 
-const WireframeColumn = memo(function WireframeColumn({ sectionId, item, index, flatIndex, ratio, totalRatio, selectedColumnKey, selectedBlockKey, hoveredColumnKey, hoveredBlockKey, actions }: {
+const WireframeColumn = memo(function WireframeColumn({ sectionId, item, index, flatIndex, ratio, totalRatio, stacked, selectedColumnKey, selectedBlockKey, hoveredColumnKey, hoveredBlockKey, actions }: {
   sectionId: string; item: NonNullable<BuilderSection["layoutItems"]>[number]; index: number; flatIndex: number; ratio: number; totalRatio: number;
+  stacked: boolean;
   selectedColumnKey: string | null; selectedBlockKey: string | null; hoveredColumnKey: string | null; hoveredBlockKey: string | null; actions: BuilderWireframeActions;
 }) {
   const columnKey = item.id ?? `layout-item-${flatIndex}`;
   const selected = selectedColumnKey === columnKey && !selectedBlockKey;
   const hovered = hoveredColumnKey === columnKey && !hoveredBlockKey;
   const blocks = item.blocks ?? [];
-  const pct = totalRatio ? Math.round((ratio / totalRatio) * 100) : 100;
+  const pct = stacked ? 100 : totalRatio ? Math.round((ratio / totalRatio) * 100) : 100;
   const nested = item.nestedLayout;
-  return <div className={`builder-wireframe-column${selected ? " is-selected" : ""}`} style={{ flex: `${ratio} ${ratio} 0%`, minWidth: 0 }}>
+  return <div className={`builder-wireframe-column${selected ? " is-selected" : ""}`} style={{ flex: stacked ? "1 1 100%" : `${ratio} ${ratio} 0%`, minWidth: 0 }}>
     <button type="button" className={`builder-wireframe-item builder-wireframe-item--column${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
       data-structure-key={`column:${sectionId}:${columnKey}`} onMouseEnter={() => actions.hover?.({ type: "column", sectionId, columnKey })} onMouseLeave={() => actions.hover?.(null)} onClick={() => actions.selectColumn(sectionId, columnKey)} role="treeitem" aria-selected={selected}>
       <GripVertical size={11} className="builder-wireframe-grip" /><Columns3 size={13} className="builder-wireframe-icon builder-wireframe-icon--column" />
       <span className="builder-wireframe-label-wrap" title={`${item.title || item.eyebrow || `Column ${index + 1}`} (Column ${index + 1})`}><strong>{item.title || `Col ${index + 1}`}</strong></span>
       <span className="builder-wireframe-meta"><span className="builder-wireframe-badge builder-wireframe-badge--column-pct">{pct}%</span><em className="builder-wireframe-count">{nested ? nested.rows.reduce((n, row) => n + row.columns.reduce((sum, column) => sum + column.blocks.length, 0), 0) : blocks.length}</em></span>
     </button>
-    {nested ? <div className="builder-wireframe-children builder-wireframe-children--blocks builder-wireframe-nested-layout">{nested.rows.map((row, rowIndex) => <div key={row.id} className="builder-wireframe-nested-row"><span className="builder-wireframe-nested-row-label">Nested row {rowIndex + 1}</span>{row.columns.map((column, columnIndex) => <WireframeColumn key={column.id} sectionId={sectionId} item={column as NonNullable<BuilderSection["layoutItems"]>[number]} index={columnIndex} flatIndex={columnIndex} ratio={1} totalRatio={row.columns.length} selectedColumnKey={selectedColumnKey} selectedBlockKey={selectedBlockKey} hoveredColumnKey={hoveredColumnKey} hoveredBlockKey={hoveredBlockKey} actions={actions} />)}</div>)}</div> :
+    {nested ? <div className="builder-wireframe-children builder-wireframe-children--blocks builder-wireframe-nested-layout">{nested.rows.map((row, rowIndex) => <div key={row.id} className="builder-wireframe-nested-row"><span className="builder-wireframe-nested-row-label">Nested row {rowIndex + 1}</span>{row.columns.map((column, columnIndex) => <WireframeColumn key={column.id} sectionId={sectionId} item={column as NonNullable<BuilderSection["layoutItems"]>[number]} index={columnIndex} flatIndex={columnIndex} ratio={1} totalRatio={row.columns.length} stacked={false} selectedColumnKey={selectedColumnKey} selectedBlockKey={selectedBlockKey} hoveredColumnKey={hoveredColumnKey} hoveredBlockKey={hoveredBlockKey} actions={actions} />)}</div>)}</div> :
       <div className="builder-wireframe-children builder-wireframe-children--blocks">{blocks.length === 0 ? <button type="button" className="builder-wireframe-item builder-wireframe-item--empty-compact" onClick={() => { actions.selectColumn(sectionId, columnKey); actions.openElements?.(); }} title="Add an element to this column."><Plus size={11} /><span className="builder-wireframe-empty-label">Add element</span></button> : blocks.map((block, blockIndex) => <WireframeBlock key={block.id ?? `${columnKey}-block-${blockIndex}`} sectionId={sectionId} columnKey={columnKey} block={block} index={blockIndex} count={blocks.length} selected={selectedColumnKey === columnKey && selectedBlockKey === (block.id ?? `${columnKey}-block-${blockIndex}`)} hovered={hoveredBlockKey === `${columnKey}:${block.id ?? `${columnKey}-block-${blockIndex}`}`} actions={actions} />)}</div>}
   </div>;
-}, sameColumn);
+}, (a, b) => sameColumn(a, b) && a.stacked === b.stacked);
 
 function sameRow(a: Readonly<{ row: BuilderLayoutRow; index: number; selected: boolean; hovered: boolean; selectedColumnKey: string | null; selectedBlockKey: string | null; hoveredColumnKey: string | null; hoveredBlockKey: string | null; collapsed: boolean; onToggle: (key: string) => void; actions: BuilderWireframeActions }>, b: Readonly<{ row: BuilderLayoutRow; index: number; selected: boolean; hovered: boolean; selectedColumnKey: string | null; selectedBlockKey: string | null; hoveredColumnKey: string | null; hoveredBlockKey: string | null; collapsed: boolean; onToggle: (key: string) => void; actions: BuilderWireframeActions }>) {
   return a.index === b.index && a.collapsed === b.collapsed && a.selected === b.selected && a.hovered === b.hovered && a.selectedColumnKey === b.selectedColumnKey && a.selectedBlockKey === b.selectedBlockKey && a.hoveredColumnKey === b.hoveredColumnKey && a.hoveredBlockKey === b.hoveredBlockKey && a.onToggle === b.onToggle && a.actions === b.actions && a.row.id === b.row.id && a.row.layoutKey === b.row.layoutKey && a.row.startIndex === b.row.startIndex && a.row.items.length === b.row.items.length && a.row.items.every((item, index) => item === b.row.items[index]);
@@ -201,15 +219,15 @@ const WireframeRow = memo(function WireframeRow({ sectionId, row, index, collaps
   sectionId: string; row: BuilderLayoutRow; index: number; collapsed: boolean; selected: boolean; hovered: boolean;
   selectedColumnKey: string | null; selectedBlockKey: string | null; hoveredColumnKey: string | null; hoveredBlockKey: string | null; onToggle: (key: string) => void; actions: BuilderWireframeActions;
 }) {
-  const rowKey = `${sectionId}:${index}`; const preset = getBuilderRowLayoutPreset(row.layoutKey); const totalRatio = preset.ratios.reduce((a, b) => a + b, 0);
+  const rowKey = `${sectionId}:${index}`; const preset = getBuilderRowLayoutPreset(row.layoutKey); const { ratios, stacked } = wireframeLayout(row, preset.ratios); const totalRatio = ratios.reduce((a, b) => a + b, 0);
   const empty = row.items.every((item) => !layoutColumnHasContent(item as NonNullable<BuilderSection["layoutItems"]>[number]));
   return <div className={`builder-wireframe-row${selected ? " is-selected" : ""}`}>
     <div className="builder-wireframe-rowline"><button type="button" className={`builder-wireframe-toggle${collapsed ? "" : " is-expanded"}`} onClick={() => onToggle(rowKey)} aria-label={collapsed ? "Expand row" : "Collapse row"}><ChevronRight size={13} /></button>
       <div className={`builder-wireframe-item builder-wireframe-item--row${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`} data-structure-key={`row:${sectionId}:${index}`} onMouseEnter={() => actions.hover?.({ type: "row", sectionId, rowIndex: index })} onMouseLeave={() => actions.hover?.(null)} onClick={() => actions.selectRow(sectionId, index)} role="treeitem" tabIndex={0} aria-selected={selected}>
-        <GripVertical size={11} className="builder-wireframe-grip" /><Rows3 size={13} className="builder-wireframe-icon builder-wireframe-icon--row" /><span className="builder-wireframe-label-wrap"><div className="builder-wireframe-row-label-row"><strong>Row {index + 1}</strong><div className="builder-wireframe-row-preview" aria-hidden="true">{preset.ratios.map((ratio, i) => <div key={i} style={{ flexGrow: ratio }} className="builder-wireframe-row-preview-col" />)}</div></div><small>{preset.label || `${row.items.length} columns`}</small></span>
+        <GripVertical size={11} className="builder-wireframe-grip" /><Rows3 size={13} className="builder-wireframe-icon builder-wireframe-icon--row" /><span className="builder-wireframe-label-wrap"><div className="builder-wireframe-row-label-row"><strong>Row {index + 1}</strong><div className={`builder-wireframe-row-preview${stacked ? " is-stacked" : ""}`} aria-hidden="true">{ratios.map((ratio, i) => <div key={i} style={{ flexGrow: ratio }} className="builder-wireframe-row-preview-col" />)}</div></div><small>{stacked ? "Stacked" : preset.label || `${row.items.length} columns`}</small></span>
         <span className="builder-wireframe-meta"><span className="builder-wireframe-badge builder-wireframe-badge--row">ROW</span><div className="builder-wireframe-actions"><button type="button" className="builder-wireframe-action-btn builder-wireframe-action-btn--settings" onClick={(e) => { e.stopPropagation(); actions.selectRow(sectionId, index); }} title="Open row settings"><Pencil size={10} /></button>{actions.moveRow && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveRow?.(sectionId, index, -1); }} disabled={index === 0} title="Move row up"><ChevronUp size={11} /></button>}{actions.moveRow && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveRow?.(sectionId, index, 1); }} title="Move row down"><ChevronDown size={11} /></button>}{actions.duplicateRow && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.duplicateRow?.(sectionId, index); }} title="Duplicate row"><Copy size={10} /></button>}{actions.deleteRow && <button type="button" className="builder-wireframe-action-btn builder-wireframe-action-btn--danger" onClick={(e) => { e.stopPropagation(); if (empty) actions.deleteRow?.(sectionId, index); }} disabled={!empty} title={empty ? "Delete empty row" : "Remove elements before deleting this row"}><Trash2 size={10} /></button>}</div></span>
       </div></div>
-    {!collapsed && <div className="builder-wireframe-children builder-wireframe-children--columns">{row.items.map((item, columnIndex) => <WireframeColumn key={item.id ?? `layout-item-${row.startIndex + columnIndex}`} sectionId={sectionId} item={item as NonNullable<BuilderSection["layoutItems"]>[number]} index={columnIndex} flatIndex={row.startIndex + columnIndex} ratio={preset.ratios[columnIndex] ?? 1} totalRatio={totalRatio} selectedColumnKey={selectedColumnKey} selectedBlockKey={selectedBlockKey} hoveredColumnKey={hoveredColumnKey} hoveredBlockKey={hoveredBlockKey} actions={actions} />)}</div>}
+    {!collapsed && <div className={`builder-wireframe-children builder-wireframe-children--columns${stacked ? " is-stacked" : ""}`}>{row.items.map((item, columnIndex) => <WireframeColumn key={item.id ?? `layout-item-${row.startIndex + columnIndex}`} sectionId={sectionId} item={item as NonNullable<BuilderSection["layoutItems"]>[number]} index={columnIndex} flatIndex={row.startIndex + columnIndex} ratio={ratios[columnIndex] ?? 1} totalRatio={totalRatio} stacked={stacked} selectedColumnKey={selectedColumnKey} selectedBlockKey={selectedBlockKey} hoveredColumnKey={hoveredColumnKey} hoveredBlockKey={hoveredBlockKey} actions={actions} />)}</div>}
   </div>;
 }, sameRow);
 
@@ -240,8 +258,8 @@ const WireframeSection = memo(function WireframeSection({ section, index, total,
   return <div className={`builder-wireframe-section${selected ? " is-selected" : ""}`} data-structure-has-selected-descendant={hasSelectedDescendant || undefined} data-structure-has-hovered-descendant={hasHoveredDescendant || undefined}>
     <div className="builder-wireframe-rowline"><button type="button" className={`builder-wireframe-toggle${collapsed ? "" : " is-expanded"}`} onClick={() => onToggle(section.id)} aria-label={collapsed ? "Expand section" : "Collapse section"}><ChevronRight size={13} /></button>
       <div className={`builder-wireframe-item builder-wireframe-item--section${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`} data-structure-key={`section:${section.id}`} onMouseEnter={() => actions.hover?.({ type: "section", sectionId: section.id })} onMouseLeave={() => actions.hover?.(null)} onClick={() => actions.selectSection(section.id)} onDoubleClick={(e) => { e.stopPropagation(); onStartRename(section); }} role="treeitem" tabIndex={0} aria-selected={selected}>
-        {!header && <GripVertical size={11} className="builder-wireframe-grip" />}<Layers3 size={13} className="builder-wireframe-icon builder-wireframe-icon--section" />
-        {editing ? <input className="builder-wireframe-rename-input" value={renameDraft} onChange={(e) => onRenameDraft(e.target.value)} onBlur={() => onFinishRename(section.id, true)} onKeyDown={(e) => { if (e.key === "Enter") onFinishRename(section.id, true); if (e.key === "Escape") onFinishRename(section.id, false); }} aria-label="Section name" /> : <span className="builder-wireframe-label-wrap"><strong>{section.name || section.title || sectionLabels[section.kind] || `Section ${index + 1}`}</strong><small>{header ? "Header" : "Section"}</small></span>}
+        <Layers3 size={13} className="builder-wireframe-icon builder-wireframe-icon--section" />
+        {editing ? <input className="builder-wireframe-rename-input" value={renameDraft} onChange={(e) => onRenameDraft(e.target.value)} onBlur={() => onFinishRename(section.id, true)} onKeyDown={(e) => { if (e.key === "Enter") onFinishRename(section.id, true); if (e.key === "Escape") onFinishRename(section.id, false); }} aria-label="Section name" /> : <span className="builder-wireframe-label-wrap" style={{ flexDirection: "row", alignItems: "center" }}><strong>{section.name || section.title || sectionLabels[section.kind] || `Section ${index + 1}`}</strong></span>}
         {!section.visible && <em className="builder-wireframe-hidden-tag">Hidden</em>}<span className="builder-wireframe-meta"><span className="builder-wireframe-badge builder-wireframe-badge--section">{header ? "HDR" : "SEC"}</span>{!header && <div className="builder-wireframe-actions"><button type="button" className="builder-wireframe-action-btn builder-wireframe-action-btn--settings" onClick={(e) => { e.stopPropagation(); actions.selectSection(section.id); }} title="Open section settings"><Settings2 size={10} /></button>{actions.renameSection && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); onStartRename(section); }} title="Rename section"><Type size={10} /></button>}{actions.moveSection && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveSection?.(section.id, -1); }} disabled={index === 0} title="Move section up"><ChevronUp size={11} /></button>}{actions.moveSection && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.moveSection?.(section.id, 1); }} disabled={index === total - 1} title="Move section down"><ChevronDown size={11} /></button>}{actions.duplicateSection && <button type="button" className="builder-wireframe-action-btn" onClick={(e) => { e.stopPropagation(); actions.duplicateSection?.(section.id); }} title="Duplicate section"><Copy size={10} /></button>}{actions.deleteSection && <button type="button" className="builder-wireframe-action-btn builder-wireframe-action-btn--danger" onClick={(e) => { e.stopPropagation(); actions.deleteSection?.(section.id); }} title="Delete section"><Trash2 size={10} /></button>}</div>}</span>
       </div></div>
     {!collapsed && <div className="builder-wireframe-children">{rows.length === 0 ? <div className="builder-wireframe-empty-row-actions"><button type="button" className="builder-wireframe-item builder-wireframe-item--empty" onClick={() => actions.selectSection(section.id)}><Square size={12} className="builder-wireframe-icon" /><span className="builder-wireframe-label-wrap"><strong>No rows</strong><small>Section settings</small></span></button>{actions.addRow ? <button type="button" className="builder-wireframe-add-section is-empty" onClick={() => actions.addRow?.(section.id, 0, "1-col")}><Plus size={13} /> Add first row</button> : null}</div> : rows.map((row, rowIndex) => {

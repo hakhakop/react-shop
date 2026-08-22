@@ -2161,6 +2161,15 @@ body:has(.builder-dashboard) .site-header--service {
   transition: background 0.15s ease;
 }
 
+.builder-wireframe-row-preview.is-stacked {
+  flex-direction: column;
+}
+
+.builder-wireframe-row-preview.is-stacked .builder-wireframe-row-preview-col {
+  width: 100%;
+  min-height: 2px;
+}
+
 .builder-wireframe-item--row:hover .builder-wireframe-row-preview-col {
   background: rgba(52, 211, 153, 0.55);
 }
@@ -2638,6 +2647,10 @@ body:has(.builder-dashboard) .site-header--service {
   border-left: none;
   width: 100%;
   box-sizing: border-box;
+}
+
+.builder-wireframe-children--columns.is-stacked {
+  flex-direction: column;
 }
 
 .builder-wireframe-children--blocks {
@@ -13187,7 +13200,7 @@ article.is-selected-column > .builder-preview-box-spacing,
   min-width: 0 !important;
   overflow: hidden !important;
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: column;
 }
 
 .builder-dashboard .builder-wireframe-label-wrap strong,
@@ -15937,13 +15950,17 @@ body:has([data-scoped-builder-root])
   pointer-events: none !important;
 }
 
-/* Ensure row layout uses a clean 12-column CSS grid with 20px horizontal gap between columns */
+/* Keep the editor grid geometry equivalent to UIkit's gutter modifiers. The
+   preview uses CSS grid for its interaction surface, so the published UIkit
+   flex-gutter rules cannot supply these values by themselves. Resolve the
+   classes against the imported site tokens instead of baking editor-only
+   pixel values into the row. */
 .builder-preview-canvas .builder-preview-content-row {
   position: static !important;
   display: grid !important;
   grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-  column-gap: 20px !important;
-  row-gap: 16px !important;
+  column-gap: 0 !important;
+  row-gap: var(--uk-global-gutter, 30px) !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
   width: 100% !important;
@@ -15951,14 +15968,118 @@ body:has([data-scoped-builder-root])
   box-sizing: border-box !important;
 }
 
-/* Imported UIkit content-layout rows use column padding for gutters, not a
-   second editor grid gap. Keep the interaction grid, but preserve the
-   canonical 1/3 track widths. */
-.builder-preview-canvas
-  .builder-preview-content-layout-grid
-  .builder-preview-content-row {
-  column-gap: 0 !important;
+.builder-preview-canvas {
+  --builder-yootheme-row-gap-large: var(--uk-global-medium-gutter, 40px);
+}
+
+@media (min-width: 1200px) {
+  .builder-preview-canvas {
+    --builder-yootheme-row-gap-large: var(--uk-global-large-gutter, 70px);
+  }
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-collapse,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-column-collapse,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-row-collapse {
   row-gap: 0 !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-small,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-column-small {
+  column-gap: 0 !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-small,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-row-small {
+  row-gap: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-medium,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-column-medium {
+  column-gap: 0 !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-medium,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-row-medium {
+  row-gap: var(--uk-global-gutter, 30px) !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-large,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-column-large {
+  column-gap: 0 !important;
+}
+
+.builder-preview-canvas .builder-preview-content-row.uk-grid-large,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-row-large {
+  row-gap: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+@media (min-width: 1200px) {
+  .builder-preview-canvas .builder-preview-content-row.uk-grid-large,
+  .builder-preview-canvas .builder-preview-content-row.uk-grid-column-large {
+    column-gap: 0 !important;
+  }
+
+  .builder-preview-canvas .builder-preview-content-row.uk-grid-large,
+  .builder-preview-canvas .builder-preview-content-row.uk-grid-row-large {
+    row-gap: var(--uk-global-large-gutter, 70px) !important;
+  }
+}
+
+/* UIkit's horizontal gutter is child padding plus a negative row margin,
+   not CSS grid gap. Mirror that contract in the Builder's 12-column grid so
+   the visible card-to-card distance is the imported token itself. */
+.builder-preview-canvas
+  .builder-preview-content-row
+  > .builder-interaction-column {
+  padding-left: var(--uk-global-gutter, 30px) !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-collapse
+  > .builder-interaction-column,
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-column-collapse
+  > .builder-interaction-column {
+  padding-left: 0 !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-small
+  > .builder-interaction-column,
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-column-small
+  > .builder-interaction-column {
+  padding-left: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-medium
+  > .builder-interaction-column,
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-column-medium
+  > .builder-interaction-column {
+  padding-left: var(--uk-global-gutter, 30px) !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-large
+  > .builder-interaction-column,
+.builder-preview-canvas
+  .builder-preview-content-row.uk-grid-column-large
+  > .builder-interaction-column {
+  padding-left: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+@media (min-width: 1200px) {
+  .builder-preview-canvas
+    .builder-preview-content-row.uk-grid-large
+    > .builder-interaction-column,
+  .builder-preview-canvas
+    .builder-preview-content-row.uk-grid-column-large
+    > .builder-interaction-column {
+    padding-left: var(--uk-global-large-gutter, 70px) !important;
+  }
 }
 
 .builder-preview-canvas
@@ -15971,15 +16092,23 @@ body:has([data-scoped-builder-root])
   box-sizing: border-box !important;
 }
 
-/* Canonical UIkit column width mappings in 12-column grid */
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-1-1"] { grid-column: span 12 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-1-2"] { grid-column: span 6 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-1-3"] { grid-column: span 4 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-2-3"] { grid-column: span 8 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-1-4"] { grid-column: span 3 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-3-4"] { grid-column: span 9 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-1-6"] { grid-column: span 2 !important; }
-.builder-preview-canvas .builder-preview-content-row > [class*="uk-width-5-6"] { grid-column: span 10 !important; }
+/* Canonical UIkit column width mappings in the 12-column grid. Match whole
+   class tokens so responsive widths such as 1-2@s do not accidentally
+   override a later 1-1@m token on the same column. */
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-1"] { grid-column: span 12 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-2"] { grid-column: span 6 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-3"] { grid-column: span 4 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-2-3"] { grid-column: span 8 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-4"] { grid-column: span 3 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-3-4"] { grid-column: span 9 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-6"] { grid-column: span 2 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-5-6"] { grid-column: span 10 !important; }
+
+/* Desktop Builder previews represent the active medium-and-up UIkit tier. */
+.builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-1@m"] { grid-column: span 12 !important; }
+.builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-2@m"] { grid-column: span 6 !important; }
+.builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-3@m"] { grid-column: span 4 !important; }
+.builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-2-3@m"] { grid-column: span 8 !important; }
 
 /* Imported YOOtheme content layouts use two equal columns through tablet,
    including the source override that keeps the third column at 50%. */
@@ -19027,6 +19156,86 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   margin: 0 auto;
 }
 
+.builder-dashboard .builder-wireframe-item--section {
+  margin-bottom: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap {
+  flex-direction: row;
+  align-items: center;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap small {
+  display: none !important;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline {
+  display: flex !important;
+  align-items: center;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline > .builder-wireframe-item--section {
+  order: 1;
+  flex: 1 1 auto;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline > .builder-wireframe-toggle {
+  order: 2;
+  margin-left: auto;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+/* Keep each structure row visually grouped without overriding selection state. */
+.builder-dashboard .builder-wireframe-row:not(.is-selected) {
+  background: rgba(255, 255, 255, 0.018) !important;
+  border: 1px solid rgba(255, 255, 255, 0.045) !important;
+  border-radius: 6px;
+  padding: 8px 10px !important;
+}
+
+.builder-dashboard[data-theme="light"] .builder-wireframe-row:not(.is-selected) {
+  background: rgba(15, 23, 42, 0.035) !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+}
+
+.builder-dashboard .builder-wireframe-section {
+  padding-bottom: 14px !important;
+}
+
+.builder-dashboard .builder-wireframe-item--section {
+  margin-bottom: 0;
+  border-bottom: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap {
+  flex-direction: row;
+  align-items: center;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap small {
+  display: none;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline {
+  display: flex;
+  align-items: center;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline > .builder-wireframe-item--section {
+  order: 1;
+  flex: 1 1 auto;
+}
+
+.builder-dashboard .builder-wireframe-section > .builder-wireframe-rowline > .builder-wireframe-toggle {
+  order: 2;
+  margin-left: auto;
+}
+
 /* Section-owned transparent headers must be visible in the Builder canvas.
    The editable Header slot normally keeps its Header in document flow, which
    would otherwise mask the pull-behind setting used on the first Section. */
@@ -19142,7 +19351,7 @@ body:has([data-scoped-builder-root])
 }
 
 .builder-dashboard .builder-wireframe-section > .builder-wireframe-children {
-  gap: 12px;
+  gap: 20px;
   margin-right: 0 !important;
   margin-left: 0 !important;
   padding-right: 6px !important;
@@ -19154,6 +19363,13 @@ body:has([data-scoped-builder-root])
   margin-left: 0 !important;
   padding-right: 6px !important;
   padding-left: 6px !important;
+}
+
+.builder-dashboard .builder-wireframe-row {
+  background: rgba(255, 255, 255, 0.018);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 6px;
+  padding: 3px 0;
 }
 
 .builder-dashboard .builder-wireframe-column > .builder-wireframe-children--blocks {
@@ -19262,8 +19478,8 @@ body:has([data-scoped-builder-root])
 }
 
 .builder-dashboard .builder-wireframe-item--section {
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--builder-ui-border);
+  margin-bottom: 0;
+  border-bottom: 0;
 }
 
 .builder-dashboard .builder-wireframe-item--section > .builder-wireframe-icon,
@@ -19276,6 +19492,10 @@ body:has([data-scoped-builder-root])
 
 .builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap strong {
   font-size: 15px;
+}
+
+.builder-dashboard .builder-wireframe-item--section .builder-wireframe-label-wrap small {
+  display: none;
 }
 
 .builder-dashboard .builder-wireframe-item--row .builder-wireframe-label-wrap strong,
