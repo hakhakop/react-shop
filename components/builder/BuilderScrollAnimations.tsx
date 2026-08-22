@@ -33,28 +33,6 @@ const parallaxScrollParent = (element: HTMLElement): HTMLElement => {
   return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
 };
 
-const layoutOffsetTop = (
-  element: HTMLElement,
-  styleCache?: Map<HTMLElement, CSSStyleDeclaration>,
-): number => {
-  let current: HTMLElement | null = element;
-  let top = 0;
-  while (current) {
-    top += current.offsetTop;
-    const parent = current.offsetParent as HTMLElement | null;
-    if (!parent) break;
-    const parentStyle = styleCache?.get(parent) ?? getComputedStyle(parent);
-    styleCache?.set(parent, parentStyle);
-    top += Number.parseFloat(parentStyle.borderTopWidth) || 0;
-    if (parentStyle.position === "fixed") {
-      top += window.scrollY;
-      break;
-    }
-    current = parent;
-  }
-  return top;
-};
-
 const breakpointPixels = (breakpoint: string): number => {
   const rootValue = getComputedStyle(document.documentElement)
     .getPropertyValue(`--uk-breakpoint-${breakpoint}`).trim();
@@ -71,6 +49,15 @@ const resolveParallaxTarget = (node: HTMLElement, selector?: string): HTMLElemen
   if (selector === "![class*='uk-section-'] ~ [class*='uk-section-']") {
     const section = node.closest(".shop-builder-section, .builder-preview-section") as HTMLElement | null;
     return section?.nextElementSibling as HTMLElement ?? node;
+  }
+  // UIkit's `!.tm-grid-expand>*` target means the owning expanded grid item,
+  // not the animated image itself. The shared renderer uses a semantic
+  // content-layout card/interaction column in place of UIkit's grid item;
+  // resolve both paths so imported parallax endpoints use the row geometry.
+  if (selector.includes(".tm-grid-expand")) {
+    return node.closest(
+      ".shop-builder-content-layout-card, .builder-interaction-column, .uk-grid-item-match",
+    ) as HTMLElement ?? node;
   }
   if (selector.startsWith("!")) {
     const candidate = selector.slice(1).trim();
@@ -221,8 +208,6 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
 
     const parallaxRuntime = new Map<HTMLElement, ParallaxRuntime>();
     const breakpointCache = new Map<string, number>();
-    const layoutOffsetCache = new Map<HTMLElement, number>();
-    const styleCache = new Map<HTMLElement, CSSStyleDeclaration>();
     let dashboardPaused = false;
     const activeLayoutTransitions = new Set<EventTarget | string>();
     let requestProgressUpdate: (() => void) | null = null;
@@ -236,12 +221,16 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       parallaxRuntime.forEach((runtime) => {
         runtime.geometry = undefined;
       });
-      layoutOffsetCache.clear();
-      styleCache.clear();
       breakpointCache.clear();
       if (pauseDashboard) dashboardPaused = true;
       requestProgressUpdate?.();
     };
+    const geometryResizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => invalidateLayout(false))
+      : null;
+    if (geometryResizeObserver && document.body) {
+      geometryResizeObserver.observe(document.body);
+    }
     const invalidateDashboardLayout = () => invalidateLayout(false);
     const dashboardResizeObserver = dashboardPreview
       ? new ResizeObserver(invalidateDashboardLayout)
@@ -406,13 +395,6 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       if (dashboardPaused) return;
       const viewportHeight = window.innerHeight || 1;
       const viewportWidth = window.innerWidth || 1;
-      const cachedLayoutOffsetTop = (element: HTMLElement) => {
-        const cached = layoutOffsetCache.get(element);
-        if (cached !== undefined) return cached;
-        const offset = layoutOffsetTop(element, styleCache);
-        layoutOffsetCache.set(element, offset);
-        return offset;
-      };
       const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; clear?: boolean }> = [];
       parallaxNodes.forEach((node) => {
         let runtime = parallaxRuntime.get(node);
@@ -430,6 +412,8 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
             target: resolveParallaxTarget(node, parallax.target),
             applied,
           };
+          geometryResizeObserver?.observe(runtime.target);
+          geometryResizeObserver?.observe(node);
           parallaxRuntime.set(node, runtime);
         }
         const { parallax, scrollElement, target } = runtime;
@@ -451,12 +435,22 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
             ? viewportHeight
             : scrollElement.getBoundingClientRect().height;
           const targetHeight = target.offsetHeight;
+          // offsetTop chains are not document coordinates when the Builder
+          // content surface introduces positioned/ transformed wrappers. Use
+          // the canonical rect-to-scroll-origin measurement so imported
+          // `target: !.tm-grid-expand>*` intervals match UIkit exactly.
+          const targetRect = target.getBoundingClientRect();
+          const scrollRect = isDocumentScroll
+            ? undefined
+            : scrollElement.getBoundingClientRect();
           geometry = {
             viewportHeight,
             viewportWidth,
             scrollViewportHeight,
             maxScroll: Math.max(0, scrollElement.scrollHeight - scrollViewportHeight),
-            targetTop: cachedLayoutOffsetTop(target) - (isDocumentScroll ? 0 : cachedLayoutOffsetTop(scrollElement)),
+            targetTop: isDocumentScroll
+              ? targetRect.top + window.scrollY
+              : targetRect.top - (scrollRect?.top ?? 0) + scrollElement.scrollTop,
             targetHeight,
             nodeWidth: node.offsetWidth || 1,
           };
@@ -616,16 +610,21 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const handleResize = () => {
       invalidateLayout(false);
     };
+    const handleImageLoad = (event: Event) => {
+      if (event.target instanceof HTMLImageElement) invalidateLayout(false);
+    };
 
     updatePinnedProgress();
     updateScrollProgress();
     updateParallax();
     window.addEventListener("scroll", requestProgressUpdate, { passive: true });
     window.addEventListener("resize", handleResize);
+    window.addEventListener("load", handleImageLoad, true);
 
     return () => {
       observer.disconnect();
       dashboardResizeObserver?.disconnect();
+      geometryResizeObserver?.disconnect();
       dashboardMutationObserver?.disconnect();
       dashboardRoot?.removeEventListener("transitionstart", handleTransitionStart, true);
       dashboardRoot?.removeEventListener("transitionend", handleTransitionEnd, true);
@@ -638,6 +637,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       });
       window.removeEventListener("scroll", requestProgressUpdate);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("load", handleImageLoad, true);
     };
   }, []);
 

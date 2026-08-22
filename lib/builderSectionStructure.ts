@@ -230,6 +230,7 @@ function rowStyleInput(
 ): BuilderRowStyleInput {
   return {
     ...legacyItem,
+    advanced: row.advanced,
     spacingContract: row.spacingContract ?? (legacyItem as any)?.spacingContract,
     rowHeight: row.height,
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,

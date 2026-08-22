@@ -3618,8 +3618,19 @@ body.dark {
   position: relative;
 }
 
-.shop-builder-content-layout-card .shop-builder-element-shell.yootheme-imported-spacing {
-  margin-bottom: 0 !important;
+.shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title {
+  margin-bottom: var(--uk-global-margin, 20px) !important;
+}
+
+/* Imported UIkit headings and image figures participate in the same flow as
+   YOOtheme's panel. Keep the H1 token and remove inline-image baseline space
+   that otherwise adds a few pixels to every positioned gallery row. */
+.shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title.uk-h1 {
+  font-size: 42px !important;
+  line-height: 1.2 !important;
+}
+.shop-builder-element-shell.yootheme-imported-spacing .shop-builder-column-block--image {
+  line-height: 0 !important;
 }
 
 /* UIkit grid modifiers own horizontal gutters through column padding. Keep
@@ -6595,6 +6606,15 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   padding-top: var(--uk-section-padding-large, 100px) !important;
   padding-bottom: var(--uk-section-padding-large, 100px) !important;
 }
+
+/* Imported YOOtheme sections use the canonical large section token. Keep the
+   Builder projection on the same token path as the published storefront. */
+.shop-builder-section.uk-section-large {
+  padding-top: var(--uk-section-padding-large-yootheme, 140px) !important;
+}
+.shop-builder-section.uk-section-large:not(.uk-padding-remove-bottom) {
+  padding-bottom: var(--uk-section-padding-large-yootheme, 140px) !important;
+}
   .uk-section-xlarge {
     padding-top: var(--uk-section-padding-xlarge, 140px) !important;
     padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
@@ -6696,6 +6716,34 @@ body.is-visual-builder-active .uk-lightbox {
 
 .shop-builder-grid-card--yootheme .shop-builder-panel-padding-large {
   padding: 70px !important;
+}
+
+/* YOOtheme's panel_image_no_padding applies to bottom media as well as top
+   media. The image is rendered inside the padded content slot for stable
+   editor hooks, so break that slot back out to the card edge. */
+.shop-builder-grid-card--yootheme.shop-builder-panel--media-bottom.is-image-frameless
+  > .shop-builder-grid-content.shop-builder-panel-padding-large
+  > .shop-builder-grid-image {
+  width: calc(100% + 140px) !important;
+  max-width: none !important;
+  margin-right: -70px !important;
+  margin-left: -70px !important;
+}
+.shop-builder-grid-card--yootheme.shop-builder-panel--media-bottom.is-image-frameless
+  > .shop-builder-grid-content.shop-builder-panel-padding-default
+  > .shop-builder-grid-image {
+  width: calc(100% + 80px) !important;
+  max-width: none !important;
+  margin-right: -40px !important;
+  margin-left: -40px !important;
+}
+.shop-builder-grid-card--yootheme.shop-builder-panel--media-bottom.is-image-frameless
+  > .shop-builder-grid-content.shop-builder-panel-padding-small
+  > .shop-builder-grid-image {
+  width: calc(100% + 40px) !important;
+  max-width: none !important;
+  margin-right: -20px !important;
+  margin-left: -20px !important;
 }
 
 /* YOOtheme keeps the title's bottom edge flush, then gives the content its

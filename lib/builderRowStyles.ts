@@ -7,6 +7,7 @@ import {
 import { visualStyleToCss } from "@/lib/builderVisualStyle";
 
 export type BuilderRowStyleInput = {
+  advanced?: { css?: string };
   spacingContract?: "yootheme";
   rowHeight?: {
     mode?: "none" | "pixels" | "viewport";
@@ -94,6 +95,14 @@ export function resolveBuilderRowStyle(
     : explicitSpacing(row?.rowTopMargin, "rowMargin", row?.spacingContract);
 
   const rowHeight = row?.rowHeight;
+  // YOOtheme rows may carry authored layout CSS (for example the Feature
+  // Gallery row's `height: 60vh; min-height: 700px; margin-bottom: 10vh`).
+  // Preserve these structural declarations in the shared row path so
+  // Builder and storefront reserve the same parallax field.
+  const authoredCss = row?.advanced?.css ?? "";
+  const authoredHeight = authoredCss.match(/(?:^|[;{])\s*height\s*:\s*([^;}]*)/i)?.[1]?.trim();
+  const authoredMinHeight = authoredCss.match(/(?:^|[;{])\s*min-height\s*:\s*([^;}]*)/i)?.[1]?.trim();
+  const authoredBottomMargin = authoredCss.match(/(?:^|[;{])\s*margin-bottom\s*:\s*([^;}]*)/i)?.[1]?.trim();
   const minHeight = rowHeight?.mode === "pixels" && rowHeight.value
     ? rowHeight.value
     : rowHeight?.mode === "viewport"
@@ -121,8 +130,20 @@ export function resolveBuilderRowStyle(
     // Global row margins are intentionally not inherited. Row siblings use
     // rowGap; an explicit local margin replaces that boundary's gap.
     marginTop: topMargin,
-    marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
-    ...(minHeight ? { minHeight } : {}),
+    marginBottom: authoredBottomMargin || explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
+    ...(authoredHeight ? { height: authoredHeight } : {}),
+    ...(authoredMinHeight ? { minHeight: authoredMinHeight } : minHeight ? { minHeight } : {}),
+    // The Builder projects UIkit's flex row as CSS grid. Authored fixed-height
+    // rows must use a zero-minimum track so grid min-content cannot expand the
+    // row beyond the imported height while positioned/parallax children remain
+    // free to paint outside it, as they do in UIkit.
+    ...(authoredHeight ? { gridTemplateRows: "minmax(0, 1fr)" } : {}),
+    ...(authoredHeight && authoredMinHeight
+      ? ({
+          "--builder-authored-row-height": authoredHeight,
+          "--builder-authored-row-min-height": authoredMinHeight,
+        } as CSSProperties)
+      : {}),
     ...(row?.maxWidth && row.maxWidth !== "inherit"
       ? {
           maxWidth:

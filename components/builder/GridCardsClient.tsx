@@ -522,7 +522,9 @@ export function GridCardsClient({
               const placement = item.mediaPlacement && item.mediaPlacement !== "top"
                 ? item.mediaPlacement
                 : (block as any).gridMediaPlacement ?? item.mediaPlacement ?? "top";
-              const mediaClass = isFrameless ? (placement === "left" || placement === "right" ? `uk-card-media-${placement}` : "uk-card-media-top") : "";
+              const mediaClass = isFrameless && (placement === "left" || placement === "right" || placement === "top")
+                ? `uk-card-media-${placement}`
+                : "";
               const imageElementStyle = {
                 // `Auto` columns use UIkit's natural-width semantics.
                 // Numeric tiers continue to stretch media within a track.

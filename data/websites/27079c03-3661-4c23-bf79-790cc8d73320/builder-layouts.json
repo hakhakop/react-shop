@@ -117,6 +117,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -127,9 +128,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -887,13 +886,8 @@
                     "breakpoint": "m"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "right",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1008,13 +1002,8 @@
                     "breakpoint": "m"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "left",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1133,13 +1122,8 @@
                     "breakpoint": "m"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -1251,14 +1235,8 @@
                     "breakpoint": "m"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -1716,7 +1694,7 @@
                         "title_style": "h1"
                       }
                     },
-                    "title": "A High Level of Security\nGuaranteed",
+                    "title": "A High Level of Security<br>Guaranteed",
                     "eyebrow": "",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lock.svg",
@@ -1724,7 +1702,7 @@
                     "imageMaxWidth": 80,
                     "imageHeight": "80px",
                     "imageWidth": "80px",
-                    "imageSvgColor": "muted",
+                    "imageSvgColor": "emphasis",
                     "buttonLabel": "Read More",
                     "buttonUrl": "?page_id=19#data-privacy",
                     "buttonStyle": "text",
@@ -1781,6 +1759,7 @@
                         "breakpoint": "m"
                       }
                     },
+                    "elementPadding": "none",
                     "spacingContract": "yootheme"
                   }
                 ]
@@ -4947,13 +4926,8 @@
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "maxWidth": "medium",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -6189,6 +6163,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -6197,9 +6172,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
@@ -6418,7 +6391,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-22T20:38:28.549Z"
+    "updatedAt": "2026-08-22T21:54:10.339Z"
   },
   "header": {
     "version": 1,

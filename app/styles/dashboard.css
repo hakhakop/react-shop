@@ -15968,6 +15968,26 @@ body:has([data-scoped-builder-root])
   box-sizing: border-box !important;
 }
 
+/* Authored UIkit rows use a definite height plus a minimum. The editor's
+   grid tracks must not replace that contract with child min-content sizing;
+   positioned/parallax children may still paint outside the reserved row. */
+.builder-preview-canvas
+  .builder-preview-content-row[style*="--builder-authored-row-height"] {
+  height: max(
+    var(--builder-authored-row-height),
+    var(--builder-authored-row-min-height)
+  ) !important;
+  min-height: max(
+    var(--builder-authored-row-height),
+    var(--builder-authored-row-min-height)
+  ) !important;
+  max-height: max(
+    var(--builder-authored-row-height),
+    var(--builder-authored-row-min-height)
+  ) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+
 .builder-preview-canvas {
   --builder-yootheme-row-gap-large: var(--uk-global-medium-gutter, 40px);
 }
@@ -16110,6 +16130,19 @@ body:has([data-scoped-builder-root])
 .builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-3@m"] { grid-column: span 4 !important; }
 .builder-preview-desktop .builder-preview-canvas .builder-preview-content-row > [class~="uk-width-2-3@m"] { grid-column: span 8 !important; }
 
+/* UIkit's fifth-based widths cannot be represented as integer spans in a
+   twelve-track grid.  Use the canonical five-track equivalent for rows that
+   contain those imported YOOtheme widths, preserving exact 2/5 + 3/5 (and
+   other fifth-based) proportions in the Builder preview. */
+.builder-preview-canvas
+  .builder-preview-content-row:has(> [class~="uk-width-1-5@m"], > [class~="uk-width-2-5@m"], > [class~="uk-width-3-5@m"], > [class~="uk-width-4-5@m"]) {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-1-5@m"] { grid-column: span 1 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-2-5@m"] { grid-column: span 2 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-3-5@m"] { grid-column: span 3 !important; }
+.builder-preview-canvas .builder-preview-content-row > [class~="uk-width-4-5@m"] { grid-column: span 4 !important; }
+
 /* Imported YOOtheme content layouts use two equal columns through tablet,
    including the source override that keeps the third column at 50%. */
 .builder-preview-tablet
@@ -16148,22 +16181,19 @@ body:has([data-scoped-builder-root])
   height: var(--builder-editor-row-interaction-gutter) !important;
 }
 
-/* Actual editor-only margin between top-level row frames. Unlike the
-   insertion hit strip, this participates in layout and creates visible room. */
+/* The insertion corridor is interaction-only. It must not participate in
+   published row geometry: storefront/YOOtheme rows meet directly when no
+   authored row gap or margin exists. */
 .builder-preview-canvas
   .builder-main-row-frame:not(:last-child) {
-  margin-bottom: var(--builder-editor-main-row-margin, 24px);
+  margin-bottom: 0 !important;
 }
 
 .builder-preview-canvas
   .builder-main-row-frame
   > .builder-preview-row-insert {
   bottom: calc(
-    (
-        var(--builder-editor-main-row-margin, 24px) +
-          var(--builder-editor-row-interaction-gutter, 20px)
-      ) /
-      -2
+    var(--builder-editor-row-interaction-gutter, 20px) / -2
   ) !important;
 }
 
