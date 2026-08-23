@@ -6120,6 +6120,58 @@ body:has(.builder-dashboard) .site-header--service {
     var(--builder-preview-shell-bg, transparent)
   );
   color: inherit;
+
+  /* Static Builder preview scaffolding. Values that differ by shell settings
+     remain inline; these defaults do not need to be serialized per render. */
+  --builder-global-section-padding-top: 64px;
+  --builder-global-section-padding-bottom: 64px;
+  --builder-global-section-margin-top: 0px;
+  --builder-global-section-margin-bottom: 0px;
+  --builder-global-row-padding-top: 0px;
+  --builder-global-row-padding-bottom: 0px;
+  --builder-global-row-margin-top: 0px;
+  --builder-global-row-margin-bottom: 0px;
+  --builder-global-row-gap: 32px;
+  --builder-global-column-gap: 32px;
+  --builder-global-element-padding-top: 8px;
+  --builder-global-element-padding-right: 8px;
+  --builder-global-element-padding-bottom: 8px;
+  --builder-global-element-padding-left: 8px;
+  --builder-global-element-margin-top: 0px;
+  --builder-global-element-margin-right: 0px;
+  --builder-global-element-margin-bottom: 0px;
+  --builder-global-element-margin-left: 0px;
+  --builder-element-stack-gap: 16px;
+  --builder-structure-card-gap: 16px;
+  --builder-structure-card-padding: 16px;
+  --builder-structure-card-radius: 12px;
+  --builder-structure-card-placeholder-ratio: 4 / 3;
+  --builder-structure-panel-gap: 16px;
+  --builder-structure-panel-padding: 32px;
+  --builder-structure-panel-radius: 12px;
+  --builder-editor-row-interaction-gutter: 20px;
+  --builder-editor-empty-target-min-height: 64px;
+  --builder-editor-insertion-hit-size: 32px;
+  --builder-structure-empty-row-min-height: 72px;
+  --builder-structure-empty-column-min-height: 64px;
+  --builder-structure-placeholder-border-opacity: 0.12;
+  --builder-structure-placeholder-surface-opacity: 0.025;
+  --builder-structure-placeholder-label-opacity: 0.58;
+  --builder-editor-main-row-margin: 24px;
+  --button-bg: #111111;
+  --button-text-color: #ffffff;
+  --button-radius: 999px;
+  --button-border-width: 0px;
+  --button-border-color: transparent;
+  --button-padding-y: 11px;
+  --button-padding-x: 18px;
+  --button-font-weight: 720;
+  --button-letter-spacing: 0px;
+  --button-hover-bg: #111111;
+  --button-hover-text-color: #ffffff;
+  --button-hover-border-color: transparent;
+  --button-hover-transform: translateY(-2px);
+  --button-hover-shadow: 0 16px 34px rgba(17, 17, 17, 0.16);
 }
 
 .builder-preview-page {
@@ -6501,7 +6553,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   display: block;
   color: var(
     --builder-preview-section-text,
-    var(--builder-preview-text, inherit)
+    var(--uk-global-text-color, var(--builder-preview-text, inherit))
   );
   --builder-preview-active-muted: var(
     --builder-preview-section-muted,
@@ -6548,6 +6600,17 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   --builder-preview-section-button-text: #09090b;
 }
 
+/* UIkit's default-surface rule owns `color: inherit`.  In the Builder that
+   inherited value is the editor shell color, not the canonical tenant token.
+   Keep default sections on the same semantic text variable as storefront so
+   dark tenant surfaces (and light tenants) resolve from the document theme. */
+.builder-preview-section.uk-section-default {
+  color: var(
+    --builder-preview-section-text,
+    var(--uk-global-text-color, var(--builder-preview-text, inherit))
+  );
+}
+
 .builder-preview-section.shop-builder-section--height-viewport,
 .builder-preview-section.shop-builder-section--height-viewport-80,
 .builder-preview-section.shop-builder-section--height-viewport-20,
@@ -6567,6 +6630,17 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
      chrome without reintroducing a horizontal gutter ahead of uk-container. */
   padding-left: 0;
   padding-right: 0;
+}
+
+/* UIkit's parallax field is allowed to paint below its authored row. Reserve
+   that field in Builder so the following section starts after the final
+   parallax frame instead of visually overlapping it. The imported row margin
+   remains intact; this is only the Builder viewport clearance. */
+.builder-preview-canvas .builder-preview-section:has(.shop-builder-animate--parallax):not([style*="--builder-section-padding-bottom: 0px"]) {
+  padding-bottom: max(
+    17vh,
+    var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 0px))
+  ) !important;
 }
 
 .builder-preview-canvas .shop-builder-section.builder-preview-section--boxed {
@@ -16755,6 +16829,64 @@ body:has(.builder-dashboard.is-inspector-docked)
   overflow: hidden;
 }
 
+/* Panel Slider's Circle/YOOtheme card contract is scoped here rather than
+   changing the global default-card tokens used by other elements. */
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.uk-card-default {
+  --uk-card-border-width: 0px;
+  --uk-card-default-border: transparent;
+  --uk-card-shadow: none;
+  --uk-card-padding-large: 70px;
+  --uk-card-default-text: var(--uk-global-text-color, rgba(255, 255, 255, 0.7));
+  --uk-card-default-title: var(--uk-global-emphasis-color, #fff);
+}
+
+/* YOOtheme Panel Slider keeps media inside the panel padding unless the
+   authored `panel_image_no_padding` switch is enabled. Keep this structural
+   distinction on the canonical card owner; the image itself remains unchanged. */
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--media-padded {
+  --shop-builder-panel-padding: var(--uk-card-padding-large, 70px);
+}
+
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--media-padded > .shop-builder-panel-slider-media {
+  margin: var(--shop-builder-panel-padding) var(--shop-builder-panel-padding) 0;
+}
+
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--media-padded > .shop-builder-panel-slider-body {
+  padding: 0 var(--shop-builder-panel-padding) var(--shop-builder-panel-padding);
+}
+
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-none,
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-content,
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-image,
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-both {
+  height: 100%;
+}
+
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-content > .shop-builder-panel-slider-body,
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-both > .shop-builder-panel-slider-body {
+  min-height: 100%;
+}
+
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-image > .shop-builder-panel-slider-media,
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.shop-builder-panel-slider--expand-both > .shop-builder-panel-slider-media {
+  flex: 1 1 auto;
+}
+
+/* YOOtheme's panel_match equalizes the item cards within one slider. Swiper
+   stretches the track; the card only needs to participate in that stretch. */
+.shop-builder-swiper--panel-match .swiper-wrapper {
+  align-items: stretch;
+}
+
+.shop-builder-swiper--panel-match .swiper-slide,
+.shop-builder-swiper--panel-match .shop-builder-panel-slider-card {
+  height: auto;
+}
+
+.shop-builder-swiper--panel-match .shop-builder-panel-slider-card {
+  height: 100%;
+}
+
 .shop-builder-panel-slider-media {
   position: relative;
   overflow: hidden;
@@ -16783,7 +16915,7 @@ body:has(.builder-dashboard.is-inspector-docked)
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
 }
 
 .shop-builder-panel-slider-icon {

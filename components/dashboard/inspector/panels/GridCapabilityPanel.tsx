@@ -17,9 +17,9 @@ import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/
 import {
   ActionSettingsGroup,
   CardSettingsGroup,
-  ContentSettingsGroup,
   MetaSettingsGroup,
   TitleSettingsGroup,
+  CONTENT_STYLE_OPTIONS,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import {
   InspectorFieldRow,
@@ -122,6 +122,74 @@ function GridImageSettingsGroup({ block, update }: Pick<Props, "block" | "update
       <InspectorSelect value={String(values.imageSvgColor ?? "none")} options={UIKIT_YOOTHEME_SVG_COLOR_OPTIONS} disabled={values.imageSvgInline !== true} onChange={(value) => update({ imageSvgColor: value === "none" ? undefined : value })} ariaLabel="SVG color" />
     </InspectorFieldRow>
     <InspectorFieldRow label="Text Color" isOverridden={values.imageTextColor !== undefined} inheritedValueText="None" onReset={() => update({ imageTextColor: undefined })}>{select("imageTextColor", "none", colorOptions, "Image text color")}</InspectorFieldRow>
+  </InspectorDivision>;
+}
+
+/**
+ * YOOtheme Grid's shared Content composition controls. These values belong to
+ * the Grid's authored visual-style layout contract; keeping them here avoids
+ * exposing the same controls again in the generic General panel.
+ */
+function GridContentSettingsGroup({ block, update }: Pick<Props, "block" | "update">) {
+  const visual = ((block as any).visualStyle ?? {}) as any;
+  const layout = visual.layout ?? {};
+  const setLayout = (patch: Record<string, unknown>) =>
+    update({ visualStyle: { ...visual, layout: { ...layout, ...patch } } });
+  const breakpointOptions = [
+    { value: "always", label: "Always" },
+    { value: "small", label: "Small (Phone Landscape)" },
+    { value: "medium", label: "Medium (Tablet Landscape)" },
+    { value: "large", label: "Large (Desktop)" },
+    { value: "xlarge", label: "X-Large (Large Screens)" },
+  ];
+  const alignOptions = [
+    { value: "none", label: "None" },
+    { value: "left", label: "Left" },
+    { value: "center", label: "Center" },
+    { value: "right", label: "Right" },
+  ];
+  const textAlignOptions = [...alignOptions, { value: "justify", label: "Justify" }];
+  const select = (value: unknown, fallback: string, options: ReadonlyArray<{ value: string; label: string }>, onChange: (value: string) => void, label: string) => (
+    <InspectorSelect value={String(value ?? fallback)} options={options} onChange={onChange} ariaLabel={label} />
+  );
+  return <InspectorDivision title="CONTENT">
+    {false && <>
+    <InspectorFieldRow label="Max Width" isOverridden={layout.maxWidth !== undefined} inheritedValueText="None" onReset={() => setLayout({ maxWidth: undefined })}>
+      {select(layout.maxWidth, "none", [{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "2xlarge", label: "2X-Large" }], (value) => setLayout({ maxWidth: value === "none" ? undefined : value }), "Grid content max width")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Max Width Breakpoint" isOverridden={layout.maxWidthBreakpoint !== undefined} inheritedValueText="Always" onReset={() => setLayout({ maxWidthBreakpoint: undefined })}>
+      {select(layout.maxWidthBreakpoint, "always", breakpointOptions, (value) => setLayout({ maxWidthBreakpoint: value === "always" ? undefined : value }), "Grid content max width breakpoint")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Block Alignment" isOverridden={layout.blockAlign !== undefined} inheritedValueText="None" onReset={() => setLayout({ blockAlign: undefined })}>
+      {select(layout.blockAlign, "none", alignOptions, (value) => setLayout({ blockAlign: value === "none" ? undefined : value }), "Grid block alignment")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Block Alignment Breakpoint" isOverridden={layout.blockAlignBreakpoint !== undefined} inheritedValueText="Always" onReset={() => setLayout({ blockAlignBreakpoint: undefined })}>
+      {select(layout.blockAlignBreakpoint, "always", breakpointOptions, (value) => setLayout({ blockAlignBreakpoint: value === "always" ? undefined : value }), "Grid block alignment breakpoint")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Block Alignment Fallback" isOverridden={layout.blockAlignFallback !== undefined} inheritedValueText="Left" onReset={() => setLayout({ blockAlignFallback: undefined })}>
+      {select(layout.blockAlignFallback, "left", alignOptions, (value) => setLayout({ blockAlignFallback: value }), "Grid block alignment fallback")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Text Alignment" isOverridden={layout.textAlign !== undefined} inheritedValueText="None" onReset={() => setLayout({ textAlign: undefined })}>
+      {select(layout.textAlign, "none", textAlignOptions, (value) => setLayout({ textAlign: value === "none" ? undefined : value }), "Grid text alignment")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Text Alignment Breakpoint" isOverridden={layout.textAlignBreakpoint !== undefined} inheritedValueText="Always" onReset={() => setLayout({ textAlignBreakpoint: undefined })}>
+      {select(layout.textAlignBreakpoint, "always", breakpointOptions, (value) => setLayout({ textAlignBreakpoint: value === "always" ? undefined : value }), "Grid text alignment breakpoint")}
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Text Alignment Fallback" isOverridden={layout.textAlignFallback !== undefined} inheritedValueText="None" onReset={() => setLayout({ textAlignFallback: undefined })}>
+      {select(layout.textAlignFallback, "none", textAlignOptions, (value) => setLayout({ textAlignFallback: value === "none" ? undefined : value }), "Grid text alignment fallback")}
+    </InspectorFieldRow>
+    </>}
+    <InspectorFieldRow label="Style" isOverridden={(block as any).contentStyle !== undefined} inheritedValueText="None" onReset={() => update({ contentStyle: undefined })}>
+      <InspectorSelect value={String((block as any).contentStyle ?? "none")} options={CONTENT_STYLE_OPTIONS} onChange={(value) => update({ contentStyle: value === "none" ? undefined : value })} ariaLabel="Content style" />
+    </InspectorFieldRow>
+    <InspectorFieldRow label="Alignment" isOverridden={(block as any).gridContentAlign !== undefined} inheritedValueText="Left" onReset={() => update({ gridContentAlign: undefined })}><InspectorSwitch checked={(block as any).gridContentAlign === true} onChange={(checked) => update({ gridContentAlign: checked || undefined })} label="Force left alignment" /></InspectorFieldRow>
+    <InspectorFieldRow label="Drop Cap" isOverridden={(block as any).gridContentDropcap === true} inheritedValueText="Off" onReset={() => update({ gridContentDropcap: undefined })}><InspectorSwitch checked={(block as any).gridContentDropcap === true} onChange={(checked) => update({ gridContentDropcap: checked || undefined })} label="Enable drop cap" /></InspectorFieldRow>
+    <InspectorFieldRow label="Columns" isOverridden={(block as any).gridContentColumn !== undefined} inheritedValueText="None" onReset={() => update({ gridContentColumn: undefined })}>{select((block as any).gridContentColumn, "none", [{ value: "none", label: "None" }, { value: "1-2", label: "Halves" }, { value: "1-3", label: "Thirds" }, { value: "1-4", label: "Quarters" }, { value: "1-5", label: "Fifths" }, { value: "1-6", label: "Sixths" }], (value) => update({ gridContentColumn: value }), "Grid content columns")}</InspectorFieldRow>
+    <InspectorFieldRow label="Show Dividers" isOverridden={(block as any).gridContentColumnDivider === true} inheritedValueText="Off" onReset={() => update({ gridContentColumnDivider: undefined })}><InspectorSwitch checked={(block as any).gridContentColumnDivider === true} onChange={(checked) => update({ gridContentColumnDivider: checked || undefined })} label="Show dividers" /></InspectorFieldRow>
+    <InspectorFieldRow label="Columns Breakpoint" isOverridden={(block as any).gridContentColumnBreakpoint !== undefined} inheritedValueText="Always" onReset={() => update({ gridContentColumnBreakpoint: undefined })}>{select((block as any).gridContentColumnBreakpoint, "always", breakpointOptions, (value) => update({ gridContentColumnBreakpoint: value }), "Grid content columns breakpoint")}</InspectorFieldRow>
+    <InspectorFieldRow label="Margin Top" isOverridden={(block as any).contentMarginTop !== undefined} inheritedValueText="Small" onReset={() => update({ contentMarginTop: undefined })}>
+      {select((block as any).contentMarginTop, "small", [{ value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "none", label: "None" }], (value) => update({ contentMarginTop: value }), "Grid content margin top")}
+    </InspectorFieldRow>
   </InspectorDivision>;
 }
 
@@ -816,13 +884,7 @@ export default function GridCapabilityPanel({
           keys={{ role: "metaTypographyRole", align: "textAlignment", level: "gridMetaHtmlElement", style: "metaStyle", color: "metaColor", position: "gridMetaAlign" }}
         />
 
-        <ContentSettingsGroup
-          block={block}
-          update={update}
-          showAlignment={false}
-          showStyle
-          keys={{ role: "contentTypographyRole", align: "textAlignment", style: "contentStyle" }}
-        />
+        <GridContentSettingsGroup block={block} update={update} />
 
         <ActionSettingsGroup
           block={block}

@@ -561,6 +561,11 @@ export type BuilderLayoutBlock = {
   /** YOOtheme Panel text presets for meta and body content. */
   metaStyle?: string;
   contentStyle?: string;
+  gridContentAlign?: boolean;
+  gridContentDropcap?: boolean;
+  gridContentColumn?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";
+  gridContentColumnDivider?: boolean;
+  gridContentColumnBreakpoint?: "always" | "s" | "m" | "l" | "xl";
   panelMetaHtmlElement?: "div" | "span" | "p";
   panelVerticalAlign?: "top" | "center" | "bottom";
   panelTitleElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
@@ -1250,6 +1255,8 @@ export type BuilderSection = {
     metaTypographyRole?: BuilderLayoutBlock["metaTypographyRole"];
     contentTypographyRole?: BuilderLayoutBlock["contentTypographyRole"];
     contentStyle?: string;
+    contentMarginTop?: string;
+    titleMarginTop?: string;
     buttonStyle?: BuilderLayoutBlock["buttonStyle"];
     buttonSize?: BuilderCarouselActionSize;
     metaPosition?: BuilderCarouselMetaPosition;

@@ -154,7 +154,19 @@ export function GridCardsClient({
   const filterCategories = Array.from(new Set(items.flatMap(itemFilterTags)));
   // Preserve source indices after filtering so Builder adapters always act on the
   // persisted items collection rather than the transient filtered list.
-  const filteredItems = items
+  // Grid item ids are the canonical identity shared by Builder and storefront.
+  // Protect the renderer from transient/persisted duplicate entries (which can
+  // otherwise make the final card appear twice after an inspector update).
+  const uniqueItems = items.filter((item, index, all) => {
+    const id = typeof item?.id === "string" && item.id.trim() ? item.id : `__grid-index-${index}`;
+    return all.findIndex((candidate) => {
+      const candidateId = typeof candidate?.id === "string" && candidate.id.trim()
+        ? candidate.id
+        : `__grid-index-${all.indexOf(candidate)}`;
+      return candidateId === id;
+    }) === index;
+  });
+  const filteredItems = uniqueItems
     .map((item, sourceIndex) => ({ item, sourceIndex }))
     .filter(({ item }) => activeFilter === "all" || itemFilterTags(item).includes(activeFilter));
 
@@ -366,9 +378,27 @@ export function GridCardsClient({
 
             // Content styling
             const contentStyleClass = isYoothemeGrid
-              ? getUikitTextStyleClass(rawBlock.contentStyle).replace(/\buk-h[1-6]\b/g, "").trim()
+              ? getUikitTextStyleClass(rawBlock.contentStyle).replace(/\buk-h[1-6]\b|\buk-margin-remove-top\b/g, "").trim()
               : getUikitTextStyleClass(rawBlock.contentStyle);
-            const contentMarginTopClass = getUikitMarginClass(rawBlock.contentMarginTop);
+            // YOOtheme Grid's Content > Margin Top default is the Small
+            // token. Preserve explicit authored values (including `none`),
+            // but do not fall back to the generic 20px margin utility when an
+            // imported block arrives without the normalized field.
+            const contentMarginTopClass = getUikitMarginClass(
+              isYoothemeGrid && rawBlock.contentMarginTop === undefined
+                ? "small"
+                : rawBlock.contentMarginTop,
+                "top",
+            );
+            const contentColumn = rawBlock.gridContentColumn && rawBlock.gridContentColumn !== "none"
+              ? `uk-column-${rawBlock.gridContentColumn}${rawBlock.gridContentColumnBreakpoint && rawBlock.gridContentColumnBreakpoint !== "always" ? `@${rawBlock.gridContentColumnBreakpoint}` : ""}`
+              : "";
+            const contentCompositionClass = [
+              rawBlock.gridContentAlign === true ? "uk-text-left" : "",
+              contentColumn,
+              rawBlock.gridContentColumnDivider === true && contentColumn ? "uk-column-divider" : "",
+              rawBlock.gridContentDropcap === true ? "uk-dropcap" : "",
+            ].filter(Boolean).join(" ");
             // Image styling
             // `imageShape` and `imageShadow` are the canonical shared Image
             // owners. Older Grid documents may retain the previous aliases,
@@ -504,7 +534,7 @@ export function GridCardsClient({
               canShowContent && safeContent ? (
                 <Typog
                   as="div"
-                  className={`${isYoothemeGrid ? "uk-panel uk-flex-1" : ""} ${contentStyleClass} ${contentMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "" : typographyRoleClass(
+                  className={`${isYoothemeGrid ? "uk-panel uk-flex-1" : ""} ${contentStyleClass} ${contentCompositionClass} ${contentMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")} ${isYoothemeGrid ? "" : typographyRoleClass(
                     block.contentTypographyRole,
                   )}`.trim()}
                   typography={isYoothemeGrid && !rawBlock.contentStyle && !block.contentTypographyRole
@@ -642,7 +672,7 @@ export function GridCardsClient({
               return <div className={`${cardBodyClass} ${bodyPaddingClass} shop-builder-grid-content`.trim()}>
                 {mediaPlacement === "top" && !isFrameless && renderImage()}
                 {constrainOneColumnContent ? <div className={`uk-container uk-container-${rawBlock.panelContentWidth} shop-builder-grid-one-column-content`}>{contents}</div> : contents}
-                {mediaPlacement === "bottom" && renderImage()}
+                {mediaPlacement === "bottom" && !isYoothemeGrid && renderImage()}
               </div>;
             };
             const composedBody = isSideMedia ? (
@@ -689,6 +719,7 @@ export function GridCardsClient({
                 )}
                 {isFrameless && mediaPlacement === "top" && renderImage()}
                 {composedBody}
+                {isYoothemeGrid && mediaPlacement === "bottom" && renderImage()}
               </article>
             );
           })()

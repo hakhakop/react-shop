@@ -75,6 +75,7 @@ export type CarouselSlide = {
   headingLevel?: string | null;
   headingSize?: string | null;
   titleTypographyRole?: string | null;
+  titleMarginTop?: string | null;
   headingAlign?: string | null;
   titleDecoration?: string | null;
   titleColor?: string | null;
@@ -87,6 +88,7 @@ export type CarouselSlide = {
   contentTypographyRole?: string | null;
   contentAlign?: string | null;
   contentStyle?: string | null;
+  contentMarginTop?: string | null;
   imageFit?: string | null;
   imageRatio?: string | null;
   imageShape?: string | null;
@@ -113,6 +115,11 @@ export type CarouselSlide = {
   linkMarginTop?: string | null;
   buttonStyle?: string | null;
   buttonSize?: string | null;
+  alignImageWithoutPadding?: boolean | null;
+  panelImageNoPadding?: boolean | null;
+  panelHeightExpand?: boolean | null;
+  panelExpand?: "none" | "image" | "content" | "both" | string | null;
+  panelMatch?: boolean | null;
 };
 
 export type CarouselSettings = {
@@ -200,12 +207,14 @@ export type CarouselSettings = {
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
   headingSize?: string | null;
   titleTypographyRole?: string | null;
+  titleMarginTop?: string | null;
   metaTypographyRole?: string | null;
   metaPosition?: "above-title" | "below-title" | "below-content" | string | null;
   metaHtmlElement?: "div" | "p" | "span" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
   metaStyle?: string | null;
   contentTypographyRole?: string | null;
   contentStyle?: string | null;
+  contentMarginTop?: string | null;
   /** Shared element content alignment, inherited by Panel Slider items. */
   contentAlign?: "left" | "center" | "right" | string | null;
   headingAlign?: "left" | "center" | "right" | string | null;
@@ -230,6 +239,10 @@ export type CarouselSettings = {
   imageAlignment?: string | null;
   imageBoxDecoration?: string | null;
   alignImageWithoutPadding?: boolean | null;
+  panelImageNoPadding?: boolean | null;
+  panelHeightExpand?: boolean | null;
+  panelExpand?: "none" | "image" | "content" | "both" | string | null;
+  panelMatch?: boolean | null;
 };
 
 function resolveImageLoading(
@@ -400,6 +413,9 @@ export default function CarouselBlock({
   // Swiper must only own movement: passing the persisted gap here adds a
   // second margin between slides and changes both intrinsic item geometry and
   // navigation locking. Keep the canonical token intact for the UIkit track.
+  // Panel Slider keeps UIkit's grid gutter as the visual gap owner. The
+  // canonical value is projected through the root CSS variable below rather
+  // than passed as a second Swiper gap (which would double the gutter).
   const swiperSpaceBetween = isPanelSlider ? 0 : spaceBetween;
   const panelSliderIsEffectivelyLocked = (swiper: any) => {
     if (!isPanelSlider || !swiper?.wrapperEl) return Boolean(swiper?.isLocked);
@@ -590,11 +606,15 @@ export default function CarouselBlock({
         "shop-builder-swiper",
         `shop-builder-swiper--${swiperVariant}`,
         isPanelSlider ? "el-element" : "",
+        isPanelSlider && settings?.panelMatch === true ? "shop-builder-swiper--panel-match" : "",
         panelContentAlignment ? `uk-text-${panelContentAlignment}` : "",
         isPanelSlider && panelSliderLocked ? "shop-builder-swiper--locked" : "",
         isPanelSlider ? `shop-builder-panel-slidenav-margin--${settings?.slidenavMargin ?? "medium"}` : "",
         `shop-builder-arrow--${arrowStyle}`,
         settings?.slidenavBreakpoint ? `shop-builder-slidenav-from-${settings.slidenavBreakpoint}` : "",
+        isPanelSlider && booleanSetting(settings?.slidenavHoverOnly, false) ? "shop-builder-panel-slidenav-hover" : "",
+        isPanelSlider && booleanSetting(settings?.slidenavLarger, false) ? "shop-builder-panel-slidenav-large" : "",
+        isPanelSlider && settings?.slidenavOutsideBreakpoint ? `shop-builder-slidenav-outside-from-${settings.slidenavOutsideBreakpoint}` : "",
         showArrows ? `shop-builder-arrow-pos--${arrowPosition}` : "",
         `shop-builder-pag--${paginationStyle}`,
         `shop-builder-pag-pos--${paginationPosition}`,
@@ -650,6 +670,7 @@ export default function CarouselBlock({
             ? { "--shop-builder-slideshow-max-height": toCssDimension(settings?.slideshowMaxHeight) }
             : {}),
         } : {}),
+        ...(isPanelSlider ? { "--shop-builder-panel-slider-gap": `${spaceBetween}px` } : {}),
       } as React.CSSProperties}
     >
       <Swiper
@@ -898,19 +919,25 @@ export default function CarouselBlock({
             const itemTitleClass = getUikitHeadingClass(
               slide.headingLevel ?? headingLevel ?? "h3",
               slide.headingSize ?? headingSize,
-            );
+            ).replace(/\buk-margin-remove-top\b/g, "").trim();
+            const titleMarginClass = isPanelSlider
+              ? getUikitMarginClass(slide.titleMarginTop ?? settings?.titleMarginTop ?? "medium", "top")
+              : "";
             const itemTitleRole = (slide.titleTypographyRole ?? titleRole) as SemanticTypographyRole | undefined;
             const itemMetaRole = (slide.metaTypographyRole ?? metaRole) as SemanticTypographyRole | undefined;
             const itemContentRole = (slide.contentTypographyRole ?? contentRole) as SemanticTypographyRole | undefined;
             const itemMetaClass = getUikitTextClass(slide.metaStyle ?? settings?.metaStyle ?? undefined);
             const itemContentClass = getUikitTextClass(slide.contentStyle ?? settings?.contentStyle ?? undefined);
+            const contentMarginClass = isPanelSlider
+              ? getUikitMarginClass(slide.contentMarginTop ?? settings?.contentMarginTop ?? "default", "top")
+              : "";
             const itemButtonClass = getUikitButtonClass(
               slide.buttonStyle ?? settings?.buttonStyle ?? undefined,
               slide.buttonSize ?? settings?.buttonSize ?? undefined,
             );
             const itemButtonFullWidth = slide.fullWidthButton ?? settings?.fullWidthButton;
             const itemButtonMarginClass = getUikitMarginClass(
-              slide.linkMarginTop ?? settings?.linkMarginTop,
+              slide.linkMarginTop ?? settings?.linkMarginTop ?? (isPanelSlider ? "default" : undefined),
               "top",
             );
             const itemMeta = slide.meta ?? slide.subtitle;
@@ -929,6 +956,11 @@ export default function CarouselBlock({
             const hasPanelLink = (slide.linkPanel ?? settings?.linkPanel) === true && Boolean(slide.buttonUrl);
             const itemButtonLabel = slide.buttonLabel ?? settings?.buttonLabel;
             const hasAction = slide.showAction !== false && Boolean(itemButtonLabel && slide.buttonUrl);
+            const panelImageNoPadding = slide.panelImageNoPadding ?? slide.alignImageWithoutPadding ?? false;
+            const panelExpansionClass = slide.panelHeightExpand
+              ? `shop-builder-panel-slider--expand-${slide.panelExpand ?? "none"}`
+              : "";
+            const panelMatchClass = slide.panelMatch === true ? "shop-builder-panel-slider--match" : "";
             const mediaStyle: React.CSSProperties = {
               aspectRatio: itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
               // UIkit's width-only inline icon presentation uses the same
@@ -987,7 +1019,7 @@ export default function CarouselBlock({
             const renderTitle = () =>
               showTitle && slide.title ? (
                 <ItemTitle
-                  className={`shop-builder-panel-slider-title ${hasRealImage ? "uk-margin-top uk-margin-remove-bottom" : ""} ${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
+                  className={`shop-builder-panel-slider-title ${hasRealImage ? `${titleMarginClass} uk-margin-remove-bottom` : ""} ${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
                 >
                   {slide.title}
                 </ItemTitle>
@@ -1005,7 +1037,7 @@ export default function CarouselBlock({
                   hasPanelSliderDivider && idx === 0 ? "uk-first-column" : "",
                 ].filter(Boolean).join(" ") || undefined}
               >
-                <article className={`el-item shop-builder-panel-slider-card ${hasPanelLink ? "shop-builder-panel--linked" : ""} ${panelClass}`.trim()}>
+                <article className={`el-item shop-builder-panel-slider-card ${panelImageNoPadding ? "shop-builder-panel-slider--media-flush" : "shop-builder-panel-slider--media-padded"} ${panelMatchClass} ${panelExpansionClass} ${hasPanelLink ? "shop-builder-panel--linked" : ""} ${panelClass}`.trim()}>
                   {hasPanelLink && (
                     <a
                       className="shop-builder-panel-link-overlay"
@@ -1048,19 +1080,23 @@ export default function CarouselBlock({
                     {metaPosition !== "above-title" && metaPosition !== "below-content" && renderMeta()}
                     {showContent && slide.text && (
                       <div
-                        className={`${itemContentClass} ${typographyRoleClass(itemContentRole)}`.trim()}
+                        className={`${isPanelSlider ? "uk-panel" : ""} ${itemContentClass} ${contentMarginClass} ${typographyRoleClass(itemContentRole)}`.trim()}
                         dangerouslySetInnerHTML={{ __html: sanitizeHtml(slide.text) }}
                       />
                     )}
                     {metaPosition === "below-content" && renderMeta()}
                     {showLink && hasAction && (
-                      <a
-                        href={panelLinkUrl}
-                        className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
-                        {...panelLinkProps}
-                      >
-                        {itemButtonLabel}
-                      </a>
+                      isPanelSlider ? (
+                        <div className={itemButtonMarginClass}>
+                          <a href={panelLinkUrl} className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()} {...panelLinkProps}>
+                            {itemButtonLabel}
+                          </a>
+                        </div>
+                      ) : (
+                        <a href={panelLinkUrl} className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()} {...panelLinkProps}>
+                          {itemButtonLabel}
+                        </a>
+                      )
                     )}
                   </div>
                 </article>

@@ -63,6 +63,7 @@ export function TitleSettingsGroup({
   block,
   update,
   showFontRole = true,
+  showMargin = false,
   showDecoration = false,
   showColor = false,
   showLink = false,
@@ -78,11 +79,13 @@ export function TitleSettingsGroup({
     decoration: "titleDecoration",
     color: "titleColor",
     link: "linkTitle",
+    margin: "titleMarginTop",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   showFontRole?: boolean;
+  showMargin?: boolean;
   /** @deprecated Alignment is owned by the shared General settings panel. */
   showAlignment?: boolean;
   showDecoration?: boolean;
@@ -100,6 +103,7 @@ export function TitleSettingsGroup({
     decoration?: string;
     color?: string;
     link?: string;
+    margin?: string;
   };
 }) {
   const values = block as any;
@@ -121,6 +125,22 @@ export function TitleSettingsGroup({
           ariaLabel={styleAriaLabel}
         />
       </InspectorFieldRow>
+
+      {showMargin && (
+        <InspectorFieldRow
+          label="Margin Top"
+          isOverridden={values[keys.margin ?? "titleMarginTop"] !== undefined}
+          inheritedValueText="Medium"
+          onReset={() => update({ [keys.margin ?? "titleMarginTop"]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.margin ?? "titleMarginTop"] ?? "medium")}
+            options={[{ value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "none", label: "None" }]}
+            onChange={(value) => update({ [keys.margin ?? "titleMarginTop"]: value })}
+            ariaLabel="Title margin top"
+          />
+        </InspectorFieldRow>
+      )}
 
       {showDecoration && (
         <InspectorFieldRow
@@ -424,12 +444,14 @@ export function ContentSettingsGroup({
   showAlignment = true,
   showStyle = false,
   showRole = true,
+  showMargin = false,
   defaultStyle = "none",
   styleOptions,
   keys = {
     role: "contentTypographyRole",
     align: "contentAlign",
     style: "contentStyle",
+    margin: "contentMarginTop",
   },
 }: {
   block: BuilderLayoutBlock;
@@ -439,12 +461,14 @@ export function ContentSettingsGroup({
   showAlignment?: boolean;
   showStyle?: boolean;
   showRole?: boolean;
+  showMargin?: boolean;
   defaultStyle?: string;
   styleOptions?: ReadonlyArray<{ value: string; label: string }>;
   keys?: {
     role: string;
     align: string;
     style?: string;
+    margin?: string;
   };
 }) {
   const values = block as any;
@@ -492,6 +516,22 @@ export function ContentSettingsGroup({
           onChange={(value) => update({ [keys.align]: value })}
         />
       </InspectorFieldRow>}
+
+      {showMargin && (
+        <InspectorFieldRow
+          label="Margin Top"
+          isOverridden={values[keys.margin ?? "contentMarginTop"] !== undefined}
+          inheritedValueText="Default"
+          onReset={() => update({ [keys.margin ?? "contentMarginTop"]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.margin ?? "contentMarginTop"] ?? "default")}
+            options={[{ value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }, { value: "none", label: "None" }]}
+            onChange={(value) => update({ [keys.margin ?? "contentMarginTop"]: value })}
+            ariaLabel="Content margin top"
+          />
+        </InspectorFieldRow>
+      )}
     </InspectorDivision>
   );
 }
@@ -1334,6 +1374,7 @@ export function CardSettingsGroup({
   sizeLabel = "Size",
   hoverLabel = "Enable hover effect",
   showHeight = false,
+  showMatch = false,
   showExpandContent = false,
   showMaxWidth = false,
   showImageNoPadding = false,
@@ -1358,6 +1399,8 @@ export function CardSettingsGroup({
   hoverLabel?: string;
   /** Panel-only YOOtheme height/expansion semantics belong to its Panel group. */
   showHeight?: boolean;
+  /** Expose YOOtheme's equal-height item contract. */
+  showMatch?: boolean;
   /** Expose YOOtheme's Panel expand control without requiring height expansion. */
   showExpandContent?: boolean;
   /** Expose the Grid item max-width owner. */
@@ -1469,6 +1512,16 @@ export function CardSettingsGroup({
             checked={Boolean(values[keys.hover])}
             onChange={(checked) => update({ [keys.hover]: checked })}
             label={hoverLabel}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showMatch && (
+        <InspectorFieldRow label="Height" isOverridden={values.panelMatch !== undefined} inheritedValueText="Off" onReset={() => update({ panelMatch: undefined })}>
+          <InspectorSwitch
+            checked={values.panelMatch === true}
+            onChange={(checked) => update({ panelMatch: checked })}
+            label="Match panel heights"
           />
         </InspectorFieldRow>
       )}

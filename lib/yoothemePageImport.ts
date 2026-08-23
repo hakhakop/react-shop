@@ -1416,11 +1416,13 @@ const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
   "title", "meta", "content",
   "show_title", "show_image", "show_meta", "show_content", "show_link",
   "text_align", "meta_align", "meta_element", "meta_style", "title_element", "title_style",
+  "title_margin", "content_margin", "link_margin",
   "link", "link_text", "link_style", "link_size", "link_target",
   "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
   "slider_autoplay", "slider_autoplay_interval", "slider_autoplay_pause", "slider_center", "slider_finite", "slider_gap", "slider_width",
   "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge",
   "slider_divider", "slidenav", "slidenav_margin", "slidenav_breakpoint", "nav", "nav_position",
+  "height_expand", "panel_expand", "panel_image_no_padding", "panel_match", "slidenav_hover", "slidenav_large", "slidenav_outside_breakpoint",
   // Dynamic source descriptors are classified by reportUnsupportedDynamicSource.
   "source", "query", "content_source", "item_source",
 ]);
@@ -1428,9 +1430,7 @@ const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
 const PANEL_SLIDER_DEFERRED_FIELDS = new Set([
   "image_align",
   "text_color",
-  "panel_match",
   "nav_breakpoint",
-  "slidenav_outside_breakpoint",
 ]);
 
 const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
@@ -1438,17 +1438,15 @@ const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
   "show_hover_image", "show_hover_video", "show_video", "slider_sets",
   "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
   "link_image", "image_transition", "animate_strokes", "image_icon_width", "image_icon_color",
-  "grid_column_gap", "grid_row_gap", "vertical_align", "margin_top", "link_margin", "title_margin",
+  "grid_column_gap", "grid_row_gap", "vertical_align", "margin_top",
   "lightbox_bg_close", "parallax_easing", "item_animation", "item_maxwidth",
-  "panel_expand", "panel_image_no_padding", "meta_color", "title_link",
+  "meta_color", "title_link",
 ]);
 
 const PANEL_SLIDER_DEFERRED_MESSAGES: Record<string, string> = {
   image_align: "Panel Slider structural image alignment requires the shared media-grid layout runtime, which is not in the current supported scope.",
   text_color: "Panel Slider has no canonical shared text-context owner that applies this source value across title, meta, content, and actions.",
-  panel_match: "equal-height Panel Slider sets require the shared item-height contract, which is not in the current supported scope.",
   nav_breakpoint: "navigation breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
-  slidenav_outside_breakpoint: "outside-arrow breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
 };
 
 const warnPanelSliderFields = (
@@ -1672,7 +1670,7 @@ const mapStaticElement = (
       "image_box_shadow", "image_box_decoration", "image_transition", "image_hover_box_shadow", "image_hover_border", "image_inverse", "image_link", "image_grid_width", "image_svg_inline", "image_svg_animate", "image_svg_color", "icon_width", "icon_color",
       "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
-      "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style", "text_color",
+      "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style", "content_align", "content_dropcap", "content_column", "content_column_divider", "content_column_breakpoint", "text_color",
       "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       // Filter navigation has an existing Grid owner. More detailed filter
       // layout options remain unsupported until the responsive runtime owns
@@ -1781,9 +1779,16 @@ const mapStaticElement = (
       // heading-style alias (for example `h2`) into the body renderer; the
       // source Grid body is a plain `uk-panel` unless a text preset is set.
       contentStyle: sourceTextVariant(props.content_style),
+      gridContentAlign: sourceBoolean(props.content_align) ?? false,
+      gridContentDropcap: sourceBoolean(props.content_dropcap) ?? false,
+      gridContentColumn: ["1-2", "1-3", "1-4", "1-5", "1-6"].includes(String(props.content_column)) ? props.content_column as any : "none",
+      gridContentColumnDivider: sourceBoolean(props.content_column_divider) ?? false,
+      gridContentColumnBreakpoint: ["s", "m", "l", "xl"].includes(String(props.content_column_breakpoint)) ? props.content_column_breakpoint as any : "always",
       titleMarginTop: props.title_margin === "remove" ? "remove" : sourceMargin(props.title_margin),
       metaMarginTop: props.meta_margin === "remove" ? "remove" : sourceMargin(props.meta_margin),
-      contentMarginTop: props.content_margin === "remove" ? "remove" : sourceMargin(props.content_margin),
+      // YOOtheme Grid defaults Content > Margin Top to Small when the source
+      // omits the field. Preserve explicit remove/none and authored tokens.
+      contentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin) ?? "small",
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonStyle: Object.prototype.hasOwnProperty.call(props, "link_style")
         ? sourceButtonStyle(props.link_style)
@@ -2268,10 +2273,10 @@ const mapStaticElement = (
         thumbnavWidth: Number.isFinite(Number(props.thumbnav_width)) ? Number(props.thumbnav_width) : undefined,
         thumbnavHeight: Number.isFinite(Number(props.thumbnav_height)) ? Number(props.thumbnav_height) : undefined,
         thumbnavNoWrap: props.thumbnav_nowrap === true || props.thumbnav_nowrap === "true" || props.thumbnav_wrap === false || props.thumbnav_wrap === "false",
-        slidenavHoverOnly: props.slidenav_hover === true || props.slidenav_hover === "true",
-        slidenavLarger: props.slidenav_large === true || props.slidenav_large === "true",
         slidenavMargin: asString(props.slidenav_margin) ?? undefined,
         slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
+        slidenavHoverOnly: props.slidenav_hover === true || props.slidenav_hover === "true",
+        slidenavLarger: props.slidenav_large === true || props.slidenav_large === "true",
         effect: props.slideshow_animation === "fade" ? "fade" : "slide",
         overlayPosition: sourceCarouselOverlayPosition(props.overlay_position),
         overlayPadding: sourceCarouselOverlayPadding(props.overlay_padding),
@@ -2320,6 +2325,9 @@ const mapStaticElement = (
           : "below-title",
         metaHtmlElement: sourceMetaElement(props.meta_element) ?? "div",
         metaStyle: asString(props.meta_style) ?? undefined,
+        titleMarginTop: props.title_margin === "remove" ? "none" : sourceMargin(props.title_margin),
+        contentStyle: sourceTextVariant(props.content_style),
+        contentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin),
         headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
         headingSize: sourceHeadingSize(props.title_style),
         imageFit: "natural",
@@ -2332,8 +2340,19 @@ const mapStaticElement = (
         panelSize: props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
           ? props.panel_padding
           : "none",
+        panelImageNoPadding: props.panel_image_no_padding === true || props.panel_image_no_padding === "true",
+        panelHeightExpand: props.height_expand === true || props.height_expand === "true",
+        panelExpand: props.panel_expand === "image" || props.panel_expand === "content" || props.panel_expand === "both"
+          ? props.panel_expand
+          : "none",
+        panelMatch: props.panel_match !== false && props.panel_match !== "false",
         panelHover: props.panel_link_hover === true || props.panel_link_hover === "true" || props.panel_style === "card-hover",
-        buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+        // An empty YOOtheme link_style is authored plain-link semantics, not
+        // an omitted value. Preserve it so the shared action renderer emits
+        // uk-link instead of its Primary-button fallback.
+        buttonStyle: Object.prototype.hasOwnProperty.call(props, "link_style")
+          ? sourceButtonStyle(props.link_style)
+          : undefined,
         buttonSize: sourceButtonSize(props.link_size),
         buttonLabel: asString(props.link_text) ?? undefined,
         linkTarget: props.link_target === "blank" ? "_blank" : "_self",
@@ -2361,6 +2380,9 @@ const mapStaticElement = (
         arrowPosition: sourceSlidenav === "outside" ? "outer" : sourceSlidenav === "default" ? "overlay" : undefined,
         slidenavMargin: asString(props.slidenav_margin) ?? undefined,
         slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
+        slidenavHoverOnly: props.slidenav_hover === true || props.slidenav_hover === "true",
+        slidenavLarger: props.slidenav_large === true || props.slidenav_large === "true",
+        slidenavOutsideBreakpoint: sourceBreakpoint(props.slidenav_outside_breakpoint),
         paginationPosition: asString(props.nav_position) ?? undefined,
         effect: "slide",
       },

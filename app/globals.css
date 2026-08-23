@@ -2164,6 +2164,11 @@ a {
 .shop-builder-main .uk-margin-small { margin-bottom: 10px; }
 .shop-builder-main .uk-margin-medium { margin-bottom: 40px; }
 .shop-builder-main .uk-margin-large { margin-bottom: 70px; }
+.shop-builder-main .uk-margin-top { margin-top: var(--uk-global-margin, 30px); }
+.shop-builder-main .uk-margin-small-top { margin-top: var(--uk-global-margin-small, 15px); }
+.shop-builder-main .uk-margin-medium-top { margin-top: var(--uk-global-margin-medium, 40px); }
+.shop-builder-main .uk-margin-large-top { margin-top: var(--uk-global-margin-large, 70px); }
+.shop-builder-main .uk-margin-xlarge-top { margin-top: var(--uk-global-margin-xlarge, 140px); }
 .shop-builder-main .uk-margin-remove-top { margin-top: 0; }
 .shop-builder-main .uk-margin-remove-bottom { margin-bottom: 0; }
 

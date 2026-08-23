@@ -395,6 +395,11 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
 
   return {
     ...(layout.position ? { position: layout.position } : {}),
+    // YOOtheme's positioned element wrapper spans its containing column
+    // (`uk-width-1-1`); the media/content inside it keeps its authored width.
+    // Without this, an image shell shrink-wraps to the media itself and the
+    // General text-alignment control has no space in which to align it.
+    ...(layout.position === "absolute" ? { width: "100%" } : {}),
     ...(positioned && layout.top?.trim() ? { top: layout.top.trim() } : {}),
     ...(positioned && layout.right?.trim() ? { right: layout.right.trim() } : {}),
     ...(positioned && layout.bottom?.trim() ? { bottom: layout.bottom.trim() } : {}),

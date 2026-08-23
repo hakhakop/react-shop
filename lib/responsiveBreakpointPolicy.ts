@@ -150,6 +150,7 @@ function renderResponsiveConsumerCss(selector: string, policy: ResponsiveBreakpo
     .map((value, index) => `${selector} .builder-text-columns-${value}-from-${tier}{columns:${index + 2};}`)
     .join("");
   const navRule = (tier: string) => `${selector} .shop-builder-slidenav-from-${tier} .swiper-button-prev,${selector} .shop-builder-slidenav-from-${tier} .swiper-button-next{display:flex!important;}${selector} .shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-${tier} .swiper-pagination.uk-dotnav,${selector} .shop-builder-swiper--slideshow.shop-builder-slideshow-nav-from-${tier} .swiper-pagination.uk-thumbnav{display:flex!important;}${selector} .shop-builder-swiper--overlay.shop-builder-overlay-nav-from-${tier} .shop-builder-overlay-navigation-frame{display:block!important;}`;
+  const outsideNavHideRule = (tier: string) => `${selector} .shop-builder-slidenav-outside-from-${tier}.shop-builder-arrow-pos--outer .swiper-button-prev,${selector} .shop-builder-slidenav-outside-from-${tier}.shop-builder-arrow-pos--outer .swiper-button-next{display:none!important;}`;
   const titleReset = (tier: string, max: number) => `@media (max-width:${max}px){${selector} .shop-builder-section[data-section-title-breakpoint="${tier}"] .shop-builder-section-heading{writing-mode:horizontal-tb;transform:none;}}`;
   const generalVisibilityBase = tiers.map(([tier]) => `${selector} .builder-general-visible-from-${tier}{display:none!important;}`).join("");
   const generalVisibilityRules = tiers.map(([tier, value]) => `@media (min-width:${value}px){${selector} .builder-general-visible-from-${tier}{display:block!important;}${selector} .builder-general-hidden-from-${tier}{display:none!important;}}`).join("");
@@ -172,14 +173,16 @@ function renderResponsiveConsumerCss(selector: string, policy: ResponsiveBreakpo
         ? `${previewRoot} .builder-hide-tablet{display:none!important;}`
         : `${previewRoot} .builder-hide-desktop{display:none!important;}`;
     const active = activeTiers.map(([tier]) => `${scope(generalRule(tier), previewTier)}${scope(yoothemeWidthRule(tier), previewTier)}${scope(gridRules[tier], previewTier)}${scope(textColumnRule(tier), previewTier)}${scope(navRule(tier), previewTier)}${previewSelector(previewTier)} .builder-general-visible-from-${tier}{display:block!important;}${previewSelector(previewTier)} .builder-general-hidden-from-${tier}{display:none!important;}`).join("");
+    const outsideHidden = tiers.slice(0, Math.min(index + 1, tiers.length)).map(([tier]) => scope(outsideNavHideRule(tier), previewTier)).join("");
     const titleResets = inactiveTitleTiers.map(([tier]) => `${previewSelector(previewTier)} .shop-builder-section[data-section-title-breakpoint="${tier}"] .shop-builder-section-heading{writing-mode:horizontal-tb;transform:none;}`).join("");
-    return `${resetGeneral}${scope(gridBaseRule, previewTier)}${resetTextColumns}${scope(baseNav, previewTier)}${resetVisibility}${resetDeviceVisibility}${deviceVisibilityForTier}${active}${titleResets}`;
+    return `${resetGeneral}${scope(gridBaseRule, previewTier)}${resetTextColumns}${scope(baseNav, previewTier)}${resetVisibility}${resetDeviceVisibility}${deviceVisibilityForTier}${active}${outsideHidden}${titleResets}`;
   }).join("");
   return [
     generalVisibilityBase,
     deviceVisibility,
     baseNav,
     ...tiers.map(([tier, value]) => `@media (min-width:${value}px){${generalRule(tier)}${yoothemeWidthRule(tier)}${gridRules[tier]}${textColumnRule(tier)}${navRule(tier)}}`),
+    ...tiers.map(([tier, value]) => `@media (min-width:${value}px){${outsideNavHideRule(tier)}}`),
     generalVisibilityRules,
     titleReset("small", policy.small - 0.02),
     titleReset("medium", policy.medium - 0.02),

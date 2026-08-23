@@ -165,6 +165,7 @@ type ParallaxRuntime = {
   target: HTMLElement;
   geometry?: ParallaxGeometry;
   applied: AppliedParallaxStyle;
+  originalWillChange: string;
 };
 
 type AppliedParallaxStyle = {
@@ -182,10 +183,18 @@ type ParallaxGeometry = {
   targetTop: number;
   targetHeight: number;
   nodeWidth: number;
+  nodeTop: number;
+  nodeHeight: number;
 };
 
 export default function BuilderScrollAnimations({ dashboardMode = false }: Props) {
   useEffect(() => {
+    // The dashboard renders a footer through StorefrontBuilderRenderer as
+    // well. Its storefront animation component is document-wide, so without
+    // this guard it would compete with the dashboard runtime and re-promote
+    // every Builder parallax node after the dashboard releases it.
+    if (!dashboardMode && document.querySelector(".builder-dashboard")) return;
+    const layerPromotionMode = dashboardMode || Boolean(document.querySelector(".builder-dashboard"));
     const animatedNodes = Array.from(
       document.querySelectorAll<HTMLElement>("[data-builder-animate]"),
     );
@@ -395,22 +404,19 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       if (dashboardPaused) return;
       const viewportHeight = window.innerHeight || 1;
       const viewportWidth = window.innerWidth || 1;
-      const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; clear?: boolean }> = [];
+      const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; willChange?: string; clear?: boolean }> = [];
       parallaxNodes.forEach((node) => {
         let runtime = parallaxRuntime.get(node);
         if (!runtime) {
           const parallax = parseParallaxNode(node);
           if (!parallax) return;
-          const willChange = "transform";
-          const applied: AppliedParallaxStyle = { willChange };
-          if (node.style.willChange !== willChange) {
-            node.style.willChange = willChange;
-          }
+          const applied: AppliedParallaxStyle = {};
           runtime = {
             parallax,
             scrollElement: parallaxScrollParent(node),
             target: resolveParallaxTarget(node, parallax.target),
             applied,
+            originalWillChange: node.style.willChange,
           };
           geometryResizeObserver?.observe(runtime.target);
           geometryResizeObserver?.observe(node);
@@ -443,6 +449,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
           const scrollRect = isDocumentScroll
             ? undefined
             : scrollElement.getBoundingClientRect();
+          const nodeRect = node.getBoundingClientRect();
           geometry = {
             viewportHeight,
             viewportWidth,
@@ -453,10 +460,30 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
               : targetRect.top - (scrollRect?.top ?? 0) + scrollElement.scrollTop,
             targetHeight,
             nodeWidth: node.offsetWidth || 1,
+            nodeTop: isDocumentScroll
+              ? nodeRect.top + window.scrollY
+              : nodeRect.top - (scrollRect?.top ?? 0) + scrollElement.scrollTop,
+            nodeHeight: nodeRect.height,
           };
           runtime.geometry = geometry;
         }
         const { scrollViewportHeight, maxScroll, targetTop, targetHeight, nodeWidth } = geometry;
+        if (layerPromotionMode) {
+          const nearMargin = scrollViewportHeight * 1.5;
+          const viewportTop = isDocumentScroll ? window.scrollY : scrollElement.scrollTop;
+          const viewportBottom = viewportTop + scrollViewportHeight;
+          const nodeOutsideNearRange = geometry.nodeTop + geometry.nodeHeight < viewportTop - nearMargin
+            || geometry.nodeTop > viewportBottom + nearMargin;
+          if (nodeOutsideNearRange) {
+            const applied = runtime.applied;
+            if (applied.willChange !== undefined) {
+              if (runtime.originalWillChange) node.style.willChange = runtime.originalWillChange;
+              else node.style.removeProperty("will-change");
+              applied.willChange = undefined;
+            }
+            return;
+          }
+        }
         const startOffset = resolveParallaxOffset(parallax.start, target, viewportHeight, viewportWidth, targetHeight);
         const endOffset = resolveParallaxOffset(parallax.end, target, viewportHeight, viewportWidth, targetHeight);
         const start = Math.max(0, targetTop - scrollViewportHeight + startOffset);
@@ -485,6 +512,9 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
           rotate !== undefined ? `rotate(${rotate}deg)` : "",
           scale !== undefined ? `scale(${scale})` : "",
         ].filter(Boolean).join(" ");
+        const willChange = layerPromotionMode && parallax.opacity?.length
+          ? "transform, opacity"
+          : "transform";
         writes.push({
           node,
           transform,
@@ -492,9 +522,10 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
           ...(blur !== undefined ? { filter: `blur(${blur}${blur.endsWith("px") ? "" : "px"})` } : {}),
           ...(parallax.transformOrigin ? { origin: parallax.transformOrigin.replaceAll("-", " ") } : {}),
           ...(parallax.zIndex ? { zIndex: "1" } : {}),
+          willChange,
         });
       });
-      writes.forEach(({ node, clear, transform, opacity, filter, origin, zIndex }) => {
+      writes.forEach(({ node, clear, transform, opacity, filter, origin, zIndex, willChange }) => {
         const applied = parallaxRuntime.get(node)?.applied;
         if (!applied) return;
         if (clear) {
@@ -524,6 +555,10 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         if (filter !== undefined && applied.filter !== filter) {
           node.style.filter = filter;
           applied.filter = filter;
+        }
+        if (willChange !== undefined && applied.willChange !== willChange) {
+          if (node.style.willChange !== willChange) node.style.willChange = willChange;
+          applied.willChange = willChange;
         }
         if (origin !== undefined) node.style.transformOrigin = origin;
         if (zIndex !== undefined) node.style.zIndex = zIndex;
@@ -633,7 +668,9 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       cancelAnimationFrame(rafId);
       parallaxNodes.forEach((node) => {
         node.style.removeProperty("transform");
-        node.style.removeProperty("will-change");
+        const runtime = parallaxRuntime.get(node);
+        if (dashboardMode && runtime?.originalWillChange) node.style.willChange = runtime.originalWillChange;
+        else node.style.removeProperty("will-change");
       });
       window.removeEventListener("scroll", requestProgressUpdate);
       window.removeEventListener("resize", handleResize);

@@ -789,8 +789,11 @@ export default function SliderCapabilityPanel({
 
           <InspectorDivision title="SLIDENAV">
             <InspectorFieldRow label="Position"><InspectorSelect value={carouselSettings.showArrows === false ? "none" : (carouselSettings.arrowPosition === "outer" ? "outside" : "default")} onChange={(value: string) => updateCarousel(value === "none" ? { showArrows: false } : { showArrows: true, arrowPosition: value === "outside" ? "outer" : "overlay" })} options={[{ value: "none", label: "None" }, { value: "default", label: "Default" }, { value: "outside", label: "Outside" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover"><InspectorSwitch checked={carouselSettings.slidenavHoverOnly === true} onChange={(checked: boolean) => updateCarousel({ slidenavHoverOnly: checked })} label="Show on hover" /></InspectorFieldRow>
+            <InspectorFieldRow label="Size"><InspectorSwitch checked={carouselSettings.slidenavLarger === true} onChange={(checked: boolean) => updateCarousel({ slidenavLarger: checked })} label="Larger" /></InspectorFieldRow>
             <InspectorFieldRow label="Margin"><InspectorSelect value={carouselSettings.slidenavMargin ?? "medium"} onChange={(value: string) => updateCarousel({ slidenavMargin: value })} options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }]} /></InspectorFieldRow>
             <InspectorFieldRow label="Breakpoint"><InspectorSelect value={carouselSettings.slidenavBreakpoint ?? ""} onChange={(value: string) => updateCarousel({ slidenavBreakpoint: value || undefined })} options={[{ value: "", label: "Always" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Outside Breakpoint"><InspectorSelect value={carouselSettings.slidenavOutsideBreakpoint ?? ""} onChange={(value: string) => updateCarousel({ slidenavOutsideBreakpoint: value || undefined })} options={[{ value: "", label: "Always" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} /></InspectorFieldRow>
           </InspectorDivision>
 
           <InspectorDivision title="ITEM">
@@ -805,6 +808,11 @@ export default function SliderCapabilityPanel({
             update={updateCarousel}
             title="PANEL"
             showLink
+            showHeight
+            showMatch
+            showImageNoPadding
+            heightLabel="Fill the available column space"
+            imageNoPaddingLabel="Align image without padding"
             surfaceOptions={[
               { value: "blank", label: "None" },
               { value: "default", label: "Default" },
@@ -833,8 +841,18 @@ export default function SliderCapabilityPanel({
             block={sharedSettingsBlock}
             update={updateCarousel}
             showFontRole={false}
+            showMargin
             defaultSize="inherit"
             defaultLevel="h3"
+          />
+
+          <ContentSettingsGroup
+            block={sharedSettingsBlock}
+            update={updateCarousel}
+            showRole={false}
+            showStyle
+            showAlignment
+            showMargin
           />
 
           <MetaSettingsGroup

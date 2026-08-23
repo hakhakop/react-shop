@@ -291,7 +291,6 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
               ariaLabel="Text Alignment Fallback"
             />
           </InspectorFieldRow>
-
           {showAnimation && (() => {
             const animation = typeof block.animation === "object" && block.animation ? block.animation : {};
             const animationMode = typeof block.animation === "string" ? block.animation : (block.animation?.preset ?? "inherit");

@@ -692,6 +692,11 @@ body.dark {
    intrinsic Panel Slider layout disagree with UIkit. */
 .shop-builder-swiper--panel .swiper-wrapper.uk-slider-items {
   width: auto !important;
+  margin-left: calc(-1 * var(--shop-builder-panel-slider-gap, 40px)) !important;
+}
+
+.shop-builder-swiper--panel .swiper-wrapper.uk-slider-items > .swiper-slide {
+  padding-left: var(--shop-builder-panel-slider-gap, 40px) !important;
 }
 
 /* Panel Slider uses the same canonical spacing scale as the other UIkit
@@ -748,6 +753,25 @@ body.dark {
 .shop-builder-slidenav-from-large .swiper-button-next,
 .shop-builder-slidenav-from-xlarge .swiper-button-prev,
 .shop-builder-slidenav-from-xlarge .swiper-button-next { display: none; }
+
+.shop-builder-panel-slidenav-hover .swiper-button-prev,
+.shop-builder-panel-slidenav-hover .swiper-button-next {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shop-builder-panel-slidenav-hover:hover .swiper-button-prev,
+.shop-builder-panel-slidenav-hover:hover .swiper-button-next {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.shop-builder-panel-slidenav-large .swiper-button-prev,
+.shop-builder-panel-slidenav-large .swiper-button-next {
+  width: 52px;
+  height: 52px;
+}
+
 /* Responsive slidenav visibility is emitted per rendered page from the
    canonical Global Styles policy. */
 
@@ -1147,7 +1171,9 @@ body.dark {
 /* Panel Slider can use any supported title element, including a semantic div.
    Keep linked titles on the same canonical Card title-token path as headings. */
 .shop-builder-panel-slider-title {
-  color: inherit;
+  color: var(--uk-card-default-title, var(--uk-global-emphasis-color, inherit));
+  font-family: inherit;
+  font-weight: var(--uk-heading-font-weight, 700);
 }
 
 .shop-builder-panel-slider-card.uk-card-primary .shop-builder-panel-slider-title {
@@ -2236,7 +2262,7 @@ body.dark {
 .shop-builder-grid-card--yootheme.uk-card-default,
 .shop-builder-grid-card--yootheme.uk-card-hover {
   background: var(--uk-card-default-background, var(--global-background, #f7f8fc)) !important;
-  box-shadow: var(--uk-card-default-box-shadow, -15px -15px 20px rgba(255, 255, 255, 0.8), 15px 15px 20px rgba(57, 65, 124, 0.08)) !important;
+  box-shadow: var(--uk-card-default-box-shadow, var(--uk-card-shadow, none)) !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-primary {
@@ -6189,7 +6215,9 @@ body.dark {
 
 .shop-builder-image-media img {
   max-width: 100% !important;
-  height: auto !important;
+  /* Keep natural sizing as the fallback, but do not override the Image
+     renderer's inline height for YOOtheme-authored image_height values. */
+  height: auto;
 }
 
 .shop-builder-image-media[data-image-ratio="true"] img {
@@ -6728,6 +6756,7 @@ body.is-visual-builder-active .uk-lightbox {
   max-width: none !important;
   margin-right: -70px !important;
   margin-left: -70px !important;
+  margin-bottom: -70px !important;
 }
 .shop-builder-grid-card--yootheme.shop-builder-panel--media-bottom.is-image-frameless
   > .shop-builder-grid-content.shop-builder-panel-padding-default
@@ -6736,6 +6765,7 @@ body.is-visual-builder-active .uk-lightbox {
   max-width: none !important;
   margin-right: -40px !important;
   margin-left: -40px !important;
+  margin-bottom: -40px !important;
 }
 .shop-builder-grid-card--yootheme.shop-builder-panel--media-bottom.is-image-frameless
   > .shop-builder-grid-content.shop-builder-panel-padding-small
@@ -6744,6 +6774,7 @@ body.is-visual-builder-active .uk-lightbox {
   max-width: none !important;
   margin-right: -20px !important;
   margin-left: -20px !important;
+  margin-bottom: -20px !important;
 }
 
 /* YOOtheme keeps the title's bottom edge flush, then gives the content its
@@ -6863,7 +6894,7 @@ body.is-visual-builder-active .uk-lightbox {
    default/primary/secondary cards and a different shadow per surface. */
 .shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
   background-color: var(--uk-card-default-background, #f7f8fc) !important;
-  box-shadow: var(--uk-card-default-hover-box-shadow, -2px -2px 5px rgba(255,255,255,.9), 2px 2px 4px rgba(57,65,124,.2)) !important;
+  box-shadow: var(--uk-card-default-hover-box-shadow, var(--uk-card-hover-shadow, none)) !important;
   translate: 0 3px !important;
 }
 
@@ -6883,7 +6914,7 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:focus,
 .shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:focus-within,
 .shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-disabled:active {
-  box-shadow: var(--uk-card-default-box-shadow, -15px -15px 20px rgba(255,255,255,.8), 15px 15px 20px rgba(57,65,124,.08)) !important;
+  box-shadow: var(--uk-card-default-box-shadow, var(--uk-card-shadow, none)) !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:hover,

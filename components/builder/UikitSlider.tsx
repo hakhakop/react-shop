@@ -76,13 +76,26 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         gridMetaAlign: rawCarouselSettings.metaPosition,
         metaHtmlElement: rawCarouselSettings.metaHtmlElement,
         metaStyle: rawCarouselSettings.metaStyle,
+        titleMarginTop: rawCarouselSettings.titleMarginTop,
+        contentStyle: rawCarouselSettings.contentStyle,
+        contentMarginTop: rawCarouselSettings.contentMarginTop,
         headingLevel: rawCarouselSettings.headingLevel,
         headingSize: rawCarouselSettings.headingSize,
-        buttonStyle: rawCarouselSettings.buttonStyle,
+        // Older imports lost an explicitly empty YOOtheme `link_style` and
+        // therefore have no persisted buttonStyle. Their element-level link
+        // label is still present; retain the plain-link presentation until
+        // the document is re-imported, while fresh imports persist it as
+        // `link` in the canonical field.
+        buttonStyle: rawCarouselSettings.buttonStyle ??
+          (rawCarouselSettings.buttonLabel ? "link" : undefined),
         buttonSize: rawCarouselSettings.buttonSize,
         linkTarget: rawCarouselSettings.linkTarget,
         imageBoxDecoration: rawCarouselSettings.imageBoxDecoration,
         alignImageWithoutPadding: rawCarouselSettings.alignImageWithoutPadding ?? false,
+        panelImageNoPadding: rawCarouselSettings.panelImageNoPadding,
+        panelHeightExpand: rawCarouselSettings.panelHeightExpand,
+        panelExpand: rawCarouselSettings.panelExpand,
+        panelMatch: rawCarouselSettings.panelMatch,
       }
     : null;
   const sharedImageSettings = !panelMode && (rawBlock.kind === "overlaySlider" || rawBlock.kind === "slideshow")
@@ -131,11 +144,18 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         imageSvgColor: panelMode ? slide.imageSvgColor ?? panelShared?.imageSvgColor : slide.imageSvgColor,
         imageBoxDecoration: slide.imageBoxDecoration ?? panelShared?.imageBoxDecoration,
         alignImageWithoutPadding: slide.alignImageWithoutPadding ?? panelShared?.alignImageWithoutPadding,
+        panelImageNoPadding: slide.panelImageNoPadding ?? panelShared?.panelImageNoPadding,
+        panelHeightExpand: slide.panelHeightExpand ?? panelShared?.panelHeightExpand,
+        panelExpand: slide.panelExpand ?? panelShared?.panelExpand,
+        panelMatch: slide.panelMatch ?? panelShared?.panelMatch,
         contentAlign: panelMode ? panelShared?.contentAlign : slide.contentAlign,
         headingAlign: panelMode ? panelShared?.headingAlign : slide.headingAlign,
         gridMetaAlign: slide.gridMetaAlign ?? panelShared?.gridMetaAlign,
         metaHtmlElement: slide.metaHtmlElement ?? panelShared?.metaHtmlElement,
         metaStyle: slide.metaStyle ?? panelShared?.metaStyle,
+        titleMarginTop: slide.titleMarginTop ?? panelShared?.titleMarginTop,
+        contentStyle: slide.contentStyle ?? panelShared?.contentStyle,
+        contentMarginTop: slide.contentMarginTop ?? panelShared?.contentMarginTop,
         headingLevel: slide.headingLevel ?? panelShared?.headingLevel,
         headingSize: slide.headingSize ?? panelShared?.headingSize,
         buttonLabel: slide.buttonLabel ?? "",
@@ -143,6 +163,8 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         // Native demonstration slides already carry explicit URLs.
         buttonUrl: slide.buttonUrl ?? undefined,
         buttonTarget: slide.buttonTarget ?? panelShared?.linkTarget ?? "_self",
+        buttonStyle: slide.buttonStyle ?? panelShared?.buttonStyle,
+        buttonSize: slide.buttonSize ?? panelShared?.buttonSize,
       }));
 
   const carousel = resolveCarouselPresentation(
@@ -190,6 +212,8 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
                 metaStyle: carousel.settings.metaStyle ?? rawBlock.metaStyle,
                 contentTypographyRole: carousel.settings.contentTypographyRole ?? rawBlock.contentTypographyRole,
                 contentStyle: carousel.settings.contentStyle ?? rawBlock.contentStyle,
+                contentMarginTop: carousel.settings.contentMarginTop ?? rawBlock.contentMarginTop,
+                titleMarginTop: carousel.settings.titleMarginTop ?? rawBlock.titleMarginTop,
                 // Runtime input only: this is derived directly from General,
                 // never persisted inside carouselSettings.
                 contentAlign: panelContentAlignment,

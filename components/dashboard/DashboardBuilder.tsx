@@ -185,7 +185,6 @@ import {
   normalizeLayoutToUikitPreset,
   UIKIT_LAYOUT_PRESETS,
 } from "@/lib/uikitLayoutEngine";
-import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import {
   resolveResponsiveBreakpointPolicy,
   resolveResponsiveBreakpointTier,
@@ -353,7 +352,6 @@ import {
   builderAnimationDataAttributes as previewAnimationAttrs,
 } from "@/lib/builderAnimation";
 import { normalizeBuilderLineBreaks } from "@/lib/builderText";
-import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import {
   BUILDER_BUTTON_PRESETS,
   builderButtonCssVars,
@@ -1658,6 +1656,9 @@ function normalizeBuilderState(
             return {
               ...block,
               ...(gridStyle ? { buttonStyle: gridStyle } : {}),
+              ...(block.spacingContract === "yootheme" && block.contentMarginTop === undefined
+                ? { contentMarginTop: "small" }
+                : {}),
               gridItems,
             } as BuilderLayoutBlock;
           }
@@ -11346,7 +11347,6 @@ export default function DashboardBuilder({
           "--builder-preview-real-bg": previewPageBackground,
           "--builder-sidebar-width": `${sidebarWidth}px`,
           "--builder-inspector-width": `${clampedInspectorWidth}px`,
-          ...getUikitGlobalsCssVars(shellSettings, builderState.design),
         } as CSSProperties
       }
       onTransitionEnd={handleDashboardTransitionEnd}
@@ -13136,8 +13136,7 @@ function PreviewCanvas({
           setEditingTarget(null);
         }
       }}
-      style={
-        {
+        style={omitPreviewCanvasDefaults({
           "--builder-global-section-padding-top": resolveBuilderSpacing(
             shellSettings.sectionPaddingTop,
             "sectionPadding",
@@ -13211,7 +13210,6 @@ function PreviewCanvas({
             shellSettings.elementMarginLeft,
             "elementMargin",
           ),
-          ...builderGeometryCssVariables({ includeEditorAffordances: true }),
           "--builder-editor-row-interaction-gutter": `${
             20 / Math.max(interactionScale, 0.25)
           }px`,
@@ -13219,8 +13217,7 @@ function PreviewCanvas({
             24 / Math.max(interactionScale, 0.25)
           }px`,
           ...builderButtonCssVars(shellSettings),
-        } as CSSProperties
-      }
+        } as CSSProperties)}
       onDragEnter={(event) => {
         const dragType = getBuilderTemplateDragType(event.dataTransfer.types);
         if (!dragType) return;
@@ -13270,7 +13267,7 @@ function PreviewCanvas({
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         data-theme={layoutScheme}
         style={{
-          ...designStyle({ design, sections }, shellSettings),
+          ...designStyle({ design, sections } as BuilderLayout),
         }}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
@@ -13803,6 +13800,52 @@ function getPreviewRowSpacing(
   context: "rowPadding" | "rowMargin" | "rowGap",
 ) {
   return resolveBuilderSpacing(value, context).css;
+}
+
+const PREVIEW_CANVAS_DEFAULTS: Record<string, string> = {
+  "--builder-global-section-padding-top": "64px",
+  "--builder-global-section-padding-bottom": "64px",
+  "--builder-global-section-margin-top": "0px",
+  "--builder-global-section-margin-bottom": "0px",
+  "--builder-global-row-padding-top": "0px",
+  "--builder-global-row-padding-bottom": "0px",
+  "--builder-global-row-margin-top": "0px",
+  "--builder-global-row-margin-bottom": "0px",
+  "--builder-global-row-gap": "32px",
+  "--builder-global-column-gap": "32px",
+  "--builder-global-element-padding-top": "8px",
+  "--builder-global-element-padding-right": "8px",
+  "--builder-global-element-padding-bottom": "8px",
+  "--builder-global-element-padding-left": "8px",
+  "--builder-global-element-margin-top": "0px",
+  "--builder-global-element-margin-right": "0px",
+  "--builder-global-element-margin-bottom": "0px",
+  "--builder-global-element-margin-left": "0px",
+  "--button-bg": "#111111",
+  "--button-text-color": "#ffffff",
+  "--button-radius": "999px",
+  "--button-border-width": "0px",
+  "--button-border-color": "transparent",
+  "--button-padding-y": "11px",
+  "--button-padding-x": "18px",
+  "--button-font-weight": "720",
+  "--button-letter-spacing": "0px",
+  "--button-hover-bg": "#111111",
+  "--button-hover-text-color": "#ffffff",
+  "--button-hover-border-color": "transparent",
+  "--button-hover-transform": "translateY(-2px)",
+  "--button-hover-shadow": "0 16px 34px rgba(17, 17, 17, 0.16)",
+};
+
+function omitPreviewCanvasDefaults(style: CSSProperties): CSSProperties {
+  const filtered = Object.entries(style).filter(([name, value]) => {
+    const defaultValue = PREVIEW_CANVAS_DEFAULTS[name];
+    if (defaultValue === undefined || value === undefined || value === null) {
+      return true;
+    }
+    return String(value).trim().toLowerCase() !== defaultValue.toLowerCase();
+  });
+  return Object.fromEntries(filtered) as CSSProperties;
 }
 
 function GlobalSpacingControl({
@@ -14838,6 +14881,10 @@ function BuilderInteractionLayer({
     updateRect(true);
     let animationFrame: number | null = null;
     const scheduleUpdate = () => {
+      // The selected interaction portal is not mounted when there is no
+      // active selection. Avoid scheduling a scroll-following geometry read
+      // for an overlay that cannot paint anything.
+      if (!selectedFrameRef.current && !selectedToolbarRef.current) return;
       if (animationFrame !== null) return;
       animationFrame = window.requestAnimationFrame(() => {
         animationFrame = null;
@@ -14846,6 +14893,7 @@ function BuilderInteractionLayer({
     };
     const handleResize = () => scheduleUpdate();
     const handleScroll = () => {
+      if (!selectedFrameRef.current && !selectedToolbarRef.current) return;
       hoverSuppressedByScrollRef.current = true;
       if (hoverFrameRef.current) hoverFrameRef.current.style.display = "none";
       scheduleUpdate();

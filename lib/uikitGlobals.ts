@@ -312,6 +312,9 @@ export function getUikitGlobalsCssVars(
     "--uk-card-secondary-border": value("cardSecondaryBorder", "transparent"),
     "--uk-card-transition-duration": value("cardTransitionDuration", "0.1s"),
     "--uk-card-shadow": value("cardShadow", "0 8px 24px rgba(0,0,0,.08)"),
+    // YOOtheme's default-card shadow is imported into the canonical card
+    // shadow field; expose the semantic alias consumed by card projections.
+    "--uk-card-default-box-shadow": value("cardShadow", "none"),
     "--uk-card-hover-shadow": value("cardHoverShadow", value("cardShadowHover", "0 8px 24px rgba(0,0,0,.08)")),
     "--uk-card-hover-transform": value("cardHoverTransform", "translateY(3px)"),
     "--uk-card-default-hover-background": cardDefaultHoverBackground,

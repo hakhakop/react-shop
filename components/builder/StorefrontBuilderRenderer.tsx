@@ -69,7 +69,6 @@ import { getProductsForGrid, type ProductNode } from "@/lib/products";
 import type { SaaSWebsite } from "@/lib/websites";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
-import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { resolveResponsiveBreakpointPolicy } from "@/lib/responsiveBreakpointPolicy";
 import {
   getUikitSemanticContextVars,
@@ -363,10 +362,7 @@ function resolveDesignColors(layout: BuilderLayout) {
   return design;
 }
 
-export function designStyle(
-  layout: BuilderLayout,
-  shellSettings?: Partial<BuilderShellSettings>,
-): BuilderStyle {
+export function designStyle(layout: BuilderLayout): BuilderStyle {
   const design = layout.design;
   const colors = resolveDesignColors(layout);
   const styleObj: Record<string, string | undefined> = {};
@@ -434,11 +430,6 @@ export function designStyle(
   if (design?.cardImagePadding) {
     styleObj["--builder-card-image-padding"] = design.cardImagePadding;
   }
-  // Keep the published renderer on the same live semantic token surface as
-  // the Builder preview. This is especially important when a global preset
-  // changes button radii or other UIkit variables before publish.
-  Object.assign(styleObj, getUikitGlobalsCssVars(shellSettings, design));
-
   return styleObj as BuilderStyle;
 }
 
@@ -3176,6 +3167,12 @@ function StorefrontBuilderRendererBase({
   const transparentSectionHeader = firstVisibleSection?.headerTransparent === true;
   const RootElement = rootElement;
   const responsiveBreakpointPolicy = resolveResponsiveBreakpointPolicy(shellSettings);
+  // Footer layout state is a document shell, not a second theme root. Its
+  // inherited BuilderDesign is the global preset and must remain owned by the
+  // canonical document/theme root rather than being serialized on <footer>.
+  const rootLayout = rootElement === "footer"
+    ? { ...layout, design: undefined }
+    : layout;
 
   useEffect(() => {
     if (!isPageDocument) return;
@@ -3197,8 +3194,8 @@ function StorefrontBuilderRendererBase({
       /> : null}
       {isPageDocument ? <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} /> : null}
       <RootElement
-        className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
-        style={designStyle(layout, shellSettings) as CSSProperties}
+        className={`${designClassName(rootLayout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
+        style={designStyle(rootLayout) as CSSProperties}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
         data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}

@@ -66,7 +66,7 @@ export function getUikitMarginClass(
   if (value === "lg" || value === "large") {
     return sized("large");
   }
-  if (value === "xl" || value === "2xl" || value === "3xl") {
+  if (value === "xl" || value === "xlarge" || value === "2xl" || value === "3xl") {
     return sized("xlarge");
   }
 

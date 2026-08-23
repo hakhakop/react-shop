@@ -24,7 +24,8 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   const role = cardColorRole(block.panelVariant ?? block.panelStyle ?? block.cardVariant);
   const variant = String(block.panelVariant ?? block.panelStyle ?? block.cardVariant ?? "").trim().toLowerCase();
   const isDefaultCard = ["default", "card-default"].includes(variant);
-  if (!role && !isDefaultCard) return {
+  const isBlankPanel = ["", "blank", "none"].includes(variant);
+  if (!role && !isDefaultCard && !isBlankPanel) return {
     className: "",
     style: {} as Record<string, string>,
     metaStyle: {} as Record<string, string>,
@@ -35,11 +36,15 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   // YOOtheme Grid and a standalone Panel cannot diverge.
   if (!role) {
     const style: Record<string, string> = {
-      // Default Cards inherit the page's emphasis/text/link palette in
-      // YOOtheme. Do not freeze Circle's dark-surface text to the light-mode
-      // fallback token (`#111827`).
-      "--builder-card-content-color": "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
-      "--builder-card-meta-color": "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
+      // YOOtheme blank panels use the normal semantic panel foreground:
+      // headings take emphasis while body/meta text takes global text. A
+      // default Card has its own Card token path below these same fallbacks.
+      "--builder-card-content-color": isBlankPanel
+        ? "var(--uk-global-text-color, inherit)"
+        : "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
+      "--builder-card-meta-color": isBlankPanel
+        ? "var(--uk-global-text-color, inherit)"
+        : "var(--uk-global-emphasis-color, var(--uk-card-default-color, inherit))",
       "--uk-global-link-color": "var(--uk-global-emphasis-color, inherit)",
       "--uk-global-link-hover-color": "var(--uk-global-emphasis-color, inherit)",
       "--uk-button-text-color": "var(--uk-global-emphasis-color, inherit)",
