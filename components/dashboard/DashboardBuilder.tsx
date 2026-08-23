@@ -78,6 +78,7 @@ import {
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
+import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 import type { BuilderLayout } from "@/lib/builderLayouts";
 import {
@@ -114,12 +115,15 @@ import CarouselBlock, {
 } from "@/components/blocks/CarouselBlock";
 import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import BuilderStickyRuntime from "@/components/builder/BuilderStickyRuntime";
+import { LayoutAdvancedStyle } from "@/components/builder/LayoutAdvancedStyle";
 import { BuilderCarouselGeometryCoordinator } from "@/components/builder/BuilderCarouselGeometryCoordinator";
 import StorefrontBuilderRenderer, {
   BodyText,
   ContentLayoutBlock,
   designStyle,
   getBuilderSectionClassName,
+  getBuilderStickyDeclaration,
   isRichPreviewText,
   sectionStyle,
 } from "@/components/builder/StorefrontBuilderRenderer";
@@ -2174,6 +2178,7 @@ export default function DashboardBuilder({
   );
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [activeDynamicDocumentId, setActiveDynamicDocumentId] = useState<string | null>(null);
   const [layoutLibraryRequest, setLayoutLibraryRequest] = useState<{
     type: LayoutLibraryType;
@@ -2692,6 +2697,37 @@ export default function DashboardBuilder({
   const [panelForceToggler, setPanelForceToggler] = useState(0);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
+  const dashboardGlobalCssSnapshotRef = useRef<Map<string, string | null> | null>(null);
+
+  // The app layout emits the canonical UIkit variables during SSR, but Global
+  // Styles edits happen client-side. Keep the same document/theme root live so
+  // the Builder canvas resolves the new tokens without a refresh. This does
+  // not add an inline token payload to the dashboard or preview roots.
+  useEffect(() => {
+    const root = document.documentElement;
+    const vars = getUikitGlobalsCssVars(shellSettings);
+    if (!dashboardGlobalCssSnapshotRef.current) {
+      dashboardGlobalCssSnapshotRef.current = new Map(
+        Object.keys(vars).map((name) => [name, root.style.getPropertyValue(name) || null]),
+      );
+    }
+    for (const [name, value] of Object.entries(vars)) {
+      root.style.setProperty(name, value);
+    }
+  }, [shellSettings]);
+
+  useEffect(() => {
+    return () => {
+      const root = document.documentElement;
+      const snapshot = dashboardGlobalCssSnapshotRef.current;
+      if (!snapshot) return;
+      for (const [name, value] of snapshot) {
+        if (value === null) root.style.removeProperty(name);
+        else root.style.setProperty(name, value);
+      }
+      dashboardGlobalCssSnapshotRef.current = null;
+    };
+  }, []);
   const [shellStatus, setShellStatus] = useState(
     `${shellSettingsStatusLabel} load from React`,
   );
@@ -2778,6 +2814,7 @@ export default function DashboardBuilder({
     sections: BuilderSection[];
     warnings: string[];
     globalStylePatch: Partial<BuilderShellSettings>;
+    headerDocumentPatch: Partial<BuilderSection>;
   } | null>(null);
   const [previewProducts, setPreviewProducts] = useState<ProductNode[]>([]);
   const [previewCategoryTree, setPreviewCategoryTree] = useState<
@@ -3431,10 +3468,16 @@ export default function DashboardBuilder({
     builderState.design,
     layoutScheme,
   );
+  const previewUsesCanonicalPageBackground =
+    (builderState.design.colorScheme ?? "auto") === "auto" &&
+    (!builderState.design.pageBackground ||
+      builderState.design.pageBackground === lightScheme.pageBackground);
   const previewPageBackground =
-    previewColors.pageBackground ??
-    builderState.design.pageBackground ??
-    "#f7f7f4";
+    previewUsesCanonicalPageBackground
+      ? "var(--uk-global-background-color, #f7f7f4)"
+      : previewColors.pageBackground ??
+        builderState.design.pageBackground ??
+        "#f7f7f4";
   const selectedMenuItem = useMemo(() => {
     function findItem(items: MenuItem[]): MenuItem | null {
       for (const item of items) {
@@ -9229,7 +9272,7 @@ export default function DashboardBuilder({
       const parsed = JSON.parse(await file.text()) as unknown;
       const mapping = mapYoothemeStaticContent(parsed);
 
-      if (!mapping.sections.length) {
+      if (!mapping.sections.length && !Object.keys(mapping.globalStylePatch).length && !Object.keys(mapping.headerDocumentPatch).length) {
         setTemplateStatus("YOOtheme import failed: no supported sections");
         return;
       }
@@ -9241,6 +9284,7 @@ export default function DashboardBuilder({
         // canonical Phase 12 report rather than raw importer warning strings.
         warnings: mapping.reportWarnings,
         globalStylePatch: mapping.globalStylePatch,
+        headerDocumentPatch: mapping.headerDocumentPatch,
       });
       setTemplateStatus("YOOtheme import preview ready");
     } catch {
@@ -9253,8 +9297,69 @@ export default function DashboardBuilder({
     setTemplateStatus("YOOtheme import cancelled");
   };
 
+  const materializeImportedHeaderDocument = (
+    currentHeaderState: BuilderState,
+    patch: Partial<BuilderSection>,
+  ): BuilderState => {
+    const preset = patch.headerLayout
+      ? headerPresets.find((candidate) => candidate.key === patch.headerLayout)
+      : undefined;
+    const baseSections = preset
+      ? mergeBrandingIntoPreset(currentHeaderState.sections, preset.sections)
+      : currentHeaderState.sections;
+    return {
+      ...currentHeaderState,
+      page: "header",
+      targetType: "header",
+      sections: baseSections.map((section, index) =>
+        index === 0 || section.id === "header-document"
+          ? { ...section, ...patch, headerArchitectureVersion: 2 }
+          : section,
+      ),
+    };
+  };
+
   const applyYoothemeImport = () => {
     if (!yoothemeImportPreview) return;
+
+    // A full YOOtheme site export can contain canonical Header/Navbar settings
+    // without a page `layout` root. Apply Global Styles and the Header document
+    // independently without replacing the current page with empty sections.
+    if (!yoothemeImportPreview.sections.length) {
+      if (Object.keys(yoothemeImportPreview.globalStylePatch).length) {
+        updateShellSettings(yoothemeImportPreview.globalStylePatch);
+      }
+      if (Object.keys(yoothemeImportPreview.headerDocumentPatch).length) {
+        const patch = yoothemeImportPreview.headerDocumentPatch;
+        const currentHeaderState = builderStateRef.current.page === "header"
+          ? builderStateRef.current
+          : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
+          loadDraftForKey("header", storageKeys),
+          shellSettings,
+        );
+        const nextHeaderState = materializeImportedHeaderDocument(currentHeaderState, patch);
+        setHeaderDocumentPreviewState(nextHeaderState);
+        if (builderStateRef.current.page === "header") setBuilderState(nextHeaderState);
+        try {
+          const drafts = JSON.parse(window.localStorage.getItem(storageKeys.drafts) ?? "{}") as Partial<Record<BuilderLayoutKey, BuilderState>>;
+          drafts.header = nextHeaderState;
+          window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+        } catch {
+          // The in-memory Header document remains authoritative for this session.
+        }
+        void fetch(builderApiUrl("/api/builder-layouts"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nextHeaderState),
+        }).catch(() => {
+          // Keep the imported document available locally if the API is offline.
+        });
+      }
+      setYoothemeImportWarnings(yoothemeImportPreview.warnings);
+      setTemplateStatus("YOOtheme Header/Navbar settings imported");
+      setYoothemeImportPreview(null);
+      return;
+    }
 
     const importedState = {
       ...builderStateRef.current,
@@ -9295,6 +9400,25 @@ export default function DashboardBuilder({
     setBuilderState(importedState);
     if (Object.keys(yoothemeImportPreview.globalStylePatch).length) {
       updateShellSettings(yoothemeImportPreview.globalStylePatch);
+    }
+    if (Object.keys(yoothemeImportPreview.headerDocumentPatch).length) {
+      const patch = yoothemeImportPreview.headerDocumentPatch;
+      const currentHeaderState = builderStateRef.current.page === "header"
+        ? builderStateRef.current
+        : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
+        loadDraftForKey("header", storageKeys),
+        shellSettings,
+        );
+      const nextHeaderState = materializeImportedHeaderDocument(currentHeaderState, patch);
+      setHeaderDocumentPreviewState(nextHeaderState);
+      if (builderStateRef.current.page === "header") setBuilderState(nextHeaderState);
+      void fetch(builderApiUrl("/api/builder-layouts"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextHeaderState),
+      }).catch(() => {
+        // The page import itself remains valid if Header persistence is offline.
+      });
     }
     setYoothemeImportWarnings(yoothemeImportPreview.warnings);
     setSelectedId(yoothemeImportPreview.sections[0]?.id ?? "");
@@ -13276,6 +13400,7 @@ function PreviewCanvas({
         data-responsive-breakpoint-large={responsiveBreakpointPolicy.large}
         data-responsive-breakpoint-xlarge={responsiveBreakpointPolicy.xlarge}
         data-responsive-preview-width={previewWidth}
+        data-builder-preview-tier={previewResponsiveTier}
         // Desktop Builder uses the real rendered-page viewport, exactly like
         // storefront. Device previews deliberately opt into the simulated
         // canvas tier below; applying that simulation to desktop caused a
@@ -13295,6 +13420,7 @@ function PreviewCanvas({
         }
       >
         <BuilderScrollAnimations key={animationSignature} dashboardMode />
+        <BuilderStickyRuntime />
         <div
           className="shop-builder-inner builder-preview-inner"
           aria-label={`${pageLabel} preview`}
@@ -13354,6 +13480,7 @@ function PreviewCanvas({
               return (
                 <motion.div
                   key={section.id}
+                  className={section.stickyEffect && section.stickyEffect !== "none" ? "builder-preview-section-sticky-wrapper" : undefined}
                   initial={false}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={undefined}
@@ -13362,7 +13489,7 @@ function PreviewCanvas({
                   }}
                   style={{
                     position: "relative",
-                    zIndex: Math.max(1, 100 - sectionIndex),
+                    zIndex: section.stickyEffect === "reveal" ? -1 : Math.max(1, 100 - sectionIndex),
                   }}
                 >
                   <div
@@ -13398,7 +13525,9 @@ function PreviewCanvas({
                           : ""
                     } ${isSectionActive ? "is-selected" : ""}`}
                     style={{
-                      zIndex: Math.max(1, 100 - sectionIndex),
+                      // Reveal sections are the lower sticky layer in
+                      // YOOtheme; the following section must paint over them.
+                      zIndex: section.stickyEffect === "reveal" ? -1 : Math.max(1, 100 - sectionIndex),
                       ...sectionStyle(section, layoutScheme),
                       "--shop-builder-section-height-offset":
                         section.heightOffset === undefined
@@ -13409,7 +13538,7 @@ function PreviewCanvas({
                     {...animationAttrs.data}
                     data-section-title-breakpoint={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
                     data-builder-html-element={section.htmlElement || "section"}
-                    data-uk-sticky={section.stickyEffect && section.stickyEffect !== "none" ? `cls-active: uk-navbar-sticky; ${section.stickyEffect === "reveal" ? "show-on-up: true" : ""}` : undefined}
+                    data-uk-sticky={getBuilderStickyDeclaration(section.stickyEffect)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
@@ -16814,6 +16943,7 @@ const PreviewSection = memo(function PreviewSection({
                   data-builder-section-id={section.id}
                   data-builder-row-index={rowMeta?.rowIndex}
                   data-builder-column-key={columnKey}
+                  data-builder-element-scope={`column-${columnKey}`}
                   data-builder-interaction-state={columnInteractionState}
                   className={`${structuralColumn.className} ${builderInteractionClassName(
                     columnTarget,
@@ -16828,6 +16958,10 @@ const PreviewSection = memo(function PreviewSection({
                     "--builder-nested-row-count": typedItem.nestedLayout.rows.length,
                   } as CSSProperties}
                 >
+                  <LayoutAdvancedStyle
+                    css={structuralColumn.column.advanced?.css}
+                    scope={`column-${columnKey}`}
+                  />
 
                   <div className="builder-nested-layout">
                     <PreviewSection
@@ -16912,6 +17046,7 @@ const PreviewSection = memo(function PreviewSection({
                   data-builder-section-id={section.id}
                   data-builder-row-index={rowMeta?.rowIndex}
                   data-builder-column-key={columnKey}
+                  data-builder-element-scope={`column-${columnKey}`}
                   data-builder-column-empty={blocks.length === 0 ? "true" : undefined}
                   data-builder-interaction-state={columnInteractionState}
                   data-builder-double-click-inspector="true"
@@ -17052,6 +17187,10 @@ const PreviewSection = memo(function PreviewSection({
                     onBlockDragEnd();
                   }}
                 >
+                  <LayoutAdvancedStyle
+                    css={structuralColumn.column.advanced?.css}
+                    scope={`column-${columnKey}`}
+                  />
                   {columnChrome.showSpacing && (
                     <BoxSpacingOverlay
                       kind="column"
@@ -17065,7 +17204,7 @@ const PreviewSection = memo(function PreviewSection({
                     />
                   )}
 
-                  <div className="shop-builder-column-content">
+                  <div className="shop-builder-column-content" data-uk-sticky={structuralColumn.stickyDeclaration}>
                     {blocks.length === 0 && (
                       <div
                         className="builder-preview-drop-zone"
@@ -17406,6 +17545,7 @@ const PreviewSection = memo(function PreviewSection({
                           />
                         ) : block.kind === "text" ? (
                           <UikitText
+                            sourceId={block.id}
                             eyebrow={block.eyebrow}
                             title={block.title}
                             content={block.body}
@@ -17418,6 +17558,14 @@ const PreviewSection = memo(function PreviewSection({
                             columnDivider={block.textColumnDivider}
                             columnBreakpoint={block.textColumnBreakpoint}
                             htmlElement={block.textHtmlElement}
+                            margin={block.visualStyle?.layout?.marginMode ?? (block as any).margin}
+                            maxWidth={block.visualStyle?.layout?.maxWidth ?? (block as any).maxWidth}
+                            maxWidthBreakpoint={block.visualStyle?.layout?.maxWidthBreakpoint ?? (block as any).maxWidthBreakpoint}
+                            blockAlign={block.elementAlign ?? block.visualStyle?.layout?.blockAlign}
+                            align={block.textAlign ?? block.visualStyle?.layout?.textAlign}
+                            textAlignBreakpoint={block.visualStyle?.layout?.textAlignBreakpoint}
+                            removeTopMargin={(block as any).removeTopMargin ?? block.visualStyle?.layout?.removeTopMargin}
+                            removeBottomMargin={(block as any).removeBottomMargin ?? block.visualStyle?.layout?.removeBottomMargin}
                           />
                         ) : block.kind === "heading" ? (
                           <UikitHeading block={block} isCanvas />

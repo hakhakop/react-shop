@@ -218,6 +218,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const parallaxRuntime = new Map<HTMLElement, ParallaxRuntime>();
     const breakpointCache = new Map<string, number>();
     let dashboardPaused = false;
+    let dashboardResumeTimer: number | null = null;
     const activeLayoutTransitions = new Set<EventTarget | string>();
     let requestProgressUpdate: (() => void) | null = null;
     const dashboardRoot = dashboardMode
@@ -226,12 +227,35 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const dashboardPreview = dashboardMode
       ? document.querySelector<HTMLElement>(".builder-preview-page")
       : null;
+    const clearDashboardResumeTimer = () => {
+      if (dashboardResumeTimer === null) return;
+      window.clearTimeout(dashboardResumeTimer);
+      dashboardResumeTimer = null;
+    };
+    const scheduleDashboardResume = () => {
+      if (!dashboardMode) return;
+      clearDashboardResumeTimer();
+      // The intended CSS transition is 220ms. This bounded fallback covers
+      // canceled/ skipped transitions where transitionend never arrives and
+      // prevents a stale pause from freezing the Builder until reload.
+      dashboardResumeTimer = window.setTimeout(() => {
+        dashboardResumeTimer = null;
+        // A missing transitionend leaves the target in this set forever;
+        // after the intended transition window, treat it as canceled.
+        activeLayoutTransitions.clear();
+        dashboardPaused = false;
+        invalidateLayout(false);
+      }, 360);
+    };
     const invalidateLayout = (pauseDashboard = false) => {
       parallaxRuntime.forEach((runtime) => {
         runtime.geometry = undefined;
       });
       breakpointCache.clear();
-      if (pauseDashboard) dashboardPaused = true;
+      if (pauseDashboard) {
+        dashboardPaused = true;
+        scheduleDashboardResume();
+      }
       requestProgressUpdate?.();
     };
     const geometryResizeObserver = typeof ResizeObserver !== "undefined"
@@ -304,6 +328,15 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       if (!isLayoutTransition(event as TransitionEvent)) return;
       if (event.target) activeLayoutTransitions.delete(event.target);
       if (activeLayoutTransitions.size > 0) return;
+      clearDashboardResumeTimer();
+      dashboardPaused = false;
+      invalidateLayout(false);
+    };
+    const handleTransitionCancel = (event: Event) => {
+      if (!isLayoutTransition(event as TransitionEvent)) return;
+      if (event.target) activeLayoutTransitions.delete(event.target);
+      if (activeLayoutTransitions.size > 0) return;
+      clearDashboardResumeTimer();
       dashboardPaused = false;
       invalidateLayout(false);
     };
@@ -314,11 +347,13 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const handleExternalTransitionEnd = () => {
       activeLayoutTransitions.delete("inspector-resize");
       if (activeLayoutTransitions.size > 0) return;
+      clearDashboardResumeTimer();
       dashboardPaused = false;
       invalidateLayout(false);
     };
     dashboardRoot?.addEventListener("transitionstart", handleTransitionStart, true);
     dashboardRoot?.addEventListener("transitionend", handleTransitionEnd, true);
+    dashboardRoot?.addEventListener("transitioncancel", handleTransitionCancel, true);
     window.addEventListener("builder:layout-transition-start", handleExternalTransitionStart);
     window.addEventListener("builder:layout-transition-end", handleExternalTransitionEnd);
 
@@ -663,9 +698,11 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       dashboardMutationObserver?.disconnect();
       dashboardRoot?.removeEventListener("transitionstart", handleTransitionStart, true);
       dashboardRoot?.removeEventListener("transitionend", handleTransitionEnd, true);
+      dashboardRoot?.removeEventListener("transitioncancel", handleTransitionCancel, true);
       window.removeEventListener("builder:layout-transition-start", handleExternalTransitionStart);
       window.removeEventListener("builder:layout-transition-end", handleExternalTransitionEnd);
       cancelAnimationFrame(rafId);
+      clearDashboardResumeTimer();
       parallaxNodes.forEach((node) => {
         node.style.removeProperty("transform");
         const runtime = parallaxRuntime.get(node);

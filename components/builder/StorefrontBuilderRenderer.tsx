@@ -51,6 +51,8 @@ import CarouselBlock, {
 import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import BuilderStickyRuntime from "@/components/builder/BuilderStickyRuntime";
+import { LayoutAdvancedStyle } from "@/components/builder/LayoutAdvancedStyle";
 import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
@@ -731,6 +733,9 @@ export function getBuilderSectionClassName(
   const modeClass = mode ? `shop-builder-section--${mode}` : "";
   const maxWidthClass = maxWidth && maxWidth !== "boxed" && maxWidth !== "default" ? `shop-builder-section--content-${maxWidth}` : "";
   const schemeClass = scheme && scheme !== "light" && scheme !== "auto" ? `shop-builder-section--scheme-${scheme}` : "";
+  const yoothemeSectionClass = section.id.startsWith("yootheme-") ? "shop-builder-section--yootheme" : "";
+  const stickyClass = section.stickyEffect && section.stickyEffect !== "none" ? "shop-builder-section--sticky" : "";
+  const stickyRevealClass = section.stickyEffect === "reveal" ? "uk-position-z-index-negative" : "";
 
   return [
     uikitSectionPad,
@@ -751,6 +756,9 @@ export function getBuilderSectionClassName(
     modeClass,
     maxWidthClass,
     schemeClass,
+    yoothemeSectionClass,
+    stickyClass,
+    stickyRevealClass,
     heightClass,
     verticalAlignClass,
     visualClass,
@@ -761,6 +769,22 @@ export function getBuilderSectionClassName(
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+export function getBuilderStickyDeclaration(stickyEffect?: BuilderSection["stickyEffect"]) {
+  if (!stickyEffect || stickyEffect === "none") {
+    return undefined;
+  }
+
+  // This is the declaration emitted by YOOtheme for its Reveal sticky
+  // section.  Reveal is a bottom-positioned layer that begins one viewport
+  // before the section and ends at the following section boundary; it is not
+  // the generic show-on-up sticky mode.
+  if (stickyEffect === "reveal") {
+    return "position: bottom; overflow-flip: true; start: -100%; end: 0;";
+  }
+
+  return "cls-active: uk-navbar-sticky;";
 }
 
 function SectionFrame({
@@ -825,7 +849,7 @@ function SectionFrame({
       data-builder-html-element={section.htmlElement || "section"}
       data-section-title-breakpoint={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
       data-subtract-height-above={section.subtractHeightAbove || undefined}
-      data-uk-sticky={section.stickyEffect && section.stickyEffect !== "none" ? `cls-active: uk-navbar-sticky; ${section.stickyEffect === "reveal" ? "show-on-up: true" : ""}` : undefined}
+      data-uk-sticky={getBuilderStickyDeclaration(section.stickyEffect)}
       {...animationAttrs.data}
     >
       {isAnimatedBg && (
@@ -1727,8 +1751,10 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "text") {
+    const textLayout = (block.visualStyle as any)?.layout ?? {};
     return (
       <UikitText
+        sourceId={block.id}
         eyebrow={block.eyebrow}
         title={block.title}
         content={block.body}
@@ -1741,7 +1767,14 @@ export function ContentLayoutBlock({
           columnDivider={block.textColumnDivider}
           columnBreakpoint={block.textColumnBreakpoint}
           htmlElement={block.textHtmlElement}
-        margin={(block as any).margin}
+        margin={textLayout.marginMode ?? (block as any).margin}
+        maxWidth={textLayout.maxWidth ?? (block as any).maxWidth}
+        maxWidthBreakpoint={textLayout.maxWidthBreakpoint ?? (block as any).maxWidthBreakpoint}
+        blockAlign={block.elementAlign ?? textLayout.blockAlign}
+        align={block.textAlign ?? textLayout.textAlign}
+        textAlignBreakpoint={textLayout.textAlignBreakpoint}
+        removeTopMargin={(block as any).removeTopMargin ?? textLayout.removeTopMargin}
+        removeBottomMargin={(block as any).removeBottomMargin ?? textLayout.removeBottomMargin}
         animation={typeof block.animation === "string" ? block.animation : (block.animation as any)?.preset}
         visibility={(block as any).visibility}
       />
@@ -2855,6 +2888,7 @@ function ContentLayoutSection({
                     data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
                     data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
                     data-builder-column-key={columnKey}
+                    data-builder-element-scope={`column-${columnKey}`}
                     className={`${structuralColumn.className} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
                         ? "w-full"
@@ -2862,6 +2896,10 @@ function ContentLayoutSection({
                     }`}
                     style={structuralColumn.style}
                   >
+                    <LayoutAdvancedStyle
+                      css={structuralColumn.column.advanced?.css}
+                      scope={`column-${columnKey}`}
+                    />
                     {nestedLayout ? (
                       <div
                         className="builder-nested-layout"
@@ -2892,7 +2930,7 @@ function ContentLayoutSection({
                         ))}
                       </div>
                     ) : (
-                      <div className="shop-builder-column-content">
+                      <div className="shop-builder-column-content" data-uk-sticky={structuralColumn.stickyDeclaration}>
                         <ContentPositioningGroup blocks={blocks}>
                           {renderColumnBlocks(blocks)}
                         </ContentPositioningGroup>
@@ -3210,6 +3248,7 @@ function StorefrontBuilderRendererBase({
         data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
       >
         <BuilderScrollAnimations />
+        {isPageDocument ? <BuilderStickyRuntime /> : null}
         <div className="shop-builder-inner">
           {layout.sections.map((section) => (
             <BuilderSectionRenderer

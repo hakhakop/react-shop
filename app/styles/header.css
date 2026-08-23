@@ -6,6 +6,47 @@
   --header-pill-top-scrolled: 12px; /* fixed header row position when scrolled */
 }
 
+/* Navbar vertical-divider mode must follow the complete navbar surface. The
+   navigation subtree otherwise sizes itself to the 37px link content box. */
+.site-header--navbar-border-vertical-partial .site-header-builder-primary-row,
+.site-header--navbar-border-vertical-all .site-header-builder-primary-row,
+.site-header--navbar-border-vertical-partial .header-builder-columns,
+.site-header--navbar-border-vertical-all .header-builder-columns,
+.site-header--navbar-border-vertical-partial .header-builder-column,
+.site-header--navbar-border-vertical-all .header-builder-column,
+.site-header--navbar-border-vertical-partial .header-builder-element--navigation,
+.site-header--navbar-border-vertical-all .header-builder-element--navigation,
+.site-header--navbar-border-vertical-partial .site-header-nav,
+.site-header--navbar-border-vertical-all .site-header-nav,
+.site-header--navbar-border-vertical-partial .site-header-nav-item,
+.site-header--navbar-border-vertical-all .site-header-nav-item,
+.site-header--navbar-border-vertical-partial .site-header-nav-link,
+  .site-header--navbar-border-vertical-all .site-header-nav-link {
+  height: var(--header-builder-height, 90px);
+  min-height: 0;
+}
+
+.site-header--navbar-border-vertical-partial .header-builder-columns,
+.site-header--navbar-border-vertical-all .header-builder-columns,
+.site-header--navbar-border-vertical-partial .header-builder-column,
+.site-header--navbar-border-vertical-all .header-builder-column,
+.site-header--navbar-border-vertical-partial .site-header-nav,
+.site-header--navbar-border-vertical-all .site-header-nav {
+  align-items: stretch;
+}
+
+.site-header--navbar-border-vertical-partial .header-builder-column > div > .header-builder-element:not(.header-builder-element--navigation),
+.site-header--navbar-border-vertical-all .header-builder-column > div > .header-builder-element:not(.header-builder-element--navigation) {
+  align-self: center;
+}
+
+.site-header--navbar-border-vertical-partial .header-builder-column > div,
+.site-header--navbar-border-vertical-all .header-builder-column > div {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .site-header.site-header--scroll-hidden {
   transform: translateY(-110%);
   pointer-events: none;
@@ -1155,6 +1196,61 @@ html.dark .site-header {
   text-decoration: none;
   color: var(--text-muted, #4b5563);
   padding: 8px 0;
+}
+
+/* UIkit/YOOtheme navbar-mode-border-vertical parity. The global token owns
+ * the mode; these selectors adapt the same behavior to WebPages' header DOM. */
+.site-header--navbar-border-vertical-partial .site-header-nav {
+  border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+  border-right: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+  padding-inline: var(--uk-container-padding-horizontal, 0px);
+  align-self: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.site-header--navbar-border-vertical-partial .site-header-main-inner,
+.site-header--navbar-border-vertical-all .site-header-main-inner,
+.site-header--navbar-border-vertical-partial .site-header-builder-primary-row,
+.site-header--navbar-border-vertical-all .site-header-builder-primary-row,
+.site-header--navbar-border-vertical-partial .header-builder-columns,
+.site-header--navbar-border-vertical-all .header-builder-columns,
+.site-header--navbar-border-vertical-partial .header-builder-column,
+.site-header--navbar-border-vertical-all .header-builder-column {
+  align-items: stretch;
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav {
+  align-self: stretch;
+  align-items: stretch;
+  height: 100%;
+  flex-wrap: nowrap;
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav-item {
+  align-self: stretch;
+  height: 100%;
+  justify-content: center;
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav-item:not(:first-child) {
+  position: relative;
+  padding-left: var(--uk-navbar-nav-item-padding-horizontal, 0px);
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+  pointer-events: none;
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav-link {
+  height: var(--header-builder-height, 90px);
+  box-sizing: border-box;
 }
 
 .site-header-nav-icon {
@@ -4066,7 +4162,9 @@ body[data-storefront-preset="princity"] .category-mega-card,
 @media (min-width: 901px) {
   .site-header .header-builder-element--navigation .site-header-nav {
     gap: var(--header-builder-menu-gap, var(--uk-navbar-nav-gap, var(--uk-navbar-gap, 1.4rem)));
-    font-size: var(--uk-navbar-nav-item-font-size, 15px);
+    font-size: var(--uk-navbar-nav-item-font-size, 16px);
+    font-family: var(--uk-navbar-nav-item-font-family, var(--uk-global-font-family, inherit));
+    font-weight: var(--uk-navbar-nav-item-font-weight, 400);
   }
 
   .site-header .header-builder-element--navigation .site-header-nav-link {
@@ -4082,6 +4180,9 @@ body[data-storefront-preset="princity"] .category-mega-card,
 
   .site-header .header-builder-element--navigation .site-header-nav-link:hover {
     color: var(--header-builder-menu-hover, var(--uk-navbar-nav-item-hover-color, var(--text-main, #111827)));
+    background: var(--uk-navbar-nav-item-hover-background, transparent);
+    text-shadow: var(--uk-navbar-nav-item-hover-text-shadow, none);
+    box-shadow: var(--uk-navbar-nav-item-hover-box-shadow, none);
   }
 
   .site-header[data-header-text-mode="dark"] .header-builder-element--navigation .site-header-nav-link:hover {
@@ -4092,6 +4193,9 @@ body[data-storefront-preset="princity"] .category-mega-card,
   .site-header .header-builder-element--navigation:not([style*="--header-builder-menu-active"]) .site-header-nav-link[aria-current="page"],
   .site-header .header-builder-element--navigation:not([style*="--header-builder-menu-active"]) .site-header-nav-link[data-active="true"] {
     color: var(--uk-navbar-nav-item-active-color, var(--text-main, #111827));
+    background: var(--uk-navbar-nav-item-active-background, transparent);
+    text-shadow: var(--uk-navbar-nav-item-active-text-shadow, none);
+    box-shadow: var(--uk-navbar-nav-item-active-box-shadow, none);
   }
 
   .site-header[data-header-text-mode="dark"] .header-builder-element--navigation:not([style*="--header-builder-menu-active"]) .site-header-nav-link.is-active,
@@ -4295,4 +4399,63 @@ body[data-storefront-preset="princity"] .category-mega-card,
       margin-left: var(--uk-navbar-dropdown-shift-margin-m, var(--uk-navbar-dropdown-shift-margin, 0px));
     }
   }
+}
+
+/* YOOtheme's dark vertical-border navbar keeps the active item bright. Keep
+   this override after the generic text-mode rules so they cannot turn the
+   active item back to the dark primary color. Authored/token values still win. */
+.site-header.site-header--navbar-border-vertical-partial[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link.is-active,
+.site-header.site-header--navbar-border-vertical-partial[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link[aria-current="page"],
+.site-header.site-header--navbar-border-vertical-partial[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link[data-active="true"],
+.site-header.site-header--navbar-border-vertical-all[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link.is-active,
+.site-header.site-header--navbar-border-vertical-all[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link[aria-current="page"],
+.site-header.site-header--navbar-border-vertical-all[data-header-text-mode="dark"]
+    .header-builder-element--navigation
+    .site-header-nav-link[data-active="true"] {
+  color: var(--header-builder-menu-active, var(--uk-navbar-nav-item-active-color, rgba(255, 255, 255, 1))) !important;
+}
+
+/* Transparent dark-surface headers must keep utility controls readable too;
+   these controls use their own utility classes and otherwise retain the
+   default dark foreground instead of inheriting the header surface mode. */
+.site-header.site-header--section-transparent
+    .header-builder-element--utility
+    .site-header-actions
+    button,
+.site-header.site-header--section-transparent
+    .header-builder-element--utility
+    .site-header-actions
+    a {
+  color: var(--uk-navbar-toggle-color, rgba(255, 255, 255, 0.9)) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+.site-header.site-header--section-transparent
+    .header-builder-element--utility
+    .site-header-actions
+    button:hover,
+.site-header.site-header--section-transparent
+    .header-builder-element--utility
+    .site-header-actions
+    a:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* The shared navbar has no hover underline. Keep the active indicator intact
+   for links explicitly marked active. */
+.site-header .site-header-nav-link:not(.is-active):not([aria-current="page"]):not([data-active="true"]):hover::after {
+  opacity: 0 !important;
+  transform: scaleX(0) !important;
 }

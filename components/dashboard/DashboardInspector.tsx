@@ -726,6 +726,8 @@ function HeaderHeightControl({
 type HeaderDocumentSettingsValues = Pick<
   BuilderSection,
   | "headerVisible"
+  | "headerTransparent"
+  | "headerOverlay"
   | "headerHeight"
   | "headerCustomHeight"
   | "headerBehavior"
@@ -915,6 +917,49 @@ function HeaderDocumentSettings({
           customHeight={headerCustomHeight}
           onChange={onHeaderDocumentChange}
         />
+        <div className="builder-two-column">
+          <label className="builder-check">
+            <input
+              type="checkbox"
+              checked={headerSettings.headerTransparent === true}
+              onChange={(event) => onHeaderDocumentChange({ headerTransparent: event.target.checked })}
+            />
+            <span>Transparent header</span>
+          </label>
+          <label className="builder-check">
+            <input
+              type="checkbox"
+              checked={headerSettings.headerOverlay === true}
+              onChange={(event) => onHeaderDocumentChange({ headerOverlay: event.target.checked })}
+            />
+            <span>Overlay content</span>
+          </label>
+        </div>
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Background mode</span>
+            <select
+              value={headerSettings.headerBackgroundMode ?? "default"}
+              onChange={(event) => onHeaderDocumentChange({ headerBackgroundMode: event.target.value as BuilderSection["headerBackgroundMode"] })}
+            >
+              <option value="default">Default</option>
+              <option value="glass">Glass</option>
+              <option value="accent">Accent</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Text mode</span>
+            <select
+              value={headerSettings.headerTextMode ?? "auto"}
+              onChange={(event) => onHeaderDocumentChange({ headerTextMode: event.target.value as BuilderSection["headerTextMode"] })}
+            >
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
       </details>
 
       <details className="builder-collapse">
@@ -2239,6 +2284,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <HeaderDocumentSettings
                 headerSettings={{
                   headerVisible: selectedSection.headerVisible ?? shellSettings.headerVisible ?? true,
+                  headerTransparent: selectedSection.headerTransparent ?? shellSettings.headerTransparent,
+                  headerOverlay: selectedSection.headerOverlay ?? shellSettings.headerOverlay,
                   headerHeight: selectedSection.headerHeight ?? shellSettings.headerHeight,
                   headerCustomHeight: selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight,
                   headerBehavior: selectedSection.headerBehavior ?? shellSettings.headerBehavior,

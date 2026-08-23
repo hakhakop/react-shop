@@ -4,5 +4,17 @@
     "title": "Home",
     "slug": "home-2",
     "updatedAt": "2026-08-23T08:19:17.551Z"
+  },
+  {
+    "key": "page:about",
+    "title": "About",
+    "slug": "about",
+    "updatedAt": "2026-08-23T18:01:48.980Z"
+  },
+  {
+    "key": "page:product-2",
+    "title": "Product",
+    "slug": "product-2",
+    "updatedAt": "2026-08-23T18:41:37.159Z"
   }
 ]

@@ -2035,6 +2035,10 @@ a {
   .shop-builder-main .uk-heading-2xlarge { font-size: 8rem; }
   .shop-builder-main .uk-heading-3xlarge { font-size: 10rem; }
 }
+@media (min-width: 1200px) {
+  /* Match UIkit/YOOtheme's Heading Large 1200px tier. */
+  .shop-builder-main .uk-heading-large { font-size: 6rem; }
+}
 
 /* --- UIkit Text utilities --- */
 .shop-builder-main .uk-text-lead {

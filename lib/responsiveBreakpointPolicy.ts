@@ -159,6 +159,21 @@ function renderResponsiveConsumerCss(selector: string, policy: ResponsiveBreakpo
   const previewSelector = (tier: ResponsiveBreakpointTier) => `${selector}[data-responsive-preview-tier="${tier}"]`;
   const scope = (css: string, previewTier: ResponsiveBreakpointTier) => css.split(selector).join(previewSelector(previewTier));
   const tierOrder: ResponsiveBreakpointTier[] = ["base", "small", "medium", "large", "xlarge"];
+  // Desktop Builder keeps the host viewport for the rest of the page, but
+  // Slidenav breakpoints must follow the rendered preview canvas width, as
+  // YOOtheme evaluates `uk-visible@xl` inside that canvas.
+  const builderPreviewSelector = (tier: ResponsiveBreakpointTier) => `${selector}[data-builder-preview-tier="${tier}"]`;
+  const builderPreviewNavRules = tierOrder.map((previewTier, index) => {
+    const previewRoot = builderPreviewSelector(previewTier);
+    const reset = `${previewRoot} .shop-builder-slidenav-from-small .swiper-button-prev,${previewRoot} .shop-builder-slidenav-from-small .swiper-button-next,${previewRoot} .shop-builder-slidenav-from-medium .swiper-button-prev,${previewRoot} .shop-builder-slidenav-from-medium .swiper-button-next,${previewRoot} .shop-builder-slidenav-from-large .swiper-button-prev,${previewRoot} .shop-builder-slidenav-from-large .swiper-button-next,${previewRoot} .shop-builder-slidenav-from-xlarge .swiper-button-prev,${previewRoot} .shop-builder-slidenav-from-xlarge .swiper-button-next{display:none!important;}`;
+    const active = tiers.slice(0, index).map(([tier]) => `${previewRoot} .shop-builder-slidenav-from-${tier} .swiper-button-prev,${previewRoot} .shop-builder-slidenav-from-${tier} .swiper-button-next{display:flex!important;}`).join("");
+    return `${reset}${active}`;
+  }).join("");
+  const builderPreviewHeadingRules = tierOrder.map((previewTier) => {
+    const previewRoot = builderPreviewSelector(previewTier);
+    const size = previewTier === "medium" ? "4rem" : previewTier === "large" || previewTier === "xlarge" ? "6rem" : "3.4rem";
+    return `${previewRoot} .uk-heading-large{font-size:${size}!important;line-height:1.1!important;}`;
+  }).join("");
   const previewRules = tierOrder.map((previewTier, index) => {
     const activeTiers = tiers.slice(0, Math.max(index, 0));
     const inactiveTitleTiers = tiers.slice(Math.max(index, 0));
@@ -189,5 +204,7 @@ function renderResponsiveConsumerCss(selector: string, policy: ResponsiveBreakpo
     titleReset("large", policy.large - 0.02),
     titleReset("xlarge", policy.xlarge - 0.02),
     previewRules,
+    builderPreviewNavRules,
+    builderPreviewHeadingRules,
   ].join("");
 }

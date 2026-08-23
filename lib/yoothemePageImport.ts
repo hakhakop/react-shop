@@ -21,6 +21,7 @@ import {
   normalizeYoothemeHeadingColor,
   normalizeYoothemeTypographyRole,
   normalizeYoothemeTextPresentation,
+  normalizeYoothemeHeaderDocument,
 } from "@/lib/yoothemeImportContract";
 import { createYoothemePageImportReport, formatYoothemeImportWarnings, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
 import type { UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
@@ -108,6 +109,8 @@ export type YoothemeStaticImportMapping = {
   sections: BuilderSection[];
   warnings: string[];
   globalStylePatch: Partial<BuilderShellSettings>;
+  /** Header-document-owned structure/behaviour imported from a full theme export. */
+  headerDocumentPatch: Partial<BuilderSection>;
   /** Registry-backed reporting projection; legacy warnings remain readable during Batch 2 migration. */
   report: YoothemeImportReport;
   /** Compatibility bridge for existing string[] preview consumers. */
@@ -1756,7 +1759,12 @@ const mapStaticElement = (
       imageHoverBoxShadow: asString(props.image_hover_box_shadow) || undefined,
       imageHoverBorder: sourceBoolean(props.image_hover_border) ?? undefined,
       imageInverse: sourceBoolean(props.image_inverse) ?? undefined,
-      imageIconWidth: typeof props.icon_width === "number" ? String(props.icon_width) : asString(props.icon_width) || undefined,
+      // `icon_width` belongs to a Grid icon item, not the shared Image
+      // dimensions. Keep explicit image_width/image_height authoritative so
+      // linked SVG images retain their YOOtheme sizing.
+      imageIconWidth: !props.image_width && !props.image_height
+        ? (typeof props.icon_width === "number" ? String(props.icon_width) : asString(props.icon_width) || undefined)
+        : undefined,
       imageIconColor: asString(props.icon_color) || undefined,
       imageSvgAnimate: sourceBoolean(props.image_svg_animate) ?? undefined,
       imageTextColor: ["light", "dark"].includes(String(props.text_color)) ? props.text_color as "light" | "dark" : undefined,
@@ -2616,7 +2624,7 @@ const sourceColumnSticky = (
   props: Record<string, unknown>,
 ): BuilderColumn["sticky"] => {
   const rawMode = asString(props.position_sticky)?.toLowerCase();
-  const mode: NonNullable<BuilderColumn["sticky"]>["mode"] =
+  let mode: NonNullable<BuilderColumn["sticky"]>["mode"] =
     rawMode === "elements" || rawMode === "elements-within-column"
       ? "elements-within-column"
       : rawMode === "column" || rawMode === "column-within-row"
@@ -2628,11 +2636,22 @@ const sourceColumnSticky = (
             : rawMode === "none"
               ? "none"
               : undefined;
+  const topOffset = sourcePositionValue(props.position_sticky_offset);
+  const bottomOffset = sourcePositionValue(props.position_sticky_offset_bottom);
+  // YOOtheme omits the default mode from some exported documents while still
+  // persisting its sticky offset. In that shape the active control is
+  // Column within Row; retain that semantic instead of importing a disabled
+  // offset-only object.
+  if (!mode && (topOffset || bottomOffset)) mode = "column-within-row";
+  const blend = sourceBoolean(
+    props.position_sticky_blend ?? props.sticky_blend ?? props.blend,
+  );
   const sticky: NonNullable<BuilderColumn["sticky"]> = {
     ...(mode ? { mode } : {}),
-    ...(sourcePositionValue(props.position_sticky_offset) ? { topOffset: sourcePositionValue(props.position_sticky_offset) } : {}),
-    ...(sourcePositionValue(props.position_sticky_offset_bottom) ? { bottomOffset: sourcePositionValue(props.position_sticky_offset_bottom) } : {}),
+    ...(topOffset ? { topOffset } : {}),
+    ...(bottomOffset ? { bottomOffset } : {}),
     ...(sourceStructuralBreakpoint(props.position_sticky_breakpoint) ? { breakpoint: sourceStructuralBreakpoint(props.position_sticky_breakpoint) } : {}),
+    ...(blend !== undefined ? { blend } : {}),
   };
   return Object.keys(sticky).length ? sticky : undefined;
 };
@@ -2782,10 +2801,12 @@ export const mapYoothemeStaticContent = (
       : null;
   const structure = mapYoothemeStructure(source);
   const warnings = [...structure.warnings];
+  const globalStylePatch = root ? sourceGlobalBackgroundPatch(root) : {};
+  const headerDocumentPatch = root ? normalizeYoothemeHeaderDocument(root) : {};
 
   if (!root || root.type !== "layout") {
     const report = createYoothemePageImportReport(source);
-    return { sections: [], warnings, globalStylePatch: {}, report, reportWarnings: formatYoothemeImportWarnings(report) };
+    return { sections: [], warnings, globalStylePatch, headerDocumentPatch, report, reportWarnings: formatYoothemeImportWarnings(report) };
   }
 
   const sections: BuilderSection[] = [];
@@ -2896,7 +2917,7 @@ export const mapYoothemeStaticContent = (
   });
 
   const report = createYoothemePageImportReport(source);
-  return { sections, warnings, globalStylePatch: sourceGlobalBackgroundPatch(root), report, reportWarnings: formatYoothemeImportWarnings(report) };
+  return { sections, warnings, globalStylePatch, headerDocumentPatch, report, reportWarnings: formatYoothemeImportWarnings(report) };
 };
 
 export const analyzeYoothemeLayout = (

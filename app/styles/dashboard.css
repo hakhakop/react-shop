@@ -6368,6 +6368,14 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   pointer-events: auto;
 }
 
+/* The embedded Builder header is a preview of the storefront header, not a
+ * second framed editor panel. Keep the editor-only header slot from adding a
+ * bright 1px rule that is absent from the imported Circle presentation. */
+.builder-preview-header-slot .site-header:not([data-scrolled="true"]),
+.builder-preview-header-slot .site-header:not([data-scrolled="true"]) .site-header-main {
+  border-bottom-color: transparent !important;
+}
+
 .builder-preview-header-editable {
   position: relative;
   pointer-events: auto;

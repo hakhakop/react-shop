@@ -294,5 +294,79 @@ export function normalizeYoothemeTemplateGlobals(root: Record<string, unknown>):
     ["textColor", ["global_color", "global-color"]], ["mutedTextColor", ["global_muted_color", "global-muted-color"]], ["emphasisColor", ["global_emphasis_color", "global-emphasis-color"]], ["fontFamilyBody", ["global_font_family", "global-font-family"]], ["fontFamilyPrimary", ["global_primary_font_family", "global-primary-font-family"]], ["fontFamilySecondary", ["global_secondary_font_family", "global-secondary-font-family"]], ["fontFamilyTertiary", ["global_tertiary_font_family", "global-tertiary-font-family"]],
   ];
   fields.forEach(([owner, keys]) => { const value = read(...keys); if (value) (patch as Record<string, string>)[owner] = value; });
+
+  return patch;
+}
+
+/**
+ * Maps only document-owned Header settings from a full YOOtheme export.
+ * Appearance tokens stay in Global Styles; this patch is intentionally limited
+ * to the canonical Header document fields consumed by both renderers.
+ */
+export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): Partial<BuilderSection> {
+  const sourceHeader = root.header && typeof root.header === "object"
+    ? root.header as Record<string, unknown>
+    : {};
+  const sourceNavbar = root.navbar && typeof root.navbar === "object"
+    ? root.navbar as Record<string, unknown>
+    : {};
+  const sourceMobile = root.mobile && typeof root.mobile === "object"
+    ? root.mobile as Record<string, unknown>
+    : {};
+  const sourceSite = root.site && typeof root.site === "object"
+    ? root.site as Record<string, unknown>
+    : {};
+
+  const sourceLayout = string(sourceHeader.layout)?.toLowerCase();
+  const headerLayout: BuilderSection["headerLayout"] =
+    sourceLayout === "horizontal-justify" ? "wordpress" :
+      sourceLayout === "horizontal-left" ? "simple" :
+        sourceLayout === "horizontal-right" ? "princity" :
+          sourceLayout === "stacked" ? "two-row" : undefined;
+  const width = string(sourceHeader.width)?.toLowerCase();
+  const sticky = sourceNavbar.sticky;
+  const headerBehavior: BuilderSection["headerBehavior"] =
+    sticky === false || sticky === 0 || sticky === "0" ? "static" :
+      sticky === 2 || sticky === "2" || sticky === "show-on-up" ? "sticky-on-scroll-up" :
+        sticky === true || sticky === 1 || sticky === "1" || sticky === "sticky" ? "sticky" : undefined;
+
+  const patch: Partial<BuilderSection> = {
+    headerArchitectureVersion: 2,
+    ...(headerLayout ? { headerLayout } : {}),
+    ...(width === "full" || width === "expand" ? { headerWidthMode: "full" as const } : {}),
+    ...(width === "default" || width === "boxed" ? { headerWidthMode: "boxed" as const } : {}),
+    ...(headerBehavior ? { headerBehavior } : {}),
+  };
+
+  // These keys are accepted by YOOtheme exports when present (they are absent
+  // from some theme exports). Preserve them as document values instead of
+  // inventing tenant-specific defaults.
+  const boolValue = (value: unknown) => typeof value === "boolean" ? value : undefined;
+  const transparent = boolValue(sourceHeader.transparent ?? sourceHeader.header_transparent);
+  const overlay = boolValue(sourceHeader.overlay ?? sourceHeader.header_overlay);
+  const height = string(sourceHeader.height ?? sourceHeader.header_height);
+  const customHeight = typeof sourceHeader.custom_height === "number" ? sourceHeader.custom_height : undefined;
+  const zIndex = typeof sourceHeader.z_index === "number" ? sourceHeader.z_index : undefined;
+  const backgroundMode = string(sourceHeader.background_mode ?? sourceHeader.background);
+  const textMode = string(sourceHeader.text_mode ?? sourceHeader.color_mode);
+  if (transparent !== undefined) patch.headerTransparent = transparent;
+  if (overlay !== undefined) patch.headerOverlay = overlay;
+  if (height === "auto" || height === "small" || height === "medium" || height === "large" || height === "custom") patch.headerHeight = height;
+  if (customHeight !== undefined && Number.isFinite(customHeight)) patch.headerCustomHeight = customHeight;
+  if (zIndex !== undefined && Number.isFinite(zIndex)) patch.headerZIndex = zIndex;
+  if (backgroundMode === "default" || backgroundMode === "glass" || backgroundMode === "accent" || backgroundMode === "none") patch.headerBackgroundMode = backgroundMode;
+  if (textMode === "auto" || textMode === "light" || textMode === "dark") patch.headerTextMode = textMode;
+
+  // Theme exports use the `site.boxed.header_outside` flag for the structural
+  // overlay case. It is a document behaviour, not a global colour token.
+  if (sourceSite.boxed && typeof sourceSite.boxed === "object") {
+    const boxed = sourceSite.boxed as Record<string, unknown>;
+    if (typeof boxed.header_outside === "boolean") patch.headerOverlay = boxed.header_outside;
+  }
+
+  // Keep the imported mobile breakpoint available to the shared Header
+  // document once responsive Header controls consume it. It is deliberately
+  // omitted here until that canonical field exists, avoiding a dead setting.
+  void sourceMobile;
   return patch;
 }

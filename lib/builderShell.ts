@@ -278,6 +278,12 @@ export type BuilderShellSettings = {
   navbarNavItemHoverColor?: string;
   navbarNavItemOnclickColor?: string;
   navbarNavItemActiveColor?: string;
+  navbarNavItemHoverBackground?: string;
+  navbarNavItemActiveBackground?: string;
+  navbarNavItemHoverTextShadow?: string;
+  navbarNavItemActiveTextShadow?: string;
+  navbarNavItemHoverBoxShadow?: string;
+  navbarNavItemActiveBoxShadow?: string;
   navbarNavItemFontSize?: string;
   navbarNavItemTextTransform?: string;
   navbarPrimaryNavItemFontSize?: string;
@@ -289,6 +295,8 @@ export type BuilderShellSettings = {
   navbarItemPaddingHorizontalMedium?: string;
   navbarBackdropFilter?: string;
   navbarMode?: string;
+  /** UIkit Navbar vertical divider mode: none, partial, or all. */
+  navbarModeBorderVertical?: "none" | "partial" | "all" | string;
   navbarBorderWidth?: string;
   navbarBorder?: string;
   navbarNavItemLineMode?: string;

@@ -3,9 +3,8 @@
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl, InspectorSwitch, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorSwitch, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -33,10 +32,9 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
     return (
       <div className="builder-inspector-stack" data-uikit-capability="text-style">
         <div className="builder-element-inspector-note"><strong>UIkit Text</strong><span>Semantic values map to UIkit text helpers in builder and frontend.</span></div>
-        <InspectorDivision title="TYPOGRAPHY">
-          <TypographyRoleSettingsPanel block={block} fields={[{ field: "textTypographyRole", label: "Font role" }]} update={update} noSection />
+        <InspectorDivision title="TEXT">
           <InspectorFieldRow
-            label="Variant"
+            label="Text Style"
             isOverridden={block.textVariant !== undefined}
             inheritedValueText="Default"
             onReset={() => update({ textVariant: undefined })}
@@ -49,7 +47,7 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
             />
           </InspectorFieldRow>
           <InspectorFieldRow
-            label="Color"
+            label="Text Color"
             isOverridden={block.textColor !== undefined}
             inheritedValueText="None"
             onReset={() => update({ textColor: undefined })}
@@ -61,20 +59,6 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
               ariaLabel="Text color"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Alignment"
-            isOverridden={block.textAlign !== undefined}
-            inheritedValueText="Left"
-            onReset={() => update({ textAlign: undefined })}
-          >
-            <InspectorAlignmentControl
-              value={block.textAlign ?? "left"}
-              onChange={(value) => update({ textAlign: value })}
-              ariaLabel="Text alignment"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
-        <InspectorDivision title="TEXT">
           <InspectorFieldRow label="Drop Cap" isOverridden={block.textDropcap !== undefined} inheritedValueText="Off" onReset={() => update({ textDropcap: undefined })}>
             <InspectorSwitch checked={Boolean(block.textDropcap)} onChange={(checked) => update({ textDropcap: checked || undefined })} label="Enable drop cap" />
           </InspectorFieldRow>

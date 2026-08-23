@@ -40,6 +40,10 @@ function normalizeLayout(
   value: string | undefined | null,
 ): "simple" | "two-row" | "hero" | "pill" | "princity" {
   switch ((value || "centered").toLowerCase()) {
+    // YOOtheme's horizontal-justify preset is stored as WebPages' canonical
+    // `wordpress` Header document layout. It is a single-row composition.
+    case "wordpress":
+      return "simple";
     case "simple":
       return "simple";
     case "hero":
@@ -214,11 +218,12 @@ export default function HeaderShellView({
     headerComposition,
     shellSettings,
   );
-  const layoutValue = documentSettings.layout !== "wordpress"
-    ? documentSettings.layout
-    : layoutOverride && layoutOverride !== "wordpress"
-      ? layoutOverride
-      : asString(settings.layout, "centered");
+  // `wordpress` is the canonical persisted name for YOOtheme's
+  // horizontal-justify preset. Do not fall back to the legacy theme setting,
+  // otherwise an imported Header document silently loses its layout.
+  const layoutValue = documentSettings.layout === "wordpress"
+    ? "wordpress"
+    : documentSettings.layout ?? layoutOverride ?? asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
   const headerBehavior = documentSettings.behavior;
   const headerHeight = resolveHeaderHeightCss(
@@ -309,6 +314,11 @@ export default function HeaderShellView({
   )
     ? shellSettings.navbarNavItemLineSlideMode
     : "center";
+  const navbarVerticalBorder = ["partial", "all"].includes(
+    shellSettings.navbarModeBorderVertical ?? "",
+  )
+    ? shellSettings.navbarModeBorderVertical
+    : "none";
   const headerClassName = [
     layout === "pill" || layout === "princity" ? "site-header--pill" : "",
     serviceHomepageMode ? "site-header--service" : "",
@@ -321,6 +331,7 @@ export default function HeaderShellView({
     `site-header--navbar-line-mode-${navbarLineMode}`,
     `site-header--navbar-line-position-${navbarLinePosition}`,
     `site-header--navbar-line-slide-${navbarLineSlide}`,
+    `site-header--navbar-border-vertical-${navbarVerticalBorder}`,
     documentSettings.overlay ? "site-header--builder-overlay" : "",
     hasDocumentBackground
       ? "site-header--document-background"

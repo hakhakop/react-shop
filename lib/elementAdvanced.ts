@@ -204,3 +204,12 @@ export function scopeElementCss(source: string | undefined, scope: string) {
   css = scopeCssRules(css, scopeSelector);
   return css.replace(/___BUILDER_KEYFRAME_(\d+)___/g, (_whole, index) => retainedKeyframes[Number(index)] ?? "");
 }
+
+/** Scopes YOOtheme Row/Column Advanced CSS to a canonical layout root. */
+export function scopeLayoutCss(source: string | undefined, scope: string) {
+  if (!source?.trim()) return "";
+  return scopeElementCss(
+    source.replace(/\.(?:el-row|el-column)\b/g, ".el-element"),
+    scope,
+  );
+}

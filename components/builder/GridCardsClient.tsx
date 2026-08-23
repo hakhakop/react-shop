@@ -455,7 +455,12 @@ export function GridCardsClient({
             // YOOtheme's Image > Margin Top is a shared image owner, not a
             // placement-specific toggle. Apply the authored top margin for
             // every Grid image alignment, including the default top track.
-            const mediaMarginTopClass = getUikitMarginClass(rawBlock.imageMarginTop ?? "default", "top");
+            // In YOOtheme Grid, an omitted/default Image margin is the
+            // intrinsic row position (no utility class). Only authored
+            // spacing tokens add a top margin.
+            const mediaMarginTopClass = rawBlock.imageMarginTop && rawBlock.imageMarginTop !== "default"
+              ? getUikitMarginClass(rawBlock.imageMarginTop, "top")
+              : "";
             const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "1-2";
             // Explicit media alignment has higher precedence than Grid text
             // alignment. Without one, media participates in the same item
@@ -468,7 +473,12 @@ export function GridCardsClient({
               position: (item as any).imagePosition ?? (block as any).imagePosition,
             });
             const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
-            const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
+            // Imported YOOtheme Grid items own their media/content split in
+            // the inner `uk-grid` composition below. Applying the generic
+            // Panel layout to the outer article as well creates a second
+            // 36%/64% split and makes auto-width rows stack. Native cards keep
+            // the existing outer layout contract.
+            const panelLayoutClass = isYoothemeGrid ? "" : getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
             const itemUrl = action.url;
             const titlePlacement = rawBlock.gridTitlePlacement === "left" ? "left" : "top";
             const titleBreakpoint = rawBlock.gridTitleBreakpoint ?? "always";
@@ -578,6 +588,10 @@ export function GridCardsClient({
               const isStylableSvg = rawBlock.imageSvgInline === true && isSvgAsset;
               const svgColorClass = getUikitSvgColorClass(rawBlock.imageIconColor ?? rawBlock.imageSvgColor);
               const preserveIntrinsicSvgSize = isStylableSvg && !imageWidth && !imageHeight && !hasCropFrame;
+              // Grid's `icon_width` is an icon semantic, not an override for an
+              // authored Image width. YOOtheme keeps both controls independent;
+              // explicit image dimensions must therefore win for inline SVGs.
+              const svgIconWidth = !imageWidth && !imageHeight ? rawBlock.imageIconWidth : undefined;
               const imageEl = isStylableSvg ? (
                 <UikitStylableSvg
                   src={item.imageUrl}
@@ -588,7 +602,7 @@ export function GridCardsClient({
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   preserveIntrinsicSize={preserveIntrinsicSvgSize}
                   fallback={fallbackImage}
-                  style={{ ...(preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle), ...(rawBlock.imageIconWidth ? { width: imageDimension(rawBlock.imageIconWidth) } : {}) }}
+                  style={{ ...(preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle), ...(svgIconWidth ? { width: imageDimension(svgIconWidth) } : {}) }}
                 />
               ) : fallbackImage;
 

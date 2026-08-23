@@ -32,6 +32,7 @@ export type BuilderStructuralColumn = {
   span: number;
   className: string;
   style: CSSProperties;
+  stickyDeclaration?: string;
 };
 
 export type BuilderStructuralRow = {
@@ -89,15 +90,38 @@ function rowGridClass(
   );
   const base = getUikitGridClass({
     gutter: usesCombinedGap ? row.columnGap : undefined,
-    matchHeight: legacyItem?.rowMatchHeight !== false,
+    // A sticky column must retain its intrinsic content height. UIkit's
+    // match-height modifier stretches the sticky target to the full row,
+    // preventing it from ever entering the sticky state in tall parallax
+    // rows such as the imported Product hero.
+    matchHeight:
+      legacyItem?.rowMatchHeight !== false &&
+      !row.columns.some((column) => {
+        const sticky = column.sticky;
+        return Boolean(
+          (sticky?.mode && sticky.mode !== "none") ||
+            sticky?.topOffset ||
+            sticky?.bottomOffset,
+        );
+      }),
     // Legacy rowAlignment remains read compatibility only. Canonical vertical
     // alignment is projected by each Column below.
     alignItems: legacyItem?.rowAlignment,
     justifyContent,
   });
-  if (usesCombinedGap) return base;
+  const hasStickyColumn = row.columns.some((column) => {
+    const sticky = column.sticky;
+    return Boolean(
+      (sticky?.mode && sticky.mode !== "none") ||
+        sticky?.topOffset ||
+        sticky?.bottomOffset,
+    );
+  });
+  const boundaryClass = hasStickyColumn ? "builder-sticky-boundary-row" : undefined;
+  if (usesCombinedGap) return compactClasses(base, boundaryClass);
   return compactClasses(
     base,
+    boundaryClass,
     columnGap ? `uk-grid-column-${columnGap}` : undefined,
     rowGap ? `uk-grid-row-${rowGap}` : undefined,
   );
@@ -224,6 +248,30 @@ function columnClassName(
   );
 }
 
+/**
+ * Canonical UIkit sticky declaration for imported column settings.  A column
+ * within a row naturally uses the row as its sticky boundary, matching
+ * YOOtheme's default containment without inventing a second runtime model.
+ */
+export function getBuilderColumnStickyDeclaration(
+  column: BuilderColumn,
+): string | undefined {
+  const sticky = column.sticky;
+  const mode = sticky?.mode;
+  if (!sticky || !mode || mode === "none") return undefined;
+  const declaration: string[] = [];
+  if (sticky.topOffset) declaration.push(`offset: ${sticky.topOffset}`);
+  if (sticky.bottomOffset) declaration.push(`offset-end: ${sticky.bottomOffset}`);
+  // YOOtheme terminates column sticky panels at their containing grid row
+  // (`end: !.tm-grid-expand`).  Use the shared WebPages row class for the
+  // same UIkit boundary; without it the panel remains sticky until document
+  // end instead of releasing when the following row enters the viewport.
+  declaration.push("end: !.shop-builder-content-row");
+  if (sticky.breakpoint) declaration.push(`media: @${sticky.breakpoint}`);
+  if (sticky.blend) declaration.push("cls-active: uk-preserve-color");
+  return declaration.length ? `${declaration.join("; ")};` : "";
+}
+
 function rowStyleInput(
   row: BuilderRow,
   legacyItem: LegacyLayoutItem | undefined,
@@ -287,22 +335,35 @@ export function resolveBuilderSectionStructure(
     previousRowInput = structuralInput;
 
     const columns = row.columns.map((column, columnIndex) => {
+      const normalizedColumn =
+        column.sticky &&
+        !column.sticky.mode &&
+        (column.sticky.topOffset || column.sticky.bottomOffset)
+          ? {
+              ...column,
+              sticky: {
+                ...column.sticky,
+                mode: "column-within-row" as const,
+              },
+            }
+          : column;
       const columnFlatIndex = flatIndex;
       const legacyColumn = legacyItems[columnFlatIndex];
       flatIndex += 1;
       return {
-        column,
+        column: normalizedColumn,
         legacyItem: legacyColumn,
         index: columnIndex,
         flatIndex: columnFlatIndex,
         span: equalColumnSpan(columnIndex, row.columns.length),
         className: columnClassName(
           row,
-          column,
+          normalizedColumn,
           columnIndex,
           legacyColumn,
         ),
-        style: columnStyle(column),
+        style: columnStyle(normalizedColumn),
+        stickyDeclaration: getBuilderColumnStickyDeclaration(normalizedColumn),
       } satisfies BuilderStructuralColumn;
     });
 

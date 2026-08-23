@@ -175,6 +175,79 @@ body.dark {
   --uk-global-link-color: var(--uk-global-inverse-color, #fff);
 }
 
+/* YOOtheme imported sections inherit the source theme's inverse button
+   semantics. Keep this scoped to imported sections so native WebPages button
+   presets and tenant-wide Global Styles remain untouched. */
+.shop-builder-section.shop-builder-section--yootheme {
+  --uk-button-inverse-default-text: currentColor;
+  --uk-button-inverse-default-shadow: none;
+  --uk-button-inverse-primary-shadow: none;
+  --uk-button-text-color: currentColor !important;
+  --uk-button-text-hover-color: color-mix(in srgb, currentColor 70%, transparent) !important;
+  --uk-button-text-active-color: color-mix(in srgb, currentColor 70%, transparent) !important;
+  --uk-grid-gutter-medium: 30px;
+}
+.shop-builder-section.shop-builder-section--yootheme .uk-button-default,
+.shop-builder-section.shop-builder-section--yootheme .uk-button-text {
+  color: inherit !important;
+}
+.shop-builder-section.shop-builder-section--yootheme .uk-button-default:hover,
+.shop-builder-section.shop-builder-section--yootheme .uk-button-text:hover {
+  color: inherit !important;
+}
+.builder-preview-section-sticky-wrapper {
+  /* UIkit owns the sticky host in Builder; keep the motion wrapper in normal
+     flow and let the section remain the visual target. */
+  display: block;
+  position: relative;
+}
+
+/* Reveal remains a visible layer, while the document footer/next section is
+   allowed to paint over it. UIkit's default fixed z-index is intentionally
+   lowered only for the canonical Reveal declaration. */
+.shop-builder-main:has(.shop-builder-section[data-uk-sticky*="start: -100%"]) .shop-builder-section:not([data-uk-sticky*="start: -100%"]) {
+  position: relative;
+  z-index: 1;
+}
+.site-footer-builder {
+  position: relative;
+  z-index: 1;
+}
+.site-footer-builder:has(.shop-builder-section[data-uk-sticky*="start: -100%"]) {
+  /* A footer-owned Reveal section is the lower layer. Keep the ordinary
+     footer stacking rule for non-sticky footers and let preceding content
+     paint over the imported footer reveal, as in YOOtheme. */
+  z-index: 0;
+  border-top: 0;
+}
+body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100%"]) .shop-builder-main:not(.site-footer-builder) {
+  /* The footer reveal is a background layer across document roots. Keep the
+     page content above it instead of allowing the later footer root to paint
+     over the preceding sections. */
+  position: relative;
+  z-index: 1;
+}
+.shop-builder-section.shop-builder-section--yootheme .uk-button-text::after {
+  background-image: none !important;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='13' height='10' viewBox='0 0 13 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='white' stroke-width='1.2' d='M6.88 .45L12 5 6.88 9.45'/%3E%3Cpath fill='none' stroke='white' stroke-width='1.2' d='M0 5H11.53'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='13' height='10' viewBox='0 0 13 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='white' stroke-width='1.2' d='M6.88 .45L12 5 6.88 9.45'/%3E%3Cpath fill='none' stroke='white' stroke-width='1.2' d='M0 5H11.53'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: calc(100% - 5px) 50%;
+  mask-position: calc(100% - 5px) 50%;
+}
+.shop-builder-section.shop-builder-section--yootheme {
+  --uk-button-inverse-default-background: rgba(27, 23, 31, 0.75);
+}
+
+/* Imported YOOtheme primary sections can author both a background image and
+   the theme's primary gradient. UIkit paints the image above that gradient;
+   retaining both layers is what produces the source section treatment. */
+.shop-builder-section.shop-builder-section--yootheme.shop-builder-section--has-background-image.uk-section-primary {
+  background-image: var(--uikit-section-primary-bg-image, none), var(--uikit-section-primary-gradient, none) !important;
+}
+
 .shop-builder-main[data-gsap-home] .shop-builder-section-content {
   animation: none;
 }
@@ -3666,6 +3739,16 @@ body.dark {
   padding-left: var(--uk-global-gutter, 30px) !important;
 }
 
+/* A sticky column can keep its transformed/parallax descendants painted after
+   the row itself has reached its containing boundary.  Match UIkit's sticky
+   boundary semantics by clipping only rows that the structural projection
+   marked as sticky; ordinary rows remain paint-visible as before. `clip`
+   avoids creating a scroll container, so sticky positioning still resolves
+   against the intended viewport/row boundary. */
+.shop-builder-content-row.builder-sticky-boundary-row {
+  overflow: clip;
+}
+
 .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card,
 .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card {
   padding-left: 0 !important;
@@ -6495,6 +6578,13 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 .uk-text-small { font-size: 0.875rem !important; line-height: 1.4 !important; }
 .uk-text-large { font-size: 1.35rem !important; line-height: 1.5 !important; }
 
+/* Imported YOOtheme Text uses the theme's 19px large-text token. Keep this
+   scoped to imported Text blocks so native WebPages text remains unchanged. */
+.shop-builder-column-block--text[data-builder-yootheme-text="true"].uk-text-large {
+  font-size: 1.1875rem !important;
+  line-height: 1.5 !important;
+}
+
 /* UIkit Image Borders, Box Shadows & Transitions */
 .uk-border-rounded { border-radius: 12px !important; }
 .uk-border-circle { border-radius: 50% !important; }
@@ -6783,6 +6873,22 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-grid-card--yootheme .shop-builder-title.uk-margin-top {
   margin-top: var(--uk-global-margin, 20px) !important;
   margin-bottom: 0 !important;
+}
+
+/* UIkit heading presets can restore their own bottom margin after the
+   semantic remove-bottom utility. YOOtheme Grid item titles are flush with
+   the adjacent image/content row. */
+.shop-builder-grid-card--yootheme .shop-builder-title.uk-margin-remove-bottom {
+  margin-bottom: 0 !important;
+}
+
+/* Keep imported Grid h5 titles on the same UIkit token as YOOtheme. The
+   generic Builder heading preset is 17px/600, while this source role is
+   16px/700 and must align with the 20x25px inline SVG row. */
+.shop-builder-grid-card--yootheme .shop-builder-title.uk-h5 {
+  font-size: var(--uk-heading-h5-font-size, 1rem) !important;
+  line-height: var(--uk-heading-h5-line-height, 1.4) !important;
+  font-weight: var(--uk-heading-h5-font-weight, 700) !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-grid-content > .uk-panel.uk-margin-top {
