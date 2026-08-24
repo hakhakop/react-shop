@@ -7,7 +7,7 @@ export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selectio
 
 type SelectionMessage = {
   source: typeof BUILDER_IFRAME_SELECTION_SOURCE;
-  type: "select" | "focus" | "rect" | "scroll-start" | "navigate";
+  type: "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell";
   target?: BuilderInteractionTarget;
   scrollIntoView?: boolean;
   rect?: { x: number; y: number; width: number; height: number } | null;
@@ -138,6 +138,52 @@ export default function BuilderIframeSelectionBridge({
     };
     const handleClick = (event: MouseEvent) => {
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+      // Header navigation links belong to the scoped preview router. They
+      // synchronize the Builder document on the first click. Hash-only links
+      // remain ordinary in-page preview navigation.
+      if (anchor?.closest(".site-header")) {
+        const href = anchor.getAttribute("href") ?? "";
+        const isPageNavigation = /(?:[?&]page=|\/preview\?)/.test(href) && !href.includes("#");
+        if ((diagnostics === "settled" || diagnostics === "full") && isPageNavigation) {
+          event.preventDefault();
+          window.parent.postMessage({
+            source: BUILDER_IFRAME_SELECTION_SOURCE,
+            type: "navigate",
+            href,
+          } satisfies SelectionMessage, window.location.origin);
+        }
+        return;
+      }
+      const element = event.target instanceof Element ? event.target : null;
+      const header = element?.closest(".site-header");
+      const headerInteractive = element?.closest(
+        "button, input, select, textarea, form, [role='button']",
+      );
+      // A shell edit is a temporary document context. Clicking the rendered
+      // page below it must return to the page document, even though the page
+      // itself is otherwise non-editable while the shell owns the canvas.
+      if (!header && (diagnostics === "settled" || diagnostics === "full")) {
+        window.parent.postMessage({
+          source: BUILDER_IFRAME_SELECTION_SOURCE,
+          type: "exit-shell",
+        } satisfies SelectionMessage, window.location.origin);
+      }
+      if (header && !headerInteractive) {
+        const headerTarget: BuilderInteractionTarget = {
+          type: "section",
+          sectionId: "header-document",
+        };
+        selectedTarget = headerTarget;
+        observeSelectedElement();
+        window.parent.postMessage({
+          source: BUILDER_IFRAME_SELECTION_SOURCE,
+          type: "select",
+          target: headerTarget,
+          shell: "header",
+        } satisfies SelectionMessage, window.location.origin);
+        if (diagnostics !== "minimal") scheduleRect();
+        return;
+      }
       const target = targetFromClick(event);
       const navigationEnabled = diagnostics === "settled" || diagnostics === "full";
       if (anchor && navigationEnabled && targetsMatch(selectedTarget, target)) {

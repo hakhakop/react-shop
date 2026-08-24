@@ -9,6 +9,7 @@ import {
   normalizeBuilderSectionLayout,
   type BuilderSectionLayoutConflict,
 } from "@/lib/builderSectionLayout";
+import { builderGeneralVisibilityClassName } from "@/lib/builderVisualStyle";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -182,9 +183,10 @@ function columnOrderClasses(column: BuilderColumn) {
 
 function columnStyle(column: BuilderColumn): CSSProperties {
   const defaultOrder = column.order?.default;
+  const stickyOwnsVerticalAlignment = column.sticky?.mode === "column-within-row";
   return {
     ...(typeof defaultOrder === "number" ? { order: defaultOrder } : {}),
-    ...(column.verticalAlign === "middle" || column.verticalAlign === "bottom"
+    ...(!stickyOwnsVerticalAlignment && (column.verticalAlign === "middle" || column.verticalAlign === "bottom")
       ? { flexDirection: "row" }
       : {}),
     ...(column.background?.color ? { backgroundColor: column.background.color } : {}),
@@ -229,21 +231,44 @@ function columnSurfaceClass(column: BuilderColumn) {
   );
 }
 
+/**
+ * YOOtheme can place a visibility-only decorative element in a column. In
+ * that shape UIkit hides the whole grid item at the breakpoint, not merely
+ * the inner image. Collapsing the column keeps hidden Hero artwork from
+ * leaving an empty fifth column that wraps the remaining grid on tablet and
+ * phone widths.
+ */
+function columnVisibilityClass(column: BuilderColumn) {
+  const elements = column.elements ?? [];
+  if (!elements.length) return undefined;
+  const classes = elements.map((element) =>
+    builderGeneralVisibilityClassName(element.visualStyle?.layout?.visibilityMode),
+  );
+  if (classes.some((value) => !value) || new Set(classes).size !== 1) return undefined;
+  return classes[0];
+}
+
 function columnClassName(
   row: BuilderRow,
   column: BuilderColumn,
   columnIndex: number,
   legacyItem: LegacyLayoutItem | undefined,
 ) {
+  const stickyOwnsVerticalAlignment = column.sticky?.mode === "column-within-row";
   return compactClasses(
     columnWidthClasses(row, column, columnIndex),
     getUikitColumnClass({
       horizontalAlign: legacyItem?.columnHorizontalAlign,
-      verticalAlign: column.verticalAlign === "middle" ? "center" : column.verticalAlign,
+      verticalAlign: stickyOwnsVerticalAlignment
+        ? undefined
+        : column.verticalAlign === "middle"
+          ? "center"
+          : column.verticalAlign,
       flex: legacyItem?.columnFlex,
       responsiveWidth: legacyItem?.columnResponsiveWidth,
     }),
     columnOrderClasses(column),
+    columnVisibilityClass(column),
     columnSurfaceClass(column),
   );
 }
@@ -278,7 +303,10 @@ function rowStyleInput(
 ): BuilderRowStyleInput {
   return {
     ...legacyItem,
-    advanced: row.advanced,
+    // Legacy YOOtheme exports keep authored row CSS on the layout item. Feed
+    // it through the canonical advanced-css path so shared row spacing
+    // preserves declarations such as `margin-bottom: 15vh`.
+    advanced: row.advanced ?? ((legacyItem as any)?.css ? { css: (legacyItem as any).css } : undefined),
     spacingContract: row.spacingContract ?? (legacyItem as any)?.spacingContract,
     rowHeight: row.height,
     rowTopMargin: row.topMargin ?? legacyItem?.rowTopMargin,

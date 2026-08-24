@@ -7,6 +7,7 @@ const layers = [
   { name: "master-devstack/_import.less", precedence: 1, content: `
     @global-font-family: Manrope;
     @global-primary-background: #6F40F1;
+    @global-background-image: url(/media/yootheme-default-bg.jpg);
     @global-background: #F7F8FC;
     @global-muted-background: #EEF1F8;
     @global-secondary-background: #17104E;
@@ -40,6 +41,7 @@ test("YOOtheme resolver honors layer precedence and evaluates supported color fu
   const preset = resolveYoothemeLess(layers);
   assert.equal(preset.shellSettings.backgroundPrimary, "#1991EE");
   assert.equal(preset.shellSettings.backgroundDefault, "#F7F8FC");
+  assert.equal(preset.shellSettings.backgroundDefaultImage, "url(/media/yootheme-default-bg.jpg)");
   assert.equal(preset.shellSettings.backgroundMuted, "#EEF1F8");
   assert.equal(preset.shellSettings.backgroundSecondary, "#17104E");
   assert.equal(preset.shellSettings.fontFamilyBody, "Manrope");

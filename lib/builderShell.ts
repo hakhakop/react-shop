@@ -133,6 +133,7 @@ export type BuilderShellSettings = {
   backgroundSecondaryImage?: string;
   backgroundDefaultGradient?: string;
   backgroundPrimaryGradient?: string;
+  textBackgroundGradient?: string;
   /** Legacy aliases retained only for document migration. */
   backgroundColor?: string;
   fontFamilyBody?: string;
@@ -163,6 +164,9 @@ export type BuilderShellSettings = {
   visibilityTablet?: boolean;
   visibilityMobile?: boolean;
   headingFontWeight?: string;
+  headingH3FontSize?: string;
+  headingH1FontSize?: string;
+  headingH1FontWeight?: string;
   headingSmallFontSize?: string;
   headingMediumFontSize?: string;
   headingLargeFontSize?: string;
@@ -546,6 +550,7 @@ export type BuilderShellSettings = {
   containerPaddingHorizontalMedium?: string;
   containerExpand?: boolean;
   cardBackground?: string;
+  cardBackdropFilter?: string;
   cardBorderRadius?: string;
   cardBorderColor?: string;
   cardShadow?: string;
@@ -704,6 +709,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   containerPaddingHorizontalMedium: "40px",
   containerExpand: false,
   cardBackground: "#ffffff",
+  cardBackdropFilter: "none",
   cardPrimaryBackground: "#1991ee",
   cardSecondaryBackground: "#0c273a",
   cardBorderRadius: "8px",
@@ -941,12 +947,17 @@ export function normalizeBuilderShellSettings(
     backgroundMuted: normalizeOptionalString(value?.backgroundMuted) ?? normalizeOptionalString(value?.mutedBackgroundColor) ?? defaultBuilderShellSettings.backgroundMuted,
     backgroundPrimary: normalizeOptionalString(value?.backgroundPrimary) ?? normalizeOptionalString(value?.primaryColor) ?? defaultBuilderShellSettings.backgroundPrimary,
     backgroundSecondary: normalizeOptionalString(value?.backgroundSecondary) ?? normalizeOptionalString(value?.secondaryColor) ?? defaultBuilderShellSettings.backgroundSecondary,
-    backgroundDefaultImage: normalizeOptionalString(value?.backgroundDefaultImage),
-    backgroundMutedImage: normalizeOptionalString(value?.backgroundMutedImage),
-    backgroundPrimaryImage: normalizeOptionalString(value?.backgroundPrimaryImage),
-    backgroundSecondaryImage: normalizeOptionalString(value?.backgroundSecondaryImage),
-    backgroundDefaultGradient: normalizeOptionalString(value?.backgroundDefaultGradient),
-    backgroundPrimaryGradient: normalizeOptionalString(value?.backgroundPrimaryGradient),
+    backgroundDefaultImage: normalizeOptionalString(value?.backgroundDefaultImage) ?? undefined,
+    backgroundMutedImage: normalizeOptionalString(value?.backgroundMutedImage) ?? undefined,
+    backgroundPrimaryImage: normalizeOptionalString(value?.backgroundPrimaryImage) ?? undefined,
+    backgroundSecondaryImage: normalizeOptionalString(value?.backgroundSecondaryImage) ?? undefined,
+    backgroundDefaultGradient: normalizeOptionalString(value?.backgroundDefaultGradient) ?? undefined,
+    backgroundPrimaryGradient: normalizeOptionalString(value?.backgroundPrimaryGradient) ?? undefined,
+    textBackgroundGradient: normalizeOptionalString(value?.textBackgroundGradient) ?? undefined,
+    headingH3FontSize: normalizeOptionalString(value?.headingH3FontSize) ?? undefined,
+    headingH1FontSize: normalizeOptionalString(value?.headingH1FontSize) ?? undefined,
+    headingH1FontWeight: normalizeOptionalString(value?.headingH1FontWeight) ?? undefined,
+    cardBackdropFilter: normalizeOptionalString(value?.cardBackdropFilter) ?? undefined,
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible

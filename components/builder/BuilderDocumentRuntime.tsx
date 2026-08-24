@@ -13,11 +13,17 @@ import { BUILDER_DOCUMENT_RUNTIME_READY_EVENT } from "@/components/builder/build
  */
 export default function BuilderDocumentRuntime({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
+  const [animationRuntimeVersion, setAnimationRuntimeVersion] = useState(0);
 
   useEffect(() => {
     let firstFrame = 0;
     let secondFrame = 0;
     let cancelled = false;
+    const hasAnimationNodes = (node: Node) =>
+      node instanceof Element && Boolean(
+        node.matches("[data-builder-parallax], [data-builder-parallax-y], [data-builder-animate]") ||
+        node.querySelector("[data-builder-parallax], [data-builder-parallax-y], [data-builder-animate]"),
+      );
 
     // The canonical preview is already hydrated before this client effect
     // runs. Two post-layout frames let streamed Header/content/Footer nodes
@@ -32,8 +38,23 @@ export default function BuilderDocumentRuntime({ children }: { children: ReactNo
       });
     });
 
+    // The document runtime is intentionally mounted once, while page changes
+    // replace the rendered builder subtree beneath it. Remount the animation
+    // owner when imported animation nodes are replaced so parallax never keeps
+    // stale geometry or stale scroll-parent bindings from the previous page.
+    const contentObserver = new MutationObserver((records) => {
+      if (records.some((record) =>
+        Array.from(record.addedNodes).some(hasAnimationNodes) ||
+        Array.from(record.removedNodes).some(hasAnimationNodes),
+      )) {
+        setAnimationRuntimeVersion((version) => version + 1);
+      }
+    });
+    contentObserver.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       cancelled = true;
+      contentObserver.disconnect();
       if (firstFrame) window.cancelAnimationFrame(firstFrame);
       if (secondFrame) window.cancelAnimationFrame(secondFrame);
     };
@@ -44,7 +65,7 @@ export default function BuilderDocumentRuntime({ children }: { children: ReactNo
       {children}
       {ready ? (
         <>
-          <BuilderScrollAnimations />
+          <BuilderScrollAnimations key={animationRuntimeVersion} />
           <BuilderStickyRuntime />
         </>
       ) : null}

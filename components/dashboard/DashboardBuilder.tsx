@@ -1629,13 +1629,26 @@ function normalizeBuilderState(
     key === "product-single"
       ? migrateProductTemplateSections(state.sections)
       : state.sections;
+  const headerBlockIds = new Set<string>();
   const sections = migratedSections
     .map(normalizeScrollPinnedDemoSection)
     .map((section) => ({
       ...section,
       layoutItems: section.layoutItems?.map((item) => ({
         ...item,
-        blocks: (item.blocks ?? []).map((block) => {
+        blocks: (item.blocks ?? []).map((block, blockIndex) => {
+          if (key === "header") {
+            const baseId = block.id?.trim() ||
+              `header-${block.kind ?? "element"}-${item.id ?? "column"}-${blockIndex}`;
+            let canonicalId = baseId;
+            let suffix = 2;
+            while (headerBlockIds.has(canonicalId)) {
+              canonicalId = `${baseId}-${suffix}`;
+              suffix += 1;
+            }
+            headerBlockIds.add(canonicalId);
+            if (block.id !== canonicalId) block = { ...block, id: canonicalId };
+          }
           if (block.kind === "grid") {
             const gridStyle = UIKIT_YOOTHEME_BUTTON_VARIANTS.includes(
               block.buttonStyle as typeof UIKIT_YOOTHEME_BUTTON_VARIANTS[number],
@@ -2969,7 +2982,12 @@ export default function DashboardBuilder({
     if (headerContextState.page === "product-single" && productSlug) {
       params.set("product", productSlug);
     }
-    const tenantRouteSegment = websiteRouteSegment ?? websiteId ?? "";
+    if (!websiteId) {
+      params.set("builderFrame", "selection");
+      params.set("builderBridge", iframeDiagnosticMode);
+      return `/dashboard/preview?${params.toString()}`;
+    }
+    const tenantRouteSegment = websiteRouteSegment ?? websiteId;
     params.set("builderFrame", "selection");
     params.set("builderBridge", iframeDiagnosticMode);
     return `/app/websites/${encodeURIComponent(tenantRouteSegment)}/preview?${params.toString()}`;
@@ -4084,7 +4102,10 @@ export default function DashboardBuilder({
     // draft over the shell target during that transaction.
     if (activeShellEntry) return;
     if (searchParams.get("document")) return;
-    const nextKey = resolveRequestedPageFromSearch(builderState.page);
+    const requestedPage = searchParams.get("page") ?? searchParams.get("template");
+    const nextKey = resolveRequestedPageFromSearch(
+      parseBuilderLayoutKey(requestedPage) ?? builderState.page,
+    );
     if (nextKey === builderState.page) return;
     setPublishedDocumentReady(false);
     const nextState = hydrateDocumentBuilderState(
@@ -5520,6 +5541,12 @@ export default function DashboardBuilder({
         if (handleScopedBuilderNavigate(href)) return;
         const page = getBuilderPageKeyForHref(href, scopedPreviewPages);
         if (page) switchBuilderTarget(page);
+        return;
+      }
+      if (event.data.type === "exit-shell") {
+        if (builderState.page === "header" || builderState.page === "footer") {
+          exitShellEdit();
+        }
         return;
       }
       if (event.data.type !== "select") return;
@@ -6960,6 +6987,9 @@ export default function DashboardBuilder({
       const existingLocation = headerSection?.layoutItems?.find((item) =>
         (item.blocks ?? []).some((block) => block.id === headerElement.id),
       );
+      const elementToInsert = existingLocation
+        ? { ...headerElement, id: createBlockId(kind) }
+        : headerElement;
       const headerRow = headerSection?.layoutItems?.find(
         (item) => item.id === (preferredHeaderColumnKey ?? selectedLayoutColumnKey),
       ) ?? headerSection?.layoutItems?.find((item) => item.id === "header-main-row")
@@ -6985,7 +7015,7 @@ export default function DashboardBuilder({
                   const insertIndex = targetIndex < 0
                     ? blocks.length
                     : targetIndex + (placement === "below" ? 1 : 0);
-                  blocks.splice(insertIndex, 0, headerElement);
+                  blocks.splice(insertIndex, 0, elementToInsert);
                   return { ...item, blocks };
                 }),
               },
@@ -6993,7 +7023,7 @@ export default function DashboardBuilder({
       }));
       setSelectedId(headerSection.id);
       setSelectedLayoutColumnKey(headerRow.id ?? "header-main-row");
-      setSelectedLayoutBlockKey(headerElement.id);
+      setSelectedLayoutBlockKey(elementToInsert.id ?? null);
       setInspectorOpen(true);
       setPublishStatus(`${layoutBlockLabels[kind]} restored`);
       return;
@@ -11946,6 +11976,7 @@ export default function DashboardBuilder({
             >
               <iframe
                 ref={iframeComparisonRef}
+                key={iframeComparisonHref}
                 className="builder-iframe-comparison-frame"
                 src={iframeComparisonHref}
                 title="Canonical tenant Builder canvas"
@@ -12114,7 +12145,10 @@ export default function DashboardBuilder({
                           data-header-element={element.type}
                           onClickCapture={(event) => {
                             const target = event.target as HTMLElement;
-                            if (resolveBuilderOpenLinkIntent(target)) return;
+                            // Authored Header links retain normal one-click
+                            // navigation. Selection belongs to empty/content
+                            // space; the scoped Builder router owns anchors.
+                            if (target.closest("a[href]")) return;
                             if (
                               target.closest(".builder-preview-block-tools") ||
                               !target.closest("a, button, [role='button']")
@@ -12150,10 +12184,10 @@ export default function DashboardBuilder({
                           }}
                           onClick={(event) => {
                             const target = event.target as HTMLElement;
+                            if (target.closest("a[href]")) return;
                             if (target.closest(".builder-preview-block-tools")) {
                               return;
                             }
-                            if (resolveBuilderOpenLinkIntent(target)) return;
                             event.preventDefault();
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
@@ -12426,7 +12460,15 @@ export default function DashboardBuilder({
                   ? "Locked page context"
                   : undefined
               }
-              onClick={builderState.page === "header" ? exitShellEdit : undefined}
+              // The locked page preview deliberately disables its editing
+              // controls, but PreviewCanvas descendants may still stop the
+              // bubble-phase click. Capture here so clicking anywhere inside
+              // the page reliably returns to the page document.
+              onClickCapture={
+                builderState.page === "header" || builderState.page === "footer"
+                  ? exitShellEdit
+                  : undefined
+              }
             >
             {builderState.page === "header" ? (
               <div className="builder-context-preview-status-sticky-wrapper">
@@ -17782,7 +17824,16 @@ const PreviewSection = memo(function PreviewSection({
                     />
                   )}
 
-                  <div className="shop-builder-column-content" data-uk-sticky={structuralColumn.stickyDeclaration}>
+                  <div
+                    className={`shop-builder-column-content${
+                      structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
+                        ? " uk-flex uk-flex-middle"
+                        : structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "bottom"
+                          ? " uk-flex uk-flex-bottom"
+                          : ""
+                    }`}
+                    data-uk-sticky={structuralColumn.stickyDeclaration}
+                  >
                     {blocks.length === 0 && (
                       <div
                         className="builder-preview-drop-zone"
@@ -18396,6 +18447,8 @@ const PreviewSection = memo(function PreviewSection({
                             const isPanelImagePlaceholder =
                               !block.imageUrl ||
                               !block.imageUrl.trim();
+                            const panelMetaStyleName = String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase();
+                            const panelMetaIsHeading = /^h[1-6]$/.test(panelMetaStyleName);
 
                             const panelTitleStyle = {
                               color: "var(--builder-card-title-color, inherit)",
@@ -18404,12 +18457,20 @@ const PreviewSection = memo(function PreviewSection({
                               margin: "var(--builder-card-title-margin, 0) 0 0",
                             } as React.CSSProperties;
                             const panelMetaStyle = {
-                              color: "var(--builder-card-meta-color, inherit)",
-                              fontSize:
-                                "var(--builder-card-meta-size, inherit)",
+                              color: panelMetaIsHeading
+                                ? "var(--builder-card-title-color, inherit)"
+                                : "var(--builder-card-meta-color, inherit)",
+                              fontSize: panelMetaIsHeading
+                                ? undefined
+                                : "var(--builder-card-meta-size, inherit)",
+                              fontFamily: panelMetaIsHeading
+                                ? "var(--uk-heading-font-family, inherit)"
+                                : undefined,
                               textTransform:
                                 "var(--builder-card-meta-transform, none)" as React.CSSProperties["textTransform"],
-                              marginTop: "var(--builder-card-meta-spacing, 0)",
+                              marginTop: /^h[1-6]$/.test(String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase())
+                                ? "var(--builder-card-meta-spacing, var(--uk-global-margin, 20px))"
+                                : "var(--builder-card-meta-spacing, 0)",
                             } as React.CSSProperties;
                             const panelBodyStyle = {
                               color:
@@ -18452,7 +18513,7 @@ const PreviewSection = memo(function PreviewSection({
                                 as="span"
                                 area="eyebrow"
                                 className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
-                                typography={block.typography}
+                                typography={panelMetaIsHeading ? undefined : block.typography}
                                 style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
                                 value={block.eyebrow}
                                 onChange={(eyebrow) =>

@@ -31,6 +31,7 @@ export function resolveHeaderBuilderComposition(
     object,
     { id?: string; flex?: number; index: number; count: number }
   >();
+  const blockIds = new Map<object, string>();
   layout?.sections.forEach((layoutSection) => {
     layoutSection.layoutItems?.forEach((item, itemIndex) => {
       const rowId = item.rowId ?? item.id ?? `header-row-${itemIndex}`;
@@ -39,7 +40,8 @@ export function resolveHeaderBuilderComposition(
       ) ?? [item];
       const preset = getBuilderRowLayoutPreset(item.rowLayout);
       const columnIndex = rowItems.indexOf(item);
-      item.blocks?.forEach((block) => {
+      item.blocks?.forEach((block, blockIndex) => {
+        blockIds.set(block, block.id ?? `${item.id ?? "header-column"}-block-${blockIndex}`);
         blockRowIds.set(block, rowId);
         blockColumnMeta.set(block, {
           id: item.id,
@@ -69,7 +71,7 @@ export function resolveHeaderBuilderComposition(
   });
   const elements = blocks.flatMap((block, blockIndex): HeaderBuilderElement[] => {
     if (block.id === "header-logo" || block.kind === "image") return [{
-      id: block.id ?? `header-logo-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-logo-${blockIndex}`,
       type: "logo",
       imageUrl: block.imageUrl,
       imageAlt: block.imageAlt,
@@ -98,7 +100,7 @@ export function resolveHeaderBuilderComposition(
     if (block.id === "header-navigation" || block.kind === "menu") {
       const overrides = block.headerNavigationOverrides;
       return [{
-      id: block.id ?? `header-navigation-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-navigation-${blockIndex}`,
       type: "navigation",
       menuItemGap: overrides?.gap ? block.menuItemGap : undefined,
       menuHoverColor: overrides?.hoverColor ? block.menuHoverColor : undefined,
@@ -133,27 +135,27 @@ export function resolveHeaderBuilderComposition(
           headerButtonOverrides: overrides,
         };
       })(),
-      id: block.id ?? `header-button-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-button-${blockIndex}`,
       type: "button",
       label: block.buttonLabel,
       url: block.buttonUrl,
       ...sharedElementFields(block),
     }];
     if (block.id === "header-spacer" || block.kind === "embed") return [{
-      id: block.id ?? `header-spacer-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-spacer-${blockIndex}`,
       type: "spacer",
       ...sharedElementFields(block),
     }];
     const utilityAction = block.headerUtilityAction ?? headerActionFromKind(block.kind);
     if (block.id?.startsWith("header-utility-") || block.kind === "headerUtility" || utilityAction) return [{
-      id: block.id ?? `header-utility-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-utility-${blockIndex}`,
       type: "utility",
       utilityAction,
       utilityVariant: block.headerUtilityVariant,
       ...sharedElementFields(block),
     }];
     if (block.id === "header-categories" || block.kind === "headerCategories") return [{
-      id: block.id ?? `header-categories-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-categories-${blockIndex}`,
       type: "categories",
       categoriesLabel: block.headerCategoriesLabel,
       categoriesShowLabel: block.headerCategoriesShowLabel,
@@ -180,7 +182,7 @@ export function resolveHeaderBuilderComposition(
       ...sharedElementFields(block),
     }];
     if (block.id === "header-language" || block.kind === "headerLanguage") return [{
-      id: block.id ?? `header-language-${blockIndex}`,
+      id: blockIds.get(block) ?? `header-language-${blockIndex}`,
       type: "language",
       languageDisplay: block.headerLanguageDisplay,
       buttonBg: block.buttonBg,

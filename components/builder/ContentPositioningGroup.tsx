@@ -28,15 +28,19 @@ export function getContentPositioningGroupChildStyle(
   siblings: BuilderLayoutBlock[],
 ): CSSProperties {
   const layout = positioningLayout(block)?.layout;
+  if (!hasPositionedSiblings(siblings) || layout?.textAlign !== "center") return {};
+
+  // A centered normal-flow image shares the same full positioning panel as
+  // YOOtheme's `uk-width-1-1` image item. Without this width, its intrinsic
+  // media width shrink-wraps the shell and the image is centered in a narrow
+  // 495px box instead of the full expanded row.
+  if (block.kind === "image" && layout.position !== "absolute") return { width: "100%" };
+
   if (
-    !hasPositionedSiblings(siblings) ||
-    layout?.position !== "absolute" ||
+    layout.position !== "absolute" ||
     layout.left ||
-    layout.right ||
-    layout.textAlign !== "center"
-  ) {
-    return {};
-  }
+    layout.right
+  ) return {};
 
   return { width: "100%" };
 }
@@ -62,6 +66,7 @@ export function ContentPositioningGroup({ blocks, children }: Props) {
           // itself unpositioned matches YOOtheme's absolute-element origin at
           // the outer column/panel top while the group still owns flow height.
           position: "static",
+          width: "100%",
           // The group mirrors YOOtheme's column panel. Its flow height must
           // come from the authored children themselves, not WebPages' legacy
           // implicit element-padding defaults. Explicit element padding is an

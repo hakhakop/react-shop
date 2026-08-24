@@ -4459,3 +4459,12 @@ body[data-storefront-preset="princity"] .category-mega-card,
   opacity: 0 !important;
   transform: scaleX(0) !important;
 }
+
+/* Override the desktop surface rule for the legacy shell: the inner main row
+   already paints the single YOOtheme navbar border. */
+@media (min-width: 901px) {
+  .site-header.site-header--background-default.site-header--builder-width-boxed.border-b:not(.site-header--background-none):not(.site-header--background-glass):not(.site-header--background-accent):not(.site-header--document-background):has(.site-header-main) {
+    border-bottom-width: 0 !important;
+    border-bottom-color: transparent !important;
+  }
+}

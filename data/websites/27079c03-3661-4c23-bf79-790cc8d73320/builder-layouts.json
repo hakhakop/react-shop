@@ -6571,6 +6571,11 @@
                 "buttonUrl": "#contact",
                 "buttonStyle": "default",
                 "size": "default"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -6591,10 +6596,10 @@
         "headerTopToolbarPhone": "+374 xx xx xx",
         "headerTopToolbarMeta": "AMD ֏",
         "headerHeight": "custom",
-        "headerCustomHeight": 91
+        "headerCustomHeight": 80
       }
     ],
-    "updatedAt": "2026-08-23T22:28:27.643Z"
+    "updatedAt": "2026-08-24T22:37:17.437Z"
   },
   "footer": {
     "version": 1,
@@ -17279,7 +17284,7 @@
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
-        "layoutRows": 5,
+        "layoutRows": 3,
         "layoutItems": [
           {
             "id": "yootheme-section-1-row-1-column-1",
@@ -17356,6 +17361,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -17366,9 +17372,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -17820,8 +17824,8 @@
                   {
                     "id": "yootheme-heading-0-0-0-0",
                     "kind": "heading",
-                    "headingText": "Best App to Stay in Touch",
-                    "title": "Best App to Stay in Touch",
+                    "headingText": "Best App to<br class=\"uk-visible@s\"> Stay in Touch",
+                    "title": "Best App to<br class=\"uk-visible@s\"> Stay in Touch",
                     "headingLevel": "h1",
                     "headingSize": "medium",
                     "headingAlign": "center",
@@ -18295,24 +18299,6 @@
             ]
           },
           {
-            "id": "layout-row-mt6ul7lv",
-            "layout": "3-col-equal",
-            "columns": [
-              {
-                "id": "layout-row-mt6ul7lv-column-1",
-                "elements": []
-              },
-              {
-                "id": "layout-row-mt6ul7lv-column-2",
-                "elements": []
-              },
-              {
-                "id": "layout-row-mt6ul7lv-column-3",
-                "elements": []
-              }
-            ]
-          },
-          {
             "id": "yootheme-section-1-row-3",
             "layout": "1-col",
             "spacingContract": "yootheme",
@@ -18461,16 +18447,6 @@
                     "spacingContract": "yootheme"
                   }
                 ]
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mt6ulb4k",
-            "layout": "1-col",
-            "columns": [
-              {
-                "id": "layout-row-mt6ulb4k-column-1",
-                "elements": []
               }
             ]
           }
@@ -18832,14 +18808,8 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-1-1-0-4",
@@ -18945,14 +18915,8 @@
                     ]
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -19596,14 +19560,8 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-image-2-0-0-2",
@@ -19839,14 +19797,8 @@
                     ]
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -20895,14 +20847,8 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-3-0-0-4",
@@ -21012,13 +20958,8 @@
                     ]
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-image-3-0-0-5",
@@ -21707,13 +21648,8 @@
                 "elementAlign": "center",
                 "textAlign": "left",
                 "headingAlign": "left",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -23234,13 +23170,8 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-6-0-0-1",
@@ -23337,13 +23268,8 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-6-0-0-2",
@@ -23440,13 +23366,8 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-6-0-0-3",
@@ -23543,13 +23464,8 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -24590,13 +24506,8 @@
                     "end": "100vh + 100%  - 175vh"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-7-0-0-1",
@@ -24722,13 +24633,8 @@
                     "end": "100% + 100vh - 250vh"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-7-0-0-2",
@@ -24852,13 +24758,8 @@
                     "end": "100% + 100vh - 325vh"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-7-0-0-3",
@@ -24978,13 +24879,8 @@
                     "end": "100% + 100vh - 400vh"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -26190,13 +26086,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-9-1-0-1",
@@ -26323,13 +26214,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-9-1-0-2",
@@ -26456,13 +26342,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-9-1-0-3",
@@ -26589,13 +26470,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-9-1-0-4",
@@ -26722,13 +26598,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-panel-9-1-0-5",
@@ -26855,13 +26726,8 @@
                     "end": "100%"
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -27785,6 +27651,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -27793,9 +27660,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
@@ -28119,6 +27984,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -28127,9 +27993,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
@@ -28353,6 +28217,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-24T07:50:44.189Z"
+    "updatedAt": "2026-08-24T21:53:35.899Z"
   }
 }

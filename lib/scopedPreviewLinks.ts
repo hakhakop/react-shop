@@ -56,7 +56,7 @@ function isSaaSRoute(path: string) {
 
 export function getBuilderPageKeyForHref(
   href: string | null | undefined,
-  pages: ScopedPreviewPage[] = [],
+  pages: Array<{ key: string; slug?: string }> = [],
 ): BuilderLayoutKey | null {
   if (!href) return null;
 
@@ -102,12 +102,31 @@ export function getBuilderPageKeyForHref(
       page.key === `page:${slug}` ||
       page.key === slug,
   );
-  if (matchingPage) return matchingPage.key;
+  if (matchingPage) return matchingPage.key as BuilderLayoutKey;
   if (/^\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path)) {
     return `page:${slug}`;
   }
 
   return null;
+}
+
+/** Resolve a storefront pathname after removing an optional local tenant prefix. */
+export function getBuilderPageKeyForTenantPath(
+  pathname: string | null | undefined,
+  pages: Array<{ key: string; slug?: string }> = [],
+  tenantRouteSegment?: string | null,
+) {
+  const rawPath = pathname?.trim() || "/";
+  const normalizedPath = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+  const encodedTenant = tenantRouteSegment
+    ? `/${encodeURIComponent(tenantRouteSegment)}`
+    : null;
+  const tenantRelativePath = encodedTenant &&
+    (normalizedPath === encodedTenant || normalizedPath.startsWith(`${encodedTenant}/`))
+    ? normalizedPath.slice(encodedTenant.length) || "/"
+    : normalizedPath;
+
+  return getBuilderPageKeyForHref(tenantRelativePath, pages);
 }
 
 export function getPreviewActivePathForPageKey(pageKey: BuilderLayoutKey) {

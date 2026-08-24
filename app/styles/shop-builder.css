@@ -241,6 +241,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   --uk-button-inverse-default-background: rgba(27, 23, 31, 0.75);
 }
 
+/* UIkit's background text variant is compiled from the theme's
+   internal-text-background-color-gradient token. Keep imported YOOtheme text
+   variants on that canonical token path instead of UIkit's blue fallback. */
+.shop-builder-section.shop-builder-section--yootheme .uk-text-background {
+  background-image: var(--uk-text-background-gradient, var(--uikit-section-primary-gradient, none)) !important;
+}
+
 /* Imported YOOtheme primary sections can author both a background image and
    the theme's primary gradient. UIkit paints the image above that gradient;
    retaining both layers is what produces the source section treatment. */
@@ -293,6 +300,11 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   /* UIkit/YOOtheme containers use a content-box max width; the responsive
      horizontal gutters extend the border box beyond the 1200px content track. */
   box-sizing: content-box;
+  /* The base section shell is width: 100%, but UIkit containers size their
+     content track from the available border-box width. Keeping width: 100%
+     here makes the 40px gutters additive at narrow desktop widths and lets
+     imported YOOtheme grids overflow by the full gutter width. */
+  width: auto;
   max-width: var(--uk-container-default-max-width, 1200px);
   padding-left: var(--uk-container-padding-horizontal, 15px);
   padding-right: var(--uk-container-padding-horizontal, 15px);
@@ -1690,6 +1702,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 .shop-builder-column-block--panel.uk-card-default {
   border: none !important;
+  backdrop-filter: var(--uk-card-default-backdrop-filter, none) !important;
+  -webkit-backdrop-filter: var(--uk-card-default-backdrop-filter, none) !important;
 }
 
 .shop-builder-column-block--panel.uk-card-small > .uk-card-body {
@@ -1697,7 +1711,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 
 .shop-builder-column-block--panel.uk-card-default:not(.uk-card-small):not(.uk-card-large) > .uk-card-body {
-  padding: var(--uk-global-gutter, 30px) !important;
+  padding: var(--uk-card-padding, var(--uk-global-gutter, 30px)) !important;
 }
 
 .shop-builder-column-block--panel.uk-card-large > .uk-card-body {
@@ -2636,6 +2650,41 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   text-align: var(--builder-card-title-align, inherit);
 }
 
+/* Imported UIkit feature grids retain the heading class on the title. The
+   generic grid-card rule above must not collapse that semantic heading back
+   to the base card font. */
+.shop-builder-grid-content .shop-builder-title.uk-heading-small {
+  font-size: var(--uk-heading-small-font-size, 2.6rem) !important;
+  line-height: var(--uk-heading-small-line-height, 1.2) !important;
+  font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)) !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.shop-builder-grid-content .shop-builder-grid-meta {
+  font-size: var(--uk-base-font-size, 16px) !important;
+  line-height: var(--uk-base-line-height, 1.5) !important;
+  margin-bottom: var(--uk-global-margin-small, 10px) !important;
+}
+
+@media (min-width: 960px) {
+  .shop-builder-grid-content .shop-builder-title.uk-heading-small {
+    font-size: var(--uk-heading-small-font-size-responsive, 3.25rem) !important;
+  }
+}
+
+/* UIkit's large column gutter expands this centered feature track beyond the
+   container content box. Keep the imported grid's intrinsic auto-width items
+   and its 70px leading gutter in the shared projection. */
+.shop-builder-uikit-grid--column-center.shop-builder-grid--gap-large {
+  margin-left: calc(-1 * var(--uk-global-large-gutter, 70px));
+  width: calc(100% + var(--uk-global-large-gutter, 70px));
+}
+
+.shop-builder-uikit-grid--column-center.shop-builder-grid--gap-large > * {
+  padding-left: var(--uk-global-large-gutter, 70px);
+}
+
 .shop-builder-grid-content .shop-builder-title.uk-h1 {
   font-size: var(--uk-h1-font-size, 2.5rem);
   line-height: var(--uk-h1-line-height, 1.2);
@@ -3256,7 +3305,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   padding: 20px !important;
 }
 .shop-builder-panel-padding-default {
-  padding: 30px !important;
+  padding: var(--uk-card-padding, 30px) !important;
 }
 .shop-builder-panel-padding-large {
   padding: 40px !important;
@@ -3668,7 +3717,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 .shop-builder-content-layout-card {
   min-width: 0;
-  padding: 0 0 0 var(--uk-container-padding-horizontal-m, 40px) !important;
+  padding: 0 0 0 var(--uk-container-padding-horizontal, 15px) !important;
   box-sizing: border-box;
   border-radius: 0;
   background: transparent;
@@ -3678,6 +3727,15 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
      second vertical rhythm between otherwise normal-flow siblings. */
   gap: 0;
   transition: box-shadow 0.14s ease, background 0.14s ease;
+}
+
+/* A single YOOtheme column can become a flex row when it owns a sticky
+   middle panel. Its content surface must still span the full column track;
+   otherwise intrinsic media width shrink-wraps the containing block and
+   shifts centered images and absolute overlays toward the left edge. */
+.shop-builder-content-layout-card > .shop-builder-column-content {
+  width: 100%;
+  min-width: 0;
 }
 
 /* The structural column baseline above is intentionally transparent and
@@ -3721,6 +3779,14 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   margin-bottom: var(--uk-global-margin, 20px) !important;
 }
 
+/* UIkit's final child does not contribute an extra trailing margin to the
+   expanded content row. Imported shells keep their authored margin between
+   siblings, but the last shell must terminate the row at its own box so the
+   following grid starts at the same position as YOOtheme. */
+.shop-builder-content-layout-card:only-child > .shop-builder-column-content > .shop-builder-element-shell.yootheme-imported-spacing:last-child {
+  margin-bottom: 0 !important;
+}
+
 /* Imported UIkit headings and image figures participate in the same flow as
    YOOtheme's panel. Keep the H1 token and remove inline-image baseline space
    that otherwise adds a few pixels to every positioned gallery row. */
@@ -3736,17 +3802,15 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    the published storefront and Builder projection on the same token path;
    the content-layout baseline must not add a second fixed 40px gutter. */
 .shop-builder-content-row > .shop-builder-content-layout-card {
-  padding-left: var(--uk-global-gutter, 30px) !important;
+  padding-left: var(--uk-container-padding-horizontal, 15px) !important;
 }
 
-/* A sticky column can keep its transformed/parallax descendants painted after
-   the row itself has reached its containing boundary.  Match UIkit's sticky
-   boundary semantics by clipping only rows that the structural projection
-   marked as sticky; ordinary rows remain paint-visible as before. `clip`
-   avoids creating a scroll container, so sticky positioning still resolves
-   against the intended viewport/row boundary. */
+/* A sticky column's transformed/parallax descendants must be allowed to paint
+   across the row edge. YOOtheme's `end: !.tm-grid-expand` controls when the
+   sticky column releases; clipping the row itself hides the swirl's authored
+   overlap into the preceding gap. */
 .shop-builder-content-row.builder-sticky-boundary-row {
-  overflow: clip;
+  overflow: visible;
 }
 
 .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card,
@@ -3806,10 +3870,18 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   .shop-builder-content-layout-card {
     padding-left: var(--uk-container-padding-horizontal-s, 30px) !important;
   }
+
+  .shop-builder-content-row > .shop-builder-content-layout-card {
+    padding-left: var(--uk-container-padding-horizontal-s, 30px) !important;
+  }
 }
 
 @media (min-width: 960px) {
   .shop-builder-content-layout-card {
+    padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
+  }
+
+  .shop-builder-content-row > .shop-builder-content-layout-card {
     padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
   }
 }
@@ -6367,7 +6439,9 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 
 @media (max-width: 480px) {
-  .shop-builder-title {
+  /* Keep UIkit/YOOtheme semantic heading roles on their canonical token
+     ladder; this fallback is only for legacy titles without a heading role. */
+  .shop-builder-title:not([class*="uk-heading-"]) {
     font-size: clamp(30px, 9vw, 48px) !important;
   }
   .shop-builder-buttons {
@@ -6547,7 +6621,11 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
 .shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h3 {
+  font-size: var(--uk-heading-h3-font-size, 22px) !important;
+  line-height: 1.4 !important;
+  font-weight: 600 !important;
+}
 .shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, 1.0625rem) !important; line-height: 1.4 !important; font-weight: 600 !important; }
 .shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }

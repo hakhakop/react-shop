@@ -433,6 +433,9 @@ export type BuilderLayoutBlock = {
   customAttributes?: string;
   customCss?: string;
   kind?: LayoutBlockKind;
+  /** Cart element presentation. Inline is the backwards-compatible default. */
+  cartPresentation?: "inline" | "floating";
+  cartFloatingPosition?: "bottom-right" | "bottom-left";
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
     | "headingText" | "body" | "eyebrow" | "title"

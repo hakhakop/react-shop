@@ -399,9 +399,18 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
     // (`uk-width-1-1`); the media/content inside it keeps its authored width.
     // Without this, an image shell shrink-wraps to the media itself and the
     // General text-alignment control has no space in which to align it.
-    ...(layout.position === "absolute" ? { width: "100%" } : {}),
+    // An unanchored YOOtheme image wrapper spans its positioning column so
+    // text alignment can place the authored media at the edge. Explicitly
+    // anchored layers (for example the Hero swirl at left: 50%) keep their
+    // intrinsic media width; widening those layers changes their center.
+    ...(layout.position === "absolute" && !layout.left?.trim() && !layout.right?.trim()
+      ? { width: "100%" }
+      : {}),
     ...(positioned && layout.top?.trim() ? { top: layout.top.trim() } : {}),
     ...(positioned && layout.right?.trim() ? { right: layout.right.trim() } : {}),
+    ...(layout.position === "absolute" && !layout.left?.trim() && !layout.right?.trim() && layout.textAlign === "right"
+      ? { right: "0px" }
+      : {}),
     ...(positioned && layout.bottom?.trim() ? { bottom: layout.bottom.trim() } : {}),
     ...(positioned && layout.left?.trim() ? { left: layout.left.trim() } : {}),
     ...(positioned && layout.zIndex !== undefined ? { zIndex: layout.zIndex } : {}),

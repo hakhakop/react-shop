@@ -31,6 +31,7 @@ import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumen
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
+import { getBuilderPageKeyForTenantPath } from "@/lib/scopedPreviewLinks";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
@@ -87,6 +88,29 @@ ${uikitCss}
   --builder-global-element-margin-bottom: ${spacing(shellSettings.elementMarginBottom, "elementMargin")};
   --builder-global-element-margin-left: ${spacing(shellSettings.elementMarginLeft, "elementMargin")};
 }
+
+/* The canonical preview keeps the imported Header in normal document flow
+   when overlay/pull-under are disabled. In that mode YOOtheme still paints
+   the global default surface behind the header; inherit the same semantic
+   surface on the preview document so the reserved header-height area does
+   not fall back to the host app background. */
+html:has([data-scoped-preview-root]),
+body:has([data-scoped-preview-root]),
+html:has([data-domain-website-root]),
+body:has([data-domain-website-root]) {
+  background-color: var(--uikit-section-default-bg, var(--page-bg)) !important;
+  background-image: var(--uikit-section-default-bg-image, var(--uikit-section-default-gradient, none)) !important;
+  color: var(--uk-global-text-color, var(--text-main)) !important;
+}
+
+/* Keep the reserved normal-flow header area on the same imported surface as
+   the document root. Without this, the translucent header reveals the host
+   app's light .site-main fallback before the first section begins. */
+body:has([data-scoped-preview-root]) .site-main,
+body:has([data-domain-website-root]) .site-main {
+  background-color: var(--uikit-section-default-bg, var(--page-bg)) !important;
+  background-image: var(--uikit-section-default-bg-image, var(--uikit-section-default-gradient, none)) !important;
+}
   `.trim();
 }
 
@@ -120,15 +144,7 @@ function resolveWebsitePageKey(
     return normalizedDirect;
   }
 
-  const requestedSlug = requestedPage.replace(/^\/+|\/+$/g, "");
-  const customPage = customPages.find(
-    (item) =>
-      item.slug === requestedSlug ||
-      item.key === `page:${requestedSlug}` ||
-      item.key === requestedPage,
-  );
-
-  return customPage?.key ?? normalizedDirect;
+  return getBuilderPageKeyForTenantPath(requestedPage, customPages) ?? normalizedDirect;
 }
 
 export default async function WebsiteFrontend({

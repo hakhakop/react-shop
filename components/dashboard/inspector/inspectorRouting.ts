@@ -29,6 +29,7 @@ import FluentFormCapabilityPanel from "@/components/dashboard/inspector/panels/F
 import ProductsCapabilityPanel from "@/components/dashboard/inspector/panels/ProductsCapabilityPanel";
 import CategoryFiltersCapabilityPanel from "@/components/dashboard/inspector/panels/CategoryFiltersCapabilityPanel";
 import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCapabilityPanel";
+import CartCapabilityPanel from "@/components/dashboard/inspector/panels/CartCapabilityPanel";
 
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
@@ -308,6 +309,11 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: DatePickerCapabilityPanel,
     settingsLabel: "Settings",
+  },
+  cartContent: {
+    capabilities: ["content"],
+    composes: ["content", "general"],
+    panel: CartCapabilityPanel,
   },
 };
 

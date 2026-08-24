@@ -20,11 +20,11 @@ type CartPageClientProps = {
 };
 
 export default function CartPageClient({ asSlot = false }: CartPageClientProps) {
-  const { items, totalAmount, totalCount, removeItem, clearCart, updateItemQty } =
+  const { items, totalAmount = 0, totalCount = 0, removeItem, clearCart, updateItemQty } =
     useCart();
 
-  const formatAMD = (value: number) =>
-    `${value.toLocaleString("hy-AM", {
+  const formatAMD = (value: number | null | undefined) =>
+    `${(value ?? 0).toLocaleString("hy-AM", {
       maximumFractionDigits: 0,
     })} ֏`;
 

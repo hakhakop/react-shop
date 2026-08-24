@@ -2,9 +2,10 @@
 
 import { Edit3, ExternalLink, Gauge, Settings, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { EditableLayoutTarget } from "@/lib/builderEditorContext";
+import { getBuilderPageKeyForTenantPath } from "@/lib/scopedPreviewLinks";
 import {
   getDefaultWebsiteBuilderPageKey,
   resolveBuilderPageParam,
@@ -45,21 +46,6 @@ type DomainWebsiteContext = {
   ownerId: string;
   routeSegment: string;
 };
-
-function getBuilderPageKeyForPath(pathname: string) {
-  if (pathname === "/") return "home";
-  if (pathname === "/shop") return "shop";
-  if (pathname === "/client") return "client";
-  if (pathname === "/cart") return "page:cart";
-  if (pathname === "/checkout") return "page:checkout";
-  if (pathname === "/my-account") return "page:my-account";
-  if (pathname === "/search") return "search-results";
-  if (pathname.startsWith("/product/")) return "product-single";
-  if (pathname.startsWith("/category/")) return "product-category-specific";
-
-  const customPageMatch = pathname.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-  return customPageMatch ? `page:${customPageMatch[1]}` : "home";
-}
 
 function labelForPageKey(pageKey: string, pathname: string) {
   if (pageKey === "product-single") return "Edit Product Template";
@@ -109,7 +95,12 @@ function dashboardTargetForPath(
       user?.role === "super_admin";
     if (!canEditDomainWebsite) return null;
 
-    const pageKey = getBuilderPageKeyForPath(pathname);
+    const pageKey = getBuilderPageKeyForTenantPath(
+      pathname,
+      builderPages?.pages ?? [],
+      domainWebsite.routeSegment,
+    );
+    if (!pageKey) return null;
     const websitePageKey = getDefaultWebsiteBuilderPageKey(builderPages);
     return {
       href: scopedBuilderHref(domainWebsite.routeSegment, pageKey),
@@ -127,7 +118,8 @@ function dashboardTargetForPath(
     return null;
   }
 
-  const pageKey = getBuilderPageKeyForPath(pathname);
+  const pageKey = getBuilderPageKeyForTenantPath(pathname, builderPages?.pages ?? []);
+  if (!pageKey) return null;
   const params = new URLSearchParams({ page: pageKey });
   return {
     href: `/dashboard?${params.toString()}`,
@@ -145,6 +137,11 @@ export default function FrontendAdminBar({
   domainWebsite?: DomainWebsiteContext;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isCanonicalBuilderPreview =
+    pathname?.startsWith("/dashboard/preview") ||
+    (pathname?.match(/^\/app\/websites\/[^/]+\/preview(?:\/|$)/) &&
+      searchParams.get("builderFrame") !== null);
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
   const [saasUser, setSaasUser] = useState<AuthMeResponse["user"]>(null);
@@ -328,7 +325,7 @@ export default function FrontendAdminBar({
   // storefront toolbar merely because the storefront uses a real domain.
   const shouldShow = ready && target && Boolean(saasUser);
 
-  if (!ready || pathname?.startsWith("/dashboard")) return null;
+  if (isCanonicalBuilderPreview || !ready || pathname?.startsWith("/dashboard")) return null;
 
   if (!shouldShow) return null;
 

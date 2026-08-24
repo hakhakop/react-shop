@@ -49,6 +49,11 @@ export function resolvePanelColorSemantics(block: PanelLike) {
       "--uk-global-link-hover-color": "var(--uk-global-emphasis-color, inherit)",
       "--uk-button-text-color": "var(--uk-global-emphasis-color, inherit)",
       "--uk-button-link-color": "var(--uk-global-emphasis-color, inherit)",
+      // Keep the default Card's glass treatment on the semantic surface
+      // itself. Inline projection is shared by Builder and storefront and
+      // avoids browser/theme stylesheet ordering changing the result.
+      backdropFilter: "var(--uk-card-default-backdrop-filter, none)",
+      WebkitBackdropFilter: "var(--uk-card-default-backdrop-filter, none)",
     };
     if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
       style["--builder-card-title-color"] = "var(--uk-global-emphasis-color, var(--uk-card-default-title, inherit))";

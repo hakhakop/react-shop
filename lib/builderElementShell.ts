@@ -90,7 +90,7 @@ function getYoothemeWidthClass(
 export function getGeneralElementShellClassName(block: GeneralElementShellBlock) {
   if (!usesYoothemeSpacingContract(block)) return "";
   const layout = block.visualStyle?.layout;
-  const isPositioned = layout?.position === "absolute" || layout?.position === "fixed";
+  const isPositioned = layout?.position === "absolute";
   return [
     "yootheme-imported-spacing",
     getYoothemeWidthClass(layout?.maxWidth, layout?.maxWidthBreakpoint),
@@ -140,11 +140,6 @@ export function getGeneralElementShellStyle(
   const style: CSSProperties = {};
   const localPadding = block.elementPadding?.trim().toLowerCase();
   const localMargin = (block.elementMargin ?? block.gridMargin)?.trim().toLowerCase();
-  const intrinsicAbsoluteImage =
-    block.kind === "image" &&
-    block.visualStyle?.layout?.position === "absolute" &&
-    block.imageWidth !== undefined &&
-    String(block.imageWidth).trim() !== "";
   const sourceVerticalMarginOnly = usesYoothemeSpacingContract(block)
     && Boolean(visual?.margin)
     && !visual?.margin?.left
@@ -189,11 +184,10 @@ export function getGeneralElementShellStyle(
   return {
     ...style,
     ...visualStyleToCss(visual),
-    // YOOtheme absolute images keep their authored media width so the
-    // positioned wrapper can be centered from the containing panel. A
-    // blanket width:100% makes imported SVG/parallax layers shrink to the
-    // column width and shifts their visual center.
-    ...(intrinsicAbsoluteImage ? { width: undefined } : {}),
+    // The absolute shell is the full YOOtheme positioning wrapper. The
+    // rendered image keeps its authored width inside that wrapper, allowing
+    // right/center alignment to resolve against the whole column rather than
+    // against a shrink-wrapped 170px shell.
     // YOOtheme's General `margin` is a vertical UIkit margin. Older imported
     // visual margin objects contain only `top`; do not let absent horizontal
     // sides inherit WebPages' global element margins and narrow the source

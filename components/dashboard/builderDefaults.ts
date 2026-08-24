@@ -812,6 +812,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
+      cartPresentation: "inline",
+      cartFloatingPosition: "bottom-right",
       title: "Your cart",
       body: "Review selected items, update quantities, and continue securely when you are ready.",
       elementPadding: "md",

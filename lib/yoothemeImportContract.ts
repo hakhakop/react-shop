@@ -42,6 +42,7 @@ export const YOOTHEME_LESS_CAPABILITIES: Record<string, YoothemeCapability> = {
   "button-primary-background": { owner: "shellSettings.buttonPrimaryBackground", status: "mapped-rendered", ui: "Global Styles › Button" },
   "button-secondary-background": { owner: "shellSettings.buttonSecondaryBackground", status: "mapped-rendered", ui: "Global Styles › Button" },
   "card-default-background": { owner: "shellSettings.cardBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
+  "card-default-backdrop-filter": { owner: "shellSettings.cardBackdropFilter", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
   "card-primary-background": { owner: "shellSettings.cardPrimaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
   "card-secondary-background": { owner: "shellSettings.cardSecondaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
   "alert-background": { owner: "shellSettings.alertBackground", status: "mapped-rendered", ui: "Global Styles › Alert › Default surface" },

@@ -58,7 +58,7 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   inverseColor: "#ffffff",
   headingFontWeight: "700",
   headingSmallFontSize: "30px",
-  headingMediumFontSize: "34px",
+  headingMediumFontSize: "46.2px",
   headingLargeFontSize: "38px",
   headingXLargeFontSize: "44px",
   smallTextFontSize: "14px",

@@ -68,7 +68,11 @@ export function Typog({
   // class from the semantic tag: the imported visual style is authoritative.
   const hasHeadingPresentation = /(?:^|\s)uk-(?:h[1-6]|heading-[\w-]+)/.test(String(className ?? ""));
   const uikitHeading = isHeading && !hasHeadingPresentation ? getUikitHeadingClass(As, typography?.preset) : "";
-  const uikitText = resolvedArea === "eyebrow" ? getUikitTextClass("meta") : resolvedArea === "lead" ? getUikitTextClass("lead") : "";
+  const uikitText = resolvedArea === "eyebrow" && !hasHeadingPresentation
+    ? getUikitTextClass("meta")
+    : resolvedArea === "lead"
+      ? getUikitTextClass("lead")
+      : "";
   const isCta = String(className || "").includes("cta");
   // Renderers that already selected a semantic UIkit button variant must not
   // receive this legacy Primary fallback as a second, competing class.

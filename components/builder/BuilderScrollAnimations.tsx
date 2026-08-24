@@ -216,8 +216,10 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     if (!animatedNodes.length && !parallaxNodes.length) return;
 
     const parallaxRuntime = new Map<HTMLElement, ParallaxRuntime>();
+    const parallaxScrollTargets = new Set<HTMLElement>();
     const breakpointCache = new Map<string, number>();
     let dashboardPaused = false;
+    let documentHidden = document.hidden;
     let dashboardResumeTimer: number | null = null;
     const activeLayoutTransitions = new Set<EventTarget | string>();
     let requestProgressUpdate: (() => void) | null = null;
@@ -436,7 +438,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     };
 
     const updateParallax = () => {
-      if (dashboardPaused) return;
+      if (dashboardPaused || documentHidden) return;
       const viewportHeight = window.innerHeight || 1;
       const viewportWidth = window.innerWidth || 1;
       const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; willChange?: string; clear?: boolean }> = [];
@@ -456,6 +458,18 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
           geometryResizeObserver?.observe(runtime.target);
           geometryResizeObserver?.observe(node);
           parallaxRuntime.set(node, runtime);
+          // UIkit listens to the element returned by scrollParent(), not only
+          // the window. Imported pages can place parallax inside an overflow
+          // surface, so subscribe to each resolved parent once while keeping
+          // the existing RAF coalescing path for low-cost scroll handling.
+          if (runtime.scrollElement !== document.scrollingElement && runtime.scrollElement !== document.documentElement) {
+            if (!parallaxScrollTargets.has(runtime.scrollElement)) {
+              parallaxScrollTargets.add(runtime.scrollElement);
+              if (requestProgressUpdate) {
+                runtime.scrollElement.addEventListener("scroll", requestProgressUpdate, { passive: true });
+              }
+            }
+          }
         }
         const { parallax, scrollElement, target } = runtime;
         if (!parallax) return;
@@ -669,6 +683,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     animatedNodes.forEach((node) => observer.observe(node));
     let rafId = 0;
     requestProgressUpdate = () => {
+      if (documentHidden) return;
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         updatePinnedProgress();
@@ -680,6 +695,10 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const handleResize = () => {
       invalidateLayout(false);
     };
+    const handleVisibilityChange = () => {
+      documentHidden = document.hidden;
+      if (!documentHidden) requestProgressUpdate?.();
+    };
     const handleImageLoad = (event: Event) => {
       if (event.target instanceof HTMLImageElement) invalidateLayout(false);
     };
@@ -690,6 +709,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     window.addEventListener("scroll", requestProgressUpdate, { passive: true });
     window.addEventListener("resize", handleResize);
     window.addEventListener("load", handleImageLoad, true);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       observer.disconnect();
@@ -709,9 +729,15 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         if (dashboardMode && runtime?.originalWillChange) node.style.willChange = runtime.originalWillChange;
         else node.style.removeProperty("will-change");
       });
+      parallaxScrollTargets.forEach((scrollTarget) => {
+        if (requestProgressUpdate) {
+          scrollTarget.removeEventListener("scroll", requestProgressUpdate);
+        }
+      });
       window.removeEventListener("scroll", requestProgressUpdate);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("load", handleImageLoad, true);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

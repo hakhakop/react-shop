@@ -62,6 +62,7 @@ import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductGallery from "@/components/ProductGallery";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
+import CartElement from "@/components/builder/CartElement";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import WishlistToggle from "@/components/WishlistToggle";
 import { getCategoryTree } from "@/lib/categories";
@@ -1932,19 +1933,7 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "cartContent") {
-    return page === "page:cart" ? (
-      (pageContent ?? (
-        <div className="shop-builder-column-block shop-builder-column-block--text">
-          <Typog as="h3">Cart content</Typog>
-          <Typog as="p">The live cart UI will render here.</Typog>
-        </div>
-      ))
-    ) : (
-      <div className="shop-builder-column-block shop-builder-column-block--text">
-        <Typog as="h3">Cart content</Typog>
-        <Typog as="p">Use this block on the Cart page.</Typog>
-      </div>
-    );
+    return <CartElement block={block} page={page} pageContent={pageContent} />;
   }
 
   if (block.kind === "checkoutContent") {
@@ -2188,6 +2177,8 @@ export function ContentLayoutBlock({
 
 
   if (block.kind === "panel") {
+    const panelMetaStyleName = String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase();
+    const panelMetaIsHeading = /^h[1-6]$/.test(panelMetaStyleName);
     const panelTitleStyle = {
       color: "var(--builder-card-title-color, inherit)",
       textAlign:
@@ -2195,11 +2186,16 @@ export function ContentLayoutBlock({
       margin: "var(--builder-card-title-margin, 0)",
     } as CSSProperties;
     const panelMetaStyle = {
-      color: "var(--builder-card-meta-color, inherit)",
-      fontSize: "var(--builder-card-meta-size, inherit)",
+      color: panelMetaIsHeading
+        ? "var(--builder-card-title-color, inherit)"
+        : "var(--builder-card-meta-color, inherit)",
+      fontSize: panelMetaIsHeading ? undefined : "var(--builder-card-meta-size, inherit)",
+      fontFamily: panelMetaIsHeading ? "var(--uk-heading-font-family, inherit)" : undefined,
       textTransform:
         "var(--builder-card-meta-transform, none)" as CSSProperties["textTransform"],
-      marginTop: "var(--builder-card-meta-spacing, 0)",
+      marginTop: /^h[1-6]$/.test(String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase())
+        ? "var(--builder-card-meta-spacing, var(--uk-global-margin, 20px))"
+        : "var(--builder-card-meta-spacing, 0)",
     } as CSSProperties;
     const panelBodyStyle = {
       color: "var(--builder-card-content-color, inherit)",
@@ -2234,7 +2230,7 @@ export function ContentLayoutBlock({
       <Typog
         as="span"
         area="eyebrow"
-        typography={block.typography}
+        typography={panelMetaIsHeading ? undefined : block.typography}
         className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
         style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
       >
@@ -2937,7 +2933,16 @@ function ContentLayoutSection({
                         ))}
                       </div>
                     ) : (
-                      <div className="shop-builder-column-content" data-uk-sticky={structuralColumn.stickyDeclaration}>
+                      <div
+                        className={`shop-builder-column-content${
+                          structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
+                            ? " uk-flex uk-flex-middle"
+                            : structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "bottom"
+                              ? " uk-flex uk-flex-bottom"
+                              : ""
+                        }`}
+                        data-uk-sticky={structuralColumn.stickyDeclaration}
+                      >
                         <ContentPositioningGroup blocks={blocks}>
                           {renderColumnBlocks(blocks)}
                         </ContentPositioningGroup>

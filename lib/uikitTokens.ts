@@ -630,7 +630,8 @@ export function getUikitTextClass(variant?: string): string {
   if (["heading-small", "heading-medium", "heading-large", "heading-xlarge", "heading-2xlarge", "heading-3xlarge"].includes(v)) {
     return `uk-${v}`;
   }
-  if (/^heading-h[1-6]$/.test(v)) return `uk-${v.slice("heading-".length)}`;
+  if (/^heading-h[1-6]$/.test(v)) return `uk-${v.slice("heading-".length)} uk-margin-top uk-margin-remove-bottom`;
+  if (/^h[1-6]$/.test(v)) return `uk-${v} uk-margin-top uk-margin-remove-bottom`;
   return "";
 }
 
