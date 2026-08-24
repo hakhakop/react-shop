@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { waitForBuilderDocumentRuntime } from "@/components/builder/builderDocumentRuntimeReady";
 
 type UikitLightboxInstance = {
   $destroy?: (remove?: boolean) => void;
@@ -31,11 +32,15 @@ export function useUikitLightboxRuntime(
     let cancelled = false;
     let instance: UikitLightboxInstance | undefined;
 
-    void Promise.all([import("uikit"), import("uikit/dist/js/uikit-icons")]).then(([module, iconsModule]) => {
+    void waitForBuilderDocumentRuntime(rootRef.current)
+      .then(() => Promise.all([import("uikit"), import("uikit/dist/js/uikit-icons")]))
+      .then(([module, iconsModule]) => {
       if (cancelled || !rootRef.current) return;
 
       const UIkit = (module.default ?? module) as unknown as UikitLightboxApi;
       if (!iconsRegistered) {
+        // UIkit is the imperative library object, not a React hook.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         UIkit.use?.(iconsModule.default ?? iconsModule);
         iconsRegistered = true;
       }
@@ -44,7 +49,7 @@ export function useUikitLightboxRuntime(
       // React has committed the trigger collection; let UIkit discover it on
       // the same lifecycle path in Builder and storefront.
       instance.$emit?.("update");
-    });
+      });
 
     return () => {
       cancelled = true;

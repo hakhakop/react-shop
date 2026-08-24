@@ -17279,7 +17279,7 @@
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
-        "layoutRows": 3,
+        "layoutRows": 5,
         "layoutItems": [
           {
             "id": "yootheme-section-1-row-1-column-1",
@@ -17356,7 +17356,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -17367,7 +17366,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               }
             ]
           },
@@ -17819,8 +17820,8 @@
                   {
                     "id": "yootheme-heading-0-0-0-0",
                     "kind": "heading",
-                    "headingText": "Best App to<br class=\"uk-visible@s\"> Stay in Touch",
-                    "title": "Best App to<br class=\"uk-visible@s\"> Stay in Touch",
+                    "headingText": "Best App to Stay in Touch",
+                    "title": "Best App to Stay in Touch",
                     "headingLevel": "h1",
                     "headingSize": "medium",
                     "headingAlign": "center",
@@ -18294,6 +18295,24 @@
             ]
           },
           {
+            "id": "layout-row-mt6ul7lv",
+            "layout": "3-col-equal",
+            "columns": [
+              {
+                "id": "layout-row-mt6ul7lv-column-1",
+                "elements": []
+              },
+              {
+                "id": "layout-row-mt6ul7lv-column-2",
+                "elements": []
+              },
+              {
+                "id": "layout-row-mt6ul7lv-column-3",
+                "elements": []
+              }
+            ]
+          },
+          {
             "id": "yootheme-section-1-row-3",
             "layout": "1-col",
             "spacingContract": "yootheme",
@@ -18442,6 +18461,16 @@
                     "spacingContract": "yootheme"
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mt6ulb4k",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mt6ulb4k-column-1",
+                "elements": []
               }
             ]
           }
@@ -18803,8 +18832,14 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-1-1-0-4",
@@ -18910,8 +18945,14 @@
                     ]
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           }
@@ -19555,8 +19596,14 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-image-2-0-0-2",
@@ -19792,8 +19839,14 @@
                     ]
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           },
@@ -20842,8 +20895,14 @@
                     "target": "!.tm-grid-expand"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-3-0-0-4",
@@ -20953,8 +21012,13 @@
                     ]
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-image-3-0-0-5",
@@ -21643,8 +21707,13 @@
                 "elementAlign": "center",
                 "textAlign": "left",
                 "headingAlign": "left",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           },
@@ -23165,8 +23234,13 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-6-0-0-1",
@@ -23263,8 +23337,13 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-6-0-0-2",
@@ -23361,8 +23440,13 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-6-0-0-3",
@@ -23459,8 +23543,13 @@
                 "elementAlign": "center",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           },
@@ -24501,8 +24590,13 @@
                     "end": "100vh + 100%  - 175vh"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-7-0-0-1",
@@ -24628,8 +24722,13 @@
                     "end": "100% + 100vh - 250vh"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-7-0-0-2",
@@ -24753,8 +24852,13 @@
                     "end": "100% + 100vh - 325vh"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-7-0-0-3",
@@ -24874,8 +24978,13 @@
                     "end": "100% + 100vh - 400vh"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           }
@@ -26081,8 +26190,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-9-1-0-1",
@@ -26209,8 +26323,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-9-1-0-2",
@@ -26337,8 +26456,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-9-1-0-3",
@@ -26465,8 +26589,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-9-1-0-4",
@@ -26593,8 +26722,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "yootheme-panel-9-1-0-5",
@@ -26721,8 +26855,13 @@
                     "end": "100%"
                   }
                 },
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           }
@@ -27646,7 +27785,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -27655,7 +27793,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               }
             ]
           }
@@ -27979,7 +28119,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -27988,7 +28127,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               }
             ]
           }
@@ -28212,6 +28353,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-23T22:28:37.367Z"
+    "updatedAt": "2026-08-24T07:50:44.189Z"
   }
 }

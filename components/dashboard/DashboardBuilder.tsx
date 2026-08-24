@@ -128,6 +128,10 @@ import StorefrontBuilderRenderer, {
   sectionStyle,
 } from "@/components/builder/StorefrontBuilderRenderer";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
+import {
+  BUILDER_IFRAME_DRAFT_MESSAGE,
+  BUILDER_IFRAME_DRAFT_SOURCE,
+} from "@/components/builder/BuilderIframeDraftBridge";
 import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName, UIKIT_ICON_OPTIONS } from "@/lib/uikitIconRegistry";
@@ -210,6 +214,7 @@ import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import { ElementLibraryIcon } from "@/components/dashboard/elementIconRegistry";
 import BuilderWireframePanel, {
   type BuilderHoverTarget,
@@ -238,6 +243,7 @@ import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
+import { BUILDER_IFRAME_SELECTION_SOURCE } from "@/components/builder/BuilderIframeSelectionBridge";
 import type {
   BuilderCustomPage,
   BuilderCustomPageKey,
@@ -350,7 +356,11 @@ import {
   builderLinkTargetProps,
   resolveWebsiteStorefrontHref,
 } from "@/lib/websiteBuilderLinks";
-import { resolveTenantPathHref } from "@/lib/scopedPreviewLinks";
+import {
+  getBuilderPageKeyForHref,
+  getStorefrontHrefFromScopedPreviewHref,
+  resolveTenantPathHref,
+} from "@/lib/scopedPreviewLinks";
 import {
   builderAnimationClassName as previewAnimationClassName,
   builderAnimationDataAttributes as previewAnimationAttrs,
@@ -2392,6 +2402,21 @@ export default function DashboardBuilder({
   const authoredRevisionSignatureRef = useRef(authoredRevisionSignature);
   authoredRevisionSignatureRef.current = authoredRevisionSignature;
   const authoredRefreshTimerRef = useRef<number | null>(null);
+  const iframeSaveTimerRef = useRef<number | null>(null);
+  const iframeSavedSignatureRef = useRef<string | null>(null);
+  const iframePendingSaveRef = useRef<{
+    sequence: number;
+    signature: string;
+    state: BuilderState;
+  } | null>(null);
+  const iframeSaveInFlightRef = useRef(false);
+  const iframeSaveSequenceRef = useRef(0);
+  const iframeRunSaveRef = useRef<() => void>(() => {});
+  const iframeFlushSaveRef = useRef<() => void>(() => {});
+  const iframeDraftRevisionRef = useRef(0);
+  const iframeDraftSignatureRef = useRef<string | null>(null);
+  const iframeDraftFrameRef = useRef<number | null>(null);
+  const iframeDraftPendingRef = useRef<BuilderState | null>(null);
   const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
     setRawBuilderState((current) => {
       let nextState = typeof value === "function" ? value(current) : value;
@@ -2587,6 +2612,23 @@ export default function DashboardBuilder({
     };
   }, []);
   const [device, setDevice] = useState<PreviewDevice>("desktop");
+  // The canonical tenant preview is the production Builder canvas. Keep the
+  // in-document renderer available only as an explicit temporary fallback so
+  // ordinary Builder visits retain iframe isolation and settled bridge work.
+  const [iframeComparisonMode, setIframeComparisonMode] = useState(
+    () => searchParams.get("builderCanvas") !== "legacy",
+  );
+  const [iframeSelectionRect, setIframeSelectionRect] = useState<BuilderInteractionLayerRect | null>(null);
+  const iframeDiagnosticMode = searchParams.get("iframeDiag") === "minimal"
+    ? "minimal"
+    : searchParams.get("iframeDiag") === "full"
+    ? "full"
+    : searchParams.get("iframeDiag") === "toolbar"
+      ? "toolbar"
+    : searchParams.get("iframeDiag") === "rect"
+      ? "rect"
+      : "settled";
+  const iframeMutationSyncEnabled = searchParams.get("iframeMutations") === "1";
   const laptopPreviewWidth = 1280;
   const [customMobileWidth, setCustomMobileWidth] = useState(390);
   const [customTabletWidth, setCustomTabletWidth] = useState(820);
@@ -2645,6 +2687,12 @@ export default function DashboardBuilder({
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("layout");
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [inspectorRendered, setInspectorRendered] = useState(false);
+  const [elementLibraryOpen, setElementLibraryOpen] = useState(false);
+  const [elementLibraryTarget, setElementLibraryTarget] = useState<{
+    sectionId: string;
+    columnKey: string;
+  } | null>(null);
+  const previousInspectorOpenRef = useRef(false);
   const [inspectorMode, setInspectorMode] = useState<InspectorMode>(
     readInspectorModePreference,
   );
@@ -2682,6 +2730,7 @@ export default function DashboardBuilder({
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
   const previewScaleRef = useRef(previewScale);
   const previewCanvasWidthRef = useRef(previewCanvasWidth);
+  const iframeComparisonShellRef = useRef<HTMLDivElement | null>(null);
   const previewViewportFrameRef = useRef<number | null>(null);
   const workspaceWidthRef = useRef(0);
   const inspectorDesktopLayoutRef = useRef(false);
@@ -2694,7 +2743,6 @@ export default function DashboardBuilder({
     field?: string;
   } | null>(null);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("builder");
-  const [panelForceToggler, setPanelForceToggler] = useState(0);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const dashboardGlobalCssSnapshotRef = useRef<Map<string, string | null> | null>(null);
@@ -2766,7 +2814,7 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (sidebarTab === "globalStyles" && !canEditShellSettings) {
-      setSidebarTab("elements");
+      setSidebarTab("builder");
       setShellStatus("Platform global settings require super admin access.");
     }
   }, [canEditShellSettings, sidebarTab]);
@@ -2829,6 +2877,11 @@ export default function DashboardBuilder({
   const [mediaPickerMultiple, setMediaPickerMultiple] = useState(false);
   const mediaSelectManyRef = useRef<((media: WordPressMediaItem[]) => void) | null>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
+  const iframeComparisonRef = useRef<HTMLIFrameElement>(null);
+  const pendingIframeShellTargetRef = useRef<{
+    shell: "header" | "footer";
+    target: BuilderInteractionTarget;
+  } | null>(null);
   const headerPreviewSlotRef = useRef<HTMLDivElement>(null);
   const [builderHeaderScrollState, setBuilderHeaderScrollState] = useState({
     scrolled: false,
@@ -2909,6 +2962,26 @@ export default function DashboardBuilder({
         : builderState,
     [builderState, headerContextKey, shellPageContextState, storageKeys],
   );
+  const iframeComparisonHref = useMemo(() => {
+    const params = new URLSearchParams({ page: headerContextState.page });
+    const productSlug = individualBuilderContext?.slug ??
+      (templateBuilderContext?.family === "product" ? previewProducts[0]?.slug : undefined);
+    if (headerContextState.page === "product-single" && productSlug) {
+      params.set("product", productSlug);
+    }
+    const tenantRouteSegment = websiteRouteSegment ?? websiteId ?? "";
+    params.set("builderFrame", "selection");
+    params.set("builderBridge", iframeDiagnosticMode);
+    return `/app/websites/${encodeURIComponent(tenantRouteSegment)}/preview?${params.toString()}`;
+  }, [
+    headerContextState.page,
+    individualBuilderContext?.slug,
+    previewProducts,
+    templateBuilderContext?.family,
+    iframeDiagnosticMode,
+    websiteId,
+    websiteRouteSegment,
+  ]);
   const headerContextSections = useMemo(
     () => {
       const resolved = resolveContentSections(
@@ -3266,6 +3339,13 @@ export default function DashboardBuilder({
         return;
       }
 
+      // Structure and the sidebar own panel switching. Let those controls
+      // decide whether Inspector should be replaced instead of closing it
+      // before the replacement handler can preserve its previous state.
+      if (target.closest(".builder-sidebar")) {
+        return;
+      }
+
       // Canvas selection is independent from inspection. Keep an already-open
       // Inspector stable while the user changes the selected canvas object.
       if (
@@ -3617,7 +3697,7 @@ export default function DashboardBuilder({
   }, [selectedMenuItemId]);
 
   const measurePreviewViewport = useCallback(() => {
-    const shell = previewShellRef.current;
+    const shell = previewShellRef.current ?? iframeComparisonShellRef.current;
     if (!shell) return;
     const shellWidth = shell.clientWidth || window.innerWidth;
 
@@ -3668,7 +3748,7 @@ export default function DashboardBuilder({
   }, [measurePreviewViewport]);
 
   useEffect(() => {
-    const shell = previewShellRef.current;
+    const shell = previewShellRef.current ?? iframeComparisonShellRef.current;
     if (!shell) return;
 
     schedulePreviewViewport();
@@ -3698,7 +3778,7 @@ export default function DashboardBuilder({
         sidebarViewportTimerRef.current = null;
       }
     };
-  }, [device, sidebarCollapsed, sidebarWidth, schedulePreviewViewport]);
+  }, [device, iframeComparisonMode, sidebarCollapsed, sidebarWidth, schedulePreviewViewport]);
 
   const handleDeviceResizeStart = (
     e: React.MouseEvent,
@@ -4130,6 +4210,94 @@ export default function DashboardBuilder({
     publishedDocumentReady,
     storageKeys,
   ]);
+
+  const runNextIframeSave = useCallback(() => {
+    if (iframeSaveInFlightRef.current) return;
+    const pending = iframePendingSaveRef.current;
+    if (!pending) return;
+    iframePendingSaveRef.current = null;
+    iframeSaveInFlightRef.current = true;
+    void (async () => {
+      const response = await fetch(builderApiUrl("/api/builder-layouts"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(activeDynamicDocumentId
+          ? { ...pending.state, action: "save", documentId: activeDynamicDocumentId }
+          : pending.state),
+      });
+      iframeSaveInFlightRef.current = false;
+      if (!response.ok) {
+        setPublishStatus("Iframe preview update failed");
+      } else {
+        iframeSavedSignatureRef.current = pending.signature;
+      }
+      if (iframePendingSaveRef.current) {
+        queueMicrotask(() => iframeRunSaveRef.current());
+      }
+    })();
+  }, [activeDynamicDocumentId, builderApiUrl]);
+  useEffect(() => {
+    iframeRunSaveRef.current = runNextIframeSave;
+    iframeFlushSaveRef.current = () => {
+      if (iframeSaveTimerRef.current !== null) {
+        window.clearTimeout(iframeSaveTimerRef.current);
+        iframeSaveTimerRef.current = null;
+      }
+      iframeRunSaveRef.current();
+    };
+  }, [runNextIframeSave]);
+
+  useEffect(() => {
+    if (!iframeMutationSyncEnabled || (iframeDiagnosticMode !== "settled" && iframeDiagnosticMode !== "full") || !iframeComparisonMode || !draftReady || !publishedDocumentReady) {
+      iframeSavedSignatureRef.current = null;
+      iframePendingSaveRef.current = null;
+      return;
+    }
+    const signature = JSON.stringify(builderState);
+    if (iframeSavedSignatureRef.current === null) {
+      iframeSavedSignatureRef.current = signature;
+      return;
+    }
+    if (iframeSavedSignatureRef.current === signature) return;
+    const sequence = iframeSaveSequenceRef.current + 1;
+    iframeSaveSequenceRef.current = sequence;
+    iframePendingSaveRef.current = {
+      sequence,
+      signature,
+      state: structuredClone(builderState),
+    };
+    if (iframeSaveTimerRef.current !== null) window.clearTimeout(iframeSaveTimerRef.current);
+    iframeSaveTimerRef.current = window.setTimeout(() => {
+      iframeSaveTimerRef.current = null;
+      iframeRunSaveRef.current();
+    }, 180);
+    return () => {
+      if (iframeSaveTimerRef.current !== null) {
+        window.clearTimeout(iframeSaveTimerRef.current);
+        iframeSaveTimerRef.current = null;
+      }
+    };
+  }, [
+    builderState,
+    draftReady,
+    iframeComparisonMode,
+    iframeDiagnosticMode,
+    iframeMutationSyncEnabled,
+    publishedDocumentReady,
+  ]);
+
+  useEffect(() => {
+    if (!iframeMutationSyncEnabled || !iframeComparisonMode || (iframeDiagnosticMode !== "settled" && iframeDiagnosticMode !== "full")) return;
+    const flushAfterControlCommit = () => {
+      window.setTimeout(() => iframeFlushSaveRef.current(), 0);
+    };
+    window.addEventListener("pointerup", flushAfterControlCommit, true);
+    window.addEventListener("change", flushAfterControlCommit, true);
+    return () => {
+      window.removeEventListener("pointerup", flushAfterControlCommit, true);
+      window.removeEventListener("change", flushAfterControlCommit, true);
+    };
+  }, [iframeComparisonMode, iframeDiagnosticMode, iframeMutationSyncEnabled]);
 
   useEffect(() => {
     if (builderState.page === "header") {
@@ -5076,10 +5244,25 @@ export default function DashboardBuilder({
     }));
   };
 
-  const openElementsPanel = () => {
+  const openElementsPanel = (target?: { sectionId: string; columnKey: string }) => {
+    // A Structure column action selects the column and requests its Inspector
+    // in the same event turn before opening Library. Treat that target as the
+    // appropriate Inspector return state even when the prior panel was closed.
+    previousInspectorOpenRef.current = inspectorOpen || Boolean(target);
+    setElementLibraryTarget(target ?? null);
     setSidebarCollapsed(false);
-    setSidebarTab("elements");
-    setPanelForceToggler((prev) => prev + 1);
+    setSidebarTab("builder");
+    setInspectorOpen(false);
+    setElementLibraryOpen(true);
+  };
+
+  const closeElementLibrary = (restoreInspector = true) => {
+    setElementLibraryOpen(false);
+    if (restoreInspector && (previousInspectorOpenRef.current || elementLibraryTarget)) {
+      setInspectorOpen(true);
+    }
+    previousInspectorOpenRef.current = false;
+    setElementLibraryTarget(null);
   };
 
   const openInspectorPanel = () => {
@@ -5236,6 +5419,166 @@ export default function DashboardBuilder({
       : null;
     revealCanvasTarget(row?.id);
   };
+
+  const iframeSelectedTarget = useMemo(
+    () => selectedBuilderTarget({
+      sectionId: selectedId,
+      rowIndex: selectedLayoutRowIndex,
+      columnKey: selectedLayoutColumnKey,
+      blockKey: selectedLayoutBlockKey,
+    }),
+    [selectedId, selectedLayoutBlockKey, selectedLayoutColumnKey, selectedLayoutRowIndex],
+  );
+  const sendSelectionToIframe = useCallback((scrollIntoView = true) => {
+    if (!iframeSelectedTarget) return;
+    iframeComparisonRef.current?.contentWindow?.postMessage({
+      source: BUILDER_IFRAME_SELECTION_SOURCE,
+      type: "focus",
+      target: iframeSelectedTarget,
+      scrollIntoView,
+    }, window.location.origin);
+  }, [iframeSelectedTarget]);
+  const postIframeDraftSnapshot = useCallback((state: BuilderState) => {
+    const frame = iframeComparisonRef.current;
+    if (!frame?.contentWindow) return;
+    iframeDraftRevisionRef.current += 1;
+    frame.contentWindow.postMessage({
+      source: BUILDER_IFRAME_DRAFT_SOURCE,
+      type: BUILDER_IFRAME_DRAFT_MESSAGE,
+      documentKey: headerContextState.page,
+      revision: iframeDraftRevisionRef.current,
+      state,
+    }, window.location.origin);
+  }, [headerContextState.page]);
+
+  useEffect(() => {
+    if (!iframeComparisonMode) return;
+    const signature = JSON.stringify(builderState);
+    if (iframeDraftSignatureRef.current === signature) return;
+    iframeDraftSignatureRef.current = signature;
+    iframeDraftPendingRef.current = builderState;
+    if (iframeDraftFrameRef.current !== null) return;
+    iframeDraftFrameRef.current = window.requestAnimationFrame(() => {
+      iframeDraftFrameRef.current = null;
+      const pending = iframeDraftPendingRef.current;
+      iframeDraftPendingRef.current = null;
+      if (pending) postIframeDraftSnapshot(pending);
+    });
+  }, [builderState, iframeComparisonMode, postIframeDraftSnapshot]);
+
+  useEffect(() => () => {
+    if (iframeDraftFrameRef.current !== null) {
+      window.cancelAnimationFrame(iframeDraftFrameRef.current);
+      iframeDraftFrameRef.current = null;
+    }
+  }, []);
+
+  const handleIframeLoad = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      postIframeDraftSnapshot(builderStateRef.current);
+      sendSelectionToIframe(false);
+    });
+  }, [postIframeDraftSnapshot, sendSelectionToIframe]);
+
+  useEffect(() => {
+    if (!iframeComparisonMode) return;
+    const handleIframeSelection = (event: MessageEvent) => {
+      if (
+        event.origin !== window.location.origin ||
+        event.source !== iframeComparisonRef.current?.contentWindow ||
+        event.data?.source !== BUILDER_IFRAME_SELECTION_SOURCE
+      ) return;
+      if (event.data.type === "scroll-start" && iframeDiagnosticMode === "settled") {
+        setIframeSelectionRect(null);
+        return;
+      }
+      if (event.data.type === "rect" && iframeDiagnosticMode !== "minimal") {
+        if (iframeDiagnosticMode === "rect") return;
+        const frame = iframeComparisonRef.current;
+        const rect = event.data.rect as { x: number; y: number; width: number; height: number } | null;
+        if (!frame || !rect) {
+          setIframeSelectionRect(null);
+          return;
+        }
+        const frameRect = frame.getBoundingClientRect();
+        const scale = frame.clientWidth > 0 ? frameRect.width / frame.clientWidth : 1;
+        setIframeSelectionRect({
+          left: frameRect.left + rect.x * scale,
+          top: frameRect.top + rect.y * scale,
+          width: rect.width * scale,
+          height: rect.height * scale,
+        });
+        return;
+      }
+      if (event.data.type === "navigate" && (iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "full")) {
+        const rawHref = typeof event.data.href === "string" ? event.data.href : "";
+        const href = getStorefrontHrefFromScopedPreviewHref(
+          rawHref,
+          websiteRouteSegment ?? websiteId ?? "",
+        );
+        if (!href || href === "#" || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+        if (handleScopedBuilderNavigate(href)) return;
+        const page = getBuilderPageKeyForHref(href, scopedPreviewPages);
+        if (page) switchBuilderTarget(page);
+        return;
+      }
+      if (event.data.type !== "select") return;
+      const target = event.data.target as BuilderInteractionTarget | undefined;
+      if (!target) return;
+      const shell = iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "full"
+        ? event.data.shell === "header" || event.data.shell === "footer"
+          ? event.data.shell
+          : target.sectionId === "header-document"
+            ? "header"
+            : target.sectionId === "footer-document"
+              ? "footer"
+              : null
+        : null;
+      if (shell) {
+        pendingIframeShellTargetRef.current = { shell, target };
+        void enterShellEdit(shell);
+        return;
+      }
+      if (!builderState.sections.some((section) => section.id === target.sectionId)) return;
+      if (target.type === "section") {
+        selectSection(target.sectionId, true);
+      } else if (target.type === "row" && Number.isInteger(target.rowIndex)) {
+        selectLayoutRow(target.sectionId, target.rowIndex, true);
+      } else if (target.type === "column" && target.columnKey) {
+        setHeaderSelected(false);
+        setFooterSelected(false);
+        setSelectedId(target.sectionId);
+        setSelectedLayoutRowIndex(null);
+        setSelectedLayoutColumnKey(target.columnKey);
+        setSelectedLayoutBlockKey(null);
+        setOpenLayoutItemId(target.columnKey);
+        setInspectorTab("layout");
+        openInspectorPanel();
+      } else if (target.type === "block" && target.columnKey && target.blockKey) {
+        selectLayoutBlock(target.sectionId, target.columnKey, target.blockKey, true);
+      }
+    };
+    window.addEventListener("message", handleIframeSelection);
+    return () => window.removeEventListener("message", handleIframeSelection);
+  }, [builderState.sections, handleScopedBuilderNavigate, iframeComparisonMode, iframeDiagnosticMode, scopedPreviewPages]);
+
+  useEffect(() => {
+    if (iframeComparisonMode) sendSelectionToIframe();
+  }, [iframeComparisonMode, sendSelectionToIframe]);
+
+  useEffect(() => {
+    const pending = pendingIframeShellTargetRef.current;
+    if (!pending || builderState.page !== pending.shell) return;
+    pendingIframeShellTargetRef.current = null;
+    const target = pending.target;
+    setSelectedId(target.sectionId);
+    setSelectedLayoutRowIndex(target.type === "row" ? target.rowIndex : null);
+    setSelectedLayoutColumnKey(target.type === "column" || target.type === "block" ? target.columnKey : null);
+    setSelectedLayoutBlockKey(target.type === "block" ? target.blockKey : null);
+    setOpenLayoutItemId(target.type === "column" || target.type === "block" ? target.columnKey : null);
+    setInspectorTab(target.type === "block" ? "content" : target.type === "row" ? "settings" : "layout");
+    setInspectorOpen(true);
+  }, [builderState.page]);
 
   const enterShellEdit = async (shellType: "header" | "footer") => {
     if (builderState.page !== "header" && builderState.page !== "footer") {
@@ -6525,6 +6868,7 @@ export default function DashboardBuilder({
     preferredHeaderColumnKey?: string,
     targetHeaderBlockId?: string,
     placement: "above" | "below" = "below",
+    explicitTarget?: { sectionId: string; columnKey: string },
   ) => {
     if (builderState.page === "header") {
       const headerElementByKind: Partial<Record<LayoutBlockKind, BuilderLayoutBlock>> = {
@@ -6655,7 +6999,9 @@ export default function DashboardBuilder({
       return;
     }
 
-    let targetSection = selectedSection;
+    let targetSection = explicitTarget
+      ? builderState.sections.find((section) => section.id === explicitTarget.sectionId) ?? null
+      : selectedSection;
 
     if (!targetSection || !isLayoutContainerSection(targetSection)) {
       const nextSection = createWireframeSection(1, 1);
@@ -6688,10 +7034,11 @@ export default function DashboardBuilder({
     }
 
     const layoutItems = targetSection.layoutItems ?? [];
-    const targetColumn =
-      (selectedLayoutColumnKey
-        ? findLayoutColumn(targetSection, selectedLayoutColumnKey)
-        : null) ?? layoutItems[0];
+    const targetColumn = explicitTarget
+      ? findLayoutColumn(targetSection, explicitTarget.columnKey)
+      : (selectedLayoutColumnKey
+          ? findLayoutColumn(targetSection, selectedLayoutColumnKey)
+          : null) ?? layoutItems[0];
     const targetColumnIndex = layoutItems.findIndex(
       (item) => item === targetColumn,
     );
@@ -7045,6 +7392,31 @@ export default function DashboardBuilder({
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
     }
+  };
+
+  const deleteStructureColumn = ({ sectionId, columnKey }: { sectionId: string; columnKey: string }) => {
+    const section = builderState.sections.find((candidate) => candidate.id === sectionId);
+    if (!section || section.rows !== undefined) return;
+    const index = (section.layoutItems ?? []).findIndex(
+      (item, itemIndex) => (item.id ?? `layout-item-${itemIndex}`) === columnKey,
+    );
+    if (index < 0) return;
+    if (selectedSection?.id === sectionId) {
+      deleteSelectedLayoutItem(index);
+      return;
+    }
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((candidate) =>
+        candidate.id === sectionId
+          ? {
+              ...candidate,
+              layout: undefined,
+              layoutItems: (candidate.layoutItems ?? []).filter((_, itemIndex) => itemIndex !== index),
+            }
+          : candidate,
+      ),
+    }));
   };
 
   const openWordPressMediaPicker = ({
@@ -7718,10 +8090,6 @@ export default function DashboardBuilder({
     setBuilderState(nextState);
     syncHeaderDocumentToShell(nextState);
 
-    // Reset selection to first section or clear
-    setSelectedId(nextState.sections[0]?.id ?? "");
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
     setPublishStatus("Undid last change");
   };
   undoRef.current = undoBuilder;
@@ -7739,9 +8107,6 @@ export default function DashboardBuilder({
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
     syncHeaderDocumentToShell(nextState);
-    setSelectedId(nextState.sections[0]?.id ?? "");
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
     setPublishStatus("Redid last change");
   };
   redoRef.current = redoBuilder;
@@ -9797,7 +10162,9 @@ export default function DashboardBuilder({
         undefined,
         "section",
       ),
-    addRow: (sectionId, rowIndex, presetKey) => addRowNear(sectionId, rowIndex, "after", presetKey),
+    addRow: (sectionId, rowIndex, placement, presetKey) => addRowNear(sectionId, rowIndex, placement, presetKey),
+    addColumnAfter: addSelectedLayoutItem,
+    deleteColumn: deleteStructureColumn,
     openElements: openElementsPanel,
     selectSection: (sectionId) => selectSection(sectionId, true),
     selectRow: (sectionId, rowIndex) => selectLayoutRow(sectionId, rowIndex, true),
@@ -9826,10 +10193,10 @@ export default function DashboardBuilder({
       structureLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
       structureAriaLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
       sections={builderState.sections}
-      selectedSectionId={selectedId}
-      selectedLayoutRowIndex={selectedLayoutRowIndex}
-      selectedLayoutColumnKey={selectedLayoutColumnKey}
-      selectedLayoutBlockKey={selectedLayoutBlockKey}
+      selectedSectionId={elementLibraryOpen ? elementLibraryTarget?.sectionId ?? selectedId : selectedId}
+      selectedLayoutRowIndex={elementLibraryOpen && elementLibraryTarget ? null : selectedLayoutRowIndex}
+      selectedLayoutColumnKey={elementLibraryOpen ? elementLibraryTarget?.columnKey ?? selectedLayoutColumnKey : selectedLayoutColumnKey}
+      selectedLayoutBlockKey={elementLibraryOpen && elementLibraryTarget ? null : selectedLayoutBlockKey}
       hoveredTarget={hoveredBuilderTarget}
       actions={wireframeActions}
       renameSectionId={renameSectionRequestId}
@@ -11327,6 +11694,17 @@ export default function DashboardBuilder({
       </div>
       <button
         type="button"
+        className={`builder-sidebar-utility-button${iframeComparisonMode ? " is-active" : ""}`}
+        onClick={() => setIframeComparisonMode((current) => !current)}
+        title={iframeComparisonMode ? "Use legacy canvas (temporary fallback)" : "Use canonical iframe canvas"}
+        aria-label={iframeComparisonMode ? "Use legacy canvas (temporary fallback)" : "Use canonical iframe canvas"}
+        aria-pressed={iframeComparisonMode}
+      >
+        <Frame size={18} />
+        <span>{iframeComparisonMode ? "Legacy" : "Iframe"}</span>
+      </button>
+      <button
+        type="button"
         className="builder-sidebar-utility-button"
         onClick={handleToggleTheme}
         title={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
@@ -11460,7 +11838,7 @@ export default function DashboardBuilder({
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
       }${sidebarTransitioning ? " is-sidebar-transitioning" : ""}${inspectorOpen ? ` is-inspector-${effectiveInspectorMode}` : " is-inspector-collapsed"}${
         sidebarResizing ? " is-sidebar-resizing" : ""
-      } builder-preview-scheme-${
+      }${elementLibraryOpen ? " is-element-library-open" : ""} builder-preview-scheme-${
         builderState.design.colorScheme ?? "auto"
       }`}
       data-theme={dashboardTheme}
@@ -11501,7 +11879,7 @@ export default function DashboardBuilder({
         yoothemeImportPreview={yoothemeImportPreview}
         topActionsSlot={sidebarTopActions}
         utilityControlsSlot={sidebarUtilityControls}
-        onAddElementFromLibrary={addElementFromLibrary}
+        onOpenElementLibrary={openElementsPanel}
         onCreateBuilderPage={createBuilderPage}
         onCreateBuilderPageFromTemplate={createBuilderPageFromTemplate}
         onDeleteBuilderPage={deleteBuilderPage}
@@ -11525,7 +11903,6 @@ export default function DashboardBuilder({
               ? selectFooter()
               : switchBuilderTarget(nextKey)
         }
-        openElementsPanelKey={panelForceToggler}
         shellSettings={shellSettings}
         onUpdateShellSettings={updateShellSettings}
         onSaveMenuItems={saveMenuItems}
@@ -11552,6 +11929,31 @@ export default function DashboardBuilder({
           </div>
         )}
 
+        {iframeComparisonMode ? (
+          <div
+            ref={iframeComparisonShellRef}
+            className={`builder-iframe-comparison-shell builder-preview-${device}`}
+            aria-label="Canonical iframe Builder canvas"
+          >
+            <motion.div
+              className="builder-iframe-comparison-viewport"
+              animate={{
+                width: device === "desktop" ? "100%" : previewCanvasWidth,
+                scale: 1,
+              }}
+              transition={{ type: "tween", duration: 0 }}
+              style={{ transformOrigin: "top center" }}
+            >
+              <iframe
+                ref={iframeComparisonRef}
+                className="builder-iframe-comparison-frame"
+                src={iframeComparisonHref}
+                title="Canonical tenant Builder canvas"
+                onLoad={handleIframeLoad}
+              />
+            </motion.div>
+          </div>
+        ) : (
         <div
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
@@ -12247,13 +12649,50 @@ export default function DashboardBuilder({
             )}
           </motion.div>
         </div>
+        )}
+        {iframeComparisonMode && (iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "toolbar" || iframeDiagnosticMode === "full") ? (
+          <IframeBuilderInteractionLayer
+            target={iframeSelectedTarget}
+            rect={iframeSelectionRect}
+            sections={builderState.sections}
+            onSelectTarget={(target, shouldOpenInspector = false) => {
+              if (target.type === "section") selectSection(target.sectionId, shouldOpenInspector);
+              else if (target.type === "row") selectLayoutRow(target.sectionId, target.rowIndex, shouldOpenInspector);
+              else if (target.type === "column") {
+                setSelectedId(target.sectionId);
+                setSelectedLayoutRowIndex(null);
+                setSelectedLayoutColumnKey(target.columnKey);
+                setSelectedLayoutBlockKey(null);
+                setOpenLayoutItemId(target.columnKey);
+                setInspectorTab("layout");
+                if (shouldOpenInspector) openInspectorPanel();
+              } else selectLayoutBlock(target.sectionId, target.columnKey, target.blockKey, shouldOpenInspector);
+            }}
+            onOpenInspector={openInspectorPanel}
+            onMoveSection={moveSection}
+            onDuplicateSection={duplicateSection}
+            onDeleteSection={deleteSection}
+            onMoveRow={moveLayoutRow}
+            onDuplicateRow={duplicateLayoutRow}
+            onDeleteRow={deleteEmptyRow}
+            onMoveBlock={moveLayoutBlockWithinColumn}
+            onDuplicateBlock={duplicateLayoutBlock}
+            onDeleteBlock={deleteLayoutBlock}
+            onSaveSection={saveSectionTemplateById}
+            onSaveRow={saveRowTemplateByIndex}
+            onSaveBlock={saveElementTemplateByKey}
+            onAddSection={(sectionId) => addWireframeNear(1, 1, sectionId, "below", undefined, "section")}
+            onAddRow={(sectionId, rowIndex) => addRowNear(sectionId, rowIndex, "after", "whole")}
+            onAddBlock={openElementsPanel}
+          />
+        ) : null}
       </main>
 
-      {(inspectorOpen || inspectorRendered) && selectedSection ? (
+      {(elementLibraryOpen || inspectorOpen || inspectorRendered) && selectedSection ? (
         <div
           ref={inspectorPanelRef}
           className={`builder-floating-inspector is-${effectiveInspectorMode}${
-            !inspectorOpen ? " is-closing" : ""
+            !inspectorOpen && !elementLibraryOpen ? " is-closing" : ""
           }${
             inspectorResizing ? " is-resizing" : ""
           }${inspectorDragging ? " is-dragging" : ""}`}
@@ -12279,45 +12718,65 @@ export default function DashboardBuilder({
             onLostPointerCapture={stopInspectorDrag}
           >
             <span>
-              <GripVertical size={14} aria-hidden="true" />
-              Inspector
+              {elementLibraryOpen ? (
+                <>
+                  <PanelRightOpen size={14} aria-hidden="true" />
+                  Element Library
+                </>
+              ) : (
+                <>
+                  <GripVertical size={14} aria-hidden="true" />
+                  Inspector
+                </>
+              )}
             </span>
             <div>
-              <button
-                type="button"
-                onClick={() =>
-                  setInspectorModePreference(
+              {elementLibraryOpen ? (
+                <button
+                  type="button"
+                  onClick={() => closeElementLibrary(true)}
+                  aria-label="Close Element Library"
+                  title="Close Element Library"
+                >
+                  <X size={14} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setInspectorModePreference(
+                      effectiveInspectorMode === "docked"
+                        ? "floating"
+                        : "docked",
+                    )
+                  }
+                  disabled={
+                    effectiveInspectorMode === "floating" &&
+                    !inspectorDesktopLayout
+                  }
+                  aria-label={
                     effectiveInspectorMode === "docked"
-                      ? "floating"
-                      : "docked",
-                  )
-                }
-                disabled={
-                  effectiveInspectorMode === "floating" &&
-                  !inspectorDesktopLayout
-                }
-                aria-label={
-                  effectiveInspectorMode === "docked"
-                    ? "Undock Inspector"
-                    : "Dock Inspector right"
-                }
-                title={
-                  effectiveInspectorMode === "docked"
-                    ? "Undock Inspector"
-                    : inspectorDesktopLayout
-                      ? "Dock Inspector right"
-                      : "Docking is available on wider screens"
-                }
-              >
-                {effectiveInspectorMode === "docked" ? (
-                  <SquareMousePointer size={14} />
-                ) : (
-                  <PanelRightOpen size={14} />
-                )}
-              </button>
+                      ? "Undock Inspector"
+                      : "Dock Inspector right"
+                  }
+                  title={
+                    effectiveInspectorMode === "docked"
+                      ? "Undock Inspector"
+                      : inspectorDesktopLayout
+                        ? "Dock Inspector right"
+                        : "Docking is available on wider screens"
+                  }
+                >
+                  {effectiveInspectorMode === "docked" ? (
+                    <SquareMousePointer size={14} />
+                  ) : (
+                    <PanelRightOpen size={14} />
+                  )}
+                </button>
+              )}
             </div>
           </div>
-          {inspectorResizeEnabled ? (
+          {!elementLibraryOpen && inspectorResizeEnabled ? (
             <div
               className="builder-inspector-resize-handle"
               role="separator"
@@ -12333,8 +12792,23 @@ export default function DashboardBuilder({
               onLostPointerCapture={stopInspectorResize}
             />
           ) : null}
-          {inspectorPanel}
-          {effectiveInspectorMode === "floating" ? (
+          {!elementLibraryOpen ? inspectorPanel : null}
+          {elementLibraryOpen ? (
+            <div className="builder-inspector builder-panel is-open">
+              <ElementLibrary
+                availableLayoutBlockKinds={availableLayoutBlockKinds}
+                onAddElement={(kind) => {
+                  const target = elementLibraryTarget;
+                  addElementFromLibrary(kind, undefined, undefined, "below", target ?? undefined);
+                  closeElementLibrary(false);
+                  setInspectorOpen(true);
+                }}
+                onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
+                headerMode={builderState.page === "header"}
+              />
+            </div>
+          ) : null}
+          {!elementLibraryOpen && effectiveInspectorMode === "floating" ? (
             <div
               className="builder-inspector-floating-resize-handle"
               role="separator"
@@ -12349,7 +12823,7 @@ export default function DashboardBuilder({
         </div>
       ) : null}
 
-      {!inspectorOpen && !inspectorRendered && selectedSection ? (
+      {!elementLibraryOpen && !inspectorOpen && !inspectorRendered && selectedSection ? (
         <button
           type="button"
           className="builder-inspector-collapsed-rail"
@@ -14740,6 +15214,110 @@ function BuilderElementToolbar({
       </button>
     </div>
   );
+}
+
+function IframeBuilderInteractionLayer({
+  target,
+  rect,
+  sections,
+  onSelectTarget,
+  onOpenInspector,
+  onMoveSection,
+  onDuplicateSection,
+  onDeleteSection,
+  onMoveRow,
+  onDuplicateRow,
+  onDeleteRow,
+  onMoveBlock,
+  onDuplicateBlock,
+  onDeleteBlock,
+  onSaveSection,
+  onSaveRow,
+  onSaveBlock,
+  onAddSection,
+  onAddRow,
+  onAddBlock,
+}: {
+  target: BuilderInteractionTarget | null;
+  rect: BuilderInteractionLayerRect | null;
+  sections: BuilderSection[];
+  onSelectTarget: (target: BuilderInteractionTarget, openInspector?: boolean) => void;
+  onOpenInspector: () => void;
+  onMoveSection: (sectionId: string, direction: -1 | 1) => void;
+  onDuplicateSection: (sectionId: string) => void;
+  onDeleteSection: (sectionId: string) => void;
+  onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
+  onDuplicateRow: (sectionId: string, rowIndex: number) => void;
+  onDeleteRow: (sectionId: string, rowIndex: number) => void;
+  onMoveBlock: (payload: { sectionId: string; columnKey: string; blockKey: string; direction: -1 | 1 }) => void;
+  onDuplicateBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
+  onDeleteBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
+  onSaveSection: (sectionId: string) => void;
+  onSaveRow: (sectionId: string, rowIndex: number) => void;
+  onSaveBlock: (sectionId: string, columnKey: string, blockKey: string) => void;
+  onAddSection: (sectionId: string) => void;
+  onAddRow: (sectionId: string, rowIndex: number) => void;
+  onAddBlock: () => void;
+}) {
+  if (!target || !rect || typeof document === "undefined") return null;
+  const section = sections.find((candidate) => candidate.id === target.sectionId);
+  if (!section) return null;
+  const rows = resolveBuilderSectionStructure(section).rows;
+  const rowIndex = target.type === "row"
+    ? target.rowIndex
+    : target.type === "column" || target.type === "block"
+      ? rows.findIndex((row) => row.columns.some((column) => column.column.id === target.columnKey))
+      : -1;
+  const toolbarTop = Math.min(rect.top + rect.height + 8, window.innerHeight - 58);
+  const toolbarLeft = Math.min(Math.max(rect.left + rect.width / 2, 210), window.innerWidth - 210);
+  let actions: ReactNode = null;
+  if (target.type === "section") {
+    const index = sections.findIndex((candidate) => candidate.id === target.sectionId);
+    actions = <BuilderContextToolbar context="section" label={sectionLabels[section.kind] ?? "Section"}
+      canMoveUp={index > 0} canMoveDown={index < sections.length - 1} canDelete
+      onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }}
+      onMoveUp={() => onMoveSection(target.sectionId, -1)} onMoveDown={() => onMoveSection(target.sectionId, 1)}
+      onSave={() => onSaveSection(target.sectionId)} onDuplicate={() => onDuplicateSection(target.sectionId)} onDelete={() => onDeleteSection(target.sectionId)} />;
+  } else if (target.type === "row") {
+    const row = rows[target.rowIndex];
+    const empty = Boolean(row?.columns.every((column) => column.column.elements.length === 0));
+    actions = <BuilderContextToolbar context="layout" label={`Row ${target.rowIndex + 1}`}
+      canMoveUp={target.rowIndex > 0} canMoveDown={target.rowIndex < rows.length - 1} canDelete={empty}
+      onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }}
+      onMoveUp={() => onMoveRow(target.sectionId, target.rowIndex, -1)} onMoveDown={() => onMoveRow(target.sectionId, target.rowIndex, 1)}
+      onSave={() => onSaveRow(target.sectionId, target.rowIndex)} onDuplicate={() => onDuplicateRow(target.sectionId, target.rowIndex)} onDelete={() => onDeleteRow(target.sectionId, target.rowIndex)} />;
+  } else if (target.type === "column") {
+    actions = <BuilderContextToolbar context="layout" label="Column" canMoveUp={false} canMoveDown={false} canDelete={false}
+      onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }} />;
+  } else {
+    const column = findLayoutColumn(section, target.columnKey);
+    const blocks = column?.blocks ?? [];
+    const blockIndex = blocks.findIndex((block, index) => (block.id ?? `${target.columnKey}-block-${index}`) === target.blockKey);
+    const block = blocks[blockIndex];
+    actions = <BuilderElementToolbar label={layoutBlockLabels[block?.kind ?? "text"] ?? "Block"}
+      canMoveUp={blockIndex > 0} canMoveDown={blockIndex >= 0 && blockIndex < blocks.length - 1}
+      onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }}
+      onMoveUp={() => onMoveBlock({ ...target, direction: -1 })} onMoveDown={() => onMoveBlock({ ...target, direction: 1 })}
+      onSave={() => onSaveBlock(target.sectionId, target.columnKey, target.blockKey)} onDuplicate={() => onDuplicateBlock(target)} onDelete={() => onDeleteBlock(target)} />;
+  }
+  return createPortal(<>
+    <div className={`builder-shared-interaction-frame is-selected is-${target.type}`} style={{ position: "fixed", left: rect.left, top: rect.top, width: rect.width, height: rect.height }} />
+    <div className={`builder-fixed-selection-toolbar is-anchored${target.type === "block" ? " is-element" : ""}`}
+      role="toolbar" aria-label="Selected iframe Builder object"
+      style={{ position: "fixed", left: toolbarLeft, top: toolbarTop, right: "auto", bottom: "auto" }}>
+      <nav className="builder-fixed-selection-breadcrumb" aria-label="Builder object hierarchy">
+        <button type="button" onClick={() => onSelectTarget({ type: "section", sectionId: target.sectionId })}>Section</button>
+        {rowIndex >= 0 ? <button type="button" onClick={() => onSelectTarget({ type: "row", sectionId: target.sectionId, rowIndex })}>Row {rowIndex + 1}</button> : null}
+        {target.type === "column" || target.type === "block" ? <button type="button" onClick={() => onSelectTarget({ type: "column", sectionId: target.sectionId, columnKey: target.columnKey })}>Column</button> : null}
+      </nav>
+      <div className="builder-fixed-selection-actions">{actions}</div>
+      <div className="builder-fixed-add-control">
+        <button type="button" onClick={() => onAddSection(target.sectionId)}><Plus size={13} /> Section</button>
+        {rowIndex >= 0 ? <button type="button" onClick={() => onAddRow(target.sectionId, rowIndex)}><Plus size={13} /> Row</button> : null}
+        <button type="button" onClick={onAddBlock}><Plus size={13} /> Block</button>
+      </div>
+    </div>
+  </>, document.body);
 }
 
 type BuilderInteractionLayerRect = {

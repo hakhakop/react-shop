@@ -23,6 +23,8 @@ type WebsitePreviewPageProps = {
   searchParams?: Promise<{
     page?: string;
     product?: string;
+    builderFrame?: string;
+    builderBridge?: string;
   }>;
 };
 
@@ -110,6 +112,18 @@ export default async function WebsitePreviewPage({
             : undefined
       }
       fallbackContent={corePageFallback}
+      builderIframeSelection={query?.builderFrame === "selection"}
+      builderIframeDiagnostics={
+        query?.builderBridge === "full"
+          ? "full"
+          : query?.builderBridge === "settled"
+            ? "settled"
+          : query?.builderBridge === "toolbar"
+            ? "toolbar"
+          : query?.builderBridge === "rect"
+            ? "rect"
+            : "minimal"
+      }
     />
   );
 }

@@ -42,7 +42,6 @@ import type {
   SidebarTab,
   BuilderShellSettings,
 } from "@/components/dashboard/builderTypes";
-import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import RoutingTemplatesPanel from "@/components/dashboard/RoutingTemplatesPanel";
 import ContentPanel from "@/components/dashboard/ContentPanel";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
@@ -102,7 +101,7 @@ type DashboardSidebarProps = {
   onSaveMenuItems?: (newItems: BuilderShellSettings["menuItems"]) => void | Promise<void>;
   topActionsSlot?: ReactNode;
   utilityControlsSlot?: ReactNode;
-  onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
+  onOpenElementLibrary?: () => void;
   onCreateBuilderPage: () => void;
   onCreateBuilderPageFromTemplate?: (
     template: BuilderSavedTemplate | PageTemplateLibraryItem,
@@ -127,7 +126,6 @@ type DashboardSidebarProps = {
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
   onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
-  openElementsPanelKey: number;
   sidebarCollapsed?: boolean;
   onSetSidebarCollapsed?: (collapsed: boolean) => void;
   requestedLayoutType?: LayoutLibraryType | null;
@@ -159,7 +157,7 @@ export default function DashboardSidebar({
   yoothemeImportPreview = null,
   topActionsSlot,
   utilityControlsSlot,
-  onAddElementFromLibrary,
+  onOpenElementLibrary,
   onCreateBuilderPage,
   onCreateBuilderPageFromTemplate = () => undefined,
   onDeleteBuilderPage,
@@ -177,7 +175,6 @@ export default function DashboardSidebar({
   onSetSidebarTab,
   onStartSidebarResize,
   onSwitchBuilderTarget,
-  openElementsPanelKey,
   onUpdateShellSettings,
   onSaveMenuItems,
   onReorderCustomPages,
@@ -235,13 +232,6 @@ export default function DashboardSidebar({
       return indexA - indexB;
     });
   }, [corePagesOrder]);
-
-  useEffect(() => {
-    if (openElementsPanelKey === 0) return;
-    onSetSidebarTab("elements");
-    const frame = window.requestAnimationFrame(() => setNestedOpen(true));
-    return () => window.cancelAnimationFrame(frame);
-  }, [openElementsPanelKey]);
 
   useEffect(() => {
     if (!requestedLayoutType) return;
@@ -621,6 +611,11 @@ export default function DashboardSidebar({
                 type="button"
                 className={`builder-sidebar-nav-tile${isActive ? " is-active" : ""}`}
                 onClick={() => {
+                  if (item.tab === "elements") {
+                    onOpenElementLibrary?.();
+                    onSetSidebarCollapsed?.(false);
+                    return;
+                  }
                   if (sidebarCollapsed) {
                     onSetSidebarTab(item.tab);
                     onSetSidebarCollapsed?.(false);
@@ -661,23 +656,6 @@ export default function DashboardSidebar({
         ) : null}
         <div className="builder-sidebar-content">
           <AnimatePresence mode="wait">
-            {sidebarTab === "elements" && (
-              <motion.div
-                key="elements"
-                initial={{ opacity: 0, scale: 0.985 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.995 }}
-                transition={{ duration: 0.12, ease: "easeOut" }}
-              >
-                <ElementLibrary
-                  availableLayoutBlockKinds={availableLayoutBlockKinds}
-                  onAddElement={onAddElementFromLibrary}
-                  onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
-                  headerMode={builderState.page === "header"}
-                />
-              </motion.div>
-            )}
-
             {sidebarTab === "builder" && (
               <motion.div
                 key="builder"

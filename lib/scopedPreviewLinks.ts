@@ -126,6 +126,32 @@ export function getPreviewActivePathForPageKey(pageKey: BuilderLayoutKey) {
   return "/";
 }
 
+/** Convert a canonical tenant preview URL back to its storefront identity. */
+export function getStorefrontHrefFromScopedPreviewHref(
+  href: string,
+  websiteId: string,
+) {
+  try {
+    const url = new URL(href, "https://webpages.local");
+    const match = url.pathname.match(/^\/app\/websites\/([^/]+)\/preview\/?$/);
+    if (!match || decodeURIComponent(match[1]) !== websiteId) return href;
+    const requestedPage = url.searchParams.get("page");
+    if (!requestedPage) return href;
+    if (requestedPage === "product-single") {
+      const product = url.searchParams.get("product");
+      return `${product ? `/product/${encodeURIComponent(product)}` : "/product"}${url.hash}`;
+    }
+    const pageKey = requestedPage.startsWith("page:")
+      ? requestedPage as BuilderLayoutKey
+      : (["home", "shop", "client", "product-category", "product-category-specific", "search-results"] as string[]).includes(requestedPage)
+        ? requestedPage as BuilderLayoutKey
+        : `page:${requestedPage}` as BuilderLayoutKey;
+    return `${getPreviewActivePathForPageKey(pageKey)}${url.hash}`;
+  } catch {
+    return href;
+  }
+}
+
 export function resolveScopedPreviewHref(
   href: string | null | undefined,
   context: ScopedWebsiteLinkContext | string,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { waitForBuilderDocumentRuntime } from "@/components/builder/builderDocumentRuntimeReady";
 
 type UikitGridInstance = {
   $destroy?: (remove?: boolean) => void;
@@ -40,7 +41,7 @@ export function useUikitGridRuntime(
     let cancelled = false;
     let instance: UikitGridInstance | undefined;
 
-    void import("uikit").then((module) => {
+    void waitForBuilderDocumentRuntime(rootRef.current).then(() => import("uikit")).then((module) => {
       if (cancelled || !rootRef.current) return;
       const UIkit = (module.default ?? module) as unknown as UikitGridApi;
       instance = UIkit.grid(rootRef.current, {

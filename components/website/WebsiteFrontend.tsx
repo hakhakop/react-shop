@@ -34,6 +34,8 @@ import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
+import BuilderIframeSelectionBridge from "@/components/builder/BuilderIframeSelectionBridge";
+import BuilderDocumentRuntime from "@/components/builder/BuilderDocumentRuntime";
 
 type WebsiteFrontendMode = "preview" | "domain" | "tenant-path";
 
@@ -50,6 +52,8 @@ type WebsiteFrontendProps = {
   /** Pre-resolved document ownership; selection remains outside rendering. */
   layoutOverride?: BuilderLayout;
   dynamicItemContextOverride?: DynamicItemContext;
+  builderIframeSelection?: boolean;
+  builderIframeDiagnostics?: "minimal" | "settled" | "rect" | "toolbar" | "full";
 };
 
 function spacing(value: string | undefined, context: BuilderSpacingContext) {
@@ -136,6 +140,8 @@ export default async function WebsiteFrontend({
   fallbackContent,
   layoutOverride,
   dynamicItemContextOverride,
+  builderIframeSelection = false,
+  builderIframeDiagnostics = "minimal",
 }: WebsiteFrontendProps) {
   await ensureWebsiteBuilderData(website.id);
 
@@ -200,8 +206,9 @@ export default async function WebsiteFrontend({
       desktop: shellSettings.visibilityDesktop,
       tablet: shellSettings.visibilityTablet,
       mobile: shellSettings.visibilityMobile,
-    })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined} data-tenant-website-root={isTenantPath ? websiteRouteSegment : undefined}>
+    })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined} data-tenant-website-root={isTenantPath ? websiteRouteSegment : undefined} data-builder-runtime-deferred="true">
       <WebPagesFontLoader settings={shellSettings} />
+      {builderIframeSelection ? <BuilderIframeSelectionBridge diagnostics={builderIframeDiagnostics} /> : null}
       {(isPreview || isTenantPath) && (
         <ScopedPreviewLinkRouter
           websiteId={websiteRouteSegment}
@@ -213,33 +220,42 @@ export default async function WebsiteFrontend({
         data-builder-preview-shell
         dangerouslySetInnerHTML={{ __html: scopedShellCss(shellSettings) }}
       />
-      <HeaderShell
-        layoutOverride={shellSettings.headerLayout}
-        shellSettingsOverride={shellSettings}
-        scopedPreviewWebsiteId={isPreview ? websiteRouteSegment : undefined}
-        scopedPreviewPage={page}
-        scopedPreviewPages={scopedPreviewPages}
-        hideSaaSEntry={!isPreview}
-        website={website}
-        activeContentLanguage={activeContentLanguage}
-      />
-      {renderLayout && hasVisibleLayout ? (
-        <StorefrontBuilderRenderer
-          layout={renderLayout}
-          page={page}
-          pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+      <BuilderDocumentRuntime>
+        <HeaderShell
+          layoutOverride={shellSettings.headerLayout}
+          shellSettingsOverride={shellSettings}
+          scopedPreviewWebsiteId={isPreview ? websiteRouteSegment : undefined}
+          scopedPreviewPage={page}
+          scopedPreviewPages={scopedPreviewPages}
+          hideSaaSEntry={!isPreview}
           website={website}
-          headerOverlay={headerDocumentSettings.overlay}
-          {...rendererProps}
-          shellSettings={shellSettings}
+          activeContentLanguage={activeContentLanguage}
+          builderInteractionIdentity={builderIframeDiagnostics === "full"}
+          themeSettingsOverride={{}}
         />
-      ) : (
-        fallbackContent
-      )}
-      <FooterShell
-        website={website}
-        activeContentLanguage={activeContentLanguage}
-      />
+        {renderLayout && hasVisibleLayout ? (
+          <StorefrontBuilderRenderer
+            layout={renderLayout}
+            page={page}
+            pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+            website={website}
+            headerOverlay={headerDocumentSettings.overlay}
+            {...rendererProps}
+            builderInteractionIdentity={builderIframeSelection || rendererProps?.builderInteractionIdentity}
+            shellSettings={shellSettings}
+            documentRuntimeOwnedExternally
+          />
+        ) : (
+          fallbackContent
+        )}
+        <FooterShell
+          website={website}
+          activeContentLanguage={activeContentLanguage}
+          builderInteractionIdentity={builderIframeDiagnostics === "full"}
+          shellSettingsOverride={shellSettings}
+          documentRuntimeOwnedExternally
+        />
+      </BuilderDocumentRuntime>
       {website.status !== "active" && (
         <div className="webpages-draft-branding"><Sparkles size={14} /> Created with <strong>WebPages</strong></div>
       )}

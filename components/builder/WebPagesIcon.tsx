@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import uikitModule from "uikit";
-import uikitIconsModule from "uikit/dist/js/uikit-icons";
 import { resolveUikitIconName, type UikitIconName } from "@/lib/uikitIconRegistry";
+import { waitForBuilderDocumentRuntime } from "@/components/builder/builderDocumentRuntimeReady";
 
 type UIKitModule = {
   use?: (plugin: unknown) => void;
@@ -13,9 +12,7 @@ type UIKitModule = {
   ) => { svg?: Promise<unknown> } | undefined;
 };
 
-const uikit = (uikitModule ?? {}) as UIKitModule;
-const uikitIcons = uikitIconsModule ?? {};
-uikit.use?.(uikitIcons);
+let iconsRegistered = false;
 
 export type WebPagesIconProps = {
   name?: string | null;
@@ -39,7 +36,19 @@ export function WebPagesIcon({ name, size = 20, className, label }: WebPagesIcon
     let commitTimer: ReturnType<typeof setTimeout> | undefined;
     setSvgMarkup(null);
 
-    if (uikit.icon) {
+    void waitForBuilderDocumentRuntime(element).then(async () => {
+      if (cancelled) return;
+      const [uikitModule, iconsModule] = await Promise.all([
+        import("uikit"),
+        import("uikit/dist/js/uikit-icons"),
+      ]);
+      if (cancelled) return;
+      const uikit = (uikitModule.default ?? {}) as UIKitModule;
+      if (!iconsRegistered) {
+        uikit.use?.(iconsModule.default ?? iconsModule);
+        iconsRegistered = true;
+      }
+      if (!uikit.icon) return;
       const instance = uikit.icon(element, {
         icon: resolvedName,
         width: size,
@@ -54,7 +63,7 @@ export function WebPagesIcon({ name, size = 20, className, label }: WebPagesIcon
           setSvgMarkup(markup);
         }, 0);
       });
-    }
+    });
 
     return () => {
       cancelled = true;

@@ -116,6 +116,7 @@ export default function UikitText({
       {content ? (
         <ContentTag
           className={`shop-builder-text-content ${columnClass} ${columnDivider && columns !== "none" ? "uk-column-divider" : ""} ${dropcap ? "uk-dropcap" : ""}`.trim()}
+          suppressHydrationWarning={content.includes("<script") || undefined}
           dangerouslySetInnerHTML={{ __html: content }}
         />
       ) : null}

@@ -10,7 +10,6 @@ import {
   type BuilderShellSettings,
 } from "../lib/builderShell";
 import {
-  getPublishedBuilderLayout,
   type BuilderCustomPage,
   type BuilderLayoutKey,
 } from "../lib/builderLayouts";
@@ -28,23 +27,27 @@ import { resolveContentSections } from "@/lib/builderContentLanguages";
 type HeaderShellProps = {
   layoutOverride?: BuilderHeaderLayout;
   shellSettingsOverride?: BuilderShellSettings;
+  themeSettingsOverride?: Record<string, unknown>;
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
   hideSaaSEntry?: boolean;
   website?: SaaSWebsite | null;
   activeContentLanguage?: string;
+  builderInteractionIdentity?: boolean;
 };
 
 export default async function HeaderShell({
   layoutOverride,
   shellSettingsOverride,
+  themeSettingsOverride,
   scopedPreviewWebsiteId,
   scopedPreviewPage,
   scopedPreviewPages,
   hideSaaSEntry = false,
   website,
   activeContentLanguage,
+  builderInteractionIdentity = false,
 }: HeaderShellProps) {
   const scope = website?.id
     ? { websiteId: website.id }
@@ -52,14 +55,13 @@ export default async function HeaderShell({
       ? { websiteId: scopedPreviewWebsiteId }
       : undefined;
 
-  const [settingsRaw, shellSettingsRaw, homeLayout] = await Promise.all([
-    getThemeSettings().catch(() => ({})),
-    getBuilderShellSettings(scope),
-    getPublishedBuilderLayout("home", scope).catch(() => null),
+  const [settingsRaw, shellSettingsRaw] = await Promise.all([
+    themeSettingsOverride ?? getThemeSettings().catch(() => ({})),
+    shellSettingsOverride ?? getBuilderShellSettings(scope),
   ]);
 
   const settings = (settingsRaw || {}) as Record<string, unknown>;
-  const shellSettings = shellSettingsOverride ?? shellSettingsRaw;
+  const shellSettings = shellSettingsRaw;
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
     : extractHeaderSettings(settings);
@@ -132,6 +134,7 @@ export default async function HeaderShell({
       activeContentLanguage={selectedContentLanguage}
       enabledContentLanguages={website?.enabledLanguages ?? ["hy", "en", "ru"]}
       languagePreferenceKey={`website_content_language_${website?.id ?? "root"}`}
+      builderInteractionIdentity={builderInteractionIdentity}
     />
   );
 }

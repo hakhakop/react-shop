@@ -1,12 +1,14 @@
 "use client";
 
-import { Suspense, memo, useEffect } from "react";
+import { Suspense, memo, useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
+import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import BuilderStickyRuntime from "@/components/builder/BuilderStickyRuntime";
 import { RenderChecklist, Typog, blockLegacyGridMargin } from "@/components/builder/BuilderRenderHelpers";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitAlert from "@/components/builder/UikitAlert";
@@ -50,8 +52,6 @@ import CarouselBlock, {
 } from "@/components/blocks/CarouselBlock";
 import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
-import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
-import BuilderStickyRuntime from "@/components/builder/BuilderStickyRuntime";
 import { LayoutAdvancedStyle } from "@/components/builder/LayoutAdvancedStyle";
 import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
@@ -142,6 +142,11 @@ import {
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
 import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
 import { getGeneralElementShellClassName } from "@/lib/builderElementShell";
+import {
+  BUILDER_IFRAME_DRAFT_MESSAGE,
+  BUILDER_IFRAME_DRAFT_SOURCE,
+} from "@/components/builder/BuilderIframeDraftBridge";
+import type { BuilderState } from "@/components/dashboard/builderTypes";
 
 export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -164,6 +169,8 @@ export type StorefrontBuilderRendererProps = {
   /** Exposes canonical selection identity when this storefront projection is
    * hosted inside the visual Builder. */
   builderInteractionIdentity?: boolean;
+  /** Canonical WebsiteFrontend owns one document-global runtime after hydration. */
+  documentRuntimeOwnedExternally?: boolean;
 };
 
 export type StorefrontBuilderProduct = {
@@ -3157,7 +3164,7 @@ function BuilderSectionRenderer({
 }
 
 function StorefrontBuilderRendererBase({
-  layout,
+  layout: initialLayout,
   page,
   pageLabel,
   breadcrumbItems,
@@ -3171,7 +3178,45 @@ function StorefrontBuilderRendererBase({
   headerOverlay = false,
   rootElement = "main",
   builderInteractionIdentity = false,
+  documentRuntimeOwnedExternally = false,
 }: StorefrontBuilderRendererProps) {
+  const [liveDraft, setLiveDraft] = useState<BuilderState | null>(null);
+  const liveRevisionRef = useRef(0);
+
+  useEffect(() => {
+    liveRevisionRef.current = 0;
+    setLiveDraft(null);
+    const handleDraftMessage = (event: MessageEvent) => {
+      if (
+        event.origin !== window.location.origin ||
+        event.source !== window.parent ||
+        event.data?.source !== BUILDER_IFRAME_DRAFT_SOURCE ||
+        event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE ||
+        event.data?.documentKey !== page
+      ) {
+        return;
+      }
+      const revision = Number(event.data.revision);
+      const state = event.data.state as BuilderState | undefined;
+      if (!Number.isFinite(revision) || revision <= liveRevisionRef.current) return;
+      if (!state || state.page !== page || !Array.isArray(state.sections)) return;
+      liveRevisionRef.current = revision;
+      setLiveDraft(state);
+    };
+    window.addEventListener("message", handleDraftMessage);
+    return () => window.removeEventListener("message", handleDraftMessage);
+  }, [page]);
+
+  // Keep the canonical renderer and its DOM/runtime instances mounted. A
+  // draft snapshot only replaces the data prop that drives this render tree.
+  const layout = liveDraft?.page === page
+    ? {
+        ...initialLayout,
+        ...liveDraft,
+        version: initialLayout.version,
+        updatedAt: initialLayout.updatedAt,
+      }
+    : initialLayout;
   const label =
     pageLabel ??
     pageLabels[page as BuilderPage] ??
@@ -3247,8 +3292,8 @@ function StorefrontBuilderRendererBase({
         data-section-pull-under-header={pullUnderHeader ? "true" : undefined}
         data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
       >
-        <BuilderScrollAnimations />
-        {isPageDocument ? <BuilderStickyRuntime /> : null}
+        {!documentRuntimeOwnedExternally ? <BuilderScrollAnimations /> : null}
+        {!documentRuntimeOwnedExternally && isPageDocument ? <BuilderStickyRuntime /> : null}
         <div className="shop-builder-inner">
           {layout.sections.map((section) => (
             <BuilderSectionRenderer

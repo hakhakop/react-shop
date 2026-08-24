@@ -427,7 +427,7 @@ body:has(.builder-dashboard) .site-header--service {
 .builder-sidebar {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
-  overflow: hidden;
+  overflow: auto;
   border-radius: 0 var(--builder-ui-radius) var(--builder-ui-radius) 0;
   min-width: 0;
   padding: 0;
@@ -633,7 +633,21 @@ body:has(.builder-dashboard) .site-header--service {
     var(--builder-inspector-width, 360px);
 }
 
+.builder-dashboard.is-element-library-open.is-inspector-docked {
+  grid-template-columns:
+    var(--builder-sidebar-width, 390px)
+    minmax(0, 1fr)
+    var(--builder-inspector-width, 360px);
+}
+
 .builder-dashboard.is-sidebar-collapsed.is-inspector-docked {
+  grid-template-columns:
+    64px
+    minmax(0, 1fr)
+    var(--builder-inspector-width, 360px);
+}
+
+.builder-dashboard.is-sidebar-collapsed.is-element-library-open.is-inspector-docked {
   grid-template-columns:
     64px
     minmax(0, 1fr)
@@ -2003,29 +2017,30 @@ body:has(.builder-dashboard) .site-header--service {
   white-space: nowrap;
 }
 
+/* ==========================================================================
+   WebPages Builder Structure Outline Panel (Section → Row → Column → Element)
+   ========================================================================== */
+
+.builder-structure-panel,
 .builder-wireframe-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   min-height: 100%;
 }
 
-.builder-wireframe-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px;
-}
-
+.builder-structure-header,
 .builder-wireframe-header-consolidated {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-  background: rgba(18, 18, 22, 0.45);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(12px);
-  margin-bottom: 4px;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--builder-ui-panel, rgba(18, 18, 22, 0.65));
+  border-bottom: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
 }
 
+.builder-structure-header-row,
 .builder-wireframe-header-row {
   display: flex;
   justify-content: space-between;
@@ -2033,712 +2048,878 @@ body:has(.builder-dashboard) .site-header--service {
   width: 100%;
 }
 
+.builder-structure-header-title-wrap,
 .builder-wireframe-header-title-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 
+.builder-structure-header-title-wrap strong,
 .builder-wireframe-header-title-wrap strong {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--builder-ui-text-strong);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.builder-wireframe-header-row--sub span {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--builder-ui-muted);
-}
-
-.builder-wireframe-header-row--sub small {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--builder-ui-soft-muted);
-}
-
-.builder-wireframe-item svg {
-  flex: 0 0 auto;
-}
-
-.builder-wireframe-item span {
-  min-width: 0;
-}
-
-.builder-wireframe-item strong {
-  display: block;
-  overflow: hidden;
-  color: var(--builder-ui-text-strong);
   font-size: 11.5px;
   font-weight: 600;
-  line-height: 1.2;
+  color: var(--builder-ui-text-strong, #ffffff);
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.builder-wireframe-item small,
-.builder-wireframe-empty span {
-  display: block;
-  overflow: hidden;
-  color: var(--builder-ui-muted);
+.builder-structure-header-icon,
+.builder-wireframe-icon--page {
+  color: var(--builder-ui-muted, #9ca3af);
+  flex-shrink: 0;
+}
+
+.builder-structure-header-row--sub span,
+.builder-wireframe-header-row--sub span {
   font-size: 9.5px;
   font-weight: 500;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--builder-ui-muted, #9ca3af);
 }
 
-/* Section Card */
-.builder-wireframe-section {
+.builder-structure-header-row--sub small,
+.builder-wireframe-header-row--sub small {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--builder-ui-soft-muted, #6b7280);
+}
+
+/* Document Tree Container */
+.builder-structure-tree,
+.builder-wireframe-tree {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: rgba(22, 22, 28, 0.45);
-  border: 1px solid rgba(99, 102, 241, 0.08);
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  position: relative;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 1px;
+  padding: 3px 5px 12px;
+  overflow-y: auto;
+  flex: 1 1 auto;
 }
 
-.builder-wireframe-section.is-selected {
-  border-color: rgba(99, 102, 241, 0.45) !important;
-  box-shadow: 0 0 14px rgba(99, 102, 241, 0.12), 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-  background: rgba(22, 22, 28, 0.55);
-}
-
-/* Row Card */
-.builder-wireframe-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: rgba(16, 16, 22, 0.35);
-  border: 1px solid rgba(16, 185, 129, 0.08);
-  border-radius: 8px;
-  padding: 6px;
-  margin-top: 4px;
-  position: relative;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.builder-wireframe-row.is-selected {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.12) !important;
-  background: rgba(16, 16, 22, 0.45);
-}
-
-/* Row Label Custom Alignment & Miniature Preview */
-.builder-wireframe-row-label-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.builder-wireframe-row-preview {
-  display: flex;
-  gap: 2px;
-  width: 32px;
-  height: 10px;
-  border-radius: 2px;
-  background: var(--builder-ui-surface-strong);
-  border: 1px solid var(--builder-ui-border);
-  padding: 1px;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.builder-wireframe-row-preview-col {
-  height: 100%;
-  background: rgba(52, 211, 153, 0.3); /* Emerald by default */
-  border-radius: 1px;
-  min-width: 2px;
-  transition: background 0.15s ease;
-}
-
-.builder-wireframe-row-preview.is-stacked {
-  flex-direction: column;
-}
-
-.builder-wireframe-row-preview.is-stacked .builder-wireframe-row-preview-col {
-  width: 100%;
-  min-height: 2px;
-}
-
-.builder-wireframe-item--row:hover .builder-wireframe-row-preview-col {
-  background: rgba(52, 211, 153, 0.55);
-}
-
-.builder-wireframe-item--row.is-selected .builder-wireframe-row-preview-col,
-.builder-wireframe-row.is-selected .builder-wireframe-row-preview-col {
-  background: rgba(52, 211, 153, 0.8);
-}
-
-/* Column Card */
+/* Branch Container (Section / Row / Column) */
+.builder-structure-branch,
+.builder-wireframe-section,
+.builder-wireframe-row,
 .builder-wireframe-column {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: rgba(245, 158, 11, 0.015);
-  border: 1px solid rgba(245, 158, 11, 0.08);
-  border-radius: 6px;
-  padding: 5px;
-  position: relative;
+  width: 100%;
   box-sizing: border-box;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.builder-wireframe-column.is-selected {
-  border-color: rgba(245, 158, 11, 0.45) !important;
-  background: rgba(245, 158, 11, 0.04) !important;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.12) !important;
-}
-
-.builder-wireframe-column::before {
-  display: none; /* Hide legacy hierarchical vertical connector */
-}
-
-.builder-wireframe-rowline {
-  display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  align-items: center;
-  gap: 2px;
-  position: relative;
-}
-
-.builder-wireframe-rowline::before {
-  content: '';
-  position: absolute;
-  left: -12px;
-  top: 50%;
-  width: 10px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.12);
-}
-
-.builder-wireframe-toggle {
-  display: grid;
-  width: 16px;
-  height: 36px;
-  place-items: center;
-  border: 0;
-  border-radius: 4px;
+/* Section Branch separation */
+.builder-structure-branch--section,
+.builder-wireframe-section {
+  margin-top: 2px;
+  margin-bottom: 1px;
   background: transparent;
-  color: var(--builder-ui-muted);
-  cursor: pointer;
-  z-index: 2;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
-.builder-wireframe-toggle svg {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.builder-wireframe-toggle.is-expanded svg {
-  transform: rotate(90deg);
-}
-
-.builder-wireframe-toggle:hover {
-  background: color-mix(in srgb, var(--builder-ui-accent) 8%, transparent);
-  color: var(--builder-ui-text);
-}
-
+/* Tree Rows / Items (Universal compact row base) */
+.builder-structure-item,
 .builder-wireframe-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  min-height: 36px;
-  padding: 6px 9px;
+  min-height: 24px;
+  height: 24px;
+  padding: 0 5px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
-  color: var(--builder-ui-text-strong);
+  color: var(--builder-ui-text, #d1d5db);
   text-align: left;
   cursor: pointer;
   position: relative;
-  transition: all 0.15s ease;
-}
-
-/* Specific item buttons headers */
-.builder-wireframe-item--column {
-  min-height: 30px;
-  padding: 4px 6px;
-}
-
-.builder-wireframe-item--block {
-  min-height: 32px;
-  padding: 4px 7px;
-  background: var(--builder-ui-nested-bg, rgba(255, 255, 255, 0.015));
-  border: 1px solid var(--builder-ui-nested-border, rgba(255, 255, 255, 0.04));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
   box-sizing: border-box;
+  user-select: none;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
-.builder-wireframe-item--block::before {
-  display: none; /* Hide legacy hierarchical vertical connector */
+.builder-structure-item:hover,
+.builder-wireframe-item:hover {
+  background: var(--builder-ui-surface-hover, rgba(255, 255, 255, 0.04));
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--builder-ui-text-strong, #ffffff);
 }
 
-.builder-wireframe-grip {
-  color: var(--builder-ui-soft-muted);
-  opacity: 0;
-  cursor: grab;
-  flex: 0 0 auto;
-  transition: opacity 0.15s ease;
-  margin-right: -2px;
+/* Canvas Hover Sync highlight */
+.builder-structure-item.is-hovered:not(.is-selected),
+.builder-wireframe-item.is-hovered:not(.is-selected) {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--builder-ui-text-strong, #ffffff);
 }
 
-.builder-wireframe-item:hover .builder-wireframe-grip {
-  opacity: 0.35;
+/* Active Selection highlight */
+.builder-structure-item.is-selected,
+.builder-wireframe-item.is-selected,
+.builder-structure-item--section.is-selected,
+.builder-structure-item--row.is-selected,
+.builder-structure-item--column.is-selected,
+.builder-structure-item--element.is-selected,
+.builder-wireframe-item--section.is-selected,
+.builder-wireframe-item--row.is-selected,
+.builder-wireframe-item--column.is-selected,
+.builder-wireframe-item--block.is-selected {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
 }
 
+/* Level Specific Rows */
+.builder-structure-item--section,
+.builder-wireframe-item--section {
+  min-height: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+.builder-structure-item--section:hover,
+.builder-wireframe-item--section:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.builder-structure-item--row,
+.builder-wireframe-item--row {
+  min-height: 24px;
+  height: 24px;
+}
+
+.builder-structure-item--column,
+.builder-wireframe-item--column {
+  min-height: 23px;
+  height: 23px;
+}
+
+.builder-structure-item--element,
+.builder-wireframe-item--block {
+  min-height: 21px;
+  height: 21px;
+  padding-block: 0 !important;
+}
+
+/* Icons by Level */
+.builder-structure-icon,
 .builder-wireframe-icon {
-  flex: 0 0 auto;
-  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--builder-ui-muted, #9ca3af);
 }
 
+.builder-structure-icon--section,
 .builder-wireframe-icon--section {
   color: #818cf8;
 }
 
+.builder-structure-icon--row,
 .builder-wireframe-icon--row {
   color: #34d399;
 }
 
+.builder-structure-icon--column,
 .builder-wireframe-icon--column {
   color: #fbbf24;
 }
 
-/* Colorful Element Icons */
-.builder-wireframe-icon--text {
-  color: #38bdf8; /* Cyan/Blue */
-}
-.builder-wireframe-icon--image {
-  color: #c084fc; /* Purple */
-}
-.builder-wireframe-icon--button {
-  color: #fb7185; /* Rose */
-}
-.builder-wireframe-icon--grid {
-  color: #34d399; /* Green/Emerald */
-}
-.builder-wireframe-icon--slider {
-  color: #2dd4bf; /* Teal */
-}
-.builder-wireframe-icon--embed {
-  color: #fb923c; /* Orange */
-}
-.builder-wireframe-icon--table {
-  color: #fb923c; /* Orange */
-}
-.builder-wireframe-icon--list {
-  color: #fb923c; /* Orange */
-}
-.builder-wireframe-icon--hero {
-  color: #facc15; /* Yellow/Gold */
-}
-.builder-wireframe-icon--default {
-  color: #a1a1aa; /* Zinc */
+.builder-structure-icon--element,
+.builder-structure-icon-svg {
+  color: #38bdf8;
 }
 
-.builder-wireframe-label-wrap {
-  flex: 1;
-  min-width: 0;
+/* Tree Children Containers & Indentation Guide Lines */
+.builder-structure-children,
+.builder-wireframe-children {
   display: flex;
   flex-direction: column;
+  gap: 1px;
+  padding-left: 9px;
+  margin-left: 5px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
+.builder-structure-children--columns,
+.builder-wireframe-children--columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+.builder-structure-children--elements,
+.builder-wireframe-children--blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+/* Expand / Collapse Toggle Chevron */
+.builder-structure-toggle,
+.builder-wireframe-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  min-height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--builder-ui-muted, #9ca3af);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.12s ease;
+}
+
+.builder-structure-toggle svg,
+.builder-wireframe-toggle svg {
+  transition: transform 0.15s ease;
+}
+
+.builder-structure-toggle.is-expanded svg,
+.builder-wireframe-toggle.is-expanded svg {
+  transform: rotate(90deg);
+}
+
+.builder-structure-toggle:hover,
+.builder-wireframe-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--builder-ui-text-strong, #ffffff);
+}
+
+.builder-structure-toggle-placeholder {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Labels & Typography */
+.builder-structure-label-wrap,
+.builder-wireframe-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.builder-structure-title,
+.builder-wireframe-item strong {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.builder-structure-item--section .builder-structure-title,
+.builder-wireframe-item--section strong {
+  font-weight: 600;
+}
+
+.builder-structure-snippet {
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--builder-ui-soft-muted, #6b7280);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* Metadata Badges */
+.builder-structure-meta,
+.builder-wireframe-meta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  flex-shrink: 0;
+  height: 18px;
+}
+
+.builder-structure-badge,
+.builder-wireframe-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--builder-ui-muted, #9ca3af);
+  flex-shrink: 0;
+}
+
+.builder-structure-badge--doc,
+.builder-wireframe-badge--page {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--builder-ui-text, #ffffff);
+}
+
+.builder-structure-badge--row,
+.builder-wireframe-badge--row {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.builder-structure-badge--column,
+.builder-wireframe-badge--column-pct {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+.builder-structure-badge--count,
+.builder-wireframe-count {
+  font-size: 7.5px;
+  font-weight: 700;
+  font-style: normal;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--builder-ui-soft-muted, #9ca3af);
+  padding: 0 3px;
+  border-radius: 999px;
+  min-width: 13px;
+  height: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.builder-structure-badge--dynamic,
+.builder-wireframe-badge--dynamic {
+  background: rgba(14, 165, 233, 0.12);
+  color: #38bdf8;
+  padding: 0 3px;
+}
+
+.builder-structure-tag-hidden,
 .builder-wireframe-hidden-tag {
-  font-size: 8.5px;
-  padding: 1px 4px;
-  border-radius: 4px;
+  font-size: 8px;
+  padding: 1px 3px;
+  border-radius: 3px;
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
   font-style: normal;
   font-weight: 600;
-  flex: 0 0 auto;
 }
 
-.builder-wireframe-count {
-  font-size: 8px;
-  font-weight: 700;
-  font-style: normal;
-  background: var(--builder-ui-surface-hover);
-  color: var(--builder-ui-muted);
-  padding: 0px 3px;
-  border-radius: 999px;
-  min-width: 12px;
-  height: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.12s ease;
-}
-
-.builder-wireframe-meta {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-  height: 20px;
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-
-.builder-wireframe-badge {
-  font-size: 7.5px;
-  font-weight: 700;
-  padding: 1px 3px;
-  border-radius: 3px;
-  letter-spacing: 0.04em;
-  transition: opacity 0.12s ease, transform 0.12s ease;
-  transform-origin: right center;
-  flex: 0 0 auto;
-}
-
-.builder-wireframe-badge--page {
-  background: var(--builder-ui-surface-hover);
-  color: var(--builder-ui-text);
-}
-
-.builder-wireframe-badge--section {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-}
-
-.builder-wireframe-badge--row {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-}
-
-.builder-wireframe-badge--column-pct {
-  font-size: 7.5px;
-  font-weight: 700;
-  padding: 1px 3px;
-  border-radius: 3px;
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  letter-spacing: 0.02em;
-}
-
-.builder-wireframe-badge--element {
-  background: var(--builder-ui-surface-hover);
-  color: var(--builder-ui-muted);
-}
-
-.builder-wireframe-badge--dynamic {
-  background: rgba(14, 165, 233, 0.16);
-  color: #0284c7;
-}
-
+/* Progressive Disclosure Contextual Actions */
+.builder-structure-actions,
 .builder-wireframe-actions {
   display: flex;
+  align-items: center;
   gap: 2px;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(4px);
-  transition: opacity 0.12s ease, transform 0.12s ease;
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  align-items: center;
-  background: transparent;
+  transition: opacity 0.12s ease;
 }
 
-/* Inline section insertion keeps placement explicit without a second global
-   add button that can only append at the bottom. */
-.builder-wireframe-section-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.builder-wireframe-insert-section {
-  align-self: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 18px;
-  margin: 1px 0;
-  padding: 0;
-  border: 1px solid color-mix(in srgb, var(--builder-ui-accent) 35%, var(--builder-ui-border));
-  border-radius: 999px;
-  background: var(--builder-ui-surface);
-  color: var(--builder-ui-accent);
-  cursor: pointer;
-  opacity: .72;
-}
-
-.builder-wireframe-insert-section:hover {
-  opacity: 1;
-  background: color-mix(in srgb, var(--builder-ui-accent) 12%, var(--builder-ui-surface));
-}
-
-/* Remove the vertical continuation directly beneath the chevron; retain the
-   short horizontal branch and the Section/Row/Column indentation. */
-.builder-dashboard .builder-wireframe-children {
-  border-left: 0 !important;
-}
-
-/* Keep element labels legible while their quick actions are visible. */
-.builder-wireframe-item--block {
-  min-height: 40px;
-  padding-block: 7px;
-}
-
-/* Section settings must remain reachable from Structure/Layout even when the
-   row is not hovered; section content can cover the canvas toolbar. */
-.builder-wireframe-item--section .builder-wireframe-actions {
+.builder-structure-item:hover .builder-structure-actions,
+.builder-wireframe-item:hover .builder-wireframe-actions,
+.builder-structure-item.is-selected .builder-structure-actions,
+.builder-wireframe-item.is-selected .builder-wireframe-actions,
+.builder-structure-actions:has(details[open]),
+.builder-wireframe-actions:has(details[open]) {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(0);
 }
 
-.builder-wireframe-item:hover .builder-wireframe-badge {
-  opacity: 0;
-  transform: scale(0.85);
-}
-
-.builder-wireframe-item:hover .builder-wireframe-count {
-  opacity: 0;
-}
-
-.builder-wireframe-item:hover .builder-wireframe-actions {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-}
-
-/* Keep quick actions attached to the active tree item, not only to a hover
-   target that can disappear while the pointer moves across the canvas. */
-.builder-wireframe-item.is-selected .builder-wireframe-actions {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-}
-
+/* Quick Action & Icon Buttons */
+.builder-structure-action-btn,
 .builder-wireframe-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 18px;
   height: 18px;
+  min-width: 18px;
+  padding: 0;
   border: 0;
-  border-radius: 4px;
-  background: var(--builder-ui-surface-hover);
-  color: var(--builder-ui-muted);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--builder-ui-muted, #9ca3af);
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition: background 0.1s ease, color 0.1s ease;
 }
 
-.builder-wireframe-action-btn:hover:not(:disabled) {
-  background: var(--builder-ui-accent);
-  color: #fff;
+.builder-structure-action-btn:hover:not(:disabled),
+.builder-wireframe-action-btn:hover:not(:disabled),
+.builder-structure-action-btn.is-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
+.builder-structure-action-btn--add,
+.builder-wireframe-column-add {
+  color: var(--builder-ui-accent, #38bdf8) !important;
+}
+
+.builder-structure-action-btn--add:hover,
+.builder-wireframe-column-add:hover {
+  background: var(--builder-ui-accent, #3b82f6) !important;
+  color: #ffffff !important;
+}
+
+.builder-structure-action-btn:disabled,
 .builder-wireframe-action-btn:disabled {
-  opacity: 0.2;
+  opacity: 0.25;
   cursor: not-allowed;
 }
 
-.builder-wireframe-action-btn--danger:hover:not(:disabled) {
-  background: #ef4444 !important;
-  color: white !important;
-}
-
-.builder-wireframe-item:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.builder-wireframe-item.is-hovered:not(.is-selected) {
-  border-color: rgba(99, 102, 241, 0.42);
-  background: rgba(99, 102, 241, 0.08);
-}
-
-.builder-wireframe-rename-input {
-  min-width: 0;
-  flex: 1;
-  height: 26px;
-  padding: 0 7px;
-  border: 1px solid rgba(99, 102, 241, 0.72);
-  border-radius: 6px;
-  background: rgba(8, 10, 18, 0.92);
-  color: var(--builder-ui-text);
-  font: inherit;
-  font-size: 11px;
-  outline: none;
-}
-
-.builder-anchor-field-row {
+/* Sibling Columns Composition Bar under Row */
+.builder-structure-row-columns-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.builder-anchor-field-row > span {
-  color: var(--builder-ui-muted);
-}
-
-.builder-anchor-field-row input {
-  min-width: 0;
-  flex: 1;
-}
-
-.builder-field-error {
-  color: #fca5a5 !important;
-}
-
-.builder-preview-content-layout-card.is-hovered-row:not(.is-selected-row) {
-  outline: 1px dashed rgba(99, 102, 241, 0.48);
-  outline-offset: -1px;
-}
-
-.builder-header-live-column.is-hovered-column:not(.is-selected),
-.builder-header-live-row.is-hovered-row:not(.is-selected) {
-  outline: 1px dashed rgba(99, 102, 241, 0.48);
-  outline-offset: -1px;
-}
-
-/* Glowing selection border/accents on active items */
-.builder-wireframe-item--section.is-selected {
-  background: rgba(99, 102, 241, 0.06) !important;
-  border-color: rgba(99, 102, 241, 0.5) !important;
-}
-
-.builder-wireframe-item--row.is-selected {
-  background: rgba(16, 185, 129, 0.06) !important;
-  border-color: rgba(16, 185, 129, 0.5) !important;
-}
-
-.builder-wireframe-item--column.is-selected {
-  background: rgba(245, 158, 11, 0.05) !important;
-  border-color: rgba(245, 158, 11, 0.5) !important;
-}
-
-.builder-wireframe-item--block.is-selected {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Layout Children Containers */
-.builder-wireframe-children {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-left: 6px;
-  padding-left: 8px;
-  border-left: 1px dashed rgba(255, 255, 255, 0.08);
-}
-
-.builder-wireframe-children--columns {
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-  margin-left: 0;
-  padding-left: 0;
-  border-left: none;
+  gap: 2px;
   width: 100%;
+  padding: 2px 0 2px 2px;
   box-sizing: border-box;
 }
 
-.builder-wireframe-children--columns.is-stacked {
-  flex-direction: column;
-}
-
-.builder-wireframe-children--blocks {
-  margin-left: 0;
-  padding-left: 0;
-  border-left: none;
-  gap: 4px;
+.builder-structure-col-segment-wrapper {
   display: flex;
-  flex-direction: column;
-  width: 100%;
+  align-items: center;
+  position: relative;
+  min-width: 0;
 }
 
-/* Compact Empty Column State */
-.builder-wireframe-item--empty-compact {
+.builder-structure-col-segment {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   width: 100%;
-  min-height: 24px;
-  padding: 2px 4px;
-  background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
+  min-height: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--builder-ui-muted, #9ca3af);
+  font-size: 9.5px;
+  font-weight: 500;
   cursor: pointer;
+  min-width: 0;
   transition: all 0.12s ease;
+  user-select: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.builder-structure-col-segment:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--builder-ui-text-strong, #ffffff);
+}
+
+.builder-structure-col-segment.is-active,
+.builder-structure-col-segment.is-selected {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  color: #fbbf24 !important;
+  font-weight: 600;
+}
+
+.builder-structure-col-segment.is-hovered:not(.is-active) {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.builder-structure-col-segment-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-structure-col-segment-pct {
+  font-size: 8px;
+  opacity: 0.75;
+  font-weight: 500;
+}
+
+.builder-structure-col-segment-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 11px;
+  height: 11px;
+  padding: 0 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 7px;
+  font-weight: 700;
+  color: inherit;
+}
+
+.builder-structure-insert-col-btn {
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 999px;
+  background: #181b22;
+  color: #fbbf24;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.builder-structure-row-columns-bar:hover .builder-structure-insert-col-btn,
+.builder-structure-col-segment-wrapper:hover .builder-structure-insert-col-btn {
+  opacity: 0.75;
+  pointer-events: auto;
+}
+
+.builder-structure-insert-col-btn:hover {
+  opacity: 1 !important;
+  background: var(--builder-ui-accent, #3b82f6);
+  border-color: var(--builder-ui-accent, #3b82f6);
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.2);
+}
+
+/* Overflow Menu (Portal overlay & legacy fallback) */
+.builder-structure-portal-menu {
+  position: fixed;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 136px;
+  width: max-content;
+  max-width: 240px;
+  padding: 3px;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.12));
+  border-radius: 5px;
+  background: #181b22;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.2);
+  pointer-events: auto;
+  user-select: none;
   box-sizing: border-box;
 }
 
+.builder-structure-overflow,
+.builder-wireframe-overflow {
+  position: relative;
+  display: inline-flex;
+}
+
+.builder-structure-overflow > summary,
+.builder-wireframe-overflow > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.builder-structure-overflow > summary::-webkit-details-marker,
+.builder-wireframe-overflow > summary::-webkit-details-marker {
+  display: none;
+}
+
+.builder-structure-overflow-menu,
+.builder-wireframe-overflow-menu {
+  position: absolute;
+  top: calc(100% + 3px);
+  right: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 136px;
+  width: max-content;
+  padding: 3px;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.1));
+  border-radius: 5px;
+  background: var(--builder-ui-panel-solid, #181b22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.builder-structure-menu-btn,
+.builder-wireframe-overflow-menu .builder-wireframe-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 23px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--builder-ui-text, #e5e7eb);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.builder-structure-menu-btn:hover:not(:disabled),
+.builder-wireframe-overflow-menu .builder-wireframe-action-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.builder-structure-menu-btn--danger,
+.builder-wireframe-action-btn--danger {
+  color: #f87171 !important;
+}
+
+.builder-structure-menu-btn--danger:hover:not(:disabled),
+.builder-wireframe-action-btn--danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+}
+
+.builder-structure-menu-note,
+.builder-wireframe-overflow-reason {
+  display: block;
+  padding: 2px 5px;
+  color: var(--builder-ui-muted, #9ca3af);
+  font-size: 9px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+/* Add Element Button in Column & Empty Targets */
+.builder-structure-add-element-btn,
+.builder-structure-empty-target,
+.builder-wireframe-item--empty-compact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--builder-ui-soft-muted, #6b7280);
+  font-size: 9.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-sizing: border-box;
+  text-align: left;
+  margin-top: 1px;
+}
+
+.builder-structure-add-element-btn:hover,
+.builder-structure-empty-target:hover,
 .builder-wireframe-item--empty-compact:hover {
-  border-color: rgba(245, 158, 11, 0.3);
-  background: rgba(245, 158, 11, 0.02);
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.06);
+  color: var(--builder-ui-accent, #38bdf8);
 }
 
+.builder-structure-empty-label,
 .builder-wireframe-empty-label {
-  font-size: 8.5px;
-  font-weight: 600;
-  color: var(--builder-ui-soft-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-size: 9px;
+  font-weight: 500;
 }
 
+/* Row Insertion Affordances */
+.builder-structure-row-slot {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.builder-structure-insert-row-slot {
+  display: flex;
+  justify-content: center;
+  padding: 1px 0;
+}
+
+.builder-structure-insert-row-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 13px;
+  padding: 0 5px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--builder-ui-soft-muted, #6b7280);
+  font-size: 7.5px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: all 0.15s ease;
+}
+
+.builder-structure-insert-row-btn:hover {
+  opacity: 1;
+  border-color: #34d399;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.08);
+}
+
+/* Inline Section Insertion */
+.builder-structure-section-slot,
+.builder-wireframe-section-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.builder-structure-insert-section-row {
+  display: flex;
+  justify-content: center;
+  padding: 1px 0;
+}
+
+.builder-structure-insert-section-btn,
+.builder-wireframe-insert-section {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 14px;
+  padding: 0 5px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--builder-ui-soft-muted, #6b7280);
+  font-size: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.15s ease;
+}
+
+.builder-structure-insert-section-btn:hover,
+.builder-wireframe-insert-section:hover {
+  opacity: 1;
+  border-color: var(--builder-ui-accent, #3b82f6);
+  color: var(--builder-ui-accent, #38bdf8);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.builder-structure-insert-label {
+  font-size: 8px;
+}
+
+/* Empty Page / Section state */
+.builder-structure-empty,
 .builder-wireframe-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 16px 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  gap: 3px;
+  padding: 14px 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
   background: rgba(255, 255, 255, 0.01);
-  color: var(--builder-ui-muted);
+  color: var(--builder-ui-muted, #9ca3af);
   text-align: center;
 }
 
+.builder-structure-empty strong,
 .builder-wireframe-empty strong {
-  color: var(--builder-ui-text);
-  font-size: 11px;
+  color: var(--builder-ui-text, #ffffff);
+  font-size: 10.5px;
 }
 
-.builder-wireframe-add-section-wrapper {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
+.builder-structure-empty span,
+.builder-wireframe-empty span {
+  font-size: 9.5px;
+  color: var(--builder-ui-muted, #9ca3af);
 }
 
-.builder-wireframe-add-section-btn {
-  display: flex;
+.builder-structure-add-btn,
+.builder-wireframe-add-section.is-empty {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  color: #3b82f6;
-  font-size: 11.5px;
+  gap: 3px;
+  padding: 3px 8px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--builder-ui-accent, #38bdf8);
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  margin-top: 4px;
+  transition: all 0.15s ease;
 }
 
-.builder-wireframe-add-section-btn:hover {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #60a5fa;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+.builder-structure-add-btn:hover,
+.builder-wireframe-add-section.is-empty:hover {
+  background: var(--builder-ui-accent, #3b82f6);
+  color: #ffffff;
+}
+
+.builder-structure-rename-input,
+.builder-wireframe-rename-input {
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--builder-ui-accent, #3b82f6);
+  border-radius: 3px;
+  background: rgba(8, 10, 18, 0.95);
+  color: #ffffff;
+  font: inherit;
+  font-size: 10.5px;
+  outline: none;
+}
+
+/* Nested Layout Group */
+.builder-structure-nested-layout,
+.builder-wireframe-nested-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+.builder-structure-nested-row-label,
+.builder-wireframe-nested-row-label {
+  font-size: 8.5px;
+  font-weight: 600;
+  color: var(--builder-ui-soft-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 3px;
 }
 
 .builder-two-column:has(.builder-inspector-choice-group),
@@ -3023,6 +3204,130 @@ body:has(.builder-dashboard) .site-header--service {
   .builder-layout-picker-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* Focused Structure UX pass: keep the row context controls compact and
+   horizontal. These rules are dashboard-only and never reach the iframe or
+   storefront renderer. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  width: auto;
+  min-width: 0;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 24px !important;
+  min-height: 24px;
+  height: 24px;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  width: auto;
+  height: 24px !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-action-btn {
+  flex: 0 0 24px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  padding-right: 8px !important;
+}
+
+/* Keep column actions available in Structure without placing them over the
+   neighboring column or its elements. */
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: flex !important;
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: flex !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-actions {
+  position: static;
+  width: auto;
+  height: 24px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Blank rows should expose only the structural insertion targets, not a large
+   canvas-sized placeholder. */
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 76px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 64px;
+  padding: 6px 8px 6px 0 !important;
+  gap: 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 28%, var(--builder-ui-border)) !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column {
+  min-height: 50px;
+  padding: 3px;
+  border: 1px dashed color-mix(in srgb, #f59e0b 42%, var(--builder-ui-border)) !important;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 5%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+/* Structure Tree Overrides within Builder Dashboard */
+.builder-dashboard .builder-structure-panel,
+.builder-dashboard .builder-wireframe-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+.builder-dashboard .builder-structure-tree,
+.builder-dashboard .builder-wireframe-tree {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.builder-dashboard .builder-structure-children--columns,
+.builder-dashboard .builder-wireframe-children--columns {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.builder-dashboard .builder-structure-overflow[open] > .builder-structure-overflow-menu,
+.builder-dashboard .builder-wireframe-overflow[open] > .builder-wireframe-overflow-menu {
+  top: calc(100% + 3px);
+  right: 0;
+  max-height: min(280px, calc(100vh - 32px));
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .builder-media-modal {
@@ -6106,6 +6411,33 @@ body:has(.builder-dashboard) .site-header--service {
     --builder-preview-effective-bg,
     var(--builder-preview-shell-bg, transparent)
   );
+}
+
+/* Temporary read-only performance comparison. The iframe loads the existing
+   authenticated tenant preview route, so none of the Builder interaction DOM
+   participates in its scroll/render tree. */
+.builder-iframe-comparison-shell {
+  flex: 1;
+  width: 100%;
+  height: 100vh;
+  min-height: 720px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background: #f7f7f4;
+}
+
+.builder-iframe-comparison-viewport {
+  height: 100%;
+  flex: 0 0 auto;
+}
+
+.builder-iframe-comparison-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #f7f7f4;
 }
 
 .builder-preview-canvas {
@@ -19326,6 +19658,287 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   margin: 0 auto;
 }
 
+/* Last-cascade guard for the focused Structure UX. */
+
+/* Last-cascade guard for the focused Structure UX. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  width: auto;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 24px !important;
+  min-height: 24px;
+  height: 24px;
+  flex-direction: row;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  width: auto;
+  height: 24px !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  padding-right: 8px !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: flex !important;
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: flex !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-actions {
+  position: static;
+  width: auto;
+  height: 24px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 76px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 64px;
+  padding: 6px 8px 6px 0 !important;
+  gap: 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 28%, var(--builder-ui-border)) !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column {
+  min-height: 50px;
+  padding: 3px;
+  border: 1px dashed color-mix(in srgb, #f59e0b 42%, var(--builder-ui-border)) !important;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 5%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 42px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  width: 100%;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+/* Keep the focused Structure treatment last in the cascade. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  width: auto;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 24px !important;
+  min-height: 24px;
+  height: 24px;
+  flex-direction: row;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  width: auto;
+  height: 24px !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  padding-right: 8px !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: flex !important;
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: flex !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-actions {
+  position: static;
+  width: auto;
+  height: 24px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 76px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 64px;
+  padding: 6px 8px 6px 0 !important;
+  gap: 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 28%, var(--builder-ui-border)) !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column {
+  min-height: 50px;
+  padding: 3px;
+  border: 1px dashed color-mix(in srgb, #f59e0b 42%, var(--builder-ui-border)) !important;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 5%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 42px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  width: 100%;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+/* Final focused Structure overrides. Keep these last so the legacy rail and
+   oversized empty-row presentation cannot win the cascade. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  width: auto;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 24px !important;
+  min-height: 24px;
+  height: 24px;
+  flex-direction: row;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  width: auto;
+  height: 24px !important;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  padding-right: 8px !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: flex !important;
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: flex !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-actions {
+  position: static;
+  width: auto;
+  height: 24px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 76px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 64px;
+  padding: 6px 8px 6px 0 !important;
+  gap: 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 28%, var(--builder-ui-border)) !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column {
+  min-height: 50px;
+  padding: 3px;
+  border: 1px dashed color-mix(in srgb, #f59e0b 42%, var(--builder-ui-border)) !important;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 5%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 42px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  width: 100%;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
 .builder-dashboard .builder-wireframe-item--section {
   margin-bottom: 0 !important;
   border-bottom: 0 !important;
@@ -20127,4 +20740,97 @@ body:has([data-scoped-builder-root])
 
 .builder-wireframe-panel .builder-wireframe-insert-section {
   margin: 0 auto;
+}
+
+/* Last-cascade guard for the focused Structure UX. */
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
+  width: auto;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-item--row {
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 24px !important;
+  min-height: 24px;
+  height: 24px;
+  flex-direction: row;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline .builder-wireframe-actions {
+  width: auto;
+  height: 24px !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.builder-dashboard .builder-wireframe-row > .builder-wireframe-children--columns {
+  padding-right: 8px !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column {
+  display: flex !important;
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-meta {
+  display: flex !important;
+}
+
+.builder-dashboard .builder-wireframe-column > .builder-wireframe-item--column .builder-wireframe-actions {
+  position: static;
+  width: auto;
+  height: 24px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) {
+  min-height: 76px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) > .builder-wireframe-children--columns {
+  min-height: 64px;
+  padding: 6px 8px 6px 0 !important;
+  gap: 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 28%, var(--builder-ui-border)) !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-column {
+  min-height: 50px;
+  padding: 3px;
+  border: 1px dashed color-mix(in srgb, #f59e0b 42%, var(--builder-ui-border)) !important;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 5%, transparent);
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-children--blocks,
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  min-height: 42px;
+}
+
+.builder-dashboard .builder-wireframe-row:has(.builder-wireframe-item--empty-compact) .builder-wireframe-item--empty-compact {
+  width: 100%;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
 }

@@ -138,6 +138,7 @@ type HeaderShellViewProps = {
   ) => ReactNode;
   renderBuilderColumn?: (columnId: string, content: ReactNode) => ReactNode;
   renderBuilderRow?: (rowId: string, content: ReactNode) => ReactNode;
+  builderInteractionIdentity?: boolean;
   activeContentLanguage?: string;
   enabledContentLanguages?: string[];
   languagePreferenceKey?: string;
@@ -165,9 +166,10 @@ export default function HeaderShellView({
   hideSaaSEntry = false,
   categoriesContent,
   headerComposition,
-  renderBuilderElement,
-  renderBuilderColumn,
-  renderBuilderRow,
+  renderBuilderElement: renderBuilderElementProp,
+  renderBuilderColumn: renderBuilderColumnProp,
+  renderBuilderRow: renderBuilderRowProp,
+  builderInteractionIdentity = false,
   activeContentLanguage = "hy",
   enabledContentLanguages = ["hy"],
   languagePreferenceKey = "website_content_language",
@@ -176,6 +178,25 @@ export default function HeaderShellView({
   publicAnchorId,
   scrollState,
 }: HeaderShellViewProps) {
+  const renderBuilderElement = renderBuilderElementProp ?? (builderInteractionIdentity
+    ? (element: HeaderBuilderElement, content: ReactNode, flexItemStyle?: CSSProperties) => (
+        <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id="header-document"
+          data-builder-column-key={element.columnId ?? "header-main-row"} data-builder-block-key={element.id}>{content}</div>
+      )
+    : undefined);
+  const renderBuilderColumn = renderBuilderColumnProp ?? (builderInteractionIdentity
+    ? (columnId: string, content: ReactNode) => (
+        <div data-builder-object-type="column" data-builder-section-id="header-document"
+          data-builder-column-key={columnId} style={{ display: "contents" }}>{content}</div>
+      )
+    : undefined);
+  const renderBuilderRow = renderBuilderRowProp ?? (builderInteractionIdentity
+    ? (rowId: string, content: ReactNode) => {
+        const rowIndex = (headerComposition.rows ?? []).findIndex((row) => row.rowId === rowId);
+        return <div data-builder-object-type="row" data-builder-section-id="header-document"
+          data-builder-row-index={Math.max(0, rowIndex)} style={{ display: "contents" }}>{content}</div>;
+      }
+    : undefined);
   const documentLogo = headerComposition.elements.find((item) => item.type === "logo");
   const documentNavigation = headerComposition.elements.find((item) => item.type === "navigation");
   const primaryColor =
