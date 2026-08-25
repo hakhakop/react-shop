@@ -1,9 +1,5 @@
 import { cookies } from "next/headers";
-import {
-  extractHeaderSettings,
-  getThemeSettings,
-  type HeaderSettings,
-} from "../lib/themeSettings";
+import { type HeaderSettings } from "../lib/themeSettings";
 import {
   getBuilderShellSettings,
   type BuilderHeaderLayout,
@@ -35,6 +31,8 @@ type HeaderShellProps = {
   website?: SaaSWebsite | null;
   activeContentLanguage?: string;
   builderInteractionIdentity?: boolean;
+  builderPreviewMode?: boolean;
+  builderDraftPreview?: boolean;
 };
 
 export default async function HeaderShell({
@@ -48,6 +46,8 @@ export default async function HeaderShell({
   website,
   activeContentLanguage,
   builderInteractionIdentity = false,
+  builderPreviewMode = false,
+  builderDraftPreview = false,
 }: HeaderShellProps) {
   const scope = website?.id
     ? { websiteId: website.id }
@@ -55,16 +55,22 @@ export default async function HeaderShell({
       ? { websiteId: scopedPreviewWebsiteId }
       : undefined;
 
-  const [settingsRaw, shellSettingsRaw] = await Promise.all([
-    themeSettingsOverride ?? getThemeSettings().catch(() => ({})),
-    shellSettingsOverride ?? getBuilderShellSettings(scope),
-  ]);
+  const shellSettingsRaw =
+    shellSettingsOverride ?? (await getBuilderShellSettings(scope));
 
-  const settings = (settingsRaw || {}) as Record<string, unknown>;
+  // Header rendering is owned by the canonical Builder shell/document. Keep
+  // the optional override for callers that explicitly provide compatibility
+  // data, but never fetch the obsolete root GraphQL theme-settings field here.
+  const settings = (themeSettingsOverride || {}) as Record<string, unknown>;
   const shellSettings = shellSettingsRaw;
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
-    : extractHeaderSettings(settings);
+    : {
+        menuLocation: "primary",
+        logoMaxWidth: shellSettings.headerLogoMaxWidth,
+        iconVariant: shellSettings.headerIconVariant,
+        iconOrder: shellSettings.headerIconOrder,
+      };
   const scopedLinkContext = scopedPreviewWebsiteId
     ? { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages }
     : null;
@@ -135,6 +141,8 @@ export default async function HeaderShell({
       enabledContentLanguages={website?.enabledLanguages ?? ["hy", "en", "ru"]}
       languagePreferenceKey={`website_content_language_${website?.id ?? "root"}`}
       builderInteractionIdentity={builderInteractionIdentity}
+      builderPreviewMode={builderPreviewMode}
+      builderDraftPreview={builderDraftPreview}
     />
   );
 }

@@ -112,36 +112,39 @@ body.dark {
 .shop-builder-section.uk-section-primary,
 .shop-builder-section.uk-section-secondary,
 .shop-builder-section.uk-light,
+.shop-builder-main .uk-light,
+.builder-preview-shell .uk-light,
 .builder-preview-section[data-theme="dark"],
 .builder-preview-section.shop-builder-section--scheme-dark {
   --context-bg: transparent;
-  --context-text: var(--uk-global-inverse-color, #fff);
-  --context-muted: var(--uk-global-inverse-color, #fff);
-  --context-emphasis: var(--uk-global-inverse-color, #fff);
+  --context-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --context-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --context-emphasis: var(--uk-inverse-global-emphasis-color, #fff);
   --context-surface: var(--webpages-background-secondary, #111827);
-  --uikit-text-default-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-lead-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-meta-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-muted-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-emphasis-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-primary-color: var(--uk-global-inverse-color, #fff);
-  --uikit-text-secondary-color: var(--uk-global-inverse-color, #fff);
-  --uikit-accordion-title-color: var(--uk-global-inverse-color, #fff);
-  --uikit-accordion-content-color: var(--uk-global-inverse-color, #fff);
-  --uikit-accordion-icon-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
-  --uikit-accordion-divider-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 24%, transparent);
-  --uikit-accordion-title-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
-  --builder-section-text: var(--uk-global-inverse-color, #fff);
-  --builder-section-muted: var(--uk-global-inverse-color, #fff);
+  --uikit-text-default-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-text-lead-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-text-meta-color: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --uikit-text-muted-color: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --uikit-text-emphasis-color: var(--uk-inverse-global-emphasis-color, #fff);
+  --uikit-text-primary-color: var(--uk-inverse-global-link-color, #fff);
+  --uikit-text-secondary-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-accordion-title-color: var(--uk-inverse-global-emphasis-color, #fff);
+  --uikit-accordion-content-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-accordion-icon-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-accordion-divider-color: var(--uk-inverse-global-border, rgba(255, 255, 255, 0.2));
+  --uikit-accordion-title-hover-color: var(--uk-inverse-global-link-hover-color, #fff);
+  --builder-section-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --builder-section-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
   --builder-section-button-bg: var(--uk-button-primary-background, var(--uk-global-primary-color, #111111));
   --builder-section-button-text: var(--uk-button-primary-text, #fff);
-  --builder-active-text: var(--uk-global-inverse-color, #fff);
-  --builder-active-muted: var(--uk-global-inverse-color, #fff);
-  --builder-active-heading: var(--uk-global-inverse-color, #fff);
+  --builder-active-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --builder-active-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --builder-active-heading: var(--uk-inverse-global-emphasis-color, #fff);
   --builder-active-surface: var(--webpages-background-secondary, #111827);
   --builder-active-button-bg: var(--uk-button-primary-background, var(--uk-global-primary-color, #111111));
   --builder-active-button-text: var(--uk-button-primary-text, #fff);
   --uk-button-default-background: var(--uk-button-inverse-default-background, var(--uk-global-inverse-color, #fff));
+  --uk-button-default-render-background: var(--uk-button-default-background, var(--uk-global-inverse-color, #fff));
   --uk-button-default-text: var(--uk-button-inverse-default-text, var(--uk-global-text-color, #111827));
   --uk-button-default-border: var(--uk-button-inverse-default-border, var(--uk-global-inverse-color, #fff));
   --uk-button-default-shadow: var(--uk-button-inverse-default-shadow, none);
@@ -167,33 +170,19 @@ body.dark {
   --uk-button-secondary-shadow: none;
   --uk-button-secondary-hover-shadow: none;
   --uk-button-secondary-active-shadow: none;
-  --uk-button-text-color: var(--uk-global-inverse-color, #fff);
-  --uk-button-text-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
-  --uk-button-text-active-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
-  --uk-button-link-color: var(--uk-global-inverse-color, #fff);
-  --uk-button-link-hover-color: color-mix(in srgb, var(--uk-global-inverse-color, #fff) 70%, transparent);
-  --uk-global-link-color: var(--uk-global-inverse-color, #fff);
+  --uk-button-text-color: var(--uk-inverse-global-link-color, #fff);
+  --uk-button-text-hover-color: var(--uk-inverse-global-link-hover-color, #fff);
+  --uk-button-text-active-color: var(--uk-inverse-global-link-hover-color, #fff);
+  --uk-button-link-color: var(--uk-inverse-global-link-color, #fff);
+  --uk-button-link-hover-color: var(--uk-inverse-global-link-hover-color, #fff);
+  --uk-global-link-color: var(--uk-inverse-global-link-color, #fff);
 }
 
 /* YOOtheme imported sections inherit the source theme's inverse button
    semantics. Keep this scoped to imported sections so native WebPages button
    presets and tenant-wide Global Styles remain untouched. */
 .shop-builder-section.shop-builder-section--yootheme {
-  --uk-button-inverse-default-text: currentColor;
-  --uk-button-inverse-default-shadow: none;
-  --uk-button-inverse-primary-shadow: none;
-  --uk-button-text-color: currentColor !important;
-  --uk-button-text-hover-color: color-mix(in srgb, currentColor 70%, transparent) !important;
-  --uk-button-text-active-color: color-mix(in srgb, currentColor 70%, transparent) !important;
   --uk-grid-gutter-medium: 30px;
-}
-.shop-builder-section.shop-builder-section--yootheme .uk-button-default,
-.shop-builder-section.shop-builder-section--yootheme .uk-button-text {
-  color: inherit !important;
-}
-.shop-builder-section.shop-builder-section--yootheme .uk-button-default:hover,
-.shop-builder-section.shop-builder-section--yootheme .uk-button-text:hover {
-  color: inherit !important;
 }
 .builder-preview-section-sticky-wrapper {
   /* UIkit owns the sticky host in Builder; keep the motion wrapper in normal
@@ -2354,12 +2343,12 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 .shop-builder-grid-card--yootheme.uk-card-primary {
   background: var(--uk-card-primary-background, var(--global-primary-background, #6f40f1)) !important;
-  box-shadow: var(--uk-card-primary-box-shadow, -5px -5px 20px rgba(255, 255, 255, 0.9), 5px 5px 20px rgba(60, 14, 189, 0.3)) !important;
+  box-shadow: var(--uk-card-primary-shadow, none) !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-secondary {
   background: var(--uk-card-secondary-background, var(--global-secondary-background, #171258)) !important;
-  box-shadow: var(--uk-card-secondary-box-shadow, -5px -5px 20px rgba(255, 255, 255, 0.9), 5px 5px 20px rgba(23, 18, 88, 0.3)) !important;
+  box-shadow: var(--uk-card-secondary-shadow, none) !important;
 }
 
 /* In the source template the title is the flexible track in an expanded
@@ -3523,6 +3512,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   color: var(--builder-card-meta-color, var(--builder-active-muted, var(--builder-muted, #5f5f58)));
   font-size: var(--builder-card-meta-size, inherit);
   text-transform: var(--builder-card-meta-transform, none);
+}
+
+/* Panel Meta Color is authored on the Meta control, while UIkit's text
+   presets use !important. Project the canonical semantic value here so the
+   imported Panel setting wins in both the builder and storefront renderers. */
+.shop-builder-column-block--panel .shop-builder-panel-meta {
+  color: var(--builder-card-meta-color, var(--builder-active-muted, var(--builder-muted, #5f5f58))) !important;
 }
 
 .shop-builder-column-block--panel .shop-builder-buttons {
@@ -7041,11 +7037,11 @@ body.is-visual-builder-active .uk-lightbox {
    canonical opt-in Grid hover for both native and imported card surfaces. */
 .shop-builder-grid-card--hover-enabled:hover {
   /* YOOtheme card hover changes the surface only; parallax owns movement. */
-  box-shadow: var(--uk-card-hover-box-shadow, 0 22px 48px rgba(17, 17, 17, 0.1)) !important;
+  box-shadow: var(--uk-card-hover-shadow, none) !important;
 }
 
 .shop-builder-grid-card.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
-  box-shadow: var(--uk-card-hover-box-shadow, 0 22px 48px rgba(17, 17, 17, 0.1)) !important;
+  box-shadow: var(--uk-card-hover-shadow, none) !important;
 }
 
 /* YOOtheme Grid Card Hover is a modifier-only card in tenant previews and
@@ -7078,19 +7074,19 @@ body.is-visual-builder-active .uk-lightbox {
    default/primary/secondary cards and a different shadow per surface. */
 .shop-builder-grid-card--yootheme.uk-card-default.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
   background-color: var(--uk-card-default-background, #f7f8fc) !important;
-  box-shadow: var(--uk-card-default-hover-box-shadow, var(--uk-card-hover-shadow, none)) !important;
+  box-shadow: var(--uk-card-default-hover-shadow, var(--uk-card-hover-shadow, none)) !important;
   translate: 0 3px !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
   background-color: var(--uk-card-primary-background, #6f40f1) !important;
-  box-shadow: var(--uk-card-primary-hover-box-shadow, -2px -2px 10px rgba(255,255,255,.8), 2px 2px 5px rgba(60,14,189,.3)) !important;
+  box-shadow: var(--uk-card-primary-hover-shadow, none) !important;
   translate: 0 3px !important;
 }
 
 .shop-builder-grid-card--yootheme.uk-card-secondary.shop-builder-grid-card--hover-enabled.uk-card-hover:hover {
   background-color: var(--uk-card-secondary-background, #171258) !important;
-  box-shadow: var(--uk-card-secondary-hover-box-shadow, -2px -2px 10px rgba(255,255,255,.8), 2px 2px 5px rgba(1,1,3,.3)) !important;
+  box-shadow: var(--uk-card-secondary-hover-shadow, none) !important;
   translate: 0 3px !important;
 }
 
@@ -7105,5 +7101,5 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus,
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus-within,
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:active {
-  box-shadow: var(--uk-card-primary-box-shadow, -5px -5px 20px rgba(255,255,255,.9), 5px 5px 20px rgba(60,14,189,.3)) !important;
+  box-shadow: var(--uk-card-primary-shadow, none) !important;
 }

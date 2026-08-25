@@ -110,11 +110,27 @@ export type BuilderLayoutBlock = {
   menuHoverColor?: string;
   menuActiveColor?: string;
   menuActiveIndicator?: "princity" | "underline" | "none";
+  menuHoverVariant?: "none" | "line" | "glow" | "line-glow";
+  menuHoverLine?: "none" | "top" | "bottom" | "left" | "right";
+  menuDropdownIndicator?: "none" | "chevron";
+  menuDividerMode?: "none" | "partial" | "all";
+  menuColumns?: number;
+  menuMegaWidth?: string;
+  menuDropbar?: boolean;
+  menuClickMode?: boolean;
+  menuShowParentIcon?: boolean;
+  menuItems?: unknown[];
+  imageInverseUrl?: string | null;
+  imageMobileUrl?: string | null;
   headerNavigationOverrides?: {
     gap?: boolean;
     hoverColor?: boolean;
     activeColor?: boolean;
     indicator?: boolean;
+    hoverVariant?: boolean;
+    hoverLine?: boolean;
+    dropdownIndicator?: boolean;
+    divider?: boolean;
     typography?: boolean;
   };
   headerBrandMode?: "logo" | "brand" | "both";
@@ -190,6 +206,7 @@ export type BuilderLayoutBlock = {
   };
   imageUrl?: string;
   imageAlt?: string;
+  imageBorder?: string;
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
@@ -213,7 +230,7 @@ export type BuilderLayoutBlock = {
   imageSvgInline?: boolean;
   imageSvgAnimate?: boolean;
   imageSvgColor?: string;
-  gridMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
+  gridMetaHtmlElement?: string;
   imageLinkUrl?: string;
   /** YOOtheme Panel image-link toggle; uses the Panel link URL. */
   linkImage?: boolean;
@@ -249,10 +266,19 @@ export type BuilderLayoutBlock = {
   /** YOOtheme Panel text presets for meta and body content. */
   metaStyle?: string;
   contentStyle?: string;
-  panelMetaHtmlElement?: "div" | "span" | "p";
+  panelMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   panelVerticalAlign?: "top" | "center" | "bottom";
   panelTitleElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   panelTitleStyle?: string;
+  titleDecoration?: string;
+  titleColor?: string;
+  linkTitle?: boolean;
+  panelTitleHoverStyle?: "none" | "heading-link" | "default-link";
+  panelTitleAlign?: "top" | "left";
+  panelTitleGridWidth?: string;
+  panelTitleGridBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  panelTitleGridColumnGap?: "small" | "medium" | "default" | "large" | "none";
+  panelTitleGridRowGap?: "small" | "medium" | "default" | "large" | "none";
   titleMarginTop?: string;
   metaMarginTop?: string;
   contentMarginTop?: string;

@@ -2185,7 +2185,13 @@ a {
 .shop-builder-main .uk-card {
   position: relative;
   box-sizing: border-box;
-  transition: box-shadow var(--uk-card-transition-duration, 0.1s) ease-in-out, background var(--uk-card-transition-duration, 0.1s) ease-in-out, color var(--uk-card-transition-duration, 0.1s) ease-in-out;
+  transition:
+    color var(--uk-card-transition-duration, 0.1s) ease-in-out,
+    background-color var(--uk-card-transition-duration, 0.1s) ease-in-out,
+    background-size var(--uk-card-transition-duration, 0.1s) ease-in-out,
+    border-color var(--uk-card-transition-duration, 0.1s) ease-in-out,
+    box-shadow var(--uk-card-transition-duration, 0.1s) ease-in-out,
+    transform var(--uk-card-transition-duration, 0.1s) ease-in-out;
   border-radius: var(--uk-card-border-radius, 0);
   border-width: var(--uk-card-border-width, 1px);
   border-style: solid;

@@ -1,5 +1,5 @@
 import { getBuilderRowLayoutPreset } from "@/components/dashboard/builderLayoutPresets";
-import type { BuilderLayout } from "@/lib/builderLayouts";
+import type { BuilderLayout, BuilderLayoutBlock } from "@/lib/builderLayouts";
 import type { HeaderBuilderComposition, HeaderBuilderElement, HeaderRowComposition } from "@/lib/headerBuilderDocument";
 import { resolveHeaderElementAlignment } from "@/lib/headerElementAlignment";
 
@@ -70,10 +70,13 @@ export function resolveHeaderBuilderComposition(
       : block.typography,
   });
   const elements = blocks.flatMap((block, blockIndex): HeaderBuilderElement[] => {
+    const blockData = block as BuilderLayoutBlock;
     if (block.id === "header-logo" || block.kind === "image") return [{
       id: blockIds.get(block) ?? `header-logo-${blockIndex}`,
       type: "logo",
       imageUrl: block.imageUrl,
+      imageInverseUrl: blockData.imageInverseUrl,
+      imageMobileUrl: blockData.imageMobileUrl,
       imageAlt: block.imageAlt,
       imageMaxWidth: block.imageMaxWidth,
       imageWidth: block.imageWidth,
@@ -81,7 +84,7 @@ export function resolveHeaderBuilderComposition(
       imageFit: block.imageFit,
       imageRatio: block.imageRatio,
       imageShape: block.imageShape,
-      imageBorder: block.imageBorder,
+      imageBorder: blockData.imageBorder,
       imageShadow: block.imageShadow,
       imageBoxShadow: block.imageBoxShadow,
       imageSvgInline: block.imageSvgInline,
@@ -106,6 +109,15 @@ export function resolveHeaderBuilderComposition(
       menuHoverColor: overrides?.hoverColor ? block.menuHoverColor : undefined,
       menuActiveColor: overrides?.activeColor ? block.menuActiveColor : undefined,
       menuActiveIndicator: overrides?.indicator ? block.menuActiveIndicator : undefined,
+      menuHoverVariant: overrides?.hoverVariant ? block.menuHoverVariant : undefined,
+      menuHoverLine: overrides?.hoverLine ? block.menuHoverLine : undefined,
+      menuDropdownIndicator: overrides?.dropdownIndicator ? block.menuDropdownIndicator : undefined,
+      menuDividerMode: overrides?.divider ? block.menuDividerMode : undefined,
+      menuColumns: blockData.menuColumns,
+      menuMegaWidth: blockData.menuMegaWidth,
+      menuDropbar: blockData.menuDropbar,
+      menuClickMode: blockData.menuClickMode,
+      menuShowParentIcon: blockData.menuShowParentIcon,
       headerNavigationOverrides: overrides,
       ...sharedElementFields(block),
       }];
@@ -249,6 +261,25 @@ export function resolveHeaderBuilderComposition(
     documentWidthMode: section?.headerWidthMode,
     documentBackgroundMode: section?.headerBackgroundMode,
     documentTextMode: section?.headerTextMode,
+    documentBreakpoint: section?.headerBreakpoint,
+    documentMobileBreakpoint: section?.headerMobileBreakpoint,
+    documentStickyShowOnUp: section?.headerStickyShowOnUp,
+    documentStickyAnimation: section?.headerStickyAnimation,
+    documentDropdownAlign: section?.headerDropdownAlign,
+    documentDropdownAlignToNavbar: section?.headerDropdownAlignToNavbar,
+    documentDropbarEnabled: section?.headerDropbarEnabled,
+    documentParentIconEnabled: section?.headerParentIconEnabled,
+    documentClickModeEnabled: section?.headerClickModeEnabled,
+    documentDialogTogglePosition: section?.headerDialogTogglePosition,
+    documentDialogLayout: section?.headerDialogLayout,
+    documentDialogCenter: section?.headerDialogCenter,
+    documentDialogPushAfter: section?.headerDialogPushAfter,
+    documentSearchPosition: section?.headerSearchPosition,
+    documentSearchLayout: section?.headerSearchLayout,
+    documentSocialPosition: section?.headerSocialPosition,
+    documentMobileLogoUrl: section?.headerMobileLogoUrl,
+    documentInverseLogoUrl: section?.headerInverseLogoUrl,
+    documentMobileComposition: section?.headerMobileComposition,
     documentZIndex: section?.headerZIndex,
     documentTopToolbarVisible: section?.headerTopToolbarVisible,
     documentTopToolbarText: section?.headerTopToolbarText,

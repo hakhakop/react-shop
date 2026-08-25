@@ -2178,7 +2178,8 @@ export function ContentLayoutBlock({
 
   if (block.kind === "panel") {
     const panelMetaStyleName = String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase();
-    const panelMetaIsHeading = /^h[1-6]$/.test(panelMetaStyleName);
+    const panelMetaIsHeading = /^(?:h[1-6]|heading-h[1-6])$/.test(panelMetaStyleName);
+    const panelMetaHasExplicitMargin = (block as any).metaMarginTop !== undefined;
     const panelTitleStyle = {
       color: "var(--builder-card-title-color, inherit)",
       textAlign:
@@ -2193,7 +2194,9 @@ export function ContentLayoutBlock({
       fontFamily: panelMetaIsHeading ? "var(--uk-heading-font-family, inherit)" : undefined,
       textTransform:
         "var(--builder-card-meta-transform, none)" as CSSProperties["textTransform"],
-      marginTop: /^h[1-6]$/.test(String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase())
+      marginTop: panelMetaHasExplicitMargin
+        ? undefined
+        : panelMetaIsHeading
         ? "var(--builder-card-meta-spacing, var(--uk-global-margin, 20px))"
         : "var(--builder-card-meta-spacing, 0)",
     } as CSSProperties;
@@ -2224,11 +2227,23 @@ export function ContentLayoutBlock({
       (block as any).imageInverse === true ? "uk-light" : "",
     ].filter(Boolean).join(" ");
     const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
+    const panelTitleDecorationClass = block.titleDecoration && block.titleDecoration !== "none" ? `uk-heading-${block.titleDecoration}` : "";
+    const panelTitleColorClass = block.titleColor && !["none", "default", "inherit"].includes(block.titleColor)
+      ? (block.titleColor.startsWith("uk-text-") ? block.titleColor : `uk-text-${block.titleColor}`)
+      : "";
+    const panelTitleHoverClass = block.panelTitleHoverStyle === "heading-link" ? "uk-link-heading" : block.panelTitleHoverStyle === "default-link" ? "uk-link" : "";
+    const panelTitleLink = block.linkTitle === true && Boolean(block.buttonUrl);
     const panelShowMedia = block.panelShowMedia !== false;
+    const panelTitleGridWidth = ({
+      expand: "100%", "5-6": "80%", "3-4": "75%", "2-3": "66.6667%", "3-5": "60%", "1-2": "50%", "2-5": "40%", "1-3": "33.3333%", "1-4": "25%", "1-5": "20%",
+    } as Record<string, string>)[String(block.panelTitleGridWidth ?? "")] ?? (/^\d+%$/.test(String(block.panelTitleGridWidth ?? "")) ? String(block.panelTitleGridWidth) : undefined);
+    const panelTitleLayoutStyle = panelShowMedia && panelTitleGridWidth
+      ? { width: panelTitleGridWidth, maxWidth: panelTitleGridWidth, ...(block.panelTitleAlign === "left" ? { marginLeft: 0, marginRight: "auto" } : {}) }
+      : {};
     const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
     const panelMeta = block.eyebrow ? (
       <Typog
-        as="span"
+        as={((block as any).panelMetaHtmlElement ?? "div") as any}
         area="eyebrow"
         typography={panelMetaIsHeading ? undefined : block.typography}
         className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
@@ -2298,12 +2313,39 @@ export function ContentLayoutBlock({
           {block.title && (
             <Typog
               as={block.panelTitleElement ?? "h3"}
-              className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`}
+              className={`${panelTitleClass} ${panelTitleDecorationClass} ${panelTitleHoverClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`}
               area="title"
               typography={undefined}
-              style={panelTitleStyle}
+              style={{ ...panelTitleStyle, ...panelTitleLayoutStyle }}
             >
-              {block.typewriterEnabled ? (
+              {panelTitleLink ? (
+                <a className="uk-link-reset" href={block.buttonUrl} {...builderLinkTargetProps(block.buttonTarget)}>
+                  {block.typewriterEnabled ? (
+                    <TypewriterText
+                      text={block.title}
+                      phrases={block.typewriterPhrases}
+                      speed={block.typewriterSpeed}
+                      eraseSpeed={block.typewriterEraseSpeed}
+                      delay={block.typewriterDelay}
+                      loop={block.typewriterLoop}
+                      useGradient={block.typewriterUseGradient}
+                      gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset}
+                      customStart={block.textGradientCustomStart}
+                      customMiddle={block.textGradientCustomMiddle}
+                      customEnd={block.textGradientCustomEnd}
+                      customAngle={block.textGradientCustomAngle}
+                      customStartOffset={block.textGradientCustomStartOffset}
+                      customMiddleOffset={block.textGradientCustomMiddleOffset}
+                      customEndOffset={block.textGradientCustomEndOffset}
+                      typography={block.typography}
+                      area="title"
+                      preserveHeight={block.typewriterPreserveHeight !== false}
+                      reservedLines={block.typewriterReservedLines ?? 1}
+                      mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
+                    />
+                  ) : <BuilderLineBreakText text={block.title} className={panelTitleColorClass} />}
+                </a>
+              ) : block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
                   phrases={block.typewriterPhrases}
@@ -2329,7 +2371,7 @@ export function ContentLayoutBlock({
                   mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
-                <BuilderLineBreakText text={block.title} />
+                <BuilderLineBreakText text={block.title} className={panelTitleColorClass} />
               )}
             </Typog>
           )}

@@ -36,6 +36,9 @@ interface HeaderNavProps {
   scopedPreviewPages?: ScopedPreviewPage[];
   scopedLinkMode?: "builder" | "preview";
   activeContentLanguage?: string;
+  dropdownIndicator?: "none" | "chevron";
+  parentIconEnabled?: boolean;
+  clickModeEnabled?: boolean;
   style?: CSSProperties;
 }
 
@@ -54,6 +57,8 @@ type MenuPresentationSettings = {
   icon: string | null;
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
+  submenuWidth: string | null;
+  mobileAccordion: boolean;
   badgeText: string | null;
 };
 
@@ -146,6 +151,11 @@ function normalizeMenuPresentation(
     submenuColumns: Number.isFinite(rawColumns)
       ? Math.min(Math.max(Math.round(rawColumns), 1), 6)
       : 3,
+    submenuWidth:
+      typeof value?.submenuWidth === "string" && value.submenuWidth.trim().length > 0
+        ? value.submenuWidth.trim()
+        : null,
+    mobileAccordion: value?.mobileAccordion !== false,
     badgeText:
       typeof value?.badgeText === "string" && value.badgeText.trim().length > 0
         ? value.badgeText.trim()
@@ -180,9 +190,20 @@ function renderMenuItems(
   presentationById?: Record<string, MenuPresentationSettings>,
   level = 0,
   hrefResolver?: (href: string) => string,
+  dropdownIndicator: "none" | "chevron" = "none",
+  parentIconEnabled = dropdownIndicator === "chevron",
+  clickModeEnabled = false,
+  mobileMode = false,
+  expandedIds = new Set<string>(),
+  onToggleMobileItem?: (id: string) => void,
 ): ReactNode {
-  return items.map((item) => {
-    const href = item.path || item.url || "#";
+  const visibleItems = items.filter((item) =>
+    mobileMode ? item.visibility !== "desktop" : item.visibility !== "mobile",
+  );
+  return visibleItems.map((item) => {
+    const href = mobileMode
+      ? (item.mobileUrl || item.path || item.url || "#")
+      : (item.path || item.url || "#");
     const isSectionLink = href.includes("#");
     const resolvedHref = hrefResolver ? hrefResolver(href) : href;
     const dashboardHref = dashboardMode
@@ -194,52 +215,104 @@ function renderMenuItems(
       !isSectionLink &&
       itemPath !== "#" &&
       (currentPath === itemPath || currentPath.startsWith(itemPath + "/"));
-    const children = item.children ?? [];
+    const children = (item.children ?? []).filter((child) =>
+      mobileMode ? child.visibility !== "desktop" : child.visibility !== "mobile",
+    );
     const hasChildren = children.length > 0;
     const isBranchActive = itemHasActiveDescendant(item, currentPath);
     const presentation = normalizeMenuPresentation(presentationById?.[item.id]);
     const headingVisible = presentation.showHeading !== false;
-    const iconName = resolveUikitIconName(presentation.icon);
-    const icon = iconName ? <WebPagesIcon name={iconName} size={14} /> : null;
+    const iconName = resolveUikitIconName(item.iconName || presentation.icon);
+    const icon = item.iconUrl ? (
+      <img src={item.iconUrl} alt="" width={52} height={52} loading="eager" />
+    ) : iconName ? (
+      <WebPagesIcon name={iconName} size={14} />
+    ) : null;
     const badgeText = presentation.badgeText;
     const submenuLayout = hasChildren ? presentation.submenuLayout : "list";
     const submenuColumns = presentation.submenuColumns;
+    const mobileParentAccordion = mobileMode && hasChildren && presentation.mobileAccordion;
+    const desktopParentToggle = !mobileMode && hasChildren;
+    const submenuOpen = !mobileParentAccordion || expandedIds.has(item.id);
 
     return (
       <div
         key={item.id}
         className={`site-header-nav-item${
           hasChildren ? " has-children" : ""
-        }${isBranchActive ? " is-active" : ""}`}
+        }${isBranchActive ? " is-active" : ""}${
+          desktopParentToggle && expandedIds.has(item.id) ? " is-open" : ""
+        }`}
       >
         <Link
-          href={dashboardHref}
+          href={mobileParentAccordion ? "#" : dashboardHref}
           className={`site-header-nav-link${
             level > 0 ? " site-header-nav-submenu-link" : ""
           }${isActive ? " is-active" : ""}`}
           aria-current={isActive ? "page" : undefined}
           aria-haspopup={hasChildren ? "menu" : undefined}
+          aria-expanded={hasChildren ? expandedIds.has(item.id) : undefined}
+          role={hasChildren ? "button" : undefined}
+          target={item.target}
           onMouseMove={handleNavMouseMove}
           onMouseLeave={handleNavMouseLeave}
+          onClick={(event) => {
+            if (mobileParentAccordion) {
+              event.preventDefault();
+              onToggleMobileItem?.(item.id);
+              return;
+            }
+            if (desktopParentToggle) {
+              event.preventDefault();
+              onToggleMobileItem?.(item.id);
+              return;
+            }
+            if (clickModeEnabled && level === 0 && hasChildren) {
+              event.preventDefault();
+            }
+          }}
         >
           {icon && <span className="site-header-nav-icon">{icon}</span>}
-          {item.label}
+          <span className="site-header-nav-label">{item.label}</span>
+          {item.subtitle && (
+            <span className="site-header-nav-subtitle">{item.subtitle}</span>
+          )}
           {badgeText && <span className="site-header-nav-badge">{badgeText}</span>}
+          {level === 0 && hasChildren && parentIconEnabled && dropdownIndicator === "chevron" && (
+            <WebPagesIcon
+              name="chevron-down"
+              size={12}
+              className="site-header-nav-parent-icon"
+            />
+          )}
         </Link>
 
-        {hasChildren && (
+        {hasChildren && submenuOpen && (
           <div
             className={`site-header-nav-submenu site-header-nav-submenu--${submenuLayout}`}
             role="menu"
             style={
               {
                 "--submenu-columns": submenuColumns,
+                ...(presentation.submenuWidth
+                  ? { width: presentation.submenuWidth, maxWidth: "min(100vw - 30px, 1424px)" }
+                  : {}),
                 ...(submenuLayout === "list"
                   ? { backdropFilter: "var(--uk-navbar-backdrop-filter)" }
                   : {}),
               } as CSSProperties
             }
           >
+            {mobileMode && (
+              <Link
+                href={dashboardMode ? getDashboardEditHref(href, dashboardMode) : resolvedHref}
+                className="site-header-nav-link site-header-nav-submenu-link site-header-nav-mobile-parent-link"
+                target={item.target}
+              >
+                {icon && <span className="site-header-nav-icon">{icon}</span>}
+                {item.label}
+              </Link>
+            )}
             {headingVisible && (
               <div className="site-header-nav-submenu-heading">
                 {icon && <span className="site-header-nav-icon">{icon}</span>}
@@ -257,6 +330,12 @@ function renderMenuItems(
                 presentationById,
                 level + 1,
                 hrefResolver,
+                dropdownIndicator,
+                parentIconEnabled,
+                clickModeEnabled,
+                mobileMode,
+                expandedIds,
+                onToggleMobileItem,
               )}
             </div>
           </div>
@@ -276,12 +355,18 @@ export default function HeaderNav({
   scopedPreviewPages,
   scopedLinkMode = "preview",
   activeContentLanguage,
+  dropdownIndicator = "none",
+  parentIconEnabled = dropdownIndicator === "chevron",
+  clickModeEnabled = false,
   style,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
   const dashboardMode = rawPathname === "/dashboard";
   const [dashboardPageKey, setDashboardPageKey] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [expandedMobileIds, setExpandedMobileIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const { totalCount: wishlistCount } = useWishlist();
   const { totalCount: cartCount, openMiniCart } = useCart();
   const { openSearch } = useSearch();
@@ -289,7 +374,17 @@ export default function HeaderNav({
   // Close mobile navigation panel when path changes
   useEffect(() => {
     setIsMobileOpen(false);
+    setExpandedMobileIds(new Set());
   }, [rawPathname]);
+
+  const toggleMenuItem = (id: string) => {
+    setExpandedMobileIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!dashboardMode) {
@@ -370,6 +465,12 @@ export default function HeaderNav({
           presentationById,
           0,
           hrefResolver,
+          dropdownIndicator,
+          parentIconEnabled,
+          clickModeEnabled,
+          false,
+          expandedMobileIds,
+          toggleMenuItem,
         )}
       </nav>
 
@@ -457,6 +558,12 @@ export default function HeaderNav({
                   presentationById,
                   0,
                   hrefResolver,
+                  dropdownIndicator,
+                  parentIconEnabled,
+                  clickModeEnabled,
+                  true,
+                  expandedMobileIds,
+                  toggleMenuItem,
                 )}
                 {serviceHomepageMode && (
                   <div className="site-header-nav-item">

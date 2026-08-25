@@ -63,6 +63,7 @@ const PANEL_TEXT_STYLE_OPTIONS = [
 ];
 
 const PANEL_HTML_ELEMENT_OPTIONS = ["h1", "h2", "h3", "h4", "h5", "h6", "div"];
+const PANEL_META_STYLE_OPTIONS = PANEL_TEXT_STYLE_OPTIONS.filter(({ value }) => value !== "link");
 
 export default function PanelCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => update({ ...legacyPanelFields, ...patch });
@@ -167,8 +168,12 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
         <TitleSettingsGroup
           block={block}
           update={updateSemantic}
-          showDecoration={false}
-          keys={{ role: "titleTypographyRole", size: "panelTitleStyle", align: "panelTextAlign", level: "panelTitleElement" }}
+          showDecoration
+          showColor
+          showLink
+          showMargin
+          showPanelLayout
+          keys={{ role: "titleTypographyRole", size: "panelTitleStyle", align: "panelTextAlign", level: "panelTitleElement", decoration: "titleDecoration", color: "titleColor", link: "linkTitle", margin: "titleMarginTop" }}
           defaultSize="inherit"
           defaultLevel="h3"
           visualPresetOptions={PANEL_TEXT_STYLE_OPTIONS}
@@ -177,13 +182,16 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           block={block}
           update={updateSemantic}
           showAlignment={false}
+          showRole={false}
+          showColor
           showStyle
           showHtmlElement
           showPosition
+          showMargin
           positionLabel="Alignment"
-          styleOptions={PANEL_TEXT_STYLE_OPTIONS.filter(({ value }) => value !== "inherit").map((option) => option)}
+          styleOptions={PANEL_META_STYLE_OPTIONS}
           htmlElementOptions={PANEL_HTML_ELEMENT_OPTIONS}
-          keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement", position: "panelMetaPosition" }}
+          keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement", style: "metaStyle", color: "metaColor", position: "panelMetaPosition", margin: "metaMarginTop" }}
         />
         <ContentSettingsGroup
           block={block}

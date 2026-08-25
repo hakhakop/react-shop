@@ -903,6 +903,8 @@ const defaultMenuPresentation: MenuPresentationSettings = {
   icon: null,
   submenuLayout: "list",
   submenuColumns: 3,
+  submenuWidth: null,
+  mobileAccordion: true,
   badgeText: null,
 };
 
@@ -934,6 +936,11 @@ function normalizeMenuPresentation(
     submenuColumns: Number.isFinite(rawColumns)
       ? Math.min(Math.max(Math.round(rawColumns), 1), 6)
       : defaultMenuPresentation.submenuColumns,
+    submenuWidth:
+      typeof value?.submenuWidth === "string" && value.submenuWidth.trim().length > 0
+        ? value.submenuWidth.trim()
+        : null,
+    mobileAccordion: value?.mobileAccordion !== false,
     badgeText:
       typeof value?.badgeText === "string" && value.badgeText.trim().length > 0
         ? value.badgeText.trim()
@@ -2548,6 +2555,7 @@ export default function DashboardBuilder({
     signature: string;
   } | null>(null);
   const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
+  const headerRouteHydrationRef = useRef<string | null>(null);
   const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
   const footerDocumentLoadRef = useRef<Promise<BuilderState | null> | null>(null);
   const [presetToApply, setPresetToApply] = useState<{ presetKey: string; name: string } | null>(null);
@@ -2706,14 +2714,15 @@ export default function DashboardBuilder({
     columnKey: string;
   } | null>(null);
   const previousInspectorOpenRef = useRef(false);
-  const [inspectorMode, setInspectorMode] = useState<InspectorMode>(
-    readInspectorModePreference,
-  );
-  const [inspectorWidth, setInspectorWidth] = useState(
-    readInspectorWidthPreference,
-  );
+  const [inspectorMode, setInspectorMode] = useState<InspectorMode>("docked");
+  const [inspectorWidth, setInspectorWidth] = useState(INSPECTOR_DEFAULT_WIDTH);
   const [inspectorFloatingRect, setInspectorFloatingRect] =
-    useState<InspectorFloatingRect>(readInspectorFloatingRectPreference);
+    useState<InspectorFloatingRect>({
+      x: 960,
+      y: 82,
+      width: INSPECTOR_DEFAULT_WIDTH,
+      height: INSPECTOR_DEFAULT_HEIGHT,
+    });
   const inspectorFloatingRectRef = useRef(inspectorFloatingRect);
   const [inspectorDragging, setInspectorDragging] = useState(false);
   const [inspectorWorkspaceWidth, setInspectorWorkspaceWidth] = useState(0);
@@ -2734,7 +2743,7 @@ export default function DashboardBuilder({
     "section" | "row" | "element" | null
   >(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
-    loadSidebarCollapsedPreference(storageKeys.sidebarCollapsed),
+    false,
   );
   const [sidebarTransitioning, setSidebarTransitioning] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(480);
@@ -2831,6 +2840,12 @@ export default function DashboardBuilder({
       setShellStatus("Platform global settings require super admin access.");
     }
   }, [canEditShellSettings, sidebarTab]);
+
+  useEffect(() => {
+    setInspectorMode(readInspectorModePreference());
+    setInspectorWidth(readInspectorWidthPreference());
+    setInspectorFloatingRect(readInspectorFloatingRectPreference());
+  }, []);
 
   useEffect(() => {
     setSidebarCollapsed(
@@ -2985,11 +3000,17 @@ export default function DashboardBuilder({
     if (!websiteId) {
       params.set("builderFrame", "selection");
       params.set("builderBridge", iframeDiagnosticMode);
+      if (builderState.page === "header" || builderState.page === "footer") {
+        params.set("builderContext", builderState.page);
+      }
       return `/dashboard/preview?${params.toString()}`;
     }
     const tenantRouteSegment = websiteRouteSegment ?? websiteId;
     params.set("builderFrame", "selection");
     params.set("builderBridge", iframeDiagnosticMode);
+    if (builderState.page === "header" || builderState.page === "footer") {
+      params.set("builderContext", builderState.page);
+    }
     return `/app/websites/${encodeURIComponent(tenantRouteSegment)}/preview?${params.toString()}`;
   }, [
     headerContextState.page,
@@ -2997,6 +3018,7 @@ export default function DashboardBuilder({
     previewProducts,
     templateBuilderContext?.family,
     iframeDiagnosticMode,
+    builderState.page,
     websiteId,
     websiteRouteSegment,
   ]);
@@ -4362,6 +4384,55 @@ export default function DashboardBuilder({
     };
   }, [builderApiUrl, builderState.page, draftReady, headerDocumentPreviewState, shellSettings]);
 
+  useEffect(() => {
+    const requestedPage = searchParams.get("page") ?? searchParams.get("template");
+    if (!draftReady || requestedPage !== "header") return;
+
+    const routeIdentity = `${websiteId ?? "root"}:header:${searchParams.toString()}`;
+    if (headerRouteHydrationRef.current === routeIdentity) return;
+    // Shell entry has already selected its authoritative in-memory state. Do
+    // not replace active edits when the URL is synchronized by that entry.
+    if (activeShellEntry) {
+      headerRouteHydrationRef.current = routeIdentity;
+      return;
+    }
+    headerRouteHydrationRef.current = routeIdentity;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "header" }), {
+          cache: "no-store",
+        });
+        if (!response.ok || cancelled) return;
+        const payload = (await response.json()) as { layout?: BuilderState | null };
+        if (cancelled || !payload.layout?.sections?.length) return;
+        const nextState = hydrateDocumentBuilderState(
+          normalizeBuilderState(payload.layout, "header"),
+          shellSettings,
+        );
+        setHeaderDocumentPreviewState(nextState);
+        setBuilderState(nextState);
+        undoHistoryRef.current = [structuredClone(nextState)];
+        setCommittedBuilderStateSignature(JSON.stringify(nextState));
+        setPublishedDocumentReady(true);
+        setSelectedId(nextState.sections[0]?.id ?? "");
+        setSelectedLayoutColumnKey(null);
+        setSelectedLayoutBlockKey(null);
+        setOpenLayoutItemId(null);
+        removeBuilderDraft(storageKeys, "header");
+        restoredDraftKeysRef.current.delete("header");
+        delete draftMetadataRef.current.header;
+      } catch {
+        // Keep the current state if the persisted Header cannot be read.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeShellEntry, builderApiUrl, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
+
   const loadFooterDocumentPreview = useCallback(async () => {
     if (footerDocumentPreviewState) return footerDocumentPreviewState;
     if (footerDocumentLoadRef.current) return footerDocumentLoadRef.current;
@@ -4454,6 +4525,22 @@ export default function DashboardBuilder({
     nextKey: BuilderLayoutKey,
     options: { syncUrl?: boolean; state?: BuilderState } = {},
   ) => {
+    if (
+      (builderState.page === "header" || builderState.page === "footer") &&
+      nextKey !== "header" &&
+      nextKey !== "footer"
+    ) {
+      // Navigation from a shell is a real document transition. Clear the
+      // shell context before replacing the URL so the old header query cannot
+      // restore Header state over the newly selected page.
+      shellTransitionRef.current = { direction: "exit", page: nextKey };
+      setActiveShellEntry(null);
+      setShellPageContextState(null);
+      setHeaderSelected(false);
+      setFooterSelected(false);
+      setSectionSettingsOpen(false);
+      setInspectorOpen(false);
+    }
     setActiveDynamicDocumentId(null);
     setActiveRoutingTemplateId(null);
     setActiveIndividualContextToken(null);
@@ -4480,6 +4567,39 @@ export default function DashboardBuilder({
       router.replace(`${pathname}?page=${nextKey}`, { scroll: false });
     }
   };
+
+  const switchBuilderTargetFromNavigation = useCallback(async (nextKey: BuilderLayoutKey) => {
+    const localState = hydrateDocumentBuilderState(
+      loadDraftForKey(nextKey, storageKeys),
+      shellSettings,
+    );
+    if (localState.sections.length > 0) {
+      switchBuilderTarget(nextKey, { state: localState });
+      return;
+    }
+
+    // A shell can be entered before the page has a local draft. Navigation
+    // must then use the published document instead of replacing the canvas
+    // with the empty default state.
+    try {
+      const response = await fetch(builderApiUrl("/api/builder-layouts", { key: nextKey }), {
+        cache: "no-store",
+      });
+      const payload = (await response.json()) as { layout?: BuilderState | null };
+      if (response.ok && payload.layout?.sections?.length) {
+        const publishedState = hydrateDocumentBuilderState(
+          normalizeBuilderState(payload.layout, nextKey),
+          shellSettings,
+        );
+        switchBuilderTarget(nextKey, { state: publishedState });
+        return;
+      }
+    } catch {
+      // Fall through to the normal local/default transition when the
+      // published document cannot be loaded.
+    }
+    switchBuilderTarget(nextKey, { state: localState });
+  }, [builderApiUrl, shellSettings, storageKeys, switchBuilderTarget]);
 
   const updateSelected = (patch: Partial<BuilderSection>) => {
     setBuilderState((current) => ({
@@ -4521,77 +4641,6 @@ export default function DashboardBuilder({
         };
       }),
     }));
-  };
-
-  const syncHeaderBlockPatch = (
-    blockKey: string,
-    patch: Partial<BuilderLayoutBlock>,
-  ) => {
-    if (builderState.page !== "header") return;
-    if (blockKey === "header-logo" || blockKey === "starter-brand") {
-      updateShellSettings({
-        ...(typeof patch.imageUrl === "string" ? { headerLogoUrl: patch.imageUrl || null } : {}),
-        ...(typeof patch.imageAlt === "string" ? { headerLogoAlt: patch.imageAlt } : {}),
-        ...(typeof patch.imageMaxWidth === "number" ? { headerLogoMaxWidth: patch.imageMaxWidth } : {}),
-        ...(patch.headerBrandMode ? { headerBrandMode: patch.headerBrandMode } : {}),
-        ...(typeof patch.headerBrandText === "string" ? { headerBrandText: patch.headerBrandText } : {}),
-      });
-    }
-    if (blockKey === "header-navigation" && Array.isArray(patch.items)) {
-      updateShellSettings({
-        menuItems: patch.items.map((label, index) => ({
-          ...(shellSettings.menuItems[index] ?? {
-            id: `header-menu-${Date.now().toString(36)}-${index}`,
-            url: "/",
-          }),
-          label,
-        })),
-      });
-    }
-    if (blockKey === "header-button" || blockKey === "starter-header-button") {
-      updateShellSettings({
-        ...(typeof patch.buttonLabel === "string" ? { headerButtonLabel: patch.buttonLabel } : {}),
-        ...(typeof patch.buttonUrl === "string" ? { headerButtonUrl: patch.buttonUrl } : {}),
-      });
-    }
-  };
-
-  const syncHeaderDocumentToShell = (state: BuilderState) => {
-    if (state.page !== "header") return;
-    const blocks = state.sections.flatMap((section) =>
-      (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
-    );
-    const logo = blocks.find((block) => block.id === "header-logo" || block.kind === "image");
-    const navigation = blocks.find((block) => block.id === "header-navigation" || block.kind === "menu");
-    const button = blocks.find((block) => block.id === "header-button" || block.id === "starter-header-button" || block.kind === "button");
-    updateShellSettings({
-      ...(logo
-        ? {
-            headerLogoUrl: logo.imageUrl || null,
-            headerLogoAlt: logo.imageAlt ?? shellSettings.headerLogoAlt,
-            headerLogoMaxWidth: logo.imageMaxWidth ?? shellSettings.headerLogoMaxWidth,
-            headerBrandMode: logo.headerBrandMode ?? shellSettings.headerBrandMode,
-            headerBrandText: logo.headerBrandText ?? shellSettings.headerBrandText,
-          }
-        : {}),
-      ...(navigation?.items
-        ? {
-            menuItems: navigation.items.map((label, index) => ({
-              ...(shellSettings.menuItems[index] ?? {
-                id: `header-menu-${Date.now().toString(36)}-${index}`,
-                url: "/",
-              }),
-              label,
-            })),
-          }
-        : {}),
-      ...(button
-        ? {
-            headerButtonLabel: button.buttonLabel ?? shellSettings.headerButtonLabel,
-            headerButtonUrl: button.buttonUrl ?? shellSettings.headerButtonUrl,
-          }
-        : {}),
-    });
   };
 
   const updateLayoutBlockByKey = (
@@ -4647,8 +4696,6 @@ export default function DashboardBuilder({
           ),
         }
       : patch;
-
-    syncHeaderBlockPatch(blockKey, canonicalPatch);
 
     setBuilderState((current) => ({
       ...current,
@@ -5540,7 +5587,7 @@ export default function DashboardBuilder({
         if (!href || href === "#" || href.startsWith("mailto:") || href.startsWith("tel:")) return;
         if (handleScopedBuilderNavigate(href)) return;
         const page = getBuilderPageKeyForHref(href, scopedPreviewPages);
-        if (page) switchBuilderTarget(page);
+        if (page) void switchBuilderTargetFromNavigation(page);
         return;
       }
       if (event.data.type === "exit-shell") {
@@ -5561,7 +5608,7 @@ export default function DashboardBuilder({
               ? "footer"
               : null
         : null;
-      if (shell) {
+      if (shell && builderState.page !== shell) {
         pendingIframeShellTargetRef.current = { shell, target };
         void enterShellEdit(shell);
         return;
@@ -5587,7 +5634,14 @@ export default function DashboardBuilder({
     };
     window.addEventListener("message", handleIframeSelection);
     return () => window.removeEventListener("message", handleIframeSelection);
-  }, [builderState.sections, handleScopedBuilderNavigate, iframeComparisonMode, iframeDiagnosticMode, scopedPreviewPages]);
+  }, [
+    builderState.sections,
+    handleScopedBuilderNavigate,
+    iframeComparisonMode,
+    iframeDiagnosticMode,
+    scopedPreviewPages,
+    switchBuilderTargetFromNavigation,
+  ]);
 
   useEffect(() => {
     if (iframeComparisonMode) sendSelectionToIframe();
@@ -5623,6 +5677,27 @@ export default function DashboardBuilder({
       loadDraftForKey(shellType, storageKeys),
       shellSettings,
     );
+
+    if (shellType === "header" && !headerDocumentPreviewState) {
+      // Header entry must be anchored to the persisted document. A local draft
+      // can belong to an older saved revision and would otherwise resurrect
+      // deleted blocks or reintroduce stale layout/design values after refresh.
+      try {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "header" }), {
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as { layout?: BuilderState | null };
+        if (response.ok && payload.layout?.sections?.length) {
+          nextState = hydrateDocumentBuilderState(
+            normalizeBuilderState(payload.layout, "header"),
+            shellSettings,
+          );
+          setHeaderDocumentPreviewState(nextState);
+        }
+      } catch {
+        // Keep the local draft fallback when the persisted Header cannot load.
+      }
+    }
     // A newly-created website can have an empty Header document.  Seed it
     // with the canonical minimal Header preset on first entry so owners can
     // immediately add/edit rows, while retaining any authored header that
@@ -6017,10 +6092,11 @@ export default function DashboardBuilder({
       currentHeaderSections = headerDocumentPreviewState.sections;
     }
 
-    const mergedSections = mergeBrandingIntoPreset(
+    const brandedSections = mergeBrandingIntoPreset(
       currentHeaderSections,
       preset.sections
     );
+    const mergedSections = brandedSections;
 
     if (mergedSections.length > 0) {
       const currentSettings = resolveHeaderDocumentSettings(
@@ -6158,10 +6234,6 @@ export default function DashboardBuilder({
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
     const targetBlock = blocks[blockIndex] ?? {};
-    syncHeaderBlockPatch(
-      targetBlock.id ?? `${item.id ?? `layout-item-${columnIndex}`}-block-${blockIndex}`,
-      nextPatch,
-    );
     blocks[blockIndex] = applyContentPatch(
       targetBlock,
       nextPatch,
@@ -8118,8 +8190,6 @@ export default function DashboardBuilder({
     const nextState = structuredClone(history[history.length - 1]);
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
-    syncHeaderDocumentToShell(nextState);
-
     setPublishStatus("Undid last change");
   };
   undoRef.current = undoBuilder;
@@ -8136,7 +8206,6 @@ export default function DashboardBuilder({
     undoHistoryRef.current.push(structuredClone(nextState));
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
-    syncHeaderDocumentToShell(nextState);
     setPublishStatus("Redid last change");
   };
   redoRef.current = redoBuilder;
@@ -12120,6 +12189,7 @@ export default function DashboardBuilder({
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
                     headerComposition={currentHeaderComposition}
+                    builderPreviewMode={true}
                     scrollState={builderHeaderScrollState}
                     publicAnchorId={builderState.sections.find((section) => section.id === "header-document")?.anchorId}
                     activeContentLanguage={contentLanguage}
@@ -12145,28 +12215,14 @@ export default function DashboardBuilder({
                           data-header-element={element.type}
                           onClickCapture={(event) => {
                             const target = event.target as HTMLElement;
-                            // Authored Header links retain normal one-click
-                            // navigation. Selection belongs to empty/content
-                            // space; the scoped Builder router owns anchors.
-                            if (target.closest("a[href]")) return;
-                            if (
-                              target.closest(".builder-preview-block-tools") ||
-                              !target.closest("a, button, [role='button']")
-                            ) {
-                              return;
-                            }
-                            // Capture before Next/Link or live Header controls
-                            // run their own handlers. In the Builder these are
-                            // editable content, not navigation.
+                            // A Header element is an ordinary Builder block.
+                            // Capture every canvas click before authored links
+                            // or live controls can route/select the document;
+                            // the inspector should follow the clicked element.
+                            if (target.closest(".builder-preview-block-tools")) return;
                             event.preventDefault();
                             event.stopPropagation();
-                            if (selectedLayoutBlockKey !== element.id) {
-                              selectLayoutBlock(
-                                "header-document",
-                                columnId,
-                                element.id,
-                              );
-                            }
+                            selectLayoutBlock("header-document", columnId, element.id, true);
                           }}
                           onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
@@ -12179,7 +12235,7 @@ export default function DashboardBuilder({
                             }
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
-                              selectLayoutBlock("header-document", columnId, element.id);
+                              selectLayoutBlock("header-document", columnId, element.id, true);
                             }
                           }}
                           onClick={(event) => {
@@ -12191,7 +12247,7 @@ export default function DashboardBuilder({
                             event.preventDefault();
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
-                              selectLayoutBlock("header-document", columnId, element.id);
+                              selectLayoutBlock("header-document", columnId, element.id, true);
                             }
                           }}
                           onDragStart={(event) => {
@@ -12425,6 +12481,7 @@ export default function DashboardBuilder({
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
                     headerComposition={currentHeaderComposition}
+                    builderPreviewMode={true}
                     scrollState={builderHeaderScrollState}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
@@ -18448,7 +18505,8 @@ const PreviewSection = memo(function PreviewSection({
                               !block.imageUrl ||
                               !block.imageUrl.trim();
                             const panelMetaStyleName = String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase();
-                            const panelMetaIsHeading = /^h[1-6]$/.test(panelMetaStyleName);
+                            const panelMetaIsHeading = /^(?:h[1-6]|heading-h[1-6])$/.test(panelMetaStyleName);
+                            const panelMetaHasExplicitMargin = (block as any).metaMarginTop !== undefined;
 
                             const panelTitleStyle = {
                               color: "var(--builder-card-title-color, inherit)",
@@ -18468,7 +18526,9 @@ const PreviewSection = memo(function PreviewSection({
                                 : undefined,
                               textTransform:
                                 "var(--builder-card-meta-transform, none)" as React.CSSProperties["textTransform"],
-                              marginTop: /^h[1-6]$/.test(String((block as any).metaStyle ?? "").replace(/^uk-/, "").toLowerCase())
+                              marginTop: panelMetaHasExplicitMargin
+                                ? undefined
+                                : panelMetaIsHeading
                                 ? "var(--builder-card-meta-spacing, var(--uk-global-margin, 20px))"
                                 : "var(--builder-card-meta-spacing, 0)",
                             } as React.CSSProperties;
@@ -18504,13 +18564,22 @@ const PreviewSection = memo(function PreviewSection({
                               (block as any).imageInverse === true ? "uk-light" : "",
                             ].filter(Boolean).join(" ");
                             const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)).replace(/\buk-margin-remove-top\b/g, "").trim() : "";
+                            const panelTitleDecorationClass = block.titleDecoration && block.titleDecoration !== "none" ? `uk-heading-${block.titleDecoration}` : "";
+                            const panelTitleColorClass = block.titleColor && !["none", "default", "inherit"].includes(block.titleColor)
+                              ? (block.titleColor.startsWith("uk-text-") ? block.titleColor : `uk-text-${block.titleColor}`)
+                              : "";
+                            const panelTitleHoverClass = block.panelTitleHoverStyle === "heading-link" ? "uk-link-heading" : block.panelTitleHoverStyle === "default-link" ? "uk-link" : "";
+                            const panelTitleGridWidth = ({ expand: "100%", "5-6": "80%", "3-4": "75%", "2-3": "66.6667%", "3-5": "60%", "1-2": "50%", "2-5": "40%", "1-3": "33.3333%", "1-4": "25%", "1-5": "20%" } as Record<string, string>)[String(block.panelTitleGridWidth ?? "")] ?? (/^\d+%$/.test(String(block.panelTitleGridWidth ?? "")) ? String(block.panelTitleGridWidth) : undefined);
+                            const panelTitleLayoutStyle = block.panelShowMedia !== false && panelTitleGridWidth
+                              ? { width: panelTitleGridWidth, maxWidth: panelTitleGridWidth, ...(block.panelTitleAlign === "left" ? { marginLeft: 0, marginRight: "auto" } : {}) }
+                              : {};
                             const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
                             const panelAnimationClass = (block.animation && typeof block.animation === "string" && block.animation !== "none") ? `uk-animation-${block.animation}` : "";
                             const panelVisibilityClass = ((block as any).visibility && (block as any).visibility !== "always") ? `uk-${(block as any).visibility}` : "";
                             const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
                             const panelMeta = block.eyebrow ? (
                               <InlineEditableText
-                                as="span"
+                                as={((block as any).panelMetaHtmlElement ?? "div") as any}
                                 area="eyebrow"
                                 className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)} ${getUikitMarginClass((block as any).metaMarginTop)}`}
                                 typography={panelMetaIsHeading ? undefined : block.typography}
@@ -18632,10 +18701,10 @@ const PreviewSection = memo(function PreviewSection({
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
+                                        className={`shop-builder-title ${panelTitleClass} ${panelTitleDecorationClass} ${panelTitleColorClass} ${panelTitleHoverClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
                                         area="title"
                                         typography={undefined}
-                                        style={panelTitleStyle}
+                                        style={{ ...panelTitleStyle, ...panelTitleLayoutStyle }}
                                       >
                                         <TypewriterText
                                           text={block.title}
@@ -18692,10 +18761,10 @@ const PreviewSection = memo(function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
+                                        className={`shop-builder-title ${panelTitleClass} ${panelTitleDecorationClass} ${panelTitleColorClass} ${panelTitleHoverClass} ${typographyRoleClass(block.titleTypographyRole)} ${getUikitMarginClass((block as any).titleMarginTop)}`.trim()}
                                         area="title"
                                         typography={undefined}
-                                        style={panelTitleStyle}
+                                        style={{ ...panelTitleStyle, ...panelTitleLayoutStyle }}
                                         value={block.title}
                                         onChange={(title) =>
                                           onUpdateBlock(

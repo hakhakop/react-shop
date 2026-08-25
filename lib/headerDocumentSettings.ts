@@ -12,6 +12,25 @@ export type ResolvedHeaderDocumentSettings = {
   widthMode: BuilderShellSettings["headerWidthMode"];
   backgroundMode: BuilderShellSettings["headerBackgroundMode"];
   textMode: BuilderShellSettings["headerTextMode"];
+  breakpoint: string | undefined;
+  mobileBreakpoint: string | undefined;
+  stickyShowOnUp: boolean;
+  stickyAnimation: string | undefined;
+  dropdownAlign: "left" | "right" | "center" | undefined;
+  dropdownAlignToNavbar: boolean;
+  dropbarEnabled: boolean;
+  parentIconEnabled: boolean;
+  clickModeEnabled: boolean;
+  dialogTogglePosition: string | undefined;
+  dialogLayout: string | undefined;
+  dialogCenter: boolean;
+  dialogPushAfter: number | undefined;
+  searchPosition: string | undefined;
+  searchLayout: string | undefined;
+  socialPosition: string | undefined;
+  mobileLogoUrl: string | null | undefined;
+  inverseLogoUrl: string | null | undefined;
+  mobileComposition: "separate" | "responsive" | undefined;
   zIndex: number;
   topToolbarVisible: boolean;
   topToolbarText: string;
@@ -31,6 +50,25 @@ type HeaderSettingsFallback = Partial<Pick<
   | "headerWidthMode"
   | "headerBackgroundMode"
   | "headerTextMode"
+  | "headerBreakpoint"
+  | "headerMobileBreakpoint"
+  | "headerStickyShowOnUp"
+  | "headerStickyAnimation"
+  | "headerDropdownAlign"
+  | "headerDropdownAlignToNavbar"
+  | "headerDropbarEnabled"
+  | "headerParentIconEnabled"
+  | "headerClickModeEnabled"
+  | "headerDialogTogglePosition"
+  | "headerDialogLayout"
+  | "headerDialogCenter"
+  | "headerDialogPushAfter"
+  | "headerSearchPosition"
+  | "headerSearchLayout"
+  | "headerSocialPosition"
+  | "headerMobileLogoUrl"
+  | "headerInverseLogoUrl"
+  | "headerMobileComposition"
   | "headerZIndex"
   | "topToolbarVisible"
   | "topToolbarText"
@@ -56,6 +94,25 @@ export function resolveHeaderDocumentSettings(
     | "documentWidthMode"
     | "documentBackgroundMode"
     | "documentTextMode"
+    | "documentBreakpoint"
+    | "documentMobileBreakpoint"
+    | "documentStickyShowOnUp"
+    | "documentStickyAnimation"
+    | "documentDropdownAlign"
+    | "documentDropdownAlignToNavbar"
+    | "documentDropbarEnabled"
+    | "documentParentIconEnabled"
+    | "documentClickModeEnabled"
+    | "documentDialogTogglePosition"
+    | "documentDialogLayout"
+    | "documentDialogCenter"
+    | "documentDialogPushAfter"
+    | "documentSearchPosition"
+    | "documentSearchLayout"
+    | "documentSocialPosition"
+    | "documentMobileLogoUrl"
+    | "documentInverseLogoUrl"
+    | "documentMobileComposition"
     | "documentZIndex"
     | "documentTopToolbarVisible"
     | "documentTopToolbarText"
@@ -76,6 +133,28 @@ export function resolveHeaderDocumentSettings(
     widthMode: composition.documentWidthMode ?? fallback.headerWidthMode ?? "boxed",
     backgroundMode: composition.documentBackgroundMode ?? fallback.headerBackgroundMode ?? "default",
     textMode: composition.documentTextMode ?? fallback.headerTextMode ?? "auto",
+    breakpoint: composition.documentBreakpoint ?? fallback.headerBreakpoint,
+    mobileBreakpoint: composition.documentMobileBreakpoint ?? fallback.headerMobileBreakpoint,
+    // YOOtheme's live Circle header uses show-on-up with a slide-top
+    // transition. Keep this as the compatibility default for legacy Header
+    // documents; an explicit document value still wins.
+    stickyShowOnUp: composition.documentStickyShowOnUp ?? fallback.headerStickyShowOnUp ?? true,
+    stickyAnimation: composition.documentStickyAnimation ?? fallback.headerStickyAnimation ?? "slide-top",
+    dropdownAlign: composition.documentDropdownAlign ?? fallback.headerDropdownAlign,
+    dropdownAlignToNavbar: composition.documentDropdownAlignToNavbar ?? fallback.headerDropdownAlignToNavbar ?? false,
+    dropbarEnabled: composition.documentDropbarEnabled ?? fallback.headerDropbarEnabled ?? false,
+    parentIconEnabled: composition.documentParentIconEnabled ?? fallback.headerParentIconEnabled ?? false,
+    clickModeEnabled: composition.documentClickModeEnabled ?? fallback.headerClickModeEnabled ?? false,
+    dialogTogglePosition: composition.documentDialogTogglePosition ?? fallback.headerDialogTogglePosition,
+    dialogLayout: composition.documentDialogLayout ?? fallback.headerDialogLayout,
+    dialogCenter: composition.documentDialogCenter ?? fallback.headerDialogCenter ?? false,
+    dialogPushAfter: composition.documentDialogPushAfter ?? fallback.headerDialogPushAfter,
+    searchPosition: composition.documentSearchPosition ?? fallback.headerSearchPosition,
+    searchLayout: composition.documentSearchLayout ?? fallback.headerSearchLayout,
+    socialPosition: composition.documentSocialPosition ?? fallback.headerSocialPosition,
+    mobileLogoUrl: composition.documentMobileLogoUrl ?? fallback.headerMobileLogoUrl,
+    inverseLogoUrl: composition.documentInverseLogoUrl ?? fallback.headerInverseLogoUrl,
+    mobileComposition: composition.documentMobileComposition ?? fallback.headerMobileComposition,
     zIndex: composition.documentZIndex ?? fallback.headerZIndex ?? 40,
     topToolbarVisible: composition.documentTopToolbarVisible ?? fallback.topToolbarVisible ?? true,
     topToolbarText: composition.documentTopToolbarText ?? fallback.topToolbarText ?? "",

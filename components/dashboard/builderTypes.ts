@@ -56,6 +56,8 @@ export type MenuPresentationSettings = {
   icon: string | null;
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
+  submenuWidth: string | null;
+  mobileAccordion: boolean;
   badgeText: string | null;
 };
 export type SectionKind =
@@ -531,7 +533,7 @@ export type BuilderLayoutBlock = {
   imageSvgInline?: boolean;
   imageSvgAnimate?: boolean;
   imageSvgColor?: string;
-  gridMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
+  gridMetaHtmlElement?: string;
   imageLinkUrl?: string;
   /** YOOtheme Panel image-link toggle; uses the Panel link URL. */
   linkImage?: boolean;
@@ -569,10 +571,19 @@ export type BuilderLayoutBlock = {
   gridContentColumn?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";
   gridContentColumnDivider?: boolean;
   gridContentColumnBreakpoint?: "always" | "s" | "m" | "l" | "xl";
-  panelMetaHtmlElement?: "div" | "span" | "p";
+  panelMetaHtmlElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   panelVerticalAlign?: "top" | "center" | "bottom";
   panelTitleElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   panelTitleStyle?: string;
+  titleDecoration?: string;
+  titleColor?: string;
+  linkTitle?: boolean;
+  panelTitleHoverStyle?: "none" | "heading-link" | "default-link";
+  panelTitleAlign?: "top" | "left";
+  panelTitleGridWidth?: string;
+  panelTitleGridBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  panelTitleGridColumnGap?: "small" | "medium" | "default" | "large" | "none";
+  panelTitleGridRowGap?: "small" | "medium" | "default" | "large" | "none";
   titleMarginTop?: string;
   metaMarginTop?: string;
   contentMarginTop?: string;
@@ -631,11 +642,19 @@ export type BuilderLayoutBlock = {
   menuHoverColor?: string;
   menuActiveColor?: string;
   menuActiveIndicator?: BuilderHeaderActiveIndicator;
+  menuHoverVariant?: "none" | "line" | "glow" | "line-glow";
+  menuHoverLine?: "none" | "top" | "bottom" | "left" | "right";
+  menuDropdownIndicator?: "none" | "chevron";
+  menuDividerMode?: "none" | "partial" | "all";
   headerNavigationOverrides?: {
     gap?: boolean;
     hoverColor?: boolean;
     activeColor?: boolean;
     indicator?: boolean;
+    hoverVariant?: boolean;
+    hoverLine?: boolean;
+    dropdownIndicator?: boolean;
+    divider?: boolean;
     typography?: boolean;
   };
   headerBrandMode?: BuilderHeaderBrandMode;
@@ -943,6 +962,25 @@ export type BuilderSection = {
   headerBackgroundMode?: "default" | "glass" | "accent" | "none";
   headerTextMode?: "auto" | "light" | "dark";
   headerZIndex?: number;
+  headerBreakpoint?: string;
+  headerMobileBreakpoint?: string;
+  headerStickyShowOnUp?: boolean;
+  headerStickyAnimation?: string;
+  headerDropdownAlign?: "left" | "right" | "center";
+  headerDropdownAlignToNavbar?: boolean;
+  headerDropbarEnabled?: boolean;
+  headerParentIconEnabled?: boolean;
+  headerClickModeEnabled?: boolean;
+  headerDialogTogglePosition?: string;
+  headerDialogLayout?: string;
+  headerDialogCenter?: boolean;
+  headerDialogPushAfter?: number;
+  headerSearchPosition?: string;
+  headerSearchLayout?: string;
+  headerSocialPosition?: string;
+  headerMobileLogoUrl?: string | null;
+  headerInverseLogoUrl?: string | null;
+  headerMobileComposition?: "separate" | "responsive";
   headerTopToolbarVisible?: boolean;
   headerTopToolbarText?: string;
   headerTopToolbarPhone?: string;

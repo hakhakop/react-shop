@@ -96,6 +96,45 @@ test("imported inverse Button LESS tokens reach the shared runtime token owner",
   });
 });
 
+test("imported Nav and Navbar LESS tokens remain global UIkit variables", () => {
+  const imported = resolveYoothemeLess([{
+    name: "circle-nav-navbar.less",
+    precedence: 1,
+    content: `
+      @nav-large-font-size: 3.4rem;
+      @nav-large-font-size-l: 6rem;
+      @nav-header-font-size: 13px;
+      @navbar-padding-top: 4px;
+      @navbar-padding-bottom: 6px;
+      @navbar-parent-icon-margin-left: .25em;
+      @navbar-dropdown-nav-item-padding-horizontal: 15px;
+      @navbar-dropdown-dropbar-large-padding-top: 40px;
+    `,
+  }]);
+
+  expect(imported.shellSettings).toMatchObject({
+    navLargeFontSize: "3.4rem",
+    navLargeFontSizeL: "6rem",
+    navHeaderFontSize: "13px",
+    navbarPaddingTop: "4px",
+    navbarPaddingBottom: "6px",
+    navbarParentIconMarginLeft: ".25em",
+    navbarDropdownNavItemPaddingHorizontal: "15px",
+    navbarDropdownDropbarLargePaddingTop: "40px",
+  });
+
+  expect(getUikitGlobalsCssVars(imported.shellSettings)).toMatchObject({
+    "--uk-nav-large-font-size": "3.4rem",
+    "--uk-nav-large-font-size-l": "6rem",
+    "--uk-nav-header-font-size": "13px",
+    "--uk-navbar-padding-top": "4px",
+    "--uk-navbar-padding-bottom": "6px",
+    "--uk-navbar-parent-icon-margin-left": ".25em",
+    "--uk-navbar-dropdown-nav-item-padding-horizontal": "15px",
+    "--uk-navbar-dropdown-dropbar-large-padding-top": "40px",
+  });
+});
+
 test("YOOtheme Button token absence inherits imported global semantics instead of WebPages defaults", () => {
   const imported = resolveYoothemeLess([{
     name: "button-inheritance.less",

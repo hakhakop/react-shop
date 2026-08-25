@@ -182,6 +182,7 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   navbarNavItemLineActiveHeight: "0",
   navbarNavItemLineOpacity: "1",
   navbarNavItemLineGradient: "none",
+  navbarDropdownIndicator: "none",
   navbarDropdownMargin: "15px",
   navbarDropdownShiftMargin: "0",
   navbarDropdownWidth: "auto",

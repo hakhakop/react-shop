@@ -8,6 +8,7 @@ import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
+import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
 
 export const metadata = {
   title: "Root Website Builder",
@@ -55,15 +56,27 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ? requestedTargetValue[0] ?? "home"
     : requestedTargetValue;
   const initialPage = normalizeBuilderLayoutKey(requestedTarget);
+  const contextTargetValue = resolvedSearchParams?.context ?? "home";
+  const contextTarget = Array.isArray(contextTargetValue)
+    ? contextTargetValue[0] ?? "home"
+    : contextTargetValue;
+  const requestedContextPage = normalizeBuilderLayoutKey(contextTarget);
+  // A direct Header/Footer URL must hydrate the active document itself. The
+  // context page is only the locked preview canvas; using it as the authored
+  // Builder state lets an older page draft overwrite the shell after refresh.
+  const initialHydrationPage =
+    initialPage === "header" || initialPage === "footer"
+      ? initialPage
+      : resolveInitialBuilderHydrationPage(initialPage, requestedContextPage);
   const hasStrictDocumentTarget = Boolean(
     resolvedSearchParams?.document ||
     resolvedSearchParams?.routingTemplate ||
     resolvedSearchParams?.individual,
   );
   const initialPageHydration =
-    !hasStrictDocumentTarget && initialPage !== "header" && initialPage !== "footer"
+    !hasStrictDocumentTarget
       ? await resolveInitialBuilderPage({
-          page: initialPage,
+          page: initialHydrationPage,
           contentLanguage: ["hy", "en", "ru"].includes(
             cookieStore.get("website_content_language_root")?.value as never,
           )

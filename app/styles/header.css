@@ -61,6 +61,55 @@
   -webkit-backdrop-filter: none !important;
 }
 
+/* Builder canvases must keep the Header available for selection. A stale
+   storefront scroll state must never move it outside the preview viewport. */
+.site-header.site-header--builder-preview.site-header--scroll-hidden,
+.site-header[data-builder-preview="true"].site-header--scroll-hidden {
+  transform: none !important;
+  pointer-events: auto !important;
+  position: sticky !important;
+  top: 0 !important;
+  visibility: visible !important;
+  background: var(--header-bg, rgba(255, 255, 255, 0.92)) !important;
+  backdrop-filter: var(--uk-navbar-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--uk-navbar-backdrop-filter) !important;
+}
+
+/* Keep the editor preview navbar on one line at narrower iframe widths.
+   If it wraps, the fixed header row vertically centers a multi-row nav and
+   part of the menu is positioned above the preview viewport. */
+.site-header.site-header--builder-preview .site-header-nav {
+  flex-wrap: nowrap;
+  gap: clamp(0.4rem, 0.5vw, var(--header-builder-menu-gap, 1.4rem));
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  align-items: stretch;
+}
+
+.site-header.site-header--builder-preview .site-header-nav-item {
+  flex: 0 0 auto;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  justify-content: center;
+}
+
+.site-header.site-header--builder-preview .site-header-nav-link {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Overlay/boxed Header documents can intentionally be shorter than the
+   imported 90px navbar token. Let their links use natural height instead of
+   vertically centering a 90px nav inside a compact row. */
+.site-header.site-header--builder-preview.site-header--builder-overlay .site-header-nav,
+.site-header.site-header--builder-preview.site-header--builder-overlay .site-header-nav-item,
+.site-header.site-header--builder-preview.site-header--builder-overlay .site-header-nav-link {
+  height: auto;
+}
+
 .site-header[data-header-behavior="static"] {
   position: relative;
   top: auto;
@@ -1146,6 +1195,49 @@ html.dark .site-header {
   width: auto;
 }
 
+/* Header documents may provide an inverse logo for transparent/light surfaces.
+   The active text mode owns which asset is visible; the document only owns the
+   asset identity, so this never copies theme colors into the header. */
+.site-header-logo-img-wrap .site-header-logo-inverse {
+  display: none;
+}
+
+.site-header-logo-primary {
+  display: block;
+}
+
+.site-header-logo-img-wrap .site-header-logo-mobile {
+  display: none;
+}
+
+.site-header[data-header-text-mode="light"] .site-header-logo-primary {
+  display: none;
+}
+
+.site-header[data-header-text-mode="light"] .site-header-logo-img-wrap > .site-header-logo-inverse {
+  display: block;
+}
+
+.site-header[data-header-text-mode="light"] .site-header-logo-img-wrap > img:not(.site-header-logo-inverse) {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .site-header-logo-img-wrap > .site-header-logo-primary,
+  .site-header-logo-img-wrap > img.site-header-logo-inverse {
+    display: none !important;
+  }
+
+  .site-header-logo-img-wrap > img.site-header-logo-mobile {
+    display: block !important;
+  }
+
+  .site-header-logo-img-wrap > img.site-header-logo-inverse,
+  .site-header-logo-img-wrap > img:not(.site-header-logo-mobile) {
+    display: none !important;
+  }
+}
+
 
 .site-header-brand {
   font-size: 1.0rem;
@@ -1260,6 +1352,53 @@ html.dark .site-header {
   line-height: 0;
   color: inherit;
   flex: 0 0 auto;
+}
+
+/* Canonical menu item metadata used by YOOtheme-style mega menus. */
+.site-header-nav-submenu .site-header-nav-link {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.site-header-nav-label {
+  min-width: 0;
+}
+
+.site-header-nav-subtitle {
+  flex-basis: 100%;
+  margin-left: 1.8rem;
+  color: var(--uk-navbar-dropdown-nav-subtitle-color, var(--text-muted, #64748b));
+  font-size: var(--uk-navbar-dropdown-nav-subtitle-font-size, 14px);
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.site-header-nav-mobile-parent-link {
+  margin-bottom: 0.25rem;
+}
+
+/* UIkit's navbar parent icon is a 12px down chevron with a 4px label gap.
+ * It flips while the associated dropdown branch is open/hovered. */
+.site-header-nav-item.has-children > .site-header-nav-link:has(.site-header-nav-parent-icon) {
+  gap: 0;
+}
+
+.site-header-nav-item.has-children > .site-header-nav-link:has(.site-header-nav-parent-icon) > .site-header-nav-icon {
+  margin-right: 0.4rem;
+}
+
+.site-header-nav-item.has-children > .site-header-nav-link:has(.site-header-nav-parent-icon) > .site-header-nav-badge {
+  margin-left: 0.4rem;
+}
+
+.site-header-nav-parent-icon {
+  margin-left: 4px;
+  transition: transform 0.3s ease-out;
+}
+
+.site-header-nav-item.has-children:hover > .site-header-nav-link .site-header-nav-parent-icon,
+.site-header-nav-item.has-children:focus-within > .site-header-nav-link .site-header-nav-parent-icon {
+  transform: rotateX(180deg);
 }
 
 .uikit-icon {
@@ -1394,7 +1533,8 @@ html.dark .site-header {
 }
 
 .site-header-nav-item:hover > .site-header-nav-submenu,
-.site-header-nav-item:focus-within > .site-header-nav-submenu {
+.site-header-nav-item:focus-within > .site-header-nav-submenu,
+.site-header-nav-item.is-open > .site-header-nav-submenu {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -1429,8 +1569,11 @@ html.dark .site-header {
   transform: scaleX(1);
 }
 
-.site-header--indicator-none .site-header-nav-link::after {
-  display: none;
+.site-header--indicator-none .site-header-nav-link.is-active::after,
+.site-header--indicator-none .site-header-nav-link[aria-current="page"]::after,
+.site-header--indicator-none .site-header-nav-link[data-active="true"]::after {
+  opacity: 0;
+  transform: scaleX(0);
 }
 
 .site-header--indicator-princity .site-header-nav-link::after {
@@ -3171,6 +3314,15 @@ body[data-storefront-preset="princity"] .category-mega-card,
   display: none !important;
 }
 
+/* The responsive drawer is rendered alongside the desktop tree so it can
+   animate without remounting. Keep that inactive duplicate completely out of
+   hit-testing until the responsive container explicitly opens it. */
+.site-header-mobile-drawer-backdrop,
+.site-header-mobile-drawer-wrapper {
+  pointer-events: none;
+  visibility: hidden;
+}
+
 @container site-header-container (max-width: 640px) {
   .site-header {
     z-index: 100000 !important;
@@ -4185,6 +4337,24 @@ body[data-storefront-preset="princity"] .category-mega-card,
     box-shadow: var(--uk-navbar-nav-item-hover-box-shadow, none);
   }
 
+  /* Header-document hover variants only select which imported UIkit effects
+     participate. The effect values themselves remain tenant/global tokens. */
+  .site-header.site-header--nav-hover-none
+    .header-builder-element--navigation .site-header-nav-link:hover,
+  .site-header.site-header--nav-hover-line
+    .header-builder-element--navigation .site-header-nav-link:hover {
+    background: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .site-header.site-header--nav-hover-none
+    .header-builder-element--navigation .site-header-nav-link:hover::after,
+  .site-header.site-header--nav-hover-glow
+    .header-builder-element--navigation .site-header-nav-link:hover::after {
+    display: none !important;
+  }
+
   .site-header[data-header-text-mode="dark"] .header-builder-element--navigation .site-header-nav-link:hover {
     color: var(--header-builder-menu-hover, var(--uk-navbar-nav-item-hover-color, rgba(15, 23, 42, 1))) !important;
   }
@@ -4292,6 +4462,57 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header.site-header--indicator-underline.site-header--navbar-line-slide-right
     .header-builder-element--navigation .site-header-nav-link::after {
     transform-origin: right center;
+  }
+
+  /* Hover-line presentation is independent from the active-item indicator.
+     Princity intentionally retains its own text-gradient interaction. */
+  .site-header.site-header--navbar-line-mode-enabled:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link:hover::after {
+    display: block;
+    height: var(--uk-navbar-nav-item-line-hover-height, var(--uk-navbar-nav-item-line-height, 2px));
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .site-header.site-header--navbar-line-mode-disabled
+    .header-builder-element--navigation .site-header-nav-link::after {
+    display: none;
+  }
+
+  .site-header.site-header--navbar-line-position-top:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link::after {
+    top: 0;
+    bottom: auto;
+  }
+
+  .site-header.site-header--navbar-line-position-left:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link::after,
+  .site-header.site-header--navbar-line-position-right:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link::after {
+    top: 0;
+    bottom: 0;
+    width: var(--uk-navbar-nav-item-line-height, 2px);
+    height: auto;
+    transform: scaleY(0);
+  }
+
+  .site-header.site-header--navbar-line-position-left:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link::after {
+    left: 0;
+    right: auto;
+  }
+
+  .site-header.site-header--navbar-line-position-right:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link::after {
+    left: auto;
+    right: 0;
+  }
+
+  .site-header.site-header--navbar-line-mode-enabled.site-header--navbar-line-position-left:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link:hover::after,
+  .site-header.site-header--navbar-line-mode-enabled.site-header--navbar-line-position-right:not(.site-header--indicator-princity)
+    .header-builder-element--navigation .site-header-nav-link:hover::after {
+    transform: scaleY(1);
   }
 
   .site-header .header-builder-element--navigation[style*="--header-builder-menu-hover"] .site-header-nav-link:hover {
@@ -4451,13 +4672,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
     a:hover {
   color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.18) !important;
-}
-
-/* The shared navbar has no hover underline. Keep the active indicator intact
-   for links explicitly marked active. */
-.site-header .site-header-nav-link:not(.is-active):not([aria-current="page"]):not([data-active="true"]):hover::after {
-  opacity: 0 !important;
-  transform: scaleX(0) !important;
 }
 
 /* Override the desktop surface rule for the legacy shell: the inner main row

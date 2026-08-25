@@ -67,6 +67,7 @@ export function TitleSettingsGroup({
   showDecoration = false,
   showColor = false,
   showLink = false,
+  showPanelLayout = false,
   defaultSize = "medium",
   defaultLevel = "h2",
   visualPresetOptions,
@@ -91,6 +92,7 @@ export function TitleSettingsGroup({
   showDecoration?: boolean;
   showColor?: boolean;
   showLink?: boolean;
+  showPanelLayout?: boolean;
   defaultSize?: string;
   defaultLevel?: string;
   visualPresetOptions?: Array<{ value: string; label: string }>;
@@ -218,6 +220,27 @@ export function TitleSettingsGroup({
         </InspectorFieldRow>
       )}
 
+      {showPanelLayout && <>
+        <InspectorFieldRow label="Hover Style" isOverridden={values.panelTitleHoverStyle !== undefined} inheritedValueText="None" onReset={() => update({ panelTitleHoverStyle: undefined })}>
+          <InspectorSelect value={String(values.panelTitleHoverStyle ?? "none")} options={[{ value: "none", label: "None" }, { value: "heading-link", label: "Heading Link" }, { value: "default-link", label: "Default Link" }]} onChange={(value) => update({ panelTitleHoverStyle: value })} ariaLabel="Panel title hover style" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Alignment" isOverridden={values.panelTitleAlign !== undefined} inheritedValueText="Top" onReset={() => update({ panelTitleAlign: undefined })}>
+          <InspectorSelect value={String(values.panelTitleAlign ?? "top")} options={[{ value: "top", label: "Top" }, { value: "left", label: "Left" }]} onChange={(value) => update({ panelTitleAlign: value })} ariaLabel="Panel title alignment" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Grid Width" isOverridden={values.panelTitleGridWidth !== undefined} inheritedValueText="Auto" onReset={() => update({ panelTitleGridWidth: undefined })}>
+          <InspectorSelect value={String(values.panelTitleGridWidth ?? "auto")} options={[{ value: "auto", label: "Auto" }, { value: "expand", label: "Expand" }, { value: "80%", label: "80%" }, { value: "75%", label: "75%" }, { value: "66%", label: "66%" }, { value: "60%", label: "60%" }, { value: "50%", label: "50%" }, { value: "40%", label: "40%" }, { value: "33%", label: "33%" }, { value: "25%", label: "25%" }, { value: "20%", label: "20%" }]} onChange={(value) => update({ panelTitleGridWidth: value === "auto" ? undefined : value })} ariaLabel="Panel title grid width" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Grid Breakpoint" isOverridden={values.panelTitleGridBreakpoint !== undefined} inheritedValueText="Always" onReset={() => update({ panelTitleGridBreakpoint: undefined })}>
+          <InspectorSelect value={String(values.panelTitleGridBreakpoint ?? "always")} options={[{ value: "always", label: "Always" }, { value: "small", label: "Small (Phone Landscape)" }, { value: "medium", label: "Medium (Tablet Landscape)" }, { value: "large", label: "Large (Desktop)" }, { value: "xlarge", label: "X-Large (Large Screens)" }]} onChange={(value) => update({ panelTitleGridBreakpoint: value })} ariaLabel="Panel title grid breakpoint" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Grid Column Gap" isOverridden={values.panelTitleGridColumnGap !== undefined} inheritedValueText="Default" onReset={() => update({ panelTitleGridColumnGap: undefined })}>
+          <InspectorSelect value={String(values.panelTitleGridColumnGap ?? "default")} options={[{ value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "default", label: "Default" }, { value: "large", label: "Large" }, { value: "none", label: "None" }]} onChange={(value) => update({ panelTitleGridColumnGap: value })} ariaLabel="Panel title grid column gap" />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Grid Row Gap" isOverridden={values.panelTitleGridRowGap !== undefined} inheritedValueText="Default" onReset={() => update({ panelTitleGridRowGap: undefined })}>
+          <InspectorSelect value={String(values.panelTitleGridRowGap ?? "default")} options={[{ value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "default", label: "Default" }, { value: "large", label: "Large" }, { value: "none", label: "None" }]} onChange={(value) => update({ panelTitleGridRowGap: value })} ariaLabel="Panel title grid row gap" />
+        </InspectorFieldRow>
+      </>}
+
       <InspectorFieldRow
         label="HTML Element"
         isOverridden={values[keys.level] !== undefined}
@@ -325,7 +348,7 @@ export function MetaSettingsGroup({
               { value: "text-lead", label: "Text Lead" },
               { value: "heading-small", label: "Heading Small" },
             ]}
-            onChange={(value) => update({ [styleKey]: value })}
+            onChange={(value) => update({ [styleKey]: value === "inherit" ? undefined : value })}
           />
         </InspectorFieldRow>
       )}

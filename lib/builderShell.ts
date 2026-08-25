@@ -43,6 +43,8 @@ export type BuilderMenuPresentation = {
   icon: string | null;
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
+  submenuWidth: string | null;
+  mobileAccordion: boolean;
   badgeText: string | null;
 };
 
@@ -53,6 +55,12 @@ export type ReactMenuItem = {
   label: string;
   url: string;
   parentId?: string | null;
+  iconName?: string | null;
+  iconUrl?: string | null;
+  subtitle?: string | null;
+  mobileUrl?: string | null;
+  target?: "_self" | "_blank";
+  visibility?: "all" | "desktop" | "mobile";
 };
 
 /** A named, semantic Global Styles snapshot created from a YOOtheme import. */
@@ -93,6 +101,25 @@ export type BuilderShellSettings = {
   headerHeight?: string;
   headerCustomHeight?: number;
   headerZIndex: number;
+  headerBreakpoint?: string;
+  headerMobileBreakpoint?: string;
+  headerStickyShowOnUp?: boolean;
+  headerStickyAnimation?: string;
+  headerDropdownAlign?: "left" | "right" | "center";
+  headerDropdownAlignToNavbar?: boolean;
+  headerDropbarEnabled?: boolean;
+  headerParentIconEnabled?: boolean;
+  headerClickModeEnabled?: boolean;
+  headerDialogTogglePosition?: string;
+  headerDialogLayout?: string;
+  headerDialogCenter?: boolean;
+  headerDialogPushAfter?: number;
+  headerSearchPosition?: string;
+  headerSearchLayout?: string;
+  headerSocialPosition?: string;
+  headerMobileLogoUrl?: string | null;
+  headerInverseLogoUrl?: string | null;
+  headerMobileComposition?: "separate" | "responsive";
   sectionPaddingTop: BuilderSectionSpacing;
   sectionPaddingBottom: BuilderSectionSpacing;
   sectionMarginTop: BuilderSectionSpacing;
@@ -175,6 +202,15 @@ export type BuilderShellSettings = {
   largeTextFontSize?: string;
   emphasisColor?: string;
   inverseColor?: string;
+  inverseTextColor?: string;
+  inverseEmphasisColor?: string;
+  inverseMutedTextColor?: string;
+  inverseLinkColor?: string;
+  inverseLinkHoverColor?: string;
+  inverseBorderColor?: string;
+  inverseInverseColor?: string;
+  inversePrimaryBackground?: string;
+  inverseMutedBackground?: string;
   mutedTextColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
@@ -225,7 +261,33 @@ export type BuilderShellSettings = {
   accordionItemBoxShadow?: string;
   /** Canonical UIkit/YOOtheme Nav presentation tokens. */
   navDividerMarginVertical?: string;
+  navDividerMarginHorizontal?: string;
+  navLargeFontSize?: string;
+  navLargeFontSizeL?: string;
+  navLargeFontSizeM?: string;
+  navLargeLineHeight?: string;
+  navMediumFontSize?: string;
+  navMediumFontSizeL?: string;
+  navMediumFontSizeM?: string;
+  navMediumLineHeight?: string;
+  navXLargeFontSize?: string;
+  navXLargeFontSizeL?: string;
+  navXLargeFontSizeM?: string;
+  navXLargeLineHeight?: string;
+  navItemPaddingHorizontal?: string;
+  navItemPaddingVertical?: string;
+  navSublistDeeperPaddingLeft?: string;
+  navSublistItemPaddingVertical?: string;
+  navSublistPaddingLeft?: string;
+  navSublistPaddingVertical?: string;
+  navParentIconMarginLeft?: string;
   navDefaultFontSize?: string;
+  navDefaultFontFamily?: string;
+  navDefaultFontStyle?: string;
+  navDefaultFontWeight?: string;
+  navDefaultLetterSpacing?: string;
+  navDefaultLineHeight?: string;
+  navDefaultTextTransform?: string;
   navDefaultItemColor?: string;
   navDefaultItemHoverColor?: string;
   navDefaultItemActiveColor?: string;
@@ -236,6 +298,25 @@ export type BuilderShellSettings = {
   navDefaultSublistItemHoverColor?: string;
   navDefaultSublistItemActiveColor?: string;
   navDefaultDividerBoxShadow?: string;
+  navDefaultDividerBorder?: string;
+  navDefaultDividerBorderWidth?: string;
+  navDefaultItemPaddingHorizontal?: string;
+  navDefaultItemPaddingVertical?: string;
+  navDefaultItemBorderRadius?: string;
+  navDefaultItemHoverBackground?: string;
+  navDefaultItemHoverBoxShadow?: string;
+  navDefaultItemActiveBackground?: string;
+  navDefaultItemLineBackground?: string;
+  navDefaultItemLineBottom?: string;
+  navDefaultItemLineHeight?: string;
+  navDefaultItemLineLeft?: string;
+  navDefaultItemLineRight?: string;
+  navDefaultItemLineTransitionDuration?: string;
+  navDefaultItemLineTransitionTimingFunction?: string;
+  navDefaultItemLineHoverLeft?: string;
+  navDefaultItemLineHoverRight?: string;
+  navDefaultSiblingsFilter?: string;
+  navDefaultSiblingsOpacity?: string;
   navPrimaryItemColor?: string;
   navPrimaryItemHoverColor?: string;
   navPrimaryItemActiveColor?: string;
@@ -246,6 +327,25 @@ export type BuilderShellSettings = {
   navPrimarySublistItemHoverColor?: string;
   navPrimarySublistItemActiveColor?: string;
   navPrimaryDividerBoxShadow?: string;
+  navPrimaryDividerBorder?: string;
+  navPrimaryDividerBorderWidth?: string;
+  navPrimaryItemPaddingHorizontal?: string;
+  navPrimaryItemPaddingVertical?: string;
+  navPrimaryItemBorderRadius?: string;
+  navPrimaryItemHoverBackground?: string;
+  navPrimaryItemHoverBoxShadow?: string;
+  navPrimaryItemActiveBackground?: string;
+  navPrimaryItemLineBackground?: string;
+  navPrimaryItemLineBottom?: string;
+  navPrimaryItemLineHeight?: string;
+  navPrimaryItemLineLeft?: string;
+  navPrimaryItemLineRight?: string;
+  navPrimaryItemLineTransitionDuration?: string;
+  navPrimaryItemLineTransitionTimingFunction?: string;
+  navPrimaryItemLineHoverLeft?: string;
+  navPrimaryItemLineHoverRight?: string;
+  navPrimarySiblingsFilter?: string;
+  navPrimarySiblingsOpacity?: string;
   navSecondaryLineHeight?: string;
   navSecondaryItemHoverColor?: string;
   navSecondaryItemActiveColor?: string;
@@ -260,7 +360,29 @@ export type BuilderShellSettings = {
   navSecondaryItemHoverBackground?: string;
   navSecondaryItemActiveBackground?: string;
   navSecondaryItemBorderRadius?: string;
-  navMediumLineHeight?: string;
+  navSecondaryFontFamily?: string;
+  navSecondaryFontSize?: string;
+  navSecondaryFontStyle?: string;
+  navSecondaryFontWeight?: string;
+  navSecondaryLetterSpacing?: string;
+  navSecondaryTextTransform?: string;
+  navSecondaryItemColor?: string;
+  navSecondarySubtitleColor?: string;
+  navSecondaryHeaderColor?: string;
+  navSecondaryDividerBorder?: string;
+  navSecondaryDividerBorderWidth?: string;
+  navSecondaryDividerBoxShadow?: string;
+  navSecondaryItemHoverBoxShadow?: string;
+  navSecondaryItemActiveBoxShadow?: string;
+  navSecondarySiblingsFilter?: string;
+  navSecondarySiblingsOpacity?: string;
+  navHeaderFontSize?: string;
+  navHeaderFontWeight?: string;
+  navHeaderLetterSpacing?: string;
+  navHeaderMarginTop?: string;
+  navHeaderPaddingHorizontal?: string;
+  navHeaderPaddingVertical?: string;
+  navHeaderTextTransform?: string;
   navMediumFontSizeResponsive?: string;
   navDividersMarginTop?: string;
   navDividersBoxShadow?: string;
@@ -289,7 +411,16 @@ export type BuilderShellSettings = {
   navbarNavItemHoverBoxShadow?: string;
   navbarNavItemActiveBoxShadow?: string;
   navbarNavItemFontSize?: string;
+  navbarNavItemFontFamily?: string;
+  navbarNavItemFontStyle?: string;
+  navbarNavItemFontWeight?: string;
+  navbarNavItemLetterSpacing?: string;
+  navbarNavItemTransitionDuration?: string;
   navbarNavItemTextTransform?: string;
+  navbarPaddingTop?: string;
+  navbarPaddingBottom?: string;
+  navbarPaddingTopMedium?: string;
+  navbarPaddingBottomMedium?: string;
   navbarPrimaryNavItemFontSize?: string;
   navbarToggleColor?: string;
   navbarToggleHoverColor?: string;
@@ -313,15 +444,59 @@ export type BuilderShellSettings = {
   navbarNavItemLineActiveHeight?: string;
   navbarNavItemLineOpacity?: string;
   navbarNavItemLineGradient?: string;
+  navbarNavItemLineBorderRadius?: string;
+  navbarNavItemLineMarginHorizontal?: string;
+  navbarNavItemLineMarginVertical?: string;
+  navbarNavItemLineHoverBackground?: string;
+  navbarNavItemLineHoverOpacity?: string;
+  navbarNavItemLineOnclickBackground?: string;
+  navbarNavItemLineOnclickOpacity?: string;
+  navbarNavItemLineActiveBackground?: string;
+  navbarNavItemLineActiveOpacity?: string;
+  navbarParentIconMarginLeft?: string;
+  navbarPrimaryNavGap?: string;
+  navbarPrimaryNavGapMedium?: string;
+  navbarPrimaryNavItemFontFamily?: string;
+  navbarPrimaryNavItemFontStyle?: string;
+  navbarPrimaryNavItemFontWeight?: string;
+  navbarPrimaryNavItemLetterSpacing?: string;
+  navbarPrimaryNavItemPaddingHorizontal?: string;
+  navbarPrimaryNavItemPaddingHorizontalMedium?: string;
+  navbarPrimaryNavItemHoverColor?: string;
+  navbarPrimaryNavItemOnclickColor?: string;
+  navbarPrimaryNavItemActiveColor?: string;
+  navbarPrimaryItemPaddingHorizontal?: string;
+  navbarPrimaryItemPaddingHorizontalMedium?: string;
+  navbarPrimaryToggleIconWidth?: string;
+  navbarStickyBoxShadow?: string;
+  /** Visual marker shown after top-level navbar items that own a dropdown. */
+  navbarDropdownIndicator?: "none" | "chevron" | string;
   navbarDropdownMargin?: string;
   navbarDropdownShiftMargin?: string;
   navbarDropdownWidth?: string;
   navbarDropdownPadding?: string;
   navbarDropdownBackground?: string;
+  navbarDropdownColor?: string;
+  navbarDropdownColorMode?: string;
+  navbarDropdownBorderWidth?: string;
+  navbarDropdownBorder?: string;
+  navbarDropdownViewportMargin?: string;
+  navbarDropdownFocusOutline?: string;
   navbarDropdownLargeShiftMargin?: string;
+  navbarDropdownLargePadding?: string;
+  navbarDropdownLargeShiftMarginMedium?: string;
   navbarDropdownDropbarShiftMargin?: string;
   navbarDropdownDropbarPaddingTop?: string;
+  navbarDropdownDropbarPaddingBottom?: string;
+  navbarDropdownDropbarViewportMargin?: string;
+  navbarDropdownDropbarViewportMarginMedium?: string;
+  navbarDropdownDropbarViewportMarginSmall?: string;
   navbarDropdownDropbarLargeShiftMargin?: string;
+  navbarDropdownDropbarLargePaddingTop?: string;
+  navbarDropdownDropbarLargePaddingBottom?: string;
+  navbarDropdownDropbarLargeShiftMarginMedium?: string;
+  navbarDropdownGridGutterHorizontal?: string;
+  navbarDropdownGridGutterVertical?: string;
   navbarDropdownNavItemColor?: string;
   navbarDropdownNavItemHoverColor?: string;
   navbarDropdownNavItemActiveColor?: string;
@@ -330,12 +505,27 @@ export type BuilderShellSettings = {
   navbarDropdownNavSublistItemHoverColor?: string;
   navbarDropdownNavSublistItemActiveColor?: string;
   navbarDropdownNavItemPaddingVertical?: string;
+  navbarDropdownNavItemPaddingHorizontal?: string;
+  navbarDropdownNavItemBorderRadius?: string;
+  navbarDropdownNavItemHoverBackground?: string;
+  navbarDropdownNavItemActiveBackground?: string;
+  navbarDropdownNavFontFamily?: string;
+  navbarDropdownNavFontStyle?: string;
+  navbarDropdownNavFontWeight?: string;
+  navbarDropdownNavLetterSpacing?: string;
+  navbarDropdownNavLineHeight?: string;
+  navbarDropdownNavTextTransform?: string;
+  navbarDropdownNavHeaderColor?: string;
+  navbarDropdownNavDividerBorder?: string;
+  navbarDropdownNavDividerBorderWidth?: string;
+  navbarDropdownNavDividerMarginVertical?: string;
+  navbarDropdownNavSublistItemColor?: string;
+  navbarDropdownNavSublistPaddingLeft?: string;
   navbarDropdownNavFontSize?: string;
   navbarDropdownBorderRadius?: string;
   navbarDropdownBoxShadow?: string;
   navbarDropdownShiftMarginMedium?: string;
   navbarDropdownDropbarShiftMarginMedium?: string;
-  navbarDropdownDropbarLargeShiftMarginMedium?: string;
   inverseNavbarNavItemHoverColor?: string;
   /** Canonical UIkit/YOOtheme Alert presentation tokens. */
   alertBackground?: string;
@@ -717,6 +907,14 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   cardBorderWidth: "1px",
   cardShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
   cardShadowHover: "0 12px 30px rgba(0, 0, 0, 0.12)",
+  // Card variants own their shadows. An absent YOOtheme variant shadow is
+  // intentionally explicit `none`; it must not inherit another variant's
+  // authored glow through a generic fallback.
+  cardDefaultHoverShadow: "0 12px 30px rgba(0, 0, 0, 0.12)",
+  cardPrimaryShadow: "none",
+  cardPrimaryHoverShadow: "none",
+  cardSecondaryShadow: "none",
+  cardSecondaryHoverShadow: "none",
   cardHoverTransform: "translateY(3px)",
   cardDefaultHoverBackground: "#ffffff",
   cardPrimaryHoverBackground: "#1991ee",
@@ -897,6 +1095,11 @@ function normalizeMenuPresentation(value: unknown): BuilderMenuPresentation {
     submenuColumns: Number.isFinite(submenuColumnsNumber)
       ? Math.min(Math.max(Math.round(submenuColumnsNumber), 1), 6)
       : 3,
+    submenuWidth:
+      typeof raw.submenuWidth === "string" && raw.submenuWidth.trim().length > 0
+        ? raw.submenuWidth.trim()
+        : null,
+    mobileAccordion: raw.mobileAccordion !== false,
     badgeText:
       typeof raw.badgeText === "string" && raw.badgeText.trim().length > 0
         ? raw.badgeText.trim()
@@ -926,13 +1129,33 @@ export function normalizeBuilderShellSettings(
   value: Partial<BuilderShellSettings> | null | undefined
 ): BuilderShellSettings {
   const allowedPresets = ["minimal", "soft", "elevated", "boutique", "princity"];
+  const normalizedInput: Partial<BuilderShellSettings> = { ...(value ?? {}) };
+  // Older YOOtheme imports stored the default-card shadows in the generic
+  // Card fields. Promote those values once at the normalization boundary so
+  // existing DevStack tenants receive the same canonical UIkit hover tokens
+  // as newly imported tenants.
+  if (/^devstack\b/i.test(String(value?.globalStylePresetName ?? ""))) {
+    if (normalizedInput.navbarDropdownIndicator == null) {
+      normalizedInput.navbarDropdownIndicator = "chevron";
+    }
+    if (normalizedInput.cardDefaultShadow == null && value?.cardShadow != null) {
+      normalizedInput.cardDefaultShadow = value.cardShadow;
+    }
+    if (
+      (normalizedInput.cardDefaultHoverShadow == null ||
+        normalizedInput.cardDefaultHoverShadow === defaultBuilderShellSettings.cardDefaultHoverShadow) &&
+      value?.cardShadowHover != null
+    ) {
+      normalizedInput.cardDefaultHoverShadow = value.cardShadowHover;
+    }
+  }
   const preset = typeof value?.storefrontPreset === "string" && allowedPresets.includes(value.storefrontPreset.trim().toLowerCase())
     ? value.storefrontPreset.trim().toLowerCase()
     : defaultBuilderShellSettings.storefrontPreset;
 
   return {
     ...defaultBuilderShellSettings,
-    ...(value ?? {}),
+    ...normalizedInput,
     // Version 2 was written while Cover was the implicit product default, so
     // `cover` there is indistinguishable from an author choice. Treat that
     // historical ambiguity as Natural for YOOtheme-compatible media. Version
@@ -1181,6 +1404,9 @@ function normalizeMenuItems(value: unknown): ReactMenuItem[] {
     const label = typeof raw.label === "string" ? raw.label.trim() : "";
     const url = typeof raw.url === "string" ? raw.url.trim() : "";
     const parentId = typeof raw.parentId === "string" ? raw.parentId.trim() : null;
+    const visibility = raw.visibility === "desktop" || raw.visibility === "mobile"
+      ? raw.visibility
+      : "all";
 
     if (id && label) {
       normalized.push({
@@ -1188,6 +1414,12 @@ function normalizeMenuItems(value: unknown): ReactMenuItem[] {
         label,
         url: url || "",
         parentId: parentId || null,
+        iconName: typeof raw.iconName === "string" ? raw.iconName.trim() || null : null,
+        iconUrl: typeof raw.iconUrl === "string" ? raw.iconUrl.trim() || null : null,
+        subtitle: typeof raw.subtitle === "string" ? raw.subtitle.trim() || null : null,
+        mobileUrl: typeof raw.mobileUrl === "string" ? raw.mobileUrl.trim() || null : null,
+        target: raw.target === "_blank" ? "_blank" : "_self",
+        visibility,
       });
     }
   }

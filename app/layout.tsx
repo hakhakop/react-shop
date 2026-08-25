@@ -61,22 +61,24 @@ export default async function RootLayout({
   const pathTenantWebsite =
     pathTenantCandidate?.slug === pathTenantSlug ? pathTenantCandidate : null;
   const scopedWebsite = scopedWebsiteCandidate;
-  // A tenant request owns the entire Global Styles surface. Do not load the
-  // root ACF/theme settings as a fallback: incomplete tenant shell settings
-  // must resolve through canonical WebPages/UIkit defaults instead.
-  const styleWebsite = domainWebsite ?? pathTenantWebsite ?? scopedWebsite;
-  const styleScope = styleWebsite ? { websiteId: styleWebsite.id } : {};
-  const [themeSettingsRaw, shellSettings] = await Promise.all([
-    styleWebsite ? Promise.resolve<Record<string, any>>({}) : getThemeSettings(),
-    getBuilderShellSettings(styleScope),
-  ]);
-  const isDomainWebsiteRequest = Boolean(domainWebsite || pathTenantWebsite);
   const isDashboardWorkspaceRequest =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/app") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register");
+  // A tenant request owns the entire Global Styles surface. Do not load the
+  // root ACF/theme settings as a fallback: incomplete tenant shell settings
+  // must resolve through canonical WebPages/UIkit defaults instead.
+  const styleWebsite = domainWebsite ?? pathTenantWebsite ?? scopedWebsite;
+  const styleScope = styleWebsite ? { websiteId: styleWebsite.id } : {};
+  const [themeSettingsRaw, shellSettings] = await Promise.all([
+    styleWebsite || isDashboardWorkspaceRequest
+      ? Promise.resolve<Record<string, any>>({})
+      : getThemeSettings(),
+    getBuilderShellSettings(styleScope),
+  ]);
+  const isDomainWebsiteRequest = Boolean(domainWebsite || pathTenantWebsite);
   // Tenant preview is rendered inside the authenticated /app route, but it
   // is still a storefront surface and must retain the frontend Builder bar.
   // Keep the SaaS workspace chrome hidden while allowing FrontendAdminBar to

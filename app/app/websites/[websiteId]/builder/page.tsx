@@ -15,6 +15,7 @@ import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
+import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
 
 export const metadata = {
   title: "Website Builder",
@@ -89,6 +90,15 @@ export default async function WebsiteBuilderPage({
     ? requestedTargetValue[0] ?? "home"
     : requestedTargetValue;
   const initialPage = normalizeBuilderLayoutKey(requestedTarget);
+  const contextTargetValue = resolvedSearchParams?.context ?? "home";
+  const contextTarget = Array.isArray(contextTargetValue)
+    ? contextTargetValue[0] ?? "home"
+    : contextTargetValue;
+  const requestedContextPage = normalizeBuilderLayoutKey(contextTarget);
+  const initialHydrationPage = resolveInitialBuilderHydrationPage(
+    initialPage,
+    requestedContextPage,
+  );
   const hasStrictDocumentTarget = Boolean(
     resolvedSearchParams?.document ||
     resolvedSearchParams?.routingTemplate ||
@@ -100,9 +110,9 @@ export default async function WebsiteBuilderPage({
     ? languageCookie!
     : website.primaryLanguage;
   const initialPageHydration =
-    !hasStrictDocumentTarget && initialPage !== "header" && initialPage !== "footer"
+    !hasStrictDocumentTarget
       ? await resolveInitialBuilderPage({
-          page: initialPage,
+          page: initialHydrationPage,
           scope: { websiteId: website.id },
           website,
           contentLanguage,

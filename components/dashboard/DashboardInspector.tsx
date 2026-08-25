@@ -21,6 +21,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
+import { createPortal } from "react-dom";
 import type {
   BuilderLayoutBlock,
   BuilderSavedTemplate,
@@ -735,6 +736,25 @@ type HeaderDocumentSettingsValues = Pick<
   | "headerBackgroundMode"
   | "headerTextMode"
   | "headerZIndex"
+  | "headerBreakpoint"
+  | "headerMobileBreakpoint"
+  | "headerStickyShowOnUp"
+  | "headerStickyAnimation"
+  | "headerDropdownAlign"
+  | "headerDropdownAlignToNavbar"
+  | "headerDropbarEnabled"
+  | "headerParentIconEnabled"
+  | "headerClickModeEnabled"
+  | "headerDialogTogglePosition"
+  | "headerDialogLayout"
+  | "headerDialogCenter"
+  | "headerDialogPushAfter"
+  | "headerSearchPosition"
+  | "headerSearchLayout"
+  | "headerSocialPosition"
+  | "headerMobileLogoUrl"
+  | "headerInverseLogoUrl"
+  | "headerMobileComposition"
   | "headerTopToolbarVisible"
   | "headerTopToolbarText"
   | "headerTopToolbarPhone"
@@ -965,6 +985,50 @@ function HeaderDocumentSettings({
       <details className="builder-collapse">
         <summary>
           <InspectorGroupSummary
+            title="YOOtheme Header behavior"
+            description="Canonical document-owned responsive and interaction settings."
+            meta={headerSettings.headerDropdownAlign ?? "center"}
+          />
+        </summary>
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Dropdown alignment</span>
+            <select value={headerSettings.headerDropdownAlign ?? "center"} onChange={(event) => onHeaderDocumentChange({ headerDropdownAlign: event.target.value as BuilderSection["headerDropdownAlign"] })}>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+              <option value="center">Center</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Dialog toggle</span>
+            <select value={headerSettings.headerDialogTogglePosition ?? "header-end"} onChange={(event) => onHeaderDocumentChange({ headerDialogTogglePosition: event.target.value })}>
+              <option value="navbar-start">Navbar Start</option>
+              <option value="navbar-end">Navbar End</option>
+              <option value="header-start">Header Start</option>
+              <option value="header-end">Header End</option>
+            </select>
+          </label>
+        </div>
+        <div className="builder-two-column">
+          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerDropdownAlignToNavbar === true} onChange={(event) => onHeaderDocumentChange({ headerDropdownAlignToNavbar: event.target.checked })} /><span>Align dropdown to navbar</span></label>
+          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerDropbarEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerDropbarEnabled: event.target.checked })} /><span>Enable dropbar</span></label>
+          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerParentIconEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerParentIconEnabled: event.target.checked })} /><span>Show parent icon</span></label>
+          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerClickModeEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerClickModeEnabled: event.target.checked })} /><span>Click mode on text items</span></label>
+          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerStickyShowOnUp === true} onChange={(event) => onHeaderDocumentChange({ headerStickyShowOnUp: event.target.checked })} /><span>Show sticky header on scroll up</span></label>
+        </div>
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Sticky animation</span><input value={headerSettings.headerStickyAnimation ?? ""} placeholder="uk-animation-slide-top" onChange={(event) => onHeaderDocumentChange({ headerStickyAnimation: event.target.value || undefined })} /></label>
+          <label className="builder-field"><span>Dialog layout</span><input value={headerSettings.headerDialogLayout ?? ""} placeholder="offcanvas-center" onChange={(event) => onHeaderDocumentChange({ headerDialogLayout: event.target.value || undefined })} /></label>
+        </div>
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Search position</span><input value={headerSettings.headerSearchPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerSearchPosition: event.target.value })} /></label>
+          <label className="builder-field"><span>Social position</span><input value={headerSettings.headerSocialPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerSocialPosition: event.target.value })} /></label>
+        </div>
+      </details>
+
+      <details className="builder-collapse">
+        <summary>
+          <InspectorGroupSummary
             title="Advanced"
             description="Header-wide announcement and support metadata."
             meta={headerSettings.headerTopToolbarVisible ? "visible" : "hidden"}
@@ -1086,6 +1150,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const { t } = useTranslation();
   const [categoryHideSearch, setCategoryHideSearch] = useState("");
   const [openNestedCardId, setOpenNestedCardId] = useState<string | null>(null);
+  const [rowLayoutPickerOpen, setRowLayoutPickerOpen] = useState(false);
   const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
     area: "title" | "body" | "button" | "eyebrow";
     blockKey: string | null;
@@ -1174,6 +1239,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     uploadSelectedLayoutBlockSlideImage,
     uploadSelectedSlideImage,
   } = props;
+  useEffect(() => {
+    setRowLayoutPickerOpen(false);
+  }, [selectedLayoutRowIndex, selectedLayoutColumnKey, selectedSection?.id]);
   const isHeaderDocumentSection =
     headerDocumentRoot || selectedSection?.id === "header-document";
   const hasLocalButtonStyles = (block: BuilderLayoutBlock) =>
@@ -2293,6 +2361,25 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   headerBackgroundMode: selectedSection.headerBackgroundMode ?? shellSettings.headerBackgroundMode,
                   headerTextMode: selectedSection.headerTextMode ?? shellSettings.headerTextMode,
                   headerZIndex: selectedSection.headerZIndex ?? shellSettings.headerZIndex,
+                  headerBreakpoint: selectedSection.headerBreakpoint,
+                  headerMobileBreakpoint: selectedSection.headerMobileBreakpoint,
+                  headerStickyShowOnUp: selectedSection.headerStickyShowOnUp,
+                  headerStickyAnimation: selectedSection.headerStickyAnimation,
+                  headerDropdownAlign: selectedSection.headerDropdownAlign,
+                  headerDropdownAlignToNavbar: selectedSection.headerDropdownAlignToNavbar,
+                  headerDropbarEnabled: selectedSection.headerDropbarEnabled,
+                  headerParentIconEnabled: selectedSection.headerParentIconEnabled,
+                  headerClickModeEnabled: selectedSection.headerClickModeEnabled,
+                  headerDialogTogglePosition: selectedSection.headerDialogTogglePosition,
+                  headerDialogLayout: selectedSection.headerDialogLayout,
+                  headerDialogCenter: selectedSection.headerDialogCenter,
+                  headerDialogPushAfter: selectedSection.headerDialogPushAfter,
+                  headerSearchPosition: selectedSection.headerSearchPosition,
+                  headerSearchLayout: selectedSection.headerSearchLayout,
+                  headerSocialPosition: selectedSection.headerSocialPosition,
+                  headerMobileLogoUrl: selectedSection.headerMobileLogoUrl,
+                  headerInverseLogoUrl: selectedSection.headerInverseLogoUrl,
+                  headerMobileComposition: selectedSection.headerMobileComposition,
                   headerTopToolbarVisible: selectedSection.headerTopToolbarVisible ?? shellSettings.topToolbarVisible,
                   headerTopToolbarText: selectedSection.headerTopToolbarText ?? shellSettings.topToolbarText,
                   headerTopToolbarPhone: selectedSection.headerTopToolbarPhone ?? shellSettings.topToolbarPhone,
@@ -2324,7 +2411,20 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
-              <details className="builder-collapse" open>
+              {isHeaderDocumentSection ? (
+                <div className="builder-header-active-row-layout">
+                  <span>Active row preset</span>
+                  <strong>{selectedRowLayoutSummary}</strong>
+                  <button
+                    type="button"
+                    className="builder-secondary-button"
+                    onClick={() => setRowLayoutPickerOpen(true)}
+                  >
+                    Change layout
+                  </button>
+                </div>
+              ) : null}
+              <details className="builder-collapse" open={!isHeaderDocumentSection}>
                 <summary>
                   <InspectorGroupSummary
                     title="Row Layout"
@@ -2341,7 +2441,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   </small>
                 </label>
 
-                {isHeaderDocumentRoot ? (
+                {isHeaderDocumentSection ? (
                   <>
                     <div className="builder-two-column">
                       <label className="builder-field">
@@ -2384,38 +2484,31 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   </>
                 ) : null}
 
-                <div className="builder-layout-picker-grid is-inline">
-                  {builderRowLayoutPresets.map((preset) => {
-                    const isActive =
-                      selectedRowLayoutPreset?.key === preset.key;
-                    return (
-                      <button
-                        key={preset.key}
-                        type="button"
-                        className={`builder-layout-picker-card ${
-                          isActive ? "is-active" : ""
-                        }`}
-                        onClick={() => applySelectedRowLayoutPreset(preset.key)}
-                      >
-                        <span className="builder-layout-picker-card-copy">
-                          <strong>{preset.label}</strong>
-                          <small>{preset.description}</small>
-                        </span>
-                        <span
-                          className="builder-layout-picker-preview"
-                          aria-hidden="true"
+                {!isHeaderDocumentSection ? (
+                  <div className="builder-layout-picker-grid is-inline">
+                    {builderRowLayoutPresets.map((preset) => {
+                      const isActive = selectedRowLayoutPreset?.key === preset.key;
+                      return (
+                        <button
+                          key={preset.key}
+                          type="button"
+                          className={`builder-layout-picker-card ${isActive ? "is-active" : ""}`}
+                          onClick={() => applySelectedRowLayoutPreset(preset.key)}
                         >
-                          {preset.ratios.map((ratio, index) => (
-                            <i
-                              key={`${preset.key}-${index}`}
-                              style={{ flex: ratio }}
-                            />
-                          ))}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                          <span className="builder-layout-picker-card-copy">
+                            <strong>{preset.label}</strong>
+                            <small>{preset.description}</small>
+                          </span>
+                          <span className="builder-layout-picker-preview" aria-hidden="true">
+                            {preset.ratios.map((ratio, index) => (
+                              <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
+                            ))}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </details>
 
               <details className="builder-collapse">
@@ -2455,6 +2548,61 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               />
             </div>
           )}
+
+          {selectedLayoutRow && isHeaderDocumentSection && rowLayoutPickerOpen
+            ? createPortal(
+                <div
+                  className="builder-layout-modal"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="builder-header-row-layout-picker-title"
+                  onClick={() => setRowLayoutPickerOpen(false)}
+                >
+                  <div className="builder-layout-dialog" onClick={(event) => event.stopPropagation()}>
+                    <div className="builder-layout-header">
+                      <div>
+                        <strong id="builder-header-row-layout-picker-title">Choose Header row layout</strong>
+                        <span>Select a UIkit/YOOtheme column structure.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="builder-layout-close"
+                        onClick={() => setRowLayoutPickerOpen(false)}
+                        aria-label="Close Header row layout picker"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
+                    <div className="builder-layout-picker-body">
+                      <div className="builder-layout-picker-grid">
+                        {builderRowLayoutPresets.map((preset) => (
+                          <button
+                            key={preset.key}
+                            type="button"
+                            className={`builder-layout-picker-card ${selectedRowLayoutPreset?.key === preset.key ? "is-active" : ""}`}
+                            onClick={() => {
+                              applySelectedRowLayoutPreset(preset.key);
+                              setRowLayoutPickerOpen(false);
+                            }}
+                          >
+                            <span className="builder-layout-picker-card-copy">
+                              <strong>{preset.label}</strong>
+                              <small>{preset.description}</small>
+                            </span>
+                            <span className="builder-layout-picker-preview" aria-hidden="true">
+                              {preset.ratios.map((ratio, index) => (
+                                <i key={`${preset.key}-modal-${index}`} style={{ flex: ratio }} />
+                              ))}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>,
+                document.body,
+              )
+            : null}
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "spacing" && (
             <div className="builder-inspector-stack">
@@ -5369,6 +5517,93 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               <>
                                                 {renderAnimationControls(block)}
                                               </>
+                                            )}
+
+                                          {isSelectedBlock &&
+                                            selectedSection?.id === "header-document" &&
+                                            block.kind === "menu" &&
+                                            isElementSettingsTab && (
+                                              <div className="builder-inspector-section">
+                                                <div className="builder-field-header">
+                                                  <strong>Navigation presentation</strong>
+                                                  <small>Override Global Navbar styling for this Header document.</small>
+                                                </div>
+                                                <label className="builder-field">
+                                                  <span>Hover variant</span>
+                                                  <select
+                                                    value={block.headerNavigationOverrides?.hoverVariant ? block.menuHoverVariant ?? "none" : "inherit"}
+                                                    onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                      menuHoverVariant: event.target.value === "inherit" ? undefined : event.target.value as BuilderLayoutBlock["menuHoverVariant"],
+                                                      headerNavigationOverrides: {
+                                                        ...block.headerNavigationOverrides,
+                                                        hoverVariant: event.target.value !== "inherit",
+                                                      },
+                                                    })}
+                                                  >
+                                                    <option value="inherit">Inherit Global</option>
+                                                    <option value="line">Line</option>
+                                                    <option value="glow">Glow</option>
+                                                    <option value="line-glow">Line + Glow</option>
+                                                    <option value="none">None</option>
+                                                  </select>
+                                                  <small>Glow consumes the imported Navbar hover background and shadow tokens.</small>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Line position</span>
+                                                  <select
+                                                    value={block.headerNavigationOverrides?.hoverLine ? block.menuHoverLine ?? "top" : "inherit"}
+                                                    onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                      menuHoverLine: event.target.value === "inherit" ? undefined : event.target.value as BuilderLayoutBlock["menuHoverLine"],
+                                                      headerNavigationOverrides: {
+                                                        ...block.headerNavigationOverrides,
+                                                        hoverLine: event.target.value !== "inherit",
+                                                      },
+                                                    })}
+                                                  >
+                                                    <option value="inherit">Inherit Global</option>
+                                                    <option value="top">Top</option>
+                                                    <option value="bottom">Bottom</option>
+                                                    <option value="left">Left</option>
+                                                    <option value="right">Right</option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Dropdown indicator style</span>
+                                                  <select
+                                                    value={block.headerNavigationOverrides?.dropdownIndicator ? block.menuDropdownIndicator ?? "chevron" : "inherit"}
+                                                    onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                      menuDropdownIndicator: event.target.value === "inherit" ? undefined : event.target.value as BuilderLayoutBlock["menuDropdownIndicator"],
+                                                      headerNavigationOverrides: {
+                                                        ...block.headerNavigationOverrides,
+                                                        dropdownIndicator: event.target.value !== "inherit",
+                                                      },
+                                                    })}
+                                                  >
+                                                    <option value="inherit">Inherit Global</option>
+                                                    <option value="none">None</option>
+                                                    <option value="chevron">Chevron</option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Vertical dividers</span>
+                                                  <select
+                                                    value={block.headerNavigationOverrides?.divider ? block.menuDividerMode ?? "none" : "inherit"}
+                                                    onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                      menuDividerMode: event.target.value === "inherit" ? undefined : event.target.value as BuilderLayoutBlock["menuDividerMode"],
+                                                      headerNavigationOverrides: {
+                                                        ...block.headerNavigationOverrides,
+                                                        divider: event.target.value !== "inherit",
+                                                      },
+                                                    })}
+                                                  >
+                                                    <option value="inherit">Inherit Global</option>
+                                                    <option value="none">None</option>
+                                                    <option value="partial">Outer edges</option>
+                                                    <option value="all">Between all items</option>
+                                                  </select>
+                                                  <small>Uses the imported Navbar border width and color tokens.</small>
+                                                </label>
+                                              </div>
                                             )}
 
                                           {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&

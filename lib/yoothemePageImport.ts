@@ -743,10 +743,19 @@ const sourceHeadingLevel = (
     ? (value as BuilderLayoutBlock["headingLevel"])
     : undefined;
 
-/** Meta uses its own compact HTML-element contract (div/span/p), rather than
- * the Heading contract. Keep that distinction at the import boundary. */
-const sourceMetaElement = (value: unknown): "div" | "span" | "p" | undefined =>
+/** Grid/Slider meta keeps its compact legacy element vocabulary. */
+const sourceMetaElement = (
+  value: unknown,
+): "div" | "span" | "p" | undefined =>
   value === "div" || value === "span" || value === "p" ? value : undefined;
+
+/** Panel Meta accepts the full authored element vocabulary exposed by YOOtheme. */
+const sourcePanelMetaElement = (
+  value: unknown,
+): "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | undefined =>
+  value === "h1" || value === "h2" || value === "h3" || value === "h4" || value === "h5" || value === "h6" || value === "div"
+    ? value
+    : undefined;
 
 const sourceHeadingSize = (
   value: unknown,
@@ -1771,6 +1780,16 @@ const mapStaticElement = (
       linkImage: sourceBoolean(props.image_link) ?? false,
       enableLightbox: sourceBoolean(props.lightbox) ?? false,
       linkTitle: sourceBoolean(props.title_link) ?? false,
+      panelTitleHoverStyle: props.title_hover_style === "heading" || props.title_hover_style === "heading-link"
+        ? "heading-link"
+        : props.title_hover_style === "default" || props.title_hover_style === "default-link"
+          ? "default-link"
+          : "none",
+      panelTitleAlign: props.title_align === "left" ? "left" : "top",
+      panelTitleGridWidth: asString(props.title_grid_width) ?? undefined,
+      panelTitleGridBreakpoint: props.title_grid_breakpoint === "s" ? "small" : props.title_grid_breakpoint === "m" ? "medium" : props.title_grid_breakpoint === "l" ? "large" : props.title_grid_breakpoint === "xl" ? "xlarge" : "always",
+      panelTitleGridColumnGap: ["small", "medium", "default", "large", "none"].includes(String(props.title_grid_column_gap)) ? props.title_grid_column_gap as "small" | "medium" | "default" | "large" | "none" : "default",
+      panelTitleGridRowGap: ["small", "medium", "default", "large", "none"].includes(String(props.title_grid_row_gap)) ? props.title_grid_row_gap as "small" | "medium" | "default" | "large" | "none" : "default",
       gridTitleSize: sourceHeadingSize(props.title_style),
       titleDecoration: asString(props.title_decoration) ?? undefined,
       titleColor: asString(props.title_color) ?? undefined,
@@ -1782,7 +1801,7 @@ const mapStaticElement = (
       gridMetaAlign: ["above-title", "below-title", "above-content", "below-content"].includes(String(props.meta_align))
         ? props.meta_align as "above-title" | "below-title" | "above-content" | "below-content"
         : undefined,
-      gridMetaHtmlElement: sourceMetaElement(props.meta_element) ?? "div",
+      gridMetaHtmlElement: (sourceMetaElement(props.meta_element) ?? "div") as "div" | "span" | "p",
       // Grid content accepts YOOtheme text presets only. Do not leak a
       // heading-style alias (for example `h2`) into the body renderer; the
       // source Grid body is a plain `uk-panel` unless a text preset is set.
@@ -1814,9 +1833,9 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_link", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta", "meta_style",
+      "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_link", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin",
       "text_align", "title", "title_element", "panel_style", "panel_padding", "panel_link", "panel_link_hover", "panel_image_no_padding", "height_expand", "panel_expand", "image_align", "image_grid_width", "image_grid_breakpoint", "image_vertical_align",
-      "title_align", "title_grid_breakpoint", "title_grid_width", "meta_align", "meta_element", "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
+      "title_align", "title_grid_breakpoint", "title_grid_width", "title_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -1875,10 +1894,13 @@ const mapStaticElement = (
       panelVerticalAlign: props.image_vertical_align === true || props.image_vertical_align === "true" ? "center" : "top",
       panelTitleStyle: sourceHeadingSize(props.title_style) as string | undefined,
       panelTitleElement: sourceHeadingLevel(props.title_element) as "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | undefined,
+      linkTitle: sourceBoolean(props.title_link) ?? false,
+      titleDecoration: asString(props.title_decoration) ?? undefined,
+      titleColor: asString(props.title_color) ?? undefined,
       panelTextAlign: props.text_align === "left" || props.text_align === "center" || props.text_align === "right" ? props.text_align : undefined,
       metaStyle: asString(props.meta_style) ?? undefined,
       contentStyle: sourceTextVariant(props.content_style),
-      panelMetaHtmlElement: sourceMetaElement(props.meta_element),
+      panelMetaHtmlElement: sourcePanelMetaElement(props.meta_element),
       titleMarginTop: props.title_margin === "remove" ? "none" : sourceMargin(props.title_margin),
       metaMarginTop: props.meta_margin === "remove" ? "none" : sourceMargin(props.meta_margin),
       contentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin),

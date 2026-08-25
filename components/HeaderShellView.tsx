@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 
 import HeaderActions from "./HeaderActions";
@@ -30,6 +30,12 @@ import UikitImage from "@/components/builder/UikitImage";
 import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
+import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import {
+  BUILDER_IFRAME_DRAFT_MESSAGE,
+  BUILDER_IFRAME_DRAFT_SOURCE,
+} from "@/components/builder/BuilderIframeDraftBridge";
+import type { BuilderState } from "@/components/dashboard/builderTypes";
 
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -82,6 +88,12 @@ function buildReactMenuTree(items: ReactMenuItem[] = []): MenuItem[] {
       url: item.url,
       path: item.url,
       parentId: item.parentId || null,
+      iconName: item.iconName || null,
+      iconUrl: item.iconUrl || null,
+      subtitle: item.subtitle || null,
+      mobileUrl: item.mobileUrl || null,
+      target: item.target,
+      visibility: item.visibility,
       children: [],
     });
   }
@@ -139,6 +151,8 @@ type HeaderShellViewProps = {
   renderBuilderColumn?: (columnId: string, content: ReactNode) => ReactNode;
   renderBuilderRow?: (rowId: string, content: ReactNode) => ReactNode;
   builderInteractionIdentity?: boolean;
+  builderPreviewMode?: boolean;
+  builderDraftPreview?: boolean;
   activeContentLanguage?: string;
   enabledContentLanguages?: string[];
   languagePreferenceKey?: string;
@@ -165,11 +179,13 @@ export default function HeaderShellView({
   scopedLinkMode,
   hideSaaSEntry = false,
   categoriesContent,
-  headerComposition,
+  headerComposition: initialHeaderComposition,
   renderBuilderElement: renderBuilderElementProp,
   renderBuilderColumn: renderBuilderColumnProp,
   renderBuilderRow: renderBuilderRowProp,
   builderInteractionIdentity = false,
+  builderPreviewMode = false,
+  builderDraftPreview = false,
   activeContentLanguage = "hy",
   enabledContentLanguages = ["hy"],
   languagePreferenceKey = "website_content_language",
@@ -178,6 +194,42 @@ export default function HeaderShellView({
   publicAnchorId,
   scrollState,
 }: HeaderShellViewProps) {
+  const [liveHeaderComposition, setLiveHeaderComposition] = useState<HeaderBuilderComposition | null>(null);
+  const liveHeaderRevisionRef = useRef(0);
+  useEffect(() => {
+    liveHeaderRevisionRef.current = 0;
+    setLiveHeaderComposition(null);
+    if (!builderDraftPreview) return;
+
+    const handleDraftMessage = (event: MessageEvent) => {
+      if (
+        event.origin !== window.location.origin ||
+        event.source !== window.parent ||
+        event.data?.source !== BUILDER_IFRAME_DRAFT_SOURCE ||
+        event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE ||
+        (scopedPreviewPage && event.data?.documentKey !== scopedPreviewPage)
+      ) return;
+      const revision = Number(event.data.revision);
+      const state = event.data.state as BuilderState | undefined;
+      if (!Number.isFinite(revision) || revision <= liveHeaderRevisionRef.current) return;
+      if (!state || state.page !== "header" || !Array.isArray(state.sections)) return;
+
+      // Header draft messages can race a page/shell URL transition. Only
+      // replace the rendered Header with a structurally complete composition;
+      // otherwise retain the server-hydrated document instead of blanking it.
+      try {
+        const candidate = resolveHeaderBuilderComposition({ sections: state.sections });
+        if (!candidate.elements.length || !candidate.columns?.length) return;
+        liveHeaderRevisionRef.current = revision;
+        setLiveHeaderComposition(candidate);
+      } catch {
+        // Keep the canonical server composition on malformed/stale drafts.
+      }
+    };
+    window.addEventListener("message", handleDraftMessage);
+    return () => window.removeEventListener("message", handleDraftMessage);
+  }, [builderDraftPreview, scopedPreviewPage]);
+  const headerComposition = liveHeaderComposition ?? initialHeaderComposition;
   const renderBuilderElement = renderBuilderElementProp ?? (builderInteractionIdentity
     ? (element: HeaderBuilderElement, content: ReactNode, flexItemStyle?: CSSProperties) => (
         <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id="header-document"
@@ -247,6 +299,10 @@ export default function HeaderShellView({
     : documentSettings.layout ?? layoutOverride ?? asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
   const headerBehavior = documentSettings.behavior;
+  const effectiveHeaderBehavior =
+    headerBehavior === "sticky" && documentSettings.stickyShowOnUp
+      ? "sticky-on-scroll-up"
+      : headerBehavior;
   const headerHeight = resolveHeaderHeightCss(
     documentSettings.height,
     documentSettings.customHeight,
@@ -319,27 +375,54 @@ export default function HeaderShellView({
     documentLogo?.headerBrandMode || shellSettings.headerBrandMode || (serviceHomepageMode ? "brand" : "logo");
   const effectiveLogoMaxWidth =
     documentLogo?.imageMaxWidth || shellSettings.headerLogoMaxWidth || headerSettings.logoMaxWidth;
+  const effectiveInverseLogoUrl =
+    documentLogo?.imageInverseUrl || documentSettings.inverseLogoUrl || null;
   const effectiveIconVariant =
     shellSettings.headerIconVariant || headerSettings.iconVariant;
   const effectiveActiveIndicator =
     documentNavigation?.menuActiveIndicator ||
     (layout === "princity" ? "princity" : "underline");
-  const navbarLineMode = shellSettings.navbarNavItemLineMode === "true" ? "enabled" : "disabled";
+  const navigationHoverLine = documentNavigation?.headerNavigationOverrides?.hoverLine
+    ? documentNavigation.menuHoverLine
+    : undefined;
+  const navigationHoverVariant = documentNavigation?.headerNavigationOverrides?.hoverVariant
+    ? documentNavigation.menuHoverVariant ?? "none"
+    : "inherit";
+  const navbarLineMode = navigationHoverVariant !== "inherit"
+    ? navigationHoverVariant === "line" || navigationHoverVariant === "line-glow"
+      ? "enabled"
+      : "disabled"
+    : navigationHoverLine
+      ? navigationHoverLine === "none" ? "disabled" : "enabled"
+      : shellSettings.navbarNavItemLineMode === "true" ? "enabled" : "disabled";
   const navbarLinePosition = ["top", "bottom", "left", "right"].includes(
-    shellSettings.navbarNavItemLinePositionMode ?? "",
+    navigationHoverLine && navigationHoverLine !== "none"
+      ? navigationHoverLine
+      : shellSettings.navbarNavItemLinePositionMode ?? "",
   )
-    ? shellSettings.navbarNavItemLinePositionMode
+    ? navigationHoverLine && navigationHoverLine !== "none"
+      ? navigationHoverLine
+      : shellSettings.navbarNavItemLinePositionMode
     : "bottom";
   const navbarLineSlide = ["center", "left", "right"].includes(
     shellSettings.navbarNavItemLineSlideMode ?? "",
   )
     ? shellSettings.navbarNavItemLineSlideMode
     : "center";
+  const navigationDividerMode = documentNavigation?.headerNavigationOverrides?.divider
+    ? documentNavigation.menuDividerMode
+    : undefined;
   const navbarVerticalBorder = ["partial", "all"].includes(
-    shellSettings.navbarModeBorderVertical ?? "",
+    navigationDividerMode ?? shellSettings.navbarModeBorderVertical ?? "",
   )
-    ? shellSettings.navbarModeBorderVertical
+    ? navigationDividerMode ?? shellSettings.navbarModeBorderVertical
     : "none";
+  const dropdownIndicator = documentNavigation?.headerNavigationOverrides?.dropdownIndicator
+    ? documentNavigation.menuDropdownIndicator ?? "none"
+    : shellSettings.navbarDropdownIndicator === "chevron" ? "chevron" : "none";
+  const parentIconEnabled = documentNavigation?.menuShowParentIcon ??
+    (documentSettings.parentIconEnabled || dropdownIndicator === "chevron");
+  const clickModeEnabled = documentNavigation?.menuClickMode ?? documentSettings.clickModeEnabled;
   const headerClassName = [
     layout === "pill" || layout === "princity" ? "site-header--pill" : "",
     serviceHomepageMode ? "site-header--service" : "",
@@ -352,8 +435,14 @@ export default function HeaderShellView({
     `site-header--navbar-line-mode-${navbarLineMode}`,
     `site-header--navbar-line-position-${navbarLinePosition}`,
     `site-header--navbar-line-slide-${navbarLineSlide}`,
+    `site-header--nav-hover-${navigationHoverVariant}`,
     `site-header--navbar-border-vertical-${navbarVerticalBorder}`,
+    builderDraftPreview ? "site-header--builder-preview" : "",
     documentSettings.overlay ? "site-header--builder-overlay" : "",
+    documentSettings.dropbarEnabled ? "site-header--dropdown-dropbar" : "",
+    documentSettings.dropdownAlign
+      ? `site-header--dropdown-align-${documentSettings.dropdownAlign}`
+      : "",
     hasDocumentBackground
       ? "site-header--document-background"
       : "",
@@ -424,6 +513,9 @@ export default function HeaderShellView({
       scopedPreviewPages={scopedPreviewPages}
       scopedLinkMode={scopedLinkMode}
       activeContentLanguage={activeContentLanguage}
+      dropdownIndicator={dropdownIndicator}
+      parentIconEnabled={parentIconEnabled}
+      clickModeEnabled={clickModeEnabled}
       style={typographyProps(
         allDocumentElements.find((candidate) => candidate.type === "navigation")
           ?.typography,
@@ -435,6 +527,8 @@ export default function HeaderShellView({
     const elementLogoUrl = element?.imageUrl || effectiveLogoUrl;
     const elementLogoAlt = element?.imageAlt || effectiveLogoAlt;
     const elementLogoMaxWidth = element?.imageMaxWidth || effectiveLogoMaxWidth;
+    const effectiveMobileLogoUrl =
+      element?.imageMobileUrl || documentSettings.mobileLogoUrl || null;
     const elementBrandMode = element?.headerBrandMode || effectiveBrandMode;
     const elementBrandText = element?.headerBrandText || effectiveBrandText;
     const elementImageAlignment = element?.imageAlignment || "left";
@@ -453,8 +547,9 @@ export default function HeaderShellView({
       <div className="site-header-logo-wrap" style={alignStyle}>
         {elementShowLogo && elementLogoUrl && (
           <Link href={homeHref} className="site-header-logo-img-wrap">
-            <UikitImage
-              block={{
+            <span className="site-header-logo-primary">
+              <UikitImage
+                block={{
                 id: element?.id ?? "header-logo",
                 kind: "image",
                 imageUrl: elementLogoUrl,
@@ -473,8 +568,25 @@ export default function HeaderShellView({
                 imageSvgColor: element?.imageSvgColor,
                 imagePosition: element?.imagePosition,
                 imageLoading: element?.imageLoading,
-              }}
-            />
+                }}
+              />
+            </span>
+            {effectiveInverseLogoUrl && (
+              <img
+                src={effectiveInverseLogoUrl}
+                alt={elementLogoAlt}
+                className="site-header-logo-inverse"
+                loading="eager"
+              />
+            )}
+            {effectiveMobileLogoUrl && (
+              <img
+                src={effectiveMobileLogoUrl}
+                alt={elementLogoAlt}
+                className="site-header-logo-mobile"
+                loading="eager"
+              />
+            )}
           </Link>
         )}
 
@@ -836,11 +948,13 @@ export default function HeaderShellView({
     <HeaderFrame
       id={publicAnchorId}
       accentColor={accentColor}
-      behavior={headerBehavior}
+      behavior={effectiveHeaderBehavior}
+      stickyAnimation={documentSettings.stickyAnimation}
       className={headerClassName}
       backgroundMode={headerMustBeTransparent ? "none" : effectiveHeaderBackgroundMode}
       textMode={effectiveHeaderTextMode}
       overlapHeader={documentSettings.overlay}
+      builderPreviewMode={builderPreviewMode}
       scrollState={scrollState}
       style={{
         ...documentVisualCss,

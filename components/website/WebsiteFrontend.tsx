@@ -67,7 +67,11 @@ function scopedShellCss(shellSettings: BuilderShellSettings) {
     .map(([key, value]) => `  ${key}: ${value};`)
     .join("\n");
   return `
-:root {
+/* Tenant-owned UIkit tokens must live on the WebsiteFrontend root rather
+   than document :root. The application shell also emits generic globals at
+   document scope; putting an imported YOOtheme preset on :root lets one
+   tenant's Card/Button tokens compete with another tenant's runtime. */
+:where([data-scoped-preview-root], [data-domain-website-root]) {
 ${uikitCss}
   --builder-global-section-padding-top: ${spacing(shellSettings.sectionPaddingTop, "sectionPadding")};
   --builder-global-section-padding-bottom: ${spacing(shellSettings.sectionPaddingBottom, "sectionPadding")};
@@ -246,7 +250,9 @@ export default async function WebsiteFrontend({
           hideSaaSEntry={!isPreview}
           website={website}
           activeContentLanguage={activeContentLanguage}
-          builderInteractionIdentity={builderIframeDiagnostics === "full"}
+          builderInteractionIdentity={builderIframeSelection}
+          builderPreviewMode={builderIframeSelection}
+          builderDraftPreview={builderIframeSelection}
           themeSettingsOverride={{}}
         />
         {renderLayout && hasVisibleLayout ? (

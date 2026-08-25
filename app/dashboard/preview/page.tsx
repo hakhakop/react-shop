@@ -105,7 +105,9 @@ export default async function RootPreviewPage({ searchParams }: RootPreviewPageP
         layoutOverride={shellSettings.headerLayout}
         shellSettingsOverride={shellSettings}
         hideSaaSEntry
-        builderInteractionIdentity={builderIframeDiagnostics === "full"}
+        builderInteractionIdentity={builderIframeSelection}
+        builderPreviewMode={builderIframeSelection}
+        builderDraftPreview={builderIframeSelection}
       />
       <StorefrontBuilderRenderer
         layout={renderLayout}

@@ -71,6 +71,25 @@ test("transparency, pull-under, and height remain independent across sequential 
     widthMode: "boxed",
     backgroundMode: "default",
     textMode: "auto",
+    breakpoint: undefined,
+    mobileBreakpoint: undefined,
+    stickyShowOnUp: true,
+    stickyAnimation: "slide-top",
+    dropdownAlign: undefined,
+    dropdownAlignToNavbar: false,
+    dropbarEnabled: false,
+    parentIconEnabled: false,
+    clickModeEnabled: false,
+    dialogTogglePosition: undefined,
+    dialogLayout: undefined,
+    dialogCenter: false,
+    dialogPushAfter: undefined,
+    searchPosition: undefined,
+    searchLayout: undefined,
+    socialPosition: undefined,
+    mobileLogoUrl: undefined,
+    inverseLogoUrl: undefined,
+    mobileComposition: undefined,
     zIndex: 40,
     topToolbarVisible: true,
     topToolbarText: "",
@@ -105,6 +124,25 @@ test("legacy Header documents still use shell values only when document fields a
     widthMode: "boxed",
     backgroundMode: "default",
     textMode: "auto",
+    breakpoint: undefined,
+    mobileBreakpoint: undefined,
+    stickyShowOnUp: true,
+    stickyAnimation: "slide-top",
+    dropdownAlign: undefined,
+    dropdownAlignToNavbar: false,
+    dropbarEnabled: false,
+    parentIconEnabled: false,
+    clickModeEnabled: false,
+    dialogTogglePosition: undefined,
+    dialogLayout: undefined,
+    dialogCenter: false,
+    dialogPushAfter: undefined,
+    searchPosition: undefined,
+    searchLayout: undefined,
+    socialPosition: undefined,
+    mobileLogoUrl: undefined,
+    inverseLogoUrl: undefined,
+    mobileComposition: undefined,
     zIndex: 40,
     topToolbarVisible: true,
     topToolbarText: "",
@@ -189,6 +227,26 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
     new URL("../components/HeaderFrame.tsx", import.meta.url),
     "utf8",
   );
+  const headerShell = readFileSync(
+    new URL("../components/HeaderShell.tsx", import.meta.url),
+    "utf8",
+  );
+  const rootLayout = readFileSync(
+    new URL("../app/layout.tsx", import.meta.url),
+    "utf8",
+  );
+  const dashboardPage = readFileSync(
+    new URL("../app/dashboard/page.tsx", import.meta.url),
+    "utf8",
+  );
+  const selectionBridge = readFileSync(
+    new URL("../components/builder/BuilderIframeSelectionBridge.tsx", import.meta.url),
+    "utf8",
+  );
+  const dashboardBuilder = readFileSync(
+    new URL("../components/dashboard/DashboardBuilder.tsx", import.meta.url),
+    "utf8",
+  );
   const headerCss = readFileSync(
     new URL("../app/styles/header.css", import.meta.url),
     "utf8",
@@ -199,7 +257,49 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
   );
   assert.match(builder, /resolveHeaderDocumentSettings\(currentHeaderComposition/);
   assert.match(headerView, /resolveHeaderDocumentSettings\(/);
+  assert.match(headerView, /builderPreviewMode\?: boolean/);
+  assert.match(frame, /builderPreviewMode = false/);
+  assert.match(frame, /data-builder-object-type=\{builderPreviewMode \? "section"/);
+  assert.match(frame, /data-builder-section-id=\{builderPreviewMode \? "header-document"/);
+  assert.match(selectionBridge, /builderContext/);
+  assert.match(selectionBridge, /event\.stopPropagation\(\)/);
+  assert.match(dashboardBuilder, /params\.set\("builderContext", builderState\.page\)/);
+  assert.doesNotMatch(dashboardBuilder, /useState<InspectorMode>\(\s*readInspectorModePreference/);
+  assert.match(dashboardBuilder, /setInspectorMode\(readInspectorModePreference\(\)\)/);
+  assert.match(dashboardBuilder, /setSidebarCollapsed\(\s*loadSidebarCollapsedPreference/);
+  assert.match(
+    headerCss,
+    /\.site-header-mobile-drawer-backdrop,\s*\.site-header-mobile-drawer-wrapper\s*\{\s*pointer-events:\s*none;\s*visibility:\s*hidden;/s,
+  );
+  assert.doesNotMatch(frame, /querySelector\("\.builder-dashboard"\)/);
+  assert.doesNotMatch(frame, /URLSearchParams\(window\.location\.search\)/);
   assert.match(frontend, /getPublishedHeaderDocumentSettings\(/);
+  assert.doesNotMatch(headerShell, /getThemeSettings\(/);
+  assert.match(headerShell, /canonical Builder shell\/document/);
+  assert.match(rootLayout, /styleWebsite \|\| isDashboardWorkspaceRequest/);
+  assert.match(dashboardPage, /initialPage === "header" \|\| initialPage === "footer"/);
+  assert.doesNotMatch(builder, /syncHeaderBlockPatch/);
+  assert.doesNotMatch(builder, /syncHeaderDocumentToShell/);
+  assert.match(
+    builder,
+    /onClickCapture=\{\(event\) => \{[\s\S]{0,900}selectLayoutBlock\("header-document", columnId, element\.id, true\)/,
+  );
+  assert.match(
+    builder,
+    /onMouseDown=\{\(event\) => \{[\s\S]{0,700}selectLayoutBlock\("header-document", columnId, element\.id, true\)/,
+  );
+  assert.match(
+    selectionBridge,
+    /if \(header && !headerInteractive\) \{[\s\S]{0,500}if \(editingShell\) \{[\s\S]{0,300}targetFromClick\(event\)/,
+  );
+  assert.match(
+    builder,
+    /if \(shell && builderState\.page !== shell\) \{[\s\S]{0,220}pendingIframeShellTargetRef\.current/,
+  );
+  assert.match(
+    selectionBridge,
+    /const hasGeometry = rect\.width > 0 && rect\.height > 0;[\s\S]{0,180}const inRowGutter = hasGeometry/,
+  );
   assert.match(composition, /documentTransparent: section\?\.headerTransparent/);
   assert.match(composition, /documentOverlay: section\?\.headerOverlay/);
   assert.match(inspector, /onHeaderDocumentChange=\{updateSelected\}/);

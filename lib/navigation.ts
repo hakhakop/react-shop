@@ -13,6 +13,12 @@ export type MenuItem = {
   url: string;
   path?: string | null;
   parentId?: string | null;
+  iconName?: string | null;
+  iconUrl?: string | null;
+  subtitle?: string | null;
+  mobileUrl?: string | null;
+  target?: "_self" | "_blank";
+  visibility?: "all" | "desktop" | "mobile";
   children?: MenuItem[];
 };
 

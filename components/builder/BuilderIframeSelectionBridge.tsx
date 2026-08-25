@@ -20,8 +20,14 @@ function targetFromClick(event: MouseEvent): BuilderInteractionTarget | null {
   const row = element?.closest<HTMLElement>('[data-builder-object-type="row"]');
   if (row) {
     const rect = row.getBoundingClientRect();
-    const inRowGutter = event.clientX - rect.left <= 12 || rect.right - event.clientX <= 12 ||
-      event.clientY - rect.top <= 12 || rect.bottom - event.clientY <= 12;
+    // Responsive/header duplicate trees can retain an identity wrapper with
+    // zero geometry. It must not look like a row whose right/bottom gutter is
+    // at coordinate 0, otherwise every click in that tree becomes Row 1.
+    const hasGeometry = rect.width > 0 && rect.height > 0;
+    const inRowGutter = hasGeometry && (
+      event.clientX - rect.left <= 12 || rect.right - event.clientX <= 12 ||
+      event.clientY - rect.top <= 12 || rect.bottom - event.clientY <= 12
+    );
     const sectionId = row.dataset.builderSectionId;
     const rowIndex = Number(row.dataset.builderRowIndex);
     if (inRowGutter && sectionId && Number.isInteger(rowIndex)) {
@@ -89,6 +95,8 @@ export default function BuilderIframeSelectionBridge({
 }) {
   useEffect(() => {
     let selectedTarget: BuilderInteractionTarget | null = null;
+    const builderContext = new URLSearchParams(window.location.search).get("builderContext");
+    const editingShell = builderContext === "header" || builderContext === "footer";
     let frame = 0;
     let scrollSettleTimer = 0;
     let scrolling = false;
@@ -119,7 +127,15 @@ export default function BuilderIframeSelectionBridge({
       selectedResizeObserver = new ResizeObserver(() => {
         if (!scrolling) scheduleRect();
       });
-      selectedResizeObserver.observe(element);
+      try {
+        selectedResizeObserver.observe(element);
+      } catch {
+        // A page/shell transition can remove the selected node between the
+        // query above and observer registration. Treat it as a stale target;
+        // the next selection or focus message will establish a fresh one.
+        selectedResizeObserver.disconnect();
+        selectedResizeObserver = null;
+      }
     };
     const handleSettledScroll = () => {
       if (!scrolling) {
@@ -136,14 +152,51 @@ export default function BuilderIframeSelectionBridge({
         reportRect();
       }, 140);
     };
+    const selectTarget = (target: BuilderInteractionTarget) => {
+      selectedTarget = target;
+      observeSelectedElement();
+      window.parent.postMessage({
+        source: BUILDER_IFRAME_SELECTION_SOURCE,
+        type: "select",
+        target,
+        shell: target.sectionId === "header-document"
+          ? "header"
+          : target.sectionId === "footer-document"
+            ? "footer"
+            : undefined,
+      } satisfies SelectionMessage, window.location.origin);
+      if (diagnostics !== "minimal") scheduleRect();
+    };
     const handleClick = (event: MouseEvent) => {
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
       // Header navigation links belong to the scoped preview router. They
       // synchronize the Builder document on the first click. Hash-only links
       // remain ordinary in-page preview navigation.
       if (anchor?.closest(".site-header")) {
+        if (editingShell) {
+          const explicitlyOpened = anchor.target === "_blank" || event.metaKey || event.ctrlKey || event.shiftKey;
+          if (explicitlyOpened) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const target = targetFromClick(event) ?? {
+            type: "section",
+            sectionId: "header-document",
+          } satisfies BuilderInteractionTarget;
+          selectTarget(target);
+          return;
+        }
         const href = anchor.getAttribute("href") ?? "";
-        const isPageNavigation = /(?:[?&]page=|\/preview\?)/.test(href) && !href.includes("#");
+        const isExternal = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href) &&
+          !href.startsWith(window.location.origin);
+        const isPageNavigation = Boolean(
+          href &&
+          href !== "#" &&
+          !href.startsWith("#") &&
+          !href.startsWith("mailto:") &&
+          !href.startsWith("tel:") &&
+          !isExternal &&
+          !href.includes("#"),
+        );
         if ((diagnostics === "settled" || diagnostics === "full") && isPageNavigation) {
           event.preventDefault();
           window.parent.postMessage({
@@ -169,19 +222,23 @@ export default function BuilderIframeSelectionBridge({
         } satisfies SelectionMessage, window.location.origin);
       }
       if (header && !headerInteractive) {
-        const headerTarget: BuilderInteractionTarget = {
+        // While editing a shell, Header content follows the same Builder
+        // selection contract as page content: resolve the authored block
+        // before falling back to the document section. Without this branch,
+        // ordinary clicks on logo/text/image content were always promoted to
+        // the Header document toolbar.
+        if (editingShell) {
+          const target = targetFromClick(event);
+          if (target) {
+            selectTarget(target);
+            return;
+          }
+        }
+        const headerTarget = {
           type: "section",
           sectionId: "header-document",
-        };
-        selectedTarget = headerTarget;
-        observeSelectedElement();
-        window.parent.postMessage({
-          source: BUILDER_IFRAME_SELECTION_SOURCE,
-          type: "select",
-          target: headerTarget,
-          shell: "header",
-        } satisfies SelectionMessage, window.location.origin);
-        if (diagnostics !== "minimal") scheduleRect();
+        } satisfies BuilderInteractionTarget;
+        selectTarget(headerTarget);
         return;
       }
       const target = targetFromClick(event);
@@ -206,22 +263,7 @@ export default function BuilderIframeSelectionBridge({
       if (event.target instanceof Element && event.target.closest("a[href], button, input, select, textarea, form")) {
         event.preventDefault();
       }
-      const message: SelectionMessage = {
-        source: BUILDER_IFRAME_SELECTION_SOURCE,
-        type: "select",
-        target,
-        shell: event.target instanceof Element
-          ? event.target.closest(".site-header")
-            ? "header"
-            : event.target.closest('footer[data-builder-page-root="true"]')
-              ? "footer"
-              : undefined
-          : undefined,
-      };
-      selectedTarget = target;
-      observeSelectedElement();
-      window.parent.postMessage(message, window.location.origin);
-      if (diagnostics !== "minimal") scheduleRect();
+      selectTarget(target);
     };
     const handleMessage = (event: MessageEvent<SelectionMessage>) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;

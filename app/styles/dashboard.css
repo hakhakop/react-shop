@@ -6072,6 +6072,41 @@ body:has(.builder-dashboard) .site-header--service {
   margin-bottom: 12px;
 }
 
+.builder-header-theme-preset-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 8px 0 10px;
+}
+
+.builder-header-theme-preset-list .builder-preset-btn small {
+  white-space: normal;
+}
+
+.builder-header-active-row-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 10px;
+  align-items: center;
+  margin: 10px 0 12px;
+  padding: 10px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: var(--builder-ui-radius-sm);
+  background: var(--builder-ui-surface-strong);
+}
+
+.builder-header-active-row-layout > span {
+  grid-column: 1 / -1;
+  color: var(--builder-ui-text-muted);
+  font-size: 11px;
+}
+
+.builder-header-active-row-layout strong {
+  min-width: 0;
+  color: var(--builder-ui-text);
+  font-size: 13px;
+}
+
 .builder-header-layout-preset {
   align-items: center;
   padding: 8px;

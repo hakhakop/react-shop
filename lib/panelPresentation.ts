@@ -15,6 +15,21 @@ function hasExplicitColor(value: unknown) {
   return typeof value === "string" && !["", "inherit", "default", "none"].includes(value.trim().toLowerCase());
 }
 
+function panelMetaColorValue(value: unknown): string | undefined {
+  const color = String(value ?? "").trim().toLowerCase().replace(/^uk-text-/, "");
+  if (!["muted", "emphasis", "primary", "secondary", "success", "warning", "danger"].includes(color)) return undefined;
+  const tokens: Record<string, string> = {
+    muted: "var(--uk-global-muted-text-color, currentColor)",
+    emphasis: "var(--uk-global-emphasis-color, currentColor)",
+    primary: "var(--uk-global-primary-color, currentColor)",
+    secondary: "var(--uk-global-secondary-color, var(--uk-global-emphasis-color, currentColor))",
+    success: "var(--uk-global-success-background, currentColor)",
+    warning: "var(--uk-global-warning-background, currentColor)",
+    danger: "var(--uk-global-danger-background, currentColor)",
+  };
+  return tokens[color];
+}
+
 /**
  * Resolve the semantic text/link palette for colored Card and Tile surfaces.
  * Global Card role tokens remain the source of truth; local color utilities
@@ -25,9 +40,10 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   const variant = String(block.panelVariant ?? block.panelStyle ?? block.cardVariant ?? "").trim().toLowerCase();
   const isDefaultCard = ["default", "card-default"].includes(variant);
   const isBlankPanel = ["", "blank", "none"].includes(variant);
+  const explicitMetaColor = panelMetaColorValue(block.metaColor ?? block.panelMetaColor);
   if (!role && !isDefaultCard && !isBlankPanel) return {
     className: "",
-    style: {} as Record<string, string>,
+    style: explicitMetaColor ? { "--builder-card-meta-color": explicitMetaColor } : {} as Record<string, string>,
     metaStyle: {} as Record<string, string>,
   };
 
@@ -58,6 +74,7 @@ export function resolvePanelColorSemantics(block: PanelLike) {
     if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
       style["--builder-card-title-color"] = "var(--uk-global-emphasis-color, var(--uk-card-default-title, inherit))";
     }
+    if (explicitMetaColor) style["--builder-card-meta-color"] = explicitMetaColor;
     return { className: "", style, metaStyle: {} as Record<string, string> };
   }
 
@@ -124,6 +141,8 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   }
   if (!hasExplicitMetaColor) {
     style["--builder-card-meta-color"] = text;
+  } else if (explicitMetaColor) {
+    style["--builder-card-meta-color"] = explicitMetaColor;
   }
   if (!hasExplicitColor(block.contentColor ?? block.panelContentColor)) {
     style["--builder-card-content-color"] = text;
