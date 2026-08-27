@@ -2,6 +2,33 @@ import DOMPurify, { type Config } from "dompurify";
 
 const HAS_HTML = /<[a-z][\s\S]*>/i;
 
+const SAFE_TEXT_ENTITIES: Record<string, string> = {
+  "&amp;": "&",
+  "&lt;": "<",
+  "&gt;": ">",
+  "&quot;": "\"",
+  "&#39;": "'",
+  "&shy;": "\u00ad",
+  "&#173;": "\u00ad",
+  "&#xad;": "\u00ad",
+};
+
+const decodeSafeEntityOnce = (value: string): string =>
+  value.replace(/&(amp|lt|gt|quot|#39|shy|#173|#x0*ad);/gi, (entity) =>
+    SAFE_TEXT_ENTITIES[entity.toLowerCase()] ?? entity,
+  );
+
+/**
+ * Decode the small, safe entity set emitted by YOOtheme for visible text.
+ *
+ * Imports from older YOOtheme/WebPages versions can be escaped twice (for
+ * example `&amp;amp;`). Keep this deliberately bounded: it repairs the
+ * persisted import format without repeatedly decoding arbitrary user text.
+ */
+export function decodeHtmlEntities(value: string): string {
+  return decodeSafeEntityOnce(decodeSafeEntityOnce(value));
+}
+
 export function isRichText(value: string): boolean {
   return HAS_HTML.test(value);
 }
@@ -60,13 +87,10 @@ const safeResponsiveBreakClass = (attrs: string) => {
  */
 function sanitizeServerHtml(html: string): string {
   // Imported rich HTML is sanitized both at the import boundary and again at
-  // rendering. Decode the five safe entities before re-escaping so this
+  // rendering. Decode the safe entities before re-escaping so this
   // canonical, fail-closed sanitizer remains idempotent instead of turning
   // `&amp;` into `&amp;amp;` on every render/save cycle.
-  const decodeSafeEntities = (value: string) => value.replace(/&(amp|lt|gt|quot|#39);/gi, (entity) => ({
-    "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": "\"", "&#39;": "'",
-  }[entity.toLowerCase()] ?? entity));
-  const escaped = (value: string) => decodeSafeEntities(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
+  const escaped = (value: string) => decodeHtmlEntities(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
   const withoutExecutableBlocks = html.replace(/<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
   return withoutExecutableBlocks.split(/(<[^>]*>)/g).map((part) => {
     if (!part.startsWith("<")) return escaped(part);

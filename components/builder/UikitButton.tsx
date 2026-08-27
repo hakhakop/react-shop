@@ -6,7 +6,7 @@ import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 import { typographyProps } from "@/lib/builderTypography";
 import { uikitGridGapCss } from "@/lib/uikitGridStructure";
-import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
+import { decodeHtmlEntities, isRichText, sanitizeHtml } from "@/lib/safeHtml";
 
 type Props = {
   block: any;
@@ -77,7 +77,7 @@ export default function UikitButton({ block, scopeClassName }: Props) {
     const value = String(label ?? "");
     return isRichText(value)
       ? <span className="shop-builder-button-label" dangerouslySetInnerHTML={{ __html: sanitizeHtml(value, { FORBID_ATTR: ["style"] }) }} />
-      : value;
+      : decodeHtmlEntities(value);
   };
 
   return (

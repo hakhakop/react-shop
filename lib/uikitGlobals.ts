@@ -77,6 +77,14 @@ export function getUikitGlobalsCssVars(
   const accent = resolveGlobalStyleToken("accentColor", shellSettings, design, "#111111").value;
   const value = (key: string, fallback: string) =>
     resolveGlobalStyleToken(key, shellSettings, design, fallback).value;
+  // YOOtheme's heading defaults inherit the active typography role. The
+  // generic WebPages defaults intentionally remain available for tenants
+  // that have no imported theme, so only fall back to the inherited token
+  // when the heading-specific token was not authored by the tenant/theme.
+  const valueOrToken = (key: string, inheritedKey: string, fallback: string) => {
+    const authored = resolveGlobalStyleToken(key, shellSettings, design, fallback);
+    return authored.source === "default" ? value(inheritedKey, fallback) : authored.value;
+  };
   const buttonValue = (key: string, fallback: string) => {
     const provenance = shellSettings?.buttonTokenInheritance?.[key];
     const raw = shellSettings?.[key as keyof BuilderShellSettings];
@@ -157,6 +165,30 @@ export function getUikitGlobalsCssVars(
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
   const globalBorder = value("borderColor", "transparent");
+  // UIkit has three heading tiers: base, tablet/medium, and laptop/large.
+  // Keep those tiers separate from HTML h1–h6 sizes. YOOtheme themes can
+  // override the responsive large values (Jack Baker does for Large,
+  // Xlarge, and 2xlarge), while the medium values are derived by UIkit when
+  // the theme does not author them.
+  const headingMediumLarge = value("headingMediumFontSizeResponsive", "64px");
+  const headingLargeLarge = value("headingLargeFontSizeResponsive", "96px");
+  const headingXLargeLarge = value("headingXLargeFontSizeResponsive", "128px");
+  const heading2XLargeLarge = value("heading2XLargeFontSizeResponsive", "176px");
+  const heading3XLargeLarge = value("heading3XLargeFontSizeResponsive", "240px");
+  const headingSmallMedium = value("headingSmallFontSizeResponsive", `calc(${headingMediumLarge} * 0.8125)`);
+  const headingMediumMedium = value("headingMediumFontSizeMedium", `calc(${headingMediumLarge} * 0.875)`);
+  const headingLargeMedium = value("headingLargeFontSizeMedium", headingMediumLarge);
+  const headingXLargeMedium = value("headingXLargeFontSizeMedium", headingLargeLarge);
+  const heading2XLargeMedium = value("heading2XLargeFontSizeMedium", headingXLargeLarge);
+  const heading3XLargeMedium = value("heading3XLargeFontSizeMedium", heading2XLargeLarge);
+  const authoredOrDerived = (key: string, derived: string) => {
+    const authored = resolveGlobalStyleToken(key, shellSettings, design, "");
+    return authored.source === "default" ? derived : authored.value;
+  };
+  const headingSmallBase = authoredOrDerived("headingSmallFontSize", `calc(${headingSmallMedium} * 0.8)`);
+  const headingMediumBase = authoredOrDerived("headingMediumFontSize", `calc(${headingMediumMedium} * 0.825)`);
+  const headingLargeBase = authoredOrDerived("headingLargeFontSize", `calc(${headingLargeMedium} * 0.85)`);
+  const headingXLargeBase = authoredOrDerived("headingXLargeFontSize", headingXLargeMedium);
   const cardDefaultBackground = resolveBackgroundPaint(value("cardBackground", "#ffffff"), "#ffffff");
   const cardDefaultColorMode = value("cardDefaultColorMode", "dark");
   const cardPrimaryBackground = resolveBackgroundPaint(value("cardPrimaryBackground", primary), primary);
@@ -204,6 +236,16 @@ export function getUikitGlobalsCssVars(
     "--uk-container-padding-horizontal-s": value("containerPaddingHorizontalSmall", "30px"),
     "--uk-container-padding-horizontal-m": value("containerPaddingHorizontalMedium", "40px"),
     "--uk-page-container-max-width": value("pageContainerMaxWidth", value("containerXLarge", "1600px")),
+    "--uk-theme-page-border-mode": value("themePageBorderMode", ""),
+    "--uk-theme-page-border-width": value("themePageBorderWidth", "0"),
+    "--uk-theme-page-border-width-large": value("themePageBorderWidthLarge", value("themePageBorderWidth", "0")),
+    "--uk-theme-page-border-color": value("themePageBorderColor", "transparent"),
+    "--uk-theme-page-border-gradient": value("themePageBorderGradient", "none"),
+    "--uk-theme-page-container-margin-top": value("themePageContainerMarginTop", "0"),
+    "--uk-theme-page-container-margin-bottom": value("themePageContainerMarginBottom", "0"),
+    "--uk-theme-page-container-background": value("themePageContainerBackground", "transparent"),
+    "--uk-theme-page-container-color-mode": value("themePageContainerColorMode", "dark"),
+    "--uk-theme-page-container-color": value("themePageContainerColor", globalText),
 
     // Grid gutters
     "--uk-grid-gutter-small": value("gridGutterSmall", "15px"),
@@ -275,24 +317,55 @@ export function getUikitGlobalsCssVars(
     "--webpages-font-tertiary-text-transform": value("textTransformTertiary", "inherit"),
     "--uk-base-font-size": value("baseFontSize", "16px"),
     "--uk-base-line-height": value("baseLineHeight", "1.5"),
-    "--uk-heading-font-weight": value("headingFontWeight", "700"),
-    "--uk-heading-h3-font-size": value("headingH3FontSize", "22px"),
+    // YOOtheme's heading presets inherit the Primary typography role unless
+    // a preset-specific weight was authored. This matters for themes such as
+    // Jack Baker where Primary is normal/400, not the WebPages default 700.
+    "--uk-heading-font-weight": valueOrToken("headingFontWeight", "fontWeightPrimary", "700"),
+    // UIkit h3 is the global Large text size. `heading-small-font-size` is a
+    // separate presentation utility and must not be used as an h3 alias.
+    "--uk-heading-h3-font-size": valueOrToken("headingH3FontSize", "fontSizeLarge", "22px"),
     // YOOtheme's h1 preset is a distinct semantic heading contract.
-    "--uk-heading-h1-font-size": value("headingH1FontSize", "42px"),
-    "--uk-heading-h1-font-weight": value("headingH1FontWeight", "700"),
-    "--uk-heading-small-font-size": value("headingSmallFontSize", "30px"),
-    "--uk-heading-medium-font-size": value("headingMediumFontSize", "46.2px"),
-    "--uk-heading-large-font-size": value("headingLargeFontSize", "38px"),
-    "--uk-heading-xlarge-font-size": value("headingXLargeFontSize", "44px"),
-    "--uk-heading-small-font-size-responsive": value("headingSmallFontSizeResponsive", "52px"),
+    "--uk-heading-h1-font-size": valueOrToken("headingH1FontSize", "fontSize2XLarge", "44px"),
+    "--uk-heading-h1-font-weight": valueOrToken("headingH1FontWeight", "fontWeightPrimary", "400"),
+    "--uk-heading-h3-font-weight": valueOrToken("headingFontWeight", "fontWeightPrimary", "400"),
+    "--uk-heading-h5-font-size": valueOrToken("headingH5FontSize", "baseFontSize", "16px"),
+    "--uk-heading-h6-font-size": valueOrToken("headingH6FontSize", "fontSizeSmall", "14px"),
+    // These are UIkit presentation classes, not HTML heading aliases. Their
+    // source defaults are derived from the responsive medium-size tokens.
+    "--uk-heading-small-font-size": headingSmallBase,
+    "--uk-heading-medium-font-size": headingMediumBase,
+    "--uk-heading-large-font-size": headingLargeBase,
+    "--uk-heading-xlarge-font-size": headingXLargeBase,
+    "--uk-heading-2xlarge-font-size": heading2XLargeMedium,
+    "--uk-heading-3xlarge-font-size": heading3XLargeMedium,
+    "--uk-heading-small-font-size-responsive": headingSmallMedium,
+    "--uk-heading-medium-font-size-m": headingMediumMedium,
+    "--uk-heading-large-font-size-m": headingLargeMedium,
+    "--uk-heading-xlarge-font-size-m": headingXLargeMedium,
+    "--uk-heading-2xlarge-font-size-m": heading2XLargeMedium,
+    "--uk-heading-3xlarge-font-size-m": heading3XLargeMedium,
+    "--uk-heading-large-font-size-responsive": headingLargeLarge,
+    "--uk-heading-xlarge-font-size-responsive": headingXLargeLarge,
+    "--uk-heading-2xlarge-font-size-responsive": heading2XLargeLarge,
+    "--uk-heading-3xlarge-font-size-responsive": heading3XLargeLarge,
     "--uk-heading-small-line-height": value("headingSmallLineHeight", "1.2"),
     "--uk-heading-large-line-height": value("headingLargeLineHeight", "1.1"),
-    "--uk-heading-medium-font-size-responsive": value("headingMediumFontSizeResponsive", "62px"),
+    "--uk-heading-medium-font-size-responsive": headingMediumLarge,
     "--uk-heading-medium-line-height": value("headingMediumLineHeight", "1.2"),
-    "--uk-heading-small-font-weight": value("headingSmallFontWeight", "700"),
-    "--uk-heading-medium-font-weight": value("headingMediumFontWeight", "700"),
-    "--uk-text-small-font-size": value("smallTextFontSize", "14px"),
-    "--uk-text-large-font-size": value("largeTextFontSize", "24px"),
+    "--uk-heading-small-font-weight": value("headingSmallFontWeight", value("fontWeightPrimary", "400")),
+    "--uk-heading-medium-font-weight": value("headingMediumFontWeight", value("fontWeightPrimary", "400")),
+    // UIkit text utilities are derived from the global scale. The old
+    // WebPages defaults here bypassed an imported YOOtheme global-small or
+    // global-large token (Jack Baker was therefore rendered at 14px instead
+    // of 13px in footer credits and at the wrong size for lead/large text).
+    "--uk-text-lead-font-size": value("fontSizeLarge", value("largeTextFontSize", "24px")),
+    "--uk-text-lead-line-height": value("textLeadLineHeight", "1.5"),
+    "--uk-text-meta-font-size": value("fontSizeSmall", value("smallTextFontSize", "14px")),
+    "--uk-text-meta-line-height": value("textMetaLineHeight", "1.4"),
+    "--uk-text-small-font-size": value("fontSizeSmall", value("smallTextFontSize", "14px")),
+    "--uk-text-small-line-height": value("textSmallLineHeight", "1.5"),
+    "--uk-text-large-font-size": value("fontSizeLarge", value("largeTextFontSize", "24px")),
+    "--uk-text-large-line-height": value("textLargeLineHeight", "1.5"),
     "--uk-global-font-size-small": value("fontSizeSmall", value("smallTextFontSize", "14px")),
     "--uk-global-font-size-medium": value("fontSizeMedium", "20px"),
     "--uk-global-font-size-large": value("fontSizeLarge", value("largeTextFontSize", "24px")),
@@ -759,6 +832,19 @@ export function getUikitGlobalsCssVars(
 
     // Navbar
     "--uk-navbar-background": value("navbarBackground", backgroundDefault),
+    "--uk-theme-headerbar-color-mode": value("themeHeaderbarColorMode", "light"),
+    "--uk-theme-headerbar-font-size": value("themeHeaderbarFontSize", "inherit"),
+    "--uk-theme-headerbar-top-padding-top": value("themeHeaderbarTopPaddingTop", "0"),
+    "--uk-theme-headerbar-top-padding-bottom": value("themeHeaderbarTopPaddingBottom", "0"),
+    "--uk-theme-headerbar-top-background": value("themeHeaderbarTopBackground", "transparent"),
+    "--uk-theme-headerbar-top-border-width": value("themeHeaderbarTopBorderWidth", "0"),
+    "--uk-theme-headerbar-top-border": value("themeHeaderbarTopBorder", "transparent"),
+    "--uk-theme-headerbar-bottom-padding-top": value("themeHeaderbarBottomPaddingTop", "0"),
+    "--uk-theme-headerbar-bottom-padding-bottom": value("themeHeaderbarBottomPaddingBottom", "0"),
+    "--uk-theme-headerbar-bottom-background": value("themeHeaderbarBottomBackground", "transparent"),
+    "--uk-theme-headerbar-bottom-border-width": value("themeHeaderbarBottomBorderWidth", "0"),
+    "--uk-theme-headerbar-bottom-border": value("themeHeaderbarBottomBorder", "transparent"),
+    "--uk-theme-headerbar-stacked-margin-top": value("themeHeaderbarStackedMarginTop", "0"),
     "--uk-navbar-gap": value("navbarGap", "10px"),
     "--uk-navbar-nav-gap": value("navbarNavGap", "10px"),
     "--uk-navbar-nav-item-height": value("navbarNavItemHeight", "90px"),
@@ -769,6 +855,7 @@ export function getUikitGlobalsCssVars(
     "--uk-navbar-nav-item-font-style": value("navbarNavItemFontStyle", "normal"),
     "--uk-navbar-nav-item-font-weight": value("navbarNavItemFontWeight", "400"),
     "--uk-navbar-nav-item-letter-spacing": value("navbarNavItemLetterSpacing", "0"),
+    "--uk-navbar-nav-item-text-transform": value("navbarNavItemTextTransform", "none"),
     "--uk-navbar-nav-item-transition-duration": value("navbarNavItemTransitionDuration", "0.1s"),
     "--uk-navbar-nav-item-hover-color": value("navbarNavItemHoverColor", primary),
     "--uk-navbar-nav-item-onclick-color": value("navbarNavItemOnclickColor", primary),
@@ -817,12 +904,12 @@ export function getUikitGlobalsCssVars(
     "--uk-navbar-nav-item-line-mode": value("navbarNavItemLineMode", "false"),
     "--uk-navbar-nav-item-line-position-mode": value("navbarNavItemLinePositionMode", "bottom"),
     "--uk-navbar-nav-item-line-slide-mode": value("navbarNavItemLineSlideMode", "fixed"),
-    "--uk-navbar-nav-item-line-height": value("navbarNavItemLineHeight", "3px"),
+    "--uk-navbar-nav-item-line-height": value("navbarNavItemLineHeight", "1px"),
     "--uk-navbar-nav-item-line-transition-duration": value("navbarNavItemLineTransitionDuration", "0.35s"),
-    "--uk-navbar-nav-item-line-hover-height": value("navbarNavItemLineHoverHeight", "3px"),
-    "--uk-navbar-nav-item-line-onclick-height": value("navbarNavItemLineOnclickHeight", "3px"),
-    "--uk-navbar-nav-item-line-active-height": value("navbarNavItemLineActiveHeight", "3px"),
-    "--uk-navbar-nav-item-line-opacity": value("navbarNavItemLineOpacity", "0"),
+    "--uk-navbar-nav-item-line-hover-height": value("navbarNavItemLineHoverHeight", value("navbarNavItemLineHeight", "1px")),
+    "--uk-navbar-nav-item-line-onclick-height": value("navbarNavItemLineOnclickHeight", value("navbarNavItemLineHeight", "1px")),
+    "--uk-navbar-nav-item-line-active-height": value("navbarNavItemLineActiveHeight", value("navbarNavItemLineHeight", "1px")),
+    "--uk-navbar-nav-item-line-opacity": value("navbarNavItemLineOpacity", "1"),
     "--uk-navbar-item-padding-horizontal-m": value("navbarItemPaddingHorizontalMedium", "0"),
     "--uk-navbar-dropdown-shift-margin-m": value("navbarDropdownShiftMarginMedium", "-12px"),
     "--uk-navbar-dropdown-dropbar-shift-margin-m": value("navbarDropdownDropbarShiftMarginMedium", "14px"),
@@ -859,16 +946,16 @@ export function getUikitGlobalsCssVars(
     "--uk-navbar-border-width": value("navbarBorderWidth", value("borderWidth", "1px")),
     "--uk-navbar-border": value("navbarBorder", globalBorder),
     "--uk-navbar-dropdown-border-radius": value("navbarDropdownBorderRadius", "12px"),
-    "--uk-navbar-nav-item-line-gradient": value("navbarNavItemLineGradient", "none"),
+    "--uk-navbar-nav-item-line-gradient": value("navbarNavItemLineGradient", "transparent"),
     "--uk-navbar-nav-item-line-border-radius": value("navbarNavItemLineBorderRadius", "0"),
     "--uk-navbar-nav-item-line-margin-horizontal": value("navbarNavItemLineMarginHorizontal", "0"),
     "--uk-navbar-nav-item-line-margin-vertical": value("navbarNavItemLineMarginVertical", "-1px"),
-    "--uk-navbar-nav-item-line-hover-background": value("navbarNavItemLineHoverBackground", "transparent"),
-    "--uk-navbar-nav-item-line-hover-opacity": value("navbarNavItemLineHoverOpacity", value("navbarNavItemLineOpacity", "0")),
-    "--uk-navbar-nav-item-line-onclick-background": value("navbarNavItemLineOnclickBackground", "transparent"),
-    "--uk-navbar-nav-item-line-onclick-opacity": value("navbarNavItemLineOnclickOpacity", value("navbarNavItemLineOpacity", "0")),
-    "--uk-navbar-nav-item-line-active-background": value("navbarNavItemLineActiveBackground", "transparent"),
-    "--uk-navbar-nav-item-line-active-opacity": value("navbarNavItemLineActiveOpacity", value("navbarNavItemLineOpacity", "0")),
+    "--uk-navbar-nav-item-line-hover-background": value("navbarNavItemLineHoverBackground", "currentColor"),
+    "--uk-navbar-nav-item-line-hover-opacity": value("navbarNavItemLineHoverOpacity", "1"),
+    "--uk-navbar-nav-item-line-onclick-background": value("navbarNavItemLineOnclickBackground", "currentColor"),
+    "--uk-navbar-nav-item-line-onclick-opacity": value("navbarNavItemLineOnclickOpacity", "1"),
+    "--uk-navbar-nav-item-line-active-background": value("navbarNavItemLineActiveBackground", "currentColor"),
+    "--uk-navbar-nav-item-line-active-opacity": value("navbarNavItemLineActiveOpacity", "1"),
     "--uk-navbar-parent-icon-margin-left": value("navbarParentIconMarginLeft", "4px"),
     "--uk-navbar-primary-nav-gap": value("navbarPrimaryNavGap", "0"),
     "--uk-navbar-primary-nav-gap-m": value("navbarPrimaryNavGapMedium", "0"),

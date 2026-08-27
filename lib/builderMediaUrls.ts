@@ -7,10 +7,14 @@
  * namespace is rewritten: WebPages-relative assets and already absolute URLs
  * remain untouched.
  */
-const WORDPRESS_UPLOAD_PATH = /^(?:\/)?wp-content\/uploads(?:\/|$)/i;
+const WORDPRESS_UPLOAD_PATH = /^(?:(?:https?:)?\/\/[^/]+)?\/?wp-content\/uploads(?:\/|$)/i;
 
 const MEDIA_URL_KEYS = new Set([
   "imageUrl",
+  "imageInverseUrl",
+  "imageMobileUrl",
+  "headerMobileLogoUrl",
+  "headerInverseLogoUrl",
   "thumbnailUrl",
   "image",
   "imageSrc",
@@ -38,7 +42,9 @@ export function resolveWordPressMediaUrl(
 ) {
   if (typeof value !== "string" || !WORDPRESS_UPLOAD_PATH.test(value)) return value;
   const origin = normalizedOrigin(wordpressOrigin);
-  return origin ? `${origin}/${value.replace(/^\/+/, "")}` : value;
+  if (!origin) return value;
+  const uploadPath = value.replace(/^(?:https?:)?\/\/[^/]+/i, "").replace(/^\/+/, "");
+  return `${origin}/${uploadPath}`;
 }
 
 export function resolveWordPressMediaHtml(

@@ -1,0 +1,71 @@
+{
+  "style": "jack-baker",
+  "site": {
+    "layout": "full",
+    "boxed": { "alignment": 1 }
+  },
+  "header": {
+    "layout": "horizontal-center",
+    "width": "expand",
+    "search_layout": "input-dropdown",
+    "search_icon": "left",
+    "search": ""
+  },
+  "navbar": {
+    "sticky": 2,
+    "dropdown_align": "left",
+    "dropbar": true,
+    "dropdown_boundary": false
+  },
+  "dialog": {
+    "layout": "offcanvas-top",
+    "toggle": "header:end",
+    "menu_style": "default",
+    "offcanvas": {
+      "mode": "slide",
+      "flip": true,
+      "overlay": true
+    }
+  },
+  "mobile": {
+    "breakpoint": "l",
+    "header": { "layout": "horizontal-right" },
+    "navbar": { "sticky": 0 },
+    "dialog": {
+      "layout": "modal-center",
+      "toggle": "header-mobile:end",
+      "text_center": true,
+      "push_index": 2
+    }
+  },
+  "logo": {
+    "text": "Jack Baker",
+    "image": "wp-content/uploads/yootheme/logo.svg",
+    "image_inverse": "",
+    "image_mobile": "wp-content/uploads/yootheme/logo-mobile.svg",
+    "image_svg_inline": true,
+    "image_dialog": ""
+  },
+  "menu": {
+    "items": {
+      "30": {
+        "dropdown": { "columns": 1 }
+      }
+    },
+    "positions": {
+      "navbar": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 2
+      },
+      "dialog-mobile": {
+        "style": "primary",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 4,
+        "divider": false
+      }
+    }
+  }
+}

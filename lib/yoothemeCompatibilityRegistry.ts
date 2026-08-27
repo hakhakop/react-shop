@@ -326,6 +326,7 @@ const ENTERPRISE8_SUPPORTED_FIELDS: Readonly<Record<string, readonly string[]>> 
   headline: ["animation", "block_align_breakpoint", "block_align_fallback", "content", "margin", "maxwidth", "position", "position_z_index", "text_align", "text_align_breakpoint", "text_align_fallback", "title_element", "title_style"],
   icon: ["icon", "icon_width", "margin"],
   image: ["animation", "parallax_easing", "parallax_y", "css", "image", "image_border", "image_svg_color", "image_svg_inline", "image_width", "margin", "margin_remove_top", "position", "position_left", "position_right", "position_top", "position_z_index", "text_align", "visibility"],
+  overlay: ["content", "image", "image_alt", "image_height", "image_loading", "image_width", "link", "link_aria_label", "link_text", "link_target", "meta", "overlay_animate_background", "overlay_expand", "overlay_hover", "overlay_link", "overlay_margin", "overlay_mode", "overlay_padding", "overlay_position", "overlay_style", "overlay_transition", "text_color", "title", "title_color", "title_decoration", "title_element", "title_font_family", "title_hover_style", "title_link", "title_margin", "title_style", "title_transition"],
   list_item: ["content", "icon", "link"],
   list: ["list_element", "list_horizontal_separator", "show_image", "show_link"],
   "overlay-slider_item": ["image", "item_element", "text_color", "title"],

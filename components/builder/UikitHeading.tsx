@@ -6,7 +6,7 @@ import { getUikitHeadingClass, getUikitTextClass } from "@/lib/uikitTokens";
 import { typographyProps, typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import TypewriterText from "@/components/builder/TypewriterText";
-import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
+import { decodeHtmlEntities, isRichText, sanitizeHtml } from "@/lib/safeHtml";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -50,7 +50,9 @@ export default function UikitHeading({ block }: Props) {
         : styleVal.startsWith("heading-") || ["h1", "h2", "h3", "h4", "h5", "h6"].includes(styleVal)
         ? `uk-${styleVal}`
         : getUikitHeadingClass(Tag, styleVal)
-      : getUikitHeadingClass(Tag, "default");
+      : isImportedYoothemeHeading
+        ? "uk-margin-remove-top"
+        : getUikitHeadingClass(Tag, "default");
 
   const decorationVal = rawBlock.titleDecoration;
   const decorationClass =
@@ -99,7 +101,9 @@ export default function UikitHeading({ block }: Props) {
       ? marginModeVal === "none"
         ? "uk-margin-remove-vertical"
         : `uk-margin-${marginModeVal}`
-      : "uk-margin-remove-vertical"
+      : styleVal
+        ? "uk-margin-top uk-margin-remove-bottom"
+        : "uk-margin-remove-top uk-margin-bottom"
     : "";
 
   // Max Width & Block Align
@@ -134,7 +138,8 @@ export default function UikitHeading({ block }: Props) {
   const linkUrl = rawBlock.buttonUrl ?? rawBlock.imageLinkUrl;
   const linkTarget = rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self";
 
-  const headingContent = rawBlock.headingText ?? rawBlock.title ?? "Build Anything on DevStack";
+  const headingContent = String(rawBlock.headingText ?? rawBlock.title ?? "Build Anything on DevStack");
+  const plainHeadingContent = decodeHtmlEntities(headingContent);
   const normalizedHeadingContent = headingContent.replace(/<\/br\s*>/gi, "<br>");
   const headingHtml = isRichText(normalizedHeadingContent)
     ? sanitizeHtml(normalizedHeadingContent, { FORBID_ATTR: ["style"] })
@@ -175,9 +180,9 @@ export default function UikitHeading({ block }: Props) {
   };
 
   const contentNode = rawBlock.typewriterEnabled ? (
-    <TypewriterText text={headingContent} phrases={rawBlock.typewriterPhrases ?? [headingContent]} speed={rawBlock.typewriterSpeed} loop={rawBlock.typewriterLoop !== false} />
+    <TypewriterText text={plainHeadingContent} phrases={(rawBlock.typewriterPhrases ?? [headingContent]).map((phrase: unknown) => decodeHtmlEntities(String(phrase)))} speed={rawBlock.typewriterSpeed} loop={rawBlock.typewriterLoop !== false} />
   ) : headingHtml !== undefined ? null : (
-    headingContent
+    plainHeadingContent
   );
 
   const headingProps = { className: titleClassName, style: customGradientStyle };

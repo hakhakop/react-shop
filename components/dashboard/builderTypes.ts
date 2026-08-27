@@ -206,6 +206,7 @@ export type LayoutBlockKind =
   | "heading"
   | "hero"
   | "image"
+  | "overlay"
   | "panel"
   | "table"
   | "text"
@@ -537,9 +538,49 @@ export type BuilderLayoutBlock = {
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
+  /** Source media dimensions used for responsive crop geometry, not CSS sizing. */
+  imageIntrinsicWidth?: number;
+  imageIntrinsicHeight?: number;
+  imageMinHeight?: string | number;
+  videoUrl?: string;
   /** Shared media spacing token. Structural consumers decide when it applies. */
   imageMarginTop?: "default" | "none" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageLoading?: "lazy" | "eager";
+  /** YOOtheme Overlay/Image presentation contract. */
+  imageFocalPoint?: string;
+  imageTransition?: string;
+  imageHasBorder?: boolean;
+  imageHoverFocalPoint?: string;
+  hoverImageUrl?: string;
+  hoverVideoUrl?: string;
+  containerHeightExpand?: boolean;
+  linkOverlay?: boolean;
+  htmlElement?: string;
+  overlayAnimateBackground?: boolean;
+  overlayExpandContent?: boolean;
+  overlayMaxWidth?: string;
+  overlayTextColorHover?: boolean;
+  overlayBlendImage?: boolean;
+  titleTransition?: string;
+  titleStyle?: string;
+  titleHoverStyle?: string;
+  titleLink?: boolean;
+  titleFontFamily?: string;
+  titleElement?: string;
+  metaTransition?: string;
+  metaFontFamily?: string;
+  metaColor?: string;
+  metaAlignment?: string;
+  metaElement?: string;
+  contentTransition?: string;
+  contentFontFamily?: string;
+  linkTransition?: string;
+  linkStyle?: string;
+  linkSize?: string;
+  linkFullWidth?: boolean;
+  meta?: string;
+  linkText?: string;
+  linkAriaLabel?: string;
   imageSvgInline?: boolean;
   imageSvgAnimate?: boolean;
   imageSvgColor?: string;
@@ -574,8 +615,6 @@ export type BuilderLayoutBlock = {
   panelMediaAlignment?: "left" | "center" | "right";
   panelTextAlign?: "left" | "center" | "right";
   /** YOOtheme Panel text presets for meta and body content. */
-  metaStyle?: string;
-  contentStyle?: string;
   gridContentAlign?: boolean;
   gridContentDropcap?: boolean;
   gridContentColumn?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";

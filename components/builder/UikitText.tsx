@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { TypographySettings, TypographyGroup } from "@/lib/builderTypography";
 import { resolveTypographyInput, typographyProps, typographyRoleClass, type SemanticTypographyRole } from "@/lib/builderTypography";
 import { getUikitTextClass } from "@/lib/uikitTokens";
+import { decodeHtmlEntities } from "@/lib/safeHtml";
 
 type Props = {
   sourceId?: string;
@@ -111,8 +112,8 @@ export default function UikitText({
       data-uikit-text-align={align}
       data-builder-yootheme-text={sourceId?.startsWith("yootheme-") ? "true" : undefined}
     >
-      {eyebrow ? <div className="uk-text-meta">{eyebrow}</div> : null}
-      {title ? <div className="shop-builder-text-title">{title}</div> : null}
+      {eyebrow ? <div className="uk-text-meta">{decodeHtmlEntities(eyebrow)}</div> : null}
+      {title ? <div className="shop-builder-text-title">{decodeHtmlEntities(title)}</div> : null}
       {content ? (
         <ContentTag
           className={`shop-builder-text-content ${columnClass} ${columnDivider && columns !== "none" ? "uk-column-divider" : ""} ${dropcap ? "uk-dropcap" : ""}`.trim()}

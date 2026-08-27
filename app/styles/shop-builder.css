@@ -2754,7 +2754,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-grid-content .shop-builder-title.uk-heading-small {
   font-size: var(--uk-heading-small-font-size, 2.6rem) !important;
   line-height: var(--uk-heading-small-line-height, 1.2) !important;
-  font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)) !important;
+  font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 400)) !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
@@ -3981,7 +3981,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    YOOtheme's panel. Keep the H1 token and remove inline-image baseline space
    that otherwise adds a few pixels to every positioned gallery row. */
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title.uk-h1 {
-  font-size: 42px !important;
+  font-size: var(--uk-heading-h1-font-size, var(--uk-global-font-size-2xlarge, 44px)) !important;
   line-height: 1.2 !important;
   /* UIkit's source H1 has a 40px top margin. The canonical element shell
      already preserves the preceding title's 20px bottom margin in its own
@@ -3989,6 +3989,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
      separation; without it the section paint box ends too early around
      transformed/parallax content. */
   margin-top: calc(var(--uk-heading-h1-margin-top, 40px) - var(--uk-global-margin, 20px)) !important;
+}
+/* The structural last-child reset is correct for most imported elements, but
+   a bare YOOtheme Heading still owns the normal bottom heading rhythm. */
+.shop-builder-element-shell.yootheme-imported-spacing
+  > .shop-builder-column-block--heading
+  > .shop-builder-title.uk-margin-bottom {
+  margin-bottom: var(--uk-global-margin, 20px) !important;
 }
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-column-block--image {
   line-height: 0 !important;
@@ -6839,25 +6846,43 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 .webpages-typography-role-primary {
   font-family: var(--webpages-font-primary, var(--uk-heading-font-family, inherit));
-  font-weight: var(--webpages-font-primary-weight, var(--uk-heading-font-weight, 700));
+  font-weight: var(--webpages-font-primary-weight, var(--uk-heading-font-weight, 400));
+  font-style: var(--webpages-font-primary-style, inherit);
+  letter-spacing: var(--webpages-font-primary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-primary-text-transform, inherit);
 }
 
 .webpages-typography-role-secondary {
   font-family: var(--webpages-font-secondary, var(--uk-global-font-family, inherit));
   font-weight: var(--webpages-font-secondary-weight, 400);
+  font-style: var(--webpages-font-secondary-style, inherit);
+  letter-spacing: var(--webpages-font-secondary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-secondary-text-transform, inherit);
 }
 
 .webpages-typography-role-tertiary {
   font-family: var(--webpages-font-tertiary, var(--uk-global-font-family, inherit));
   font-weight: var(--webpages-font-tertiary-weight, 400);
+  font-style: var(--webpages-font-tertiary-style, inherit);
+  letter-spacing: var(--webpages-font-tertiary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-tertiary-text-transform, inherit);
+}
+
+/* YOOtheme's image/overlay runtime resets the component title box before
+   applying its semantic heading class. Without this shared reset, the
+   browser's heading margin leaks into Overlay titles rendered as divs and
+   creates a false gap that is not present in the source preview. */
+.shop-builder-main .shop-builder-image-overlay .el-title {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* Base HTML Element Tag Defaults */
-h1.shop-builder-title { font-size: 2.5rem; line-height: 1.2; font-weight: var(--uk-heading-font-weight, 700); }
-h2.shop-builder-title { font-size: 2rem; line-height: 1.3; font-weight: var(--uk-heading-font-weight, 700); }
-h3.shop-builder-title { font-size: 1.5rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
-h4.shop-builder-title { font-size: 1.25rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
-h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
+h1.shop-builder-title { font-size: var(--uk-global-font-size-2xlarge, 44px); line-height: 1.2; font-weight: var(--uk-heading-font-weight, 400); }
+h2.shop-builder-title { font-size: var(--uk-global-font-size-xlarge, 34px); line-height: 1.3; font-weight: var(--uk-heading-font-weight, 400); }
+h3.shop-builder-title { font-size: var(--uk-global-font-size-large, 24px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
+h4.shop-builder-title { font-size: var(--uk-global-font-size-medium, 20px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
+h5.shop-builder-title { font-size: var(--uk-base-font-size, 16px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
 
 /* UIkit Width utilities. These are the fixed source semantics used by
    YOOtheme General → Max Width; they are intentionally not container tiers. */
@@ -6890,18 +6915,18 @@ h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: var(--
   .uk-width-xlarge\@l { width: 600px !important; box-sizing: border-box; }
   .uk-width-2xlarge\@l { width: 750px !important; box-sizing: border-box; }
 }
-h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
+h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
+.shop-builder-title.uk-h2 { font-size: var(--uk-global-font-size-xlarge, 34px) !important; line-height: 1.3 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
 .shop-builder-title.uk-h3 {
-  font-size: var(--uk-heading-h3-font-size, 22px) !important;
+  font-size: var(--uk-heading-h3-font-size, var(--uk-global-font-size-large, 24px)) !important;
   line-height: 1.4 !important;
-  font-weight: var(--uk-heading-font-weight, 700) !important;
+  font-weight: var(--uk-heading-h3-font-weight, var(--uk-heading-font-weight, 400)) !important;
 }
-.shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
-.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, 1.0625rem) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
-.shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
+.shop-builder-title.uk-h4 { font-size: var(--uk-global-font-size-medium, 20px) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
+.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, var(--uk-base-font-size, 16px)) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
+.shop-builder-title.uk-h6 { font-size: var(--uk-heading-h6-font-size, var(--uk-global-font-size-small, 14px)) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
 
 .shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
 .shop-builder-title.uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
@@ -6916,24 +6941,25 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: var(-
 /* UIkit Text utilities inherit their color from the canonical semantic
    context. Explicit utility colors write a local role token, so they still
    outrank an inverse surface without reintroducing a fixed light palette. */
-.uk-text-meta { font-size: 0.875rem !important; color: var(--uikit-text-local-color, var(--uikit-text-meta-color, var(--context-muted, var(--uk-global-muted-text-color, currentColor)))) !important; line-height: 1.4 !important; }
+.uk-text-meta { font-size: var(--uk-text-meta-font-size, var(--uk-global-font-size-small, 0.875rem)) !important; color: var(--uikit-text-local-color, var(--uikit-text-meta-color, var(--context-muted, var(--uk-global-muted-text-color, currentColor)))) !important; line-height: var(--uk-text-meta-line-height, 1.4) !important; }
 .shop-builder-card--inverse-meta .uk-text-meta { color: var(--builder-card-meta-color, var(--uikit-text-meta-color, var(--uk-global-inverse-color, var(--uk-global-color, currentColor)))) !important; }
 .uk-text-muted { --uikit-text-local-color: var(--uikit-text-muted-color, var(--context-muted, var(--uk-global-muted-text-color, currentColor))); color: var(--uikit-text-local-color) !important; }
 .uk-text-emphasis { --uikit-text-local-color: var(--uikit-text-emphasis-color, var(--context-emphasis, var(--uk-global-emphasis-color, currentColor))); color: var(--uikit-text-local-color) !important; }
-.uk-text-primary { --uikit-text-local-color: var(--uikit-text-primary-color, var(--uk-global-primary-color, #1e87f0)); color: var(--uikit-text-local-color) !important; font-weight: 600 !important; }
-.uk-text-secondary { --uikit-text-local-color: var(--uikit-text-secondary-color, var(--uk-global-emphasis-color, currentColor)); color: var(--uikit-text-local-color) !important; font-weight: 600 !important; }
+.uk-text-primary { --uikit-text-local-color: var(--uikit-text-primary-color, var(--uk-global-primary-color, #1e87f0)); color: var(--uikit-text-local-color) !important; }
+.uk-text-secondary { --uikit-text-local-color: var(--uikit-text-secondary-color, var(--uk-global-emphasis-color, currentColor)); color: var(--uikit-text-local-color) !important; }
 .uk-text-success { --uikit-text-local-color: var(--uk-global-success-background, #32d296); color: var(--uikit-text-local-color) !important; }
 .uk-text-warning { --uikit-text-local-color: var(--uk-global-warning-background, #faa05a); color: var(--uikit-text-local-color) !important; }
 .uk-text-danger { --uikit-text-local-color: var(--uk-global-danger-background, #f0506e); color: var(--uikit-text-local-color) !important; }
-.uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: var(--uikit-text-local-color, var(--uikit-text-lead-color, var(--context-text, var(--uk-global-text-color, currentColor)))) !important; }
-.uk-text-small { font-size: 0.875rem !important; line-height: 1.4 !important; }
-.uk-text-large { font-size: 1.35rem !important; line-height: 1.5 !important; }
+.uk-text-lead { font-size: var(--uk-text-lead-font-size, var(--uk-global-font-size-large, 1.5rem)) !important; line-height: var(--uk-text-lead-line-height, 1.5) !important; font-weight: 400 !important; color: var(--uikit-text-local-color, var(--uikit-text-lead-color, var(--context-text, var(--uk-global-text-color, currentColor)))) !important; }
+.uk-text-small { font-size: var(--uk-text-small-font-size, var(--uk-global-font-size-small, 0.875rem)) !important; line-height: var(--uk-text-small-line-height, var(--uk-base-line-height, 1.5)) !important; }
+.uk-text-large { font-size: var(--uk-text-large-font-size, var(--uk-global-font-size-large, 1.5rem)) !important; line-height: var(--uk-text-large-line-height, 1.5) !important; }
 
-/* Imported YOOtheme Text uses the theme's 19px large-text token. Keep this
-   scoped to imported Text blocks so native WebPages text remains unchanged. */
+/* Imported YOOtheme Text uses the same global-large token as UIkit. Keep this
+   scoped so native WebPages text remains unchanged when it has an explicit
+   local variant. */
 .shop-builder-column-block--text[data-builder-yootheme-text="true"].uk-text-large {
-  font-size: 1.1875rem !important;
-  line-height: 1.5 !important;
+  font-size: var(--uk-text-large-font-size, var(--uk-global-font-size-large, 1.5rem)) !important;
+  line-height: var(--uk-text-large-line-height, 1.5) !important;
 }
 
 /* UIkit Image Borders, Box Shadows & Transitions */
@@ -7273,7 +7299,7 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-grid-card--yootheme .shop-builder-title.uk-h5 {
   font-size: var(--uk-heading-h5-font-size, 1rem) !important;
   line-height: var(--uk-heading-h5-line-height, 1.4) !important;
-  font-weight: var(--uk-heading-h5-font-weight, 700) !important;
+  font-weight: var(--uk-heading-h5-font-weight, var(--uk-heading-font-weight, 400)) !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-grid-content > .uk-panel.uk-margin-top {

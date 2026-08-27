@@ -1,5 +1,1313 @@
 [
   {
+    "id": "overlay-mtbma2xb-41oh",
+    "title": "Overlay",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mtbma2we-spjt8",
+        "kind": "contentLayout",
+        "title": "Overlay",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtbma2we-template-element",
+            "rowId": "layout-row-mtbma2we-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "overlay-block-mtbma2we-oglcl",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-01.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "600px",
+                "imageHeight": "430px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Little Paradise",
+                "meta": "Travel Report",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-27T14:27:27.695Z"
+  },
+  {
+    "id": "jack-backer-mtbgzx9s-xit4",
+    "title": "jack backer",
+    "templateType": "footer",
+    "description": "Footer layout saved from the current Footer document",
+    "sourcePage": "footer",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 3,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-image-0-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "./",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-subnav-0-1-0-0",
+                "kind": "subnav",
+                "spacingContract": "yootheme",
+                "subnavItems": [
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-0",
+                    "label": "+44 555 00 00 15",
+                    "url": "tel:+44555000015",
+                    "target": "_self",
+                    "scroll": false
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-1",
+                    "label": "hello@example.com",
+                    "url": "mailto:hello@example.com",
+                    "target": "_self",
+                    "scroll": false
+                  }
+                ],
+                "subnavStyle": "default",
+                "subnavAlign": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-2",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-1-1-0",
+                "kind": "text",
+                "body": "Tell your friends!",
+                "textVariant": "default",
+                "textColor": "primary",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-3",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-3-column-1",
+            "rowId": "yootheme-section-1-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-2-0-0",
+                "kind": "text",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "textVariant": "small",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "medium",
+            "bottomMargin": "medium",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                    "imageAlt": "",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "./",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "large,expand,large",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-2-column-1",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-2",
+                  "widths": {
+                    "medium": "expand"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-3",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-subnav-0-1-0-0",
+                    "kind": "subnav",
+                    "spacingContract": "yootheme",
+                    "subnavItems": [
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-0",
+                        "label": "+44 555 00 00 15",
+                        "url": "tel:+44555000015",
+                        "target": "_self",
+                        "scroll": false
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-1",
+                        "label": "hello@example.com",
+                        "url": "mailto:hello@example.com",
+                        "target": "_self",
+                        "scroll": false
+                      }
+                    ],
+                    "subnavStyle": "default",
+                    "subnavAlign": "center",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "expand"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-1-1-0",
+                    "kind": "text",
+                    "body": "Tell your friends!",
+                    "textVariant": "default",
+                    "textColor": "primary",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-3",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-3",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "default",
+            "bottomMargin": "default",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-3-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-2-0-0",
+                    "kind": "text",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "textVariant": "small",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-27T11:59:35.728Z"
+  },
+  {
+    "id": "footer-mtbfzv2s-jnln",
+    "title": "Footer",
+    "templateType": "section",
+    "description": "Section template saved from Footer",
+    "sourcePage": "footer",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 3,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-image-0-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "./",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-subnav-0-1-0-0",
+                "kind": "subnav",
+                "spacingContract": "yootheme",
+                "subnavItems": [
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-0",
+                    "label": "+44 555 00 00 15",
+                    "url": "tel:+44555000015",
+                    "target": "_self",
+                    "scroll": false
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-1",
+                    "label": "hello@example.com",
+                    "url": "mailto:hello@example.com",
+                    "target": "_self",
+                    "scroll": false
+                  }
+                ],
+                "subnavStyle": "default",
+                "subnavAlign": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-2",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-1-1-0",
+                "kind": "text",
+                "body": "Tell your friends!",
+                "textVariant": "default",
+                "textColor": "primary",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-3",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-3-column-1",
+            "rowId": "yootheme-section-1-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-2-0-0",
+                "kind": "text",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "textVariant": "small",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "medium",
+            "bottomMargin": "medium",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                    "imageAlt": "",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "./",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "large,expand,large",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-2-column-1",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-2",
+                  "widths": {
+                    "medium": "expand"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-3",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-subnav-0-1-0-0",
+                    "kind": "subnav",
+                    "spacingContract": "yootheme",
+                    "subnavItems": [
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-0",
+                        "label": "+44 555 00 00 15",
+                        "url": "tel:+44555000015",
+                        "target": "_self",
+                        "scroll": false
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-1",
+                        "label": "hello@example.com",
+                        "url": "mailto:hello@example.com",
+                        "target": "_self",
+                        "scroll": false
+                      }
+                    ],
+                    "subnavStyle": "default",
+                    "subnavAlign": "center",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "expand"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-1-1-0",
+                    "kind": "text",
+                    "body": "Tell your friends!",
+                    "textVariant": "default",
+                    "textColor": "primary",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-3",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-3",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "default",
+            "bottomMargin": "default",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-3-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-2-0-0",
+                    "kind": "text",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "textVariant": "small",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-27T11:31:33.268Z"
+  },
+  {
+    "id": "jack-backer-footer-mtbfuwqr-z7v2",
+    "title": "Jack Backer Footer",
+    "templateType": "page",
+    "description": "Page template saved from Footer",
+    "sourcePage": "footer",
+    "design": {},
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 3,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-image-0-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "./",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-subnav-0-1-0-0",
+                "kind": "subnav",
+                "spacingContract": "yootheme",
+                "subnavItems": [
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-0",
+                    "label": "+44 555 00 00 15",
+                    "url": "tel:+44555000015",
+                    "target": "_self",
+                    "scroll": false
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-1",
+                    "label": "hello@example.com",
+                    "url": "mailto:hello@example.com",
+                    "target": "_self",
+                    "scroll": false
+                  }
+                ],
+                "subnavStyle": "default",
+                "subnavAlign": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-2",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-1-1-0",
+                "kind": "text",
+                "body": "Tell your friends!",
+                "textVariant": "default",
+                "textColor": "primary",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-3",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-3-column-1",
+            "rowId": "yootheme-section-1-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-2-0-0",
+                "kind": "text",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "textVariant": "small",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "medium",
+            "bottomMargin": "medium",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                    "imageAlt": "",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "./",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "large,expand,large",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-2-column-1",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-2",
+                  "widths": {
+                    "medium": "expand"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-3",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-subnav-0-1-0-0",
+                    "kind": "subnav",
+                    "spacingContract": "yootheme",
+                    "subnavItems": [
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-0",
+                        "label": "+44 555 00 00 15",
+                        "url": "tel:+44555000015",
+                        "target": "_self",
+                        "scroll": false
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-1",
+                        "label": "hello@example.com",
+                        "url": "mailto:hello@example.com",
+                        "target": "_self",
+                        "scroll": false
+                      }
+                    ],
+                    "subnavStyle": "default",
+                    "subnavAlign": "center",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "expand"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-1-1-0",
+                    "kind": "text",
+                    "body": "Tell your friends!",
+                    "textVariant": "default",
+                    "textColor": "primary",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-3",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-3",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "default",
+            "bottomMargin": "default",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-3-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-2-0-0",
+                    "kind": "text",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "textVariant": "small",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-27T11:27:42.147Z"
+  },
+  {
     "id": "saved-footer-mt5lz6si-43y7",
     "title": "Footer Circle",
     "templateType": "footer",
@@ -18903,1803 +20211,6 @@
     "updatedAt": "2026-08-20T16:23:00.949Z"
   },
   {
-    "id": "saved-footer-msxfwbeu-7vc9",
-    "title": "Saved Footer",
-    "templateType": "footer",
-    "description": "Footer layout saved from the current Footer document",
-    "sourcePage": "footer",
-    "sections": [
-      {
-        "id": "footer-document",
-        "kind": "contentLayout",
-        "title": "Call to Action",
-        "background": "transparent",
-        "backgroundRole": "secondary",
-        "sectionVariant": "secondary",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "large",
-        "removeBottomPadding": false,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "animation": "fade",
-        "animationDelay": 100,
-        "visible": true,
-        "layout": "2-col-equal",
-        "layoutColumns": 2,
-        "layoutRows": 2,
-        "rows": [
-          {
-            "id": "yootheme-section-1-row-1",
-            "layout": "2-col-equal",
-            "customLayout": {
-              "template": "2-3,1-3",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-1-row-1-column-1",
-                  "widths": {
-                    "medium": "2-3"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-1-row-1-column-2",
-                  "widths": {
-                    "medium": "1-3"
-                  }
-                }
-              ]
-            },
-            "spacingContract": "yootheme",
-            "columns": [
-              {
-                "id": "yootheme-section-1-row-1-column-1",
-                "responsiveWidths": {
-                  "medium": "2-3"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-0-0-0-0",
-                    "kind": "heading",
-                    "headingText": "Ready to get started?",
-                    "title": "Ready to get started?",
-                    "headingLevel": "h2",
-                    "headingSize": "h1",
-                    "headingAlign": "left",
-                    "textAlign": "left",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-text-0-0-0-1",
-                    "kind": "text",
-                    "body": "Lorem ipsum dolor sit amet diam nonumy invidunt ut.",
-                    "textVariant": "lead",
-                    "textColor": "muted",
-                    "textColumnBreakpoint": "medium",
-                    "textAlign": "left",
-                    "headingAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "small",
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-1-row-1-column-2",
-                "responsiveWidths": {
-                  "medium": "1-3"
-                },
-                "verticalAlign": "middle",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-button-0-0-1-0",
-                    "kind": "button",
-                    "buttons": [
-                      {
-                        "id": "yootheme-button-0-0-1-0-0",
-                        "label": "Sign up for Free",
-                        "url": "#",
-                        "target": "_self",
-                        "style": "primary"
-                      }
-                    ],
-                    "size": "large",
-                    "fullWidthButton": false,
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "yootheme-section-1-row-2",
-            "layout": "1-col",
-            "spacingContract": "yootheme",
-            "topMargin": "none",
-            "bottomMargin": "none",
-            "columns": [
-              {
-                "id": "yootheme-section-1-row-2-column-1",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-image-0-1-0-0",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
-                    "imageAlt": "",
-                    "imageMaxWidth": 900,
-                    "imageWidth": "900px",
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "visibility": "xl",
-                    "visibilityMode": "xl",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "absolute",
-                        "top": "-340px",
-                        "left": "-40vw",
-                        "zIndex": 0,
-                        "marginMode": "default",
-                        "visibilityMode": "xl"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-image-0-1-0-1",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
-                    "imageAlt": "",
-                    "imageMaxWidth": 600,
-                    "imageWidth": "600px",
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "visibility": "xl",
-                    "visibilityMode": "xl",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "absolute",
-                        "top": "-170px",
-                        "right": "-30vw",
-                        "zIndex": 0,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "visibilityMode": "xl"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "backgroundMode": "full",
-        "colorScheme": "dark",
-        "topSpacing": "sm"
-      },
-      {
-        "id": "contentLayout-msxa1wmz-84i54",
-        "kind": "contentLayout",
-        "title": "Footer",
-        "background": "transparent",
-        "backgroundRole": "secondary",
-        "sectionVariant": "secondary",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "large",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center",
-            "imageSize": "cover"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "visible": true,
-        "layout": "5-col-equal",
-        "layoutColumns": 5,
-        "layoutRows": 1,
-        "rows": [
-          {
-            "id": "yootheme-section-2-row-1",
-            "layout": "5-col-equal",
-            "customLayout": {
-              "template": "1-5,1-5,1-5,1-5,1-5|1-2,1-2,1-3,1-3,1-3",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-2-row-1-column-1",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-2",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-3",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-4",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-5",
-                  "widths": {
-                    "medium": "medium"
-                  }
-                }
-              ]
-            },
-            "rowGap": "large",
-            "spacingContract": "yootheme",
-            "columns": [
-              {
-                "id": "yootheme-section-2-row-1-column-1",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-0-0",
-                    "kind": "heading",
-                    "headingText": "Product",
-                    "title": "Product",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-0-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-0",
-                        "text": "Features",
-                        "url": "?page_id=19",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-1",
-                        "text": "Enterprise",
-                        "url": "?page_id=2",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-2",
-                        "text": "Pricing",
-                        "url": "?page_id=21",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-3",
-                        "text": "Feature Index",
-                        "url": "?page_id=20",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-2",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-1-0",
-                    "kind": "heading",
-                    "headingText": "Support",
-                    "title": "Support",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-1-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-0",
-                        "text": "Documentation",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-1",
-                        "text": "Changelog",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-2",
-                        "text": "Community Forum",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-3",
-                        "text": "Feature Requests",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-4",
-                        "text": "Contact",
-                        "url": "mailto:info@example.com",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-3",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-2-0",
-                    "kind": "heading",
-                    "headingText": "Developer",
-                    "title": "Developer",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-2-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-0",
-                        "text": "Getting Started",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-1",
-                        "text": "Learn the Basics",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-2",
-                        "text": "Configurations",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-3",
-                        "text": "Community",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-4",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-3-0",
-                    "kind": "heading",
-                    "headingText": "Company",
-                    "title": "Company",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-3-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-0",
-                        "text": "About",
-                        "url": "?page_id=4",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-1",
-                        "text": "Our Story",
-                        "url": "?page_id=23",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-2",
-                        "text": "Careers",
-                        "url": "?page_id=3",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-3",
-                        "text": "Blog",
-                        "url": "?post_type=post",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-5",
-                "responsiveWidths": {
-                  "medium": "medium"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-4-0",
-                    "kind": "heading",
-                    "headingText": "Follow Us",
-                    "title": "Follow Us",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "headingAlign": "left",
-                    "textAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "contentLayout-msxa1wmz-zxsgh",
-        "kind": "contentLayout",
-        "title": "Copyright",
-        "background": "transparent",
-        "backgroundRole": "default",
-        "sectionVariant": "default",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "small",
-        "removeTopPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "visible": true,
-        "layout": "2-col-equal",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "rows": [
-          {
-            "id": "yootheme-section-3-row-1",
-            "layout": "2-col-equal",
-            "customLayout": {
-              "template": "1-4,3-4",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-3-row-1-column-1",
-                  "widths": {
-                    "medium": "1-4"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-3-row-1-column-2",
-                  "widths": {
-                    "medium": "3-4"
-                  }
-                }
-              ]
-            },
-            "rowGap": "small",
-            "spacingContract": "yootheme",
-            "topMargin": "xlarge",
-            "bottomMargin": "none",
-            "columns": [
-              {
-                "id": "yootheme-section-3-row-1-column-1",
-                "responsiveWidths": {
-                  "medium": "1-4"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-image-2-0-0-0",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
-                    "imageAlt": "",
-                    "imageRatio": "natural",
-                    "imageLinkUrl": "?page_id=1",
-                    "imageLinkTarget": "_self",
-                    "imageShape": "none",
-                    "textAlign": "left",
-                    "headingAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-3-row-1-column-2",
-                "responsiveWidths": {
-                  "medium": "3-4"
-                },
-                "verticalAlign": "middle",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-text-2-0-1-0",
-                    "kind": "text",
-                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> DevStack. All rights reserved. Powered by <a class=\"uk-link-text\" href=\"https://yootheme.com/\">YOOtheme</a>.",
-                    "textVariant": "small",
-                    "textColor": "muted",
-                    "textColumnBreakpoint": "medium",
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "updatedAt": "2026-08-17T16:20:01.350Z"
-  },
-  {
-    "id": "saved-footer-msx939ea-cozv",
-    "title": "Saved Footer",
-    "templateType": "footer",
-    "description": "Footer layout saved from the current Footer document",
-    "sourcePage": "footer",
-    "sections": [
-      {
-        "id": "yootheme-section-1",
-        "kind": "contentLayout",
-        "title": "Call to Action",
-        "background": "transparent",
-        "backgroundRole": "default",
-        "sectionVariant": "default",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "large",
-        "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "animation": "fade",
-        "animationDelay": 100,
-        "visible": true,
-        "layout": "2-col-equal",
-        "layoutColumns": 2,
-        "layoutRows": 2,
-        "rows": [
-          {
-            "id": "yootheme-section-1-row-1",
-            "layout": "2-col-equal",
-            "customLayout": {
-              "template": "2-3,1-3",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-1-row-1-column-1",
-                  "widths": {
-                    "medium": "2-3"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-1-row-1-column-2",
-                  "widths": {
-                    "medium": "1-3"
-                  }
-                }
-              ]
-            },
-            "spacingContract": "yootheme",
-            "columns": [
-              {
-                "id": "yootheme-section-1-row-1-column-1",
-                "responsiveWidths": {
-                  "medium": "2-3"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-0-0-0-0",
-                    "kind": "heading",
-                    "headingText": "Ready to get started?",
-                    "title": "Ready to get started?",
-                    "headingLevel": "h2",
-                    "headingSize": "h1",
-                    "headingAlign": "left",
-                    "textAlign": "left",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-text-0-0-0-1",
-                    "kind": "text",
-                    "body": "Lorem ipsum dolor sit amet diam nonumy invidunt ut.",
-                    "textVariant": "lead",
-                    "textColor": "muted",
-                    "textColumnBreakpoint": "medium",
-                    "textAlign": "left",
-                    "headingAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "small",
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-1-row-1-column-2",
-                "responsiveWidths": {
-                  "medium": "1-3"
-                },
-                "verticalAlign": "middle",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-button-0-0-1-0",
-                    "kind": "button",
-                    "buttons": [
-                      {
-                        "id": "yootheme-button-0-0-1-0-0",
-                        "label": "Sign up for Free",
-                        "url": "#",
-                        "target": "_self",
-                        "style": "primary"
-                      }
-                    ],
-                    "size": "large",
-                    "fullWidthButton": false,
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "yootheme-section-1-row-2",
-            "layout": "1-col",
-            "spacingContract": "yootheme",
-            "topMargin": "none",
-            "bottomMargin": "none",
-            "columns": [
-              {
-                "id": "yootheme-section-1-row-2-column-1",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-image-0-1-0-0",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
-                    "imageAlt": "",
-                    "imageMaxWidth": 900,
-                    "imageWidth": "900px",
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "visibility": "xl",
-                    "visibilityMode": "xl",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "absolute",
-                        "top": "-340px",
-                        "left": "-40vw",
-                        "zIndex": 0,
-                        "marginMode": "default",
-                        "visibilityMode": "xl"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-image-0-1-0-1",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
-                    "imageAlt": "",
-                    "imageMaxWidth": 600,
-                    "imageWidth": "600px",
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "visibility": "xl",
-                    "visibilityMode": "xl",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "absolute",
-                        "top": "-170px",
-                        "right": "-30vw",
-                        "zIndex": 0,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "visibilityMode": "xl"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "yootheme-section-2",
-        "kind": "contentLayout",
-        "title": "Footer",
-        "background": "transparent",
-        "backgroundRole": "default",
-        "sectionVariant": "default",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "large",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center",
-            "imageSize": "cover"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "visible": true,
-        "layout": "5-col-equal",
-        "layoutColumns": 5,
-        "layoutRows": 1,
-        "rows": [
-          {
-            "id": "yootheme-section-2-row-1",
-            "layout": "5-col-equal",
-            "customLayout": {
-              "template": "1-5,1-5,1-5,1-5,1-5|1-2,1-2,1-3,1-3,1-3",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-2-row-1-column-1",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-2",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-3",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-4",
-                  "widths": {
-                    "default": "1-2",
-                    "small": "1-4",
-                    "medium": "expand"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-5",
-                  "widths": {
-                    "medium": "medium"
-                  }
-                }
-              ]
-            },
-            "rowGap": "large",
-            "spacingContract": "yootheme",
-            "columns": [
-              {
-                "id": "yootheme-section-2-row-1-column-1",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-0-0",
-                    "kind": "heading",
-                    "headingText": "Product",
-                    "title": "Product",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-0-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-0",
-                        "text": "Features",
-                        "url": "?page_id=19",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-1",
-                        "text": "Enterprise",
-                        "url": "?page_id=2",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-2",
-                        "text": "Pricing",
-                        "url": "?page_id=21",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-0-1-3",
-                        "text": "Feature Index",
-                        "url": "?page_id=20",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-2",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-1-0",
-                    "kind": "heading",
-                    "headingText": "Support",
-                    "title": "Support",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-1-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-0",
-                        "text": "Documentation",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-1",
-                        "text": "Changelog",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-2",
-                        "text": "Community Forum",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-3",
-                        "text": "Feature Requests",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-1-1-4",
-                        "text": "Contact",
-                        "url": "mailto:info@example.com",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-3",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-2-0",
-                    "kind": "heading",
-                    "headingText": "Developer",
-                    "title": "Developer",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-2-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-0",
-                        "text": "Getting Started",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-1",
-                        "text": "Learn the Basics",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-2",
-                        "text": "Configurations",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-2-1-3",
-                        "text": "Community",
-                        "url": "?page_id=24",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-4",
-                "responsiveWidths": {
-                  "default": "1-2",
-                  "small": "1-4",
-                  "medium": "expand"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-3-0",
-                    "kind": "heading",
-                    "headingText": "Company",
-                    "title": "Company",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "removeBottomMargin": true,
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "removeBottomMargin": true,
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
-                  {
-                    "id": "yootheme-list-1-0-3-1",
-                    "kind": "list",
-                    "listItems": [
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-0",
-                        "text": "About",
-                        "url": "?page_id=4",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-1",
-                        "text": "Our Story",
-                        "url": "?page_id=23",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-2",
-                        "text": "Careers",
-                        "url": "?page_id=3",
-                        "target": "_self"
-                      },
-                      {
-                        "id": "yootheme-list-item-1-0-3-1-3",
-                        "text": "Blog",
-                        "url": "?post_type=post",
-                        "target": "_self"
-                      }
-                    ],
-                    "listType": "vertical",
-                    "listMarker": "none",
-                    "listPresentation": "default",
-                    "listSpacing": "default",
-                    "listHorizontalSeparator": ", ",
-                    "listElement": "ul",
-                    "listWrapNav": false,
-                    "listShowLink": true,
-                    "listShowImage": true,
-                    "listLinkStyle": "muted",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "medium",
-                        "textAlignBreakpoint": "small",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-2-row-1-column-5",
-                "responsiveWidths": {
-                  "medium": "medium"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-heading-1-0-4-0",
-                    "kind": "heading",
-                    "headingText": "Follow Us",
-                    "title": "Follow Us",
-                    "headingLevel": "h3",
-                    "headingSize": "h5",
-                    "headingAlign": "left",
-                    "textAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "yootheme-section-3",
-        "kind": "contentLayout",
-        "title": "Copyright",
-        "background": "transparent",
-        "backgroundRole": "default",
-        "sectionVariant": "default",
-        "contentMode": "large",
-        "maxWidth": "large",
-        "sectionPadding": "small",
-        "removeTopPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "visualStyle": {
-          "background": {
-            "type": "image",
-            "imagePosition": "center-center"
-          }
-        },
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "visible": true,
-        "layout": "2-col-equal",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "rows": [
-          {
-            "id": "yootheme-section-3-row-1",
-            "layout": "2-col-equal",
-            "customLayout": {
-              "template": "1-4,3-4",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-3-row-1-column-1",
-                  "widths": {
-                    "medium": "1-4"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-3-row-1-column-2",
-                  "widths": {
-                    "medium": "3-4"
-                  }
-                }
-              ]
-            },
-            "rowGap": "small",
-            "spacingContract": "yootheme",
-            "topMargin": "xlarge",
-            "bottomMargin": "none",
-            "columns": [
-              {
-                "id": "yootheme-section-3-row-1-column-1",
-                "responsiveWidths": {
-                  "medium": "1-4"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-image-2-0-0-0",
-                    "kind": "image",
-                    "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
-                    "imageAlt": "",
-                    "imageRatio": "natural",
-                    "imageLinkUrl": "?page_id=1",
-                    "imageLinkTarget": "_self",
-                    "imageShape": "none",
-                    "textAlign": "left",
-                    "headingAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "left",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              },
-              {
-                "id": "yootheme-section-3-row-1-column-2",
-                "responsiveWidths": {
-                  "medium": "3-4"
-                },
-                "verticalAlign": "middle",
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "elements": [
-                  {
-                    "id": "yootheme-text-2-0-1-0",
-                    "kind": "text",
-                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> DevStack. All rights reserved. Powered by <a class=\"uk-link-text\" href=\"https://yootheme.com/\">YOOtheme</a>.",
-                    "textVariant": "small",
-                    "textColor": "muted",
-                    "textColumnBreakpoint": "medium",
-                    "textAlign": "right",
-                    "headingAlign": "right",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "position": "relative",
-                        "zIndex": 1,
-                        "marginMode": "default",
-                        "textAlign": "right",
-                        "textAlignBreakpoint": "medium",
-                        "textAlignFallback": "center"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "updatedAt": "2026-08-17T13:09:28.018Z"
-  },
-  {
     "id": "call-to-action-mswvswri-4h2z",
     "title": "Call to Action",
     "templateType": "section",
@@ -21154,126 +20665,6 @@
       }
     ],
     "updatedAt": "2026-08-16T11:43:38.906Z"
-  },
-  {
-    "id": "saved-footer-msvq0723-ul8r",
-    "title": "Saved Footer",
-    "templateType": "footer",
-    "description": "Footer layout saved from the current Footer document",
-    "sourcePage": "footer",
-    "sections": [
-      {
-        "id": "footer-document",
-        "kind": "contentLayout",
-        "title": "Footer",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "sm",
-        "bottomSpacing": "sm",
-        "layout": "halves",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "footer-main-left",
-            "rowId": "footer-main-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "footer-copyright",
-                "kind": "text",
-                "body": "© 2025 Webpages · Headless WooCommerce demo"
-              },
-              {
-                "id": "panel-block-msvl4kwj-wl4x9",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imagePadding": "frameless",
-                "imageFit": "cover",
-                "panelVariant": "default",
-                "panelHover": false,
-                "panelSize": "default",
-                "panelShowMedia": true,
-                "panelMediaPlacement": "top",
-                "panelMediaFit": "cover",
-                "panelMediaWidth": "medium",
-                "panelMediaAlignment": "center",
-                "panelTextAlign": "left",
-                "panelVerticalAlign": "top",
-                "panelTitleElement": "h3",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit",
-                "panelHeightExpand": false,
-                "panelExpand": "none",
-                "panelMetaPosition": "below-title",
-                "linkPanel": false
-              }
-            ]
-          },
-          {
-            "id": "footer-main-right",
-            "rowId": "footer-main-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "footer-platform",
-                "kind": "text",
-                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
-              },
-              {
-                "id": "text-block-msvl4pv9-ojbgk",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "Good work begins with a clear point of view",
-                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "textVariant": "default",
-                "textAlign": "left",
-                "elementPadding": "sm",
-                "visualStyle": {
-                  "customClass": "builder-premium-starter"
-                }
-              },
-              {
-                "id": "image-block-msvl4vdi-buqhv",
-                "kind": "image",
-                "title": "",
-                "body": "",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Modern editorial image placeholder",
-                "imageAlignment": "center",
-                "imageMaxWidth": 1200,
-                "imageFit": "cover",
-                "imageRatio": "16:9",
-                "imageShape": "rounded",
-                "imageShadow": "none",
-                "imageWidth": "500",
-                "imageLoading": "lazy",
-                "imageLinkTarget": "_self",
-                "imageCaption": "",
-                "elementPadding": "xs"
-              }
-            ]
-          }
-        ],
-        "visible": true
-      }
-    ],
-    "updatedAt": "2026-08-16T11:27:26.139Z"
   },
   {
     "id": "page-enterprise-msvl39by-2y3g",
@@ -27377,106 +26768,6 @@
       }
     ],
     "updatedAt": "2026-08-16T07:59:33.152Z"
-  },
-  {
-    "id": "saved-footer-msvijwn4-obb8",
-    "title": "Saved Footer",
-    "templateType": "footer",
-    "description": "Footer layout saved from the current Footer document",
-    "sourcePage": "footer",
-    "sections": [
-      {
-        "id": "footer-document",
-        "kind": "contentLayout",
-        "title": "Footer",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "sm",
-        "bottomSpacing": "sm",
-        "layout": "halves",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "footer-main-left",
-            "rowId": "footer-main-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "text-block-msv98ef9-i7ine",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "Good work begins with a clear point of view",
-                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "textVariant": "default",
-                "textAlign": "left",
-                "elementPadding": "sm",
-                "visualStyle": {
-                  "customClass": "builder-premium-starter"
-                }
-              },
-              {
-                "id": "footer-copyright",
-                "kind": "text",
-                "body": "© 2025 Webpages · Headless WooCommerce demo"
-              }
-            ]
-          },
-          {
-            "id": "footer-main-right",
-            "rowId": "footer-main-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "footer-platform",
-                "kind": "text",
-                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
-              },
-              {
-                "id": "accordion-block-msv98mte-4g8vc",
-                "kind": "accordion",
-                "accordionItems": [
-                  {
-                    "id": "accordion-block-msv98mte-4g8vc-item-1",
-                    "title": "What does this include?",
-                    "content": "Add the key details your visitors need to understand the offer."
-                  },
-                  {
-                    "id": "accordion-block-msv98mte-4g8vc-item-2",
-                    "title": "How does it work?",
-                    "content": "Explain the next step in a concise, helpful answer."
-                  },
-                  {
-                    "id": "accordion-block-msv98mte-4g8vc-item-3",
-                    "title": "Can I ask a question?",
-                    "content": "Give visitors a clear path to contact you or continue exploring."
-                  }
-                ],
-                "accordionMultiple": false,
-                "accordionCollapsible": true,
-                "accordionOpenItems": [
-                  0
-                ],
-                "accordionStyle": "striped",
-                "accordionIndicator": "default",
-                "accordionIndicatorPosition": "end",
-                "accordionTitleEmphasis": "inherit",
-                "accordionItemSpacing": "inherit",
-                "accordionContentSpacing": "inherit",
-                "accordionDivider": true,
-                "accordionTitleStyle": "inherit",
-                "accordionContentStyle": "inherit"
-              }
-            ]
-          }
-        ],
-        "visible": true
-      }
-    ],
-    "updatedAt": "2026-08-16T07:58:48.832Z"
   },
   {
     "id": "footer-msvi238g-ni2g",

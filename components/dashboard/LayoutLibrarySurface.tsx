@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, LibraryBig, Pencil, Plus, Save, Trash2 } from "lucide-react";
+import { Download, LibraryBig, Pencil, Plus, Save, Trash2, Upload } from "lucide-react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import type { BuilderSavedTemplate } from "@/components/dashboard/builderTypes";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
@@ -28,10 +29,13 @@ export type LayoutLibrarySurfaceProps = {
   savedTemplates: BuilderSavedTemplate[];
   templateStatus?: string;
   onLibraryTypeChange?: (type: LayoutLibraryType) => void;
-  onSaveCurrent?: () => void | Promise<unknown>;
+  onOpenDocument?: (type: "header" | "footer") => void;
+  onSaveCurrent?: (title?: string) => void | Promise<unknown>;
   saveLabel?: string;
   onApply: (template: BuilderSavedTemplate) => void;
   onExport?: (template: BuilderSavedTemplate) => void;
+  onImport?: (file: File, templateType: LayoutLibraryType) => void | Promise<unknown>;
+  onImportYootheme?: (file: File, targetType: LayoutLibraryType) => void | Promise<unknown>;
   onDelete?: (id: string) => void;
   onRename?: (template: BuilderSavedTemplate, title: string) => void;
   managementFooter?: ReactNode;
@@ -43,14 +47,21 @@ export default function LayoutLibrarySurface({
   savedTemplates,
   templateStatus,
   onLibraryTypeChange,
+  onOpenDocument,
   onSaveCurrent,
   saveLabel,
   onApply,
   onExport,
+  onImport,
+  onImportYootheme,
   onDelete,
   onRename,
   managementFooter,
 }: LayoutLibrarySurfaceProps) {
+  const [importInputKey, setImportInputKey] = useState(0);
+  const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
+  const [saveTitle, setSaveTitle] = useState("");
   const filteredTemplates = savedTemplates.filter(
     (template) => (template.templateType ?? "page") === libraryType,
   );
@@ -83,15 +94,44 @@ export default function LayoutLibrarySurface({
       ) : null}
 
       {mode === "contextual" && onSaveCurrent ? (
-        <button
-          type="button"
-          className="builder-template-save-card builder-library-context-save"
-          onClick={() => void onSaveCurrent()}
-        >
+        <div className="builder-template-save-card builder-library-context-save">
           <Save size={15} />
           <span>
             <strong>{saveLabel ?? `Save Current ${selectedTabLabel.slice(0, -1)} to Library`}</strong>
-            <small>Save this composition as a reusable {selectedTabLabel.slice(0, -1).toLowerCase()} layout.</small>
+            <small>Give it a name, then save this composition as a reusable {selectedTabLabel.slice(0, -1).toLowerCase()} layout.</small>
+            <input
+              className="builder-library-save-title"
+              aria-label={`Name ${selectedTabLabel.slice(0, -1).toLowerCase()} template`}
+              value={saveTitle}
+              onChange={(event) => setSaveTitle(event.target.value)}
+              placeholder={libraryType === "footer" ? "e.g. Jack Footer" : "Optional custom name"}
+            />
+            <button
+              type="button"
+              className="builder-secondary-button"
+              onClick={() => {
+                void onSaveCurrent(saveTitle.trim() || undefined);
+                setSaveTitle("");
+              }}
+            >
+              Save to Library
+            </button>
+          </span>
+        </div>
+      ) : null}
+
+      {mode === "management" && onOpenDocument && (libraryType === "header" || libraryType === "footer") ? (
+        <button
+          type="button"
+          className="builder-template-save-card builder-library-context-save"
+          onClick={() => onOpenDocument(libraryType)}
+        >
+          <Pencil size={15} />
+          <span>
+            <strong>Edit {libraryType === "footer" ? "Footer" : "Header"} Document</strong>
+            <small>
+              Open the document for import, editing, and publishing. Imported content becomes the document; save it from the document&apos;s Library tab to create a reusable listed template.
+            </small>
           </span>
         </button>
       ) : null}
@@ -126,7 +166,24 @@ export default function LayoutLibrarySurface({
                 }}
               >
                 <button type="button" onClick={() => onApply(template)}>
-                  <strong>{template.title}</strong>
+                  {renamingTemplateId === template.id ? (
+                    <input
+                      className="builder-template-inline-rename"
+                      aria-label={`New name for ${template.title}`}
+                      value={renameDraft}
+                      onChange={(event) => setRenameDraft(event.target.value)}
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          if (renameDraft.trim()) onRename?.(template, renameDraft.trim());
+                          setRenamingTemplateId(null);
+                        }
+                        if (event.key === "Escape") setRenamingTemplateId(null);
+                      }}
+                      autoFocus
+                    />
+                  ) : <strong>{template.title}</strong>}
                   <span>
                     {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
                   </span>
@@ -145,8 +202,8 @@ export default function LayoutLibrarySurface({
                     type="button"
                     className="builder-icon-button"
                     onClick={() => {
-                      const nextTitle = window.prompt("Rename layout", template.title);
-                      if (nextTitle) onRename(template, nextTitle);
+                      setRenamingTemplateId(template.id);
+                      setRenameDraft(template.title);
                     }}
                     aria-label={`Rename ${template.title}`}
                   >
@@ -174,6 +231,40 @@ export default function LayoutLibrarySurface({
       )}
 
       {templateStatus ? <small className="builder-library-status">{templateStatus}</small> : null}
+      {onImport ? (
+        <label className="builder-template-import-control">
+          <Upload size={14} />
+          <span>Upload {selectedTabLabel.slice(0, -1)} JSON</span>
+          <input
+            key={`${libraryType}-${importInputKey}`}
+            type="file"
+            accept=".json,application/json"
+            onChange={async (event) => {
+              const file = event.currentTarget.files?.[0];
+              if (!file) return;
+              await onImport(file, libraryType);
+              setImportInputKey((key) => key + 1);
+            }}
+          />
+        </label>
+      ) : null}
+      {onImportYootheme && (libraryType === "header" || libraryType === "footer") ? (
+        <label className="builder-template-import-control">
+          <Upload size={14} />
+          <span>Import YOOtheme JSON → {libraryType === "footer" ? "Footer document" : "Header document"}</span>
+          <input
+            key={`yootheme-${libraryType}-${importInputKey}`}
+            type="file"
+            accept=".json,application/json"
+            onChange={async (event) => {
+              const file = event.currentTarget.files?.[0];
+              if (!file) return;
+              await onImportYootheme(file, libraryType);
+              setImportInputKey((key) => key + 1);
+            }}
+          />
+        </label>
+      ) : null}
       {managementFooter}
     </div>
   );

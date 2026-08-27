@@ -4055,85 +4055,105 @@
     "key": "header",
     "page": "header",
     "targetType": "header",
-    "updatedAt": "2026-08-27T05:41:51.698Z",
-    "design": {},
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
     "sections": [
       {
         "id": "header-document",
         "kind": "contentLayout",
         "title": "Header",
-        "background": "#ffffff",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "layout": "thirds",
+        "layout": "header-row",
         "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-document-column-1",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
                 "headerBrandMode": "brand",
                 "headerBrandText": "Devstack",
-                "imageAlt": "Devstack logo",
-                "imageMaxWidth": 180
+                "imageMaxWidth": 180,
+                "imageAlignment": "left",
+                "imageAlt": "Devstack logo"
               }
             ]
           },
           {
-            "id": "header-document-column-2",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "menuActiveIndicator": "underline",
+                "elementAlign": "center"
               }
             ]
           },
           {
-            "id": "header-document-column-3",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Contact Us",
-                "buttonUrl": "#contact",
-                "buttonStyle": "primary"
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
               }
             ]
           }
         ],
         "visible": true,
-        "headerUtilityMigrationVersion": 3,
         "headerArchitectureVersion": 2,
-        "headerVisible": true,
-        "headerTransparent": false,
-        "headerOverlay": false,
-        "headerHeight": "auto",
-        "headerLayout": "simple",
-        "headerBehavior": "sticky",
-        "headerWidthMode": "boxed",
-        "headerBackgroundMode": "default",
-        "headerTextMode": "auto",
-        "headerZIndex": 40,
-        "headerTopToolbarVisible": false,
-        "headerTopToolbarText": "",
-        "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerLayout": "wordpress",
+        "headerWidthMode": "full",
+        "headerBehavior": "sticky"
       }
-    ]
+    ],
+    "updatedAt": "2026-08-27T17:28:31.325Z"
   },
   "footer": {
     "version": 1,

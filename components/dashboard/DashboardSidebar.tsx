@@ -94,6 +94,8 @@ type DashboardSidebarProps = {
   yoothemeImportWarnings?: string[];
   yoothemeImportPreview?: {
     fileName: string;
+    targetPage?: BuilderLayoutKey;
+    documentName?: string;
     sections: BuilderSection[];
     warnings: string[];
   } | null;
@@ -117,8 +119,9 @@ type DashboardSidebarProps = {
     file: File,
     templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
   ) => void | Promise<void>;
-  onImportYoothemePage?: (file: File) => void | Promise<void>;
+  onImportYoothemePage?: (file: File, targetType?: LayoutLibraryType) => void | Promise<void>;
   onApplyYoothemeImport?: () => void;
+  onChangeYoothemeImportName?: (name: string) => void;
   onCancelYoothemeImport?: () => void;
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
@@ -169,6 +172,7 @@ export default function DashboardSidebar({
   onImportSavedTemplate = () => undefined,
   onImportYoothemePage = () => undefined,
   onApplyYoothemeImport = () => undefined,
+  onChangeYoothemeImportName = () => undefined,
   onCancelYoothemeImport = () => undefined,
   onRenameSavedTemplate = () => undefined,
   onSetNewPageTitle,
@@ -341,11 +345,6 @@ export default function DashboardSidebar({
       row: "Rows",
       element: "Elements",
     } satisfies Record<LayoutLibraryType, string>)[templateLibraryTab];
-  const selectedTemplateTabSingular =
-    selectedTemplateTabLabel.endsWith("s")
-      ? selectedTemplateTabLabel.slice(0, -1)
-      : selectedTemplateTabLabel;
-
   const leftNavTabs = [
     { tab: "builder" as SidebarTab, label: t("builder.navigation.structure"), icon: <Layers3 size={18} /> },
     { tab: "elements" as SidebarTab, label: t("builder.navigation.blocks"), icon: <Boxes size={18} /> },
@@ -487,7 +486,9 @@ export default function DashboardSidebar({
         <div className="builder-layout-header">
           <div>
             <strong id="yootheme-import-preview-title">Preview YOOtheme import</strong>
-            <span>Review the mapped page before replacing the current builder page.</span>
+            <span>
+              Review the mapped content before replacing the {yoothemeImportPreview.targetPage === "footer" ? "Footer document" : yoothemeImportPreview.targetPage === "header" ? "Header document" : "current page"}.
+            </span>
           </div>
           <button
             type="button"
@@ -507,6 +508,18 @@ export default function DashboardSidebar({
               : " with no compatibility warnings"}.
           </span>
         </div>
+        {(yoothemeImportPreview.targetPage === "footer" || yoothemeImportPreview.targetPage === "header") ? (
+          <label className="builder-field">
+            <span>{yoothemeImportPreview.targetPage === "footer" ? "Footer document name" : "Header document name"}</span>
+            <input
+              aria-label={`${yoothemeImportPreview.targetPage === "footer" ? "Footer" : "Header"} document name`}
+              value={yoothemeImportPreview.documentName ?? ""}
+              onChange={(event) => onChangeYoothemeImportName(event.target.value)}
+              placeholder={`e.g. ${yoothemeImportPreview.targetPage === "footer" ? "Jack Footer" : "Jack Header"}`}
+            />
+            <small>This name is applied to the document when the import is applied.</small>
+          </label>
+        ) : null}
         <div
           aria-label="Mapped page preview"
           style={{
@@ -587,7 +600,7 @@ export default function DashboardSidebar({
             Cancel
           </button>
           <button type="button" className="builder-primary-button" onClick={onApplyYoothemeImport}>
-            Apply import
+            Apply to {yoothemeImportPreview.targetPage === "footer" ? "Footer" : yoothemeImportPreview.targetPage === "header" ? "Header" : "page"}
           </button>
         </div>
       </div>
@@ -1007,17 +1020,14 @@ export default function DashboardSidebar({
                   setTemplateLibraryTab(type);
                   setRenamingTemplateId(null);
                 }}
+                onOpenDocument={(type) => onSwitchBuilderTarget(type)}
                 onApply={onApplySavedTemplate}
                 onExport={onExportSavedTemplate}
+                onImport={onImportSavedTemplate}
+                onImportYootheme={onImportYoothemePage}
                 onDelete={onDeleteSavedTemplate}
                 onRename={onRenameSavedTemplate}
               />
-              {(templateLibraryTab === "header" || templateLibraryTab === "footer") ? (
-                <div className="builder-template-note">
-                  <LibraryBig size={16} />
-                  <span>{templateLibraryTab === "header" ? "Header layouts will be available here." : "Footer layouts will be available here."}</span>
-                </div>
-              ) : null}
               {templateLibraryTab === "page" ? (
                 <div className="builder-card builder-pages-card" style={{ marginBottom: "12px" }}>
                   <div className="builder-card-title"><strong>Global Layout Target</strong></div>
@@ -1088,23 +1098,6 @@ export default function DashboardSidebar({
                   )}
                 </div>
               ) : null}
-              {templateLibraryTab !== "header" && templateLibraryTab !== "footer" && (
-                <label className="builder-template-import-control">
-                  <Upload size={14} />
-                  <span>Upload {selectedTemplateTabSingular} Export</span>
-                  <input
-                    key={`${templateLibraryTab}-${templateImportKey}`}
-                    type="file"
-                    accept=".json,application/json"
-                    onChange={async (event) => {
-                      const file = event.currentTarget.files?.[0];
-                      if (!file) return;
-                      await onImportSavedTemplate(file, templateLibraryTab);
-                      setTemplateImportKey((key) => key + 1);
-                    }}
-                  />
-                </label>
-              )}
               {templateLibraryTab === "page" && (
                 <label className="builder-template-import-control">
                   <Upload size={14} />

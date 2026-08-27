@@ -384,6 +384,10 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import {
+  defaultBuilderThemeSettings,
+  type BuilderThemeSettings,
+} from "@/lib/builderThemeSettings";
 import { invalidateImportedBuilderDraft } from "@/lib/builderDraftInvalidation";
 import type { BuilderEditorContext } from "@/lib/builderEditorContext";
 import { AnimatePresence, motion } from "framer-motion";
@@ -2313,7 +2317,8 @@ export default function DashboardBuilder({
       if (
         path.includes("/api/builder-layouts") ||
         path.includes("/api/builder-pages") ||
-        path.includes("/api/builder-shell")
+        path.includes("/api/builder-shell") ||
+        path.includes("/api/builder-theme-settings")
       ) {
         console.log("[builder-scope] DashboardBuilder API URL", {
           websiteId,
@@ -2326,6 +2331,15 @@ export default function DashboardBuilder({
           userRole: saasUserRole ?? null,
           websiteId: websiteId ?? null,
           section: "builder-shell",
+          path,
+          url,
+        });
+      }
+      if (path.includes("/api/builder-theme-settings")) {
+        console.log("[global-settings-scope] DashboardBuilder theme API URL", {
+          userRole: saasUserRole ?? null,
+          websiteId: websiteId ?? null,
+          section: "builder-theme-settings",
           path,
           url,
         });
@@ -2350,11 +2364,7 @@ export default function DashboardBuilder({
     searchParams.get("page") ?? searchParams.get("template"),
   );
   const initialRequestedPage =
-    hasStrictBuilderTarget ||
-    initialResolvedPage === "header" ||
-    initialResolvedPage === "footer"
-      ? null
-      : initialResolvedPage;
+    hasStrictBuilderTarget ? null : initialResolvedPage;
   const initialPublishedState = useMemo(() => initialPageHydration?.authoredLayout
     ? normalizeBuilderState({
         page: initialPageHydration.authoredLayout.page,
@@ -2442,6 +2452,7 @@ export default function DashboardBuilder({
   const iframeDraftSignatureRef = useRef<string | null>(null);
   const iframeDraftFrameRef = useRef<number | null>(null);
   const iframeDraftPendingRef = useRef<BuilderState | null>(null);
+  const suppressNextIframeSelectionScrollRef = useRef(false);
   const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
     setRawBuilderState((current) => {
       let nextState = typeof value === "function" ? value(current) : value;
@@ -2561,6 +2572,7 @@ export default function DashboardBuilder({
   } | null>(null);
   const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
   const headerRouteHydrationRef = useRef<string | null>(null);
+  const footerRouteHydrationRef = useRef<string | null>(null);
   const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
   const footerDocumentLoadRef = useRef<Promise<BuilderState | null> | null>(null);
   const [presetToApply, setPresetToApply] = useState<{ presetKey: string; name: string } | null>(null);
@@ -2704,6 +2716,8 @@ export default function DashboardBuilder({
   const [renameSectionRequestId, setRenameSectionRequestId] = useState<
     string | null
   >(null);
+  const [documentRenameEditing, setDocumentRenameEditing] = useState(false);
+  const [documentRenameDraft, setDocumentRenameDraft] = useState("");
   const [draggingSectionId, setDraggingSectionId] = useState<string | null>(
     null,
   );
@@ -2772,6 +2786,8 @@ export default function DashboardBuilder({
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("builder");
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
+  const [themeSettings, setThemeSettings] = useState<BuilderThemeSettings>(defaultBuilderThemeSettings);
+  const [themePreviewRevision, setThemePreviewRevision] = useState(0);
   const dashboardGlobalCssSnapshotRef = useRef<Map<string, string | null> | null>(null);
 
   // The app layout emits the canonical UIkit variables during SSR, but Global
@@ -2832,6 +2848,7 @@ export default function DashboardBuilder({
   );
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
+  const themeAutoSaveTimer = useRef<number | null>(null);
   const shellSaveRevision = useRef(0);
   const spacingFocusRequestId = useRef(0);
 
@@ -2892,6 +2909,8 @@ export default function DashboardBuilder({
   const [yoothemeImportWarnings, setYoothemeImportWarnings] = useState<string[]>([]);
   const [yoothemeImportPreview, setYoothemeImportPreview] = useState<{
     fileName: string;
+    targetPage: BuilderLayoutKey;
+    documentName?: string;
     sections: BuilderSection[];
     warnings: string[];
     globalStylePatch: Partial<BuilderShellSettings>;
@@ -3016,6 +3035,7 @@ export default function DashboardBuilder({
     if (headerContextState.page === "product-single" && productSlug) {
       params.set("product", productSlug);
     }
+    if (themePreviewRevision > 0) params.set("themeRevision", String(themePreviewRevision));
     if (!websiteId) {
       params.set("builderFrame", "selection");
       params.set("builderBridge", iframeDiagnosticMode);
@@ -3037,6 +3057,7 @@ export default function DashboardBuilder({
     previewProducts,
     templateBuilderContext?.family,
     iframeDiagnosticMode,
+    themePreviewRevision,
     builderState.page,
     websiteId,
     websiteRouteSegment,
@@ -3888,6 +3909,9 @@ export default function DashboardBuilder({
       if (shellAutoSaveTimer.current) {
         window.clearTimeout(shellAutoSaveTimer.current);
       }
+      if (themeAutoSaveTimer.current) {
+        window.clearTimeout(themeAutoSaveTimer.current);
+      }
       if (publishCelebrationTimer.current) {
         window.clearTimeout(publishCelebrationTimer.current);
       }
@@ -4188,14 +4212,15 @@ export default function DashboardBuilder({
 
     async function loadShellSettings() {
       try {
-        const response = await fetch(builderApiUrl("/api/builder-shell"), {
-          cache: "no-store",
-        });
-        if (!response.ok) return;
-        const payload = (await response.json()) as {
-          settings?: Partial<BuilderShellSettings>;
-        };
-        if (!cancelled && payload.settings) {
+        const [response, themeResponse] = await Promise.all([
+          fetch(builderApiUrl("/api/builder-shell"), { cache: "no-store" }),
+          fetch(builderApiUrl("/api/builder-theme-settings"), { cache: "no-store" }),
+        ]);
+        if (response.ok) {
+          const payload = (await response.json()) as {
+            settings?: Partial<BuilderShellSettings>;
+          };
+          if (!cancelled && payload.settings) {
           const nextShellSettings = {
             ...defaultShellSettings,
             ...payload.settings,
@@ -4204,6 +4229,11 @@ export default function DashboardBuilder({
           setCommittedShellSettingsSignature(
             JSON.stringify(nextShellSettings),
           );
+          }
+        }
+        if (themeResponse.ok) {
+          const themePayload = (await themeResponse.json()) as { settings?: BuilderThemeSettings };
+          if (!cancelled && themePayload.settings) setThemeSettings(themePayload.settings);
         }
       } catch {
         if (!cancelled) setShellStatus("Shell settings unavailable");
@@ -4386,6 +4416,8 @@ export default function DashboardBuilder({
           normalizeBuilderState({
             page: "header",
             targetType: "header",
+            documentId: payload.layout.documentId,
+            displayName: payload.layout.displayName,
             design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
             sections: payload.layout.sections,
           }, "header"),
@@ -4452,6 +4484,60 @@ export default function DashboardBuilder({
     };
   }, [activeShellEntry, builderApiUrl, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
 
+  useEffect(() => {
+    const requestedPage = searchParams.get("page") ?? searchParams.get("template");
+    if (!draftReady || requestedPage !== "footer") return;
+
+    const routeIdentity = `${websiteId ?? "root"}:footer:${searchParams.toString()}`;
+    if (footerRouteHydrationRef.current === routeIdentity) return;
+    if (activeShellEntry) {
+      footerRouteHydrationRef.current = routeIdentity;
+      return;
+    }
+    footerRouteHydrationRef.current = routeIdentity;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "footer" }), {
+          cache: "no-store",
+        });
+        if (!response.ok || cancelled) return;
+        const payload = (await response.json()) as { layout?: BuilderState | null };
+        if (cancelled || !payload.layout?.sections?.length) return;
+        const nextState = hydrateDocumentBuilderState(
+          normalizeBuilderState({
+            page: "footer",
+            targetType: "footer",
+            documentId: payload.layout.documentId,
+            displayName: payload.layout.displayName,
+            design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
+            sections: payload.layout.sections,
+          }, "footer"),
+          shellSettings,
+        );
+        setFooterDocumentPreviewState(nextState);
+        setBuilderState(nextState);
+        undoHistoryRef.current = [structuredClone(nextState)];
+        setCommittedBuilderStateSignature(JSON.stringify(nextState));
+        setPublishedDocumentReady(true);
+        setSelectedId(nextState.sections[0]?.id ?? "");
+        setSelectedLayoutColumnKey(null);
+        setSelectedLayoutBlockKey(null);
+        setOpenLayoutItemId(null);
+        removeBuilderDraft(storageKeys, "footer");
+        restoredDraftKeysRef.current.delete("footer");
+        delete draftMetadataRef.current.footer;
+      } catch {
+        // Keep the current state if the persisted Footer cannot be read.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeShellEntry, builderApiUrl, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
+
   const loadFooterDocumentPreview = useCallback(async () => {
     if (footerDocumentPreviewState) return footerDocumentPreviewState;
     if (footerDocumentLoadRef.current) return footerDocumentLoadRef.current;
@@ -4467,6 +4553,8 @@ export default function DashboardBuilder({
           normalizeBuilderState({
             page: "footer",
             targetType: "footer",
+            documentId: payload.layout.documentId,
+            displayName: payload.layout.displayName,
             design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
             sections: payload.layout.sections,
           }, "footer"),
@@ -5518,21 +5606,30 @@ export default function DashboardBuilder({
   );
   const sendSelectionToIframe = useCallback((scrollIntoView = true) => {
     if (!iframeSelectedTarget) return;
+    const shouldScrollIntoView = suppressNextIframeSelectionScrollRef.current
+      ? false
+      : scrollIntoView;
+    suppressNextIframeSelectionScrollRef.current = false;
     iframeComparisonRef.current?.contentWindow?.postMessage({
       source: BUILDER_IFRAME_SELECTION_SOURCE,
       type: "focus",
       target: iframeSelectedTarget,
-      scrollIntoView,
+      scrollIntoView: shouldScrollIntoView,
     }, window.location.origin);
   }, [iframeSelectedTarget]);
   const postIframeDraftSnapshot = useCallback((state: BuilderState) => {
     const frame = iframeComparisonRef.current;
     if (!frame?.contentWindow) return;
     iframeDraftRevisionRef.current += 1;
+    // The iframe is rendering the authored document represented by `state`.
+    // Using the surrounding shell context here can label a Home draft as
+    // Header/Footer, causing the renderer to reject an otherwise valid live
+    // mutation before it ever reaches the canvas.
+    const documentKey = state.page;
     frame.contentWindow.postMessage({
       source: BUILDER_IFRAME_DRAFT_SOURCE,
       type: BUILDER_IFRAME_DRAFT_MESSAGE,
-      documentKey: headerContextState.page,
+      documentKey,
       revision: iframeDraftRevisionRef.current,
       state,
     }, window.location.origin);
@@ -7774,6 +7871,24 @@ export default function DashboardBuilder({
     });
   };
 
+  const startDocumentRename = () => {
+    if (builderState.page !== "header" && builderState.page !== "footer") return;
+    setDocumentRenameDraft(
+      builderState.displayName || (builderState.page === "footer" ? "Footer" : "Header"),
+    );
+    setDocumentRenameEditing(true);
+  };
+
+  const finishDocumentRename = (commit: boolean) => {
+    const nextName = documentRenameDraft.trim();
+    if (commit && nextName) {
+      setBuilderState((current) => ({ ...current, displayName: nextName }));
+      setPublishStatus(`${builderState.page === "footer" ? "Footer" : "Header"} document renamed`);
+    }
+    setDocumentRenameEditing(false);
+    setDocumentRenameDraft("");
+  };
+
   const addRowNear = (
     sectionId: string,
     rowIndex: number,
@@ -8683,6 +8798,37 @@ export default function DashboardBuilder({
     setShellSettings(nextSettings);
     setShellStatus(`Updating ${isWebsiteScopedBuilder ? "website" : "global"} preview...`);
 
+    // Global Styles is the editable surface for the resolved provider theme.
+    // Keep the Theme Settings document's resolved projection in sync with
+    // those edits, otherwise a refresh would re-apply the older imported
+    // value over the user's current Global Styles choice.
+    if (themeSettings.active && themeSettings.provider === "yootheme") {
+      const nextThemeSettings: BuilderThemeSettings = {
+        ...themeSettings,
+        resolved: {
+          ...themeSettings.resolved,
+          shellSettings: {
+            ...themeSettings.resolved.shellSettings,
+            ...patch,
+          },
+        },
+        updatedAt: new Date().toISOString(),
+      };
+      setThemeSettings(nextThemeSettings);
+      if (themeAutoSaveTimer.current) {
+        window.clearTimeout(themeAutoSaveTimer.current);
+      }
+      themeAutoSaveTimer.current = window.setTimeout(() => {
+        void fetch(builderApiUrl("/api/builder-theme-settings"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nextThemeSettings),
+        }).catch(() => {
+          setShellStatus("Theme settings autosave failed");
+        });
+      }, 260);
+    }
+
     if (shellAutoSaveTimer.current) {
       window.clearTimeout(shellAutoSaveTimer.current);
     }
@@ -8694,6 +8840,112 @@ export default function DashboardBuilder({
         revision,
       );
     }, 220);
+  };
+
+  const saveBuilderThemeSettings = async (nextSettings: BuilderThemeSettings) => {
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return false;
+    }
+    const response = await fetch(builderApiUrl("/api/builder-theme-settings"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextSettings),
+    });
+    if (!response.ok) {
+      setShellStatus("Theme settings save failed");
+      return false;
+    }
+    const payload = (await response.json()) as { settings?: BuilderThemeSettings };
+    if (payload.settings) setThemeSettings(payload.settings);
+    setShellStatus(`${isWebsiteScopedBuilder ? "Website" : "Global"} theme settings saved`);
+    return true;
+  };
+
+  const importBuilderThemeSettings = async (nextThemeSettings: BuilderThemeSettings) => {
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return;
+    }
+
+    // An import is a replacement of the provider document. Cancel pending
+    // Global Styles writes first; otherwise a debounced edit from the
+    // previous theme could overwrite this import a few hundred milliseconds
+    // later with stale sourceConfig/header data.
+    if (shellAutoSaveTimer.current) {
+      window.clearTimeout(shellAutoSaveTimer.current);
+      shellAutoSaveTimer.current = null;
+    }
+    if (themeAutoSaveTimer.current) {
+      window.clearTimeout(themeAutoSaveTimer.current);
+      themeAutoSaveTimer.current = null;
+    }
+
+    setThemeSettings(nextThemeSettings);
+    const saved = await saveBuilderThemeSettings(nextThemeSettings);
+    if (!saved) return;
+    // WebsiteFrontend reads Theme Settings on the server. Change the iframe
+    // identity after the persisted import so the preview cannot keep the old
+    // page shell/Header projection in its isolated document.
+    setThemePreviewRevision((revision) => revision + 1);
+
+    if (Object.keys(nextThemeSettings.resolved.shellSettings).length) {
+      // Materialize the resolved provider projection in the WebPages shell
+      // document without going through updateShellSettings. That function
+      // intentionally mirrors ordinary Global Styles edits back into the
+      // current theme document; during a replacement import its closure may
+      // still point at the old theme and would schedule a stale overwrite.
+      const nextShellSettings = {
+        ...shellSettings,
+        ...nextThemeSettings.resolved.shellSettings,
+      };
+      const shellRevision = ++shellSaveRevision.current;
+      setShellSettings(nextShellSettings);
+      await saveShellSettings(
+        nextShellSettings,
+        `${isWebsiteScopedBuilder ? "Website" : "Global"} theme shell imported`,
+        shellRevision,
+      );
+    }
+
+    if (Object.keys(nextThemeSettings.resolved.headerDocument).length) {
+      const currentHeaderState = builderStateRef.current.page === "header"
+        ? builderStateRef.current
+        : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
+            loadDraftForKey("header", storageKeys),
+            shellSettings,
+          );
+      const nextHeaderState = materializeImportedHeaderDocument(
+        currentHeaderState,
+        nextThemeSettings.resolved.headerDocument,
+      );
+      setHeaderDocumentPreviewState(nextHeaderState);
+      if (builderStateRef.current.page === "header") setBuilderState(nextHeaderState);
+      try {
+        const drafts = JSON.parse(window.localStorage.getItem(storageKeys.drafts) ?? "{}") as Partial<Record<BuilderLayoutKey, BuilderState>>;
+        drafts.header = nextHeaderState;
+        window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+      } catch {
+        // The in-memory Header document remains authoritative for this session.
+      }
+      await fetch(builderApiUrl("/api/builder-layouts"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextHeaderState),
+      });
+    }
+    setTemplateStatus(`${nextThemeSettings.displayName} Theme Settings imported`);
+  };
+
+  const exportBuilderThemeSettings = () => {
+    if (!themeSettings.active) return;
+    const blob = new Blob([JSON.stringify(themeSettings, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${themeSettings.themeId ?? "yootheme"}-theme-settings.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const applyGlobalStylePreset = (preset: GlobalStylePreset) => {
@@ -9689,6 +9941,8 @@ export default function DashboardBuilder({
 
       if (
         importedType !== "page" &&
+        importedType !== "header" &&
+        importedType !== "footer" &&
         importedType !== "section" &&
         importedType !== "row" &&
         importedType !== "element"
@@ -9746,7 +10000,14 @@ export default function DashboardBuilder({
     }
   };
 
-  const importYoothemePage = async (file: File) => {
+  const importYoothemePage = async (
+    file: File,
+    targetType?: LayoutLibraryType,
+  ) => {
+    const targetPage: BuilderLayoutKey =
+      targetType === "header" || targetType === "footer"
+        ? targetType
+        : builderStateRef.current.page;
     setTemplateStatus("Preparing YOOtheme import preview...");
     setYoothemeImportWarnings([]);
     setYoothemeImportPreview(null);
@@ -9754,6 +10015,13 @@ export default function DashboardBuilder({
     try {
       const parsed = JSON.parse(await file.text()) as unknown;
       const mapping = mapYoothemeStaticContent(parsed);
+      // Preview and apply must use the same tenant CMS origin. The pure
+      // YOOtheme mapper may initially use its process-level fallback origin;
+      // normalize here before any imported URL is shown or persisted.
+      const tenantMappedSections = resolveBuilderMediaUrls(
+        mapping.sections,
+        wordpressMediaOrigin,
+      );
 
       if (!mapping.sections.length && !Object.keys(mapping.globalStylePatch).length && !Object.keys(mapping.headerDocumentPatch).length) {
         setTemplateStatus("YOOtheme import failed: no supported sections");
@@ -9762,7 +10030,11 @@ export default function DashboardBuilder({
 
       setYoothemeImportPreview({
         fileName: file.name,
-        sections: mapping.sections,
+        targetPage,
+        documentName: targetPage === "footer" || targetPage === "header"
+          ? (targetPage === "footer" ? "Footer" : "Header")
+          : undefined,
+        sections: tenantMappedSections,
         // Keep the existing string[] preview contract, but derive it from the
         // canonical Phase 12 report rather than raw importer warning strings.
         warnings: mapping.reportWarnings,
@@ -9784,13 +10056,14 @@ export default function DashboardBuilder({
     currentHeaderState: BuilderState,
     patch: Partial<BuilderSection>,
   ): BuilderState => {
-    const preset = patch.headerLayout
+    const hasCanonicalComposition = Array.isArray(patch.layoutItems);
+    const preset = patch.headerLayout && !hasCanonicalComposition
       ? headerPresets.find((candidate) => candidate.key === patch.headerLayout)
       : undefined;
     const baseSections = preset
       ? mergeBrandingIntoPreset(currentHeaderState.sections, preset.sections)
       : currentHeaderState.sections;
-    return {
+    return resolveBuilderMediaUrls({
       ...currentHeaderState,
       page: "header",
       targetType: "header",
@@ -9799,7 +10072,7 @@ export default function DashboardBuilder({
           ? { ...section, ...patch, headerArchitectureVersion: 2 }
           : section,
       ),
-    };
+    }, wordpressMediaOrigin);
   };
 
   const applyYoothemeImport = () => {
@@ -9844,8 +10117,26 @@ export default function DashboardBuilder({
       return;
     }
 
+    const targetState = yoothemeImportPreview.targetPage === "footer"
+      ? footerDocumentPreviewState ?? hydrateDocumentBuilderState(
+          loadDraftForKey("footer", storageKeys),
+          shellSettings,
+        )
+      : yoothemeImportPreview.targetPage === "header"
+        ? headerDocumentPreviewState ?? hydrateDocumentBuilderState(
+            loadDraftForKey("header", storageKeys),
+            shellSettings,
+          )
+        : builderStateRef.current;
     const importedState = {
-      ...builderStateRef.current,
+      ...targetState,
+      page: yoothemeImportPreview.targetPage,
+      displayName: yoothemeImportPreview.documentName?.trim() || targetState.displayName,
+      targetType:
+        yoothemeImportPreview.targetPage === "header" ||
+        yoothemeImportPreview.targetPage === "footer"
+          ? yoothemeImportPreview.targetPage
+          : targetState.targetType,
       // Import replaces the document layer, not just its sections. Keep
       // global values in BuilderShellSettings; do not carry over the previous
       // native WebPages page-design preset as an accidental local override.
@@ -9870,17 +10161,28 @@ export default function DashboardBuilder({
       });
       restoredDraftKeysRef.current.delete(importedState.page);
       delete draftMetadataRef.current[importedState.page];
-      skipImportedDraftPersistenceRef.current = {
-        page: importedState.page,
-        signature: JSON.stringify(importedState),
-      };
     } catch {
       // The imported document can still be published if browser storage is
       // unavailable; do not convert a valid import into a failed operation.
     }
 
     pendingYoothemeDraftInvalidationRef.current = importedState.page;
-    setBuilderState(importedState);
+    if (importedState.page === "header") {
+      setHeaderDocumentPreviewState(importedState);
+    } else if (importedState.page === "footer") {
+      setFooterDocumentPreviewState(importedState);
+    }
+    if (builderStateRef.current.page === importedState.page) {
+      setBuilderState(importedState);
+    } else {
+      try {
+        const drafts = JSON.parse(window.localStorage.getItem(storageKeys.drafts) ?? "{}") as Partial<Record<BuilderLayoutKey, BuilderState>>;
+        drafts[importedState.page] = importedState;
+        window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+      } catch {
+        // The target document remains available in the in-memory preview state.
+      }
+    }
     if (Object.keys(yoothemeImportPreview.globalStylePatch).length) {
       updateShellSettings(yoothemeImportPreview.globalStylePatch);
     }
@@ -9904,10 +10206,21 @@ export default function DashboardBuilder({
       });
     }
     setYoothemeImportWarnings(yoothemeImportPreview.warnings);
+    suppressNextIframeSelectionScrollRef.current = true;
     setSelectedId(yoothemeImportPreview.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
+    setFooterSelected(yoothemeImportPreview.targetPage === "footer");
+    setHeaderSelected(yoothemeImportPreview.targetPage === "header");
+    // Keep the document-level Library open after an import so the next
+    // deliberate action can be naming/saving the imported Footer without
+    // forcing the user through another Footer entry cycle.
+    setInspectorTab(yoothemeImportPreview.targetPage === "footer" ? "library" : "layout");
+    setSectionSettingsOpen(true);
+    setInspectorOpen(true);
+    setSidebarCollapsed(false);
+    setSidebarTab("builder");
     setTemplateStatus(
       yoothemeImportPreview.warnings.length
         ? `YOOtheme page imported with ${yoothemeImportPreview.warnings.length} compatibility warning${yoothemeImportPreview.warnings.length === 1 ? "" : "s"}`
@@ -10198,9 +10511,9 @@ export default function DashboardBuilder({
       savedTemplates={savedTemplates}
       templateStatus={templateStatus}
       onApplyHeaderPreset={executeApplyHeaderPreset}
-      onSaveContextualLayout={(layoutType) => {
+      onSaveContextualLayout={(layoutType, title) => {
         if (layoutType === "header" || layoutType === "footer") {
-          void saveTemplate(layoutType);
+          void saveTemplate(layoutType, title);
           return;
         }
         if (layoutType === "section" && selectedSection) {
@@ -10225,6 +10538,8 @@ export default function DashboardBuilder({
         }
       }}
       onApplySavedTemplate={applySavedTemplate}
+      onImportSavedTemplate={importSavedTemplate}
+      onImportYootheme={importYoothemePage}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       onUpdateColumnStyle={updateSelectedColumnStyle}
@@ -10270,6 +10585,12 @@ export default function DashboardBuilder({
     />
   );
 
+  const activeDocumentKindLabel = builderState.page === "footer"
+    ? "Footer"
+    : builderState.page === "header"
+      ? "Header"
+      : builderDocumentKindLabel(builderEditorContext);
+
   const wireframeActions = useStableCallbackObject<BuilderWireframeActions>({
     addSection: (targetSectionId, placement) =>
       addWireframeNear(
@@ -10306,10 +10627,10 @@ export default function DashboardBuilder({
     <BuilderWireframePanel
       page={builderState.page}
       pageLabel={builderEditorContext?.document.displayName ?? getLayoutLabel(builderState.page, customPages)}
-      documentKindLabel={builderDocumentKindLabel(builderEditorContext)}
-      documentBadgeLabel={builderDocumentKindLabel(builderEditorContext)}
-      structureLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
-      structureAriaLabel={`${builderDocumentKindLabel(builderEditorContext)} structure`}
+      documentKindLabel={activeDocumentKindLabel}
+      documentBadgeLabel={activeDocumentKindLabel}
+      structureLabel={`${activeDocumentKindLabel} structure`}
+      structureAriaLabel={`${activeDocumentKindLabel} structure`}
       sections={builderState.sections}
       selectedSectionId={elementLibraryOpen ? elementLibraryTarget?.sectionId ?? selectedId : selectedId}
       selectedLayoutRowIndex={elementLibraryOpen && elementLibraryTarget ? null : selectedLayoutRowIndex}
@@ -11641,8 +11962,14 @@ export default function DashboardBuilder({
     <CanonicalGlobalStylesPanel
       shellSettings={shellSettings}
       updateShellSettings={updateShellSettings}
+      themeSettings={themeSettings}
+      onImportThemeSettings={importBuilderThemeSettings}
+      onExportThemeSettings={exportBuilderThemeSettings}
     />
   );
+
+  const activeDocumentDisplayName = builderState.displayName ||
+    (builderState.page === "footer" ? "Footer" : builderState.page === "header" ? "Header" : getLayoutLabel(builderState.page, customPages));
 
   const sidebarTopActions = (
     <div className="builder-editor-chrome" aria-label="Builder document and canvas controls">
@@ -11660,14 +11987,44 @@ export default function DashboardBuilder({
             </button>
           ) : <span className="builder-document-back-placeholder">Builder</span>}
           <span aria-hidden="true">/</span>
-          <span>{builderEditorContext ? builderEditorContext.document.displayName : getLayoutLabel(builderState.page, customPages)}</span>
+          <span>{builderEditorContext ? builderEditorContext.document.displayName : activeDocumentDisplayName}</span>
         </div>
         <div className="builder-document-header-main">
           <div className="builder-document-identity">
             <span className="builder-document-kind-badge">
-              {builderEditorContext ? builderDocumentKindLabel(builderEditorContext) : "Page"}
+              {activeDocumentKindLabel}
             </span>
-            <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : getLayoutLabel(builderState.page, customPages))}</h1>
+            {documentRenameEditing && (builderState.page === "header" || builderState.page === "footer") ? (
+              <div className="builder-document-rename-row">
+                <input
+                  aria-label={`Rename ${builderState.page} document`}
+                  value={documentRenameDraft}
+                  onChange={(event) => setDocumentRenameDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") finishDocumentRename(true);
+                    if (event.key === "Escape") finishDocumentRename(false);
+                  }}
+                  autoFocus
+                />
+                <button type="button" onClick={() => finishDocumentRename(true)}>Save</button>
+                <button type="button" onClick={() => finishDocumentRename(false)}>Cancel</button>
+              </div>
+            ) : (
+              <div className="builder-document-title-row">
+                <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : activeDocumentDisplayName)}</h1>
+                {(builderState.page === "header" || builderState.page === "footer") && !builderEditorContext ? (
+                  <button
+                    type="button"
+                    className="builder-icon-button"
+                    onClick={startDocumentRename}
+                    aria-label={`Rename ${builderState.page} document`}
+                    title={`Rename ${builderState.page} document`}
+                  >
+                    <Pencil size={13} />
+                  </button>
+                ) : null}
+              </div>
+            )}
             <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : statusText}</p>
           </div>
           <div className="builder-document-actions" aria-label="Document actions">
@@ -12010,6 +12367,9 @@ export default function DashboardBuilder({
         onImportSavedTemplate={importSavedTemplate}
         onImportYoothemePage={importYoothemePage}
         onApplyYoothemeImport={applyYoothemeImport}
+        onChangeYoothemeImportName={(name) => {
+          setYoothemeImportPreview((current) => current ? { ...current, documentName: name } : current);
+        }}
         onCancelYoothemeImport={cancelYoothemeImport}
         onRenameSavedTemplate={renameSavedTemplate}
         onSetNewPageTitle={setNewPageTitle}
@@ -18942,7 +19302,7 @@ const PreviewSection = memo(function PreviewSection({
                               </div>
                             );
                           })()
-                        ) : block.kind === "image" ? (
+                        ) : block.kind === "image" || block.kind === "overlay" ? (
                           <UikitImage
                             block={block}
                             isCanvas

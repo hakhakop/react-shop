@@ -1,0 +1,1372 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "devstack",
+  "displayName": "devstack",
+  "sourceConfig": {
+    "style": "devstack",
+    "site": {
+      "layout": "full",
+      "boxed": {
+        "alignment": 1
+      },
+      "image_size": "cover",
+      "image_position": "center-center",
+      "image_effect": "fixed",
+      "toolbar_width": "expand",
+      "breadcrumbs_show_home": true,
+      "breadcrumbs_show_current": true,
+      "breadcrumbs_home_text": "",
+      "main_section": {
+        "height": true
+      },
+      "breadcrumbs": false,
+      "padding": "small",
+      "padding_remove_top": false,
+      "padding_remove_bottom": false
+    },
+    "header": {
+      "layout": "horizontal-center",
+      "width": "expand",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_gap": "small",
+      "search": "",
+      "social_style": false,
+      "social": "",
+      "logo_padding_remove": false,
+      "social_items": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ]
+    },
+    "navbar": {
+      "sticky": 1,
+      "dropdown_align": "center",
+      "offcanvas": [],
+      "dropbar": true,
+      "dropdown_boundary": false,
+      "style": "",
+      "parent_icon": true,
+      "dropdown_target": true
+    },
+    "mobile": {
+      "breakpoint": "l",
+      "header": {
+        "layout": "horizontal-center-logo",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social_gap": "small",
+        "social": "",
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 1
+      },
+      "dialog": {
+        "layout": "dropbar-top",
+        "toggle": "navbar-mobile:start",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "text_center": false,
+        "dropdown": [],
+        "push_index": 1
+      },
+      "search": "right",
+      "offcanvas": {
+        "overlay": true
+      }
+    },
+    "dialog": {
+      "layout": "dropbar-top",
+      "toggle": "navbar-mobile:start",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "push",
+        "flip": false
+      },
+      "dropbar": {
+        "animation": "reveal-top"
+      },
+      "text_center": false,
+      "dropdown": [],
+      "push_index": 1
+    },
+    "menu": {
+      "items": {
+        "40": {
+          "content": {
+            "name": "v01",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": true,
+                  "layout": "1-4,3-4"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image": "",
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=19",
+                          "link_style": "text",
+                          "link_text": "Learn More",
+                          "margin": "default",
+                          "meta": "",
+                          "meta_align": "below-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_style": "text-small",
+                          "title": "Product Overview",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h5"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "3-4"
+                    },
+                    "children": [
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "2",
+                          "grid_column_gap": "large",
+                          "grid_row_gap": "large",
+                          "image_margin": true,
+                          "image_svg_inline": false,
+                          "image_vertical_align": false,
+                          "image_width": "50",
+                          "nav_style": "secondary",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "source": {
+                              "query": {
+                                "name": "customMenuItems",
+                                "arguments": {
+                                  "id": 9,
+                                  "parent": "40",
+                                  "heading": ""
+                                }
+                              },
+                              "props": {
+                                "content": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "title"
+                                },
+                                "meta": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "subtitle"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "image"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "url"
+                                },
+                                "active": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "active"
+                                }
+                              }
+                            },
+                            "props": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "1200",
+            "align": "",
+            "padding_remove_horizontal": false,
+            "padding_remove_vertical": false,
+            "stretch": "",
+            "size": true
+          }
+        },
+        "41": {
+          "dropdown": {
+            "columns": 1
+          },
+          "image": "wp-content/uploads/yootheme/icon-deployment.svg",
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy."
+        },
+        "42": {
+          "dropdown": {
+            "columns": 1
+          },
+          "image": "wp-content/uploads/yootheme/icon-ci-cd.svg",
+          "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore."
+        },
+        "43": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
+          "image": "wp-content/uploads/yootheme/icon-security.svg"
+        },
+        "44": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam.",
+          "image": "wp-content/uploads/yootheme/icon-features.svg"
+        },
+        "45": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
+          "image": "wp-content/uploads/yootheme/icon-automation.svg"
+        },
+        "46": {
+          "dropdown": {
+            "columns": 1
+          },
+          "image": "wp-content/uploads/yootheme/icon-infrastructure.svg",
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna."
+        },
+        "47": {
+          "dropdown": {
+            "columns": 1
+          },
+          "image": "wp-content/uploads/yootheme/icon-integrations.svg",
+          "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat."
+        },
+        "48": {
+          "dropdown": {
+            "columns": 1,
+            "width": "1200",
+            "align": "",
+            "padding_remove_horizontal": false,
+            "padding_remove_vertical": false,
+            "stretch": "",
+            "size": true
+          },
+          "content": {
+            "name": "v04",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": true,
+                  "layout": "1-4,3-4"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image": "",
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=2",
+                          "link_style": "text",
+                          "link_text": "Learn More",
+                          "margin": "default",
+                          "meta": "",
+                          "meta_align": "below-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_style": "text-small",
+                          "title": "DevStack Enterprise",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h5"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "3-4"
+                    },
+                    "children": [
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "2",
+                          "grid_column_gap": "large",
+                          "grid_row_gap": "large",
+                          "image_margin": true,
+                          "image_svg_inline": false,
+                          "image_vertical_align": false,
+                          "image_width": "50",
+                          "nav_style": "secondary",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "source": {
+                              "query": {
+                                "name": "customMenuItems",
+                                "arguments": {
+                                  "id": 9,
+                                  "parent": "48",
+                                  "heading": ""
+                                }
+                              },
+                              "props": {
+                                "content": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "title"
+                                },
+                                "meta": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "subtitle"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "image"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "url"
+                                },
+                                "active": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "active"
+                                }
+                              }
+                            },
+                            "props": []
+                          }
+                        ],
+                        "name": "Nav"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          }
+        },
+        "49": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
+          "image": "wp-content/uploads/yootheme/icon-powerful-api.svg"
+        },
+        "50": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
+          "image": "wp-content/uploads/yootheme/icon-project-management.svg"
+        },
+        "51": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
+          "image": "wp-content/uploads/yootheme/icon-client-stories.svg"
+        },
+        "52": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam.",
+          "image": "wp-content/uploads/yootheme/icon-efficient-workflow.svg"
+        },
+        "53": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
+          "image": "wp-content/uploads/yootheme/icon-collaboration.svg"
+        },
+        "54": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat.",
+          "image": "wp-content/uploads/yootheme/icon-community.svg"
+        },
+        "55": {
+          "dropdown": {
+            "columns": 1,
+            "width": "1200",
+            "align": "center",
+            "padding_remove_horizontal": true,
+            "padding_remove_vertical": true,
+            "stretch": ""
+          },
+          "content": null
+        },
+        "56": {
+          "content": {
+            "name": "v04",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": true,
+                  "layout": "1-3,1-3,1-3"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Feature Index",
+                          "link": "?page_id=20",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "margin": "medium",
+                          "nav_style": "default",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Deployment",
+                              "link": "?page_id=20"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "DevOps",
+                              "link": "?page_id=20#DevOps"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Automation",
+                              "link": "?page_id=20#Automation"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Project Management",
+                              "link": "?page_id=20#Projectmanagement"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "CI/CD",
+                              "link": "?page_id=20#CI-CD"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Infrastructure",
+                              "link": "?page_id=20#Infrastructure"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Security",
+                              "link": "?page_id=20#Security"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Integrations",
+                              "link": "?page_id=20#Integrations"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Features",
+                              "link": "?page_id=20#Features"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "expand"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Documentation",
+                          "link": "?page_id=24",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_margin": true,
+                          "image_svg_inline": false,
+                          "image_vertical_align": false,
+                          "image_width": "50",
+                          "maxwidth": "2xlarge",
+                          "nav_style": "secondary",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "source": {
+                              "query": {
+                                "name": "customMenuItems",
+                                "arguments": {
+                                  "id": 9,
+                                  "parent": "56",
+                                  "heading": ""
+                                }
+                              },
+                              "props": {
+                                "content": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "title"
+                                },
+                                "meta": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "subtitle"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "image"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "url"
+                                },
+                                "active": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "active"
+                                }
+                              }
+                            },
+                            "props": []
+                          }
+                        ],
+                        "name": "Nav"
+                      },
+                      {
+                        "type": "button",
+                        "props": {
+                          "grid_column_gap": "small",
+                          "grid_row_gap": "small",
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "button_item",
+                            "props": {
+                              "button_style": "text",
+                              "content": "See All",
+                              "dialog_layout": "modal",
+                              "dialog_offcanvas_flip": true,
+                              "icon_align": "left",
+                              "link": "?page_id=24"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "2-5"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Popular Tutorials",
+                          "link": "?page_id=24#popular-tutorials",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "medium",
+                          "grid_default": "1",
+                          "grid_medium": "",
+                          "grid_row_gap": "medium",
+                          "icon_width": 80,
+                          "image_align": "left",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_column_gap": "medium",
+                          "image_grid_row_gap": "medium",
+                          "image_grid_width": "auto",
+                          "image_height": "75",
+                          "image_link": false,
+                          "image_svg_color": "emphasis",
+                          "image_vertical_align": true,
+                          "image_width": "110",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "medium",
+                          "maxwidth": "large",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_margin": "small",
+                          "meta_style": "text-meta",
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": true,
+                          "title_style": "h6"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/support-gallery-01.jpg",
+                              "link": "?page_id=24#popular-tutorials",
+                              "meta": "Account & Settings",
+                              "title": "Getting Started With Devstack Scripts: A Practical Walkthrough"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/support-gallery-02.jpg",
+                              "link": "?page_id=24#popular-tutorials",
+                              "meta": "Account & Settings",
+                              "title": "Creating a CI/CD Pipeline with DevStack in 20 Minutes"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/support-gallery-03.jpg",
+                              "link": "?page_id=24#popular-tutorials",
+                              "meta": "Integrations & Applications",
+                              "title": "Learn About Code Review in DevStack Cloud"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "button",
+                        "props": {
+                          "grid_column_gap": "small",
+                          "grid_row_gap": "small",
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "button_item",
+                            "props": {
+                              "button_style": "text",
+                              "content": "See All",
+                              "dialog_layout": "modal",
+                              "dialog_offcanvas_flip": true,
+                              "icon_align": "left",
+                              "link": "?page_id=24#popular-tutorials"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "1200",
+            "align": "",
+            "stretch": "",
+            "size": true
+          }
+        },
+        "57": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy.",
+          "image": "wp-content/uploads/yootheme/icon-getting-started.svg"
+        },
+        "58": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut.",
+          "image": "wp-content/uploads/yootheme/icon-learn-the-basics.svg"
+        },
+        "59": {
+          "dropdown": {
+            "columns": 1
+          },
+          "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum stet clita.",
+          "image": "wp-content/uploads/yootheme/icon-configurations.svg"
+        },
+        "60": {
+          "dropdown": {
+            "columns": 1,
+            "align": "",
+            "width": "1200",
+            "stretch": "",
+            "size": true
+          },
+          "content": {
+            "name": "v06",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": true,
+                  "layout": "1-3,1-3,1-3"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=4",
+                          "link_margin": "medium",
+                          "link_style": "text",
+                          "link_text": "Read More",
+                          "margin": "default",
+                          "meta": "",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-small",
+                          "title": "About DevStack",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h6"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "expand"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image": "wp-content/uploads/yootheme/our-story-hero.jpg",
+                          "image_align": "between",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=23",
+                          "link_margin": "medium",
+                          "link_style": "text",
+                          "link_text": "Read More",
+                          "margin": "default",
+                          "meta": "",
+                          "meta_align": "above-content",
+                          "meta_element": "div",
+                          "meta_style": "text-small",
+                          "title": "Our Story",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h6"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_small": "2-5"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=3#open-positions",
+                          "link_style": "text",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "title": "See Our Open Positions",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h6"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "2",
+                          "grid_column_gap": "medium",
+                          "grid_row_gap": "medium",
+                          "image_vertical_align": true,
+                          "margin": "default",
+                          "nav_style": "secondary",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "UX/UI-Designer",
+                              "link": "?page_id=22",
+                              "meta": "Amsterdam"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Project Manager",
+                              "link": "?page_id=22",
+                              "meta": "Amsterdam, Netherlands"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Delivery Manager",
+                              "link": "?page_id=22",
+                              "meta": "Amsterdam, Netherlands"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "iOS Engineer",
+                              "link": "?page_id=22",
+                              "meta": "Netherlands"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Android Engineer",
+                              "link": "?page_id=22",
+                              "meta": "Netherlands"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Frontend Engineer",
+                              "link": "?page_id=22",
+                              "meta": "Netherlands"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "button",
+                        "props": {
+                          "grid_column_gap": "small",
+                          "grid_row_gap": "small",
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "button_item",
+                            "props": {
+                              "button_style": "text",
+                              "content": "See All",
+                              "dialog_layout": "modal",
+                              "dialog_offcanvas_flip": true,
+                              "icon_align": "left",
+                              "link": "?page_id=3#open-positions"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          }
+        },
+        "64": {
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "66": {
+          "dropdown": {
+            "columns": 1
+          }
+        }
+      },
+      "positions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "top",
+          "menu": 9
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 11,
+          "divider": true
+        }
+      }
+    }
+  },
+  "page": {
+    "layout": "full",
+    "alignment": "center",
+    "colorMode": "light"
+  },
+  "header": {
+    "source": {
+      "header": {
+        "layout": "horizontal-center",
+        "width": "expand",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_gap": "small",
+        "search": "",
+        "social_style": false,
+        "social": "",
+        "logo_padding_remove": false,
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 1,
+        "dropdown_align": "center",
+        "offcanvas": [],
+        "dropbar": true,
+        "dropdown_boundary": false,
+        "style": "",
+        "parent_icon": true,
+        "dropdown_target": true
+      },
+      "mobile": {
+        "breakpoint": "l",
+        "header": {
+          "layout": "horizontal-center-logo",
+          "search_layout": "input-dropdown",
+          "search_dropdown.stretch": "navbar",
+          "search_dropdown.size": true,
+          "search_icon": "left",
+          "social_style": false,
+          "social_gap": "small",
+          "social": "",
+          "social_items": [
+            {
+              "link": "https://twitter.com/"
+            },
+            {
+              "link": "https://dribbble.com/"
+            },
+            {
+              "link": "https://github.com/"
+            }
+          ]
+        },
+        "navbar": {
+          "sticky": 1
+        },
+        "dialog": {
+          "layout": "dropbar-top",
+          "toggle": "navbar-mobile:start",
+          "close": true,
+          "menu_style": "default",
+          "offcanvas": {
+            "mode": "push",
+            "flip": false
+          },
+          "dropbar": {
+            "animation": "reveal-top"
+          },
+          "text_center": false,
+          "dropdown": [],
+          "push_index": 1
+        },
+        "search": "right",
+        "offcanvas": {
+          "overlay": true
+        }
+      },
+      "dialog": {
+        "layout": "dropbar-top",
+        "toggle": "navbar-mobile:start",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "text_center": false,
+        "dropdown": [],
+        "push_index": 1
+      }
+    },
+    "document": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "wordpress",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky"
+    },
+    "breakpoint": "1200px",
+    "mobileLayout": "horizontal-center-logo",
+    "dialogLayout": "dropbar-top",
+    "dialogToggle": "navbar-mobile:start"
+  },
+  "resolved": {
+    "shellSettings": {
+      "headerLayout": "wordpress",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky",
+      "headerBreakpoint": "1200px",
+      "headerStickyShowOnUp": false,
+      "headerDropdownAlign": "center",
+      "headerDropbarEnabled": true,
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchPosition": "left",
+      "headerDialogLayout": "dropbar-top",
+      "headerDialogTogglePosition": "navbar-mobile:start",
+      "headerDialogCenter": false,
+      "headerDialogPushAfter": 1,
+      "themePageLayout": "full",
+      "themePageContainerAlignment": "center"
+    },
+    "headerDocument": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "wordpress",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky"
+    }
+  },
+  "capabilities": {
+    "global": [],
+    "page": [
+      "site.layout",
+      "site.boxed.alignment",
+      "theme.layout",
+      "theme.alignment",
+      "theme.colorMode"
+    ],
+    "header": [
+      "header.layout",
+      "header.width",
+      "header.search_layout",
+      "header.search_dropdown.stretch",
+      "header.search_dropdown.size",
+      "header.search_icon",
+      "header.social_gap",
+      "header.search",
+      "header.social_style",
+      "header.social",
+      "header.logo_padding_remove",
+      "header.social_items",
+      "navbar.sticky",
+      "navbar.dropdown_align",
+      "navbar.offcanvas",
+      "navbar.dropbar",
+      "navbar.dropdown_boundary",
+      "navbar.style",
+      "navbar.parent_icon",
+      "navbar.dropdown_target",
+      "mobile.breakpoint",
+      "mobile.header",
+      "mobile.navbar",
+      "mobile.dialog",
+      "mobile.search",
+      "mobile.offcanvas",
+      "dialog.layout",
+      "dialog.toggle",
+      "dialog.close",
+      "dialog.menu_style",
+      "dialog.offcanvas",
+      "dialog.dropbar",
+      "dialog.text_center",
+      "dialog.dropdown",
+      "dialog.push_index",
+      "headerDocument.headerArchitectureVersion",
+      "headerDocument.headerLayout",
+      "headerDocument.headerWidthMode",
+      "headerDocument.headerBehavior"
+    ]
+  },
+  "unsupported": [],
+  "updatedAt": "2026-08-27T17:28:31.237Z"
+}

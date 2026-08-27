@@ -233,7 +233,10 @@ function renderMenuItems(
     const submenuLayout = hasChildren ? presentation.submenuLayout : "list";
     const submenuColumns = presentation.submenuColumns;
     const mobileParentAccordion = mobileMode && hasChildren && presentation.mobileAccordion;
-    const desktopParentToggle = !mobileMode && hasChildren;
+    // In YOOtheme hover mode the parent text remains a normal link; click
+    // mode turns that text into the dropdown toggle. Previously every desktop
+    // parent was intercepted before clickModeEnabled could be consulted.
+    const desktopParentToggle = !mobileMode && hasChildren && clickModeEnabled;
     const submenuOpen = !mobileParentAccordion || expandedIds.has(item.id);
 
     return (
@@ -267,9 +270,6 @@ function renderMenuItems(
               event.preventDefault();
               onToggleMobileItem?.(item.id);
               return;
-            }
-            if (clickModeEnabled && level === 0 && hasChildren) {
-              event.preventDefault();
             }
           }}
         >

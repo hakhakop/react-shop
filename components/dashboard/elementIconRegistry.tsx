@@ -56,6 +56,7 @@ export const elementIconRegistry: Record<LayoutBlockKind, keyof typeof elementIc
   grid: "grid",
   heading: "heading",
   image: "image",
+  overlay: "image",
   panel: "panel",
   accordion: "accordion",
   table: "table",

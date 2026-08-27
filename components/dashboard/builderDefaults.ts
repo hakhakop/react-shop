@@ -618,7 +618,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
-  if (kind === "image") {
+  if (kind === "image" || kind === "overlay") {
     return {
       id,
       kind,

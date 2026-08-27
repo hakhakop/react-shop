@@ -2471,7 +2471,7 @@ export function ContentLayoutBlock({
     );
   }
 
-  if (block.kind === "image") {
+  if (block.kind === "image" || block.kind === "overlay") {
     return <UikitImage block={block} shellSettings={shellSettings} />;
   }
 
@@ -2972,10 +2972,10 @@ function ContentLayoutSection({
                 return (
                   <article
                     key={columnKey}
-                    data-builder-object-type="column"
+                    data-builder-object-type={builderInteractionIdentity ? "column" : undefined}
                     data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
                     data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
-                    data-builder-column-key={columnKey}
+                    data-builder-column-key={builderInteractionIdentity ? columnKey : undefined}
                     data-builder-element-scope={`column-${columnKey}`}
                     className={`${structuralColumn.className} ${structuralColumn.column.background?.videoUrl ? "shop-builder-column--has-background-video" : ""} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned

@@ -6,7 +6,7 @@ import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import { typographyRoleClass } from "@/lib/builderTypography";
-import { sanitizeHtml, isRichText } from "@/lib/safeHtml";
+import { decodeHtmlEntities, sanitizeHtml, isRichText } from "@/lib/safeHtml";
 
 type Props = {
   block: any;
@@ -89,7 +89,7 @@ export default function UikitList({ block }: Props) {
     <>
       {rawBlock.title && (
         <h3 className="uk-margin-small-bottom">
-          {rawBlock.title}
+          {decodeHtmlEntities(String(rawBlock.title))}
         </h3>
       )}
       {list}

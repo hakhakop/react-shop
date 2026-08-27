@@ -547,7 +547,7 @@
     "status": "creating",
     "creationRequestId": "704bde98-3cb6-4828-924e-ef93aacd5d97",
     "createdAt": "2026-08-27T10:33:05.155Z",
-    "updatedAt": "2026-08-27T10:36:51.029Z",
+    "updatedAt": "2026-08-27T18:36:46.717Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://jack.webpages.am",
@@ -562,6 +562,6 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-27T10:33:59.695Z"
     },
-    "lastPublishedAt": "2026-08-27T10:36:51.029Z"
+    "lastPublishedAt": "2026-08-27T18:36:46.717Z"
   }
 ]

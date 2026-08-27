@@ -10,7 +10,7 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
-import { sanitizeHtml } from "@/lib/safeHtml";
+import { decodeHtmlEntities, sanitizeHtml } from "@/lib/safeHtml";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import {
   normalizeYoothemeMedia,
@@ -58,6 +58,7 @@ export type YoothemeImportElementKind =
   | "text"
   | "button"
   | "image"
+  | "overlay"
   | "grid"
   | "panel"
   | "alert"
@@ -140,6 +141,7 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   button: "button",
   button_item: "button",
   image: "image",
+  overlay: "overlay",
   grid: "grid",
   grid_item: "grid",
   panel: "panel",
@@ -215,6 +217,14 @@ const sourceRowLayout = (
 
 const asString = (value: unknown): string | null =>
   typeof value === "string" && value.length > 0 ? value : null;
+
+// Visible YOOtheme text fields are commonly entity-encoded in exported JSON.
+// Keep URLs, CSS, and raw rich HTML on `asString`; only use this helper for
+// canonical plain-text fields so import data is readable and idempotent.
+const asText = (value: unknown): string | null => {
+  const normalized = asString(value);
+  return normalized === null ? null : decodeHtmlEntities(normalized);
+};
 
 /** YOOtheme treats unitless General position values as pixels. */
 const sourcePositionValue = (value: unknown): string | undefined => {
@@ -331,7 +341,7 @@ const sourceBreakpoint = (
 const sourceMargin = (value: unknown): string | undefined => {
   const normalized = String(value ?? "").toLowerCase();
   if (!normalized) return undefined;
-  if (normalized === "remove-vertical" || normalized === "none") return "none";
+  if (normalized === "remove" || normalized === "remove-vertical" || normalized === "none") return "none";
   if (normalized === "xsmall") return "small";
   if (["small", "default", "medium", "large", "xlarge"].includes(normalized)) return normalized;
   return undefined;
@@ -1691,7 +1701,7 @@ const mapStaticElement = (
     }, props);
   }
 
-  if (type === "image") {
+  if (type === "image" || type === "overlay") {
     if (Object.prototype.hasOwnProperty.call(props, "image") && !resolveYoothemeAssetUrl(props.image)) {
       warnings.push(`${path}: image asset could not be resolved and was left empty.`);
     }
@@ -1703,18 +1713,29 @@ const mapStaticElement = (
       warnings.push(`${path}.link_target: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — image modal links have no canonical WebPages image control; the ordinary link URL is retained without modal behavior.`);
     }
     const media = normalizeYoothemeMedia(props);
+    const isOverlayElement = type === "overlay" || props.overlay_mode || props.overlay_style || props.overlay_position || props.overlay_hover !== undefined || props.overlay_link !== undefined;
+    const intrinsicWidth = Number(props.image_width);
+    const intrinsicHeight = Number(props.image_height);
     // Standalone YOOtheme Image has no structural image_align control;
     // universal text_align remains owned by the shared General shell.
     const { imageAlignment: _structuralImageAlignment, ...imageMedia } = media;
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "image"),
-      kind: "image",
+      kind: isOverlayElement ? "overlay" : "image",
       imageUrl: resolveYoothemeAssetUrl(props.image),
-      imageAlt: asString(props.image_alt) ?? asString(props.alt) ?? "",
+      videoUrl: resolveYoothemeAssetUrl(props.video),
+      imageAlt: asText(props.image_alt) ?? asText(props.alt) ?? "",
       // Retained only as a read-compatible alias for documents that predate
       // canonical imageWidth. The resolver prefers imageWidth.
       imageMaxWidth: sourceImageMaxWidth(props),
       ...imageMedia,
+      ...(isOverlayElement ? {
+        imageHeight: undefined,
+        imageIntrinsicWidth: Number.isFinite(intrinsicWidth) && intrinsicWidth > 0 ? intrinsicWidth : undefined,
+        imageIntrinsicHeight: Number.isFinite(intrinsicHeight) && intrinsicHeight > 0 ? intrinsicHeight : undefined,
+        imageMinHeight: sourceCssDimension(props.image_min_height),
+        imageFit: imageMedia.imageFit ?? "cover",
+      } : {}),
       // YOOtheme's Image template only creates its cover frame when
       // `image_ratio` is authored. An omitted source ratio is therefore an
       // explicit natural-media instruction for an imported Image, not an
@@ -1722,9 +1743,65 @@ const mapStaticElement = (
       imageRatio: media.imageRatio ?? "natural",
       imageLinkUrl: asString(props.link) ?? undefined,
       imageLinkTarget: props.link ? linkTarget : undefined,
+      linkText: asText(props.link_text) || undefined,
+      linkAriaLabel: asText(props.link_aria_label) || undefined,
       imageShape: props.image_border === "rounded" || props.image_border === "circle" || props.image_border === "pill"
         ? props.image_border
         : "none",
+      imageFocalPoint: asString(props.image_focal_point) || undefined,
+      imageTransition: asString(props.image_transition) || undefined,
+      imageHasBorder: props.image_border === true || props.image_border === "true",
+      imageBorderRadius: Number.isFinite(Number(props.image_border_radius)) ? Number(props.image_border_radius) : undefined,
+      imageHoverFocalPoint: asString(props.image_hover_focal_point) || undefined,
+      hoverImageUrl: resolveYoothemeAssetUrl(props.image_hover ?? props.hover_image),
+      hoverVideoUrl: asString(props.video_hover) || asString(props.hover_video) || undefined,
+      containerHeightExpand: props.height_expand === true || props.height_expand === "true",
+      linkOverlay: props.overlay_link === true || props.overlay_link === "true",
+      htmlElement: asString(props.element) || asString(props.html_element) || undefined,
+      overlayMode: asString(props.overlay_mode) === "caption" ? "caption" : "cover",
+      overlayStyle: asString(props.overlay_style) || undefined,
+      overlayPosition: asString(props.overlay_position) || undefined,
+      overlayHover: props.overlay_hover === true || props.overlay_hover === "true",
+      overlayAnimateBackground: props.overlay_animate_background === true || props.overlay_animate_background === "true",
+      overlayExpandContent: props.overlay_expand === true || props.overlay_expand === "true",
+      overlayMaxWidth: asString(props.overlay_maxwidth) || asString(props.overlay_max_width) || undefined,
+      overlayTransition: asString(props.overlay_transition) || undefined,
+      overlayPadding: asString(props.overlay_padding) || undefined,
+      overlayMargin: asString(props.overlay_margin) || undefined,
+      overlayTextColor: asString(props.text_color) || undefined,
+      overlayTextColorHover: sourceBoolean(props.text_color_hover) ?? undefined,
+      overlayBlendImage: sourceBoolean(props.overlay_blend ?? props.blend_image) ?? undefined,
+      title: asText(props.title) || undefined,
+      meta: asText(props.meta) || undefined,
+      body: asString(props.content) || undefined,
+      titleTransition: asString(props.title_transition) || undefined,
+      titleStyle: asString(props.title_style) || undefined,
+      titleHoverStyle: asString(props.title_hover_style) || undefined,
+      titleLink: props.title_link === true || props.title_link === "true",
+      titleDecoration: asString(props.title_decoration) || undefined,
+      titleFontFamily: asString(props.title_font_family) || undefined,
+      titleTypographyRole: normalizeYoothemeTypographyRole(props.title_font_family),
+      titleColor: asString(props.title_color) || undefined,
+      titleElement: asString(props.title_element) || undefined,
+      titleMarginTop: sourceMargin(props.title_margin),
+      metaTransition: asString(props.meta_transition) || undefined,
+      metaFontFamily: asString(props.meta_font_family) || undefined,
+      metaTypographyRole: normalizeYoothemeTypographyRole(props.meta_font_family),
+      metaStyle: asString(props.meta_style) || undefined,
+      metaColor: asString(props.meta_color) || undefined,
+      metaAlignment: asString(props.meta_align) || undefined,
+      metaElement: asString(props.meta_element) || undefined,
+      metaMarginTop: sourceMargin(props.meta_margin),
+      contentTransition: asString(props.content_transition) || undefined,
+      contentFontFamily: asString(props.content_font_family) || undefined,
+      contentTypographyRole: normalizeYoothemeTypographyRole(props.content_font_family),
+      contentStyle: asString(props.content_style) || undefined,
+      contentMarginTop: sourceMargin(props.content_margin),
+      linkTransition: asString(props.link_transition) || undefined,
+      linkStyle: asString(props.link_style) || undefined,
+      linkSize: asString(props.link_size) || undefined,
+      linkFullWidth: props.link_fullwidth === true || props.link_fullwidth === "true",
+      linkMarginTop: sourceMargin(props.link_margin),
       ...(["none", "small", "medium", "large", "xlarge", "bottom"].includes(asString(props.image_box_shadow) ?? "")
         ? {
           imageShadow: asString(props.image_box_shadow) as "none" | "small" | "medium" | "large" | "xlarge" | "bottom",
@@ -1785,9 +1862,11 @@ const mapStaticElement = (
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge",
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "grid_masonry", "grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end",
-      "image_align", "image_width", "image_height", "image_fit", "image_ratio", "image_loading", "image_border", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin",
+      "image_align", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_focal_point", "image_hover_focal_point", "image_loading", "image_border", "image_border_radius", "image_transition", "image_hover_box_shadow", "image_hover_border", "image_grid_width", "image_grid_column_gap", "image_grid_row_gap", "image_grid_breakpoint", "image_vertical_align", "image_margin",
       "image_box_shadow", "image_box_decoration", "image_transition", "image_hover_box_shadow", "image_hover_border", "image_inverse", "image_link", "image_grid_width", "image_svg_inline", "image_svg_animate", "image_svg_color", "icon_width", "icon_color",
-      "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
+      "image_hover", "video_hover", "hover_image", "hover_video", "height_expand", "element", "html_element", "overlay_mode", "overlay_link", "overlay_style", "overlay_position", "overlay_hover", "overlay_animate_background", "overlay_expand", "overlay_maxwidth", "overlay_max_width", "overlay_transition", "overlay_padding", "overlay_margin", "text_color",
+      "title", "meta", "content", "title_transition", "title_style", "title_hover_style", "title_link", "title_decoration", "title_font_family", "title_color", "title_element", "title_margin", "meta_transition", "meta_font_family", "meta_style", "meta_color", "meta_align", "meta_element", "meta_margin", "content_transition", "content_font_family", "content_style", "content_margin",
+      "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "link_transition", "link_aria_label", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
       "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style", "content_align", "content_dropcap", "content_column", "content_column_divider", "content_column_breakpoint", "text_color",
       "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",

@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { getUikitAlertClass, getUikitAlertPresentationStyle, getUikitHeadingClass, getUikitTextClass } from "@/lib/uikitTokens";
-import { sanitizeHtml } from "@/lib/safeHtml";
+import { decodeHtmlEntities, sanitizeHtml } from "@/lib/safeHtml";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 
 type Props = {
@@ -22,7 +22,7 @@ export default function UikitAlert({ block }: Props) {
   const contentClass = `el-content uk-panel ${getUikitTextClass(rawBlock.alertContentStyle)} ${rawBlock.alertTitleInline ? "uk-display-inline uk-text-middle" : rawBlock.alertContentMargin === "none" ? "uk-margin-remove-top" : rawBlock.alertContentMargin ? `uk-margin-${rawBlock.alertContentMargin}-top` : ""}`.trim();
   const body = (
     <>
-      {rawBlock.title && <Title className={titleClass}>{rawBlock.title}</Title>}
+      {rawBlock.title && <Title className={titleClass}>{decodeHtmlEntities(String(rawBlock.title))}</Title>}
       {content && <div className={contentClass} dangerouslySetInnerHTML={{ __html: content }} />}
     </>
   );

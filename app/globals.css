@@ -2069,37 +2069,53 @@ a {
 .shop-builder-main h4,
 .shop-builder-main h5,
 .shop-builder-main h6 {
-  font-weight: var(--uk-heading-font-weight, 700);
+  font-weight: var(--uk-heading-font-weight, 400);
 }
-.shop-builder-main h1 { font-size: var(--uk-global-font-size-xxlarge, 42px); line-height: 1.2; }
+.shop-builder-main h1 { font-size: var(--uk-global-font-size-2xlarge, 44px); line-height: 1.2; }
 .shop-builder-main h2 { font-size: var(--uk-global-font-size-xlarge, 32px); line-height: 1.3; }
 .shop-builder-main h3 { font-size: var(--uk-global-font-size-large, 22px); line-height: 1.4; }
 .shop-builder-main h4 { font-size: var(--uk-global-font-size-medium, 18px); line-height: 1.4; }
 
-.shop-builder-main .uk-h1 { font-size: var(--uk-heading-h1-font-size, 44px); line-height: 1.2; font-weight: var(--uk-heading-h1-font-weight, 600); }
-.shop-builder-main .uk-h2 { font-size: 1.7rem; line-height: 1.3; }
+.shop-builder-main .uk-h1 { font-size: var(--uk-heading-h1-font-size, 44px); line-height: 1.2; font-weight: var(--uk-heading-h1-font-weight, var(--uk-heading-font-weight, 400)); }
+.shop-builder-main .uk-h2 { font-size: var(--uk-global-font-size-xlarge, 34px); line-height: 1.3; font-weight: var(--uk-heading-font-weight, 400); }
 .shop-builder-main .uk-h3 {
-  font-size: var(--uk-heading-h3-font-size, 22px);
+  font-size: var(--uk-heading-h3-font-size, var(--uk-global-font-size-large, 24px));
   line-height: 1.4;
+  font-family: var(--uk-heading-font-family, var(--uk-global-font-family, inherit));
+  font-weight: var(--uk-heading-h3-font-weight, var(--uk-heading-font-weight, 400));
 }
-.shop-builder-main .uk-h4 { font-size: 1.25rem; line-height: 1.4; }
-.shop-builder-main .uk-h5 { font-size: 1rem; line-height: 1.4; }
-.shop-builder-main .uk-h6 { font-size: 0.875rem; line-height: 1.4; }
+.shop-builder-main .uk-h1,
+.shop-builder-main .uk-h2,
+.shop-builder-main .uk-h4,
+.shop-builder-main .uk-h5,
+.shop-builder-main .uk-h6,
+.shop-builder-main .uk-heading-small,
+.shop-builder-main .uk-heading-medium,
+.shop-builder-main .uk-heading-large,
+.shop-builder-main .uk-heading-xlarge,
+.shop-builder-main .uk-heading-2xlarge,
+.shop-builder-main .uk-heading-3xlarge {
+  font-family: var(--uk-heading-font-family, var(--uk-global-font-family, inherit));
+  font-weight: var(--uk-heading-font-weight, 400);
+}
+.shop-builder-main .uk-h4 { font-size: var(--uk-global-font-size-medium, 20px); line-height: 1.4; }
+.shop-builder-main .uk-h5 { font-size: var(--uk-heading-h5-font-size, var(--uk-base-font-size, 16px)); line-height: 1.4; }
+.shop-builder-main .uk-h6 { font-size: var(--uk-heading-h6-font-size, var(--uk-global-font-size-small, 14px)); line-height: 1.4; }
 .shop-builder-main .uk-article-title { font-size: 2.6rem; line-height: 1.2; }
 
-.shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size, 2.6rem); line-height: var(--uk-heading-small-line-height, 1.2); font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)); }
-.shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size, 2.8875rem); line-height: var(--uk-heading-medium-line-height, var(--uk-base-line-height, 1.1)); font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 700)); }
+.shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size, 2.6rem); line-height: var(--uk-heading-small-line-height, 1.2); font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 400)); }
+.shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size, 2.8875rem); line-height: var(--uk-heading-medium-line-height, var(--uk-base-line-height, 1.1)); font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 400)); }
 .shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size, 3.4rem); line-height: var(--uk-heading-large-line-height, 1.1); }
-.shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size, 4rem); line-height: var(--uk-base-line-height, 1); }
+.shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size, 4rem); line-height: 1; }
 .shop-builder-main .uk-heading-2xlarge {
   font-size: var(--uk-heading-2xlarge-font-size, 5rem);
   line-height: 1;
-  font-weight: var(--uk-heading-font-weight, 700);
+  font-weight: var(--uk-heading-font-weight, 400);
 }
 .shop-builder-main .uk-heading-3xlarge {
   font-size: var(--uk-heading-3xlarge-font-size, 6rem);
   line-height: 1;
-  font-weight: var(--uk-heading-font-weight, 700);
+  font-weight: var(--uk-heading-font-weight, 400);
 }
 
 /* Grid titles carry an inline legacy fallback style for native WebPages
@@ -2108,17 +2124,17 @@ a {
 .shop-builder-main .shop-builder-grid-card--yootheme .shop-builder-title.uk-heading-small {
   font-size: var(--uk-heading-small-font-size, 2.6rem) !important;
   line-height: var(--uk-heading-small-line-height, 1.2) !important;
-  font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)) !important;
+  font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 400)) !important;
 }
 .shop-builder-main .shop-builder-grid-card--yootheme .shop-builder-title.uk-heading-medium {
   font-size: var(--uk-heading-medium-font-size, 2.8875rem) !important;
   line-height: var(--uk-heading-medium-line-height, 1.1) !important;
-  font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 700)) !important;
+  font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 400)) !important;
 }
 .shop-builder-main .shop-builder-grid-card--yootheme .shop-builder-title.uk-heading-large {
   font-size: var(--uk-heading-large-font-size, 3.4rem) !important;
   line-height: var(--uk-heading-large-line-height, 1.1) !important;
-  font-weight: var(--uk-heading-large-font-weight, var(--uk-heading-font-weight, 700)) !important;
+  font-weight: var(--uk-heading-large-font-weight, var(--uk-heading-font-weight, 400)) !important;
 }
 @media (min-width: 960px) {
   .shop-builder-main .shop-builder-grid-card--yootheme .shop-builder-title.uk-heading-small {
@@ -2133,25 +2149,25 @@ a {
 
 @media (min-width: 960px) {
   .shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size-responsive, 3.25rem); }
-  .shop-builder-main .uk-heading-medium { font-size: 3.5rem; }
-  .shop-builder-main .uk-heading-large { font-size: 4rem; }
-  .shop-builder-main .uk-heading-xlarge { font-size: 6rem; }
-  .shop-builder-main .uk-heading-2xlarge { font-size: 8rem; }
-  .shop-builder-main .uk-heading-3xlarge { font-size: 11rem; }
+  .shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size-m, 3.5rem); }
+  .shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size-m, 4rem); }
+  .shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size-m, 6rem); }
+  .shop-builder-main .uk-heading-2xlarge { font-size: var(--uk-heading-2xlarge-font-size-m, 8rem); }
+  .shop-builder-main .uk-heading-3xlarge { font-size: var(--uk-heading-3xlarge-font-size-m, 11rem); }
 }
 @media (min-width: 1200px) {
   /* Match UIkit/YOOtheme's Heading Large 1200px tier. */
   .shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size-responsive, 4rem); }
-  .shop-builder-main .uk-heading-large { font-size: 6rem; }
-  .shop-builder-main .uk-heading-xlarge { font-size: 8rem; }
-  .shop-builder-main .uk-heading-2xlarge { font-size: 11rem; }
-  .shop-builder-main .uk-heading-3xlarge { font-size: 15rem; }
+  .shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size-responsive, 6rem); }
+  .shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size-responsive, 8rem); }
+  .shop-builder-main .uk-heading-2xlarge { font-size: var(--uk-heading-2xlarge-font-size-responsive, 11rem); }
+  .shop-builder-main .uk-heading-3xlarge { font-size: var(--uk-heading-3xlarge-font-size-responsive, 15rem); }
 }
 
 /* --- UIkit Text utilities --- */
 .shop-builder-main .uk-text-lead {
-  font-size: 1.5rem;
-  line-height: 1.5;
+  font-size: var(--uk-text-lead-font-size, var(--uk-global-font-size-large, 1.5rem));
+  line-height: var(--uk-text-lead-line-height, 1.5);
   color: var(--uk-global-text-color, currentColor);
 }
 
@@ -2205,8 +2221,8 @@ a {
   .shop-builder-main .uk-column-1-6\@xl { columns: 6; }
 }
 .shop-builder-main .uk-text-meta {
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: var(--uk-text-meta-font-size, var(--uk-global-font-size-small, 0.875rem));
+  line-height: var(--uk-text-meta-line-height, 1.4);
   color: var(--uk-global-muted-text-color, currentColor);
 }
 .shop-builder-main .uk-text-center { text-align: center; }
@@ -2232,6 +2248,20 @@ a {
   backdrop-filter: var(--uk-overlay-primary-backdrop-filter, none);
   -webkit-backdrop-filter: var(--uk-overlay-primary-backdrop-filter, none);
 }
+
+/* Canonical YOOtheme Image/Overlay composition. The element renderer owns
+ * the structure; these shared rules keep imported and authored overlays
+ * visually consistent in Builder and storefront previews. */
+.shop-builder-image-media:has(.shop-builder-image-overlay) { position: relative; overflow: hidden; }
+.shop-builder-image-overlay { z-index: 2; pointer-events: none; }
+.shop-builder-image-overlay-content { z-index: 3; max-width: 100%; pointer-events: none; }
+.shop-builder-image-overlay-content > * { pointer-events: auto; }
+.shop-builder-image-overlay-hitarea { position: absolute; inset: 0; z-index: 1; pointer-events: auto; }
+.shop-builder-image-hover-media { z-index: 1; width: 100%; height: 100%; object-fit: cover; }
+.shop-builder-image-media > .shop-builder-image-hover-media + .shop-builder-image-overlay { z-index: 2; }
+.shop-builder-image-overlay[data-overlay-mode="caption"] { top: auto; height: auto; min-height: 0; }
+.shop-builder-image-overlay[data-overlay-animate-background="true"] { transition-property: background-color, opacity; }
+.shop-builder-image-overlay-title, .shop-builder-image-overlay-meta, .shop-builder-image-overlay-body { position: relative; z-index: 4; }
 
 /* --- UIkit Cards --- */
 .shop-builder-main .uk-card {
@@ -2300,6 +2330,7 @@ a {
 
 /* --- UIkit Spacing --- */
 .shop-builder-main .uk-margin { margin-bottom: 20px; }
+.shop-builder-main .uk-margin-bottom { margin-bottom: var(--uk-global-margin, 20px); }
 .shop-builder-main .uk-margin-small { margin-bottom: 10px; }
 .shop-builder-main .uk-margin-medium { margin-bottom: 40px; }
 .shop-builder-main .uk-margin-large { margin-bottom: 70px; }
@@ -2310,6 +2341,15 @@ a {
 .shop-builder-main .uk-margin-xlarge-top { margin-top: var(--uk-global-margin-xlarge, 140px); }
 .shop-builder-main .uk-margin-remove-top { margin-top: 0; }
 .shop-builder-main .uk-margin-remove-bottom { margin-bottom: 0; }
+
+/* YOOtheme's xlarge heading margin is a bottom rhythm in the imported
+   headline contract. The generic utility fallback is intentionally smaller
+   for native Builder content, so imported heading blocks opt into the
+   tenant's exact token here. */
+.shop-builder-main .shop-builder-column-block--heading > .shop-builder-title.uk-margin-xlarge {
+  margin-top: 0 !important;
+  margin-bottom: var(--uk-global-margin-xlarge, 140px) !important;
+}
 
 /* UIkit Pagination — all visual values are canonical Global Style tokens
    populated by YOOtheme LESS. Element documents own only composition and

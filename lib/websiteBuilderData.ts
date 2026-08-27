@@ -15,9 +15,10 @@ const BUILDER_FILES = [
 ] as const;
 const BUILDER_TEMPLATES_FILE = "builder-templates.json";
 const BUILDER_ROUTING_FILE = "builder-routing.json";
+const BUILDER_THEME_SETTINGS_FILE = "builder-theme-settings.json";
 
 type BuilderFileName = (typeof BUILDER_FILES)[number];
-type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE | typeof BUILDER_ROUTING_FILE;
+type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE | typeof BUILDER_ROUTING_FILE | typeof BUILDER_THEME_SETTINGS_FILE;
 type BuilderFileState = "missing" | "empty" | "non-empty" | "invalid";
 let rootBuilderDataEnsurePromise: Promise<void> | null = null;
 
@@ -63,6 +64,12 @@ export function getBuilderShellPath(websiteId?: string) {
   return websiteId
     ? getWebsiteBuilderFilePath(websiteId, "builder-shell.json")
     : getRuntimeBuilderFilePath("builder-shell.json");
+}
+
+export function getBuilderThemeSettingsPath(websiteId?: string) {
+  return websiteId
+    ? path.join(getWebsiteBuilderDir(websiteId), BUILDER_THEME_SETTINGS_FILE)
+    : getRuntimeBuilderFilePath(BUILDER_THEME_SETTINGS_FILE);
 }
 
 export function getBuilderTemplatesPath() {

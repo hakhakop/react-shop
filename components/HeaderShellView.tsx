@@ -404,7 +404,7 @@ export default function HeaderShellView({
       ? navigationHoverLine
       : shellSettings.navbarNavItemLinePositionMode
     : "bottom";
-  const navbarLineSlide = ["center", "left", "right"].includes(
+  const navbarLineSlide = ["fixed", "center", "left", "right"].includes(
     shellSettings.navbarNavItemLineSlideMode ?? "",
   )
     ? shellSettings.navbarNavItemLineSlideMode

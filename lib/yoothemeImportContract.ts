@@ -340,16 +340,29 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
   const sourceMobile = root.mobile && typeof root.mobile === "object"
     ? root.mobile as Record<string, unknown>
     : {};
+  const sourceDialog = root.dialog && typeof root.dialog === "object"
+    ? root.dialog as Record<string, unknown>
+    : {};
+  const sourceLogo = root.logo && typeof root.logo === "object"
+    ? root.logo as Record<string, unknown>
+    : {};
+  const sourceMenu = root.menu && typeof root.menu === "object"
+    ? root.menu as Record<string, unknown>
+    : {};
+  const sourceMenuPositions = sourceMenu.positions && typeof sourceMenu.positions === "object"
+    ? sourceMenu.positions as Record<string, unknown>
+    : {};
+  const navbarMenuPosition = sourceMenuPositions.navbar && typeof sourceMenuPositions.navbar === "object"
+    ? sourceMenuPositions.navbar as Record<string, unknown>
+    : {};
   const sourceSite = root.site && typeof root.site === "object"
     ? root.site as Record<string, unknown>
     : {};
 
   const sourceLayout = string(sourceHeader.layout)?.toLowerCase();
   const headerLayout: BuilderSection["headerLayout"] =
-    sourceLayout === "horizontal-justify" ? "wordpress" :
-      sourceLayout === "horizontal-left" ? "simple" :
-        sourceLayout === "horizontal-right" ? "princity" :
-          sourceLayout === "stacked" ? "two-row" : undefined;
+    sourceLayout === "stacked" ? "two-row" :
+      sourceLayout?.startsWith("horizontal-") ? "simple" : undefined;
   const width = string(sourceHeader.width)?.toLowerCase();
   const sticky = sourceNavbar.sticky;
   const headerBehavior: BuilderSection["headerBehavior"] =
@@ -359,11 +372,129 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
 
   const patch: Partial<BuilderSection> = {
     headerArchitectureVersion: 2,
+    headerPresetKey: undefined,
     ...(headerLayout ? { headerLayout } : {}),
     ...(width === "full" || width === "expand" ? { headerWidthMode: "full" as const } : {}),
     ...(width === "default" || width === "boxed" ? { headerWidthMode: "boxed" as const } : {}),
     ...(headerBehavior ? { headerBehavior } : {}),
   };
+
+  const sourceMobileBreakpoint = string(sourceMobile.breakpoint)?.toLowerCase();
+  const mobileBreakpoint = sourceMobileBreakpoint === "s" ? "640px"
+    : sourceMobileBreakpoint === "m" ? "960px"
+      : sourceMobileBreakpoint === "l" ? "1200px"
+        : sourceMobileBreakpoint === "xl" ? "1600px"
+          : string(sourceMobile.breakpoint);
+  if (mobileBreakpoint) patch.headerMobileBreakpoint = mobileBreakpoint;
+
+  const dropdownAlign = string(sourceNavbar.dropdown_align)?.toLowerCase();
+  if (dropdownAlign === "left" || dropdownAlign === "right" || dropdownAlign === "center") {
+    patch.headerDropdownAlign = dropdownAlign;
+  }
+  if (typeof sourceNavbar.dropdown_boundary === "boolean") {
+    patch.headerDropdownAlignToNavbar = sourceNavbar.dropdown_boundary;
+  }
+  if (typeof sourceNavbar.dropbar === "boolean") {
+    patch.headerDropbarEnabled = sourceNavbar.dropbar;
+  }
+  const clickMode = sourceNavbar.dropdown_click ?? sourceNavbar.click_mode ?? sourceNavbar.dropdown_mode;
+  if (typeof clickMode === "boolean") patch.headerClickModeEnabled = clickMode;
+  if (clickMode === "click") patch.headerClickModeEnabled = true;
+  if (clickMode === "hover") patch.headerClickModeEnabled = false;
+
+  const searchPosition = typeof sourceHeader.search === "string"
+    ? sourceHeader.search.trim() || "hide"
+    : undefined;
+  if (searchPosition) patch.headerSearchPosition = searchPosition;
+  const searchLayout = string(sourceHeader.search_layout);
+  if (searchLayout) patch.headerSearchLayout = searchLayout;
+
+  const dialogLayout = string(sourceDialog.layout);
+  const dialogToggle = string(sourceDialog.toggle);
+  if (dialogLayout) patch.headerDialogLayout = dialogLayout;
+  if (dialogToggle) patch.headerDialogTogglePosition = dialogToggle;
+  if (typeof sourceDialog.text_center === "boolean") patch.headerDialogCenter = sourceDialog.text_center;
+  if (typeof sourceDialog.push_index === "number" && Number.isFinite(sourceDialog.push_index)) {
+    patch.headerDialogPushAfter = sourceDialog.push_index;
+  }
+
+  const logoText = typeof sourceLogo.text === "string" ? sourceLogo.text.trim() : "";
+  const logoImage = string(sourceLogo.image);
+  const logoInverse = string(sourceLogo.image_inverse);
+  const logoMobile = string(sourceLogo.image_mobile);
+  const logoSvgInline = typeof sourceLogo.image_svg_inline === "boolean"
+    ? sourceLogo.image_svg_inline
+    : undefined;
+  const hasNavbarMenu = navbarMenuPosition.menu !== undefined &&
+    navbarMenuPosition.menu !== null &&
+    navbarMenuPosition.menu !== "";
+
+  if (logoMobile) patch.headerMobileLogoUrl = logoMobile;
+  if (logoInverse) patch.headerInverseLogoUrl = logoInverse;
+
+  // YOOtheme's horizontal layouts are compositions, not WebPages preset
+  // names. Materialize the supported structure directly into the existing
+  // canonical Header row/column/element model. Unrepresented Header-position
+  // modules are deliberately not invented here.
+  if (sourceLayout?.startsWith("horizontal-")) {
+    const logoBlock: BuilderLayoutBlock | null = logoImage || logoText
+      ? {
+          id: "header-logo",
+          kind: "image",
+          ...(logoImage ? { imageUrl: logoImage } : {}),
+          ...(logoInverse ? { imageInverseUrl: logoInverse } : {}),
+          ...(logoMobile ? { imageMobileUrl: logoMobile } : {}),
+          ...(logoSvgInline !== undefined ? { imageSvgInline: logoSvgInline } : {}),
+          imageAlt: logoText || "Site logo",
+          headerBrandMode: logoImage ? "logo" : "brand",
+          ...(logoText ? { headerBrandText: logoText } : {}),
+          imageAlignment: "left",
+          elementAlign: "left",
+        }
+      : null;
+    const navigationBlock: BuilderLayoutBlock | null = hasNavbarMenu
+      ? {
+          id: "header-navigation",
+          kind: "menu",
+          title: "Navigation",
+          menuSource: "main",
+          elementAlign: "center",
+          ...(patch.headerDropbarEnabled !== undefined ? { menuDropbar: patch.headerDropbarEnabled } : {}),
+          ...(patch.headerClickModeEnabled !== undefined ? { menuClickMode: patch.headerClickModeEnabled } : {}),
+        }
+      : null;
+
+    patch.layout = "header-row";
+    patch.layoutColumns = 3;
+    patch.headerUtilityMigrationVersion = 3;
+    patch.background = "transparent";
+    patch.backgroundMode = "full";
+    patch.contentMode = width === "expand" || width === "full" ? "expand" : "boxed";
+    patch.colorScheme = "inherit";
+    patch.layoutItems = [
+      {
+        id: "header-main-left",
+        rowId: "header-main-row",
+        rowLayout: "quarters-1-2-1",
+        columnHorizontalAlign: "left",
+        blocks: logoBlock ? [logoBlock] : [],
+      },
+      {
+        id: "header-main-center",
+        rowId: "header-main-row",
+        rowLayout: "quarters-1-2-1",
+        columnHorizontalAlign: "center",
+        blocks: navigationBlock ? [navigationBlock] : [],
+      },
+      {
+        id: "header-main-right",
+        rowId: "header-main-row",
+        rowLayout: "quarters-1-2-1",
+        columnHorizontalAlign: "right",
+        blocks: [],
+      },
+    ];
+  }
 
   // These keys are accepted by YOOtheme exports when present (they are absent
   // from some theme exports). Preserve them as document values instead of
@@ -391,9 +522,5 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
     if (typeof boxed.header_outside === "boolean") patch.headerOverlay = boxed.header_outside;
   }
 
-  // Keep the imported mobile breakpoint available to the shared Header
-  // document once responsive Header controls consume it. It is deliberately
-  // omitted here until that canonical field exists, avoiding a dead setting.
-  void sourceMobile;
   return patch;
 }

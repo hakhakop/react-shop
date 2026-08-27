@@ -19,11 +19,12 @@ import {
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
+import type { BuilderThemeSettings } from "@/lib/builderThemeSettings";
 
 type HeaderShellProps = {
   layoutOverride?: BuilderHeaderLayout;
   shellSettingsOverride?: BuilderShellSettings;
-  themeSettingsOverride?: Record<string, unknown>;
+  themeSettingsOverride?: BuilderThemeSettings | Record<string, unknown>;
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
@@ -75,11 +76,12 @@ export default async function HeaderShell({
       };
   const navigationWebsiteId = scopedPreviewWebsiteId ?? (tenantPathMode ? website?.slug : undefined);
   const serviceHomepageMode = !website && !scopedPreviewWebsiteId;
-  const headerLayout = await getOrCreateHeaderBuilderLayout(
+  const storedHeaderLayout = await getOrCreateHeaderBuilderLayout(
     shellSettings,
     scope ?? {},
     serviceHomepageMode,
   );
+  const headerLayout = storedHeaderLayout;
   const cookieStore = await cookies();
   const langKey = `website_content_language_${website?.id ?? "root"}`;
   const languageCookie = cookieStore.get(langKey)?.value;

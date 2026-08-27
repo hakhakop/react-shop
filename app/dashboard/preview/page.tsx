@@ -129,7 +129,7 @@ export default async function RootPreviewPage({ searchParams }: RootPreviewPageP
       />
       <FooterShell
         shellSettingsOverride={shellSettings}
-        builderInteractionIdentity={builderIframeDiagnostics === "full"}
+        builderInteractionIdentity={builderIframeSelection}
         documentRuntimeOwnedExternally
       />
     </BuilderDocumentRuntime>

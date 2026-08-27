@@ -544,7 +544,9 @@ type DashboardInspectorProps = {
   onApplyHeaderPreset?: (presetKey: string) => void;
   savedTemplates: BuilderSavedTemplate[];
   templateStatus?: string;
-  onSaveContextualLayout?: (layoutType: LayoutLibraryType) => void | Promise<unknown>;
+  onSaveContextualLayout?: (layoutType: LayoutLibraryType, title?: string) => void | Promise<unknown>;
+  onImportSavedTemplate?: (file: File, templateType: LayoutLibraryType) => void | Promise<unknown>;
+  onImportYootheme?: (file: File, targetType: LayoutLibraryType) => void | Promise<unknown>;
   onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
@@ -1213,6 +1215,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     savedTemplates,
     templateStatus,
     onSaveContextualLayout,
+    onImportSavedTemplate,
+    onImportYootheme,
     onApplySavedTemplate = () => undefined,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
@@ -2106,7 +2110,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           ? "Row Settings"
           : "Row Advanced"
       : isDocumentRoot
-        ? "Header"
+        ? isFooterDocumentRoot ? "Footer" : "Header"
       : isCanonicalSectionSelection
         ? inspectorTab === "content"
           ? "Section Content"
@@ -2223,7 +2227,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 }}
               >
                 {isDocumentRoot
-                  ? "Header"
+                  ? isFooterDocumentRoot
+                    ? "Footer"
+                    : "Header"
                   : selectedSection.name ||
                     sectionLabels[selectedSection.kind] ||
                     selectedSection.title ||
@@ -2402,10 +2408,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               saveLabel={contextualLibrarySaveLabel}
               onSaveCurrent={
                 onSaveContextualLayout
-                  ? () => onSaveContextualLayout(contextualLibraryType)
+                  ? (title) => onSaveContextualLayout(contextualLibraryType, title)
                   : undefined
               }
               onApply={onApplySavedTemplate}
+              onImport={onImportSavedTemplate}
+              onImportYootheme={onImportYootheme}
             />
           ) : null}
 
@@ -12836,7 +12844,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </button>
                                                     </details>{" "}
                                                   </>
-                                                ) : block.kind === "image" ? (
+                                                ) : block.kind === "image" || block.kind === "overlay" ? (
                                                   <>
                                                     {isElementContentTab && (
                                                       <>
@@ -12925,6 +12933,24 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             }
                                                           />
                                                         </label>
+                                                        <details className="builder-collapse" open>
+                                                          <summary><span>YOOtheme Overlay</span><small>{block.overlayStyle ?? "none"}</small></summary>
+                                                          <label className="builder-field"><span>Title</span><input value={block.title ?? ""} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { title: e.target.value })} /></label>
+                                                          <label className="builder-field"><span>Meta</span><input value={block.meta ?? ""} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { meta: e.target.value })} /></label>
+                                                          <label className="builder-field"><span>Hover image</span><input value={block.hoverImageUrl ?? ""} placeholder="https://" onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { hoverImageUrl: e.target.value })} /></label>
+                                                          <label className="builder-field"><span>Overlay mode</span><select value={block.overlayMode ?? "cover"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayMode: e.target.value })}><option value="cover">Cover</option><option value="caption">Caption</option></select></label>
+                                                          <label className="builder-field"><span>Overlay style</span><select value={block.overlayStyle ?? "none"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayStyle: e.target.value })}><option value="none">None</option><option value="overlay-default">Overlay Default</option><option value="overlay-primary">Overlay Primary</option><option value="tile-default">Tile Default</option><option value="tile-muted">Tile Muted</option><option value="tile-primary">Tile Primary</option><option value="tile-secondary">Tile Secondary</option></select></label>
+                                                          <label className="builder-field"><span>Position</span><select value={block.overlayPosition ?? "center"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayPosition: e.target.value })}>{["top","bottom","left","right","top-left","top-center","top-right","bottom-left","bottom-center","bottom-right","center","center-left","center-right"].map((v) => <option key={v} value={v}>{v.replaceAll("-", " ")}</option>)}</select></label>
+                                                          <label className="builder-field"><span>Transition</span><select value={block.overlayTransition ?? "fade"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayTransition: e.target.value })}>{["fade","scale-up","scale-down","slide-top-small","slide-bottom-small","slide-left-small","slide-right-small","slide-top-medium","slide-bottom-medium","slide-left-medium","slide-right-medium","slide-top-100","slide-bottom-100","slide-left-100","slide-right-100"].map((v) => <option key={v} value={v}>{v.replaceAll("-", " ")}</option>)}</select></label>
+                                                          <div className="builder-two-column"><label className="builder-field"><span>Padding</span><select value={block.overlayPadding ?? "default"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayPadding: e.target.value })}><option value="default">Default</option><option value="small">Small</option><option value="large">Large</option><option value="none">None</option></select></label><label className="builder-field"><span>Margin</span><select value={block.overlayMargin ?? "none"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayMargin: e.target.value })}><option value="none">None</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label></div>
+                                                          <label className="builder-field"><span>Text color</span><select value={block.overlayTextColor ?? "none"} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayTextColor: e.target.value })}><option value="none">None</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+                                                          <label className="builder-field"><span>Link text</span><input value={block.linkText ?? ""} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { linkText: e.target.value })} /></label>
+                                                          <label className="builder-field"><span>Link URL</span><input value={block.imageLinkUrl ?? ""} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { imageLinkUrl: e.target.value, linkOverlay: Boolean(e.target.value) })} /></label>
+                                                          <label className="builder-checkbox"><input type="checkbox" checked={block.linkOverlay ?? false} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { linkOverlay: e.target.checked })} /> Link overlay</label>
+                                                          <label className="builder-checkbox"><input type="checkbox" checked={block.overlayHover ?? false} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayHover: e.target.checked })} /> Display overlay on hover</label>
+                                                          <label className="builder-checkbox"><input type="checkbox" checked={block.overlayAnimateBackground ?? false} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayAnimateBackground: e.target.checked })} /> Animate background only</label>
+                                                          <label className="builder-checkbox"><input type="checkbox" checked={block.overlayExpandContent ?? false} onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { overlayExpandContent: e.target.checked })} /> Expand content</label>
+                                                        </details>
                                                       </>
                                                     )}
 

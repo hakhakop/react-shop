@@ -19,6 +19,11 @@ import {
   type BuilderShellSettings,
 } from "@/lib/builderShell";
 import {
+  applyBuilderThemeSettings,
+  type BuilderThemeSettings,
+} from "@/lib/builderThemeSettings";
+import { getBuilderThemeSettings } from "@/lib/builderThemeSettings.server";
+import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
@@ -91,6 +96,65 @@ ${uikitCss}
   --builder-global-element-margin-right: ${spacing(shellSettings.elementMarginRight, "elementMargin")};
   --builder-global-element-margin-bottom: ${spacing(shellSettings.elementMarginBottom, "elementMargin")};
   --builder-global-element-margin-left: ${spacing(shellSettings.elementMarginLeft, "elementMargin")};
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container {
+  background: var(--uk-theme-page-container-background, transparent);
+  color: var(--uk-theme-page-container-color, inherit);
+  --uk-inverse: var(--uk-theme-page-container-color-mode, dark);
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--full {
+  background: var(--uk-theme-page-container-background, transparent);
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-margin-top {
+  margin-top: var(--uk-theme-page-container-margin-top, 0);
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-margin-bottom {
+  margin-bottom: var(--uk-theme-page-container-margin-bottom, 0);
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
+  position: relative;
+  border: var(--uk-theme-page-border-width, 0) solid var(--uk-theme-page-border-color, transparent);
+  border-image: var(--uk-theme-page-border-gradient, none) 1;
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--boxed .tm-page {
+  width: 100%;
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--boxed[data-builder-theme-page-alignment="left"] .tm-page {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--boxed[data-builder-theme-page-alignment="center"] .tm-page {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--boxed[data-builder-theme-page-alignment="right"] .tm-page {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+:where([data-scoped-preview-root], [data-domain-website-root]) .tm-page-container--boxed .tm-page {
+  max-width: var(--uk-page-container-max-width, 1500px);
+}
+
+@media (min-width: 1200px) {
+  :where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
+    border-width: var(--uk-theme-page-border-width, 0);
+  }
+}
+
+@media (min-width: 1600px) {
+  :where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
+    border-width: var(--uk-theme-page-border-width-large, var(--uk-theme-page-border-width, 0));
+  }
 }
 
 /* The canonical preview keeps the imported Header in normal document flow
@@ -189,13 +253,16 @@ export default async function WebsiteFrontend({
   const websiteRouteSegment = getWebsiteRouteSegment(website);
   const page = resolveWebsitePageKey(requestedPage, customPages);
 
-  const [layout, shellSettings] = await Promise.all([
+  const [layout, baseShellSettings, themeSettings] = await Promise.all([
     layoutOverride ?? getPublishedBuilderLayout(page, scope),
     getBuilderShellSettings(scope),
+    getBuilderThemeSettings(scope),
   ]);
+  const shellSettings = applyBuilderThemeSettings(baseShellSettings, themeSettings);
   const headerDocumentSettings = await getPublishedHeaderDocumentSettings(
     shellSettings,
     scope,
+    themeSettings,
   );
   const languageCookie = (await cookies()).get(`website_content_language_${website.id}`)?.value;
   const activeContentLanguage = website.enabledLanguages.includes(languageCookie as never)
@@ -269,43 +336,51 @@ export default async function WebsiteFrontend({
         dangerouslySetInnerHTML={{ __html: scopedShellCss(shellSettings) }}
       />
       <BuilderDocumentRuntime>
-        <HeaderShell
-          layoutOverride={shellSettings.headerLayout}
-          shellSettingsOverride={shellSettings}
-          scopedPreviewWebsiteId={isPreview ? websiteRouteSegment : undefined}
-          scopedPreviewPage={page}
-          scopedPreviewPages={scopedPreviewPages}
-          hideSaaSEntry={!isPreview}
-          website={website}
-          activeContentLanguage={activeContentLanguage}
-          builderInteractionIdentity={builderIframeSelection}
-          builderPreviewMode={builderIframeSelection}
-          builderDraftPreview={builderIframeSelection}
-          tenantPathMode={isTenantPath}
-          themeSettingsOverride={{}}
-        />
-        {renderLayout && hasVisibleLayout || mountDraftPreview ? (
-          <StorefrontBuilderRenderer
-            layout={renderLayout ?? draftPreviewLayout}
-            page={page}
-            pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
-            website={website}
-            headerOverlay={headerDocumentSettings.overlay}
-            {...rendererProps}
-            builderInteractionIdentity={builderIframeSelection || rendererProps?.builderInteractionIdentity}
-            shellSettings={shellSettings}
-            documentRuntimeOwnedExternally
-          />
-        ) : (
-          fallbackContent
-        )}
-        <FooterShell
-          website={website}
-          activeContentLanguage={activeContentLanguage}
-          builderInteractionIdentity={builderIframeDiagnostics === "full"}
-          shellSettingsOverride={shellSettings}
-          documentRuntimeOwnedExternally
-        />
+        <div
+          className={shellSettings.themePageLayout === "boxed" ? "tm-page-container tm-page-container--boxed tm-page-margin-top tm-page-margin-bottom" : "tm-page-container tm-page-container--full"}
+          data-builder-theme-page-container={themeSettings.active ? themeSettings.themeId ?? "active" : undefined}
+          data-builder-theme-page-alignment={shellSettings.themePageContainerAlignment ?? undefined}
+        >
+          <div className="tm-page">
+            <HeaderShell
+              layoutOverride={shellSettings.headerLayout}
+              shellSettingsOverride={shellSettings}
+              scopedPreviewWebsiteId={isPreview ? websiteRouteSegment : undefined}
+              scopedPreviewPage={page}
+              scopedPreviewPages={scopedPreviewPages}
+              hideSaaSEntry={!isPreview}
+              website={website}
+              activeContentLanguage={activeContentLanguage}
+              builderInteractionIdentity={builderIframeSelection}
+              builderPreviewMode={builderIframeSelection}
+              builderDraftPreview={builderIframeSelection}
+              tenantPathMode={isTenantPath}
+              themeSettingsOverride={themeSettings as BuilderThemeSettings}
+            />
+            {renderLayout && hasVisibleLayout || mountDraftPreview ? (
+              <StorefrontBuilderRenderer
+                layout={renderLayout ?? draftPreviewLayout}
+                page={page}
+                pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+                website={website}
+                headerOverlay={headerDocumentSettings.overlay}
+                {...rendererProps}
+                builderInteractionIdentity={builderIframeSelection || rendererProps?.builderInteractionIdentity}
+                shellSettings={shellSettings}
+                documentRuntimeOwnedExternally
+              />
+            ) : (
+              fallbackContent
+            )}
+            <FooterShell
+              website={website}
+              activeContentLanguage={activeContentLanguage}
+              builderInteractionIdentity={builderIframeSelection}
+              shellSettingsOverride={shellSettings}
+              documentRuntimeOwnedExternally
+            />
+          </div>
+        </div>
       </BuilderDocumentRuntime>
       {website.status !== "active" && (
         <div className="webpages-draft-branding"><Sparkles size={14} /> Created with <strong>WebPages</strong></div>

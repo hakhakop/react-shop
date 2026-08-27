@@ -209,19 +209,20 @@ export default function BuilderIframeSelectionBridge({
       }
       const element = event.target instanceof Element ? event.target : null;
       const header = element?.closest(".site-header");
+      const footer = element?.closest('footer[data-builder-page-root="true"]');
       const headerInteractive = element?.closest(
         "button, input, select, textarea, form, [role='button']",
       );
       // A shell edit is a temporary document context. Clicking the rendered
       // page below it must return to the page document, even though the page
       // itself is otherwise non-editable while the shell owns the canvas.
-      if (!header && (diagnostics === "settled" || diagnostics === "full")) {
+      if (!header && !footer && (diagnostics === "settled" || diagnostics === "full")) {
         window.parent.postMessage({
           source: BUILDER_IFRAME_SELECTION_SOURCE,
           type: "exit-shell",
         } satisfies SelectionMessage, window.location.origin);
       }
-      if (header && !headerInteractive) {
+      if ((header || footer) && !headerInteractive) {
         // While editing a shell, Header content follows the same Builder
         // selection contract as page content: resolve the authored block
         // before falling back to the document section. Without this branch,
@@ -234,11 +235,11 @@ export default function BuilderIframeSelectionBridge({
             return;
           }
         }
-        const headerTarget = {
+        const shellTarget = {
           type: "section",
-          sectionId: "header-document",
+          sectionId: footer ? "footer-document" : "header-document",
         } satisfies BuilderInteractionTarget;
-        selectTarget(headerTarget);
+        selectTarget(shellTarget);
         return;
       }
       const target = targetFromClick(event);

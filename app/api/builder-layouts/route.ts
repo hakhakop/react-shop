@@ -12,6 +12,7 @@ import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getOrCreateHeaderBuilderLayout, migrateLegacyHeaderDocument } from "@/lib/headerBuilderDocument";
+import { getOrCreateFooterBuilderLayout } from "@/lib/footerBuilderDocument";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import {
   BuilderDocumentNotFoundError,
@@ -73,6 +74,8 @@ export async function GET(request: NextRequest) {
         access.scope,
         !access.scope.websiteId,
       )
+    : page === "footer"
+      ? await getOrCreateFooterBuilderLayout(access.scope)
     : await getPublishedBuilderLayout(page, access.scope);
   const materialization = layout
     ? await materializeBuilderDynamicContent(layout, {
@@ -177,6 +180,7 @@ export async function POST(request: NextRequest) {
     page,
     targetType: getBuilderTargetType(page),
     template: isBuilderTemplate(page) ? page : undefined,
+    displayName: body.displayName,
     design: body.design,
     sections,
     updatedAt: new Date().toISOString(),

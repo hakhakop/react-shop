@@ -151,11 +151,15 @@ function globalTypographyDefaults(
 ): TypographySettings {
   const value = (key: string, fallback: string) =>
     resolveGlobalStyleToken(key, shellSettings, undefined, fallback).value;
+  const valueOrToken = (key: string, inheritedKey: string, fallback: string) => {
+    const authored = resolveGlobalStyleToken(key, shellSettings, undefined, fallback);
+    return authored.source === "default" ? value(inheritedKey, fallback) : authored.value;
+  };
 
   if (area === "title" || area === "eyebrow") {
     return {
       fontFamily: value("fontFamilyHeading", "inherit"),
-      fontWeight: value("headingFontWeight", "700"),
+      fontWeight: valueOrToken("headingFontWeight", "fontWeightPrimary", "700"),
       lineHeight: value("headingMediumLineHeight", value("baseLineHeight", "1.5")),
       color: value("emphasisColor", value("textColor", "#111827")),
     };

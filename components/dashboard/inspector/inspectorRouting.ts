@@ -34,7 +34,7 @@ import CartCapabilityPanel from "@/components/dashboard/inspector/panels/CartCap
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
   "button", "panel", "heading", "text", "list", "accordion", "image",
-  "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker",
+  "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker", "overlay",
 ] as const satisfies readonly LayoutBlockKind[];
 
 /**
@@ -181,6 +181,20 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     available: normalImageAvailability,
     dynamicFields: {
       source: { label: "Image source", destination: "imageUrl" },
+      alt: { label: "Alt text", destination: "imageAlt" },
+    },
+    dynamicSourceSurface: "element",
+  },
+  overlay: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "media", "link", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: ImageCapabilityPanel,
+    settingsLabel: "Settings",
+    available: normalImageAvailability,
+    dynamicFields: {
+      source: { label: "Image source", destination: "imageUrl" },
+      hoverImage: { label: "Hover image", destination: "hoverImageUrl" },
       alt: { label: "Alt text", destination: "imageAlt" },
     },
     dynamicSourceSurface: "element",

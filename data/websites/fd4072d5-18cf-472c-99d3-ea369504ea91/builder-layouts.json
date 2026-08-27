@@ -172,7 +172,7 @@
         "visualStyle": {
           "background": {
             "type": "image",
-            "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/home-work-bg.svg",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-work-bg.svg",
             "imagePosition": "top-center"
           }
         },
@@ -241,6 +241,256 @@
                 },
                 "buttonStyle": "default",
                 "size": "default"
+              },
+              {
+                "id": "yootheme-image-1-0-0-2",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-01.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "600px",
+                "imageHeight": "430px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Little Paradise",
+                "meta": "Travel Report",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-0-3",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-02.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 385,
+                "imageWidth": "385px",
+                "imageHeight": "570px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=21",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Robert",
+                "meta": "Portrait",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-0-4",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-03.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 385,
+                "imageWidth": "385px",
+                "imageHeight": "570px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Alice &amp; George",
+                "meta": "Wedding",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-0-5",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-04.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "600px",
+                "imageHeight": "430px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=21",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Josh &amp; Kelly",
+                "meta": "Couple Shooting",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-0-6",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-05.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 385,
+                "imageWidth": "385px",
+                "imageHeight": "570px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Carf Watches",
+                "meta": "Advertisement",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               }
             ]
           },
@@ -248,7 +498,258 @@
             "id": "yootheme-section-2-row-1-column-2",
             "rowId": "yootheme-section-2-row-1",
             "rowLayout": "2-col-equal",
-            "blocks": []
+            "blocks": [
+              {
+                "id": "yootheme-image-1-0-1-0",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-06.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 700,
+                "imageWidth": "700px",
+                "imageHeight": "490px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=21",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Chloé &amp; Marc",
+                "meta": "for Ink Tattoo Convention",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-1-1",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-07.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 385,
+                "imageWidth": "385px",
+                "imageHeight": "570px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Benjamin Smoke",
+                "meta": "Advertisement",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-1-2",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-08.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 960,
+                "imageWidth": "960px",
+                "imageHeight": "640px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=21",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Eric Handerson",
+                "meta": "Lost Places",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-1-3",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-09.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 385,
+                "imageWidth": "385px",
+                "imageHeight": "570px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=23",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Tropical Jungle",
+                "meta": "for Urban Clothing",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-1-0-1-4",
+                "kind": "overlay",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-10.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "600px",
+                "imageHeight": "436px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=21",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayStyle": "overlay-primary",
+                "overlayPosition": "center",
+                "overlayHover": true,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Keven &amp; Alice",
+                "meta": "Couple Shooting",
+                "titleTransition": "slide-bottom-small",
+                "titleStyle": "h3",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "div",
+                "metaTransition": "slide-bottom-small",
+                "metaStyle": "h6",
+                "metaAlignment": "below-title",
+                "metaElement": "h3",
+                "metaMarginTop": "remove",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
           }
         ],
         "rows": [
@@ -327,6 +828,256 @@
                       "effects": {},
                       "card": {}
                     }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-0-2",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-01.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 600,
+                    "imageWidth": "600px",
+                    "imageHeight": "430px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=23",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Little Paradise",
+                    "meta": "Travel Report",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-0-3",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-02.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 385,
+                    "imageWidth": "385px",
+                    "imageHeight": "570px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=21",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Robert",
+                    "meta": "Portrait",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-0-4",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-03.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 385,
+                    "imageWidth": "385px",
+                    "imageHeight": "570px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=23",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Alice &amp; George",
+                    "meta": "Wedding",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-0-5",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-04.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 600,
+                    "imageWidth": "600px",
+                    "imageHeight": "430px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=21",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Josh &amp; Kelly",
+                    "meta": "Couple Shooting",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-0-6",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-05.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 385,
+                    "imageWidth": "385px",
+                    "imageHeight": "570px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=23",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Carf Watches",
+                    "meta": "Advertisement",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
                   }
                 ]
               },
@@ -341,7 +1092,258 @@
                 "sticky": {
                   "breakpoint": "m"
                 },
-                "elements": []
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-0-1-0",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-06.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 700,
+                    "imageWidth": "700px",
+                    "imageHeight": "490px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=21",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Chloé &amp; Marc",
+                    "meta": "for Ink Tattoo Convention",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-1-1",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-07.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 385,
+                    "imageWidth": "385px",
+                    "imageHeight": "570px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=23",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Benjamin Smoke",
+                    "meta": "Advertisement",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-1-2",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-08.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 960,
+                    "imageWidth": "960px",
+                    "imageHeight": "640px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=21",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Eric Handerson",
+                    "meta": "Lost Places",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-1-3",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-09.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 385,
+                    "imageWidth": "385px",
+                    "imageHeight": "570px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=23",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Tropical Jungle",
+                    "meta": "for Urban Clothing",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-1-0-1-4",
+                    "kind": "overlay",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-project-10.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 600,
+                    "imageWidth": "600px",
+                    "imageHeight": "436px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=21",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayStyle": "overlay-primary",
+                    "overlayPosition": "center",
+                    "overlayHover": true,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Keven &amp; Alice",
+                    "meta": "Couple Shooting",
+                    "titleTransition": "slide-bottom-small",
+                    "titleStyle": "h3",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "div",
+                    "metaTransition": "slide-bottom-small",
+                    "metaStyle": "h6",
+                    "metaAlignment": "below-title",
+                    "metaElement": "h3",
+                    "metaMarginTop": "remove",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -365,7 +1367,7 @@
         "visualStyle": {
           "background": {
             "type": "image",
-            "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/home-about-bg.svg",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-about-bg.svg",
             "imagePosition": "center-center"
           }
         },
@@ -663,7 +1665,56 @@
             "id": "yootheme-section-4-row-1-column-1",
             "rowId": "yootheme-section-4-row-1",
             "rowLayout": "1-col",
-            "blocks": []
+            "blocks": [
+              {
+                "id": "yootheme-image-3-0-0-0",
+                "kind": "overlay",
+                "imageUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 2560,
+                "imageWidth": "2560px",
+                "imageIntrinsicWidth": 2560,
+                "imageIntrinsicHeight": 900,
+                "imageMinHeight": "650px",
+                "imageRatio": "natural",
+                "imageLinkUrl": "mailto:hello@example.com",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-hire-me-bg.jpg",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "title": "Ready to start a project?",
+                "meta": "Drop me a line",
+                "titleStyle": "heading-medium",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h2",
+                "metaStyle": "h5",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
           }
         ],
         "rows": [
@@ -683,14 +1734,63 @@
                 "sticky": {
                   "breakpoint": "m"
                 },
-                "elements": []
+                "elements": [
+                  {
+                    "id": "yootheme-image-3-0-0-0",
+                    "kind": "overlay",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 2560,
+                    "imageWidth": "2560px",
+                    "imageIntrinsicWidth": 2560,
+                    "imageIntrinsicHeight": 900,
+                    "imageMinHeight": "650px",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "mailto:hello@example.com",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/home-hire-me-bg.jpg",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "title": "Ready to start a project?",
+                    "meta": "Drop me a line",
+                    "titleStyle": "heading-medium",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h2",
+                    "metaStyle": "h5",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
               }
             ]
           }
         ]
       }
     ],
-    "updatedAt": "2026-08-27T10:36:51.010Z"
+    "updatedAt": "2026-08-27T14:31:31.707Z"
   },
   "header": {
     "version": 1,
@@ -727,210 +1827,548 @@
         "id": "header-document",
         "kind": "contentLayout",
         "title": "Header",
-        "background": "#ffffff",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
         "backgroundMode": "full",
-        "contentMode": "boxed",
+        "contentMode": "expand",
         "colorScheme": "inherit",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "layout": "thirds",
+        "layout": "header-row",
         "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-document-column-1",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "columnHorizontalAlign": "left",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
-                "headerBrandMode": "brand",
-                "headerBrandText": "Jack",
-                "imageAlt": "Jack logo",
-                "imageMaxWidth": 180
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo.svg",
+                "imageMobileUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg",
+                "imageSvgInline": true,
+                "imageAlt": "Jack Baker",
+                "headerBrandMode": "logo",
+                "headerBrandText": "Jack Baker",
+                "imageAlignment": "left",
+                "elementAlign": "left"
               }
             ]
           },
           {
-            "id": "header-document-column-2",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "columnHorizontalAlign": "center",
             "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "elementAlign": "center",
+                "menuDropbar": true
               }
             ]
           },
           {
-            "id": "header-document-column-3",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Contact Us",
-                "buttonUrl": "#contact",
-                "buttonStyle": "primary",
-                "size": "default"
-              }
-            ]
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "columnHorizontalAlign": "right",
+            "blocks": []
           }
         ],
         "visible": true,
-        "headerUtilityMigrationVersion": 3,
         "headerArchitectureVersion": 2,
-        "headerVisible": true,
-        "headerTransparent": false,
-        "headerOverlay": false,
-        "headerHeight": "auto",
         "headerLayout": "simple",
-        "headerBehavior": "sticky",
-        "headerWidthMode": "boxed",
-        "headerBackgroundMode": "default",
-        "headerTextMode": "auto",
-        "headerZIndex": 40,
-        "headerTopToolbarVisible": false,
-        "headerTopToolbarText": "",
-        "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerWidthMode": "full",
+        "headerBehavior": "static",
+        "headerMobileBreakpoint": "1200px",
+        "headerDropdownAlign": "left",
+        "headerDropdownAlignToNavbar": false,
+        "headerDropbarEnabled": true,
+        "headerSearchPosition": "hide",
+        "headerSearchLayout": "input-dropdown",
+        "headerDialogLayout": "offcanvas-top",
+        "headerDialogTogglePosition": "header:end",
+        "headerMobileLogoUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg"
       }
     ],
-    "updatedAt": "2026-08-27T10:35:57.144Z"
+    "updatedAt": "2026-08-27T18:36:46.607Z"
   },
   "footer": {
     "version": 1,
     "key": "footer",
     "page": "footer",
     "targetType": "footer",
-    "updatedAt": "2026-08-27T10:33:05.157Z",
+    "displayName": "Jack Baker Footer",
     "design": {},
     "sections": [
       {
-        "id": "footer-document",
+        "id": "yootheme-section-1",
         "kind": "contentLayout",
         "title": "Footer",
-        "background": "#17211d",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "layout": "thirds",
-        "layoutColumns": 3,
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 3,
         "layoutItems": [
           {
-            "id": "footer-document-column-1",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "footer-about",
-                "kind": "text",
-                "title": "Jack",
-                "body": "A concise closing statement that reinforces what you offer and who you help.",
-                "typography": {
-                  "title": {
-                    "fontFamily": "inherit",
-                    "fontSize": "clamp(28px, 3.5vw, 48px)",
-                    "fontWeight": "700",
-                    "lineHeight": "1.08",
-                    "letterSpacing": "-0.02em",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "body": {
-                    "fontFamily": "inherit",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.65",
-                    "letterSpacing": "0",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "eyebrow": {
-                    "fontFamily": "inherit",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.08em",
-                    "color": "inherit",
+                "id": "yootheme-image-0-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                "imageAlt": "",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "./",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
                     "textAlign": "left",
-                    "textTransform": "uppercase"
-                  }
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
                 }
               }
             ]
           },
           {
-            "id": "footer-document-column-2",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
             "blocks": [
               {
-                "id": "footer-links",
-                "kind": "list",
-                "title": "Explore",
-                "items": [
-                  "About",
-                  "Services",
-                  "Testimonials",
-                  "Contact"
+                "id": "yootheme-subnav-0-1-0-0",
+                "kind": "subnav",
+                "spacingContract": "yootheme",
+                "subnavItems": [
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-0",
+                    "label": "+44 555 00 00 15",
+                    "url": "tel:+44555000015",
+                    "target": "_self",
+                    "scroll": false
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-1-0-0-1",
+                    "label": "hello@example.com",
+                    "url": "mailto:hello@example.com",
+                    "target": "_self",
+                    "scroll": false
+                  }
                 ],
-                "listIcon": "arrowRight"
+                "subnavStyle": "default",
+                "subnavAlign": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               }
             ]
           },
           {
-            "id": "footer-document-column-3",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
+            "id": "yootheme-section-1-row-2-column-2",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
             "blocks": [
               {
-                "id": "footer-contact",
+                "id": "yootheme-text-0-1-1-0",
                 "kind": "text",
-                "eyebrow": "Contact",
-                "title": "Start a conversation",
-                "body": "hello@example.com\n+1 000 000 0000",
-                "typography": {
-                  "title": {
-                    "fontFamily": "inherit",
-                    "fontSize": "clamp(28px, 3.5vw, 48px)",
-                    "fontWeight": "700",
-                    "lineHeight": "1.08",
-                    "letterSpacing": "-0.02em",
-                    "color": "inherit",
-                    "textAlign": "left"
+                "body": "Tell your friends!",
+                "textVariant": "default",
+                "textColor": "primary",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
                   },
-                  "body": {
-                    "fontFamily": "inherit",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.65",
-                    "letterSpacing": "0",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "eyebrow": {
-                    "fontFamily": "inherit",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.08em",
-                    "color": "inherit",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-3",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-3-column-1",
+            "rowId": "yootheme-section-1-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-2-0-0",
+                "kind": "text",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "textVariant": "small",
+                "textColumnBreakpoint": "medium",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
                     "textAlign": "left",
-                    "textTransform": "uppercase"
-                  }
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
                 }
               }
             ]
           }
         ],
-        "visible": true
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "medium",
+            "bottomMargin": "medium",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-footer.svg",
+                    "imageAlt": "",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "./",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "large,expand,large",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-2-column-1",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-2",
+                  "widths": {
+                    "medium": "expand"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-3",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-subnav-0-1-0-0",
+                    "kind": "subnav",
+                    "spacingContract": "yootheme",
+                    "subnavItems": [
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-0",
+                        "label": "+44 555 00 00 15",
+                        "url": "tel:+44555000015",
+                        "target": "_self",
+                        "scroll": false
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-1-0-0-1",
+                        "label": "hello@example.com",
+                        "url": "mailto:hello@example.com",
+                        "target": "_self",
+                        "scroll": false
+                      }
+                    ],
+                    "subnavStyle": "default",
+                    "subnavAlign": "center",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "expand"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-1-1-0",
+                    "kind": "text",
+                    "body": "Tell your friends!",
+                    "textVariant": "default",
+                    "textColor": "primary",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-3",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-3",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "default",
+            "bottomMargin": "default",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-3-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-2-0-0",
+                    "kind": "text",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "textVariant": "small",
+                    "textColumnBreakpoint": "medium",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-27T11:54:32.585Z"
+  },
+  "post-single": {
+    "version": 1,
+    "page": "post-single",
+    "targetType": "template",
+    "template": "post-single",
+    "updatedAt": "1970-01-01T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "post-single-content",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "visible": true,
+        "contentMode": "default",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "post-single-column",
+            "rowId": "post-single-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "post-single-heading",
+                "kind": "heading",
+                "headingText": "Post title",
+                "dynamicBindings": {
+                  "headingText": {
+                    "path": "title",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-image",
+                "kind": "image",
+                "imageUrl": "",
+                "imageAlt": "",
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "featuredImage.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "featuredImage.alt",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-content-body",
+                "kind": "text",
+                "body": "Post content",
+                "dynamicBindings": {
+                  "body": {
+                    "path": "content",
+                    "valueType": "richText"
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   }

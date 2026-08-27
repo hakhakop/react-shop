@@ -1,0 +1,1086 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "jack-baker",
+  "displayName": "Jack Baker",
+  "sourceConfig": {
+    "style": "jack-baker",
+    "site": {
+      "layout": "full",
+      "boxed": {
+        "alignment": 1
+      },
+      "image_size": "cover",
+      "image_position": "center-center",
+      "image_effect": "fixed",
+      "toolbar_width": "default",
+      "breadcrumbs_show_home": true,
+      "breadcrumbs_show_current": true,
+      "breadcrumbs_home_text": "",
+      "main_section": {
+        "height": true
+      },
+      "breadcrumbs": false,
+      "padding": "small",
+      "padding_remove_top": false,
+      "padding_remove_bottom": false,
+      "toolbar_center": true
+    },
+    "header": {
+      "layout": "horizontal-center",
+      "width": "expand",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_gap": "small",
+      "search": "",
+      "social_style": false,
+      "social": "",
+      "logo_padding_remove": false
+    },
+    "navbar": {
+      "sticky": 2,
+      "dropdown_align": "left",
+      "offcanvas": [],
+      "dropbar": true,
+      "dropdown_boundary": false
+    },
+    "mobile": {
+      "breakpoint": "l",
+      "header": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social_gap": "small",
+        "social": "",
+        "social_items": [
+          {
+            "link": "https://500px.com/"
+          },
+          {
+            "link": "https://www.instagram.com/"
+          },
+          {
+            "link": "https://www.facebook.com/yootheme"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 0
+      },
+      "dialog": {
+        "layout": "modal-center",
+        "toggle": "header-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "text_center": true,
+        "dropdown": [],
+        "push_index": 2
+      },
+      "search": "right",
+      "offcanvas": {
+        "overlay": true
+      }
+    },
+    "dialog": {
+      "layout": "offcanvas-top",
+      "toggle": "header:end",
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": true,
+        "overlay": true
+      }
+    },
+    "mobileHeader": {
+      "layout": "horizontal-right",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_style": false,
+      "social_gap": "small",
+      "social": "",
+      "social_items": [
+        {
+          "link": "https://500px.com/"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        },
+        {
+          "link": "https://www.facebook.com/yootheme"
+        }
+      ]
+    },
+    "mobileNavbar": {
+      "sticky": 0
+    },
+    "mobileDialog": {
+      "layout": "modal-center",
+      "toggle": "header-mobile:end",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "push",
+        "flip": false
+      },
+      "dropbar": {
+        "animation": "reveal-top"
+      },
+      "text_center": true,
+      "dropdown": [],
+      "push_index": 2
+    },
+    "mobileBreakpoint": "l",
+    "logo": {
+      "text": "Jack Baker",
+      "image": "wp-content/uploads/yootheme/logo.svg",
+      "image_inverse": "",
+      "image_mobile": "wp-content/uploads/yootheme/logo-mobile.svg",
+      "image_svg_inline": true,
+      "image_dialog": ""
+    },
+    "menuPositions": {
+      "navbar": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 2
+      },
+      "header": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-left": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-right": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "navbar-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "header-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog-mobile": {
+        "style": "primary",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 4,
+        "divider": false
+      }
+    },
+    "menuItems": {
+      "30": {
+        "dropdown": {
+          "columns": 1
+        }
+      },
+      "31": {
+        "justify": false,
+        "dropdown": {
+          "columns": 1
+        }
+      },
+      "33": {
+        "justify": false,
+        "dropdown": {
+          "columns": 1
+        }
+      },
+      "35": {
+        "subtitle": "",
+        "justify": false,
+        "dropdown": {
+          "columns": 1
+        }
+      }
+    },
+    "menu": {
+      "items": {
+        "30": {
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "31": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "33": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "35": {
+          "subtitle": "",
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        }
+      },
+      "positions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 2
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "primary",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 4,
+          "divider": false
+        }
+      }
+    }
+  },
+  "page": {
+    "layout": "full",
+    "alignment": "center",
+    "containerWidth": "1500px",
+    "marginTop": "70px",
+    "marginBottom": "70px",
+    "background": "#ececec",
+    "colorMode": "dark"
+  },
+  "header": {
+    "source": {
+      "header": {
+        "layout": "horizontal-center",
+        "width": "expand",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_gap": "small",
+        "search": "",
+        "social_style": false,
+        "social": "",
+        "logo_padding_remove": false
+      },
+      "navbar": {
+        "sticky": 2,
+        "dropdown_align": "left",
+        "offcanvas": [],
+        "dropbar": true,
+        "dropdown_boundary": false
+      },
+      "mobile": {
+        "breakpoint": "l",
+        "header": {
+          "layout": "horizontal-right",
+          "search_layout": "input-dropdown",
+          "search_dropdown.stretch": "navbar",
+          "search_dropdown.size": true,
+          "search_icon": "left",
+          "social_style": false,
+          "social_gap": "small",
+          "social": "",
+          "social_items": [
+            {
+              "link": "https://500px.com/"
+            },
+            {
+              "link": "https://www.instagram.com/"
+            },
+            {
+              "link": "https://www.facebook.com/yootheme"
+            }
+          ]
+        },
+        "navbar": {
+          "sticky": 0
+        },
+        "dialog": {
+          "layout": "modal-center",
+          "toggle": "header-mobile:end",
+          "close": true,
+          "menu_style": "default",
+          "offcanvas": {
+            "mode": "push",
+            "flip": false
+          },
+          "dropbar": {
+            "animation": "reveal-top"
+          },
+          "text_center": true,
+          "dropdown": [],
+          "push_index": 2
+        },
+        "search": "right",
+        "offcanvas": {
+          "overlay": true
+        }
+      },
+      "dialog": {
+        "layout": "offcanvas-top",
+        "toggle": "header:end",
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true,
+          "overlay": true
+        }
+      },
+      "mobileHeader": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social_gap": "small",
+        "social": "",
+        "social_items": [
+          {
+            "link": "https://500px.com/"
+          },
+          {
+            "link": "https://www.instagram.com/"
+          },
+          {
+            "link": "https://www.facebook.com/yootheme"
+          }
+        ]
+      },
+      "mobileNavbar": {
+        "sticky": 0
+      },
+      "mobileDialog": {
+        "layout": "modal-center",
+        "toggle": "header-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "text_center": true,
+        "dropdown": [],
+        "push_index": 2
+      },
+      "mobileBreakpoint": "l",
+      "logo": {
+        "text": "Jack Baker",
+        "image": "wp-content/uploads/yootheme/logo.svg",
+        "image_inverse": "",
+        "image_mobile": "wp-content/uploads/yootheme/logo-mobile.svg",
+        "image_svg_inline": true,
+        "image_dialog": ""
+      },
+      "menuPositions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 2
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "primary",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 4,
+          "divider": false
+        }
+      },
+      "menuItems": {
+        "30": {
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "31": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "33": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "35": {
+          "subtitle": "",
+          "justify": false,
+          "dropdown": {
+            "columns": 1
+          }
+        }
+      }
+    },
+    "document": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky-on-scroll-up",
+      "headerMobileBreakpoint": "1200px",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": true,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header:end",
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+      "layout": "header-row",
+      "layoutColumns": 3,
+      "headerUtilityMigrationVersion": 3,
+      "background": "transparent",
+      "backgroundMode": "full",
+      "contentMode": "expand",
+      "colorScheme": "inherit",
+      "layoutItems": [
+        {
+          "id": "header-main-left",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "left",
+          "blocks": [
+            {
+              "id": "header-logo",
+              "kind": "image",
+              "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+              "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+              "imageSvgInline": true,
+              "imageAlt": "Jack Baker",
+              "headerBrandMode": "logo",
+              "headerBrandText": "Jack Baker",
+              "imageAlignment": "left",
+              "elementAlign": "left"
+            }
+          ]
+        },
+        {
+          "id": "header-main-center",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "center",
+          "blocks": [
+            {
+              "id": "header-navigation",
+              "kind": "menu",
+              "title": "Navigation",
+              "menuSource": "main",
+              "elementAlign": "center",
+              "menuDropbar": true
+            }
+          ]
+        },
+        {
+          "id": "header-main-right",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "right",
+          "blocks": []
+        }
+      ]
+    },
+    "breakpoint": "1200px",
+    "mobileLayout": "horizontal-right",
+    "dialogLayout": "offcanvas-top",
+    "dialogToggle": "header:end"
+  },
+  "resolved": {
+    "shellSettings": {
+      "buttonTextTransform": "none",
+      "navbarDropdownIndicator": "chevron",
+      "fontFamilyBody": "Poppins",
+      "baseFontSize": "16px",
+      "baseLineHeight": "1.5",
+      "fontSize2XLarge": "46px",
+      "fontSizeXLarge": "40px",
+      "fontSizeLarge": "28px",
+      "fontSizeMedium": "22px",
+      "fontSizeSmall": "13px",
+      "fontFamilyPrimary": "Poppins",
+      "fontWeightPrimary": "normal",
+      "textTransformPrimary": "inherit",
+      "letterSpacingPrimary": "inherit",
+      "fontStylePrimary": "inherit",
+      "fontFamilySecondary": "inherit",
+      "fontWeightSecondary": "inherit",
+      "textTransformSecondary": "inherit",
+      "letterSpacingSecondary": "inherit",
+      "fontStyleSecondary": "inherit",
+      "textColor": "#181818",
+      "emphasisColor": "#000",
+      "mutedTextColor": "#949494",
+      "linkColor": "#ef463e",
+      "linkHoverColor": "#181818",
+      "inverseColor": "#fff",
+      "backgroundDefault": "#fff",
+      "backgroundMuted": "#f3f3f3",
+      "backgroundPrimary": "#ef463e",
+      "backgroundSecondary": "#181818",
+      "successColor": "#00b572",
+      "warningColor": "#faa05a",
+      "dangerColor": "#CE241B",
+      "borderColor": "#e4e4e4",
+      "borderWidth": "1px",
+      "borderRadius": "0",
+      "shadowSmall": "0 2px 8px rgba(0, 0, 0, 0.08)",
+      "shadowMedium": "0 5px 15px rgba(0, 0, 0, 0.08)",
+      "shadowLarge": "0 15px 55px rgba(0, 0, 0, 0.08)",
+      "shadowXLarge": "0 28px 50px rgba(0, 0, 0, 0.16)",
+      "marginDefault": "20px",
+      "marginSmall": "10px",
+      "marginMedium": "40px",
+      "marginLarge": "70px",
+      "marginXLarge": "140px",
+      "gridGutterDefault": "40px",
+      "gridGutterSmall": "15px",
+      "gridGutterMedium": "40px",
+      "gridGutterLarge": "70px",
+      "controlHeightDefault": "40px",
+      "buttonHeight": "40px",
+      "controlHeightSmall": "30px",
+      "controlHeightLarge": "55px",
+      "globalZIndex": "1000",
+      "headingSmallFontSizeResponsive": "50px",
+      "headingLargeFontSizeResponsive": "86px",
+      "headingXLargeFontSizeResponsive": "130px",
+      "heading2XLargeFontSizeResponsive": "168px",
+      "headingMediumLineHeight": "1.2",
+      "navbarBackground": "#fff",
+      "navbarNavItemHeight": "100px",
+      "navbarNavItemColor": "#181818",
+      "navbarNavItemFontSize": "14px",
+      "navbarToggleColor": "#181818",
+      "navbarToggleHoverColor": "#949494",
+      "navbarSubtitleFontSize": "12px",
+      "navbarDropdownWidth": "250px",
+      "navbarDropdownPadding": "30px",
+      "navbarDropdownBackground": "#181818",
+      "navbarDropdownColor": "#949494",
+      "navbarDropdownColorMode": "light",
+      "navbarDropdownGridGutterHorizontal": "30px",
+      "navbarNavItemPaddingHorizontalMedium": "0",
+      "navbarNavItemTransitionDuration": "0.2s",
+      "navbarNavItemLineMode": "true",
+      "navbarNavItemLineSlideMode": "left",
+      "navbarNavItemLineMarginVertical": "50%",
+      "navbarNavItemLineMarginHorizontal": "-4px",
+      "navbarNavItemLineTransitionDuration": "0.3s",
+      "navbarNavItemTextTransform": "uppercase",
+      "navbarSubtitleColor": "#949494",
+      "navbarPrimaryNavItemFontSize": "22px",
+      "navbarDropdownNavFontSize": "14px",
+      "navbarDropdownNavSubtitleColor": "#949494",
+      "themePageBorderWidth": "14px",
+      "themePageBorderColor": "#fff",
+      "pageContainerMaxWidth": "1500px",
+      "themePageContainerMarginTop": "70px",
+      "themePageContainerMarginBottom": "70px",
+      "themePageContainerBackground": "#ececec",
+      "themePageContainerColorMode": "dark",
+      "themeHeaderbarColorMode": "light",
+      "themeHeaderbarTopPaddingTop": "20px",
+      "themeHeaderbarTopPaddingBottom": "20px",
+      "themeHeaderbarTopBackground": "#fff",
+      "themeHeaderbarTopBorderWidth": "0",
+      "themeHeaderbarTopBorder": "transparent",
+      "themeHeaderbarBottomPaddingTop": "20px",
+      "themeHeaderbarBottomPaddingBottom": "20px",
+      "themeHeaderbarBottomBackground": "#fff",
+      "themeHeaderbarBottomBorderWidth": "0",
+      "themeHeaderbarBottomBorder": "transparent",
+      "themeHeaderbarStackedMarginTop": "20px",
+      "themeHeaderbarFontSize": "13px",
+      "alertColor": "#181818",
+      "buttonRadius": "0",
+      "buttonSmallRadius": "0",
+      "buttonLargeRadius": "0",
+      "buttonTokenInheritance": {
+        "buttonPrimaryBackground": "inherit",
+        "buttonPrimaryText": "inherit",
+        "buttonDefaultBackground": "inherit",
+        "buttonDefaultText": "inherit",
+        "buttonSecondaryBackground": "inherit",
+        "buttonTextColorSemantic": "inherit",
+        "buttonBorderWidth": "inherit",
+        "buttonRadius": "inherit",
+        "buttonHoverBg": "inherit",
+        "buttonPrimaryHoverText": "inherit",
+        "buttonPrimaryHoverShadow": "inherit",
+        "buttonPrimaryHoverGradient": "inherit",
+        "buttonFontSize": "inherit",
+        "buttonLargeFontSize": "inherit",
+        "buttonFontFamily": "inherit",
+        "buttonFontStyle": "inherit",
+        "buttonFontWeight": "inherit",
+        "buttonLineHeight": "inherit",
+        "buttonTextTransform": "inherit",
+        "buttonBorderMode": "inherit",
+        "buttonBackgroundSize": "inherit",
+        "buttonBackgroundPosition": "inherit",
+        "buttonHoverBackgroundPosition": "inherit",
+        "buttonSmallFontSize": "inherit",
+        "buttonSmallLineHeight": "inherit",
+        "buttonSmallPaddingX": "inherit",
+        "buttonSmallRadius": "inherit",
+        "buttonLargeLineHeight": "inherit",
+        "buttonLargePaddingX": "inherit",
+        "buttonLargeRadius": "inherit",
+        "buttonDefaultHoverBackground": "inherit",
+        "buttonDefaultHoverText": "inherit",
+        "buttonSecondaryHoverBackground": "inherit",
+        "buttonSecondaryText": "inherit",
+        "buttonSecondaryHoverText": "inherit",
+        "buttonDefaultActiveBackground": "inherit",
+        "buttonDefaultActiveText": "inherit",
+        "buttonDefaultBorder": "inherit",
+        "buttonDefaultHoverBorder": "inherit",
+        "buttonDefaultActiveBorder": "inherit",
+        "buttonDefaultActiveShadow": "inherit",
+        "buttonPrimaryHoverBorder": "inherit",
+        "buttonPrimaryActiveBackground": "inherit",
+        "buttonPrimaryActiveText": "inherit",
+        "buttonPrimaryActiveBorder": "inherit",
+        "buttonPrimaryActiveShadow": "inherit",
+        "buttonSecondaryBorder": "inherit",
+        "buttonSecondaryHoverBorder": "inherit",
+        "buttonSecondaryActiveBackground": "inherit",
+        "buttonSecondaryActiveText": "inherit",
+        "buttonSecondaryActiveBorder": "inherit",
+        "buttonSecondaryActiveShadow": "inherit",
+        "buttonInverseDefaultBackground": "inherit",
+        "buttonInverseDefaultText": "inherit",
+        "buttonInverseDefaultHoverBackground": "inherit",
+        "buttonInverseDefaultHoverText": "inherit",
+        "buttonInverseDefaultActiveBackground": "inherit",
+        "buttonInverseDefaultActiveText": "inherit",
+        "buttonInverseDefaultBorder": "inherit",
+        "buttonInverseDefaultHoverBorder": "inherit",
+        "buttonInverseDefaultActiveBorder": "inherit",
+        "buttonInverseDefaultShadow": "inherit",
+        "buttonInversePrimaryShadow": "inherit",
+        "buttonInverseSecondaryBackground": "inherit",
+        "buttonInverseSecondaryText": "inherit",
+        "buttonInverseSecondaryHoverBackground": "inherit",
+        "buttonInverseSecondaryActiveBackground": "inherit",
+        "buttonInverseSecondaryBorder": "inherit",
+        "buttonInverseSecondaryHoverText": "inherit",
+        "buttonInverseSecondaryActiveText": "inherit",
+        "buttonDangerBackground": "inherit",
+        "buttonDangerText": "inherit",
+        "buttonDangerBorder": "inherit",
+        "buttonDangerHoverBackground": "inherit",
+        "buttonDangerHoverText": "inherit",
+        "buttonDangerHoverBorder": "inherit",
+        "buttonDangerHoverShadow": "inherit",
+        "buttonDangerActiveBackground": "inherit",
+        "buttonDangerActiveText": "inherit",
+        "buttonDangerActiveBorder": "inherit",
+        "buttonDangerActiveShadow": "inherit",
+        "buttonDisabledBackground": "inherit",
+        "buttonDisabledText": "inherit",
+        "buttonDisabledBorder": "inherit",
+        "buttonTextBackground": "inherit",
+        "buttonTextBorder": "inherit",
+        "buttonTextHoverBorder": "inherit",
+        "buttonTextActiveColor": "inherit",
+        "buttonLinkColor": "inherit",
+        "buttonLinkHoverColor": "inherit",
+        "buttonBackdropFilter": "inherit",
+        "buttonTextHoverColor": "inherit",
+        "buttonTransitionDuration": "inherit",
+        "buttonPrimaryGradient": "inherit",
+        "buttonPrimaryActiveGradient": "inherit",
+        "buttonSecondaryHoverGradient": "inherit",
+        "buttonSecondaryActiveGradient": "inherit",
+        "buttonDefaultMode": "inherit",
+        "buttonDefaultGlowGradient": "inherit",
+        "buttonDefaultGlowFilter": "inherit",
+        "buttonDefaultHoverGlowFilter": "inherit",
+        "buttonPrimaryMode": "inherit",
+        "buttonPrimaryGlowGradient": "inherit",
+        "buttonPrimaryGlowFilter": "inherit",
+        "buttonPrimaryHoverGlowFilter": "inherit",
+        "buttonSecondaryMode": "inherit",
+        "buttonSecondaryGlowGradient": "inherit",
+        "buttonSecondaryGlowFilter": "inherit",
+        "buttonSecondaryHoverGlowFilter": "inherit",
+        "buttonDefaultShadow": "inherit",
+        "buttonDefaultHoverShadow": "inherit",
+        "buttonPrimaryShadow": "inherit",
+        "buttonSecondaryShadow": "inherit",
+        "buttonSecondaryHoverShadow": "inherit"
+      },
+      "buttonFontSize": "16px",
+      "buttonLineHeight": "40px",
+      "buttonLargeLineHeight": "55px",
+      "buttonLargePaddingX": "40px",
+      "themePageLayout": "full",
+      "themePageContainerAlignment": "center"
+    },
+    "headerDocument": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky-on-scroll-up",
+      "headerMobileBreakpoint": "1200px",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": true,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header:end",
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+      "layout": "header-row",
+      "layoutColumns": 3,
+      "headerUtilityMigrationVersion": 3,
+      "background": "transparent",
+      "backgroundMode": "full",
+      "contentMode": "expand",
+      "colorScheme": "inherit",
+      "layoutItems": [
+        {
+          "id": "header-main-left",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "left",
+          "blocks": [
+            {
+              "id": "header-logo",
+              "kind": "image",
+              "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+              "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+              "imageSvgInline": true,
+              "imageAlt": "Jack Baker",
+              "headerBrandMode": "logo",
+              "headerBrandText": "Jack Baker",
+              "imageAlignment": "left",
+              "elementAlign": "left"
+            }
+          ]
+        },
+        {
+          "id": "header-main-center",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "center",
+          "blocks": [
+            {
+              "id": "header-navigation",
+              "kind": "menu",
+              "title": "Navigation",
+              "menuSource": "main",
+              "elementAlign": "center",
+              "menuDropbar": true
+            }
+          ]
+        },
+        {
+          "id": "header-main-right",
+          "rowId": "header-main-row",
+          "rowLayout": "quarters-1-2-1",
+          "columnHorizontalAlign": "right",
+          "blocks": []
+        }
+      ]
+    }
+  },
+  "capabilities": {
+    "global": [
+      "alertColor",
+      "backgroundDefault",
+      "backgroundMuted",
+      "backgroundPrimary",
+      "backgroundSecondary",
+      "baseFontSize",
+      "baseLineHeight",
+      "borderColor",
+      "borderRadius",
+      "borderWidth",
+      "buttonFontSize",
+      "buttonHeight",
+      "buttonLargeLineHeight",
+      "buttonLargePaddingX",
+      "buttonLargeRadius",
+      "buttonLineHeight",
+      "buttonRadius",
+      "buttonSmallRadius",
+      "buttonTextTransform",
+      "buttonTokenInheritance",
+      "controlHeightDefault",
+      "controlHeightLarge",
+      "controlHeightSmall",
+      "dangerColor",
+      "emphasisColor",
+      "fontFamilyBody",
+      "fontFamilyPrimary",
+      "fontFamilySecondary",
+      "fontSize2XLarge",
+      "fontSizeLarge",
+      "fontSizeMedium",
+      "fontSizeSmall",
+      "fontSizeXLarge",
+      "fontStylePrimary",
+      "fontStyleSecondary",
+      "fontWeightPrimary",
+      "fontWeightSecondary",
+      "globalZIndex",
+      "gridGutterDefault",
+      "gridGutterLarge",
+      "gridGutterMedium",
+      "gridGutterSmall",
+      "heading2XLargeFontSizeResponsive",
+      "headingLargeFontSizeResponsive",
+      "headingMediumLineHeight",
+      "headingSmallFontSizeResponsive",
+      "headingXLargeFontSizeResponsive",
+      "inverseColor",
+      "letterSpacingPrimary",
+      "letterSpacingSecondary",
+      "linkColor",
+      "linkHoverColor",
+      "marginDefault",
+      "marginLarge",
+      "marginMedium",
+      "marginSmall",
+      "marginXLarge",
+      "mutedTextColor",
+      "navbarBackground",
+      "navbarDropdownBackground",
+      "navbarDropdownColor",
+      "navbarDropdownColorMode",
+      "navbarDropdownGridGutterHorizontal",
+      "navbarDropdownIndicator",
+      "navbarDropdownNavFontSize",
+      "navbarDropdownNavSubtitleColor",
+      "navbarDropdownPadding",
+      "navbarDropdownWidth",
+      "navbarNavItemColor",
+      "navbarNavItemFontSize",
+      "navbarNavItemHeight",
+      "navbarNavItemLineMarginHorizontal",
+      "navbarNavItemLineMarginVertical",
+      "navbarNavItemLineMode",
+      "navbarNavItemLineSlideMode",
+      "navbarNavItemLineTransitionDuration",
+      "navbarNavItemPaddingHorizontalMedium",
+      "navbarNavItemTextTransform",
+      "navbarNavItemTransitionDuration",
+      "navbarPrimaryNavItemFontSize",
+      "navbarSubtitleColor",
+      "navbarSubtitleFontSize",
+      "navbarToggleColor",
+      "navbarToggleHoverColor",
+      "pageContainerMaxWidth",
+      "shadowLarge",
+      "shadowMedium",
+      "shadowSmall",
+      "shadowXLarge",
+      "successColor",
+      "textColor",
+      "textTransformPrimary",
+      "textTransformSecondary",
+      "themeHeaderbarBottomBackground",
+      "themeHeaderbarBottomBorder",
+      "themeHeaderbarBottomBorderWidth",
+      "themeHeaderbarBottomPaddingBottom",
+      "themeHeaderbarBottomPaddingTop",
+      "themeHeaderbarColorMode",
+      "themeHeaderbarFontSize",
+      "themeHeaderbarStackedMarginTop",
+      "themeHeaderbarTopBackground",
+      "themeHeaderbarTopBorder",
+      "themeHeaderbarTopBorderWidth",
+      "themeHeaderbarTopPaddingBottom",
+      "themeHeaderbarTopPaddingTop",
+      "themePageBorderColor",
+      "themePageBorderWidth",
+      "themePageContainerBackground",
+      "themePageContainerColorMode",
+      "themePageContainerMarginBottom",
+      "themePageContainerMarginTop",
+      "warningColor"
+    ],
+    "page": [
+      "site.layout",
+      "site.boxed.alignment",
+      "theme.layout",
+      "theme.alignment",
+      "theme.containerWidth",
+      "theme.marginTop",
+      "theme.marginBottom",
+      "theme.background",
+      "theme.colorMode"
+    ],
+    "header": [
+      "header.layout",
+      "header.width",
+      "header.search_layout",
+      "header.search_dropdown.stretch",
+      "header.search_dropdown.size",
+      "header.search_icon",
+      "header.social_gap",
+      "header.search",
+      "header.social_style",
+      "header.social",
+      "header.logo_padding_remove",
+      "navbar.sticky",
+      "navbar.dropdown_align",
+      "navbar.offcanvas",
+      "navbar.dropbar",
+      "navbar.dropdown_boundary",
+      "mobile.breakpoint",
+      "mobile.header",
+      "mobile.navbar",
+      "mobile.dialog",
+      "mobile.search",
+      "mobile.offcanvas",
+      "dialog.layout",
+      "dialog.toggle",
+      "dialog.menu_style",
+      "dialog.offcanvas",
+      "headerDocument.headerArchitectureVersion",
+      "headerDocument.headerPresetKey",
+      "headerDocument.headerLayout",
+      "headerDocument.headerWidthMode",
+      "headerDocument.headerBehavior",
+      "headerDocument.headerMobileBreakpoint",
+      "headerDocument.headerDropdownAlign",
+      "headerDocument.headerDropdownAlignToNavbar",
+      "headerDocument.headerDropbarEnabled",
+      "headerDocument.headerSearchPosition",
+      "headerDocument.headerSearchLayout",
+      "headerDocument.headerDialogLayout",
+      "headerDocument.headerDialogTogglePosition",
+      "headerDocument.headerMobileLogoUrl",
+      "headerDocument.layout",
+      "headerDocument.layoutColumns",
+      "headerDocument.headerUtilityMigrationVersion",
+      "headerDocument.background",
+      "headerDocument.backgroundMode",
+      "headerDocument.contentMode",
+      "headerDocument.colorScheme",
+      "headerDocument.layoutItems"
+    ]
+  },
+  "unsupported": [
+    "@navbar-subtitle-font-family",
+    "@navbar-subtitle-font-weight",
+    "@navbar-dropdown-nav-subtitle-font-family",
+    "@navbar-dropdown-nav-subtitle-font-weight"
+  ],
+  "updatedAt": "2026-08-27T18:36:09.900Z"
+}
