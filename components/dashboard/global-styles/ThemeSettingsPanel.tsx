@@ -49,8 +49,8 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
       <div className="builder-theme-settings-intro">
             <FileJson size={22} aria-hidden="true" />
             <div>
-              <strong>One YOOtheme file, three semantic layers</strong>
-              <p>Theme Settings owns the imported page shell, Header behavior, and global UIkit tokens. Header and Footer builder documents remain content documents.</p>
+              <strong>Two authoritative YOOtheme sources</strong>
+              <p>Theme Settings maps Header structure and behavior, while `_import.less` maps the corresponding UIkit presentation tokens. Both resolve into the normal WebPages Header and Global Styles documents.</p>
             </div>
           </div>
 
@@ -83,7 +83,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
                 onChange={(event) => void handleFile(event.target.files?.[0])}
               />
             </span>
-            <small>Use the original YOOtheme export, such as yootheme-jack.webpages.am.json. This does not replace page, Header, or Footer content.</small>
+            <small>Use the original YOOtheme Theme Settings export, such as yootheme-jack.webpages.am.json. External WordPress widget content is intentionally outside this import.</small>
           </label>
 
           <button type="button" className="builder-secondary-button" disabled={disabled || !themeSettings.active} onClick={onExport}>

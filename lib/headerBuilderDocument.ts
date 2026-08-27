@@ -7,6 +7,7 @@ import { getOrCreateBuilderDocumentLayout } from "@/lib/builderDocument";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import type { TypographySettings, TypographyGroup } from "@/lib/builderTypography";
+import type { BuilderRow, BuilderSection } from "@/components/dashboard/builderTypes";
 import { migrateLegacyHeaderDocument } from "@/lib/headerDocumentMigration";
 export { migrateLegacyHeaderDocument } from "@/lib/headerDocumentMigration";
 
@@ -18,7 +19,7 @@ const headerActionKind = (action: string) => {
   return "headerSearch";
 };
 
-export type HeaderBuilderElementType = "logo" | "navigation" | "button" | "spacer" | "utility" | "categories" | "language";
+export type HeaderBuilderElementType = "logo" | "navigation" | "button" | "spacer" | "utility" | "social" | "categories" | "language";
 
 export type HeaderBuilderElement = {
   id: string;
@@ -55,6 +56,7 @@ export type HeaderBuilderElement = {
   visualStyle?: BuilderVisualStyle;
   typography?: TypographySettings | TypographyGroup;
   menuItemGap?: string;
+  menuSource?: string;
   menuHoverColor?: string;
   menuActiveColor?: string;
   menuActiveIndicator?: "princity" | "underline" | "none";
@@ -115,6 +117,9 @@ export type HeaderBuilderElement = {
   };
   utilityAction?: string;
   utilityVariant?: string;
+  socialItems?: Array<{ link: string }>;
+  socialStyle?: boolean;
+  socialGap?: string;
   categoriesLabel?: string;
   categoriesShowLabel?: boolean;
   categoriesDisplay?: "icon" | "icon-label" | "label";
@@ -129,6 +134,11 @@ export type HeaderBuilderElement = {
 
 export type HeaderRowComposition = {
   rowId: string;
+  role?: "toolbar";
+  headerVariant?: "desktop" | "mobile";
+  maxWidth?: BuilderRow["maxWidth"];
+  removeHorizontalPadding?: boolean;
+  horizontalDistribution?: BuilderRow["horizontalDistribution"];
   headerGap?: string;
   headerJustify?: "start" | "center" | "space-between" | "end";
   headerAlign?: "start" | "center" | "end" | "stretch";
@@ -159,6 +169,28 @@ export type HeaderBuilderComposition = {
   documentTextMode?: BuilderShellSettings["headerTextMode"];
   documentBreakpoint?: string;
   documentMobileBreakpoint?: string;
+  documentMobileLayout?: BuilderSection["headerMobileLayout"];
+  documentMobileBehavior?: BuilderSection["headerMobileBehavior"];
+  documentMobileSearchPosition?: string;
+  documentMobileSearchLayout?: string;
+  documentMobileSearchDropdownStretch?: string;
+  documentMobileSearchDropdownLarge?: boolean;
+  documentMobileSearchIconPosition?: "" | "left" | "right";
+  documentMobileSocialPosition?: string;
+  documentMobileSocialStyle?: boolean;
+  documentMobileSocialGap?: string;
+  documentMobileSocialItems?: Array<{ link: string }>;
+  documentMobileLogoPaddingRemove?: boolean;
+  documentMobileDialogTogglePosition?: string;
+  documentMobileDialogLayout?: string;
+  documentMobileDialogClose?: boolean;
+  documentMobileDialogMenuStyle?: string;
+  documentMobileDialogCenter?: boolean;
+  documentMobileDialogPushAfter?: number;
+  documentMobileOffcanvasMode?: string;
+  documentMobileOffcanvasFlip?: boolean;
+  documentMobileOffcanvasOverlay?: boolean;
+  documentMobileDialogDropbarAnimation?: string;
   documentStickyShowOnUp?: boolean;
   documentStickyAnimation?: string;
   documentDropdownAlign?: "left" | "right" | "center";
@@ -168,11 +200,23 @@ export type HeaderBuilderComposition = {
   documentClickModeEnabled?: boolean;
   documentDialogTogglePosition?: string;
   documentDialogLayout?: string;
+  documentDialogMenuStyle?: string;
   documentDialogCenter?: boolean;
   documentDialogPushAfter?: number;
+  documentOffcanvasMode?: string;
+  documentOffcanvasFlip?: boolean;
+  documentOffcanvasOverlay?: boolean;
+  documentDialogDropbarAnimation?: string;
   documentSearchPosition?: string;
   documentSearchLayout?: string;
+  documentSearchDropdownStretch?: string;
+  documentSearchDropdownLarge?: boolean;
+  documentSearchIconPosition?: "" | "left" | "right";
   documentSocialPosition?: string;
+  documentSocialStyle?: boolean;
+  documentSocialGap?: string;
+  documentSocialItems?: Array<{ link: string }>;
+  documentLogoPaddingRemove?: boolean;
   documentMobileLogoUrl?: string | null;
   documentInverseLogoUrl?: string | null;
   documentMobileComposition?: "separate" | "responsive";

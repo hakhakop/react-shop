@@ -63,6 +63,13 @@ export type ReactMenuItem = {
   visibility?: "all" | "desktop" | "mobile";
 };
 
+/** A normal WebPages menu resource addressable by Builder Menu elements. */
+export type BuilderNamedMenu = {
+  id: string;
+  name: string;
+  items: ReactMenuItem[];
+};
+
 /** A named, semantic Global Styles snapshot created from a YOOtheme import. */
 export type BuilderCustomGlobalStylePreset = {
   id: string;
@@ -112,11 +119,35 @@ export type BuilderShellSettings = {
   headerClickModeEnabled?: boolean;
   headerDialogTogglePosition?: string;
   headerDialogLayout?: string;
+  headerDialogMenuStyle?: string;
   headerDialogCenter?: boolean;
   headerDialogPushAfter?: number;
+  headerOffcanvasMode?: string;
+  headerOffcanvasFlip?: boolean;
+  headerOffcanvasOverlay?: boolean;
+  headerDialogDropbarAnimation?: string;
   headerSearchPosition?: string;
   headerSearchLayout?: string;
+  headerSearchDropdownStretch?: string;
+  headerSearchDropdownLarge?: boolean;
+  headerSearchIconPosition?: "" | "left" | "right";
   headerSocialPosition?: string;
+  headerSocialStyle?: boolean;
+  headerSocialGap?: string;
+  headerSocialItems?: Array<{ link: string }>;
+  headerLogoPaddingRemove?: boolean;
+  headerMobileSearchLayout?: string;
+  headerMobileSearchDropdownStretch?: string;
+  headerMobileSearchDropdownLarge?: boolean;
+  headerMobileSearchIconPosition?: "" | "left" | "right";
+  headerMobileSocialPosition?: string;
+  headerMobileSocialStyle?: boolean;
+  headerMobileSocialGap?: string;
+  headerMobileSocialItems?: Array<{ link: string }>;
+  headerMobileLogoPaddingRemove?: boolean;
+  headerMobileDialogClose?: boolean;
+  headerMobileDialogMenuStyle?: string;
+  headerMobileDialogDropbarAnimation?: string;
   headerMobileLogoUrl?: string | null;
   headerInverseLogoUrl?: string | null;
   headerMobileComposition?: "separate" | "responsive";
@@ -336,7 +367,10 @@ export type BuilderShellSettings = {
   navDefaultSubtitleFontSize?: string;
   navDefaultSubtitleColor?: string;
   navDefaultSubtitleFontWeight?: string;
+  navDefaultSubtitleFontFamily?: string;
+  navDefaultSubtitleTextTransform?: string;
   navDefaultHeaderColor?: string;
+  navDefaultSublistItemColor?: string;
   navDefaultSublistItemHoverColor?: string;
   navDefaultSublistItemActiveColor?: string;
   navDefaultDividerBoxShadow?: string;
@@ -357,6 +391,11 @@ export type BuilderShellSettings = {
   navDefaultItemLineTransitionTimingFunction?: string;
   navDefaultItemLineHoverLeft?: string;
   navDefaultItemLineHoverRight?: string;
+  navPrimaryFontSize?: string;
+  navPrimarySublistFontSize?: string;
+  navPrimarySublistItemColor?: string;
+  navPrimarySubtitleFontFamily?: string;
+  navPrimarySubtitleTextTransform?: string;
   navDefaultSiblingsFilter?: string;
   navDefaultSiblingsOpacity?: string;
   /** Canonical UIkit/YOOtheme Subnav pill tokens. */
@@ -485,6 +524,9 @@ export type BuilderShellSettings = {
   navbarToggleHoverColor?: string;
   navbarSubtitleFontSize?: string;
   navbarSubtitleColor?: string;
+  navbarSubtitleFontFamily?: string;
+  navbarSubtitleFontWeight?: string;
+  navbarSubtitleTextTransform?: string;
   navbarItemPaddingHorizontal?: string;
   navbarItemPaddingHorizontalMedium?: string;
   navbarBackdropFilter?: string;
@@ -561,6 +603,9 @@ export type BuilderShellSettings = {
   navbarDropdownNavItemActiveColor?: string;
   navbarDropdownNavSubtitleFontSize?: string;
   navbarDropdownNavSubtitleColor?: string;
+  navbarDropdownNavSubtitleFontFamily?: string;
+  navbarDropdownNavSubtitleFontWeight?: string;
+  navbarDropdownNavSubtitleTextTransform?: string;
   navbarDropdownNavSublistItemHoverColor?: string;
   navbarDropdownNavSublistItemActiveColor?: string;
   navbarDropdownNavItemPaddingVertical?: string;
@@ -585,6 +630,58 @@ export type BuilderShellSettings = {
   navbarDropdownBoxShadow?: string;
   navbarDropdownShiftMarginMedium?: string;
   navbarDropdownDropbarShiftMarginMedium?: string;
+  /** Canonical UIkit Dropdown surface tokens (non-navbar and dropbar fallback). */
+  dropdownPadding?: string;
+  dropdownBackground?: string;
+  dropdownColor?: string;
+  dropdownColorMode?: string;
+  dropdownDropbarMargin?: string;
+  dropdownDropbarPaddingTop?: string;
+  dropdownDropbarLargePaddingTop?: string;
+  dropdownNavItemHoverColor?: string;
+  dropdownNavSubtitleFontSize?: string;
+  dropdownNavHeaderColor?: string;
+  dropdownNavDividerBorder?: string;
+  dropdownNavSublistItemHoverColor?: string;
+  dropdownNavItemPaddingVertical?: string;
+  dropdownNavFontSize?: string;
+  dropdownNavSubtitleColor?: string;
+  dropdownNavSubtitleFontFamily?: string;
+  dropdownNavSubtitleFontWeight?: string;
+  dropdownNavSubtitleTextTransform?: string;
+  /** Canonical UIkit Dropbar surface tokens. */
+  dropbarPaddingTop?: string;
+  dropbarBackground?: string;
+  dropbarColor?: string;
+  dropbarColorMode?: string;
+  /** Canonical UIkit Search presentation tokens. */
+  searchPlaceholderColor?: string;
+  searchIconColor?: string;
+  searchDefaultBackground?: string;
+  searchNavbarBackground?: string;
+  searchToggleColor?: string;
+  searchToggleHoverColor?: string;
+  searchDefaultBorderWidth?: string;
+  searchDefaultBorder?: string;
+  searchDefaultFocusBorder?: string;
+  searchNavbarBorderWidth?: string;
+  searchNavbarBorder?: string;
+  searchNavbarFocusBorder?: string;
+  searchMediumBorderWidth?: string;
+  searchMediumBorder?: string;
+  searchMediumFocusBorder?: string;
+  searchLargeBorderWidth?: string;
+  searchLargeBorder?: string;
+  searchLargeFocusBorder?: string;
+  /** Canonical UIkit Offcanvas presentation tokens. */
+  offcanvasBarPaddingVertical?: string;
+  offcanvasBarPaddingHorizontal?: string;
+  offcanvasBarBackground?: string;
+  offcanvasBarColorMode?: string;
+  offcanvasOverlayBackground?: string;
+  /** Canonical UIkit Logo presentation tokens. */
+  logoFontSize?: string;
+  logoTextTransform?: string;
   inverseNavbarNavItemHoverColor?: string;
   /** Canonical UIkit/YOOtheme Alert presentation tokens. */
   alertBackground?: string;
@@ -868,6 +965,7 @@ export type BuilderShellSettings = {
   buttonHoverBorderColor: string;
   buttonHoverEffect: "none" | "lift" | "grow";
   menuItems: ReactMenuItem[];
+  namedMenus: BuilderNamedMenu[];
   updatedAt?: string;
 };
 
@@ -1091,6 +1189,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
     { id: "home", label: "Home", url: "/" },
     { id: "shop", label: "Shop", url: "/shop" },
   ],
+  namedMenus: [],
 };
 
 function normalizeHeaderLayout(value: unknown): BuilderHeaderLayout {
@@ -1530,12 +1629,16 @@ export function normalizeBuilderShellSettings(
     buttonHoverBorderColor: normalizeColorString(value?.buttonHoverBorderColor, defaultBuilderShellSettings.buttonHoverBorderColor),
     buttonHoverEffect: (value?.buttonHoverEffect === "none" || value?.buttonHoverEffect === "lift" || value?.buttonHoverEffect === "grow") ? value.buttonHoverEffect : defaultBuilderShellSettings.buttonHoverEffect,
     menuItems: normalizeMenuItems(value?.menuItems),
+    namedMenus: normalizeNamedMenus(value?.namedMenus),
   };
 }
 
-function normalizeMenuItems(value: unknown): ReactMenuItem[] {
+function normalizeMenuItems(
+  value: unknown,
+  fallback: ReactMenuItem[] = defaultBuilderShellSettings.menuItems,
+): ReactMenuItem[] {
   if (!Array.isArray(value)) {
-    return defaultBuilderShellSettings.menuItems;
+    return fallback;
   }
 
   const normalized: ReactMenuItem[] = [];
@@ -1567,7 +1670,30 @@ function normalizeMenuItems(value: unknown): ReactMenuItem[] {
     }
   }
 
-  return normalized.length > 0 ? normalized : defaultBuilderShellSettings.menuItems;
+  return normalized.length > 0 ? normalized : fallback;
+}
+
+function normalizeNamedMenus(value: unknown): BuilderNamedMenu[] {
+  if (!Array.isArray(value)) return [];
+
+  const normalized: BuilderNamedMenu[] = [];
+  const seen = new Set<string>();
+
+  for (const menu of value) {
+    if (!menu || typeof menu !== "object") continue;
+    const raw = menu as Record<string, unknown>;
+    const id = typeof raw.id === "string" ? raw.id.trim() : "";
+    const name = typeof raw.name === "string" ? raw.name.trim() : "";
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    normalized.push({
+      id,
+      name: name || id,
+      items: normalizeMenuItems(raw.items, []),
+    });
+  }
+
+  return normalized;
 }
 
 function normalizeSizeString(value: unknown, fallback: string): string {

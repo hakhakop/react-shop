@@ -905,6 +905,7 @@ const defaultShellSettings: BuilderShellSettings = {
     { id: "home", label: "Home", url: "/" },
     { id: "shop", label: "Shop", url: "/shop" },
   ],
+  namedMenus: [],
 };
 
 const defaultMenuPresentation: MenuPresentationSettings = {
@@ -10056,7 +10057,7 @@ export default function DashboardBuilder({
     currentHeaderState: BuilderState,
     patch: Partial<BuilderSection>,
   ): BuilderState => {
-    const hasCanonicalComposition = Array.isArray(patch.layoutItems);
+    const hasCanonicalComposition = Array.isArray(patch.rows) || Array.isArray(patch.layoutItems);
     const preset = patch.headerLayout && !hasCanonicalComposition
       ? headerPresets.find((candidate) => candidate.key === patch.headerLayout)
       : undefined;
@@ -14367,6 +14368,11 @@ function PreviewCanvas({
         }
         data-section-pull-under-header={
           visibleSections[0]?.pullUnderHeader ? "true" : undefined
+        }
+        data-section-header-text-color={
+          visibleSections[0]?.headerTextColor && visibleSections[0].headerTextColor !== "none"
+            ? visibleSections[0].headerTextColor
+            : undefined
         }
         data-overlap-header={
           (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined

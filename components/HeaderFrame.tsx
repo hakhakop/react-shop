@@ -28,6 +28,9 @@ type HeaderFrameProps = {
     scrolled: boolean;
     hidden: boolean;
   };
+  /** Active responsive row variant from the canonical Header document. */
+  activeVariant?: "desktop" | "mobile";
+  mobileBreakpoint?: string;
 };
 
 /**
@@ -48,6 +51,8 @@ export default function HeaderFrame({
   stickyAnimation,
   builderPreviewMode = false,
   scrollState,
+  activeVariant,
+  mobileBreakpoint,
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
@@ -61,6 +66,7 @@ export default function HeaderFrame({
   const [sectionHeaderState, setSectionHeaderState] = React.useState({
     transparent: false,
     pullUnder: false,
+    textMode: null as EffectiveHeaderTextMode | null,
   });
   const scheduleUpdateRef = React.useRef<() => void>(() => {});
 
@@ -69,12 +75,20 @@ export default function HeaderFrame({
       const pageRoot = document.querySelector<HTMLElement>(
         "[data-builder-page-root], [data-builder-page]",
       );
+      const sourceTextMode = pageRoot?.dataset.sectionHeaderTextColor;
+      const sectionTextMode: EffectiveHeaderTextMode | null =
+        sourceTextMode === "light" || sourceTextMode === "dark"
+          ? sourceTextMode
+          : null;
       const nextState = {
         transparent: pageRoot?.dataset.sectionHeaderTransparent === "true",
         pullUnder: pageRoot?.dataset.sectionPullUnderHeader === "true",
+        textMode: sectionTextMode,
       };
       setSectionHeaderState((current) =>
-        current.transparent === nextState.transparent && current.pullUnder === nextState.pullUnder
+        current.transparent === nextState.transparent &&
+        current.pullUnder === nextState.pullUnder &&
+        current.textMode === nextState.textMode
           ? current
           : nextState,
       );
@@ -86,7 +100,11 @@ export default function HeaderFrame({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-section-header-transparent", "data-section-pull-under-header"],
+      attributeFilter: [
+        "data-section-header-transparent",
+        "data-section-pull-under-header",
+        "data-section-header-text-color",
+      ],
     });
     return () => observer.disconnect();
   }, []);
@@ -249,6 +267,7 @@ export default function HeaderFrame({
       // storefront. The preview shell remains the page-level theme boundary,
       // but it must not replace an explicit section scheme/background.
       const sectionTextMode =
+        sectionHeaderState.textMode ??
         textModeFromClasses(
           firstSection,
           "shop-builder-section--scheme-dark",
@@ -286,7 +305,8 @@ export default function HeaderFrame({
 
       const nextState = resolveEffectiveHeaderTextMode({
         configuredTextMode: textMode,
-        backgroundMode,
+        backgroundMode:
+          sectionHeaderState.transparent && !scrolled ? "none" : backgroundMode,
         firstSectionOverlapEnabled,
         firstSectionTouchesPageTop,
         headerTextMode,
@@ -349,15 +369,18 @@ export default function HeaderFrame({
       observer.disconnect();
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [backgroundMode, textMode, scrolled, overlapHeader]);
+  }, [backgroundMode, textMode, scrolled, overlapHeader, sectionHeaderState]);
 
   const effectiveScrolled = scrollState?.scrolled ?? scrolled;
   const effectiveHidden = scrollState?.hidden ?? hiddenByScroll;
+  const sectionTransparent = sectionHeaderState.transparent;
+  const effectiveBackgroundMode =
+    sectionTransparent && !effectiveScrolled ? "none" : backgroundMode;
   let bgClass = "";
   let borderClass = "";
   let textClass = "";
 
-  if (backgroundMode === "none") {
+  if (effectiveBackgroundMode === "none") {
     bgClass = effectiveScrolled ? "bg-[var(--header-bg)]" : "bg-transparent";
     borderClass = effectiveScrolled ? "border-[var(--header-border)]" : "border-transparent";
   } else if (backgroundMode === "glass") {
@@ -393,7 +416,6 @@ export default function HeaderFrame({
 
   const resolvedTextMode =
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
-  const sectionTransparent = sectionHeaderState.transparent;
   const effectiveOverlapHeader = overlapHeader || sectionHeaderState.pullUnder;
   return (
       <header
@@ -412,7 +434,9 @@ export default function HeaderFrame({
             : {}),
           ...style,
         }}
-        data-header-behavior={behavior}
+      data-header-behavior={behavior}
+      data-header-active-variant={activeVariant}
+      data-header-mobile-breakpoint={mobileBreakpoint}
         data-header-sticky-animation={stickyAnimation || undefined}
         data-builder-preview={builderPreviewDetected ? "true" : undefined}
         data-builder-object-type={builderPreviewMode ? "section" : undefined}

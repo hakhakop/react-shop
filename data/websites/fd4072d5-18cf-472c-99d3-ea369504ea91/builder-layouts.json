@@ -38,8 +38,8 @@
         "expandOneSide": "none",
         "htmlElement": "div",
         "stickyEffect": "none",
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
+        "pullUnderHeader": true,
+        "headerTextColor": "light",
         "animation": "fade",
         "visible": true,
         "layout": "2-col-equal",
@@ -1790,7 +1790,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-27T14:31:31.707Z"
+    "updatedAt": "2026-08-27T19:16:42.570Z"
   },
   "header": {
     "version": 1,
@@ -1830,7 +1830,7 @@
         "headerUtilityMigrationVersion": 3,
         "background": "transparent",
         "backgroundMode": "full",
-        "contentMode": "expand",
+        "contentMode": "boxed",
         "colorScheme": "inherit",
         "layout": "header-row",
         "layoutColumns": 3,
@@ -1839,19 +1839,16 @@
             "id": "header-main-left",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
-            "columnHorizontalAlign": "left",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
-                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo.svg",
-                "imageMobileUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg",
-                "imageSvgInline": true,
-                "imageAlt": "Jack Baker",
-                "headerBrandMode": "logo",
-                "headerBrandText": "Jack Baker",
+                "headerBrandMode": "brand",
+                "headerBrandText": "Jack",
+                "imageMaxWidth": 140,
                 "imageAlignment": "left",
-                "elementAlign": "left"
+                "imageUrl": null,
+                "imageAlt": "Jack logo"
               }
             ]
           },
@@ -1859,15 +1856,14 @@
             "id": "header-main-center",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
-            "columnHorizontalAlign": "center",
             "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "elementAlign": "center",
-                "menuDropbar": true
+                "menuActiveIndicator": "underline",
+                "elementAlign": "center"
               }
             ]
           },
@@ -1875,27 +1871,43 @@
             "id": "header-main-right",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
-            "columnHorizontalAlign": "right",
-            "blocks": []
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              }
+            ]
           }
         ],
         "visible": true,
         "headerArchitectureVersion": 2,
-        "headerLayout": "simple",
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerHeight": "auto",
+        "headerLayout": "wordpress",
+        "headerBehavior": "sticky-on-scroll-up",
         "headerWidthMode": "full",
-        "headerBehavior": "static",
-        "headerMobileBreakpoint": "1200px",
-        "headerDropdownAlign": "left",
-        "headerDropdownAlignToNavbar": false,
-        "headerDropbarEnabled": true,
-        "headerSearchPosition": "hide",
-        "headerSearchLayout": "input-dropdown",
-        "headerDialogLayout": "offcanvas-top",
-        "headerDialogTogglePosition": "header:end",
-        "headerMobileLogoUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg"
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": ""
       }
     ],
-    "updatedAt": "2026-08-27T18:36:46.607Z"
+    "updatedAt": "2026-08-27T21:01:11.153Z"
   },
   "footer": {
     "version": 1,
@@ -2371,5 +2383,2337 @@
         ]
       }
     ]
+  },
+  "page:stories": {
+    "version": 1,
+    "key": "page:stories",
+    "page": "page:stories",
+    "targetType": "page",
+    "design": {},
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Chloé & Marc",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-01.jpg",
+            "imagePosition": "top-right"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-panel-0-0-0-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
+                    "image_align": "right",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_loading": true,
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=21",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Winner tattoo contest",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "0,-100",
+                    "title": "Chloé & Marc",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Chloé & Marc",
+                "eyebrow": "Winner tattoo contest",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "right",
+                "imageSvgColor": "emphasis",
+                "imageLoading": "eager",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=21",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "right",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-100"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-1-column-2",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-1-column-1",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-1-column-2",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-0-0-0-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
+                        "image_align": "right",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_loading": true,
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=21",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Winner tattoo contest",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "0,-100",
+                        "title": "Chloé & Marc",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Chloé & Marc",
+                    "eyebrow": "Winner tattoo contest",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "right",
+                    "imageSvgColor": "emphasis",
+                    "imageLoading": "eager",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=21",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "right",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-100"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "Benjamin Smoke",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-right",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-02.jpg",
+            "imagePosition": "top-left"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-panel-1-0-1-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
+                    "image_align": "left",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_loading": true,
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=23",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Portrait Shooting",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "100,-200",
+                    "title": "Benjamin Smoke",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Benjamin Smoke",
+                "eyebrow": "Portrait Shooting",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "left",
+                "imageSvgColor": "emphasis",
+                "imageLoading": "eager",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=23",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "left",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "100"
+                      },
+                      {
+                        "value": "-200"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-2-row-1",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-1-0-1-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
+                        "image_align": "left",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_loading": true,
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=23",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Portrait Shooting",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "100,-200",
+                        "title": "Benjamin Smoke",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Benjamin Smoke",
+                    "eyebrow": "Portrait Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "left",
+                    "imageSvgColor": "emphasis",
+                    "imageLoading": "eager",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=23",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "left",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "100"
+                          },
+                          {
+                            "value": "-200"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Clara & David",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-03.jpg",
+            "imagePosition": "top-right"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-bottom-medium",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-panel-2-0-0-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
+                    "image_align": "right",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=21",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Couple Shooting",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "100,-200",
+                    "title": "Clara & David",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Clara & David",
+                "eyebrow": "Couple Shooting",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "right",
+                "imageSvgColor": "emphasis",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=21",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "right",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "100"
+                      },
+                      {
+                        "value": "-200"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-1-column-2",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-3-row-1",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-1-column-1",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-1-column-2",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-2-0-0-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
+                        "image_align": "right",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=21",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Couple Shooting",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "100,-200",
+                        "title": "Clara & David",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Clara & David",
+                    "eyebrow": "Couple Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "right",
+                    "imageSvgColor": "emphasis",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=21",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "right",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "100"
+                          },
+                          {
+                            "value": "-200"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Welcome little Emma",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-right",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-04.jpg",
+            "imagePosition": "top-left"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-4-row-1-column-2",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-panel-3-0-1-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
+                    "image_align": "left",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=21",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Family Shooting",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "100,-200",
+                    "title": "Welcome,<br> little Emma!",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Welcome,<br> little Emma!",
+                "eyebrow": "Family Shooting",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "left",
+                "imageSvgColor": "emphasis",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=21",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "left",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "100"
+                      },
+                      {
+                        "value": "-200"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-4-row-1",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-4-row-1-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-4-row-1-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-4-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              },
+              {
+                "id": "yootheme-section-4-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-3-0-1-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
+                        "image_align": "left",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=21",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Family Shooting",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "100,-200",
+                        "title": "Welcome,<br> little Emma!",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Welcome,<br> little Emma!",
+                    "eyebrow": "Family Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "left",
+                    "imageSvgColor": "emphasis",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=21",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "left",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "100"
+                          },
+                          {
+                            "value": "-200"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Alexandra & Stephan",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-05.jpg",
+            "imagePosition": "top-right"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-panel-4-0-0-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
+                    "image_align": "right",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=21",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Couple Shooting",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "100,-200",
+                    "title": "Alexandra <br>& Stephan",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Alexandra <br>& Stephan",
+                "eyebrow": "Couple Shooting",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "right",
+                "imageSvgColor": "emphasis",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=21",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "right",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "100"
+                      },
+                      {
+                        "value": "-200"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-1-column-2",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "thirds-2-1",
+            "blocks": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-5-row-1",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-1-column-1",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-1-column-2",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-5-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-4-0-0-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
+                        "image_align": "right",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=21",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Couple Shooting",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "100,-200",
+                        "title": "Alexandra <br>& Stephan",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Alexandra <br>& Stephan",
+                    "eyebrow": "Couple Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "right",
+                    "imageSvgColor": "emphasis",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=21",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "right",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "100"
+                          },
+                          {
+                            "value": "-200"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-5-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-6",
+        "kind": "contentLayout",
+        "title": "Lennie James",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "center-right",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-06.jpg",
+            "imagePosition": "top-left"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-6-row-1-column-1",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-6-row-1-column-2",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-panel-5-0-1-0",
+                "kind": "panel",
+                "yoothemeSource": {
+                  "type": "panel",
+                  "props": {
+                    "animation": "parallax",
+                    "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "content_column_breakpoint": "m",
+                    "icon_width": 80,
+                    "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
+                    "image_align": "left",
+                    "image_grid_breakpoint": "s",
+                    "image_grid_column_gap": "large",
+                    "image_grid_row_gap": "large",
+                    "image_grid_width": "1-2",
+                    "image_svg_color": "emphasis",
+                    "image_vertical_align": true,
+                    "image_width": "610",
+                    "link": "?page_id=21",
+                    "link_style": "text",
+                    "link_text": "Read more",
+                    "margin": "default",
+                    "meta": "Portrait Photography",
+                    "meta_align": "above-title",
+                    "meta_element": "h2",
+                    "meta_style": "text-meta",
+                    "panel_image_no_padding": true,
+                    "parallax_breakpoint": "m",
+                    "parallax_easing": "1",
+                    "parallax_y": "100,-200",
+                    "title": "Lennie James",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_margin": "small",
+                    "title_style": "h2"
+                  }
+                },
+                "title": "Lennie James",
+                "eyebrow": "Portrait Photography",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageAlignment": "left",
+                "imageSvgColor": "emphasis",
+                "buttonLabel": "Read more",
+                "buttonUrl": "?page_id=21",
+                "buttonStyle": "text",
+                "panelActionStyle": "text",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "panelVariant": "blank",
+                "panelSize": "none",
+                "panelImageNoPadding": true,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelHeightExpand": false,
+                "panelExpand": "none",
+                "panelMetaPosition": "above-title",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "left",
+                "panelMediaWidth": "1-2",
+                "elementMargin": "default",
+                "panelVerticalAlign": "center",
+                "panelTitleStyle": "h2",
+                "panelTitleElement": "div",
+                "linkTitle": false,
+                "metaStyle": "text-meta",
+                "panelMetaHtmlElement": "h2",
+                "titleMarginTop": "small",
+                "linkImage": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "var(--uk-global-margin-small)",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "h2",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "100"
+                      },
+                      {
+                        "value": "-200"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-6-row-1",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-6-row-1-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-6-row-1-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-6-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              },
+              {
+                "id": "yootheme-section-6-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-panel-5-0-1-0",
+                    "kind": "panel",
+                    "yoothemeSource": {
+                      "type": "panel",
+                      "props": {
+                        "animation": "parallax",
+                        "content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
+                        "image_align": "left",
+                        "image_grid_breakpoint": "s",
+                        "image_grid_column_gap": "large",
+                        "image_grid_row_gap": "large",
+                        "image_grid_width": "1-2",
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "610",
+                        "link": "?page_id=21",
+                        "link_style": "text",
+                        "link_text": "Read more",
+                        "margin": "default",
+                        "meta": "Portrait Photography",
+                        "meta_align": "above-title",
+                        "meta_element": "h2",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": true,
+                        "parallax_breakpoint": "m",
+                        "parallax_easing": "1",
+                        "parallax_y": "100,-200",
+                        "title": "Lennie James",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h2"
+                      }
+                    },
+                    "title": "Lennie James",
+                    "eyebrow": "Portrait Photography",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageAlignment": "left",
+                    "imageSvgColor": "emphasis",
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "?page_id=21",
+                    "buttonStyle": "text",
+                    "panelActionStyle": "text",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "panelVariant": "blank",
+                    "panelSize": "none",
+                    "panelImageNoPadding": true,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelHeightExpand": false,
+                    "panelExpand": "none",
+                    "panelMetaPosition": "above-title",
+                    "panelShowMedia": true,
+                    "panelMediaPlacement": "left",
+                    "panelMediaWidth": "1-2",
+                    "elementMargin": "default",
+                    "panelVerticalAlign": "center",
+                    "panelTitleStyle": "h2",
+                    "panelTitleElement": "div",
+                    "linkTitle": false,
+                    "metaStyle": "text-meta",
+                    "panelMetaHtmlElement": "h2",
+                    "titleMarginTop": "small",
+                    "linkImage": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "var(--uk-global-margin-small)",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "h2",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "100"
+                          },
+                          {
+                            "value": "-200"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-7",
+        "kind": "contentLayout",
+        "title": "About",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "xlarge",
+        "removeTopPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-7-row-1-column-1",
+            "rowId": "yootheme-section-7-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-image-6-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-07.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=4",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "160"
+                      },
+                      {
+                        "value": "0"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-7-row-1-column-2",
+            "rowId": "yootheme-section-7-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-image-6-0-1-0",
+                "kind": "image",
+                "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-07.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 512,
+                "imageWidth": "512px",
+                "imageHeight": "158px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "x": [
+                      {
+                        "value": "-440"
+                      },
+                      {
+                        "value": "0"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-6-0-1-1",
+                "kind": "heading",
+                "headingText": "Read my story",
+                "title": "Read my story",
+                "headingLevel": "div",
+                "headingSize": "h1",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "x": [
+                      {
+                        "value": "160"
+                      },
+                      {
+                        "value": "0"
+                      }
+                    ],
+                    "easing": 1,
+                    "breakpoint": "m"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {},
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-7-row-1",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-7-row-1-column-1",
+                  "widths": {
+                    "small": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-7-row-1-column-2",
+                  "widths": {
+                    "small": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-7-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-6-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-07.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=4",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "160"
+                          },
+                          {
+                            "value": "0"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-7-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "2-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "style": "tile-default",
+                "padding": "xlarge",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-6-0-1-0",
+                    "kind": "image",
+                    "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-bg-07.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 512,
+                    "imageWidth": "512px",
+                    "imageHeight": "158px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "x": [
+                          {
+                            "value": "-440"
+                          },
+                          {
+                            "value": "0"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-6-0-1-1",
+                    "kind": "heading",
+                    "headingText": "Read my story",
+                    "title": "Read my story",
+                    "headingLevel": "div",
+                    "headingSize": "h1",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "x": [
+                          {
+                            "value": "160"
+                          },
+                          {
+                            "value": "0"
+                          }
+                        ],
+                        "easing": 1,
+                        "breakpoint": "m"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {},
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-27T19:17:22.955Z"
   }
 }

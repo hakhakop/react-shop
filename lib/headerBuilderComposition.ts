@@ -2,6 +2,7 @@ import { getBuilderRowLayoutPreset } from "@/components/dashboard/builderLayoutP
 import type { BuilderLayout, BuilderLayoutBlock } from "@/lib/builderLayouts";
 import type { HeaderBuilderComposition, HeaderBuilderElement, HeaderRowComposition } from "@/lib/headerBuilderDocument";
 import { resolveHeaderElementAlignment } from "@/lib/headerElementAlignment";
+import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 
 const headerActionFromKind = (kind?: string) => {
   if (kind === "headerSearch") return "search";
@@ -23,37 +24,33 @@ const headerButtonHoverEffect = (
 export function resolveHeaderBuilderComposition(
   layout: Pick<BuilderLayout, "sections"> | null | undefined,
 ): HeaderBuilderComposition {
-  const blocks = layout?.sections.flatMap((section) =>
-    (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
-  ) ?? [];
+  const section = layout?.sections[0];
+  const headerRows = section ? normalizeBuilderSectionLayout(section).rows : [];
+  const blocks = headerRows.flatMap((row) =>
+    row.columns.flatMap((column) => column.elements),
+  );
   const blockRowIds = new Map<object, string>();
   const blockColumnMeta = new Map<
     object,
     { id?: string; flex?: number; index: number; count: number }
   >();
   const blockIds = new Map<object, string>();
-  layout?.sections.forEach((layoutSection) => {
-    layoutSection.layoutItems?.forEach((item, itemIndex) => {
-      const rowId = item.rowId ?? item.id ?? `header-row-${itemIndex}`;
-      const rowItems = layoutSection.layoutItems?.filter(
-        (candidate) => (candidate.rowId ?? candidate.id) === rowId,
-      ) ?? [item];
-      const preset = getBuilderRowLayoutPreset(item.rowLayout);
-      const columnIndex = rowItems.indexOf(item);
-      item.blocks?.forEach((block, blockIndex) => {
-        blockIds.set(block, block.id ?? `${item.id ?? "header-column"}-block-${blockIndex}`);
-        blockRowIds.set(block, rowId);
+  headerRows.forEach((row) => {
+    const preset = getBuilderRowLayoutPreset(row.layout);
+    row.columns.forEach((column, columnIndex) => {
+      column.elements.forEach((block, blockIndex) => {
+        blockIds.set(block, block.id ?? `${column.id ?? "header-column"}-block-${blockIndex}`);
+        blockRowIds.set(block, row.id);
         blockColumnMeta.set(block, {
-          id: item.id,
+          id: column.id,
           flex: preset?.ratios[columnIndex] ?? 1,
           index: columnIndex,
-          count: rowItems.length,
+          count: row.columns.length,
         });
       });
     });
   });
-  const section = layout?.sections[0];
-  const row = section?.layoutItems?.[0];
+  const row = headerRows[0];
   const sharedElementFields = (block: (typeof blocks)[number]) => ({
     rowId: blockRowIds.get(block),
     columnId: blockColumnMeta.get(block)?.id,
@@ -105,6 +102,7 @@ export function resolveHeaderBuilderComposition(
       return [{
       id: blockIds.get(block) ?? `header-navigation-${blockIndex}`,
       type: "navigation",
+      menuSource: block.menuSource,
       menuItemGap: overrides?.gap ? block.menuItemGap : undefined,
       menuHoverColor: overrides?.hoverColor ? block.menuHoverColor : undefined,
       menuActiveColor: overrides?.activeColor ? block.menuActiveColor : undefined,
@@ -166,6 +164,14 @@ export function resolveHeaderBuilderComposition(
       utilityVariant: block.headerUtilityVariant,
       ...sharedElementFields(block),
     }];
+    if (block.kind === "headerSocial") return [{
+      id: blockIds.get(block) ?? `header-social-${blockIndex}`,
+      type: "social",
+      socialItems: block.headerSocialItems,
+      socialStyle: block.headerSocialStyle,
+      socialGap: block.headerSocialGap,
+      ...sharedElementFields(block),
+    }];
     if (block.id === "header-categories" || block.kind === "headerCategories") return [{
       id: blockIds.get(block) ?? `header-categories-${blockIndex}`,
       type: "categories",
@@ -216,12 +222,17 @@ export function resolveHeaderBuilderComposition(
   });
   const rowsList: HeaderRowComposition[] = [];
   const seenRows = new Set<string>();
-  (layout?.sections[0]?.layoutItems ?? []).forEach((item, index) => {
-    const rowId = item.rowId ?? item.id ?? `header-row-${index}`;
-    if (!seenRows.has(rowId)) {
-      seenRows.add(rowId);
+  headerRows.forEach((item) => {
+    const rowId = item.id;
+    if (!seenRows.has(item.id)) {
+      seenRows.add(item.id);
       rowsList.push({
         rowId,
+        role: item.role,
+        headerVariant: item.headerVariant,
+        maxWidth: item.maxWidth,
+        removeHorizontalPadding: item.removeHorizontalPadding,
+        horizontalDistribution: item.horizontalDistribution,
         headerGap: item.headerGap,
         headerJustify: item.headerJustify,
         headerAlign: item.headerAlign,
@@ -239,15 +250,13 @@ export function resolveHeaderBuilderComposition(
 
   return {
     elements,
-    columns: (layout?.sections[0]?.layoutItems ?? []).map((item, index, items) => {
-      const rowId = item.rowId ?? item.id ?? `header-row-${index}`;
-      const rowItems = items.filter((candidate) => (candidate.rowId ?? candidate.id) === rowId);
-      const preset = getBuilderRowLayoutPreset(item.rowLayout);
-      return {
-        id: item.id ?? `${rowId}-column-${index + 1}`,
-        rowId,
-        flex: preset?.ratios[rowItems.indexOf(item)] ?? 1,
-      };
+    columns: headerRows.flatMap((item) => {
+      const preset = getBuilderRowLayoutPreset(item.layout);
+      return item.columns.map((column, index) => ({
+        id: column.id ?? `${item.id}-column-${index + 1}`,
+        rowId: item.id,
+        flex: preset?.ratios[index] ?? 1,
+      }));
     }),
     documentBackground: section?.background,
     documentVisualStyle: section?.visualStyle,
@@ -263,6 +272,28 @@ export function resolveHeaderBuilderComposition(
     documentTextMode: section?.headerTextMode,
     documentBreakpoint: section?.headerBreakpoint,
     documentMobileBreakpoint: section?.headerMobileBreakpoint,
+    documentMobileLayout: section?.headerMobileLayout,
+    documentMobileBehavior: section?.headerMobileBehavior,
+    documentMobileSearchPosition: section?.headerMobileSearchPosition,
+    documentMobileSearchLayout: section?.headerMobileSearchLayout,
+    documentMobileSearchDropdownStretch: section?.headerMobileSearchDropdownStretch,
+    documentMobileSearchDropdownLarge: section?.headerMobileSearchDropdownLarge,
+    documentMobileSearchIconPosition: section?.headerMobileSearchIconPosition,
+    documentMobileSocialPosition: section?.headerMobileSocialPosition,
+    documentMobileSocialStyle: section?.headerMobileSocialStyle,
+    documentMobileSocialGap: section?.headerMobileSocialGap,
+    documentMobileSocialItems: section?.headerMobileSocialItems,
+    documentMobileLogoPaddingRemove: section?.headerMobileLogoPaddingRemove,
+    documentMobileDialogTogglePosition: section?.headerMobileDialogTogglePosition,
+    documentMobileDialogLayout: section?.headerMobileDialogLayout,
+    documentMobileDialogClose: section?.headerMobileDialogClose,
+    documentMobileDialogMenuStyle: section?.headerMobileDialogMenuStyle,
+    documentMobileDialogCenter: section?.headerMobileDialogCenter,
+    documentMobileDialogPushAfter: section?.headerMobileDialogPushAfter,
+    documentMobileOffcanvasMode: section?.headerMobileOffcanvasMode,
+    documentMobileOffcanvasFlip: section?.headerMobileOffcanvasFlip,
+    documentMobileOffcanvasOverlay: section?.headerMobileOffcanvasOverlay,
+    documentMobileDialogDropbarAnimation: section?.headerMobileDialogDropbarAnimation,
     documentStickyShowOnUp: section?.headerStickyShowOnUp,
     documentStickyAnimation: section?.headerStickyAnimation,
     documentDropdownAlign: section?.headerDropdownAlign,
@@ -272,11 +303,23 @@ export function resolveHeaderBuilderComposition(
     documentClickModeEnabled: section?.headerClickModeEnabled,
     documentDialogTogglePosition: section?.headerDialogTogglePosition,
     documentDialogLayout: section?.headerDialogLayout,
+    documentDialogMenuStyle: section?.headerDialogMenuStyle,
     documentDialogCenter: section?.headerDialogCenter,
     documentDialogPushAfter: section?.headerDialogPushAfter,
+    documentOffcanvasMode: section?.headerOffcanvasMode,
+    documentOffcanvasFlip: section?.headerOffcanvasFlip,
+    documentOffcanvasOverlay: section?.headerOffcanvasOverlay,
+    documentDialogDropbarAnimation: section?.headerDialogDropbarAnimation,
     documentSearchPosition: section?.headerSearchPosition,
     documentSearchLayout: section?.headerSearchLayout,
+    documentSearchDropdownStretch: section?.headerSearchDropdownStretch,
+    documentSearchDropdownLarge: section?.headerSearchDropdownLarge,
+    documentSearchIconPosition: section?.headerSearchIconPosition,
     documentSocialPosition: section?.headerSocialPosition,
+    documentSocialStyle: section?.headerSocialStyle,
+    documentSocialGap: section?.headerSocialGap,
+    documentSocialItems: section?.headerSocialItems,
+    documentLogoPaddingRemove: section?.headerLogoPaddingRemove,
     documentMobileLogoUrl: section?.headerMobileLogoUrl,
     documentInverseLogoUrl: section?.headerInverseLogoUrl,
     documentMobileComposition: section?.headerMobileComposition,

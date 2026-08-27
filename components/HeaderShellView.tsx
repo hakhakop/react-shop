@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 
 import HeaderActions from "./HeaderActions";
 import HeaderCategoriesDropdown from "./HeaderCategoriesDropdown";
 import HeaderFrame from "./HeaderFrame";
 import HeaderNav from "./HeaderNav";
+import HeaderSearchControl from "./HeaderSearchControl";
+import HeaderSocialLinks from "./HeaderSocialLinks";
 import type { MenuItem } from "../lib/navigation";
 import type { HeaderSettings } from "../lib/themeSettings";
 import type {
@@ -31,11 +33,13 @@ import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import { resolveHeaderMenuSourceItems } from "@/lib/headerMenuSources";
 import {
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
 } from "@/components/builder/BuilderIframeDraftBridge";
 import type { BuilderState } from "@/components/dashboard/builderTypes";
+import { normalizeHeaderMobileBreakpoint } from "@/lib/headerResponsive";
 
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -207,7 +211,7 @@ export default function HeaderShellView({
         event.source !== window.parent ||
         event.data?.source !== BUILDER_IFRAME_DRAFT_SOURCE ||
         event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE ||
-        (scopedPreviewPage && event.data?.documentKey !== scopedPreviewPage)
+        event.data?.documentKey !== "header"
       ) return;
       const revision = Number(event.data.revision);
       const state = event.data.state as BuilderState | undefined;
@@ -228,8 +232,33 @@ export default function HeaderShellView({
     };
     window.addEventListener("message", handleDraftMessage);
     return () => window.removeEventListener("message", handleDraftMessage);
-  }, [builderDraftPreview, scopedPreviewPage]);
+  }, [builderDraftPreview]);
   const headerComposition = liveHeaderComposition ?? initialHeaderComposition;
+  const canonicalRows = headerComposition.rows ?? [];
+  const hasCanonicalMobileRows = canonicalRows.some((row) => row.headerVariant === "mobile");
+  const mobileBreakpoint = normalizeHeaderMobileBreakpoint(
+    headerComposition.documentMobileBreakpoint ?? shellSettings.headerMobileBreakpoint,
+  );
+  const [activeHeaderVariant, setActiveHeaderVariant] = useState<"desktop" | "mobile">("desktop");
+  useEffect(() => {
+    if (!hasCanonicalMobileRows) {
+      setActiveHeaderVariant("desktop");
+      return;
+    }
+    const query = window.matchMedia(`(max-width: ${mobileBreakpoint})`);
+    const update = () => setActiveHeaderVariant(query.matches ? "mobile" : "desktop");
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, [hasCanonicalMobileRows, mobileBreakpoint]);
+  const activeRowIds = new Set(
+    canonicalRows
+      .filter((row) => !row.headerVariant || row.headerVariant === activeHeaderVariant)
+      .map((row) => row.rowId),
+  );
+  const activeDocumentElements = headerComposition.elements.filter(
+    (element) => !element.rowId || activeRowIds.has(element.rowId),
+  );
   const renderBuilderElement = renderBuilderElementProp ?? (builderInteractionIdentity
     ? (element: HeaderBuilderElement, content: ReactNode, flexItemStyle?: CSSProperties) => (
         <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id="header-document"
@@ -249,8 +278,8 @@ export default function HeaderShellView({
           data-builder-row-index={Math.max(0, rowIndex)} style={{ display: "contents" }}>{content}</div>;
       }
     : undefined);
-  const documentLogo = headerComposition.elements.find((item) => item.type === "logo");
-  const documentNavigation = headerComposition.elements.find((item) => item.type === "navigation");
+  const documentLogo = activeDocumentElements.find((item) => item.type === "logo");
+  const documentNavigation = activeDocumentElements.find((item) => item.type === "navigation");
   const primaryColor =
     asString(shellSettings.primaryColor) ||
     asString(settings.primary_color) ||
@@ -297,12 +326,16 @@ export default function HeaderShellView({
   const layoutValue = documentSettings.layout === "wordpress"
     ? "wordpress"
     : documentSettings.layout ?? layoutOverride ?? asString(settings.layout, "centered");
-  const layout = normalizeLayout(layoutValue);
+  const layout = activeHeaderVariant === "mobile" && hasCanonicalMobileRows
+    ? "simple"
+    : normalizeLayout(layoutValue);
   // The Header document behavior is already the canonical variant selected by
   // the document. Do not reinterpret an explicit `sticky` value using the
   // legacy compatibility flag: that changes the live runtime variant while
   // leaving the persisted mapping looking correct.
-  const effectiveHeaderBehavior = documentSettings.behavior;
+  const effectiveHeaderBehavior = activeHeaderVariant === "mobile" && hasCanonicalMobileRows
+    ? documentSettings.mobileBehavior ?? "static"
+    : documentSettings.behavior;
   const headerHeight = resolveHeaderHeightCss(
     documentSettings.height,
     documentSettings.customHeight,
@@ -346,6 +379,10 @@ export default function HeaderShellView({
     effectiveToolbarMeta?.trim(),
   );
   const showTopToolbar = topToolbarVisible && hasTopToolbarContent;
+  const hasCanonicalToolbarRow = Boolean(
+    headerComposition.rows?.some((row) => row.role === "toolbar"),
+  );
+  const showLegacyTopToolbar = showTopToolbar && !hasCanonicalToolbarRow;
   const effectiveHeaderBackgroundMode =
     documentSettings.backgroundMode;
   const documentHeaderBackground =
@@ -426,7 +463,7 @@ export default function HeaderShellView({
   const headerClassName = [
     layout === "pill" || layout === "princity" ? "site-header--pill" : "",
     serviceHomepageMode ? "site-header--service" : "",
-    showTopToolbar ? "" : "site-header--toolbar-hidden",
+    showLegacyTopToolbar || hasCanonicalToolbarRow ? "" : "site-header--toolbar-hidden",
     headerMustBeTransparent || effectiveHeaderBackgroundMode === "none"
       ? "site-header--no-background"
       : "",
@@ -440,6 +477,10 @@ export default function HeaderShellView({
     builderDraftPreview ? "site-header--builder-preview" : "",
     documentSettings.overlay ? "site-header--builder-overlay" : "",
     documentSettings.dropbarEnabled ? "site-header--dropdown-dropbar" : "",
+    documentSettings.dropdownAlignToNavbar || documentSettings.dropbarEnabled
+      ? "site-header--dropdown-boundary-navbar"
+      : "",
+    clickModeEnabled ? "site-header--dropdown-click" : "site-header--dropdown-hover",
     documentSettings.dropdownAlign
       ? `site-header--dropdown-align-${documentSettings.dropdownAlign}`
       : "",
@@ -447,15 +488,17 @@ export default function HeaderShellView({
       ? "site-header--document-background"
       : "",
     `site-header--builder-width-${documentSettings.widthMode}`,
+    hasCanonicalMobileRows ? `site-header--canonical-${activeHeaderVariant}` : "",
+    activeHeaderVariant === "mobile" && documentSettings.mobileLayout
+      ? `site-header--mobile-layout-${documentSettings.mobileLayout}`
+      : "",
+    activeHeaderVariant === "mobile" ? (documentSettings.mobileLogoPaddingRemove ? "site-header--logo-padding-remove" : "") : (documentSettings.logoPaddingRemove ? "site-header--logo-padding-remove" : ""),
   ]
     .filter(Boolean)
     .join(" ");
-  const allDocumentElements = useMemo(() => {
-    return headerComposition.elements;
-  }, [headerComposition.elements]);
+  const allDocumentElements = activeDocumentElements;
   const compositionTypes = new Set(allDocumentElements.map((item) => item.type));
   const showLogoElement = compositionTypes.has("logo");
-  const showNavigationElement = compositionTypes.has("navigation");
   const showButtonElement = compositionTypes.has("button");
   const showLogo = showLogoElement &&
     Boolean(effectiveLogoUrl) &&
@@ -465,15 +508,13 @@ export default function HeaderShellView({
     (effectiveBrandMode === "brand" ||
       effectiveBrandMode === "both" ||
       !showLogo);
-  const reactMenuItems = shellSettings.menuItems;
-  const menuItems =
-    Array.isArray(reactMenuItems) && reactMenuItems.length > 0
-      ? buildReactMenuTree(reactMenuItems)
+  const defaultMenuItems =
+    Array.isArray(shellSettings.menuItems) && shellSettings.menuItems.length > 0
+      ? buildReactMenuTree(shellSettings.menuItems)
       : [
           { id: "home", label: "Home", url: "/", path: "/" },
           { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
         ];
-  const publicItemsToRender = filterSaaSItems(menuItems);
   const menuPresentation =
     (shellSettings.menuPresentation as BuilderMenuPresentationMap | undefined) ??
     {};
@@ -502,31 +543,56 @@ export default function HeaderShellView({
         {categories}
       </HeaderCategoriesDropdown>
     ) : null;
-  const nav = showNavigationElement ? (
-    <HeaderNav
-      items={publicItemsToRender}
-      presentationById={menuPresentation}
-      categories={compositionTypes.has("categories") ? categories : null}
-      serviceHomepageMode={serviceHomepageMode}
-      scopedPreviewWebsiteId={scopedPreviewWebsiteId}
-      activePageKey={scopedPreviewPage}
-      scopedPreviewPages={scopedPreviewPages}
-      scopedLinkMode={scopedLinkMode}
-      activeContentLanguage={activeContentLanguage}
-      dropdownIndicator={dropdownIndicator}
-      parentIconEnabled={parentIconEnabled}
-      clickModeEnabled={clickModeEnabled}
-      style={typographyProps(
-        allDocumentElements.find((candidate) => candidate.type === "navigation")
-          ?.typography,
-        "body",
-      ).style}
-    />
-  ) : null;
+  const renderNavigation = (element: HeaderBuilderElement) => {
+    const source = element.menuSource?.trim();
+    const sourceItems = resolveHeaderMenuSourceItems(shellSettings, source);
+    const hasNamedSource = Boolean(
+      source &&
+      source !== "main" &&
+      shellSettings.namedMenus?.some((menu) => menu.id === source),
+    );
+    const menuItems = hasNamedSource
+      ? buildReactMenuTree(sourceItems)
+      : defaultMenuItems;
+
+    return (
+      <HeaderNav
+        items={filterSaaSItems(menuItems)}
+        presentationById={menuPresentation}
+        categories={
+          (!source || source === "main") && compositionTypes.has("categories")
+            ? categories
+            : null
+        }
+        serviceHomepageMode={serviceHomepageMode}
+        scopedPreviewWebsiteId={scopedPreviewWebsiteId}
+        activePageKey={scopedPreviewPage}
+        scopedPreviewPages={scopedPreviewPages}
+        scopedLinkMode={scopedLinkMode}
+        activeContentLanguage={activeContentLanguage}
+        dropdownIndicator={dropdownIndicator}
+        parentIconEnabled={parentIconEnabled}
+        clickModeEnabled={clickModeEnabled}
+        canonicalMobile={activeHeaderVariant === "mobile" && hasCanonicalMobileRows}
+        dialogLayout={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogLayout : documentSettings.dialogLayout}
+        dialogMenuStyle={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogMenuStyle : documentSettings.dialogMenuStyle}
+        dialogCenter={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogCenter : documentSettings.dialogCenter}
+        dialogPushAfter={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogPushAfter : documentSettings.dialogPushAfter}
+        dialogClose={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogClose : true}
+        offcanvasMode={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasMode : documentSettings.offcanvasMode}
+        offcanvasFlip={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasFlip : documentSettings.offcanvasFlip}
+        offcanvasOverlay={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasOverlay : documentSettings.offcanvasOverlay}
+        dropbarAnimation={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogDropbarAnimation : documentSettings.dialogDropbarAnimation}
+        style={typographyProps(element.typography, "body").style}
+      />
+    );
+  };
   const renderLogoAndBrand = (element?: HeaderBuilderElement) => {
     const elementLogoUrl = element?.imageUrl || effectiveLogoUrl;
     const elementLogoAlt = element?.imageAlt || effectiveLogoAlt;
-    const elementLogoMaxWidth = element?.imageMaxWidth || effectiveLogoMaxWidth;
+    const elementLogoMaxWidth = element?.imageSvgInline === true && element.imageMaxWidth == null
+      ? undefined
+      : element?.imageMaxWidth || effectiveLogoMaxWidth;
     const effectiveMobileLogoUrl =
       element?.imageMobileUrl || documentSettings.mobileLogoUrl || null;
     const elementBrandMode = element?.headerBrandMode || effectiveBrandMode;
@@ -567,7 +633,10 @@ export default function HeaderShellView({
                 imageSvgInline: element?.imageSvgInline,
                 imageSvgColor: element?.imageSvgColor,
                 imagePosition: element?.imagePosition,
-                imageLoading: element?.imageLoading,
+                // Header logos are above the fold. Eager loading also avoids
+                // an intrinsic-size inline SVG waiting on an observer target
+                // that has no box until the SVG itself is available.
+                imageLoading: element?.imageLoading ?? "eager",
                 }}
               />
             </span>
@@ -631,18 +700,28 @@ export default function HeaderShellView({
       }}
     />
   ) : null;
-  const primaryRowId = headerComposition.columns?.[0]?.rowId ?? allDocumentElements[0]?.rowId;
+  const toolbarRowIds = new Set(
+    canonicalRows
+      .filter((row) => activeRowIds.has(row.rowId) && row.role === "toolbar")
+      .map((row) => row.rowId),
+  );
+  const activeColumns = (headerComposition.columns ?? []).filter((column) => activeRowIds.has(column.rowId));
+  const primaryRowId = activeColumns.find(
+    (column) => !toolbarRowIds.has(column.rowId),
+  )?.rowId ?? allDocumentElements.find(
+    (element) => !element.rowId || !toolbarRowIds.has(element.rowId),
+  )?.rowId;
   const orderedElements = primaryRowId
     ? allDocumentElements.filter((element) => element.rowId === primaryRowId)
     : allDocumentElements;
   const additionalRows = primaryRowId
     ? Array.from(new Set([
-        ...(headerComposition.columns ?? []).map((column) => column.rowId),
+        ...activeColumns.map((column) => column.rowId),
         ...allDocumentElements.map((element) => element.rowId),
       ].filter((rowId): rowId is string => Boolean(rowId) && rowId !== primaryRowId))).map((rowId) => ({
         rowId,
         elements: allDocumentElements.filter((element) => element.rowId === rowId),
-        columns: (headerComposition.columns ?? []).filter((column) => column.rowId === rowId),
+        columns: activeColumns.filter((column) => column.rowId === rowId),
       }))
     : [];
 
@@ -692,6 +771,27 @@ export default function HeaderShellView({
       ...(rowComp.headerGap ? { "--header-builder-row-gap": rowComp.headerGap } : {}),
       ...(rowComp.headerJustify ? { "--header-builder-row-justify": rowComp.headerJustify } : {}),
       ...(rowComp.headerAlign ? { "--header-builder-row-align": rowComp.headerAlign } : {}),
+      ...(rowComp.horizontalDistribution ? {
+        "--header-builder-row-justify": rowComp.horizontalDistribution === "justify"
+          ? "space-between"
+          : rowComp.horizontalDistribution === "left"
+            ? "flex-start"
+            : "center",
+      } : {}),
+      ...(rowComp.maxWidth && rowComp.maxWidth !== "inherit" ? {
+        width: "100%",
+        maxWidth: rowComp.maxWidth === "small"
+          ? "var(--uk-container-small-max-width, 900px)"
+          : rowComp.maxWidth === "default" || rowComp.maxWidth === "medium"
+            ? "var(--uk-container-default-max-width, 1200px)"
+            : rowComp.maxWidth === "large"
+              ? "var(--uk-container-large-max-width, 1400px)"
+              : rowComp.maxWidth === "xlarge"
+                ? "var(--uk-container-xlarge-max-width, 1600px)"
+                : "100%",
+        marginInline: "auto",
+      } : {}),
+      ...(rowComp.removeHorizontalPadding ? { paddingInline: 0 } : {}),
       ...(resolvedTopPadding !== undefined ? { paddingTop: resolvedTopPadding } : {}),
       ...(resolvedBottomPadding !== undefined ? { paddingBottom: resolvedBottomPadding } : {}),
       ...(resolvedTopMargin !== undefined ? { marginTop: resolvedTopMargin } : {}),
@@ -719,6 +819,7 @@ export default function HeaderShellView({
     } else if (rowComp.rowColorScheme === "light") {
       cls += " theme-light bg-white text-slate-900";
     }
+    if (rowComp.role === "toolbar") cls += " site-header-builder-extra-row--toolbar";
     return cls;
   };
 
@@ -747,16 +848,26 @@ export default function HeaderShellView({
     );
     let content: ReactNode = null;
     if (element.type === "logo") content = renderLogoAndBrand(element);
-    if (element.type === "navigation") content = nav;
+    if (element.type === "navigation") content = renderNavigation(element);
     if (element.type === "button") content = renderHeaderButton(element);
     if (element.type === "spacer") content = <span className="header-builder-spacer-content" aria-hidden="true" />;
     if (element.type === "utility" && element.utilityAction) {
-      content = (
+      content = element.utilityAction === "search" ? (
+        <HeaderSearchControl
+          layout={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchLayout : documentSettings.searchLayout}
+          stretch={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownStretch : documentSettings.searchDropdownStretch}
+          large={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownLarge : documentSettings.searchDropdownLarge}
+          iconPosition={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchIconPosition : documentSettings.searchIconPosition}
+        />
+      ) : (
         <HeaderActions
           icons={[element.utilityAction as BuilderHeaderIconId]}
           iconVariant={(element.utilityVariant as BuilderHeaderIconVariant | undefined) ?? effectiveIconVariant}
         />
       );
+    }
+    if (element.type === "social") {
+      content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
     }
     if (element.type === "categories") content = renderCategoriesMega(element);
     if (element.type === "language") {
@@ -829,7 +940,11 @@ export default function HeaderShellView({
         : {}),
     };
     const styledContent = (
-      <div className={`header-builder-element header-builder-element--${element.type} ${visualStyleClassName(element.visualStyle)}`} style={elementStyle}>
+      <div
+        className={`header-builder-element header-builder-element--${element.type} ${visualStyleClassName(element.visualStyle)}`}
+        data-header-element-id={element.id}
+        style={elementStyle}
+      >
         {content}
       </div>
     );
@@ -837,7 +952,7 @@ export default function HeaderShellView({
       ? renderBuilderElement(element, styledContent, flexItemStyle)
       : styledContent;
   };
-  const primaryColumns = headerComposition.columns?.filter((column) => column.rowId === primaryRowId)
+  const primaryColumns = activeColumns.filter((column) => column.rowId === primaryRowId)
     ?? Array.from(new Set(orderedElements.map((element) => element.columnId).filter(Boolean))).map((id) => ({ id: id!, rowId: primaryRowId ?? "header-main-row", flex: 1 }));
   const usesColumnLayout = primaryColumns.length > 1 || Boolean(renderBuilderColumn && primaryColumns.length);
   const renderColumn = (column: { id: string; flex: number }) => {
@@ -921,7 +1036,7 @@ export default function HeaderShellView({
       ? renderBuilderRow(primaryRowId, sharedRow)
       : sharedRow;
   };
-  const topToolbar = showTopToolbar ? (
+  const topToolbar = showLegacyTopToolbar ? (
       <div className="site-header-top">
         <div className="site-header-top-inner">
           <div className="site-header-top-left">
@@ -934,7 +1049,7 @@ export default function HeaderShellView({
         </div>
       </div>
     ) : null;
-  const princityTopToolbar = showTopToolbar ? (
+  const princityTopToolbar = showLegacyTopToolbar ? (
       <div className="site-header-princity-meta-row">
         <span>{effectiveTopBarText || "Modern commerce by Webpages"}</span>
         <span>
@@ -944,6 +1059,50 @@ export default function HeaderShellView({
         </span>
       </div>
     ) : null;
+  const canonicalToolbarRows = additionalRows.filter((row) => toolbarRowIds.has(row.rowId));
+  const standardAdditionalRows = additionalRows.filter((row) => !toolbarRowIds.has(row.rowId));
+  const renderAdditionalHeaderRow = (row: (typeof additionalRows)[number]) => {
+    if (!renderBuilderColumn && row.elements.length === 0) return null;
+    const isToolbar = toolbarRowIds.has(row.rowId);
+    const rowSettings = headerComposition.rows?.find((candidate) => candidate.rowId === row.rowId);
+    const rowDistribution = rowSettings?.horizontalDistribution;
+    const rowContent = (
+      <div
+        className={`site-header-builder-extra-row${isToolbar ? " site-header-builder-extra-row--toolbar" : ""}${renderBuilderColumn ? " is-builder-wireframe" : ""} ${getRowClass(row.rowId)}`}
+        style={getRowStyles(row.rowId)}
+        data-header-row-role={isToolbar ? "toolbar" : undefined}
+      >
+        {renderBuilderColumn ? (
+          <span className="builder-header-row-wireframe-label">
+            {isToolbar ? "Toolbar row" : "Header row"}
+          </span>
+        ) : null}
+        {(row.columns.length > 0 ? row.columns : [{ id: row.rowId, rowId: row.rowId, flex: 1 }]).map((column) => {
+          const columnElements = row.elements.filter((element) => element.columnId === column.id);
+          const content = (
+            <div
+              className={`header-builder-column${columnElements.length === 0 ? " is-empty" : ""}`}
+              style={{
+                flex: rowDistribution === "center" ? "0 1 auto" : column.flex,
+                justifyContent: rowDistribution === "center"
+                  ? "center"
+                  : rowDistribution === "left"
+                    ? "flex-start"
+                    : undefined,
+              }}
+            >
+              {columnElements.map((element) => renderBuilderElement
+                ? <div key={element.id} style={{ display: "contents" }}>{renderCompositionElement(element, {})}</div>
+                : <div key={element.id}>{renderCompositionElement(element)}</div>)}
+            </div>
+          );
+          if (!renderBuilderColumn && columnElements.length === 0) return null;
+          return <div key={column.id} style={{ display: "contents" }}>{renderBuilderColumn ? renderBuilderColumn(column.id, content) : content}</div>;
+        })}
+      </div>
+    );
+    return <div key={row.rowId} style={{ display: "contents" }}>{renderBuilderRow ? renderBuilderRow(row.rowId, rowContent) : rowContent}</div>;
+  };
 
   return (
     <HeaderFrame
@@ -957,6 +1116,8 @@ export default function HeaderShellView({
       overlapHeader={documentSettings.overlay}
       builderPreviewMode={builderPreviewMode}
       scrollState={scrollState}
+      activeVariant={hasCanonicalMobileRows ? activeHeaderVariant : undefined}
+      mobileBreakpoint={hasCanonicalMobileRows ? mobileBreakpoint : undefined}
       style={{
         ...documentVisualCss,
         ...visualStyleToCss(headerComposition.rowVisualStyle),
@@ -989,6 +1150,7 @@ export default function HeaderShellView({
         zIndex: documentSettings.zIndex,
       } as CSSProperties}
     >
+      {canonicalToolbarRows.map(renderAdditionalHeaderRow)}
       {layout === "two-row" && (
         <>
           {topToolbar}
@@ -1072,24 +1234,7 @@ export default function HeaderShellView({
           </div>
         </div>
       )}
-      {additionalRows.map((row) => {
-        const rowContent = <div className={`site-header-builder-extra-row${renderBuilderColumn ? " is-builder-wireframe" : ""} ${getRowClass(row.rowId)}`} style={getRowStyles(row.rowId)}>
-          {renderBuilderColumn ? <span className="builder-header-row-wireframe-label">Header row</span> : null}
-          {(row.columns.length > 0 ? row.columns : [{ id: row.rowId, rowId: row.rowId, flex: 1 }]).map((column) => {
-            const columnElements = row.elements.filter((element) => element.columnId === column.id);
-            const content = (
-              <div className={`header-builder-column${columnElements.length === 0 ? " is-empty" : ""}`} style={{ flex: column.flex }}>
-                {columnElements.map((element) => renderBuilderElement
-                  ? <div key={element.id} style={{ display: "contents" }}>{renderCompositionElement(element, {})}</div>
-                  : <div key={element.id}>{renderCompositionElement(element)}</div>)}
-              </div>
-            );
-            if (!renderBuilderColumn && columnElements.length === 0) return null;
-            return <div key={column.id} style={{ display: "contents" }}>{renderBuilderColumn ? renderBuilderColumn(column.id, content) : content}</div>;
-          })}
-        </div>;
-        return <div key={row.rowId} style={{ display: "contents" }}>{renderBuilderRow ? renderBuilderRow(row.rowId, rowContent) : rowContent}</div>;
-      })}
+      {standardAdditionalRows.map(renderAdditionalHeaderRow)}
     </HeaderFrame>
   );
 }

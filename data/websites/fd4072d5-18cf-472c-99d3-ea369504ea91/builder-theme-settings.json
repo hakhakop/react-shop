@@ -531,13 +531,56 @@
       "headerWidthMode": "full",
       "headerBehavior": "sticky-on-scroll-up",
       "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "static",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "hide",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://500px.com/"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        },
+        {
+          "link": "https://www.facebook.com/yootheme"
+        }
+      ],
+      "headerMobileDialogLayout": "modal-center",
+      "headerMobileDialogTogglePosition": "mobile-end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": true,
+      "headerMobileDialogPushAfter": 2,
+      "headerMobileOffcanvasMode": "push",
+      "headerMobileOffcanvasFlip": false,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
       "headerDropdownAlign": "left",
       "headerDropdownAlignToNavbar": false,
       "headerDropbarEnabled": true,
       "headerSearchPosition": "hide",
       "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerLogoPaddingRemove": false,
       "headerDialogLayout": "offcanvas-top",
-      "headerDialogTogglePosition": "header:end",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
       "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
       "layout": "header-row",
       "layoutColumns": 3,
@@ -546,49 +589,103 @@
       "backgroundMode": "full",
       "contentMode": "expand",
       "colorScheme": "inherit",
-      "layoutItems": [
+      "rows": [
         {
-          "id": "header-main-left",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "left",
-          "blocks": [
+          "id": "header-toolbar-row",
+          "role": "toolbar",
+          "headerVariant": "desktop",
+          "layout": "whole",
+          "maxWidth": "default",
+          "horizontalDistribution": "center",
+          "columns": [
             {
-              "id": "header-logo",
-              "kind": "image",
-              "imageUrl": "wp-content/uploads/yootheme/logo.svg",
-              "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
-              "imageSvgInline": true,
-              "imageAlt": "Jack Baker",
-              "headerBrandMode": "logo",
-              "headerBrandText": "Jack Baker",
-              "imageAlignment": "left",
-              "elementAlign": "left"
+              "id": "header-toolbar-column",
+              "elements": []
             }
           ]
         },
         {
-          "id": "header-main-center",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "center",
-          "blocks": [
+          "id": "header-main-row",
+          "headerVariant": "desktop",
+          "layout": "quarters-1-2-1",
+          "columns": [
             {
-              "id": "header-navigation",
-              "kind": "menu",
-              "title": "Navigation",
-              "menuSource": "main",
-              "elementAlign": "center",
-              "menuDropbar": true
+              "id": "header-main-left",
+              "elements": [
+                {
+                  "id": "header-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+                  "imageSvgInline": true,
+                  "imageAlt": "Jack Baker",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "Jack Baker",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-main-center",
+              "elements": [
+                {
+                  "id": "header-navigation",
+                  "kind": "menu",
+                  "title": "Navigation",
+                  "menuSource": "main",
+                  "elementAlign": "center",
+                  "menuDropbar": true
+                }
+              ]
+            },
+            {
+              "id": "header-main-right",
+              "elements": []
             }
           ]
         },
         {
-          "id": "header-main-right",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "right",
-          "blocks": []
+          "id": "header-mobile-row",
+          "headerVariant": "mobile",
+          "layout": "halves",
+          "columns": [
+            {
+              "id": "header-mobile-start",
+              "elements": [
+                {
+                  "id": "header-mobile-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+                  "imageSvgInline": true,
+                  "imageAlt": "Jack Baker",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "Jack Baker",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-mobile-end",
+              "elements": [
+                {
+                  "id": "header-mobile-search",
+                  "kind": "headerSearch",
+                  "headerUtilityAction": "search",
+                  "elementAlign": "right"
+                },
+                {
+                  "id": "header-mobile-navigation",
+                  "kind": "menu",
+                  "title": "Mobile navigation",
+                  "menuSource": "main",
+                  "elementAlign": "right",
+                  "menuDropbar": true
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -599,7 +696,7 @@
   },
   "resolved": {
     "shellSettings": {
-      "buttonTextTransform": "none",
+      "buttonTextTransform": "uppercase",
       "navbarDropdownIndicator": "chevron",
       "fontFamilyBody": "Poppins",
       "baseFontSize": "16px",
@@ -708,61 +805,61 @@
       "buttonSmallRadius": "0",
       "buttonLargeRadius": "0",
       "buttonTokenInheritance": {
-        "buttonPrimaryBackground": "inherit",
-        "buttonPrimaryText": "inherit",
-        "buttonDefaultBackground": "inherit",
-        "buttonDefaultText": "inherit",
-        "buttonSecondaryBackground": "inherit",
+        "buttonPrimaryBackground": "authored",
+        "buttonPrimaryText": "authored",
+        "buttonDefaultBackground": "authored",
+        "buttonDefaultText": "authored",
+        "buttonSecondaryBackground": "authored",
         "buttonTextColorSemantic": "inherit",
-        "buttonBorderWidth": "inherit",
+        "buttonBorderWidth": "authored",
         "buttonRadius": "inherit",
-        "buttonHoverBg": "inherit",
+        "buttonHoverBg": "authored",
         "buttonPrimaryHoverText": "inherit",
         "buttonPrimaryHoverShadow": "inherit",
         "buttonPrimaryHoverGradient": "inherit",
-        "buttonFontSize": "inherit",
-        "buttonLargeFontSize": "inherit",
+        "buttonFontSize": "authored",
+        "buttonLargeFontSize": "authored",
         "buttonFontFamily": "inherit",
         "buttonFontStyle": "inherit",
         "buttonFontWeight": "inherit",
-        "buttonLineHeight": "inherit",
-        "buttonTextTransform": "inherit",
+        "buttonLineHeight": "authored",
+        "buttonTextTransform": "authored",
         "buttonBorderMode": "inherit",
         "buttonBackgroundSize": "inherit",
         "buttonBackgroundPosition": "inherit",
         "buttonHoverBackgroundPosition": "inherit",
-        "buttonSmallFontSize": "inherit",
+        "buttonSmallFontSize": "authored",
         "buttonSmallLineHeight": "inherit",
         "buttonSmallPaddingX": "inherit",
         "buttonSmallRadius": "inherit",
-        "buttonLargeLineHeight": "inherit",
+        "buttonLargeLineHeight": "authored",
         "buttonLargePaddingX": "inherit",
         "buttonLargeRadius": "inherit",
-        "buttonDefaultHoverBackground": "inherit",
-        "buttonDefaultHoverText": "inherit",
-        "buttonSecondaryHoverBackground": "inherit",
-        "buttonSecondaryText": "inherit",
+        "buttonDefaultHoverBackground": "authored",
+        "buttonDefaultHoverText": "authored",
+        "buttonSecondaryHoverBackground": "authored",
+        "buttonSecondaryText": "authored",
         "buttonSecondaryHoverText": "inherit",
-        "buttonDefaultActiveBackground": "inherit",
-        "buttonDefaultActiveText": "inherit",
+        "buttonDefaultActiveBackground": "authored",
+        "buttonDefaultActiveText": "authored",
         "buttonDefaultBorder": "inherit",
         "buttonDefaultHoverBorder": "inherit",
         "buttonDefaultActiveBorder": "inherit",
         "buttonDefaultActiveShadow": "inherit",
-        "buttonPrimaryHoverBorder": "inherit",
-        "buttonPrimaryActiveBackground": "inherit",
-        "buttonPrimaryActiveText": "inherit",
-        "buttonPrimaryActiveBorder": "inherit",
+        "buttonPrimaryHoverBorder": "authored",
+        "buttonPrimaryActiveBackground": "authored",
+        "buttonPrimaryActiveText": "authored",
+        "buttonPrimaryActiveBorder": "authored",
         "buttonPrimaryActiveShadow": "inherit",
-        "buttonSecondaryBorder": "inherit",
+        "buttonSecondaryBorder": "authored",
         "buttonSecondaryHoverBorder": "inherit",
-        "buttonSecondaryActiveBackground": "inherit",
-        "buttonSecondaryActiveText": "inherit",
+        "buttonSecondaryActiveBackground": "authored",
+        "buttonSecondaryActiveText": "authored",
         "buttonSecondaryActiveBorder": "inherit",
         "buttonSecondaryActiveShadow": "inherit",
         "buttonInverseDefaultBackground": "inherit",
         "buttonInverseDefaultText": "inherit",
-        "buttonInverseDefaultHoverBackground": "inherit",
+        "buttonInverseDefaultHoverBackground": "authored",
         "buttonInverseDefaultHoverText": "inherit",
         "buttonInverseDefaultActiveBackground": "inherit",
         "buttonInverseDefaultActiveText": "inherit",
@@ -771,13 +868,13 @@
         "buttonInverseDefaultActiveBorder": "inherit",
         "buttonInverseDefaultShadow": "inherit",
         "buttonInversePrimaryShadow": "inherit",
-        "buttonInverseSecondaryBackground": "inherit",
-        "buttonInverseSecondaryText": "inherit",
+        "buttonInverseSecondaryBackground": "authored",
+        "buttonInverseSecondaryText": "authored",
         "buttonInverseSecondaryHoverBackground": "inherit",
         "buttonInverseSecondaryActiveBackground": "inherit",
-        "buttonInverseSecondaryBorder": "inherit",
-        "buttonInverseSecondaryHoverText": "inherit",
-        "buttonInverseSecondaryActiveText": "inherit",
+        "buttonInverseSecondaryBorder": "authored",
+        "buttonInverseSecondaryHoverText": "authored",
+        "buttonInverseSecondaryActiveText": "authored",
         "buttonDangerBackground": "inherit",
         "buttonDangerText": "inherit",
         "buttonDangerBorder": "inherit",
@@ -799,7 +896,7 @@
         "buttonLinkColor": "inherit",
         "buttonLinkHoverColor": "inherit",
         "buttonBackdropFilter": "inherit",
-        "buttonTextHoverColor": "inherit",
+        "buttonTextHoverColor": "authored",
         "buttonTransitionDuration": "inherit",
         "buttonPrimaryGradient": "inherit",
         "buttonPrimaryActiveGradient": "inherit",
@@ -823,12 +920,148 @@
         "buttonSecondaryShadow": "inherit",
         "buttonSecondaryHoverShadow": "inherit"
       },
-      "buttonFontSize": "16px",
-      "buttonLineHeight": "40px",
-      "buttonLargeLineHeight": "55px",
+      "buttonFontSize": "13px",
+      "buttonLineHeight": "43px",
+      "buttonLargeLineHeight": "66px",
       "buttonLargePaddingX": "40px",
       "themePageLayout": "full",
-      "themePageContainerAlignment": "center"
+      "themePageContainerAlignment": "center",
+      "selectionBackground": "rgba(239, 70, 62, 0.7)",
+      "buttonSmallFontSize": "11px",
+      "buttonLargeFontSize": "14px",
+      "buttonDefaultBackground": "#181818",
+      "buttonDefaultText": "#fff",
+      "buttonDefaultHoverBackground": "#181818",
+      "buttonDefaultHoverText": "#fff",
+      "buttonDefaultActiveBackground": "#1a1a1a",
+      "buttonDefaultActiveText": "#fff",
+      "buttonPrimaryBackground": "transparent",
+      "buttonPrimaryText": "#ef463e",
+      "buttonHoverBg": "#ef463e",
+      "buttonPrimaryActiveBackground": "transparent",
+      "buttonPrimaryActiveText": "#ef463e",
+      "buttonSecondaryBackground": "transparent",
+      "buttonSecondaryText": "#181818",
+      "buttonSecondaryHoverBackground": "#181818",
+      "buttonSecondaryActiveBackground": "#1a1a1a",
+      "buttonTextHoverColor": "#949494",
+      "buttonBorderWidth": "1px",
+      "buttonPrimaryHoverBorder": "#ef463e",
+      "buttonPrimaryActiveBorder": "#ef463e",
+      "buttonSecondaryBorder": "#181818",
+      "buttonInverseSecondaryBackground": "transparent",
+      "containerLarge": "1450px",
+      "cardDefaultHoverBackground": "#fff",
+      "cardBackground": "#fff",
+      "cardPrimaryBackground": "#fff",
+      "cardPrimaryBorder": "rgba(24, 24, 24, 0.08)",
+      "cardPrimaryHoverBorder": "rgba(24, 24, 24, 0.04)",
+      "cardHoverShadow": "0 28px 50px rgba(0, 0, 0, 0.16)",
+      "cardDefaultShadow": "0 5px 15px rgba(0, 0, 0, 0.08)",
+      "cardDefaultHoverShadow": "0 15px 55px rgba(0, 0, 0, 0.08)",
+      "overlayDefaultBackground": "rgba(255, 255, 255, 0.9)",
+      "overlayPrimaryBackground": "rgba(24, 24, 24, 0.9)",
+      "searchPlaceholderColor": "rgba(24, 24, 24, 0.5)",
+      "searchIconColor": "#181818",
+      "searchDefaultBackground": "transparent",
+      "searchNavbarBackground": "transparent",
+      "searchToggleColor": "#181818",
+      "searchToggleHoverColor": "#949494",
+      "searchDefaultBorderWidth": "1px",
+      "searchDefaultBorder": "#e4e4e4",
+      "searchDefaultFocusBorder": "#181818",
+      "searchNavbarBorderWidth": "1px",
+      "searchNavbarBorder": "#e4e4e4",
+      "searchNavbarFocusBorder": "#181818",
+      "searchMediumBorderWidth": "1px",
+      "searchMediumBorder": "#e4e4e4",
+      "searchMediumFocusBorder": "#181818",
+      "searchLargeBorderWidth": "1px",
+      "searchLargeBorder": "#e4e4e4",
+      "searchLargeFocusBorder": "#181818",
+      "accordionTitleFontSize": "20px",
+      "accordionTitleHoverColor": "#ef463e",
+      "accordionItemBorderWidth": "1px",
+      "accordionItemBorder": "#181818",
+      "dropdownPadding": "30px",
+      "dropdownBackground": "#181818",
+      "dropdownColor": "#fff",
+      "dropdownColorMode": "light",
+      "dropdownDropbarMargin": "0",
+      "dropdownDropbarPaddingTop": "24px",
+      "dropdownDropbarLargePaddingTop": "34px",
+      "dropdownNavItemHoverColor": "#fff",
+      "dropdownNavSubtitleFontSize": "12px",
+      "dropdownNavHeaderColor": "#949494",
+      "dropdownNavDividerBorder": "rgba(228, 228, 228, 0.15)",
+      "dropdownNavSublistItemHoverColor": "#fff",
+      "dropdownNavItemPaddingVertical": "0",
+      "dropdownNavFontSize": "14px",
+      "dropdownNavSubtitleColor": "#949494",
+      "dropdownNavSubtitleFontFamily": "Poppins",
+      "dropdownNavSubtitleFontWeight": "normal",
+      "dropdownNavSubtitleTextTransform": "none",
+      "dropbarPaddingTop": "30px",
+      "dropbarBackground": "#181818",
+      "dropbarColor": "var(--uk-inverse-global-color)",
+      "dropbarColorMode": "light",
+      "offcanvasBarPaddingVertical": "40px",
+      "offcanvasBarPaddingHorizontal": "40px",
+      "offcanvasBarBackground": "#fff",
+      "offcanvasBarColorMode": "dark",
+      "offcanvasOverlayBackground": "rgba(24, 24, 24, 0.9)",
+      "navSublistPaddingLeft": "10px",
+      "navDividerMarginVertical": "10px",
+      "navDefaultFontSize": "14px",
+      "navDefaultItemColor": "#181818",
+      "navDefaultItemHoverColor": "#949494",
+      "navDefaultItemActiveColor": "#949494",
+      "navDefaultSubtitleFontSize": "12px",
+      "navDefaultSublistItemHoverColor": "#949494",
+      "navDefaultSublistItemActiveColor": "#949494",
+      "navPrimaryItemColor": "#181818",
+      "navPrimaryItemHoverColor": "#949494",
+      "navPrimaryItemActiveColor": "#949494",
+      "navPrimarySubtitleFontSize": "13px",
+      "navPrimarySublistItemHoverColor": "#949494",
+      "navPrimarySublistItemActiveColor": "#949494",
+      "navSecondaryFontSize": "14px",
+      "navSecondarySublistFontSize": "14px",
+      "navMediumLineHeight": "1.2",
+      "navLargeFontSizeL": "86px",
+      "navXLargeFontSizeL": "130px",
+      "navDividersMarginTop": "7px",
+      "navSecondaryMarginTop": "15px",
+      "navDefaultSubtitleColor": "#949494",
+      "navDefaultSubtitleFontWeight": "normal",
+      "navPrimarySubtitleColor": "#949494",
+      "navPrimarySubtitleFontWeight": "normal",
+      "navbarDropdownShiftMargin": "-30px",
+      "navbarDropdownNavItemHoverColor": "#fff",
+      "navbarDropdownNavItemActiveColor": "#fff",
+      "navbarDropdownNavSubtitleFontSize": "12px",
+      "navbarDropdownNavHeaderColor": "#949494",
+      "navbarDropdownNavDividerBorder": "rgba(228, 228, 228, 0.15)",
+      "navbarDropdownNavSublistItemHoverColor": "#fff",
+      "navbarDropdownNavSublistItemActiveColor": "#fff",
+      "navbarPaddingTopMedium": "20px",
+      "navbarPaddingBottomMedium": "20px",
+      "navbarGapMedium": "60px",
+      "navbarNavGapMedium": "60px",
+      "subnavPillItemPaddingVertical": "6px",
+      "subnavPillItemPaddingHorizontal": "14px",
+      "subnavPillItemHoverBackground": "transparent",
+      "subnavPillItemOnclickBackground": "#ef463e",
+      "subnavPillItemOnclickColor": "#fff",
+      "paginationMarginHorizontal": "20px",
+      "paginationItemPaddingVertical": "8px",
+      "paginationItemPaddingHorizontal": "8px",
+      "paginationItemColor": "#181818",
+      "paginationItemHoverColor": "#949494",
+      "paginationItemMinWidth": "39px",
+      "paginationItemBorderWidth": "1px",
+      "logoFontSize": "22px",
+      "logoTextTransform": "uppercase"
     },
     "headerDocument": {
       "headerArchitectureVersion": 2,
@@ -836,13 +1069,56 @@
       "headerWidthMode": "full",
       "headerBehavior": "sticky-on-scroll-up",
       "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "static",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "hide",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://500px.com/"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        },
+        {
+          "link": "https://www.facebook.com/yootheme"
+        }
+      ],
+      "headerMobileDialogLayout": "modal-center",
+      "headerMobileDialogTogglePosition": "mobile-end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": true,
+      "headerMobileDialogPushAfter": 2,
+      "headerMobileOffcanvasMode": "push",
+      "headerMobileOffcanvasFlip": false,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
       "headerDropdownAlign": "left",
       "headerDropdownAlignToNavbar": false,
       "headerDropbarEnabled": true,
       "headerSearchPosition": "hide",
       "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerLogoPaddingRemove": false,
       "headerDialogLayout": "offcanvas-top",
-      "headerDialogTogglePosition": "header:end",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
       "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
       "layout": "header-row",
       "layoutColumns": 3,
@@ -851,49 +1127,103 @@
       "backgroundMode": "full",
       "contentMode": "expand",
       "colorScheme": "inherit",
-      "layoutItems": [
+      "rows": [
         {
-          "id": "header-main-left",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "left",
-          "blocks": [
+          "id": "header-toolbar-row",
+          "role": "toolbar",
+          "headerVariant": "desktop",
+          "layout": "whole",
+          "maxWidth": "default",
+          "horizontalDistribution": "center",
+          "columns": [
             {
-              "id": "header-logo",
-              "kind": "image",
-              "imageUrl": "wp-content/uploads/yootheme/logo.svg",
-              "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
-              "imageSvgInline": true,
-              "imageAlt": "Jack Baker",
-              "headerBrandMode": "logo",
-              "headerBrandText": "Jack Baker",
-              "imageAlignment": "left",
-              "elementAlign": "left"
+              "id": "header-toolbar-column",
+              "elements": []
             }
           ]
         },
         {
-          "id": "header-main-center",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "center",
-          "blocks": [
+          "id": "header-main-row",
+          "headerVariant": "desktop",
+          "layout": "quarters-1-2-1",
+          "columns": [
             {
-              "id": "header-navigation",
-              "kind": "menu",
-              "title": "Navigation",
-              "menuSource": "main",
-              "elementAlign": "center",
-              "menuDropbar": true
+              "id": "header-main-left",
+              "elements": [
+                {
+                  "id": "header-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageMobileUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+                  "imageSvgInline": true,
+                  "imageAlt": "Jack Baker",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "Jack Baker",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-main-center",
+              "elements": [
+                {
+                  "id": "header-navigation",
+                  "kind": "menu",
+                  "title": "Navigation",
+                  "menuSource": "main",
+                  "elementAlign": "center",
+                  "menuDropbar": true
+                }
+              ]
+            },
+            {
+              "id": "header-main-right",
+              "elements": []
             }
           ]
         },
         {
-          "id": "header-main-right",
-          "rowId": "header-main-row",
-          "rowLayout": "quarters-1-2-1",
-          "columnHorizontalAlign": "right",
-          "blocks": []
+          "id": "header-mobile-row",
+          "headerVariant": "mobile",
+          "layout": "halves",
+          "columns": [
+            {
+              "id": "header-mobile-start",
+              "elements": [
+                {
+                  "id": "header-mobile-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo-mobile.svg",
+                  "imageSvgInline": true,
+                  "imageAlt": "Jack Baker",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "Jack Baker",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-mobile-end",
+              "elements": [
+                {
+                  "id": "header-mobile-search",
+                  "kind": "headerSearch",
+                  "headerUtilityAction": "search",
+                  "elementAlign": "right"
+                },
+                {
+                  "id": "header-mobile-navigation",
+                  "kind": "menu",
+                  "title": "Mobile navigation",
+                  "menuSource": "main",
+                  "elementAlign": "right",
+                  "menuDropbar": true
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -1026,6 +1356,8 @@
       "theme.colorMode"
     ],
     "header": [
+      "site.toolbar_width",
+      "site.toolbar_center",
       "header.layout",
       "header.width",
       "header.search_layout",
@@ -1058,13 +1390,46 @@
       "headerDocument.headerWidthMode",
       "headerDocument.headerBehavior",
       "headerDocument.headerMobileBreakpoint",
+      "headerDocument.headerMobileLayout",
+      "headerDocument.headerMobileComposition",
+      "headerDocument.headerMobileBehavior",
+      "headerDocument.headerMobileSearchPosition",
+      "headerDocument.headerMobileSearchLayout",
+      "headerDocument.headerMobileSearchDropdownStretch",
+      "headerDocument.headerMobileSearchDropdownLarge",
+      "headerDocument.headerMobileSearchIconPosition",
+      "headerDocument.headerMobileSocialPosition",
+      "headerDocument.headerMobileSocialStyle",
+      "headerDocument.headerMobileSocialGap",
+      "headerDocument.headerMobileSocialItems",
+      "headerDocument.headerMobileDialogLayout",
+      "headerDocument.headerMobileDialogTogglePosition",
+      "headerDocument.headerMobileDialogClose",
+      "headerDocument.headerMobileDialogMenuStyle",
+      "headerDocument.headerMobileDialogCenter",
+      "headerDocument.headerMobileDialogPushAfter",
+      "headerDocument.headerMobileOffcanvasMode",
+      "headerDocument.headerMobileOffcanvasFlip",
+      "headerDocument.headerMobileOffcanvasOverlay",
+      "headerDocument.headerMobileDialogDropbarAnimation",
       "headerDocument.headerDropdownAlign",
       "headerDocument.headerDropdownAlignToNavbar",
       "headerDocument.headerDropbarEnabled",
       "headerDocument.headerSearchPosition",
       "headerDocument.headerSearchLayout",
+      "headerDocument.headerSearchDropdownStretch",
+      "headerDocument.headerSearchDropdownLarge",
+      "headerDocument.headerSearchIconPosition",
+      "headerDocument.headerSocialPosition",
+      "headerDocument.headerSocialStyle",
+      "headerDocument.headerSocialGap",
+      "headerDocument.headerLogoPaddingRemove",
       "headerDocument.headerDialogLayout",
       "headerDocument.headerDialogTogglePosition",
+      "headerDocument.headerDialogMenuStyle",
+      "headerDocument.headerOffcanvasMode",
+      "headerDocument.headerOffcanvasFlip",
+      "headerDocument.headerOffcanvasOverlay",
       "headerDocument.headerMobileLogoUrl",
       "headerDocument.layout",
       "headerDocument.layoutColumns",
@@ -1073,7 +1438,8 @@
       "headerDocument.backgroundMode",
       "headerDocument.contentMode",
       "headerDocument.colorScheme",
-      "headerDocument.layoutItems"
+      "headerDocument.layoutItems",
+      "headerDocument.rows"
     ]
   },
   "unsupported": [
@@ -1082,5 +1448,5 @@
     "@navbar-dropdown-nav-subtitle-font-family",
     "@navbar-dropdown-nav-subtitle-font-weight"
   ],
-  "updatedAt": "2026-08-27T18:36:09.900Z"
+  "updatedAt": "2026-08-27T20:47:39.335Z"
 }

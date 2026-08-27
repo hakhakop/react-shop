@@ -57,6 +57,14 @@ const REPEATED_LEGACY_ROW_FIELDS = [
   "rowBorderRadius",
   "rowVisualStyle",
   "rowAnimation",
+  "role",
+  "headerVariant",
+  "maxWidth",
+  "removeHorizontalPadding",
+  "horizontalDistribution",
+  "headerGap",
+  "headerJustify",
+  "headerAlign",
 ] as const satisfies readonly (keyof LegacyLayoutItem)[];
 
 function stableValue(value: unknown): string {
@@ -266,18 +274,39 @@ export function normalizeBuilderSectionLayout(
     const topMargin = resolvedFields.rowTopMargin as BuilderRow["topMargin"];
     const bottomMargin = resolvedFields.rowBottomMargin as BuilderRow["bottomMargin"];
     const rowJustify = resolvedFields.rowJustify as LegacyLayoutItem["rowJustify"];
+    const horizontalDistribution = resolvedFields.horizontalDistribution as BuilderRow["horizontalDistribution"];
 
     return {
       id,
       layout,
+      ...(resolvedFields.role === "toolbar" ? { role: "toolbar" as const } : {}),
+      ...(resolvedFields.headerVariant === "desktop" || resolvedFields.headerVariant === "mobile"
+        ? { headerVariant: resolvedFields.headerVariant }
+        : {}),
+      ...(resolvedFields.maxWidth ? { maxWidth: resolvedFields.maxWidth as BuilderRow["maxWidth"] } : {}),
+      ...(typeof resolvedFields.removeHorizontalPadding === "boolean"
+        ? { removeHorizontalPadding: resolvedFields.removeHorizontalPadding }
+        : {}),
       // Legacy rowGap drove UIkit's combined gutter. Reading it into both
       // canonical axes preserves that historical meaning until renderer migration.
       ...(legacyGap ? { columnGap: legacyGap, rowGap: legacyGap } : {}),
       ...(topMargin ? { topMargin } : {}),
       ...(bottomMargin ? { bottomMargin } : {}),
-      ...(legacyHorizontalDistribution(rowJustify)
-        ? { horizontalDistribution: legacyHorizontalDistribution(rowJustify) }
+      ...(horizontalDistribution || legacyHorizontalDistribution(rowJustify)
+        ? { horizontalDistribution: horizontalDistribution ?? legacyHorizontalDistribution(rowJustify) }
         : {}),
+      ...(resolvedFields.headerGap ? { headerGap: resolvedFields.headerGap as string } : {}),
+      ...(resolvedFields.headerJustify ? { headerJustify: resolvedFields.headerJustify as BuilderRow["headerJustify"] } : {}),
+      ...(resolvedFields.headerAlign ? { headerAlign: resolvedFields.headerAlign as BuilderRow["headerAlign"] } : {}),
+      ...(resolvedFields.rowBackground ? { rowBackground: resolvedFields.rowBackground as string } : {}),
+      ...(resolvedFields.rowColorScheme ? { rowColorScheme: resolvedFields.rowColorScheme as BuilderRow["rowColorScheme"] } : {}),
+      ...(resolvedFields.rowTopSpacing ? { rowTopSpacing: resolvedFields.rowTopSpacing as BuilderRow["rowTopSpacing"] } : {}),
+      ...(resolvedFields.rowBottomSpacing ? { rowBottomSpacing: resolvedFields.rowBottomSpacing as BuilderRow["rowBottomSpacing"] } : {}),
+      ...(resolvedFields.rowTopMargin ? { rowTopMargin: resolvedFields.rowTopMargin as BuilderRow["rowTopMargin"] } : {}),
+      ...(resolvedFields.rowBottomMargin ? { rowBottomMargin: resolvedFields.rowBottomMargin as BuilderRow["rowBottomMargin"] } : {}),
+      ...(resolvedFields.rowBorderRadius !== undefined ? { rowBorderRadius: resolvedFields.rowBorderRadius as number } : {}),
+      ...(resolvedFields.rowVisualStyle ? { rowVisualStyle: resolvedFields.rowVisualStyle as BuilderRow["rowVisualStyle"] } : {}),
+      ...(resolvedFields.rowAnimation ? { rowAnimation: resolvedFields.rowAnimation as BuilderRow["rowAnimation"] } : {}),
       columns: items.map((item, columnIndex) =>
         normalizeLegacyColumn(item, id, columnIndex),
       ),

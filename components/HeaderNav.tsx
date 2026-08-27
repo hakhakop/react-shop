@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
+  useRef,
   useState,
   type CSSProperties,
   type MouseEvent,
@@ -40,6 +41,16 @@ interface HeaderNavProps {
   dropdownIndicator?: "none" | "chevron";
   parentIconEnabled?: boolean;
   clickModeEnabled?: boolean;
+  canonicalMobile?: boolean;
+  dialogLayout?: string;
+  dialogMenuStyle?: string;
+  dialogCenter?: boolean;
+  dialogPushAfter?: number;
+  dialogClose?: boolean;
+  offcanvasMode?: string;
+  offcanvasFlip?: boolean;
+  offcanvasOverlay?: boolean;
+  dropbarAnimation?: string;
   style?: CSSProperties;
 }
 
@@ -197,11 +208,12 @@ function renderMenuItems(
   mobileMode = false,
   expandedIds = new Set<string>(),
   onToggleMobileItem?: (id: string) => void,
+  pushAfter?: number,
 ): ReactNode {
   const visibleItems = items.filter((item) =>
     mobileMode ? item.visibility !== "desktop" : item.visibility !== "mobile",
   );
-  return visibleItems.map((item) => {
+  return visibleItems.map((item, itemIndex) => {
     const href = mobileMode
       ? (item.mobileUrl || item.path || item.url || "#")
       : (item.path || item.url || "#");
@@ -246,7 +258,7 @@ function renderMenuItems(
           hasChildren ? " has-children" : ""
         }${isBranchActive ? " is-active" : ""}${
           desktopParentToggle && expandedIds.has(item.id) ? " is-open" : ""
-        }`}
+        }${level === 0 && pushAfter && itemIndex === pushAfter ? " is-pushed" : ""}`}
       >
         <Link
           href={mobileParentAccordion ? "#" : dashboardHref}
@@ -337,6 +349,7 @@ function renderMenuItems(
                 mobileMode,
                 expandedIds,
                 onToggleMobileItem,
+                pushAfter,
               )}
             </div>
           </div>
@@ -359,6 +372,16 @@ export default function HeaderNav({
   dropdownIndicator = "none",
   parentIconEnabled = dropdownIndicator === "chevron",
   clickModeEnabled = false,
+  canonicalMobile = false,
+  dialogLayout = "offcanvas-top",
+  dialogMenuStyle = "default",
+  dialogCenter = false,
+  dialogPushAfter,
+  dialogClose = true,
+  offcanvasMode = "slide",
+  offcanvasFlip = false,
+  offcanvasOverlay = true,
+  dropbarAnimation = "",
   style,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
@@ -368,6 +391,7 @@ export default function HeaderNav({
   const [expandedMobileIds, setExpandedMobileIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const navContainerRef = useRef<HTMLDivElement>(null);
   const { totalCount: wishlistCount } = useWishlist();
   const { totalCount: cartCount, openMiniCart } = useCart();
   const { openSearch } = useSearch();
@@ -376,7 +400,7 @@ export default function HeaderNav({
   useEffect(() => {
     setIsMobileOpen(false);
     setExpandedMobileIds(new Set());
-  }, [rawPathname]);
+  }, [rawPathname, canonicalMobile]);
 
   const toggleMenuItem = (id: string) => {
     setExpandedMobileIds((current) => {
@@ -386,6 +410,30 @@ export default function HeaderNav({
       return next;
     });
   };
+
+  const toggleDesktopMenuItem = (id: string) => {
+    setExpandedMobileIds((current) =>
+      current.has(id) ? new Set() : new Set([id]),
+    );
+  };
+
+  useEffect(() => {
+    if (!clickModeEnabled) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!navContainerRef.current?.contains(event.target as Node)) {
+        setExpandedMobileIds(new Set());
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpandedMobileIds(new Set());
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [clickModeEnabled]);
 
   useEffect(() => {
     if (!dashboardMode) {
@@ -444,7 +492,11 @@ export default function HeaderNav({
     : undefined;
 
   return (
-    <div className={`site-header-nav-container${isMobileOpen ? " is-open" : ""}`}>
+    <div
+      ref={navContainerRef}
+      className={`site-header-nav-container${canonicalMobile ? " is-canonical-mobile" : ""}${isMobileOpen ? " is-open" : ""} dialog-layout-${dialogLayout} dialog-menu-${dialogMenuStyle} offcanvas-mode-${offcanvasMode}${offcanvasFlip ? " is-flipped" : ""}${offcanvasOverlay ? " has-overlay" : ""}${dialogCenter ? " is-dialog-centered" : ""}${dialogClose ? " has-dialog-close" : ""}${dropbarAnimation ? ` dropbar-animation-${dropbarAnimation}` : ""}`}
+      data-dialog-layout={dialogLayout}
+    >
       <button
         type="button"
         className="site-header-mobile-menu-toggle"
@@ -473,7 +525,8 @@ export default function HeaderNav({
           clickModeEnabled,
           false,
           expandedMobileIds,
-          toggleMenuItem,
+          toggleDesktopMenuItem,
+          dialogPushAfter,
         )}
       </nav>
 
@@ -488,7 +541,7 @@ export default function HeaderNav({
           {/* 1. Header (Menu / close) */}
           <div className="mobile-drawer-header">
             <span className="mobile-drawer-title">Menu</span>
-            <button
+            {dialogClose && <button
               type="button"
               className="mobile-drawer-close"
               onClick={() => setIsMobileOpen(false)}
@@ -498,11 +551,11 @@ export default function HeaderNav({
                 <path d="M15,15 L5,5" />
                 <path d="M15,5 L5,15" />
               </svg>
-            </button>
+            </button>}
           </div>
 
           {/* 2. Top Actions (Account, Wishlist, Cart, Theme Toggle) */}
-          <div className="mobile-drawer-top-actions">
+          {!canonicalMobile && <div className="mobile-drawer-top-actions">
             <div className="mobile-drawer-top-action-wrapper mobile-drawer-account-wrap" onClick={() => setIsMobileOpen(false)}>
               <HeaderAccountButton />
             </div>
@@ -547,7 +600,7 @@ export default function HeaderNav({
             <div className="mobile-drawer-top-action-wrapper">
               <ThemeToggle size="md" />
             </div>
-          </div>
+          </div>}
 
           <div className="mobile-drawer-scrollable-content">
             {/* 3. Main Navigation Links */}
@@ -567,6 +620,7 @@ export default function HeaderNav({
                   true,
                   expandedMobileIds,
                   toggleMenuItem,
+                  dialogPushAfter,
                 )}
                 {serviceHomepageMode && (
                   <div className="site-header-nav-item">
@@ -589,7 +643,7 @@ export default function HeaderNav({
             </div>
 
             {/* 4. Categories */}
-            {categories && (
+            {!canonicalMobile && categories && (
               <div className="mobile-drawer-section mobile-drawer-categories">
                 <span className="mobile-drawer-section-title">Categories</span>
                 <div className="mobile-drawer-categories-wrap">

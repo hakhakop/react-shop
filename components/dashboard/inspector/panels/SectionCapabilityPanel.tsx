@@ -158,6 +158,21 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
             label="Pull content behind header"
           />
         </InspectorFieldRow>
+        <InspectorFieldRow label="Header Text Color" description="Force a light or dark color for Header text, links and controls over this section.">
+          <InspectorSelect
+            value={section.headerTextColor ?? "none"}
+            disabled={!isFirstVisible || section.headerTransparent !== true}
+            options={[
+              { value: "none", label: "Auto" },
+              { value: "light", label: "Light" },
+              { value: "dark", label: "Dark" },
+            ]}
+            onChange={(headerTextColor) => update({
+              headerTextColor: headerTextColor as BuilderSection["headerTextColor"],
+            })}
+            ariaLabel="Header text color"
+          />
+        </InspectorFieldRow>
         <InspectorFieldRow label="Sticky"><InspectorSelect value={section.stickyEffect ?? "none"} options={[{ value: "none", label: "None" }, { value: "cover", label: "Sticky Cover" }, { value: "reveal", label: "Sticky Reveal" }]} onChange={(stickyEffect) => update({ stickyEffect: stickyEffect as BuilderSection["stickyEffect"] })} ariaLabel="Section sticky behavior" /></InspectorFieldRow>
         <InspectorFieldRow label="Animation"><AnimationControl value={section.animation} onChange={(animation) => update({ animation })} allowPause allowScrub /></InspectorFieldRow>
         <InspectorFieldRow label="Visibility"><InspectorSelect value={section.visualStyle?.visibility?.desktop === true ? "visible" : section.visualStyle?.visibility?.desktop === false ? "hidden" : "inherit"} options={[{ value: "inherit", label: "Inherit" }, { value: "visible", label: "Visible" }, { value: "hidden", label: "Hidden" }]} onChange={(value) => updateVisualStyle({ visibility: { ...(section.visualStyle?.visibility ?? {}), desktop: value === "inherit" ? undefined : value === "visible" } })} ariaLabel="Section visibility" /></InspectorFieldRow>

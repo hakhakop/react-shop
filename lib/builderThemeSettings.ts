@@ -397,6 +397,8 @@ export function createYoothemeThemeSettings(source: unknown): BuilderThemeSettin
     ...Object.keys(page).filter((key) => page[key as keyof typeof page] !== undefined).map((key) => `theme.${key}`),
   ];
   const headerCapabilities = [
+    ...(record(root.site).toolbar_width !== undefined ? ["site.toolbar_width"] : []),
+    ...(record(root.site).toolbar_center !== undefined ? ["site.toolbar_center"] : []),
     ...Object.keys(header).map((key) => `header.${key}`),
     ...Object.keys(record(root.navbar)).map((key) => `navbar.${key}`),
     ...Object.keys(mobile).map((key) => `mobile.${key}`),
@@ -462,8 +464,15 @@ export function applyBuilderThemeSettings(
     "headerMobileBreakpoint", "headerStickyShowOnUp", "headerStickyAnimation",
     "headerDropdownAlign", "headerDropdownAlignToNavbar", "headerDropbarEnabled",
     "headerParentIconEnabled", "headerClickModeEnabled", "headerDialogTogglePosition",
-    "headerDialogLayout", "headerDialogCenter", "headerDialogPushAfter",
-    "headerSearchPosition", "headerSearchLayout", "headerSocialPosition",
+    "headerDialogLayout", "headerDialogMenuStyle", "headerDialogCenter", "headerDialogPushAfter",
+    "headerOffcanvasMode", "headerOffcanvasFlip", "headerOffcanvasOverlay", "headerDialogDropbarAnimation",
+    "headerSearchPosition", "headerSearchLayout", "headerSearchDropdownStretch", "headerSearchDropdownLarge", "headerSearchIconPosition",
+    "headerSocialPosition", "headerSocialStyle", "headerSocialGap", "headerSocialItems", "headerLogoPaddingRemove",
+    "headerMobileSearchLayout", "headerMobileSearchDropdownStretch", "headerMobileSearchDropdownLarge", "headerMobileSearchIconPosition",
+    "headerMobileSocialPosition", "headerMobileSocialStyle", "headerMobileSocialGap", "headerMobileSocialItems", "headerMobileLogoPaddingRemove",
+    "headerMobileDialogClose", "headerMobileDialogMenuStyle", "headerMobileDialogDropbarAnimation",
+    "headerMobileLayout", "headerMobileBehavior", "headerMobileSearchPosition", "headerMobileDialogTogglePosition", "headerMobileDialogLayout",
+    "headerMobileDialogCenter", "headerMobileDialogPushAfter", "headerMobileOffcanvasMode", "headerMobileOffcanvasFlip", "headerMobileOffcanvasOverlay",
     "headerMobileLogoUrl", "headerInverseLogoUrl", "headerMobileComposition",
   ].forEach((key) => delete providerGlobalStyles[key]);
   return {

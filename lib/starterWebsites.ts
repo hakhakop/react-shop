@@ -127,7 +127,9 @@ const makeShell = (websiteName: string, now: string, theme: StarterTheme, cta: s
     { id: "starter-about", label: "About", url: "/#about", parentId: null },
     { id: "starter-services", label: "Services", url: "/#services", parentId: null },
     { id: "starter-contact", label: "Contact", url: "/#contact", parentId: null },
-  ], updatedAt: now,
+  ],
+  namedMenus: [],
+  updatedAt: now,
 });
 
 const makeData = (websiteName: string, now: string, theme: StarterTheme, sections: BuilderLayout["sections"], cta: string): StarterWebsiteData => ({

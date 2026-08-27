@@ -92,7 +92,17 @@ type Declaration = {
 };
 
 const SUPPORTED_FUNCTIONS = new Set(["darken", "lighten", "fade", "mix"]);
-const OPAQUE_CSS_FUNCTIONS = new Set(["rgb", "rgba", "hsl", "hsla", "url", "blur", "linear-gradient", "radial-gradient", "conic-gradient", "min", "max", "clamp", "color-mix"]);
+const OPAQUE_CSS_FUNCTIONS = new Set(["rgb", "rgba", "hsl", "hsla", "url", "blur", "linear-gradient", "radial-gradient", "conic-gradient", "min", "max", "clamp", "color-mix", "var"]);
+const UIKIT_VARIABLE_FALLBACKS: Record<string, string> = {
+  "inverse-global-color": "var(--uk-inverse-global-color)",
+  // UIkit's base Dropdown layer owns this default; theme `_import.less`
+  // files commonly reference it without redeclaring the base variable.
+  "dropdown-large-padding": "40px",
+  "navbar-dropdown-large-padding": "40px",
+  "navbar-nav-item-hover-color": "var(--uk-navbar-nav-item-hover-color)",
+  "navbar-nav-item-onclick-color": "var(--uk-navbar-nav-item-onclick-color)",
+  "navbar-nav-item-active-color": "var(--uk-navbar-nav-item-active-color)",
+};
 const HEX_COLOR = /^#([0-9a-f]{3,8})$/i;
 
 function stripComments(input: string) {
@@ -247,12 +257,19 @@ function evaluateFunction(name: string, args: string[]) {
 }
 
 function resolveExpression(raw: string, values: Map<string, string>, trail: string[] = []): { value?: string; reason?: string } {
-  let value = raw.trim();
+  let value = raw.trim()
+    .replace(/^~(['"])(.*)\1$/, "$2")
+    .replace(/@\{([A-Za-z0-9_-]+)\}/g, "@$1");
   const references = [...value.matchAll(/@([A-Za-z0-9_-]+)/g)].map((match) => match[1]);
   for (const reference of references) {
     if (trail.includes(reference)) return { reason: `Circular variable reference: ${[...trail, reference].join(" → ")}` };
     const referenced = values.get(reference);
-    if (referenced === undefined) return { reason: `Unresolved variable @${reference}` };
+    if (referenced === undefined) {
+      const runtimeFallback = UIKIT_VARIABLE_FALLBACKS[reference];
+      if (!runtimeFallback) return { reason: `Unresolved variable @${reference}` };
+      value = value.replace(new RegExp(`@${reference}\\b`, "g"), runtimeFallback);
+      continue;
+    }
     const resolved = resolveExpression(referenced, values, [...trail, reference]);
     if (!resolved.value) return resolved;
     value = value.replace(new RegExp(`@${reference}\\b`, "g"), resolved.value);
@@ -265,6 +282,11 @@ function resolveExpression(raw: string, values: Map<string, string>, trail: stri
   if (dimensionSubtraction) {
     const sign = value.trim().startsWith("-") ? -1 : 1;
     value = `${sign * (Number(dimensionSubtraction[1]) - Number(dimensionSubtraction[3]))}${dimensionSubtraction[2]}`;
+  }
+
+  const calcDimensionSubtraction = /^calc\(\s*(-?(?:\d+\.?\d*|\.\d+))(px|rem|em|%|vh|vw)\s*-\s*(-?(?:\d+\.?\d*|\.\d+))\2\s*\)$/.exec(value);
+  if (calcDimensionSubtraction) {
+    value = `${Number(calcDimensionSubtraction[1]) - Number(calcDimensionSubtraction[3])}${calcDimensionSubtraction[2]}`;
   }
 
   let changed = true;
@@ -313,7 +335,7 @@ function resolveExpression(raw: string, values: Map<string, string>, trail: stri
       break;
     }
   }
-  if (value.includes("@") || /~|calc\(|var\(|when\s*\(|\+\s*\d|\d\s*\+/.test(value)) return { reason: `Unsupported expression: ${raw}` };
+  if (value.includes("@") || /~|calc\(|when\s*\(|\+\s*\d|\d\s*\+/.test(value)) return { reason: `Unsupported expression: ${raw}` };
   return { value: value.replace(/^['"]|['"]$/g, "").trim() };
 }
 
@@ -722,7 +744,10 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "nav-default-subtitle-font-size": { destination: "shellSettings.navDefaultSubtitleFontSize", domain: "Nav" },
   "nav-default-subtitle-color": { destination: "shellSettings.navDefaultSubtitleColor", domain: "Nav" },
   "nav-default-subtitle-font-weight": { destination: "shellSettings.navDefaultSubtitleFontWeight", domain: "Nav" },
+  "nav-default-subtitle-font-family": { destination: "shellSettings.navDefaultSubtitleFontFamily", domain: "Nav" },
+  "nav-default-subtitle-text-transform": { destination: "shellSettings.navDefaultSubtitleTextTransform", domain: "Nav" },
   "nav-default-header-color": { destination: "shellSettings.navDefaultHeaderColor", domain: "Nav" },
+  "nav-default-sublist-item-color": { destination: "shellSettings.navDefaultSublistItemColor", domain: "Nav" },
   "nav-default-sublist-item-hover-color": { destination: "shellSettings.navDefaultSublistItemHoverColor", domain: "Nav" },
   "nav-default-sublist-item-active-color": { destination: "shellSettings.navDefaultSublistItemActiveColor", domain: "Nav" },
   "nav-default-divider-box-shadow": { destination: "shellSettings.navDefaultDividerBoxShadow", domain: "Nav" },
@@ -743,6 +768,11 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "nav-default-item-line-transition-timing-function": { destination: "shellSettings.navDefaultItemLineTransitionTimingFunction", domain: "Nav" },
   "nav-default-item-line-hover-left": { destination: "shellSettings.navDefaultItemLineHoverLeft", domain: "Nav" },
   "nav-default-item-line-hover-right": { destination: "shellSettings.navDefaultItemLineHoverRight", domain: "Nav" },
+  "nav-primary-font-size": { destination: "shellSettings.navPrimaryFontSize", domain: "Nav" },
+  "nav-primary-sublist-font-size": { destination: "shellSettings.navPrimarySublistFontSize", domain: "Nav" },
+  "nav-primary-sublist-item-color": { destination: "shellSettings.navPrimarySublistItemColor", domain: "Nav" },
+  "nav-primary-subtitle-font-family": { destination: "shellSettings.navPrimarySubtitleFontFamily", domain: "Nav" },
+  "nav-primary-subtitle-text-transform": { destination: "shellSettings.navPrimarySubtitleTextTransform", domain: "Nav" },
   "nav-default-siblings-filter": { destination: "shellSettings.navDefaultSiblingsFilter", domain: "Nav" },
   "nav-default-siblings-opacity": { destination: "shellSettings.navDefaultSiblingsOpacity", domain: "Nav" },
   "subnav-pill-item-padding-vertical": { destination: "shellSettings.subnavPillItemPaddingVertical", domain: "Nav" },
@@ -837,6 +867,31 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "inverse-nav-secondary-item-hover-background": { destination: "shellSettings.inverseNavSecondaryItemHoverBackground", domain: "Nav" },
   "inverse-nav-secondary-item-active-background": { destination: "shellSettings.inverseNavSecondaryItemActiveBackground", domain: "Nav" },
   "navbar-background": { destination: "shellSettings.navbarBackground", domain: "Navbar" },
+  "search-placeholder-color": { destination: "shellSettings.searchPlaceholderColor", domain: "Search" },
+  "search-icon-color": { destination: "shellSettings.searchIconColor", domain: "Search" },
+  "search-default-background": { destination: "shellSettings.searchDefaultBackground", domain: "Search" },
+  "search-navbar-background": { destination: "shellSettings.searchNavbarBackground", domain: "Search" },
+  "search-toggle-color": { destination: "shellSettings.searchToggleColor", domain: "Search" },
+  "search-toggle-hover-color": { destination: "shellSettings.searchToggleHoverColor", domain: "Search" },
+  "search-default-border-width": { destination: "shellSettings.searchDefaultBorderWidth", domain: "Search" },
+  "search-default-border": { destination: "shellSettings.searchDefaultBorder", domain: "Search" },
+  "search-default-focus-border": { destination: "shellSettings.searchDefaultFocusBorder", domain: "Search" },
+  "search-navbar-border-width": { destination: "shellSettings.searchNavbarBorderWidth", domain: "Search" },
+  "search-navbar-border": { destination: "shellSettings.searchNavbarBorder", domain: "Search" },
+  "search-navbar-focus-border": { destination: "shellSettings.searchNavbarFocusBorder", domain: "Search" },
+  "search-medium-border-width": { destination: "shellSettings.searchMediumBorderWidth", domain: "Search" },
+  "search-medium-border": { destination: "shellSettings.searchMediumBorder", domain: "Search" },
+  "search-medium-focus-border": { destination: "shellSettings.searchMediumFocusBorder", domain: "Search" },
+  "search-large-border-width": { destination: "shellSettings.searchLargeBorderWidth", domain: "Search" },
+  "search-large-border": { destination: "shellSettings.searchLargeBorder", domain: "Search" },
+  "search-large-focus-border": { destination: "shellSettings.searchLargeFocusBorder", domain: "Search" },
+  "offcanvas-bar-padding-vertical": { destination: "shellSettings.offcanvasBarPaddingVertical", domain: "Offcanvas" },
+  "offcanvas-bar-padding-horizontal": { destination: "shellSettings.offcanvasBarPaddingHorizontal", domain: "Offcanvas" },
+  "offcanvas-bar-background": { destination: "shellSettings.offcanvasBarBackground", domain: "Offcanvas" },
+  "offcanvas-bar-color-mode": { destination: "shellSettings.offcanvasBarColorMode", domain: "Offcanvas" },
+  "offcanvas-overlay-background": { destination: "shellSettings.offcanvasOverlayBackground", domain: "Offcanvas" },
+  "logo-font-size": { destination: "shellSettings.logoFontSize", domain: "Logo" },
+  "logo-text-transform": { destination: "shellSettings.logoTextTransform", domain: "Logo" },
   "navbar-gap": { destination: "shellSettings.navbarGap", domain: "Navbar" },
   "navbar-gap-m": { destination: "shellSettings.navbarGapMedium", domain: "Navbar" },
   "navbar-nav-gap": { destination: "shellSettings.navbarNavGap", domain: "Navbar" },
@@ -870,6 +925,9 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "navbar-toggle-hover-color": { destination: "shellSettings.navbarToggleHoverColor", domain: "Navbar" },
   "navbar-subtitle-font-size": { destination: "shellSettings.navbarSubtitleFontSize", domain: "Navbar" },
   "navbar-subtitle-color": { destination: "shellSettings.navbarSubtitleColor", domain: "Navbar" },
+  "navbar-subtitle-font-family": { destination: "shellSettings.navbarSubtitleFontFamily", domain: "Navbar" },
+  "navbar-subtitle-font-weight": { destination: "shellSettings.navbarSubtitleFontWeight", domain: "Navbar" },
+  "navbar-subtitle-text-transform": { destination: "shellSettings.navbarSubtitleTextTransform", domain: "Navbar" },
   "navbar-item-padding-horizontal": { destination: "shellSettings.navbarItemPaddingHorizontal", domain: "Navbar" },
   "navbar-item-padding-horizontal-m": { destination: "shellSettings.navbarItemPaddingHorizontalMedium", domain: "Navbar" },
   "navbar-backdrop-filter": { destination: "shellSettings.navbarBackdropFilter", domain: "Navbar" },
@@ -942,6 +1000,9 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "navbar-dropdown-nav-item-active-color": { destination: "shellSettings.navbarDropdownNavItemActiveColor", domain: "Navbar" },
   "navbar-dropdown-nav-subtitle-font-size": { destination: "shellSettings.navbarDropdownNavSubtitleFontSize", domain: "Navbar" },
   "navbar-dropdown-nav-subtitle-color": { destination: "shellSettings.navbarDropdownNavSubtitleColor", domain: "Navbar" },
+  "navbar-dropdown-nav-subtitle-font-family": { destination: "shellSettings.navbarDropdownNavSubtitleFontFamily", domain: "Navbar" },
+  "navbar-dropdown-nav-subtitle-font-weight": { destination: "shellSettings.navbarDropdownNavSubtitleFontWeight", domain: "Navbar" },
+  "navbar-dropdown-nav-subtitle-text-transform": { destination: "shellSettings.navbarDropdownNavSubtitleTextTransform", domain: "Navbar" },
   "navbar-dropdown-nav-sublist-item-hover-color": { destination: "shellSettings.navbarDropdownNavSublistItemHoverColor", domain: "Navbar" },
   "navbar-dropdown-nav-sublist-item-active-color": { destination: "shellSettings.navbarDropdownNavSublistItemActiveColor", domain: "Navbar" },
   "navbar-dropdown-nav-item-padding-vertical": { destination: "shellSettings.navbarDropdownNavItemPaddingVertical", domain: "Navbar" },
@@ -967,6 +1028,28 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "navbar-dropdown-shift-margin-m": { destination: "shellSettings.navbarDropdownShiftMarginMedium", domain: "Navbar" },
   "navbar-dropdown-dropbar-shift-margin-m": { destination: "shellSettings.navbarDropdownDropbarShiftMarginMedium", domain: "Navbar" },
   "navbar-dropdown-dropbar-large-shift-margin-m": { destination: "shellSettings.navbarDropdownDropbarLargeShiftMarginMedium", domain: "Navbar" },
+  "dropdown-padding": { destination: "shellSettings.dropdownPadding", domain: "Dropdown" },
+  "dropdown-background": { destination: "shellSettings.dropdownBackground", domain: "Dropdown" },
+  "dropdown-color": { destination: "shellSettings.dropdownColor", domain: "Dropdown" },
+  "dropdown-color-mode": { destination: "shellSettings.dropdownColorMode", domain: "Dropdown" },
+  "dropdown-dropbar-margin": { destination: "shellSettings.dropdownDropbarMargin", domain: "Dropdown" },
+  "dropdown-dropbar-padding-top": { destination: "shellSettings.dropdownDropbarPaddingTop", domain: "Dropdown" },
+  "dropdown-dropbar-large-padding-top": { destination: "shellSettings.dropdownDropbarLargePaddingTop", domain: "Dropdown" },
+  "dropdown-nav-item-hover-color": { destination: "shellSettings.dropdownNavItemHoverColor", domain: "Dropdown" },
+  "dropdown-nav-subtitle-font-size": { destination: "shellSettings.dropdownNavSubtitleFontSize", domain: "Dropdown" },
+  "dropdown-nav-header-color": { destination: "shellSettings.dropdownNavHeaderColor", domain: "Dropdown" },
+  "dropdown-nav-divider-border": { destination: "shellSettings.dropdownNavDividerBorder", domain: "Dropdown" },
+  "dropdown-nav-sublist-item-hover-color": { destination: "shellSettings.dropdownNavSublistItemHoverColor", domain: "Dropdown" },
+  "dropdown-nav-item-padding-vertical": { destination: "shellSettings.dropdownNavItemPaddingVertical", domain: "Dropdown" },
+  "dropdown-nav-font-size": { destination: "shellSettings.dropdownNavFontSize", domain: "Dropdown" },
+  "dropdown-nav-subtitle-color": { destination: "shellSettings.dropdownNavSubtitleColor", domain: "Dropdown" },
+  "dropdown-nav-subtitle-font-family": { destination: "shellSettings.dropdownNavSubtitleFontFamily", domain: "Dropdown" },
+  "dropdown-nav-subtitle-font-weight": { destination: "shellSettings.dropdownNavSubtitleFontWeight", domain: "Dropdown" },
+  "dropdown-nav-subtitle-text-transform": { destination: "shellSettings.dropdownNavSubtitleTextTransform", domain: "Dropdown" },
+  "dropbar-padding-top": { destination: "shellSettings.dropbarPaddingTop", domain: "Dropbar" },
+  "dropbar-background": { destination: "shellSettings.dropbarBackground", domain: "Dropbar" },
+  "dropbar-color": { destination: "shellSettings.dropbarColor", domain: "Dropbar" },
+  "dropbar-color-mode": { destination: "shellSettings.dropbarColorMode", domain: "Dropbar" },
   "inverse-navbar-nav-item-hover-color": { destination: "shellSettings.inverseNavbarNavItemHoverColor", domain: "Navbar" },
 };
 

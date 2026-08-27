@@ -3187,8 +3187,13 @@ export const mapYoothemeStaticContent = (
       htmlElement: (["div", "section", "header", "footer", "aside", "main"].includes(sectionProps.html_element as string) ? sectionProps.html_element : "div") as any,
       stickyEffect: sectionProps.sticky === "cover" || sectionProps.sticky === "reveal" ? sectionProps.sticky : "none",
       headerTransparent: sectionProps.header_transparent === "transparent" || sectionProps.header_transparent === "pull" || Boolean(sectionProps.header_transparent),
-      pullUnderHeader: sectionProps.header_transparent === "pull",
-      headerTextColor: sectionProps.header_transparent_color === "light" || sectionProps.header_transparent_color === "dark" ? sectionProps.header_transparent_color : "none",
+      pullUnderHeader: sectionProps.header_transparent === "pull" || Boolean(sectionProps.header_transparent_noplaceholder),
+      headerTextColor:
+        sectionProps.header_transparent_text_color === "light" || sectionProps.header_transparent_text_color === "dark"
+          ? sectionProps.header_transparent_text_color
+          : sectionProps.header_transparent_color === "light" || sectionProps.header_transparent_color === "dark"
+            ? sectionProps.header_transparent_color
+            : "none",
       animation: sourceAnimation(sectionProps.animation) as any,
       animationDelay: sectionProps.animation_delay ? Number(sectionProps.animation_delay) : undefined,
       sectionTitlePosition: typeof sectionProps.title_position === "string" ? sectionProps.title_position : undefined,

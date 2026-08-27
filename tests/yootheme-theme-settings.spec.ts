@@ -28,13 +28,44 @@ test("maps a full YOOtheme export into one page and Header theme document", () =
     headerWidthMode: "full",
     headerBehavior: "sticky-on-scroll-up",
     headerMobileBreakpoint: "1200px",
+    headerMobileLayout: "horizontal-right",
+    headerMobileBehavior: "static",
+    headerMobileSearchPosition: "right",
+    headerMobileSearchLayout: "input-dropdown",
+    headerMobileSearchDropdownStretch: "navbar",
+    headerMobileSearchDropdownLarge: true,
+    headerMobileSearchIconPosition: "left",
+    headerMobileSocialItems: [
+      { link: "https://500px.com/" },
+      { link: "https://www.instagram.com/" },
+      { link: "https://www.facebook.com/yootheme" },
+    ],
+    headerMobileComposition: "separate",
+    headerMobileDialogLayout: "modal-center",
+    headerMobileDialogTogglePosition: "mobile-end",
+    headerMobileDialogClose: true,
+    headerMobileDialogMenuStyle: "default",
+    headerMobileOffcanvasMode: "push",
+    headerMobileOffcanvasFlip: false,
+    headerMobileOffcanvasOverlay: true,
+    headerMobileDialogDropbarAnimation: "reveal-top",
     headerDropdownAlign: "left",
     headerDropdownAlignToNavbar: false,
     headerDropbarEnabled: true,
     headerSearchPosition: "hide",
     headerSearchLayout: "input-dropdown",
+    headerSearchDropdownStretch: "navbar",
+    headerSearchDropdownLarge: true,
+    headerSearchIconPosition: "left",
+    headerSocialGap: "small",
+    headerSocialStyle: false,
+    headerLogoPaddingRemove: false,
     headerDialogLayout: "offcanvas-top",
-    headerDialogTogglePosition: "header:end",
+    headerDialogTogglePosition: "header-end",
+    headerDialogMenuStyle: "default",
+    headerOffcanvasMode: "slide",
+    headerOffcanvasFlip: true,
+    headerOffcanvasOverlay: true,
   });
   expect(settings.resolved.shellSettings).toMatchObject({
     fontFamilyBody: "Poppins",
@@ -45,9 +76,21 @@ test("maps a full YOOtheme export into one page and Header theme document", () =
   expect(settings.resolved.shellSettings).not.toHaveProperty("headerSearchPosition");
   expect(settings.resolved.shellSettings).not.toHaveProperty("headerDialogLayout");
 
-  const columns = settings.header.document.layoutItems ?? [];
+  const rows = settings.header.document.rows ?? [];
+  expect(rows).toHaveLength(3);
+  expect(rows[0]).toMatchObject({
+    id: "header-toolbar-row",
+    role: "toolbar",
+    headerVariant: "desktop",
+    layout: "whole",
+    maxWidth: "default",
+    horizontalDistribution: "center",
+    columns: [{ id: "header-toolbar-column", elements: [] }],
+  });
+  expect(rows[1]).toMatchObject({ id: "header-main-row", headerVariant: "desktop" });
+  const columns = rows[1]?.columns ?? [];
   expect(columns).toHaveLength(3);
-  expect(columns[0]?.blocks).toEqual([
+  expect(columns[0]?.elements).toEqual([
     expect.objectContaining({
       id: "header-logo",
       kind: "image",
@@ -57,16 +100,38 @@ test("maps a full YOOtheme export into one page and Header theme document", () =
       headerBrandText: "Jack Baker",
     }),
   ]);
-  expect(columns[1]?.blocks).toEqual([
+  expect(columns[1]?.elements).toEqual([
     expect.objectContaining({
       id: "header-navigation",
       kind: "menu",
       menuSource: "main",
     }),
   ]);
-  expect(columns[2]?.blocks).toEqual([]);
-  expect(columns.flatMap((column) => column.blocks ?? []).map((block) => block.kind)).not.toContain("headerSearch");
-  expect(columns.flatMap((column) => column.blocks ?? []).map((block) => block.kind)).not.toContain("headerCart");
+  expect(columns[2]?.elements).toEqual([]);
+  expect(columns.flatMap((column) => column.elements ?? []).map((block) => block.kind)).not.toContain("headerSearch");
+  expect(columns.flatMap((column) => column.elements ?? []).map((block) => block.kind)).not.toContain("headerCart");
+  expect(rows[2]).toMatchObject({
+    id: "header-mobile-row",
+    headerVariant: "mobile",
+    layout: "halves",
+    columns: [
+      {
+        id: "header-mobile-start",
+        elements: [expect.objectContaining({
+          id: "header-mobile-logo",
+          kind: "image",
+          imageUrl: "wp-content/uploads/yootheme/logo-mobile.svg",
+        })],
+      },
+      {
+        id: "header-mobile-end",
+        elements: [
+          expect.objectContaining({ id: "header-mobile-search", kind: "headerSearch" }),
+          expect.objectContaining({ id: "header-mobile-navigation", kind: "menu", menuSource: "main" }),
+        ],
+      },
+    ],
+  });
 
   expect(settings.sourceConfig.dialog).toMatchObject({ layout: "offcanvas-top", toggle: "header:end" });
   expect(settings.sourceConfig.mobileHeader).toMatchObject({ layout: "horizontal-right" });
@@ -83,6 +148,54 @@ test("maps a full YOOtheme export into one page and Header theme document", () =
     provider: "yootheme",
     themeId: "jack-baker",
   });
+});
+
+test("normalizes standard YOOtheme Header position vocabulary", () => {
+  const source = JSON.parse(
+    readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
+  );
+  source.header.search = "navbar:end";
+  source.dialog.toggle = "header:start";
+  source.mobile.search = "header-mobile:start";
+  const settings = createYoothemeThemeSettings(source);
+
+  expect(settings.header.document).toMatchObject({
+    headerSearchPosition: "navbar-end",
+    headerDialogTogglePosition: "header-start",
+    headerMobileSearchPosition: "mobile-start",
+  });
+  const mobileRow = settings.header.document.rows?.find((row) => row.headerVariant === "mobile");
+  expect(mobileRow?.columns.flatMap((column) => column.elements ?? [])).toContainEqual(
+    expect.objectContaining({ id: "header-mobile-search", kind: "headerSearch", elementAlign: "left" }),
+  );
+  expect(settings.sourceConfig.dialog).toMatchObject({ toggle: "header:start" });
+});
+
+test("maps standard mobile Header alignment without using a preset", () => {
+  const source = JSON.parse(
+    readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
+  );
+  source.mobile.header.layout = "horizontal-center";
+  const center = createYoothemeThemeSettings(source).header.document.rows?.find(
+    (row) => row.headerVariant === "mobile",
+  );
+  expect(center).toMatchObject({
+    layout: "quarters-1-2-1",
+    columns: [
+      { id: "header-mobile-start", elements: [expect.objectContaining({ id: "header-mobile-logo" })] },
+      { id: "header-mobile-center", elements: [expect.objectContaining({ id: "header-mobile-navigation", elementAlign: "center" })] },
+      { id: "header-mobile-end", elements: [expect.objectContaining({ id: "header-mobile-search" })] },
+    ],
+  });
+
+  source.mobile.header.layout = "horizontal-left";
+  const left = createYoothemeThemeSettings(source).header.document.rows?.find(
+    (row) => row.headerVariant === "mobile",
+  );
+  expect(left?.columns[0]?.elements?.map((element) => element.id)).toEqual([
+    "header-mobile-logo",
+    "header-mobile-navigation",
+  ]);
 });
 
 test("provider runtime projection cannot override a normal canonical Header edit", () => {

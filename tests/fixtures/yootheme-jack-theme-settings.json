@@ -2,14 +2,22 @@
   "style": "jack-baker",
   "site": {
     "layout": "full",
+    "toolbar_width": "default",
+    "toolbar_center": true,
     "boxed": { "alignment": 1 }
   },
   "header": {
     "layout": "horizontal-center",
     "width": "expand",
     "search_layout": "input-dropdown",
+    "search_dropdown.stretch": "navbar",
+    "search_dropdown.size": true,
     "search_icon": "left",
-    "search": ""
+    "search": "",
+    "social_gap": "small",
+    "social_style": false,
+    "social": "",
+    "logo_padding_remove": false
   },
   "navbar": {
     "sticky": 2,
@@ -29,14 +37,34 @@
   },
   "mobile": {
     "breakpoint": "l",
-    "header": { "layout": "horizontal-right" },
+    "header": {
+      "layout": "horizontal-right",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_style": false,
+      "social_gap": "small",
+      "social": "",
+      "social_items": [
+        { "link": "https://500px.com/" },
+        { "link": "https://www.instagram.com/" },
+        { "link": "https://www.facebook.com/yootheme" }
+      ]
+    },
     "navbar": { "sticky": 0 },
     "dialog": {
       "layout": "modal-center",
       "toggle": "header-mobile:end",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": { "mode": "push", "flip": false },
+      "dropbar": { "animation": "reveal-top" },
       "text_center": true,
       "push_index": 2
-    }
+    },
+    "search": "right",
+    "offcanvas": { "overlay": true }
   },
   "logo": {
     "text": "Jack Baker",

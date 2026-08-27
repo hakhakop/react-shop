@@ -410,6 +410,10 @@ export type BuilderRowColumnParallaxSettings = {
 
 export type BuilderRow = {
   id: string;
+  /** Optional Header semantic; the row remains an ordinary Builder row. */
+  role?: "toolbar";
+  /** Optional responsive ownership inside the one canonical Header document. */
+  headerVariant?: "desktop" | "mobile";
   dynamicContext?: DynamicContentContextDescriptor;
   layout: string;
   /** Provenance for source-specific structural spacing semantics. */
@@ -428,6 +432,19 @@ export type BuilderRow = {
   htmlElement?: BuilderLayoutHtmlElement;
   columnParallax?: BuilderRowColumnParallaxSettings;
   advanced?: BuilderLayoutAdvancedSettings;
+  /** Header-row compatibility fields retained by the canonical Row editor. */
+  headerGap?: string;
+  headerJustify?: "start" | "center" | "space-between" | "end";
+  headerAlign?: "start" | "center" | "end" | "stretch";
+  rowBackground?: string;
+  rowColorScheme?: SectionColorScheme;
+  rowTopSpacing?: SectionSpacing;
+  rowBottomSpacing?: SectionSpacing;
+  rowTopMargin?: SectionSpacing;
+  rowBottomMargin?: SectionSpacing;
+  rowBorderRadius?: number;
+  rowVisualStyle?: BuilderVisualStyle;
+  rowAnimation?: BuilderAnimationSettings;
   columns: BuilderColumn[];
 };
 
@@ -716,6 +733,9 @@ export type BuilderLayoutBlock = {
   headerBrandText?: string;
   headerUtilityAction?: BuilderHeaderIconId;
   headerUtilityVariant?: BuilderHeaderIconVariant;
+  headerSocialItems?: Array<{ link: string }>;
+  headerSocialStyle?: boolean;
+  headerSocialGap?: string;
   headerCategoriesLabel?: string;
   headerCategoriesShowLabel?: boolean;
   headerCategoriesDisplay?: "icon" | "icon-label" | "label";
@@ -1034,6 +1054,28 @@ export type BuilderSection = {
   headerZIndex?: number;
   headerBreakpoint?: string;
   headerMobileBreakpoint?: string;
+  headerMobileLayout?: "horizontal-left" | "horizontal-center" | "horizontal-right";
+  headerMobileBehavior?: "static" | "sticky" | "sticky-on-scroll-up" | "pill-on-scroll";
+  headerMobileSearchPosition?: string;
+  headerMobileSearchLayout?: string;
+  headerMobileSearchDropdownStretch?: string;
+  headerMobileSearchDropdownLarge?: boolean;
+  headerMobileSearchIconPosition?: "" | "left" | "right";
+  headerMobileSocialPosition?: string;
+  headerMobileSocialStyle?: boolean;
+  headerMobileSocialGap?: string;
+  headerMobileSocialItems?: Array<{ link: string }>;
+  headerMobileLogoPaddingRemove?: boolean;
+  headerMobileDialogTogglePosition?: string;
+  headerMobileDialogLayout?: string;
+  headerMobileDialogClose?: boolean;
+  headerMobileDialogMenuStyle?: string;
+  headerMobileDialogCenter?: boolean;
+  headerMobileDialogPushAfter?: number;
+  headerMobileOffcanvasMode?: string;
+  headerMobileOffcanvasFlip?: boolean;
+  headerMobileOffcanvasOverlay?: boolean;
+  headerMobileDialogDropbarAnimation?: string;
   headerStickyShowOnUp?: boolean;
   headerStickyAnimation?: string;
   headerDropdownAlign?: "left" | "right" | "center";
@@ -1043,11 +1085,23 @@ export type BuilderSection = {
   headerClickModeEnabled?: boolean;
   headerDialogTogglePosition?: string;
   headerDialogLayout?: string;
+  headerDialogMenuStyle?: string;
   headerDialogCenter?: boolean;
   headerDialogPushAfter?: number;
+  headerOffcanvasMode?: string;
+  headerOffcanvasFlip?: boolean;
+  headerOffcanvasOverlay?: boolean;
+  headerDialogDropbarAnimation?: string;
   headerSearchPosition?: string;
   headerSearchLayout?: string;
+  headerSearchDropdownStretch?: string;
+  headerSearchDropdownLarge?: boolean;
+  headerSearchIconPosition?: "" | "left" | "right";
   headerSocialPosition?: string;
+  headerSocialStyle?: boolean;
+  headerSocialGap?: string;
+  headerSocialItems?: Array<{ link: string }>;
+  headerLogoPaddingRemove?: boolean;
   headerMobileLogoUrl?: string | null;
   headerInverseLogoUrl?: string | null;
   headerMobileComposition?: "separate" | "responsive";
@@ -1170,6 +1224,11 @@ export type BuilderSection = {
     dynamicContext?: DynamicContentContextDescriptor;
     rowId?: string;
     rowLayout?: string;
+    role?: "toolbar";
+    headerVariant?: "desktop" | "mobile";
+    maxWidth?: SectionContentMode;
+    removeHorizontalPadding?: boolean;
+    horizontalDistribution?: "justify" | "left" | "center";
     eyebrow?: string;
     title?: string;
     body?: string;

@@ -3395,6 +3395,11 @@ function StorefrontBuilderRendererBase({
           transparentSectionHeader ? "true" : undefined
         }
         data-section-pull-under-header={pullUnderHeader ? "true" : undefined}
+        data-section-header-text-color={
+          firstVisibleSection?.headerTextColor && firstVisibleSection.headerTextColor !== "none"
+            ? firstVisibleSection.headerTextColor
+            : undefined
+        }
         data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
         data-section-default-color-mode={resolveSectionColorMode(shellSettings, "default")}
         data-section-muted-color-mode={resolveSectionColorMode(shellSettings, "muted")}
