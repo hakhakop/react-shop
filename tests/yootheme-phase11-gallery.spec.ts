@@ -37,6 +37,56 @@ test("Phase 11.3 preserves verified UIkit masonry and responsive width semantics
   expect(gallery).toMatchObject({ columnsPhonePortrait: "1", columnsTabletLandscape: "3", masonry: "pack" });
 });
 
+test("Gallery import preserves the complete responsive column and overlay slice", () => {
+  const mapped = mapYoothemeStaticContent({
+    ...fixture,
+    children: [{ ...fixture.children[0], children: [{ ...fixture.children[0].children[0], children: [{ ...fixture.children[0].children[0].children[0], children: [{
+      type: "gallery",
+      props: {
+        grid_default: "1",
+        grid_small: "2",
+        grid_medium: "3",
+        grid_large: "4",
+        grid_xlarge: "6",
+        grid_column_align: true,
+        overlay_mode: "caption",
+        overlay_style: "overlay-default",
+        overlay_position: "bottom",
+        overlay_hover: false,
+        overlay_transition: "fade",
+        overlay_padding: "small",
+        overlay_margin: "large",
+        text_color: "light",
+        title_style: "h4",
+        meta_align: "below-title",
+        content_margin: "remove",
+      },
+      children: fixture.children[0].children[0].children[0].children[0].children,
+    }] }] }] }],
+  });
+  const gallery = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+  expect(gallery).toMatchObject({
+    columnsPhonePortrait: "1",
+    columnsPhoneLandscape: "2",
+    columnsTabletLandscape: "3",
+    columnsDesktop: "4",
+    columnsLargeScreens: "6",
+    centerColumns: true,
+    overlayMode: "caption",
+    overlayStyle: "overlay-default",
+    overlayPosition: "bottom",
+    overlayHover: false,
+    overlayTransition: "fade",
+    overlayPadding: "small",
+    overlayMargin: "large",
+    overlayTextColor: "light",
+    headingSize: "h4",
+    panelMetaPosition: "below-title",
+    contentMarginTop: "none",
+  });
+  expect(mapped.warnings.join("\n")).not.toMatch(/grid_(small|large|xlarge)|overlay_(style|position|hover|transition|padding|margin)|text_color/);
+});
+
 test("Phase 11.3 keeps an explicit Gallery overlay-link false without manufacturing a media trigger", () => {
   const mapped = mapYoothemeStaticContent({
     ...fixture,

@@ -54,6 +54,12 @@ export default function GalleryCapabilityPanel({
   const isImportedYoothemeGallery = rawBlock.spacingContract === "yootheme";
   const items: any[] = rawBlock.galleryItems ?? rawBlock.items ?? [];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const columnOptions = [
+    { value: "inherit", label: "Inherit" },
+    { value: "1", label: "1 Column" }, { value: "2", label: "2 Columns" },
+    { value: "3", label: "3 Columns" }, { value: "4", label: "4 Columns" },
+    { value: "5", label: "5 Columns" }, { value: "6", label: "6 Columns" },
+  ];
 
   const handleAddMediaFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -395,24 +401,32 @@ export default function GalleryCapabilityPanel({
 
         {/* COLUMNS SECTION */}
         <InspectorDivision title="COLUMNS">
+          <InspectorFieldRow label="Phone Portrait">
+            <InspectorSelect value={String(rawBlock.columnsPhonePortrait ?? "1")} options={columnOptions.filter((option) => option.value !== "inherit")} onChange={(value) => update({ columnsPhonePortrait: value } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Phone Landscape">
+            <InspectorSelect value={String(rawBlock.columnsPhoneLandscape ?? "inherit")} options={columnOptions} onChange={(value) => update({ columnsPhoneLandscape: value === "inherit" ? undefined : value } as any)} />
+          </InspectorFieldRow>
           <InspectorFieldRow
             label="Tablet Landscape"
-            isOverridden={rawBlock.columns !== undefined && rawBlock.columns !== 3}
+            isOverridden={rawBlock.columnsTabletLandscape !== undefined}
             inheritedValueText="3 Columns"
-            onReset={() => update({ columns: undefined } as any)}
+            onReset={() => update({ columnsTabletLandscape: undefined } as any)}
           >
             <InspectorSelect
-              value={String(rawBlock.columns ?? 3)}
-              options={[
-                { value: "1", label: "1 Column" },
-                { value: "2", label: "2 Columns" },
-                { value: "3", label: "3 Columns" },
-                { value: "4", label: "4 Columns" },
-                { value: "5", label: "5 Columns" },
-                { value: "6", label: "6 Columns" },
-              ]}
-              onChange={(v) => update({ columns: Number(v) } as any)}
+              value={String(rawBlock.columnsTabletLandscape ?? "inherit")}
+              options={columnOptions}
+              onChange={(value) => update({ columnsTabletLandscape: value === "inherit" ? undefined : value } as any)}
             />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Desktop">
+            <InspectorSelect value={String(rawBlock.columnsDesktop ?? "inherit")} options={columnOptions} onChange={(value) => update({ columnsDesktop: value === "inherit" ? undefined : value } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Large Screens">
+            <InspectorSelect value={String(rawBlock.columnsLargeScreens ?? "inherit")} options={columnOptions} onChange={(value) => update({ columnsLargeScreens: value === "inherit" ? undefined : value } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Column alignment">
+            <InspectorSwitch checked={rawBlock.centerColumns === true} onChange={(centerColumns) => update({ centerColumns } as any)} label="Center columns" />
           </InspectorFieldRow>
         </InspectorDivision>
 
@@ -475,12 +489,38 @@ export default function GalleryCapabilityPanel({
             <InspectorSelect
               value={rawBlock.overlayStyle ?? "overlay-primary"}
               options={[
+                { value: "none", label: "None" },
                 { value: "overlay-default", label: "Overlay Default" },
                 { value: "overlay-primary", label: "Overlay Primary" },
+                { value: "tile-default", label: "Tile Default" },
+                { value: "tile-muted", label: "Tile Muted" },
+                { value: "tile-primary", label: "Tile Primary" },
                 { value: "tile-secondary", label: "Tile Secondary" },
               ]}
               onChange={(overlayStyle) => update({ overlayStyle } as any)}
             />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Position">
+            <InspectorSelect value={rawBlock.overlayPosition ?? "center"} options={[
+              { value: "top-left", label: "Top Left" }, { value: "top", label: "Top Center" }, { value: "top-right", label: "Top Right" },
+              { value: "left", label: "Center Left" }, { value: "center", label: "Center" }, { value: "right", label: "Center Right" },
+              { value: "bottom-left", label: "Bottom Left" }, { value: "bottom", label: "Bottom Center" }, { value: "bottom-right", label: "Bottom Right" },
+            ]} onChange={(overlayPosition) => update({ overlayPosition } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Padding">
+            <InspectorSelect value={rawBlock.overlayPadding ?? "default"} options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "large", label: "Large" }]} onChange={(overlayPadding) => update({ overlayPadding } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Margin">
+            <InspectorSelect value={rawBlock.overlayMargin ?? "none"} options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "large", label: "Large" }]} onChange={(overlayMargin) => update({ overlayMargin } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Display">
+            <InspectorSwitch checked={rawBlock.overlayHover === true} onChange={(overlayHover) => update({ overlayHover } as any)} label="Show on hover" />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Transition">
+            <InspectorSelect value={rawBlock.overlayTransition ?? "fade"} options={[{ value: "fade", label: "Fade" }, { value: "scale-up", label: "Scale Up" }, { value: "scale-down", label: "Scale Down" }, { value: "slide-top", label: "Slide Top" }, { value: "slide-bottom", label: "Slide Bottom" }, { value: "slide-left", label: "Slide Left" }, { value: "slide-right", label: "Slide Right" }]} onChange={(overlayTransition) => update({ overlayTransition } as any)} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Text color">
+            <InspectorSelect value={rawBlock.overlayTextColor ?? "none"} options={[{ value: "none", label: "None" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} onChange={(overlayTextColor) => update({ overlayTextColor } as any)} />
           </InspectorFieldRow>
         </InspectorDivision>
 

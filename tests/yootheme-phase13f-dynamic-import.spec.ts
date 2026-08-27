@@ -6,6 +6,9 @@ import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMat
 const homeFixture = JSON.parse(
   readFileSync("/Users/hakobjaghatspanyan/Downloads/Home.json", "utf8"),
 );
+const blogFixture = JSON.parse(
+  readFileSync("/Users/hakobjaghatspanyan/Downloads/Circle-Blog-page.json", "utf8"),
+);
 
 const collectBlocks = (value: unknown, result: any[] = []) => {
   if (!value || typeof value !== "object") return result;
@@ -46,8 +49,8 @@ test("imports a real YOOtheme Custom Posts Grid item into the canonical contract
       buttonUrl: { path: "link", valueType: "url" },
     },
   });
-  expect(item.dynamicBindings.imageUrl).toEqual({ path: "acf.intro_image.url", valueType: "url" });
-  expect(item.dynamicBindings.imageAlt).toEqual({ path: "acf.intro_image.alt", valueType: "string" });
+  expect(item.dynamicBindings.imageUrl).toEqual({ path: "featuredImage.url", valueType: "url" });
+  expect(item.dynamicBindings.imageAlt).toEqual({ path: "featuredImage.alt", valueType: "string" });
   expect(item.dynamicContext.query).toMatchObject({
     filters: { rawTermIds: [2, 3, 5] },
   });
@@ -149,4 +152,55 @@ test("the imported Grid template uses the existing transient materializer", asyn
   expect(dynamicGrid.gridItems).toHaveLength(1);
   expect(dynamicGrid.gridItems[0]).toMatchObject({ title: "Resolved Post", buttonUrl: "/post-1" });
   expect(dynamicGrid.gridItems[0].dynamicContext).toBeUndefined();
+});
+
+test("imports Circle Blog archive Panel and responsive Grids into canonical post bindings", () => {
+  const mapped = mapYoothemeStaticContent(blogFixture);
+  const blocks = collectBlocks(mapped.sections);
+  const panel = blocks.find((block) => block.kind === "panel" && block.dynamicContext);
+  const grids = Array.from(new Map(
+    blocks
+      .filter((block) => block.kind === "grid" && block.gridItems?.[0]?.dynamicContext)
+      .map((block) => [block.id, block]),
+  ).values());
+
+  expect(panel).toMatchObject({
+    panelShowMedia: true,
+    dynamicContext: {
+      provider: "wordpress",
+      source: "post",
+      mode: "collection",
+      query: { archive: "single", start: 0, quantity: 1 },
+    },
+    dynamicBindings: {
+      title: { path: "title", valueType: "string" },
+      eyebrow: { path: "date", transform: { kind: "dateFormat", format: "j F, Y" } },
+      body: { path: "excerpt", transform: { kind: "textLimit", limit: 150 } },
+      imageUrl: { path: "featuredImage.url", valueType: "url" },
+      imageAlt: { path: "featuredImage.alt", valueType: "string" },
+      buttonUrl: { path: "link", valueType: "url" },
+    },
+  });
+  expect(grids).toHaveLength(2);
+  expect(grids.map((grid) => grid.visibility)).toEqual(["m", "hidden-m"]);
+  expect(grids.map((grid) => grid.pagination)).toEqual([
+    { enabled: true, perPage: 9, mode: "pageNumbers", style: "standard", margin: "large", alignment: "center", animation: "none" },
+    { enabled: true, perPage: 9, mode: "pageNumbers", style: "standard", margin: "large", alignment: "center", animation: "none" },
+  ]);
+  expect(grids.map((grid) => grid.gridItems[0].dynamicContext.query.archive)).toEqual([
+    "collection",
+    "collection",
+  ]);
+  expect(grids.map((grid) => grid.gridItems[0].dynamicContext.query.start)).toEqual([1, 0]);
+  for (const grid of grids) {
+    expect(grid.gridItems[0].dynamicBindings).toMatchObject({
+      title: { path: "title" },
+      meta: { path: "date", transform: { kind: "dateFormat", format: "j F, Y" } },
+      text: { path: "excerpt", transform: { kind: "textLimit", limit: 100 } },
+      imageUrl: { path: "featuredImage.url" },
+      imageAlt: { path: "featuredImage.alt" },
+      buttonUrl: { path: "link" },
+    });
+  }
+  expect(mapped.warnings.some((warning) => /dynamic content unsupported/i.test(warning))).toBeFalsy();
 });

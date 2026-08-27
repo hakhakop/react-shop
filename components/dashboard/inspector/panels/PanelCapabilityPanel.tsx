@@ -224,9 +224,21 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             verticalAlign: "panelVerticalAlign",
             alignmentOptions: ["top", "bottom", "left", "right", "between"],
             widthOptions: [
+              { value: "auto", label: "Auto" },
+              { value: "4-5", label: "80%" },
+              { value: "3-4", label: "75%" },
+              { value: "2-3", label: "66%" },
+              { value: "1-3", label: "33%" },
+              { value: "1-4", label: "25%" },
+              { value: "1-5", label: "20%" },
               { value: "2-5", label: "40%" },
               { value: "1-2", label: "50%" },
               { value: "3-5", label: "60%" },
+              { value: "small", label: "Small" },
+              { value: "medium", label: "Medium" },
+              { value: "large", label: "Large" },
+              { value: "xlarge", label: "X-Large" },
+              { value: "2xlarge", label: "2X-Large" },
             ],
           }}
           keys={{

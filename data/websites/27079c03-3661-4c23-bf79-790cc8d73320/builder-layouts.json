@@ -6629,7 +6629,7 @@
         "headerTopToolbarMeta": ""
       }
     ],
-    "updatedAt": "2026-08-27T05:37:49.390Z"
+    "updatedAt": "2026-08-27T09:54:42.926Z"
   },
   "footer": {
     "version": 1,
@@ -14085,13 +14085,17 @@
                 "gridGap": "small",
                 "gridRowGap": "small",
                 "showDividers": false,
+                "centerColumns": true,
                 "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "3",
                 "parallaxJustify": false,
                 "overlayMode": "caption",
                 "overlayStyle": "overlay-default",
                 "overlayPosition": "bottom",
                 "overlayHover": false,
                 "overlayTransition": "fade",
+                "overlayPadding": "small",
+                "overlayMargin": "small",
                 "overlayLink": false,
                 "headingLevel": "div",
                 "metaStyle": "text-meta",
@@ -14230,13 +14234,17 @@
                     "gridGap": "small",
                     "gridRowGap": "small",
                     "showDividers": false,
+                    "centerColumns": true,
                     "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "3",
                     "parallaxJustify": false,
                     "overlayMode": "caption",
                     "overlayStyle": "overlay-default",
                     "overlayPosition": "bottom",
                     "overlayHover": false,
                     "overlayTransition": "fade",
+                    "overlayPadding": "small",
+                    "overlayMargin": "small",
                     "overlayLink": false,
                     "headingLevel": "div",
                     "metaStyle": "text-meta",
@@ -14427,7 +14435,9 @@
                 "gridGap": "small",
                 "gridRowGap": "small",
                 "showDividers": false,
+                "centerColumns": true,
                 "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "3",
                 "columnsTabletLandscape": "4",
                 "parallaxJustify": false,
                 "overlayMode": "caption",
@@ -14435,6 +14445,8 @@
                 "overlayPosition": "bottom",
                 "overlayHover": false,
                 "overlayTransition": "fade",
+                "overlayPadding": "small",
+                "overlayMargin": "small",
                 "overlayLink": false,
                 "headingLevel": "div",
                 "metaStyle": "text-meta",
@@ -14471,6 +14483,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -14479,9 +14492,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
@@ -14626,7 +14637,9 @@
                     "gridGap": "small",
                     "gridRowGap": "small",
                     "showDividers": false,
+                    "centerColumns": true,
                     "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "3",
                     "columnsTabletLandscape": "4",
                     "parallaxJustify": false,
                     "overlayMode": "caption",
@@ -14634,6 +14647,8 @@
                     "overlayPosition": "bottom",
                     "overlayHover": false,
                     "overlayTransition": "fade",
+                    "overlayPadding": "small",
+                    "overlayMargin": "small",
                     "overlayLink": false,
                     "headingLevel": "div",
                     "metaStyle": "text-meta",
@@ -15328,12 +15343,14 @@
                 "gridGap": "small",
                 "gridRowGap": "small",
                 "showDividers": false,
+                "centerColumns": false,
                 "columnsPhonePortrait": "2",
                 "parallaxJustify": false,
                 "overlayMode": "cover",
                 "overlayPosition": "center",
                 "overlayHover": true,
                 "overlayTransition": "fade",
+                "overlayTextColor": "light",
                 "overlayLink": false,
                 "headingLevel": "h3",
                 "metaStyle": "text-meta",
@@ -15833,12 +15850,14 @@
                     "gridGap": "small",
                     "gridRowGap": "small",
                     "showDividers": false,
+                    "centerColumns": false,
                     "columnsPhonePortrait": "2",
                     "parallaxJustify": false,
                     "overlayMode": "cover",
                     "overlayPosition": "center",
                     "overlayHover": true,
                     "overlayTransition": "fade",
+                    "overlayTextColor": "light",
                     "overlayLink": false,
                     "headingLevel": "h3",
                     "metaStyle": "text-meta",
@@ -16266,7 +16285,7 @@
                 "eyebrow": "Founder & CEO",
                 "body": "„Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore Lorem ipsum dolor sit.“",
                 "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/about-reviews.jpg",
-                "imageAlt": "Sam Miller",
+                "imageAlt": "",
                 "imageMaxWidth": 220,
                 "imageWidth": "220px",
                 "imageSvgColor": "emphasis",
@@ -16288,6 +16307,7 @@
                 "panelMediaWidth": "1-2",
                 "panelVerticalAlign": "top",
                 "panelTitleElement": "h3",
+                "linkTitle": false,
                 "panelTextAlign": "center",
                 "metaStyle": "text-meta",
                 "panelMetaHtmlElement": "div",
@@ -16320,14 +16340,8 @@
                     "easing": 1
                   }
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelMediaVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-image-4-0-0-3",
@@ -16715,7 +16729,7 @@
                     "eyebrow": "Founder & CEO",
                     "body": "„Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore Lorem ipsum dolor sit.“",
                     "imageUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/about-reviews.jpg",
-                    "imageAlt": "Sam Miller",
+                    "imageAlt": "",
                     "imageMaxWidth": 220,
                     "imageWidth": "220px",
                     "imageSvgColor": "emphasis",
@@ -16737,6 +16751,7 @@
                     "panelMediaWidth": "1-2",
                     "panelVerticalAlign": "top",
                     "panelTitleElement": "h3",
+                    "linkTitle": false,
                     "panelTextAlign": "center",
                     "metaStyle": "text-meta",
                     "panelMetaHtmlElement": "div",
@@ -17117,6 +17132,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -17125,9 +17141,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               },
               {
                 "id": "yootheme-text-5-0-0-3",
@@ -17270,7 +17284,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-23T18:41:47.079Z"
+    "updatedAt": "2026-08-27T09:54:58.492Z"
   },
   "page:product-2": {
     "version": 1,
@@ -39924,6 +39938,50 @@
                 "imageAlignment": "left",
                 "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "post",
+                  "mode": "collection",
+                  "query": {
+                    "archive": "single",
+                    "start": 0,
+                    "quantity": 1
+                  }
+                },
+                "dynamicBindings": {
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "eyebrow": {
+                    "path": "date",
+                    "valueType": "string",
+                    "transform": {
+                      "kind": "dateFormat",
+                      "format": "j F, Y"
+                    }
+                  },
+                  "body": {
+                    "path": "excerpt",
+                    "valueType": "richText",
+                    "transform": {
+                      "kind": "textLimit",
+                      "limit": 150
+                    }
+                  },
+                  "imageUrl": {
+                    "path": "featuredImage.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "featuredImage.alt",
+                    "valueType": "string"
+                  },
+                  "buttonUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
                 "buttonStyle": "default",
                 "panelActionStyle": "default",
                 "buttonTarget": "_self",
@@ -39936,9 +39994,9 @@
                 "panelHeightExpand": false,
                 "panelExpand": "image",
                 "panelMetaPosition": "above-title",
-                "panelShowMedia": false,
+                "panelShowMedia": true,
                 "panelMediaPlacement": "left",
-                "panelMediaWidth": "large",
+                "panelMediaWidth": "2-3",
                 "panelVerticalAlign": "center",
                 "panelTitleStyle": "h3",
                 "panelTitleElement": "h2",
@@ -39975,7 +40033,63 @@
                 "id": "yootheme-grid-0-1-0-4",
                 "kind": "grid",
                 "gridSource": "static",
-                "gridItems": [],
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-0-1-0-4-0",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h2",
+                    "titleStyle": "h3",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "post",
+                      "mode": "collection",
+                      "query": {
+                        "archive": "collection",
+                        "start": 1
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "date",
+                        "valueType": "string",
+                        "transform": {
+                          "kind": "dateFormat",
+                          "format": "j F, Y"
+                        }
+                      },
+                      "text": {
+                        "path": "excerpt",
+                        "valueType": "richText",
+                        "transform": {
+                          "kind": "textLimit",
+                          "limit": 100
+                        }
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
                 "gridShowImage": true,
                 "gridShowMeta": true,
                 "gridShowText": true,
@@ -40060,13 +40174,78 @@
                 "visibility": "m",
                 "visibilityMode": "m",
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "pagination": {
+                  "enabled": true,
+                  "perPage": 9,
+                  "mode": "pageNumbers",
+                  "style": "standard",
+                  "margin": "large",
+                  "alignment": "center",
+                  "animation": "none"
+                }
               },
               {
                 "id": "yootheme-grid-0-1-0-5",
                 "kind": "grid",
                 "gridSource": "static",
-                "gridItems": [],
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-0-1-0-5-0",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h2",
+                    "titleStyle": "h3",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "post",
+                      "mode": "collection",
+                      "query": {
+                        "archive": "collection",
+                        "start": 0
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "date",
+                        "valueType": "string",
+                        "transform": {
+                          "kind": "dateFormat",
+                          "format": "j F, Y"
+                        }
+                      },
+                      "text": {
+                        "path": "excerpt",
+                        "valueType": "richText",
+                        "transform": {
+                          "kind": "textLimit",
+                          "limit": 100
+                        }
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
                 "gridShowImage": true,
                 "gridShowMeta": true,
                 "gridShowText": true,
@@ -40151,7 +40330,16 @@
                 "visibility": "hidden-m",
                 "visibilityMode": "hidden-m",
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "pagination": {
+                  "enabled": true,
+                  "perPage": 9,
+                  "mode": "pageNumbers",
+                  "style": "standard",
+                  "margin": "large",
+                  "alignment": "center",
+                  "animation": "none"
+                }
               }
             ]
           }
@@ -40407,6 +40595,50 @@
                     "imageAlignment": "left",
                     "imageSvgColor": "emphasis",
                     "imageLoading": "eager",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "post",
+                      "mode": "collection",
+                      "query": {
+                        "archive": "single",
+                        "start": 0,
+                        "quantity": 1
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "eyebrow": {
+                        "path": "date",
+                        "valueType": "string",
+                        "transform": {
+                          "kind": "dateFormat",
+                          "format": "j F, Y"
+                        }
+                      },
+                      "body": {
+                        "path": "excerpt",
+                        "valueType": "richText",
+                        "transform": {
+                          "kind": "textLimit",
+                          "limit": 150
+                        }
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
                     "buttonStyle": "default",
                     "panelActionStyle": "default",
                     "buttonTarget": "_self",
@@ -40419,9 +40651,9 @@
                     "panelHeightExpand": false,
                     "panelExpand": "image",
                     "panelMetaPosition": "above-title",
-                    "panelShowMedia": false,
+                    "panelShowMedia": true,
                     "panelMediaPlacement": "left",
-                    "panelMediaWidth": "large",
+                    "panelMediaWidth": "2-3",
                     "panelVerticalAlign": "center",
                     "panelTitleStyle": "h3",
                     "panelTitleElement": "h2",
@@ -40458,7 +40690,63 @@
                     "id": "yootheme-grid-0-1-0-4",
                     "kind": "grid",
                     "gridSource": "static",
-                    "gridItems": [],
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-0-1-0-4-0",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h2",
+                        "titleStyle": "h3",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "post",
+                          "mode": "collection",
+                          "query": {
+                            "archive": "collection",
+                            "start": 1
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "meta": {
+                            "path": "date",
+                            "valueType": "string",
+                            "transform": {
+                              "kind": "dateFormat",
+                              "format": "j F, Y"
+                            }
+                          },
+                          "text": {
+                            "path": "excerpt",
+                            "valueType": "richText",
+                            "transform": {
+                              "kind": "textLimit",
+                              "limit": 100
+                            }
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "featuredImage.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
                     "gridShowImage": true,
                     "gridShowMeta": true,
                     "gridShowText": true,
@@ -40543,13 +40831,78 @@
                     "visibility": "m",
                     "visibilityMode": "m",
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "pagination": {
+                      "enabled": true,
+                      "perPage": 9,
+                      "mode": "pageNumbers",
+                      "style": "standard",
+                      "margin": "large",
+                      "alignment": "center",
+                      "animation": "none"
+                    }
                   },
                   {
                     "id": "yootheme-grid-0-1-0-5",
                     "kind": "grid",
                     "gridSource": "static",
-                    "gridItems": [],
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-0-1-0-5-0",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h2",
+                        "titleStyle": "h3",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "post",
+                          "mode": "collection",
+                          "query": {
+                            "archive": "collection",
+                            "start": 0
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "meta": {
+                            "path": "date",
+                            "valueType": "string",
+                            "transform": {
+                              "kind": "dateFormat",
+                              "format": "j F, Y"
+                            }
+                          },
+                          "text": {
+                            "path": "excerpt",
+                            "valueType": "richText",
+                            "transform": {
+                              "kind": "textLimit",
+                              "limit": 100
+                            }
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "featuredImage.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
                     "gridShowImage": true,
                     "gridShowMeta": true,
                     "gridShowText": true,
@@ -40634,7 +40987,16 @@
                     "visibility": "hidden-m",
                     "visibilityMode": "hidden-m",
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "pagination": {
+                      "enabled": true,
+                      "perPage": 9,
+                      "mode": "pageNumbers",
+                      "style": "standard",
+                      "margin": "large",
+                      "alignment": "center",
+                      "animation": "none"
+                    }
                   }
                 ]
               }
@@ -41115,6 +41477,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-27T05:38:02.169Z"
+    "updatedAt": "2026-08-27T08:25:37.103Z"
   }
 }

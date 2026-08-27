@@ -128,21 +128,55 @@ export default function UikitGallery({ block }: Props) {
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
 
+  const importedChildWidth = (value: unknown, suffix = "") => {
+    const count = Number(value);
+    return Number.isFinite(count) && count >= 1 && count <= 6 ? `uk-child-width-1-${count}${suffix}` : "";
+  };
+  const importedChildWidthClass = isYoothemeGallery
+    ? [
+      importedChildWidth(rawBlock.columnsPhonePortrait),
+      importedChildWidth(rawBlock.columnsPhoneLandscape, "@s"),
+      importedChildWidth(rawBlock.columnsTabletLandscape, "@m"),
+      importedChildWidth(rawBlock.columnsDesktop, "@l"),
+      importedChildWidth(rawBlock.columnsLargeScreens, "@xl"),
+    ].filter(Boolean).join(" ") || "uk-child-width-1-1 uk-child-width-1-3@m"
+    : "";
   const gridClass = [
-    uikitGridStructureClassName(gridStructure),
+    // Gallery uses UIkit's responsive `uk-child-width-*` cascade directly.
+    // The WebPages Grid-only centering helper assigns an explicit item width
+    // and would override those responsive Gallery utilities.
+    uikitGridStructureClassName(gridStructure).replace("shop-builder-uikit-grid--column-center", ""),
+    importedChildWidthClass,
     gap !== "none" ? `uk-grid-${gap}` : "uk-grid-collapse",
     rowGap !== gap && rowGap !== "none" ? `uk-grid-row-${rowGap}` : "",
+    rawBlock.centerColumns === true ? "uk-flex-center" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const importedWidth = (value: unknown, suffix = "") => {
-    const count = Number(value);
-    return Number.isFinite(count) && count >= 1 && count <= 6 ? `uk-width-1-${count}${suffix}` : "";
-  };
-  const columnWidthClass = isYoothemeGallery
-    ? `${importedWidth(rawBlock.columnsPhonePortrait)} ${importedWidth(rawBlock.columnsTabletLandscape, "@m")}`.trim() || "uk-width-1-1 uk-width-1-3@m"
-    : `uk-width-1-${columns}@m uk-width-1-2@s`;
+  const columnWidthClass = isYoothemeGallery ? "" : `uk-width-1-${columns}@m uk-width-1-2@s`;
+  const overlayPosition = String(rawBlock.overlayPosition ?? "center");
+  const overlayPositionClass = `uk-position-${overlayPosition}`;
+  const overlayPaddingClass = rawBlock.overlayPadding === "none" ? "" : rawBlock.overlayPadding === "small" ? "uk-padding-small" : rawBlock.overlayPadding === "large" ? "uk-padding-large" : "uk-padding";
+  const overlayMarginClass = rawBlock.overlayMargin === "none" || !rawBlock.overlayMargin ? "" : rawBlock.overlayMargin === "default" ? "uk-position-medium" : `uk-position-${rawBlock.overlayMargin}`;
+  const overlayStyleClass = rawBlock.overlayStyle && rawBlock.overlayStyle !== "none"
+    ? rawBlock.overlayStyle.startsWith("overlay-") ? `uk-${rawBlock.overlayStyle}` : rawBlock.overlayStyle.startsWith("tile-") ? `uk-tile uk-${rawBlock.overlayStyle}` : ""
+    : "";
+  const overlayThemeStyle = rawBlock.overlayStyle === "overlay-default"
+    ? {
+      background: "var(--uk-overlay-default-background)",
+      backdropFilter: "var(--uk-overlay-default-backdrop-filter)",
+      WebkitBackdropFilter: "var(--uk-overlay-default-backdrop-filter)",
+    }
+    : rawBlock.overlayStyle === "overlay-primary"
+      ? {
+        background: "var(--uk-overlay-primary-background)",
+        backdropFilter: "var(--uk-overlay-primary-backdrop-filter)",
+        WebkitBackdropFilter: "var(--uk-overlay-primary-backdrop-filter)",
+      }
+      : {};
+  const overlayTransitionClass = rawBlock.overlayHover === true ? `uk-transition-${rawBlock.overlayTransition || "fade"}` : "";
+  const overlayTextModeClass = rawBlock.overlayTextColor === "light" ? "uk-light" : rawBlock.overlayTextColor === "dark" ? "uk-dark" : "";
   const imageSemantics = resolveUikitImageSemantics(rawBlock);
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
@@ -204,7 +238,7 @@ export default function UikitGallery({ block }: Props) {
         data-uk-lightbox={usesYoothemeLightbox ? "toggle: a[data-type];" : undefined}
       >
         {items.map((item: any, index: number) => {
-          const titleAlign = rawBlock.headingAlign ?? rawBlock.alignment ?? "left";
+          const titleAlign = rawBlock.headingAlign ?? rawBlock.textAlign ?? rawBlock.alignment ?? "left";
           const metaAlign = rawBlock.metaAlign ?? titleAlign;
           const contentAlign = rawBlock.contentAlign ?? titleAlign;
           const itemUrl = item.linkUrl;
@@ -228,7 +262,7 @@ export default function UikitGallery({ block }: Props) {
           return (
             <div key={item.id} className={columnWidthClass}>
               <div
-                className={isYoothemeGallery ? "el-item uk-light uk-transition-toggle uk-inline-clip" : "uk-card uk-card-default uk-overflow-hidden"}
+                className={isYoothemeGallery ? `el-item ${overlayTextModeClass} uk-transition-toggle uk-inline-clip`.trim() : "uk-card uk-card-default uk-overflow-hidden"}
                 style={{
                   position: "relative",
                   overflow: "hidden",
@@ -296,28 +330,25 @@ export default function UikitGallery({ block }: Props) {
                     />
                   )}
 
-                  {/* OVERLAY COVER MODE */}
-                  {overlayMode === "cover" && (
+                  {/* YOOtheme overlay: Cover fills the media; Caption is a positioned content box. */}
+                  {(showMeta || showTitle || showContent || showLink) && (
                     <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: isYoothemeGallery ? undefined : "linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: isYoothemeGallery ? "center" : "flex-end",
-                        padding: isYoothemeGallery ? "20px" : "20px",
-                        color: "#ffffff",
-                        borderRadius: isYoothemeGallery ? undefined : "12px",
-                        textAlign: titleAlign,
+                      style={isYoothemeGallery ? { ...overlayThemeStyle, ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" as const } : {}) } : {
+                        position: "absolute", inset: 0, padding: "20px", color: "#ffffff", borderRadius: "12px",
+                        background: "linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)",
+                        display: "flex", flexDirection: "column", justifyContent: "flex-end", textAlign: titleAlign,
                         ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" } : {}),
                       }}
-                    className={isYoothemeGallery ? `${rawBlock.overlayStyle === "overlay-primary" ? "uk-overlay-primary" : "uk-overlay"} uk-transition-${rawBlock.overlayTransition || "fade"} uk-position-cover` : "uk-transition-fade"}>
-                      {showMeta && item.meta && (
+                      className={isYoothemeGallery
+                        ? `${overlayMode === "cover" ? "uk-position-cover" : overlayPositionClass} ${overlayMarginClass} ${overlayStyleClass} ${overlayTransitionClass}`.trim()
+                        : "uk-transition-fade"}
+                    >
+                    <div className={isYoothemeGallery ? `uk-overlay ${overlayPaddingClass} uk-margin-remove-first-child`.trim() : ""}>
+                      {showMeta && item.meta && rawBlock.panelMetaPosition !== "below-title" && (
                         <div
                           className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
                           style={{
-                            color: "rgba(255, 255, 255, 0.75)",
+                            color: isYoothemeGallery ? undefined : "rgba(255, 255, 255, 0.75)",
                             ...(rawBlock.metaStyle ? {} : { fontSize: "0.825rem", textTransform: "uppercase", letterSpacing: "0.05em" }),
                             marginBottom: "4px",
                             textAlign: metaAlign,
@@ -329,18 +360,26 @@ export default function UikitGallery({ block }: Props) {
                       {showTitle && item.title && (
                         <TitleTag
                           className={`${titleClass} ${typographyRoleClass(rawBlock.titleTypographyRole)}`.trim()}
-                          style={{ color: "#ffffff", lineHeight: "1.3", textAlign: titleAlign }}
+                          style={{ color: isYoothemeGallery ? undefined : "#ffffff", lineHeight: isYoothemeGallery ? undefined : "1.3", textAlign: titleAlign }}
                         >
                           {item.title}
                         </TitleTag>
                       )}
+                      {showMeta && item.meta && rawBlock.panelMetaPosition === "below-title" && (
+                        <div
+                          className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
+                          style={{ color: isYoothemeGallery ? undefined : "rgba(255, 255, 255, 0.75)", textAlign: metaAlign }}
+                        >
+                          {item.meta}
+                        </div>
+                      )}
                       {showContent && item.content && (
                         <div
-                          className={`uk-margin-small-top ${contentClass} ${typographyRoleClass(rawBlock.contentTypographyRole)}`.trim()}
+                          className={`${rawBlock.contentMarginTop === "none" ? "" : "uk-margin-small-top"} ${contentClass} ${typographyRoleClass(rawBlock.contentTypographyRole)}`.trim()}
                           style={{
-                            color: "rgba(255, 255, 255, 0.9)",
+                            color: isYoothemeGallery ? undefined : "rgba(255, 255, 255, 0.9)",
                             ...(rawBlock.contentStyle ? {} : { fontSize: "0.9rem" }),
-                            marginTop: "6px",
+                            marginTop: rawBlock.contentMarginTop === "none" ? undefined : "6px",
                             textAlign: contentAlign,
                           }}
                         >
@@ -375,59 +414,10 @@ export default function UikitGallery({ block }: Props) {
                         </div>
                       )}
                     </div>
+                    </div>
                   )}
                 </div>
 
-                {/* OVERLAY CAPTION MODE */}
-                {overlayMode === "caption" && (
-                  <div style={{ padding: "16px", background: "#ffffff", textAlign: titleAlign }}>
-                    {showMeta && item.meta && (
-                      <div
-                        className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
-                        style={{
-                          ...(rawBlock.metaStyle ? {} : { fontSize: "0.8rem" }),
-                          color: "#666",
-                          marginBottom: "4px",
-                          textAlign: metaAlign,
-                        }}
-                      >
-                        {item.meta}
-                      </div>
-                    )}
-                    {showTitle && item.title && (
-                      <TitleTag className={`${titleClass} ${typographyRoleClass(rawBlock.titleTypographyRole)}`.trim()} style={{ color: "#111", textAlign: titleAlign }}>
-                        {item.title}
-                      </TitleTag>
-                    )}
-                    {showContent && item.content && (
-                      <div
-                        className={`uk-margin-small-top ${contentClass} ${typographyRoleClass(rawBlock.contentTypographyRole)}`.trim()}
-                        style={{
-                          ...(rawBlock.contentStyle ? {} : { fontSize: "0.875rem" }),
-                          color: "#444",
-                          marginTop: "4px",
-                          textAlign: contentAlign,
-                        }}
-                      >
-                          {renderRichContent(item.content)}
-                      </div>
-                    )}
-                    {showLink && hasLightboxAction && (
-                      <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
-                        <a href={lightboxUrl} data-type="image" data-caption={lightboxCaption || undefined} data-alt={item.imageAlt || undefined} className={buttonClass} aria-label={item.linkAriaLabel || undefined}>
-                          {actionLabel}
-                        </a>
-                      </div>
-                    )}
-                    {showLink && !usesYoothemeLightbox && hasAction && (
-                      <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
-                        <a href={itemUrl} className={buttonClass} aria-label={item.linkAriaLabel || undefined} {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}>
-                          {actionLabel}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           );

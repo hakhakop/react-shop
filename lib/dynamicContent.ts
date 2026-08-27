@@ -69,12 +69,11 @@ export type DynamicFieldBinding = {
 };
 
 /** Explicit, non-executable transforms supported by the shared resolver. */
-export type DynamicFieldTransform = {
-  kind: "dateFormat";
-  format: string;
-};
+export type DynamicFieldTransform =
+  | { kind: "dateFormat"; format: string }
+  | { kind: "textLimit"; limit: number };
 
-export const SUPPORTED_DYNAMIC_DATE_FORMATS = ["d F, Y"] as const;
+export const SUPPORTED_DYNAMIC_DATE_FORMATS = ["d F, Y", "j F, Y"] as const;
 
 export type DynamicFieldBindings<Field extends string = string> = Partial<
   Record<Field, DynamicFieldBinding>
@@ -155,8 +154,17 @@ const applyDynamicTransform = (
   transform: DynamicFieldTransform | undefined,
 ): unknown => {
   if (!transform) return value;
-  if (transform.kind !== "dateFormat" || typeof transform.format !== "string") return undefined;
-  return typeof value === "string" ? formatDateValue(value, transform.format) : undefined;
+  if (transform.kind === "dateFormat") {
+    return typeof value === "string" ? formatDateValue(value, transform.format) : undefined;
+  }
+  if (transform.kind === "textLimit") {
+    if (typeof value !== "string" || !Number.isInteger(transform.limit) || transform.limit < 1) return undefined;
+    const plainText = value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    return plainText.length <= transform.limit
+      ? plainText
+      : `${plainText.slice(0, transform.limit).trimEnd()}…`;
+  }
+  return undefined;
 };
 
 /**

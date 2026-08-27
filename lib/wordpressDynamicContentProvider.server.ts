@@ -147,6 +147,8 @@ export type WordPressPostCollectionOrder =
   | "id";
 
 export type WordPressPostCollectionQuery = {
+  /** Semantic provenance for imported archive templates. */
+  archive?: "single" | "collection";
   start?: number;
   quantity?: number;
   order?: WordPressPostCollectionOrder;
@@ -355,7 +357,7 @@ export function compileWordPressPostCollectionQuery(
   const query = assertRecord(queryData, "WordPress post collection query");
   assertAllowedKeys(
     query,
-    ["start", "quantity", "order", "direction", "search", "filters"],
+    ["archive", "start", "quantity", "order", "direction", "search", "filters"],
     "WordPress post collection query",
   );
 

@@ -570,7 +570,7 @@ export type BuilderLayoutBlock = {
   panelMediaPlacement?: "top" | "bottom" | "left" | "right" | "between";
   panelMediaVerticalAlign?: "top" | "center" | "bottom";
   panelMediaFit?: "natural" | "cover" | "contain" | "fill";
-  panelMediaWidth?: "small" | "medium" | "large" | "1-2" | "2-5" | "3-5";
+  panelMediaWidth?: "auto" | "4-5" | "3-4" | "2-3" | "3-5" | "1-2" | "2-5" | "1-3" | "1-4" | "1-5" | "small" | "medium" | "large" | "xlarge" | "2xlarge";
   panelMediaAlignment?: "left" | "center" | "right";
   panelTextAlign?: "left" | "center" | "right";
   /** YOOtheme Panel text presets for meta and body content. */
@@ -826,6 +826,14 @@ export type BuilderLayoutBlock = {
   enableLightbox?: boolean;
   /** YOOtheme Gallery whole-media/overlay link. Kept separate from visible item actions. */
   overlayLink?: boolean;
+  overlayMode?: "cover" | "caption";
+  overlayStyle?: "none" | "overlay-default" | "overlay-primary" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | string;
+  overlayPosition?: string;
+  overlayHover?: boolean;
+  overlayTransition?: string;
+  overlayPadding?: "none" | "small" | "default" | "large" | string;
+  overlayMargin?: "none" | "small" | "default" | "large" | string;
+  overlayTextColor?: "none" | "light" | "dark" | string;
   lightboxAnimation?: string;
   lightboxNav?: string;
   gridShowImage?: boolean;
@@ -946,6 +954,9 @@ export type BuilderLayoutBlock = {
     mode: "loadMore" | "pageNumbers" | "infinite";
     infiniteScroll?: boolean;
     style?: "standard" | "solid" | "minimal" | "rounded";
+    margin?: "none" | "small" | "medium" | "large" | "xlarge";
+    alignment?: "left" | "center" | "right";
+    animation?: string;
   };
   dividerStyle?: "default" | "small" | "icon" | "vertical";
   alertStyle?: "primary" | "success" | "warning" | "danger";

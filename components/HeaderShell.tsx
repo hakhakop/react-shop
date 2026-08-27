@@ -33,6 +33,7 @@ type HeaderShellProps = {
   builderInteractionIdentity?: boolean;
   builderPreviewMode?: boolean;
   builderDraftPreview?: boolean;
+  tenantPathMode?: boolean;
 };
 
 export default async function HeaderShell({
@@ -48,6 +49,7 @@ export default async function HeaderShell({
   builderInteractionIdentity = false,
   builderPreviewMode = false,
   builderDraftPreview = false,
+  tenantPathMode = false,
 }: HeaderShellProps) {
   const scope = website?.id
     ? { websiteId: website.id }
@@ -71,9 +73,7 @@ export default async function HeaderShell({
         iconVariant: shellSettings.headerIconVariant,
         iconOrder: shellSettings.headerIconOrder,
       };
-  const scopedLinkContext = scopedPreviewWebsiteId
-    ? { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages }
-    : null;
+  const navigationWebsiteId = scopedPreviewWebsiteId ?? (tenantPathMode ? website?.slug : undefined);
   const serviceHomepageMode = !website && !scopedPreviewWebsiteId;
   const headerLayout = await getOrCreateHeaderBuilderLayout(
     shellSettings,
@@ -114,18 +114,23 @@ export default async function HeaderShell({
       headerSettings={headerSettings}
       serviceHomepageMode={serviceHomepageMode}
       homeHref={
-        scopedLinkContext
-          ? resolveScopedPreviewHref("/", scopedLinkContext)
+        navigationWebsiteId
+          ? tenantPathMode
+            ? `/${encodeURIComponent(navigationWebsiteId)}`
+            : resolveScopedPreviewHref("/", { websiteId: navigationWebsiteId, pages: scopedPreviewPages })
           : "/"
       }
       clientHref={
-        scopedLinkContext
-          ? resolveScopedPreviewHref("/client", scopedLinkContext)
+        navigationWebsiteId
+          ? tenantPathMode
+            ? `/${encodeURIComponent(navigationWebsiteId)}/client`
+            : resolveScopedPreviewHref("/client", { websiteId: navigationWebsiteId, pages: scopedPreviewPages })
           : "/client"
       }
-      scopedPreviewWebsiteId={scopedPreviewWebsiteId}
+      scopedPreviewWebsiteId={navigationWebsiteId}
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
+      scopedLinkMode={tenantPathMode ? "tenant-path" : undefined}
       hideSaaSEntry={hideSaaSEntry}
       categoriesContent={categoryElement ? (
         <CategoryMegaMenu

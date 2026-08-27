@@ -149,6 +149,20 @@ test("one authored Grid template transiently expands into three ordinary cards",
   expect(gridBlock(authored).gridItems).toHaveLength(1);
 });
 
+test("paginated Dynamic Grid requests a bounded complete collection window", async () => {
+  const authored = proofLayout();
+  const block = gridBlock(authored);
+  block.pagination = { enabled: true, perPage: 9, mode: "pageNumbers", style: "standard" };
+  let requestedQuantity = 0;
+  await materializeBuilderDynamicContent(authored, {
+    resolveContexts: async ({ descriptor }) => {
+      requestedQuantity = Number(descriptor.query?.quantity ?? 0);
+      return [postContext(1)];
+    },
+  });
+  expect(requestedQuantity).toBe(100);
+});
+
 test("legacy product Grid resolves on the server into canonical Grid cards", async () => {
   const authored = proofLayout();
   const block = gridBlock(authored);

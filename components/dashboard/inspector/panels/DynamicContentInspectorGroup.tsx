@@ -8,7 +8,6 @@ import {
   DYNAMIC_CONTENT_SOURCE_CAPABILITIES,
   dynamicContentSourceCapability,
   dynamicContentSourceKey,
-  WORDPRESS_POST_COLLECTION_SOURCE,
   type DynamicContentQueryControl,
   type DynamicContentSourceCapability,
 } from "@/lib/dynamicContentCapabilities";
@@ -157,8 +156,8 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
         ...(descriptor?.query ? { query: descriptor.query } : {}),
       } satisfies DynamicContentContextDescriptor
     : descriptor;
-  const isWordPressPostCollection = source === WORDPRESS_POST_COLLECTION_SOURCE.key;
   const capability = fixedCapability ?? dynamicContentSourceCapability(effectiveDescriptor);
+  const isWordPressPostCollection = capability?.provider === "wordpress" && capability.source === "post" && capability.mode === "collection";
   const query = asRecord(effectiveDescriptor?.query);
   const filters = asRecord(query.filters);
 
@@ -200,7 +199,11 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
       provider: capability.provider,
       source: capability.source,
       mode: capability.mode,
-      ...(source === capability.key && descriptor?.query ? { query: descriptor.query } : {}),
+      ...(source === capability.key && descriptor?.query
+        ? { query: descriptor.query }
+        : capability.defaultQuery
+          ? { query: capability.defaultQuery }
+          : {}),
     };
     update({ dynamicContext: nextDescriptor } as Partial<Item>);
   };

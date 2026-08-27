@@ -461,7 +461,7 @@
     "status": "maintenance",
     "creationRequestId": "eb7e0384-62f2-4c88-b866-2d836df014df",
     "createdAt": "2026-08-21T15:24:17.584Z",
-    "updatedAt": "2026-08-27T05:38:02.209Z",
+    "updatedAt": "2026-08-27T09:54:58.547Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://circle.webpages.am",
@@ -476,7 +476,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-21T18:02:10.824Z"
     },
-    "lastPublishedAt": "2026-08-27T05:38:02.209Z"
+    "lastPublishedAt": "2026-08-27T09:54:58.547Z"
   },
   {
     "id": "4eeaf9a9-7f88-46b8-a874-d4eeeb45733f",
@@ -520,5 +520,48 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-27T05:47:08.771Z"
     }
+  },
+  {
+    "id": "fd4072d5-18cf-472c-99d3-ea369504ea91",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "Jack",
+    "slug": "jack",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "704bde98-3cb6-4828-924e-ef93aacd5d97",
+    "createdAt": "2026-08-27T10:33:05.155Z",
+    "updatedAt": "2026-08-27T10:36:51.029Z",
+    "cmsConnection": {
+      "provider": "wordpress",
+      "siteUrl": "https://jack.webpages.am",
+      "adminUrl": "https://jack.webpages.am/wp-admin",
+      "graphqlUrl": "https://jack.webpages.am/graphql",
+      "wooCommerceApiUrl": "https://jack.webpages.am/wp-json/wc/v3",
+      "wooCommerceConsumerKey": "ck_1ece14bd1fa77944429d6aeef610df26f27d46cd",
+      "wooCommerceConsumerSecret": "",
+      "wordpressUsername": "hakhakop",
+      "wordpressApplicationPassword": "83my Z3gg x3Mo zLpr tsbt 8t0K",
+      "storeStatusNotes": "",
+      "technicalNotes": "",
+      "updatedAt": "2026-08-27T10:33:59.695Z"
+    },
+    "lastPublishedAt": "2026-08-27T10:36:51.029Z"
   }
 ]

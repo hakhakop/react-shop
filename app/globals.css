@@ -2221,6 +2221,18 @@ a {
 .shop-builder-main ins { background: var(--uk-base-ins-background, transparent); color: var(--uk-base-ins-color, inherit); }
 .shop-builder-main mark { background: var(--uk-base-mark-background, #fffb8a); color: var(--uk-base-mark-color, inherit); }
 
+/* UIkit Overlay variants remain globally owned by the active imported theme. */
+.shop-builder-main .uk-overlay-default {
+  background: var(--uk-overlay-default-background, rgba(255, 255, 255, 0.9));
+  backdrop-filter: var(--uk-overlay-default-backdrop-filter, none);
+  -webkit-backdrop-filter: var(--uk-overlay-default-backdrop-filter, none);
+}
+.shop-builder-main .uk-overlay-primary {
+  background: var(--uk-overlay-primary-background, rgba(34, 34, 34, 0.8));
+  backdrop-filter: var(--uk-overlay-primary-backdrop-filter, none);
+  -webkit-backdrop-filter: var(--uk-overlay-primary-backdrop-filter, none);
+}
+
 /* --- UIkit Cards --- */
 .shop-builder-main .uk-card {
   position: relative;
@@ -2298,6 +2310,73 @@ a {
 .shop-builder-main .uk-margin-xlarge-top { margin-top: var(--uk-global-margin-xlarge, 140px); }
 .shop-builder-main .uk-margin-remove-top { margin-top: 0; }
 .shop-builder-main .uk-margin-remove-bottom { margin-bottom: 0; }
+
+/* UIkit Pagination — all visual values are canonical Global Style tokens
+   populated by YOOtheme LESS. Element documents own only composition and
+   behavior (numeric/load-more, alignment, and flow margin). */
+.shop-builder-main .uk-pagination { margin-left: calc(var(--uk-pagination-margin-horizontal, 10px) * -1); }
+.shop-builder-main .uk-pagination > * { padding-left: var(--uk-pagination-margin-horizontal, 10px); }
+.shop-builder-main .uk-pagination > * > :is(a, span) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--uk-pagination-item-min-width, 0px);
+  height: var(--uk-pagination-item-height, auto);
+  padding: var(--uk-pagination-item-padding-vertical, 5px) var(--uk-pagination-item-padding-horizontal, 10px);
+  border: var(--uk-pagination-item-border-width, 0px) solid transparent;
+  border-radius: var(--uk-pagination-item-border-radius, 0px);
+  color: var(--uk-pagination-item-color, var(--uk-global-text-color, inherit));
+  box-shadow: none;
+  text-decoration: none;
+  position: relative;
+  z-index: 0;
+}
+.shop-builder-main .uk-pagination > * > :is(a, span)::before,
+.shop-builder-main .uk-pagination > * > :is(a, span)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+}
+.shop-builder-main .uk-pagination > * > :is(a, span)::before {
+  display: var(--uk-pagination-glow-display, none);
+  background: var(--uk-pagination-item-glow-gradient, none);
+  filter: var(--uk-pagination-item-glow-filter, none);
+  opacity: var(--uk-pagination-item-glow-opacity, 0);
+}
+.shop-builder-main .uk-pagination > * > :is(a, span)::after { background: transparent; }
+.shop-builder-main .uk-pagination > * > a:hover {
+  color: var(--uk-pagination-item-hover-color, var(--uk-global-emphasis-color, inherit));
+  background: transparent;
+  box-shadow: none;
+}
+.shop-builder-main .uk-pagination > * > a:hover::before { opacity: 1; }
+.shop-builder-main .uk-pagination > * > a:hover::after {
+  background: var(--uk-pagination-item-hover-background, transparent);
+  box-shadow: var(--uk-pagination-item-hover-box-shadow, none);
+}
+.shop-builder-main .uk-pagination > .uk-active > :is(a, span) {
+  color: var(--uk-pagination-item-active-color, var(--uk-global-emphasis-color, inherit));
+  background: transparent;
+  box-shadow: none;
+}
+.shop-builder-main .uk-pagination > .uk-active > :is(a, span)::before { opacity: 1; }
+.shop-builder-main .uk-pagination > .uk-active > :is(a, span)::after {
+  background: var(--uk-pagination-item-active-background, transparent);
+  box-shadow: var(--uk-pagination-item-active-box-shadow, none);
+}
+.shop-builder-main .uk-light .uk-pagination > * > a:hover,
+.shop-builder-main .uk-section-primary .uk-pagination > * > a:hover,
+.shop-builder-main .uk-section-secondary .uk-pagination > * > a:hover {
+  background: var(--uk-inverse-pagination-item-hover-background, var(--uk-pagination-item-hover-background, transparent));
+}
+.shop-builder-main .uk-light .uk-pagination > .uk-active > :is(a, span),
+.shop-builder-main .uk-section-primary .uk-pagination > .uk-active > :is(a, span),
+.shop-builder-main .uk-section-secondary .uk-pagination > .uk-active > :is(a, span) {
+  background: var(--uk-inverse-pagination-item-active-background, var(--uk-pagination-item-active-background, transparent));
+}
 
 /* A height-expanded imported Panel fills its authored row/column. The
    element shell's generic trailing margin is spacing between siblings, not

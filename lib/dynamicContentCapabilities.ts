@@ -8,6 +8,8 @@ export type DynamicContentSourceCapability = {
   key:
     | "static"
     | "wordpress-post-collection"
+    | "wordpress-archive-post-collection"
+    | "wordpress-archive-post-single"
     | "woocommerce-product-collection"
     | "woocommerce-product-single";
   label: string;
@@ -16,6 +18,7 @@ export type DynamicContentSourceCapability = {
   mode?: "collection" | "single";
   fields?: readonly DynamicContentSourceField[];
   queryControls?: readonly DynamicContentQueryControl[];
+  defaultQuery?: DynamicContentContextDescriptor["query"];
 };
 
 export type DynamicContentSourceField = {
@@ -83,7 +86,10 @@ export function dynamicBindingDestinationCapability(
 export const WORDPRESS_POST_COLLECTION_FIELDS: readonly DynamicContentSourceField[] = [
   { path: "title", label: "Title", valueType: "string" },
   { path: "content", label: "Content", valueType: "richText" },
-  { path: "excerpt", label: "Excerpt", valueType: "richText" },
+  // YOOtheme exposes the WordPress excerpt as the authored "Teaser" field.
+  // Keep the canonical provider path while matching that field vocabulary in
+  // every element's dynamic picker.
+  { path: "excerpt", label: "Teaser", valueType: "richText" },
   { path: "date", label: "Date", valueType: "string" },
   { path: "modifiedDate", label: "Modified Date", valueType: "string" },
   { path: "meta", label: "Meta", valueType: "metadata" },
@@ -164,11 +170,29 @@ export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceC
   { key: "static", label: "None / Static" },
   {
     key: "wordpress-post-collection",
-    label: "Custom Posts",
+    label: "Posts",
     provider: "wordpress",
     source: "post",
     mode: "collection",
     fields: WORDPRESS_POST_COLLECTION_FIELDS,
+  },
+  {
+    key: "wordpress-archive-post-collection",
+    label: "Archive Posts",
+    provider: "wordpress",
+    source: "post",
+    mode: "collection",
+    fields: WORDPRESS_POST_COLLECTION_FIELDS,
+    defaultQuery: { archive: "collection" },
+  },
+  {
+    key: "wordpress-archive-post-single",
+    label: "Archive Post",
+    provider: "wordpress",
+    source: "post",
+    mode: "collection",
+    fields: WORDPRESS_POST_COLLECTION_FIELDS,
+    defaultQuery: { archive: "single", quantity: 1 },
   },
   {
     key: "woocommerce-product-collection",
@@ -191,18 +215,22 @@ export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceC
 ] as const;
 
 export const WORDPRESS_POST_COLLECTION_SOURCE =
-  DYNAMIC_CONTENT_SOURCE_CAPABILITIES[1];
+  DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((source) => source.key === "wordpress-post-collection")!;
 
 export const WOOCOMMERCE_PRODUCT_COLLECTION_SOURCE =
-  DYNAMIC_CONTENT_SOURCE_CAPABILITIES[2];
+  DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((source) => source.key === "woocommerce-product-collection")!;
 
 export const WOOCOMMERCE_PRODUCT_SINGLE_SOURCE =
-  DYNAMIC_CONTENT_SOURCE_CAPABILITIES[3];
+  DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((source) => source.key === "woocommerce-product-single")!;
 
 export function dynamicContentSourceKey(
   descriptor: DynamicContentContextDescriptor | null | undefined,
 ): DynamicContentSourceCapability["key"] {
   if (!descriptor) return "static";
+  if (descriptor.provider === "wordpress" && descriptor.source === "post" && descriptor.mode === "collection") {
+    if (descriptor.query?.archive === "single") return "wordpress-archive-post-single";
+    if (descriptor.query?.archive === "collection") return "wordpress-archive-post-collection";
+  }
   const capability = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find(
     (candidate) =>
       candidate.provider === descriptor.provider &&

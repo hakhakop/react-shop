@@ -112,6 +112,24 @@ test("source-proven date format transform resolves into the destination field", 
   expect(resolveDynamicItem(staticItem, context, bindings).text).toBe("02 February, 2021");
 });
 
+test("YOOtheme archive date and teaser-limit transforms resolve safely", () => {
+  const resolved = resolveDynamicItem(
+    { meta: "Fallback date", text: "Fallback teaser" },
+    {
+      fields: {
+        date: { type: "string", value: "2026-08-07T12:00:00.000Z" },
+        excerpt: { type: "richText", value: `<p>${"A".repeat(120)}</p>` },
+      },
+    },
+    {
+      meta: { path: "date", valueType: "string", transform: { kind: "dateFormat", format: "j F, Y" } },
+      text: { path: "excerpt", valueType: "richText", transform: { kind: "textLimit", limit: 100 } },
+    },
+  );
+  expect(resolved.meta).toBe("7 August, 2026");
+  expect(resolved.text).toBe(`${"A".repeat(100)}…`);
+});
+
 test("invalid date transform input retains the authored fallback", () => {
   const bindings: DynamicFieldBindings<keyof TestItem> = {
     text: {

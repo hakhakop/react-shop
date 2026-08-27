@@ -567,6 +567,26 @@ export type BuilderShellSettings = {
   buttonFontStyle?: string;
   buttonLineHeight?: string;
   buttonTextTransform?: string;
+  paginationMarginHorizontal?: string;
+  paginationItemPaddingVertical?: string;
+  paginationItemPaddingHorizontal?: string;
+  paginationItemColor?: string;
+  paginationItemHoverColor?: string;
+  paginationItemActiveColor?: string;
+  paginationItemMinWidth?: string;
+  paginationItemHeight?: string;
+  paginationItemHoverBackground?: string;
+  paginationItemActiveBackground?: string;
+  paginationItemBorderWidth?: string;
+  paginationItemBorderRadius?: string;
+  paginationItemHoverBoxShadow?: string;
+  paginationItemActiveBoxShadow?: string;
+  paginationItemMode?: string;
+  paginationItemGlowGradient?: string;
+  paginationItemGlowFilter?: string;
+  paginationItemGlowOpacity?: string;
+  inversePaginationItemHoverBackground?: string;
+  inversePaginationItemActiveBackground?: string;
   buttonBorderMode?: string;
   buttonBackgroundSize?: string;
   buttonBackgroundPosition?: string;
@@ -770,6 +790,10 @@ export type BuilderShellSettings = {
   cardBackground?: string;
   cardBackdropFilter?: string;
   cardDefaultColorMode?: "light" | "dark";
+  overlayDefaultBackground?: string;
+  overlayDefaultBackdropFilter?: string;
+  overlayPrimaryBackground?: string;
+  overlayPrimaryBackdropFilter?: string;
   cardBorderRadius?: string;
   cardBorderColor?: string;
   cardShadow?: string;
@@ -940,6 +964,10 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   cardBackground: "#ffffff",
   cardBackdropFilter: "none",
   cardDefaultColorMode: "dark",
+  overlayDefaultBackground: "rgba(255, 255, 255, 0.9)",
+  overlayDefaultBackdropFilter: "none",
+  overlayPrimaryBackground: "rgba(34, 34, 34, 0.8)",
+  overlayPrimaryBackdropFilter: "none",
   cardPrimaryBackground: "#1991ee",
   cardSecondaryBackground: "#0c273a",
   cardBorderRadius: "8px",
@@ -1232,6 +1260,10 @@ export function normalizeBuilderShellSettings(
       ?? defaultBuilderShellSettings.headingMediumLineHeight,
     cardBackdropFilter: normalizeOptionalString(value?.cardBackdropFilter) ?? undefined,
     cardDefaultColorMode: value?.cardDefaultColorMode === "light" ? "light" : "dark",
+    overlayDefaultBackground: normalizeOptionalString(value?.overlayDefaultBackground) ?? undefined,
+    overlayDefaultBackdropFilter: normalizeOptionalString(value?.overlayDefaultBackdropFilter) ?? undefined,
+    overlayPrimaryBackground: normalizeOptionalString(value?.overlayPrimaryBackground) ?? undefined,
+    overlayPrimaryBackdropFilter: normalizeOptionalString(value?.overlayPrimaryBackdropFilter) ?? undefined,
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible

@@ -281,6 +281,7 @@ export default async function WebsiteFrontend({
           builderInteractionIdentity={builderIframeSelection}
           builderPreviewMode={builderIframeSelection}
           builderDraftPreview={builderIframeSelection}
+          tenantPathMode={isTenantPath}
           themeSettingsOverride={{}}
         />
         {renderLayout && hasVisibleLayout || mountDraftPreview ? (

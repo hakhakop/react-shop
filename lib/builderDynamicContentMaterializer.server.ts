@@ -391,7 +391,18 @@ async function materializeGridBlock(
     }
 
     try {
-      const contexts = await resolveContexts({ website, descriptor });
+      // A paginated Grid needs the complete bounded result window so the
+      // shared client renderer can change pages without browser-side GraphQL.
+      const resolvedDescriptor = block.pagination?.enabled
+        ? {
+            ...descriptor,
+            query: {
+              ...(descriptor.query ?? {}),
+              quantity: 100 - Math.min(99, Math.max(0, Number(descriptor.query?.start ?? 0))),
+            },
+          }
+        : descriptor;
+      const contexts = await resolveContexts({ website, descriptor: resolvedDescriptor });
       const identifiedContexts = contexts.filter(
         (context): context is DynamicItemContext & { id: string | number } =>
           (typeof context.id === "string" && context.id.length > 0) ||

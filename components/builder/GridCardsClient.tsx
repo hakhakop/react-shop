@@ -196,10 +196,27 @@ export function GridCardsClient({
       return candidateId === id;
     }) === index;
   });
-  const renderedItems = uniqueItems.slice(0, limit);
-  const filteredItems = renderedItems
+  const limitedItems = uniqueItems.slice(0, limit);
+  const filteredItems = limitedItems
     .map((item, sourceIndex) => ({ item, sourceIndex }))
     .filter(({ item }) => !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter));
+  const pagination = rawBlock.pagination;
+  const paginationEnabled = pagination?.enabled === true && pagination?.mode === "pageNumbers";
+  const pageSize = paginationEnabled && Number.isFinite(Number(pagination?.perPage))
+    ? Math.max(1, Math.round(Number(pagination.perPage)))
+    : Math.max(1, filteredItems.length);
+  const pageCount = paginationEnabled ? Math.max(1, Math.ceil(filteredItems.length / pageSize)) : 1;
+  const pageSignature = `${rawBlock.id ?? "grid"}:${filteredItems.map(({ item }) => item.id).join("|")}:${pageSize}`;
+  const [pageState, setPageState] = useState({ signature: pageSignature, page: 1 });
+  const currentPage = pageState.signature === pageSignature
+    ? Math.min(pageState.page, pageCount)
+    : 1;
+  const renderedItems = paginationEnabled
+    ? filteredItems.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(({ item }) => item)
+    : limitedItems;
+  const selectPage = (page: number) => {
+    setPageState({ signature: pageSignature, page: Math.min(Math.max(1, page), pageCount) });
+  };
 
   // Field Visibility
   const canShowTitle = (rawBlock.gridShowTitle ?? rawBlock.showTitle ?? true) !== false;
@@ -313,8 +330,9 @@ export function GridCardsClient({
           } as CSSProperties
         }
       >
-        {renderedItems.map((item, sourceIndex) =>
+        {renderedItems.map((item) =>
           (() => {
+            const sourceIndex = uniqueItems.indexOf(item);
             const isVisible = !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter);
             // Grid Card Style is canonical. Legacy Panel aliases may only fill
             // an absent value; they can never override an explicit `None`.
@@ -797,6 +815,46 @@ export function GridCardsClient({
           })()
         )}
       </div>
+      {paginationEnabled && pageCount > 1 && (
+        <ul
+          className={`uk-pagination ${pagination?.alignment === "right" ? "uk-flex-right" : pagination?.alignment === "left" ? "" : "uk-flex-center"} ${getUikitMarginClass(pagination?.margin ?? "large", "top")}`.trim()}
+          aria-label="Pagination"
+        >
+          {currentPage > 1 && <li>
+            <a
+              href="#"
+              aria-label="Previous"
+              onClick={(event) => { event.preventDefault(); selectPage(currentPage - 1); }}
+            >
+              <span data-uk-pagination-previous="" />
+            </a>
+          </li>}
+          {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
+            <li key={page} className={page === currentPage ? "uk-active" : ""}>
+              {page === currentPage ? (
+                <span aria-current="page">{page}</span>
+              ) : (
+                <a
+                  href="#"
+                  aria-label={`Page ${page}`}
+                  onClick={(event) => { event.preventDefault(); selectPage(page); }}
+                >
+                  {page}
+                </a>
+              )}
+            </li>
+          ))}
+          {currentPage < pageCount && <li>
+            <a
+              href="#"
+              aria-label="Next"
+              onClick={(event) => { event.preventDefault(); selectPage(currentPage + 1); }}
+            >
+              <span data-uk-pagination-next="" />
+            </a>
+          </li>}
+        </ul>
+      )}
     </div>
   );
 }

@@ -139,7 +139,7 @@ type HeaderShellViewProps = {
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
-  scopedLinkMode?: "builder" | "preview";
+  scopedLinkMode?: "builder" | "preview" | "tenant-path";
   hideSaaSEntry?: boolean;
   categoriesContent?: ReactNode;
   headerComposition: HeaderBuilderComposition;

@@ -38,7 +38,11 @@ type PageByUriResult = {
   } | null;
 };
 
-async function renderCanonicalPost(slug: string, website?: SaaSWebsite | null) {
+async function renderCanonicalPost(
+  slug: string,
+  website?: SaaSWebsite | null,
+  websiteMode: "domain" | "tenant-path" = "domain",
+) {
   const canonical = await getCanonicalPostSingularBySlug(slug, website);
   if (!canonical) return null;
   const { post } = canonical;
@@ -84,7 +88,7 @@ async function renderCanonicalPost(slug: string, website?: SaaSWebsite | null) {
         website={website}
         requestedPage="post-single"
         pageLabelOverride={post.title}
-        mode="domain"
+        mode={websiteMode}
         layoutOverride={selectedLayout ?? undefined}
         dynamicItemContextOverride={canonical.dynamicContext}
         fallbackContent={fallbackContent}
@@ -146,6 +150,17 @@ export default async function WPPage({
   if (tenantSlug) {
     const tenantWebsite = await getWebsiteByIdOrSlug(tenantSlug);
     if (tenantWebsite?.slug === tenantSlug) {
+      if (tenantPath.length === 1) {
+        const tenantPages = await readBuilderCustomPages({ websiteId: tenantWebsite.id });
+        if (!tenantPages.some((page) => page.slug === tenantPath[0])) {
+          try {
+            const post = await renderCanonicalPost(tenantPath[0], tenantWebsite, "tenant-path");
+            if (post) return post;
+          } catch (error) {
+            console.error("[wordpress/post] tenant-path resolution failed", error);
+          }
+        }
+      }
       return (
         <WebsiteFrontend
           website={tenantWebsite}

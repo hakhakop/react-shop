@@ -163,7 +163,27 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   "overlay-slider_item": "overlaySlider",
 };
 
-const STRUCTURAL_TYPES = new Set(["layout", "section", "row", "column"]);
+// Pagination is authored as a sibling element in YOOtheme, but it controls the
+// preceding collection Grid(s). WebPages stores that behavior on the canonical
+// Grid rather than rendering a disconnected empty element.
+const STRUCTURAL_TYPES = new Set(["layout", "section", "row", "column", "pagination"]);
+
+const sourcePagination = (node: YoothemeSourceNode): BuilderLayoutBlock["pagination"] | undefined => {
+  if (node.type !== "pagination") return undefined;
+  const props = sourceProps(node);
+  const type = asString(props.pagination_type);
+  return {
+    enabled: true,
+    // Circle's archive page reserves the first post for its featured Panel;
+    // the remaining nine posts form one desktop/mobile Grid page.
+    perPage: 9,
+    mode: type === "infinite" ? "infinite" : type === "load-more" ? "loadMore" : "pageNumbers",
+    style: "standard",
+    margin: sourceMargin(props.margin),
+    alignment: props.text_align === "left" || props.text_align === "right" ? props.text_align : "center",
+    animation: asString(props.animation) ?? undefined,
+  };
+};
 
 const LAYOUT_BY_COLUMN_COUNT: Record<number, string> = {
   1: "1-col",
@@ -321,6 +341,22 @@ const sourceBoolean = (value: unknown): boolean | undefined => {
   if (value === true || value === "true" || value === 1 || value === "1") return true;
   if (value === false || value === "false" || value === 0 || value === "0") return false;
   return undefined;
+};
+
+// YOOtheme stores Grid Width as UIkit fractions while its inspector presents
+// percentages. Keep the fraction as the canonical value for rendering.
+const sourcePanelMediaWidth = (value: unknown): BuilderLayoutBlock["panelMediaWidth"] => {
+  const raw = asString(value)?.trim().toLowerCase();
+  const aliases: Record<string, NonNullable<BuilderLayoutBlock["panelMediaWidth"]>> = {
+    "80%": "4-5", "75%": "3-4", "66%": "2-3", "66.6667%": "2-3",
+    "60%": "3-5", "50%": "1-2", "40%": "2-5", "33%": "1-3",
+    "33.3333%": "1-3", "25%": "1-4", "20%": "1-5",
+    auto: "auto", small: "small", medium: "medium", large: "large",
+    xlarge: "xlarge", "2xlarge": "2xlarge",
+    "1-5": "1-5", "1-4": "1-4", "1-3": "1-3", "2-5": "2-5",
+    "1-2": "1-2", "3-5": "3-5", "2-3": "2-3", "3-4": "3-4", "4-5": "4-5",
+  };
+  return raw ? aliases[raw] : undefined;
 };
 
 const sourceLayoutHtmlElement = (
@@ -914,6 +950,8 @@ type DynamicImportDestination =
   | "title"
   | "meta"
   | "text"
+  | "body"
+  | "eyebrow"
   | "imageUrl"
   | "imageAlt"
   | "buttonLabel"
@@ -964,7 +1002,8 @@ const sourceDateTransform = (
     warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
     return undefined;
   }
-  const entries = Object.entries(filters as Record<string, unknown>);
+  const entries = Object.entries(filters as Record<string, unknown>)
+    .filter(([key, value]) => !(key === "search" && value === ""));
   if (entries.length !== 1 || entries[0][0] !== "date" || typeof entries[0][1] !== "string") {
     warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
     return undefined;
@@ -977,23 +1016,53 @@ const sourceDateTransform = (
   return { kind: "dateFormat", format };
 };
 
+const sourceTextTransform = (
+  filters: unknown,
+  warnings: string[],
+  sourcePath: string,
+): DynamicFieldTransform | undefined => {
+  if (filters === undefined) return undefined;
+  if (!filters || typeof filters !== "object" || Array.isArray(filters)) {
+    warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
+    return undefined;
+  }
+  const entries = Object.entries(filters as Record<string, unknown>)
+    .filter(([key, value]) => !(key === "search" && value === ""));
+  if (entries.length === 0) return undefined;
+  if (entries.length === 1 && entries[0][0] === "limit" && Number.isInteger(entries[0][1]) && Number(entries[0][1]) > 0) {
+    return { kind: "textLimit", limit: Number(entries[0][1]) };
+  }
+  warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
+  return undefined;
+};
+
 const sourceDynamicFieldPath = (
   value: unknown,
-): { path: string; filters?: unknown } | undefined => {
+): { path: string; filters?: unknown; arguments?: unknown } | undefined => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const descriptor = value as Record<string, unknown>;
   const name = asString(descriptor.name);
   if (!name) return undefined;
   if (name === "title" || name === "content" || name === "excerpt" || name === "date" || name === "link") {
-    return { path: name, filters: descriptor.filters };
+    return { path: name, filters: descriptor.filters, arguments: descriptor.arguments };
+  }
+  if (name === "teaser") {
+    const args = descriptor.arguments && typeof descriptor.arguments === "object" && !Array.isArray(descriptor.arguments)
+      ? descriptor.arguments as Record<string, unknown>
+      : {};
+    return { path: args.show_excerpt === false ? "content" : "excerpt", filters: descriptor.filters, arguments: descriptor.arguments };
   }
   if (name === "modified" || name === "modifiedDate") return { path: "modifiedDate", filters: descriptor.filters };
   if (name === "field.featured_image.url" || name === "featuredImage.url") return { path: "featuredImage.url", filters: descriptor.filters };
   if (name === "field.featured_image.alt" || name === "featuredImage.alt") return { path: "featuredImage.alt", filters: descriptor.filters };
   if (name === "field.featured_image.caption" || name === "featuredImage.caption") return { path: "featuredImage.caption", filters: descriptor.filters };
-  if (name === "field.intro_image.url") return { path: "acf.intro_image.url", filters: descriptor.filters };
-  if (name === "field.intro_image.alt") return { path: "acf.intro_image.alt", filters: descriptor.filters };
-  if (name === "field.intro_image.caption") return { path: "acf.intro_image.caption", filters: descriptor.filters };
+  // In YOOtheme's WordPress source model, `field.intro_image` is the post's
+  // WordPress featured image. It is not an ACF field. Keeping this mapped to
+  // the provider's canonical featuredImage projection also works when the
+  // tenant does not expose WPGraphQL for ACF (as Circle does not).
+  if (name === "field.intro_image.url") return { path: "featuredImage.url", filters: descriptor.filters };
+  if (name === "field.intro_image.alt") return { path: "featuredImage.alt", filters: descriptor.filters };
+  if (name === "field.intro_image.caption") return { path: "featuredImage.caption", filters: descriptor.filters };
   if (name === "field.teaser_image.url") return { path: "acf.teaser_image.url", filters: descriptor.filters };
   if (name === "field.teaser_image.alt") return { path: "acf.teaser_image.alt", filters: descriptor.filters };
   if (name === "field.teaser_image.caption") return { path: "acf.teaser_image.caption", filters: descriptor.filters };
@@ -1011,7 +1080,8 @@ const mapDynamicQuery = (
     return null;
   }
   const queryRecord = query as Record<string, unknown>;
-  if (queryRecord.name !== "posts.customPosts") {
+  const queryName = String(queryRecord.name ?? "");
+  if (!["posts.customPosts", "posts.archivePost", "posts.archivePostSingle"].includes(queryName)) {
     warnings.push(`${sourcePath}: dynamic source '${String(queryRecord.name ?? "unknown")}' is unsupported; static fallback was retained.`);
     return null;
   }
@@ -1022,12 +1092,15 @@ const mapDynamicQuery = (
   }
   const input = args as Record<string, unknown>;
   const output: Record<string, unknown> = {};
+  if (queryName === "posts.archivePost") output.archive = "collection";
+  if (queryName === "posts.archivePostSingle") output.archive = "single";
   const start = input.offset;
   const quantity = input.limit;
   if (Number.isInteger(start) && (start as number) >= 0) output.start = start;
   else if (start !== undefined) warnings.push(`${sourcePath}.query.arguments.offset: unsupported non-negative integer required.`);
   if (Number.isInteger(quantity) && (quantity as number) >= 1) output.quantity = quantity;
   else if (quantity !== undefined) warnings.push(`${sourcePath}.query.arguments.limit: unsupported positive integer required.`);
+  if (queryName === "posts.archivePostSingle" && output.quantity === undefined) output.quantity = 1;
 
   const orderMap: Record<string, string> = {
     date: "date",
@@ -1101,7 +1174,7 @@ const mapDynamicSource = (
   const queryName = query && typeof query === "object" && !Array.isArray(query)
     ? (query as Record<string, unknown>).name
     : undefined;
-  if (queryName !== "posts.customPosts") {
+  if (!["posts.customPosts", "posts.archivePost", "posts.archivePostSingle"].includes(String(queryName ?? ""))) {
     warnings.push(`${sourcePath}: DYNAMIC CONTENT UNSUPPORTED FOR NOW (source/query). Static fallback content was retained.`);
     return { hasSource: true, supported: false };
   }
@@ -1116,10 +1189,11 @@ const mapDynamicSource = (
       const bindingPath = `${sourcePath}.source.props.${sourceKey}`;
       const transform = descriptor.path === "date"
         ? sourceDateTransform(descriptor.filters, warnings, bindingPath)
-        : descriptor.filters === undefined
-          ? undefined
-          : (warnings.push(`${bindingPath}: dynamic filters/transforms are unsupported and the binding was not imported.`), undefined);
-      if (descriptor.filters !== undefined && !transform) continue;
+        : sourceTextTransform(descriptor.filters, warnings, bindingPath);
+      const meaningfulFilters = descriptor.filters && typeof descriptor.filters === "object" && !Array.isArray(descriptor.filters)
+        ? Object.entries(descriptor.filters as Record<string, unknown>).some(([key, value]) => !(key === "search" && value === ""))
+        : descriptor.filters !== undefined;
+      if (meaningfulFilters && !transform) continue;
       dynamicBinding(destination, descriptor.path, bindings, warnings, bindingPath, transform);
     }
   }
@@ -1141,7 +1215,7 @@ const dynamicSourceIsUnsupported = (node: YoothemeSourceNode): boolean => {
   if (!source || typeof source !== "object" || Array.isArray(source)) return false;
   const query = (source as Record<string, unknown>).query;
   if (!query || typeof query !== "object" || Array.isArray(query)) return true;
-  if ((query as Record<string, unknown>).name !== "posts.customPosts") return true;
+  if (!["posts.customPosts", "posts.archivePost", "posts.archivePostSingle"].includes(String((query as Record<string, unknown>).name ?? ""))) return true;
   const argumentsValue = (query as Record<string, unknown>).arguments;
   return !argumentsValue || typeof argumentsValue !== "object" || Array.isArray(argumentsValue);
 };
@@ -1869,6 +1943,14 @@ const mapStaticElement = (
   }
 
   if (type === "panel") {
+    const dynamic = mapDynamicSource(node, {
+      title: "title",
+      meta: "eyebrow",
+      content: "body",
+      image: "imageUrl",
+      image_alt: "imageAlt",
+      link: "buttonUrl",
+    }, warnings, path);
     // YOOtheme's absolutely centered Chat Features panel uses the positional
     // uk-position-center class. Its text_align value is not a visual
     // text-alignment override in the live theme, so do not project that source
@@ -1883,7 +1965,7 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_link", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin",
+      "content", "image", "show_image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_animate", "image_svg_color", "image_link", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin",
       "text_align", "title", "title_element", "panel_style", "panel_padding", "panel_link", "panel_link_hover", "panel_image_no_padding", "height_expand", "panel_expand", "image_align", "image_grid_width", "image_grid_breakpoint", "image_vertical_align",
       "title_align", "title_grid_breakpoint", "title_grid_width", "title_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
@@ -1907,6 +1989,8 @@ const mapStaticElement = (
       ...normalizeYoothemeMedia(props),
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonUrl: asString(props.link) ?? undefined,
+      ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
+      ...(dynamic.bindings ? { dynamicBindings: dynamic.bindings as BuilderLayoutBlock["dynamicBindings"] } : {}),
       buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
       panelActionStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
       buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
@@ -1934,13 +2018,20 @@ const mapStaticElement = (
       panelMetaPosition: props.meta_align === "above-title" || props.meta_align === "below-title" || props.meta_align === "above-content" || props.meta_align === "below-content"
         ? props.meta_align
         : undefined,
-      panelShowMedia: Boolean(props.image),
+      // A Panel can author its media entirely through Dynamic Content. The
+      // absence of a static `props.image` must not suppress a resolved image
+      // binding at render time. Explicit source visibility still wins when
+      // YOOtheme supplies it; otherwise either static or dynamic media enables
+      // the canonical Panel media region.
+      panelShowMedia: sourceBoolean(props.show_image)
+        ?? Boolean(props.image || dynamic.bindings?.imageUrl),
       panelMediaPlacement: ["top", "bottom", "left", "right", "between"].includes(String(props.image_align))
         ? props.image_align as "top" | "bottom" | "left" | "right" | "between"
         : "top",
-      panelMediaWidth: props.image_grid_width === "1-2" || props.image_grid_width === "2-5" || props.image_grid_width === "3-5"
-        ? props.image_grid_width
-        : "large",
+      panelMediaWidth: sourcePanelMediaWidth(props.image_grid_width) ?? "large",
+      // Panel margin is an element-level rhythm control. Project it to the
+      // shared shell so the authored bottom gap remains before the next Grid.
+      elementMargin: sourceMargin(props.margin),
       // YOOtheme's Vertical Alignment control aligns the panel content when
       // media is placed beside it; it is not the image's object-position.
       panelVerticalAlign: props.image_vertical_align === true || props.image_vertical_align === "true" ? "center" : "top",
@@ -2273,11 +2364,11 @@ const mapStaticElement = (
           } : {}),
         };
       });
-    ["grid_small", "grid_large", "grid_xlarge", "filter", "filter_animation", "filter_order", "filter_reverse", "filter_order_manual", "filter_style", "filter_all", "filter_all_label", "filter_position", "filter_style_primary", "filter_align", "filter_margin", "filter_grid_width", "filter_grid_column_gap", "filter_grid_row_gap", "filter_grid_breakpoint", "lightbox_controls", "lightbox_counter", "lightbox_bg_close", "lightbox_animation", "lightbox_nav", "lightbox_image_width", "lightbox_image_height", "lightbox_image_orientation", "lightbox_video_autoplay", "lightbox_text_color", "title_display", "content_display", "image_expand", "overlay_padding", "item_animation"].forEach((key) => {
+    ["filter", "filter_animation", "filter_order", "filter_reverse", "filter_order_manual", "filter_style", "filter_all", "filter_all_label", "filter_position", "filter_style_primary", "filter_align", "filter_margin", "filter_grid_width", "filter_grid_column_gap", "filter_grid_row_gap", "filter_grid_breakpoint", "lightbox_controls", "lightbox_counter", "lightbox_bg_close", "lightbox_animation", "lightbox_nav", "lightbox_image_width", "lightbox_image_height", "lightbox_image_orientation", "lightbox_video_autoplay", "lightbox_text_color", "title_display", "content_display", "image_expand", "item_animation"].forEach((key) => {
       if (props[key] !== undefined && props[key] !== "" && props[key] !== false) warnings.push(path + "." + key + ": DEFERRED — Gallery has no exact canonical runtime for this YOOtheme semantic yet.");
     });
     warnUnsupported(path, props, [
-      "content", "show_title", "show_meta", "show_content", "show_link", "link_target", "link_text", "link_style", "link_aria_label", "grid_column_gap", "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "overlay_mode", "overlay_link", "show_hover_image", "show_hover_video",
+      "content", "show_title", "show_meta", "show_content", "show_link", "link_target", "link_text", "link_style", "link_aria_label", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge", "grid_column_gap", "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "overlay_mode", "overlay_link", "overlay_style", "overlay_position", "overlay_hover", "overlay_transition", "overlay_padding", "overlay_margin", "text_align", "text_color", "title_style", "title_hover_style", "meta_align", "meta_element", "content_margin", "show_hover_image", "show_hover_video",
       "lightbox",
       "image_width", "image_height", "image_loading", "image_border", "image_box_shadow", ...GENERAL_POSITION_KEYS,
     ], warnings);
@@ -2289,8 +2380,12 @@ const mapStaticElement = (
       gridGap: props.grid_column_gap === "collapse" ? "none" : sourceMargin(props.grid_column_gap) ?? "medium",
       gridRowGap: props.grid_row_gap === "collapse" ? "none" : sourceMargin(props.grid_row_gap) ?? "medium",
       showDividers: props.grid_divider === true || props.grid_divider === "true",
+      centerColumns: props.grid_column_align === true || props.grid_column_align === "true",
       columnsPhonePortrait: asString(props.grid_default) || undefined,
+      columnsPhoneLandscape: asString(props.grid_small) || undefined,
       columnsTabletLandscape: asString(props.grid_medium) || undefined,
+      columnsDesktop: asString(props.grid_large) || undefined,
+      columnsLargeScreens: asString(props.grid_xlarge) || undefined,
       masonry: props.grid_masonry === "pack" || props.grid_masonry === "next" ? props.grid_masonry : undefined,
       parallax: Number.isFinite(Number(props.grid_parallax)) && Number(props.grid_parallax) !== 0 ? Number(props.grid_parallax) : undefined,
       parallaxJustify: sourceBoolean(props.grid_parallax_justify) ?? false,
@@ -2301,9 +2396,15 @@ const mapStaticElement = (
       overlayPosition: asString(props.overlay_position) || undefined,
       overlayHover: props.overlay_hover === true || props.overlay_hover === "true",
       overlayTransition: asString(props.overlay_transition) || undefined,
+      overlayPadding: asString(props.overlay_padding) || undefined,
+      overlayMargin: asString(props.overlay_margin) || undefined,
+      overlayTextColor: asString(props.text_color) || undefined,
       overlayLink: props.overlay_link === true || props.overlay_link === "true",
       headingLevel: sourceHeadingLevel(props.title_element) ?? undefined,
+      headingSize: sourceHeadingSize(props.title_style),
       metaStyle: asString(props.meta_style) || undefined,
+      panelMetaPosition: props.meta_align === "above-title" || props.meta_align === "below-title" || props.meta_align === "above-content" || props.meta_align === "below-content" ? props.meta_align : undefined,
+      contentMarginTop: props.content_margin === "remove" ? "none" : asString(props.content_margin) || undefined,
       textAlign: sourceAlignment(props.text_align),
       enableLightbox: props.lightbox === true || props.lightbox === "true",
       linkText: asString(props.link_text) || undefined,
@@ -2934,7 +3035,9 @@ export const mapYoothemeStaticContent = (
         );
         const rowId = `yootheme-section-${sectionIndex + 1}-row-${rowIndex + 1}`;
         const builderColumns = columns.map((columnNode, columnIndex) => {
-          const blocks = sourceChildren(columnNode)
+          const columnChildren = sourceChildren(columnNode);
+          const pagination = columnChildren.map(sourcePagination).find(Boolean);
+          const blocks = columnChildren
             .map((node, childIndex) =>
               mapStaticElement(
                 node,
@@ -2942,7 +3045,10 @@ export const mapYoothemeStaticContent = (
                 warnings,
               ),
             )
-            .filter((block): block is BuilderLayoutBlock => Boolean(block));
+            .filter((block): block is BuilderLayoutBlock => Boolean(block))
+            .map((block) => pagination && block.kind === "grid"
+              ? { ...block, pagination }
+              : block);
           importedColumnCount += 1;
           return sourceBuilderColumn(
             columnNode,

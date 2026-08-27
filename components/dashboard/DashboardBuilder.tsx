@@ -1756,7 +1756,7 @@ function normalizeBuilderState(
                 ? block.panelMediaPlacement
                 : "top",
               panelMediaFit: block.imageFit ?? block.panelMediaFit,
-              panelMediaWidth: ["small", "medium", "large", "1-2", "2-5", "3-5"].includes(block.panelMediaWidth as string) ? block.panelMediaWidth : "medium",
+              panelMediaWidth: ["auto", "4-5", "3-4", "2-3", "3-5", "1-2", "2-5", "1-3", "1-4", "1-5", "small", "medium", "large", "xlarge", "2xlarge"].includes(block.panelMediaWidth as string) ? block.panelMediaWidth : "medium",
               panelMediaAlignment: (block.imageAlignment ?? block.panelMediaAlignment) === "left" || (block.imageAlignment ?? block.panelMediaAlignment) === "right" ? (block.imageAlignment ?? block.panelMediaAlignment) : "center",
               panelVerticalAlign: block.panelVerticalAlign === "center" || block.panelVerticalAlign === "bottom" ? block.panelVerticalAlign : "top",
               panelMediaVerticalAlign: block.panelMediaVerticalAlign === "center" || block.panelMediaVerticalAlign === "bottom" ? block.panelMediaVerticalAlign : "top",
@@ -2988,6 +2988,20 @@ export default function DashboardBuilder({
     contentLanguage,
     primaryContentLanguage,
   ]);
+  // The comparison iframe is a renderer, not an authored-state owner. Send it
+  // the transient server projection once Dynamic Content resolves, while all
+  // inspector mutations and persistence continue to use `builderState`.
+  // Previously the bridge only depended on the authored draft, so a resolved
+  // projection could reach the inline preview but never the iframe until a
+  // full reload performed server-side materialization again.
+  const iframeRenderState = useMemo<BuilderState>(
+    () => materializedPreviewSections
+      ? { ...builderState, sections: materializedPreviewSections }
+      : builderState,
+    [builderState, materializedPreviewSections],
+  );
+  const iframeRenderStateRef = useRef(iframeRenderState);
+  iframeRenderStateRef.current = iframeRenderState;
   const headerContextState = useMemo(
     () =>
       builderState.page === "header" || builderState.page === "footer"
@@ -5526,10 +5540,10 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (!iframeComparisonMode) return;
-    const signature = JSON.stringify(builderState);
+    const signature = JSON.stringify(iframeRenderState);
     if (iframeDraftSignatureRef.current === signature) return;
     iframeDraftSignatureRef.current = signature;
-    iframeDraftPendingRef.current = builderState;
+    iframeDraftPendingRef.current = iframeRenderState;
     if (iframeDraftFrameRef.current !== null) return;
     iframeDraftFrameRef.current = window.requestAnimationFrame(() => {
       iframeDraftFrameRef.current = null;
@@ -5537,7 +5551,7 @@ export default function DashboardBuilder({
       iframeDraftPendingRef.current = null;
       if (pending) postIframeDraftSnapshot(pending);
     });
-  }, [builderState, iframeComparisonMode, postIframeDraftSnapshot]);
+  }, [iframeComparisonMode, iframeRenderState, postIframeDraftSnapshot]);
 
   useEffect(() => () => {
     if (iframeDraftFrameRef.current !== null) {
@@ -5548,7 +5562,7 @@ export default function DashboardBuilder({
 
   const handleIframeLoad = useCallback(() => {
     window.requestAnimationFrame(() => {
-      postIframeDraftSnapshot(builderStateRef.current);
+      postIframeDraftSnapshot(iframeRenderStateRef.current);
       sendSelectionToIframe(false);
     });
   }, [postIframeDraftSnapshot, sendSelectionToIframe]);

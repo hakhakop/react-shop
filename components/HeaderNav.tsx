@@ -20,6 +20,7 @@ import {
   getPreviewActivePathForPageKey,
   resolveScopedBuilderHref,
   resolveScopedPreviewHref,
+  resolveTenantPathHref,
   type ScopedPreviewPage,
 } from "../lib/scopedPreviewLinks";
 import type { BuilderLayoutKey } from "../lib/builderLayouts";
@@ -34,7 +35,7 @@ interface HeaderNavProps {
   scopedPreviewWebsiteId?: string;
   activePageKey?: BuilderLayoutKey;
   scopedPreviewPages?: ScopedPreviewPage[];
-  scopedLinkMode?: "builder" | "preview";
+  scopedLinkMode?: "builder" | "preview" | "tenant-path";
   activeContentLanguage?: string;
   dropdownIndicator?: "none" | "chevron";
   parentIconEnabled?: boolean;
@@ -429,7 +430,9 @@ export default function HeaderNav({
     scopedPreviewWebsiteId ?? getScopedWebsiteIdFromPath(rawPathname);
   const hrefResolver = activeScopedWebsiteId
     ? (href: string) =>
-        scopedLinkMode === "builder"
+        scopedLinkMode === "tenant-path"
+          ? resolveTenantPathHref(href, { websiteId: activeScopedWebsiteId, pages: scopedPreviewPages })
+          : scopedLinkMode === "builder"
           ? resolveScopedBuilderHref(href, {
               websiteId: activeScopedWebsiteId,
               pages: scopedPreviewPages,

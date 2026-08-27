@@ -196,7 +196,24 @@ export function resolveTenantPathHref(
 
   const trimmed = href.trim();
   if (!trimmed || trimmed === "#" || trimmed.startsWith("#")) return href;
-  if (isExternalOrSpecialHref(trimmed) || !getBuilderPageKeyForHref(trimmed, pages)) {
+  const encodedPrefix = `/${encodeURIComponent(websiteId)}`;
+  try {
+    const existingUrl = new URL(trimmed, "https://webpages.local");
+    if (
+      existingUrl.pathname === encodedPrefix ||
+      existingUrl.pathname.startsWith(`${encodedPrefix}/`)
+    ) {
+      return trimmed;
+    }
+  } catch {
+    return href;
+  }
+  const { path } = normalizeHrefPath(trimmed);
+  const dynamicSinglePath = /^\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/i.test(path);
+  if (
+    isExternalOrSpecialHref(trimmed) ||
+    (!getBuilderPageKeyForHref(trimmed, pages) && !dynamicSinglePath)
+  ) {
     return href;
   }
 
