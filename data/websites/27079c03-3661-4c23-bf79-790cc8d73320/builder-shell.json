@@ -86,6 +86,10 @@
   "backgroundMuted": "#0D0D10",
   "backgroundPrimary": "#F8154C",
   "backgroundSecondary": "#1B171F",
+  "sectionDefaultColorMode": "light",
+  "sectionMutedColorMode": "light",
+  "sectionPrimaryColorMode": "light",
+  "sectionSecondaryColorMode": "light",
   "backgroundColor": "#ffffff",
   "fontFamilyBody": "Inter",
   "fontFamilyHeading": "inherit",
@@ -122,11 +126,14 @@
   "visibilityTablet": true,
   "visibilityMobile": true,
   "sectionPaddingSmall": "40px",
-  "sectionPaddingDefault": "70px",
+  "sectionPaddingDefault": "40px",
+  "sectionPaddingDefaultMedium": "70px",
   "sectionPaddingMedium": "80px",
-  "sectionPaddingLarge": "100px",
+  "sectionPaddingLarge": "70px",
+  "sectionPaddingLargeMedium": "140px",
   "sectionPaddingXSmall": "20px",
   "sectionPaddingXLarge": "140px",
+  "sectionPaddingXLargeMedium": "210px",
   "gridGutterSmall": "15px",
   "gridGutterDefault": "30px",
   "gridGutterLarge": "70px",
@@ -141,6 +148,7 @@
   "containerExpand": false,
   "cardBackground": "rgba(255, 255, 255, 0.08)",
   "cardBackdropFilter": "blur(25px)",
+  "cardDefaultColorMode": "light",
   "cardPrimaryBackground": "linear-gradient(30deg, #812FCB 0%, #D91F71 40%, #FF1445 70%, #ED7E65 100%)",
   "cardSecondaryBackground": "#000",
   "cardBorderRadius": "8px",
@@ -228,6 +236,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -239,6 +248,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -250,6 +260,7 @@
       "iconName": "lighting",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lighting.svg",
       "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -261,6 +272,7 @@
       "iconName": "trouble-shooting",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-trouble-shooting.svg",
       "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -272,6 +284,7 @@
       "iconName": "lock",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lock.svg",
       "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -279,11 +292,11 @@
       "id": "circle-product-chat-features",
       "label": "Chat Features",
       "url": "/product-2#chat-features",
-      "mobileUrl": "/product-2#chat-features-mobile",
       "parentId": "circle-product",
       "iconName": "chat",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
       "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et",
+      "mobileUrl": "/product-2#chat-features-mobile",
       "target": "_self",
       "visibility": "all"
     },
@@ -295,6 +308,7 @@
       "iconName": "rocket",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-rocket.svg",
       "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -306,6 +320,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -317,6 +332,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -328,6 +344,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -339,6 +356,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "mobile"
     },
@@ -350,6 +368,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -361,6 +380,7 @@
       "iconName": "chat",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
       "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -372,6 +392,7 @@
       "iconName": "tutorials",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-tutorials.svg",
       "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -383,6 +404,7 @@
       "iconName": "technology",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-technology.svg",
       "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -394,6 +416,7 @@
       "iconName": "account",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-account.svg",
       "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -405,6 +428,7 @@
       "iconName": "heart",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-heart.svg",
       "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -416,6 +440,7 @@
       "iconName": "download",
       "iconUrl": null,
       "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore",
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
@@ -427,6 +452,7 @@
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
+      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     }
@@ -439,7 +465,7 @@
   "headerDropbarEnabled": false,
   "headerParentIconEnabled": false,
   "headerClickModeEnabled": false,
-  "updatedAt": "2026-08-25T12:06:11.670Z",
+  "updatedAt": "2026-08-26T19:37:18.938Z",
   "buttonTextTransform": "none",
   "emphasisColor": "#FFF",
   "mutedTextColor": "rgba(255, 255, 255, 0.5)",
@@ -677,7 +703,7 @@
     "buttonSecondaryShadow": "authored",
     "buttonSecondaryHoverShadow": "authored"
   },
-  "buttonLineHeight": "44px",
+  "buttonLineHeight": "48px",
   "buttonLargeLineHeight": "51px",
   "buttonLargePaddingX": "40px",
   "customGlobalStylePresets": [
@@ -1648,7 +1674,7 @@
         "inverseNavBackgroundItemActiveBackground": "transparent",
         "inverseNavSecondaryItemHoverBackground": "transparent",
         "inverseNavSecondaryItemActiveBackground": "transparent",
-        "navbarNavItemHeight": "auto",
+        "navbarNavItemHeight": "80px",
         "navbarNavItemOnclickColor": "inherit",
         "navbarNavItemActiveColor": "inherit",
         "navbarNavItemFontSize": "14px",
@@ -1733,7 +1759,7 @@
   "inverseNavBackgroundItemActiveBackground": "transparent",
   "inverseNavSecondaryItemHoverBackground": "transparent",
   "inverseNavSecondaryItemActiveBackground": "transparent",
-  "navbarNavItemHeight": "auto",
+  "navbarNavItemHeight": "80px",
   "navbarNavItemOnclickColor": "inherit",
   "navbarNavItemActiveColor": "inherit",
   "navbarNavItemFontSize": "16px",
@@ -1760,7 +1786,7 @@
   "navbarDropdownDropbarLargeShiftMarginMedium": "0",
   "inverseNavbarNavItemHoverColor": "inherit",
   "buttonDefaultText": "#111111",
-  "buttonFontSize": "15px",
+  "buttonFontSize": "16px",
   "buttonFontFamily": "inherit",
   "buttonFontStyle": "normal",
   "buttonTransitionDuration": "0.2s",
@@ -1790,5 +1816,21 @@
   "inverseInverseColor": "#000",
   "inversePrimaryBackground": "#fff",
   "inverseMutedBackground": "#eee",
-  "inverseBorderColor": "#ddd"
+  "inverseBorderColor": "#ddd",
+  "subnavPillItemPaddingVertical": "8px",
+  "subnavPillItemPaddingHorizontal": "14px",
+  "subnavPillItemColor": "#FFF",
+  "subnavPillItemHoverBackground": "transparent",
+  "subnavPillItemHoverColor": "rgba(255, 255, 255, 0.7)",
+  "subnavPillItemOnclickBackground": "transparent",
+  "subnavPillItemOnclickColor": "#FFF",
+  "subnavPillItemActiveBackground": "rgba(27, 23, 31, 0.75)",
+  "subnavPillItemActiveColor": "#FFF",
+  "subnavPillItemBorderRadius": "500px",
+  "subnavPillItemActiveBoxShadow": "0 0 5px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.02), 0 1px 0 rgba(255, 255, 255, 0.04)",
+  "internalSubnavPillItemMode": "glow",
+  "internalSubnavPillItemGlowGradient": "conic-gradient(from 60deg, #E8533C, #FD3D8F, #B823C3, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)",
+  "internalSubnavPillItemGlowFilter": "blur(10px)",
+  "internalSubnavPillItemGlowOpacity": "0",
+  "internalSubnavPillItemHoverGlowOpacity": "0"
 }

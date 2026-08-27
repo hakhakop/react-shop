@@ -9,6 +9,7 @@ import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 import { fontFamilyStack } from "@/lib/webFonts";
 import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
+import { resolveSectionColorMode } from "@/lib/semanticBackgrounds";
 
 function yoothemeButtonTextArrow(color: string) {
   const svg = `<svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><polyline fill="none" stroke="${color}" stroke-width="1.2" points="13 1 18 5.5 13 10"/><line fill="none" stroke="${color}" stroke-width="1.2" x1="0" y1="5.5" x2="18.4" y2="5.5"/></svg>`;
@@ -112,6 +113,7 @@ export function getUikitGlobalsCssVars(
   };
   const buttonControlHeight = value("controlHeightDefault", value("buttonHeight", "48px"));
   const buttonLargeControlHeight = value("controlHeightLarge", "56px");
+  const buttonDefaultMode = buttonValue("buttonDefaultMode", "none");
   const backgroundDefault = resolveBackgroundPaint(value("backgroundDefault", value("backgroundColor", "#ffffff")), "#ffffff");
   const backgroundMuted = resolveBackgroundPaint(value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")), "#f8fafc");
   const backgroundPrimary = resolveBackgroundPaint(value("backgroundPrimary", primary), primary);
@@ -138,12 +140,25 @@ export function getUikitGlobalsCssVars(
   const sectionPrimaryBackgroundImage = backgroundPrimaryImage === "none"
     ? (backgroundPrimaryGradient === "none" ? "none" : `var(--uikit-section-primary-gradient, ${backgroundPrimaryGradient})`)
     : backgroundPrimaryImage;
+  const sectionColorModes = {
+    default: resolveSectionColorMode(shellSettings, "default"),
+    muted: resolveSectionColorMode(shellSettings, "muted"),
+    primary: resolveSectionColorMode(shellSettings, "primary"),
+    secondary: resolveSectionColorMode(shellSettings, "secondary"),
+  };
+  // YOOtheme's Section color-mode labels select the normal or inverse UIkit
+  // context. In Circle, `light` is the normal light-text theme context; the
+  // imported `@global-inverse-color: #000` is used only for `dark` mode.
+  const sectionTextColor = (mode: "light" | "dark") => mode === "light"
+    ? "var(--uk-global-text-color, #111827)"
+    : "var(--uk-inverse-global-color, #000)";
   const globalText = value("textColor", "#111827");
   const globalEmphasis = value("emphasisColor", globalText);
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
   const globalBorder = value("borderColor", "transparent");
   const cardDefaultBackground = resolveBackgroundPaint(value("cardBackground", "#ffffff"), "#ffffff");
+  const cardDefaultColorMode = value("cardDefaultColorMode", "dark");
   const cardPrimaryBackground = resolveBackgroundPaint(value("cardPrimaryBackground", primary), primary);
   const cardSecondaryBackground = resolveBackgroundPaint(value("cardSecondaryBackground", "#111827"), "#111827");
   const cardDefaultHoverBackground = resolveBackgroundPaint(value("cardDefaultHoverBackground", cardDefaultBackground), cardDefaultBackground);
@@ -170,10 +185,13 @@ export function getUikitGlobalsCssVars(
     // Section paddings
     "--uk-section-padding-xsmall": value("sectionPaddingXSmall", "20px"),
     "--uk-section-padding-small": value("sectionPaddingSmall", "40px"),
-    "--uk-section-padding-default": value("sectionPaddingDefault", "70px"),
+    "--uk-section-padding-default": value("sectionPaddingDefault", "40px"),
+    "--uk-section-padding-default-m": value("sectionPaddingDefaultMedium", "70px"),
     "--uk-section-padding-medium": value("sectionPaddingMedium", "80px"),
-    "--uk-section-padding-large": value("sectionPaddingLarge", "140px"),
+    "--uk-section-padding-large": value("sectionPaddingLarge", "70px"),
+    "--uk-section-padding-large-m": value("sectionPaddingLargeMedium", "140px"),
     "--uk-section-padding-xlarge": value("sectionPaddingXLarge", "140px"),
+    "--uk-section-padding-xlarge-m": value("sectionPaddingXLargeMedium", "210px"),
 
     // Container max-widths
     "--uk-container-small-max-width": value("containerSmall", "900px"),
@@ -219,6 +237,14 @@ export function getUikitGlobalsCssVars(
     "--uikit-section-muted-bg": backgroundMuted,
     "--uikit-section-primary-bg": backgroundPrimary,
     "--uikit-section-secondary-bg": backgroundSecondary,
+    "--uk-section-default-color-mode": sectionColorModes.default,
+    "--uk-section-muted-color-mode": sectionColorModes.muted,
+    "--uk-section-primary-color-mode": sectionColorModes.primary,
+    "--uk-section-secondary-color-mode": sectionColorModes.secondary,
+    "--uikit-section-default-color": sectionTextColor(sectionColorModes.default),
+    "--uikit-section-muted-color": sectionTextColor(sectionColorModes.muted),
+    "--uikit-section-primary-color": sectionTextColor(sectionColorModes.primary),
+    "--uikit-section-secondary-color": sectionTextColor(sectionColorModes.secondary),
     "--webpages-background-default-image": backgroundDefaultImage,
     "--webpages-background-muted-image": backgroundMutedImage,
     "--webpages-background-primary-image": backgroundPrimaryImage,
@@ -259,6 +285,8 @@ export function getUikitGlobalsCssVars(
     "--uk-heading-large-font-size": value("headingLargeFontSize", "38px"),
     "--uk-heading-xlarge-font-size": value("headingXLargeFontSize", "44px"),
     "--uk-heading-small-font-size-responsive": value("headingSmallFontSizeResponsive", "52px"),
+    "--uk-heading-small-line-height": value("headingSmallLineHeight", "1.2"),
+    "--uk-heading-large-line-height": value("headingLargeLineHeight", "1.1"),
     "--uk-heading-medium-font-size-responsive": value("headingMediumFontSizeResponsive", "62px"),
     "--uk-heading-medium-line-height": value("headingMediumLineHeight", "1.2"),
     "--uk-heading-small-font-weight": value("headingSmallFontWeight", "700"),
@@ -272,6 +300,11 @@ export function getUikitGlobalsCssVars(
     "--uk-global-font-size-2xlarge": value("fontSize2XLarge", "44px"),
     "--uk-global-emphasis-color": value("emphasisColor", "#111827"),
     "--uk-global-inverse-color": value("inverseColor", "#fff"),
+    // UIkit semantic color utilities consume the global background roles
+    // directly. Keep these aliases generated from the active theme instead
+    // of falling back to the generic UIkit blue when a utility is used.
+    "--uk-global-primary-background": primary,
+    "--uk-global-secondary-background": value("backgroundSecondary", "#111827"),
     "--uk-inverse-global-color": value("inverseTextColor", `color-mix(in srgb, ${globalInverse} 70%, transparent)`),
     "--uk-inverse-global-emphasis-color": value("inverseEmphasisColor", globalInverse),
     "--uk-inverse-global-muted-color": value("inverseMutedTextColor", `color-mix(in srgb, ${globalInverse} 50%, transparent)`),
@@ -292,6 +325,7 @@ export function getUikitGlobalsCssVars(
     "--uk-base-mark-color": value("baseMarkColor", primary),
     "--uk-global-border-width": value("borderWidth", "1px"),
     "--uk-global-border-color": value("borderColor", "#e5e7eb"),
+    "--uk-global-border": value("borderColor", "#e5e7eb"),
     // UIkit Alert presentation. These values are consumed by the shared
     // `.uk-alert` renderer in both Builder and storefront, never by a
     // fixture-specific selector.
@@ -332,10 +366,19 @@ export function getUikitGlobalsCssVars(
     "--uk-card-default-hover-background": cardDefaultHoverBackground,
     "--uk-card-primary-hover-background": cardPrimaryHoverBackground,
     "--uk-card-secondary-hover-background": cardSecondaryHoverBackground,
-    "--uk-card-default-text": value("cardDefaultText", value("mutedTextColor", "#6b7280")),
+    // UIkit's Card Default color mode selects the normal or inverse semantic
+    // text context. Circle imports `light`, so its translucent default-card
+    // text follows the imported global text role instead of the native muted
+    // fallback. Native themes retain their existing dark-mode card text.
+    "--uk-card-default-color-mode": cardDefaultColorMode,
+    "--uk-card-default-text": cardDefaultColorMode === "light"
+      ? "var(--uk-global-text-color, var(--uk-global-color, rgba(255,255,255,0.7)))"
+      : value("cardDefaultText", value("mutedTextColor", "#6b7280")),
     "--uk-card-primary-text": value("cardPrimaryText", "#fff"),
     "--uk-card-secondary-text": value("cardSecondaryText", "#fff"),
-    "--uk-card-default-title": value("cardDefaultTitle", value("emphasisColor", "#111827")),
+    "--uk-card-default-title": cardDefaultColorMode === "light"
+      ? "var(--uk-global-emphasis-color, #fff)"
+      : value("cardDefaultTitle", value("emphasisColor", "#111827")),
     "--uk-card-primary-title": value("cardPrimaryTitle", "#fff"),
     "--uk-card-secondary-title": value("cardSecondaryTitle", "#fff"),
     "--uk-card-default-hover-text": value("cardDefaultHoverText", value("cardDefaultText", "#6b7280")),
@@ -422,7 +465,10 @@ export function getUikitGlobalsCssVars(
     "--uk-button-disabled-text": value("buttonDisabledText", "#999"),
     "--uk-button-disabled-border": value("buttonDisabledBorder", "transparent"),
     "--uk-button-text-background": buttonValue("buttonTextBackground", "transparent"),
-    "--uk-button-text-arrow-image": yoothemeButtonTextArrow(primary),
+    // UIkit/YOOtheme Button Text defaults to the emphasis foreground when
+    // the theme does not author a dedicated text-button color. The link
+    // token remains separate and must not leak into this presentation.
+    "--uk-button-text-arrow-image": yoothemeButtonTextArrow(globalEmphasis),
     "--uk-button-text-arrow-inverse-image": yoothemeButtonTextArrow(globalInverse),
     "--uk-button-text-hover-color": buttonValue("buttonTextHoverColor", primary),
     "--uk-button-text-border": buttonValue("buttonTextBorder", "transparent"),
@@ -442,13 +488,13 @@ export function getUikitGlobalsCssVars(
     "--uk-button-primary-active-gradient": buttonValue("buttonPrimaryActiveGradient", buttonValue("buttonPrimaryGradient", "none")),
     "--uk-button-secondary-hover-gradient": buttonValue("buttonSecondaryHoverGradient", "none"),
     "--uk-button-secondary-active-gradient": buttonValue("buttonSecondaryActiveGradient", "none"),
-    "--uk-button-default-mode": buttonValue("buttonDefaultMode", "none"),
-    "--uk-button-default-glow-display": buttonValue("buttonDefaultMode", "none") === "glow" ? "block" : "none",
+    "--uk-button-default-mode": buttonDefaultMode,
+    "--uk-button-default-glow-display": buttonDefaultMode === "glow" ? "block" : "none",
     "--uk-button-default-glow-gradient": buttonValue("buttonDefaultGlowGradient", "none"),
     "--uk-button-default-glow-filter": buttonValue("buttonDefaultGlowFilter", "none"),
     "--uk-button-default-hover-glow-filter": buttonValue("buttonDefaultHoverGlowFilter", buttonValue("buttonDefaultGlowFilter", "none")),
-    "--uk-button-default-render-background": buttonValue("buttonDefaultMode", "none") === "glow" ? "transparent" : buttonValue("buttonDefaultBackground", backgroundDefault),
-    "--uk-button-default-render-gradient": buttonValue("buttonDefaultMode", "none") === "glow" ? "none" : "none",
+    "--uk-button-default-render-background": buttonDefaultMode === "glow" ? "transparent" : buttonValue("buttonDefaultBackground", backgroundDefault),
+    "--uk-button-default-render-gradient": buttonDefaultMode === "glow" ? "none" : "none",
     "--uk-button-primary-mode": buttonValue("buttonPrimaryMode", "none"),
     "--uk-button-primary-glow-display": buttonValue("buttonPrimaryMode", "none") === "glow" ? "block" : "none",
     "--uk-button-primary-glow-gradient": buttonValue("buttonPrimaryGlowGradient", "none"),
@@ -504,9 +550,17 @@ export function getUikitGlobalsCssVars(
     "--uk-button-inverse-secondary-border": buttonValue("buttonInverseSecondaryBorder", globalInverse),
     "--uk-button-inverse-secondary-hover-text": buttonValue("buttonInverseSecondaryHoverText", globalText),
     "--uk-button-inverse-secondary-active-text": buttonValue("buttonInverseSecondaryActiveText", globalText),
-    "--uk-button-default-shadow": buttonValue("buttonDefaultShadow", value("shadowLarge", "none")),
+    // Glow mode paints the effect through the pseudo-element layer. UIkit's
+    // source rule clears the base box-shadow, so the canonical projection
+    // must not leave the imported shadow underneath it.
+    "--uk-button-default-shadow": buttonDefaultMode === "glow"
+      ? "none"
+      : buttonValue("buttonDefaultShadow", value("shadowLarge", "none")),
     "--uk-button-default-hover-shadow": buttonValue("buttonDefaultHoverShadow", value("shadowMedium", "none")),
-    "--uk-button-primary-shadow": buttonValue("buttonPrimaryShadow", value("shadowLarge", "none")),
+    // A missing YOOtheme button-primary shadow is `none`; the global large
+    // shadow is not an implicit Button token and created a visible mismatch
+    // on imported Pricing actions.
+    "--uk-button-primary-shadow": buttonValue("buttonPrimaryShadow", "none"),
     "--uk-button-primary-hover-shadow": buttonValue("buttonPrimaryHoverShadow", buttonValue("buttonHoverShadow", "none")),
     "--uk-button-secondary-shadow": buttonValue("buttonSecondaryShadow", "none"),
     "--uk-button-secondary-hover-shadow": buttonValue("buttonSecondaryHoverShadow", buttonValue("buttonHoverShadow", "none")),
@@ -516,17 +570,18 @@ export function getUikitGlobalsCssVars(
     "--uk-button-default-text": buttonValue("buttonDefaultText", globalText),
     "--uk-button-secondary-background": buttonValue("buttonSecondaryBackground", "#e5e7eb"),
     "--uk-button-secondary-text": buttonValue("buttonSecondaryText", globalText),
-    "--uk-button-text-color": buttonValue("buttonTextColorSemantic", primary),
+    "--uk-button-text-color": buttonValue("buttonTextColorSemantic", globalEmphasis),
     "--uk-global-control-height": value("controlHeightDefault", value("buttonHeight", "48px")),
     "--uk-global-control-height-small": value("controlHeightSmall", "40px"),
     "--uk-global-control-height-large": value("controlHeightLarge", "56px"),
     "--uk-button-height": value("buttonHeight", value("controlHeightDefault", "48px")),
     "--uk-button-height-small": value("controlHeightSmall", "40px"),
     "--uk-button-height-large": value("controlHeightLarge", "56px"),
-    "--uk-accordion-title-font-size": value("accordionTitleFontSize", "1rem"),
+    "--uk-accordion-title-font-size": value("accordionTitleFontSize", "18px"),
+    "--uk-accordion-title-line-height": value("accordionTitleLineHeight", "1.4"),
     "--uk-accordion-title-hover-color": value("accordionTitleHoverColor", primary),
     "--uk-accordion-content-margin-top": value("accordionContentMarginTop", "12px"),
-    "--uk-accordion-title-padding-vertical": value("accordionTitlePaddingVertical", "10px"),
+    "--uk-accordion-title-padding-vertical": value("accordionTitlePaddingVertical", "0px"),
     "--uk-accordion-icon-color": value("accordionIconColor", "currentColor"),
     "--uk-accordion-title-font-weight": value("accordionTitleFontWeight", "500"),
     "--uk-accordion-title-letter-spacing": value("accordionTitleLetterSpacing", "0px"),
@@ -535,6 +590,23 @@ export function getUikitGlobalsCssVars(
     "--uk-accordion-item-box-shadow": value("accordionItemBoxShadow", "none"),
 
     // Nav
+    "--uk-subnav-pill-item-padding-vertical": value("subnavPillItemPaddingVertical", "8px"),
+    "--uk-subnav-pill-item-padding-horizontal": value("subnavPillItemPaddingHorizontal", "14px"),
+    "--uk-subnav-pill-item-color": value("subnavPillItemColor", globalEmphasis),
+    "--uk-subnav-pill-item-hover-background": value("subnavPillItemHoverBackground", "transparent"),
+    "--uk-subnav-pill-item-hover-color": value("subnavPillItemHoverColor", globalEmphasis),
+    "--uk-subnav-pill-item-onclick-background": value("subnavPillItemOnclickBackground", "transparent"),
+    "--uk-subnav-pill-item-onclick-color": value("subnavPillItemOnclickColor", globalEmphasis),
+    "--uk-subnav-pill-item-active-background": value("subnavPillItemActiveBackground", buttonValue("buttonDefaultBackground", backgroundSecondary)),
+    "--uk-subnav-pill-item-active-color": value("subnavPillItemActiveColor", globalEmphasis),
+    "--uk-subnav-pill-item-border-radius": value("subnavPillItemBorderRadius", "500px"),
+    "--uk-subnav-pill-item-active-box-shadow": value("subnavPillItemActiveBoxShadow", "0 0 5px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.02), 0 1px 0 rgba(255, 255, 255, 0.04)"),
+    "--uk-internal-subnav-pill-item-mode": value("internalSubnavPillItemMode", "none"),
+    "--uk-internal-subnav-pill-item-glow-display": value("internalSubnavPillItemMode", "none") === "glow" ? "block" : "none",
+    "--uk-internal-subnav-pill-item-glow-gradient": value("internalSubnavPillItemGlowGradient", "none"),
+    "--uk-internal-subnav-pill-item-glow-filter": value("internalSubnavPillItemGlowFilter", "none"),
+    "--uk-internal-subnav-pill-item-glow-opacity": value("internalSubnavPillItemGlowOpacity", "0"),
+    "--uk-internal-subnav-pill-item-hover-glow-opacity": value("internalSubnavPillItemHoverGlowOpacity", "0"),
     "--uk-nav-divider-margin-vertical": value("navDividerMarginVertical", "0"),
     "--uk-nav-divider-margin-horizontal": value("navDividerMarginHorizontal", "0"),
     "--uk-nav-large-font-size": value("navLargeFontSize", "3.4rem"),

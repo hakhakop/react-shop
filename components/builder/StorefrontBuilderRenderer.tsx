@@ -28,6 +28,7 @@ import {
   getContentPositioningGroupChildStyle,
 } from "@/components/builder/ContentPositioningGroup";
 import UikitList from "@/components/builder/UikitList";
+import UikitSubnav from "@/components/builder/UikitSubnav";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
 import UikitFluentForm from "@/components/builder/UikitFluentForm";
@@ -78,7 +79,7 @@ import {
   getYoothemeImportGlobalAliases,
   hasYoothemeImportContract,
 } from "@/lib/uikitSemanticContext";
-import { resolveSectionBackground, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
+import { resolveSectionBackground, resolveSectionColorMode, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
@@ -120,7 +121,7 @@ import {
   getUikitSvgColor,
   getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
-import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
+import { elementAdvancedScope, layoutAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
@@ -141,8 +142,11 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
-import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
-import { getGeneralElementShellClassName } from "@/lib/builderElementShell";
+import {
+  getGeneralElementShellStyle,
+  getGeneralElementShellClassName,
+  isYoothemeCenteredPositionedPanel,
+} from "@/lib/builderElementShell";
 import {
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
@@ -352,7 +356,7 @@ function resolveSectionColorScheme(
   }
 
   const resolvedBackground = resolveSectionBackground(section);
-  if (!resolvedBackground.override) return resolvedBackground.role === "primary" || resolvedBackground.role === "secondary" ? "dark" : "light";
+  if (!resolvedBackground.override) return "light";
   const bg = resolvedBackground.override.trim().toLowerCase();
 
   return resolveColorSchemeForBackground(
@@ -361,7 +365,10 @@ function resolveSectionColorScheme(
   );
 }
 
-function resolveDesignColors(layout: BuilderLayout) {
+function resolveDesignColors(
+  layout: BuilderLayout,
+  shellSettings?: Partial<BuilderShellSettings>,
+) {
   const design = layout.design ?? {};
   if (design.colorScheme === "dark") {
     return { ...design, ...builderDarkScheme };
@@ -369,12 +376,28 @@ function resolveDesignColors(layout: BuilderLayout) {
   if (design.colorScheme === "light") {
     return { ...design, ...builderLightScheme };
   }
-  return design;
+
+  // An empty page design is an inheritance boundary, not a request for the
+  // renderer's historical Princity-like fallback palette. The active
+  // imported YOOtheme globals own the page surface, text and controls until a
+  // page explicitly overrides them.
+  return {
+    pageBackground: shellSettings?.backgroundDefault,
+    textColor: shellSettings?.textColor,
+    mutedTextColor: shellSettings?.mutedTextColor,
+    surfaceColor: shellSettings?.cardBackground ?? shellSettings?.backgroundMuted,
+    buttonBackground: shellSettings?.buttonPrimaryBackground ?? shellSettings?.primaryColor,
+    buttonTextColor: shellSettings?.buttonPrimaryText ?? shellSettings?.inverseColor,
+    ...design,
+  };
 }
 
-export function designStyle(layout: BuilderLayout): BuilderStyle {
+export function designStyle(
+  layout: BuilderLayout,
+  shellSettings?: Partial<BuilderShellSettings>,
+): BuilderStyle {
   const design = layout.design;
-  const colors = resolveDesignColors(layout);
+  const colors = resolveDesignColors(layout, shellSettings);
   const styleObj: Record<string, string | undefined> = {};
 
   if (colors.pageBackground) {
@@ -463,8 +486,11 @@ function safeCssColor(value: string | undefined, fallback: string) {
   return fallback;
 }
 
-function builderPageShellCss(layout: BuilderLayout) {
-  const colors = resolveDesignColors(layout);
+function builderPageShellCss(
+  layout: BuilderLayout,
+  shellSettings?: Partial<BuilderShellSettings>,
+) {
+  const colors = resolveDesignColors(layout, shellSettings);
   const pageBackground = safeCssColor(colors.pageBackground, "#f7f7f4");
   const textColor = safeCssColor(colors.textColor, "#111111");
   const mutedTextColor = safeCssColor(colors.mutedTextColor, "#5f5f58");
@@ -842,9 +868,9 @@ function SectionFrame({
       data-builder-object-type={builderInteractionIdentity ? "section" : undefined}
       className={`${getBuilderSectionClassName(section, layoutScheme, extra)} ${
         isFullTheme
-          ? "shop-builder-section--effect-antigravity"
+            ? "shop-builder-section--effect-antigravity"
           : isAnimatedBg
-            ? "relative overflow-hidden"
+            ? "relative"
             : ""
       }`}
       style={{
@@ -1912,6 +1938,10 @@ export function ContentLayoutBlock({
     return <UikitList block={block} />;
   }
 
+  if (block.kind === "subnav") {
+    return <UikitSubnav block={block as any} />;
+  }
+
   if (block.kind === "divider") {
     return <UikitDivider block={block} />;
   }
@@ -2606,7 +2636,9 @@ function blockShellClassName(block: BuilderLayoutBlock) {
       ? `is-padding-${block.elementPadding}`
       : "";
   const alignClass =
-    block.elementAlign && block.elementAlign !== "left"
+    block.elementAlign &&
+    block.elementAlign !== "left" &&
+    !isYoothemeCenteredPositionedPanel(block)
       ? `is-align-${block.elementAlign}`
       : "";
 
@@ -2787,14 +2819,24 @@ function ContentLayoutSection({
             rowItem?.rowBackground,
             sectionColorScheme === "auto" ? "light" : sectionColorScheme,
           );
+          const rowHasColumnVideo = structuralRow.columns.some(
+            (column) => Boolean(column.column.background?.videoUrl),
+          );
 
           return (
             <div key={structuralRow.row.id} style={{ paddingTop: rowIndex > 0 ? structuralRow.precedingGap : 0 }}>
+              <LayoutAdvancedStyle
+                css={structuralRow.row.advanced?.css}
+                scope={layoutAdvancedScope("row", page, section.id, structuralRow.row.id)}
+              />
               <div
                 data-builder-object-type={builderInteractionIdentity ? "row" : undefined}
                 data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
                 data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
+                data-builder-element-scope={layoutAdvancedScope("row", page, section.id, structuralRow.row.id)}
                 className={`${structuralRow.className} shop-builder-content-row ${
+                  structuralRow.row.spacingContract === "yootheme" ? "shop-builder-content-row--yootheme " : ""
+                }${structuralRow.style.maxWidth ? "shop-builder-content-row--contained " : ""}${
                   isFullRowTheme
                     ? "shop-builder-section--effect-antigravity"
                     : isRowAnimatedBg
@@ -2803,6 +2845,7 @@ function ContentLayoutSection({
                 }`}
                 style={{
                   ...structuralRow.style,
+                  ...(rowHasColumnVideo ? { minHeight: "100vh" } : {}),
                   ...rowContextStyle(rowItem, sectionColorScheme),
                   ...rowAnimationAttrs.style,
                 }}
@@ -2934,7 +2977,7 @@ function ContentLayoutSection({
                     data-builder-row-index={builderInteractionIdentity ? rowIndex : undefined}
                     data-builder-column-key={columnKey}
                     data-builder-element-scope={`column-${columnKey}`}
-                    className={`${structuralColumn.className} ${nestedLayout ? "builder-nested-layout-container " : ""}${
+                    className={`${structuralColumn.className} ${structuralColumn.column.background?.videoUrl ? "shop-builder-column--has-background-video" : ""} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
                         ? "w-full"
                         : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`
@@ -2977,6 +3020,10 @@ function ContentLayoutSection({
                     ) : (
                       <div
                         className={`shop-builder-column-content${
+                          structuralColumn.column.background?.videoUrl
+                            ? " shop-builder-column-content--media-sticky uk-tile uk-position-z-index"
+                            : ""
+                        }${
                           structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
                             ? " uk-flex uk-flex-middle"
                             : structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "bottom"
@@ -2985,6 +3032,17 @@ function ContentLayoutSection({
                         }`}
                         data-uk-sticky={structuralColumn.stickyDeclaration}
                       >
+                        {structuralColumn.column.background?.videoUrl ? (
+                          <video
+                            className="shop-builder-column-background-video"
+                            src={structuralColumn.column.background.videoUrl}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            aria-hidden="true"
+                          />
+                        ) : null}
                         <ContentPositioningGroup blocks={blocks}>
                           {renderColumnBlocks(blocks)}
                         </ContentPositioningGroup>
@@ -3320,12 +3378,12 @@ function StorefrontBuilderRendererBase({
     <>
       {isPageDocument ? <style
         data-builder-page-shell
-        dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}
+        dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout, shellSettings) }}
       /> : null}
       {isPageDocument ? <ResponsiveBreakpointPolicyStyle policy={responsiveBreakpointPolicy} /> : null}
       <RootElement
         className={`${designClassName(rootLayout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
-        style={designStyle(rootLayout) as CSSProperties}
+        style={designStyle(rootLayout, shellSettings) as CSSProperties}
         data-builder-page-root
         data-responsive-breakpoint-policy={responsiveBreakpointPolicy.id}
         data-responsive-breakpoint-small={responsiveBreakpointPolicy.small}
@@ -3338,6 +3396,10 @@ function StorefrontBuilderRendererBase({
         }
         data-section-pull-under-header={pullUnderHeader ? "true" : undefined}
         data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
+        data-section-default-color-mode={resolveSectionColorMode(shellSettings, "default")}
+        data-section-muted-color-mode={resolveSectionColorMode(shellSettings, "muted")}
+        data-section-primary-color-mode={resolveSectionColorMode(shellSettings, "primary")}
+        data-section-secondary-color-mode={resolveSectionColorMode(shellSettings, "secondary")}
       >
         {!documentRuntimeOwnedExternally ? <BuilderScrollAnimations /> : null}
         {!documentRuntimeOwnedExternally && isPageDocument ? <BuilderStickyRuntime /> : null}

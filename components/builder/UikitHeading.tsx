@@ -16,7 +16,20 @@ type Props = {
 export default function UikitHeading({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
   const Tag = (rawBlock.headingLevel ?? rawBlock.headingElement ?? "h2") as any;
-  const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
+  // `headingSize` is the canonical inspector value. Keep the legacy field as
+  // a fallback only; otherwise an old `headingStyle` value can shadow a live
+  // Style control update and make the heading appear unresponsive.
+  const styleVal = rawBlock.headingSize ?? rawBlock.headingStyle;
+  const isImportedYoothemeHeading =
+    rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
+  // An explicit YOOtheme style equal to the HTML element (for example the
+  // imported h4 feature titles) is already represented by the element itself;
+  // an omitted style still needs the shared UIkit size token so its line box
+  // follows the active global typography.
+  const isYoothemeElementStyleHeading =
+    isImportedYoothemeHeading &&
+    ((styleVal === Tag && typeof Tag === "string" && /^h[1-6]$/.test(Tag)) ||
+      (styleVal === undefined && typeof Tag === "string" && /^h[4-6]$/.test(Tag)));
   // YOOtheme's unstyled div titles use the compact muted/meta presentation.
   // Preserve that semantic when an older/local Builder document has lost the
   // explicit text-meta token during normalization.
@@ -27,6 +40,8 @@ export default function UikitHeading({ block }: Props) {
   const uikitHeadingClass =
     isYoothemeMetaTitle
       ? getUikitTextClass("text-meta")
+      : isYoothemeElementStyleHeading
+      ? ""
       : styleVal === "none" || styleVal === "inherit"
       ? ""
       : styleVal
@@ -37,7 +52,11 @@ export default function UikitHeading({ block }: Props) {
         : getUikitHeadingClass(Tag, styleVal)
       : getUikitHeadingClass(Tag, "default");
 
-  const decorationClass = rawBlock.titleDecoration ? `uk-heading-${rawBlock.titleDecoration}` : "";
+  const decorationVal = rawBlock.titleDecoration;
+  const decorationClass =
+    decorationVal && !["none", "default", "inherit"].includes(decorationVal)
+      ? `uk-heading-${decorationVal}`
+      : "";
 
   // Color
   const headingColorVal = rawBlock.headingColor ?? rawBlock.color;
@@ -57,7 +76,11 @@ export default function UikitHeading({ block }: Props) {
   const localTypography = typographyProps(rawBlock.typography, "title");
 
   // Margin
-  const marginModeVal = rawBlock.marginMode ?? rawBlock.margin ?? rawBlock.layout?.marginMode;
+  const marginModeVal =
+    rawBlock.marginMode ??
+    rawBlock.margin ??
+    rawBlock.layout?.marginMode ??
+    rawBlock.visualStyle?.layout?.marginMode;
   const marginClass =
     marginModeVal && marginModeVal !== "keep-existing" && marginModeVal !== "none" && marginModeVal !== "default"
       ? `uk-margin-${marginModeVal}`
@@ -66,6 +89,18 @@ export default function UikitHeading({ block }: Props) {
       : "";
   const removeTopClass = (rawBlock.removeTopMargin ?? rawBlock.layout?.removeTopMargin) ? "uk-margin-remove-top" : "";
   const removeBottomClass = (rawBlock.removeBottomMargin ?? rawBlock.layout?.removeBottomMargin) ? "uk-margin-remove-bottom" : "";
+  // YOOtheme applies the authored margin to the heading node itself. The
+  // Builder shell also carries that spacing contract for sibling flow, so
+  // preserve the source node's line-box semantics here as well. In
+  // particular, an unqualified imported headline has no heading margin, a
+  // small one is 10px, and a div title is vertically marginless.
+  const yoothemeTitleMarginClass = isImportedYoothemeHeading
+    ? marginModeVal && marginModeVal !== "default" && marginModeVal !== "keep-existing"
+      ? marginModeVal === "none"
+        ? "uk-margin-remove-vertical"
+        : `uk-margin-${marginModeVal}`
+      : "uk-margin-remove-vertical"
+    : "";
 
   // Max Width & Block Align
   const maxWidthVal = rawBlock.maxWidth ?? rawBlock.visualStyle?.effects?.maxWidth ?? rawBlock.layout?.maxWidth;
@@ -111,12 +146,24 @@ export default function UikitHeading({ block }: Props) {
     decorationClass,
     roleClass,
     localTypography.className,
-    colorClass,
+    yoothemeTitleMarginClass,
     isGradient ? `uikit-text-gradient uikit-text-gradient--${rawBlock.textGradientPreset}` : "",
     rawBlock.showHoverEffect ? "uk-link-heading" : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  // YOOtheme applies semantic heading colors to the content span, not to the
+  // heading element. This matters for `background`: the gradient belongs to
+  // the glyphs while the h1–h6 box keeps its normal transparent surface and
+  // border geometry. Keep that ownership in the shared renderer so imported
+  // and native headings use the same semantic projection.
+  const renderHeadingMarkup = () =>
+    colorClass
+      ? headingHtml !== undefined
+        ? <span className={colorClass} dangerouslySetInnerHTML={{ __html: headingHtml }} />
+        : <span className={colorClass}>{contentNode}</span>
+      : contentNode;
 
   const customGradientStyle = {
     ...(localTypography.style ?? {}),
@@ -133,29 +180,38 @@ export default function UikitHeading({ block }: Props) {
     headingContent
   );
 
-  const innerNode = linkUrl ? (
-    <a
-      href={linkUrl}
-      {...builderLinkTargetProps(linkTarget)}
-      className="uk-link-reset"
-      {...(headingHtml !== undefined ? { dangerouslySetInnerHTML: { __html: headingHtml } } : {})}
-    >
-      {headingHtml === undefined ? contentNode : null}
-    </a>
-  ) : headingHtml !== undefined ? null : (
-    contentNode
-  );
+  const headingProps = { className: titleClassName, style: customGradientStyle };
+  const uncoloredHtml = headingHtml !== undefined && !colorClass;
 
   return (
     <div
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--heading ${marginClass} ${removeTopClass} ${removeBottomClass} ${maxWidthClass} ${blockAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
-      {headingHtml !== undefined && !linkUrl ? (
-        <Tag className={titleClassName} style={customGradientStyle} dangerouslySetInnerHTML={{ __html: headingHtml }} />
+      {uncoloredHtml && !linkUrl ? (
+        <Tag {...headingProps} dangerouslySetInnerHTML={{ __html: headingHtml }} />
       ) : (
-        <Tag className={titleClassName} style={customGradientStyle}>
-          {innerNode}
+        <Tag {...headingProps}>
+          {linkUrl ? (
+            uncoloredHtml ? (
+              <a
+                href={linkUrl}
+                {...builderLinkTargetProps(linkTarget)}
+                className="uk-link-reset"
+                dangerouslySetInnerHTML={{ __html: headingHtml }}
+              />
+            ) : (
+              <a
+                href={linkUrl}
+                {...builderLinkTargetProps(linkTarget)}
+                className="uk-link-reset"
+              >
+                {renderHeadingMarkup()}
+              </a>
+            )
+          ) : (
+            renderHeadingMarkup()
+          )}
         </Tag>
       )}
     </div>

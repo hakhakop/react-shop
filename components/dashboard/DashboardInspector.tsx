@@ -690,7 +690,7 @@ function HeaderHeightControl({
           value={height ?? "auto"}
           onChange={(event) => selectHeight(event.target.value)}
         >
-          <option value="auto">Auto (Responsive)</option>
+          <option value="auto">Global (Navbar)</option>
           <option value="compact">Compact (56px)</option>
           <option value="comfortable">Comfortable (72px)</option>
           <option value="spacious">Spacious (88px)</option>

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { BuilderCustomGlobalStylePreset, BuilderShellSettings } from "@/lib/builderShell";
+import { isGradientBackgroundPaint } from "@/lib/backgroundPaint";
 import {
   RESPONSIVE_BREAKPOINT_KEYS,
   parseResponsiveBreakpoint,
@@ -14,7 +15,7 @@ import {
 import { YOOTHEME_DEVSTACK_PRESETS } from "@/lib/yoothemeLessImporter";
 import { resolveBundledYoothemeDevstackPreset } from "@/lib/yoothemeDevstackPresets";
 import { GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
-import { YoothemeColorPicker, YoothemeFontPicker, YoothemeLessImportModal } from "@/components/dashboard/global-styles/YoothemeStyleControls";
+import { YoothemeColorPaletteProvider, YoothemeColorPicker, YoothemeFontPicker, YoothemeLessImportModal } from "@/components/dashboard/global-styles/YoothemeStyleControls";
 
 type Props = { shellSettings: BuilderShellSettings; updateShellSettings: (patch: Partial<BuilderShellSettings>) => void };
 type Screen = "root" | "global" | "button" | "card" | "heading" | "accordion" | "background" | "base" | "visibility" | "section" | "container" | "grid" | "nav" | "navbar";
@@ -279,9 +280,26 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
     const query = navQuery.trim().toLowerCase();
     return !query || `${item.label} ${item.description}`.toLowerCase().includes(query);
   };
+  const themeColorPalette: unknown[] = [
+    draft.primaryColor,
+    draft.accentColor,
+    draft.secondaryColor,
+    draft.backgroundDefault,
+    draft.backgroundMuted,
+    draft.backgroundPrimary,
+    draft.backgroundSecondary,
+    draft.textColor,
+    draft.emphasisColor,
+    draft.inverseColor,
+    draft.linkColor,
+    draft.linkHoverColor,
+    draft.dangerColor,
+    draft.successColor,
+    draft.warningColor,
+  ];
 
   if (screen !== "root") {
-    return <div className="builder-global-design-editor" data-testid={`global-editor-${screen}`}>
+    return <YoothemeColorPaletteProvider colors={themeColorPalette}><div className="builder-global-design-editor" data-testid={`global-editor-${screen}`}>
       <div className="builder-design-editor-header"><button type="button" className="builder-design-back" onClick={cancel}>← <span>Back</span></button><div className="builder-design-editor-title"><small>STYLE / COMPONENT</small><strong>{supported.find((item) => item.id === screen)?.label ?? "Global"}</strong></div><div className="builder-design-editor-actions"><button type="button" onClick={cancel}>Cancel</button><button type="button" className="is-primary" onClick={save}>Save</button></div></div>
       <div className="builder-design-inheritance-banner" data-token-inheritance="global-component-local"><strong>Appearance ownership</strong><span>Global Style → Component Default → Current Element Override</span><small>These controls define the global layer. Element inspectors only override values intentionally owned by that instance.</small></div>
       <div className="builder-design-editor-body">
@@ -302,7 +320,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
           {screen === "navbar" && <NavbarGlobalEditor draft={draft} set={set} />}
         </div>
       </div>
-    </div>;
+    </div></YoothemeColorPaletteProvider>;
   }
 
   return <div className="builder-global-design-root" data-testid="global-design-root">
@@ -469,7 +487,7 @@ function CardEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Ke
     <Group title="Content rhythm"><Length label="Image to body spacing" value={draft.cardImageBodySpacing} onChange={(value) => set("cardImageBodySpacing", value)} /><Length label="Title spacing" value={draft.cardTitleSpacing} onChange={(value) => set("cardTitleSpacing", value)} /><Length label="Meta spacing" value={draft.cardMetaSpacing} onChange={(value) => set("cardMetaSpacing", value)} /><Length label="Header spacing" value={draft.cardHeaderSpacing} onChange={(value) => set("cardHeaderSpacing", value)} /><Length label="Footer spacing" value={draft.cardFooterSpacing} onChange={(value) => set("cardFooterSpacing", value)} /></Group>
   </>;
 }
-function HeadingEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Scale"><Select label="Font family" value={draft.fontFamilyHeading} options={["inherit", "Manrope", "Inter", "Georgia"]} onChange={(value) => set("fontFamilyHeading", value)} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /><Select label="Small weight" value={draft.headingSmallFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingSmallFontWeight", value)} /><Select label="Medium weight" value={draft.headingMediumFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingMediumFontWeight", value)} />{([["headingSmallFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"], ["headingSmallFontSizeResponsive", "Small responsive"], ["headingMediumFontSizeResponsive", "Medium responsive"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}<Length label="Medium line height" value={draft.headingMediumLineHeight} onChange={(value) => set("headingMediumLineHeight", value)} units={["", "px"]} /></Group></>; }
+function HeadingEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Scale"><Select label="Font family" value={draft.fontFamilyHeading} options={["inherit", "Manrope", "Inter", "Georgia"]} onChange={(value) => set("fontFamilyHeading", value)} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /><Select label="Small weight" value={draft.headingSmallFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingSmallFontWeight", value)} /><Select label="Medium weight" value={draft.headingMediumFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingMediumFontWeight", value)} />{([["headingSmallFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"], ["headingSmallFontSizeResponsive", "Small responsive"], ["headingMediumFontSizeResponsive", "Medium responsive"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}<Length label="Small line height" value={draft.headingSmallLineHeight} onChange={(value) => set("headingSmallLineHeight", value)} units={["", "px"]} /><Length label="Medium line height" value={draft.headingMediumLineHeight} onChange={(value) => set("headingMediumLineHeight", value)} units={["", "px"]} /><Length label="Large line height" value={draft.headingLargeLineHeight} onChange={(value) => set("headingLargeLineHeight", value)} units={["", "px"]} /></Group></>; }
 function VisibilityEditor({ draft, setVisibility }: { draft: BuilderShellSettings; setVisibility: (key: "visibilityDesktop" | "visibilityTablet" | "visibilityMobile", value: boolean) => void }) {
   const fields: ["visibilityDesktop" | "visibilityTablet" | "visibilityMobile", string][] = [
     ["visibilityDesktop", "Desktop"],
@@ -479,8 +497,41 @@ function VisibilityEditor({ draft, setVisibility }: { draft: BuilderShellSetting
   return <Group title="Global defaults"><div className="builder-import-readonly"><strong>Inherited by sections and content elements</strong><span>Elements remain inherited until their local inspector explicitly selects Visible or Hidden.</span></div>{fields.map(([key, label]) => <label key={key} className="builder-design-control builder-design-checkbox"><span>{label}</span><input aria-label={`${label} visibility default`} type="checkbox" checked={draft[key] !== false} onChange={(event) => setVisibility(key, event.target.checked)} /><small>{draft[key] === false ? "Hidden" : "Visible"}</small></label>)}</Group>;
 }
 function AccordionEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Title"><Length label="Font size" value={draft.accordionTitleFontSize} onChange={(value) => set("accordionTitleFontSize", value)} /><Select label="Weight" value={draft.accordionTitleFontWeight} options={["400", "500", "600", "700"]} onChange={(value) => set("accordionTitleFontWeight", value)} /><Length label="Letter spacing" value={draft.accordionTitleLetterSpacing} onChange={(value) => set("accordionTitleLetterSpacing", value)} /></Group><Group title="Icon and interaction"><Color label="Icon color" value={draft.accordionIconColor} onChange={(value) => set("accordionIconColor", value)} /><Color label="Hover color" value={draft.accordionTitleHoverColor} onChange={(value) => set("accordionTitleHoverColor", value)} /><Length label="Title vertical padding" value={draft.accordionTitlePaddingVertical} onChange={(value) => set("accordionTitlePaddingVertical", value)} /><Length label="Content top spacing" value={draft.accordionContentMarginTop} onChange={(value) => set("accordionContentMarginTop", value)} /></Group><Group title="Rows"><Length label="Border width" value={draft.accordionItemBorderWidth} onChange={(value) => set("accordionItemBorderWidth", value)} /><Color label="Border color" value={draft.accordionItemBorder} onChange={(value) => set("accordionItemBorder", value)} /><Shadow label="Row shadow" value={draft.accordionItemBoxShadow} onChange={(value) => set("accordionItemBoxShadow", value)} /></Group></>; }
-function SemanticBackgroundEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Background"><BackgroundPaint label="Default background" value={draft.backgroundDefault} onChange={(value) => set("backgroundDefault", value)} /><BackgroundPaint label="Muted background" value={draft.backgroundMuted} onChange={(value) => set("backgroundMuted", value)} /><BackgroundPaint label="Primary background" value={draft.backgroundPrimary} onChange={(value) => set("backgroundPrimary", value)} /><BackgroundPaint label="Secondary background" value={draft.backgroundSecondary} onChange={(value) => set("backgroundSecondary", value)} /></Group>; }
-function SectionGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Padding"><Length label="Xsmall padding" value={draft.sectionPaddingXSmall} onChange={(value) => set("sectionPaddingXSmall", value)} /><Length label="Small padding" value={draft.sectionPaddingSmall} onChange={(value) => set("sectionPaddingSmall", value)} /><Length label="Default padding" value={draft.sectionPaddingDefault} onChange={(value) => set("sectionPaddingDefault", value)} /><Length label="Medium padding" value={draft.sectionPaddingMedium} onChange={(value) => set("sectionPaddingMedium", value)} /><Length label="Large padding" value={draft.sectionPaddingLarge} onChange={(value) => set("sectionPaddingLarge", value)} /><Length label="Xlarge padding" value={draft.sectionPaddingXLarge} onChange={(value) => set("sectionPaddingXLarge", value)} /></Group><SemanticBackgroundEditor draft={draft} set={set} /></>; }
+function SectionColorMode({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
+  return <Select label={label} value={value ?? "light"} options={["light", "dark"]} onChange={onChange} />;
+}
+function SemanticBackgroundEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) {
+  const setSectionPaint = (solidKey: Key, gradientKey: Key, value: string) => {
+    set(solidKey, value);
+    set(gradientKey, isGradientBackgroundPaint(value) ? value : "none");
+  };
+  const paint = (solidKey: Key, gradientKey: Key, value: unknown) => (
+    <BackgroundPaint
+      label="Background"
+      value={value}
+      onChange={(next) => setSectionPaint(solidKey, gradientKey, next)}
+    />
+  );
+  return <>
+    <Group title="Default">
+      {paint("backgroundDefault", "backgroundDefaultGradient", isGradientBackgroundPaint(draft.backgroundDefaultGradient) ? draft.backgroundDefaultGradient : draft.backgroundDefault)}
+      <SectionColorMode label="Color mode" value={draft.sectionDefaultColorMode} onChange={(value) => set("sectionDefaultColorMode", value)} />
+    </Group>
+    <Group title="Muted">
+      <BackgroundPaint label="Background" value={draft.backgroundMuted} onChange={(value) => set("backgroundMuted", value)} />
+      <SectionColorMode label="Color mode" value={draft.sectionMutedColorMode} onChange={(value) => set("sectionMutedColorMode", value)} />
+    </Group>
+    <Group title="Primary">
+      {paint("backgroundPrimary", "backgroundPrimaryGradient", isGradientBackgroundPaint(draft.backgroundPrimaryGradient) ? draft.backgroundPrimaryGradient : draft.backgroundPrimary)}
+      <SectionColorMode label="Color mode" value={draft.sectionPrimaryColorMode} onChange={(value) => set("sectionPrimaryColorMode", value)} />
+    </Group>
+    <Group title="Secondary">
+      <BackgroundPaint label="Background" value={draft.backgroundSecondary} onChange={(value) => set("backgroundSecondary", value)} />
+      <SectionColorMode label="Color mode" value={draft.sectionSecondaryColorMode} onChange={(value) => set("sectionSecondaryColorMode", value)} />
+    </Group>
+  </>;
+}
+function SectionGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Padding"><Length label="Xsmall padding" value={draft.sectionPaddingXSmall} onChange={(value) => set("sectionPaddingXSmall", value)} /><Length label="Small padding" value={draft.sectionPaddingSmall} onChange={(value) => set("sectionPaddingSmall", value)} /><Length label="Default padding" value={draft.sectionPaddingDefault} onChange={(value) => set("sectionPaddingDefault", value)} /><Length label="Default padding @M" value={draft.sectionPaddingDefaultMedium} onChange={(value) => set("sectionPaddingDefaultMedium", value)} /><Length label="Large padding" value={draft.sectionPaddingLarge} onChange={(value) => set("sectionPaddingLarge", value)} /><Length label="Large padding @M" value={draft.sectionPaddingLargeMedium} onChange={(value) => set("sectionPaddingLargeMedium", value)} /><Length label="Xlarge padding" value={draft.sectionPaddingXLarge} onChange={(value) => set("sectionPaddingXLarge", value)} /><Length label="Xlarge padding @M" value={draft.sectionPaddingXLargeMedium} onChange={(value) => set("sectionPaddingXLargeMedium", value)} /></Group><SemanticBackgroundEditor draft={draft} set={set} /></>; }
 function ContainerGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Container"><Length label="Default max width" value={draft.containerDefault} onChange={(value) => set("containerDefault", value)} /><Length label="Padding horizontal" value={draft.containerPaddingHorizontal} onChange={(value) => set("containerPaddingHorizontal", value)} /><Length label="@s padding horizontal" value={draft.containerPaddingHorizontalSmall} onChange={(value) => set("containerPaddingHorizontalSmall", value)} /><Length label="@m padding horizontal" value={draft.containerPaddingHorizontalMedium} onChange={(value) => set("containerPaddingHorizontalMedium", value)} /><Length label="Xsmall max width" value={draft.containerXSmall} onChange={(value) => set("containerXSmall", value)} /><Length label="Small max width" value={draft.containerSmall} onChange={(value) => set("containerSmall", value)} /><Length label="Large max width" value={draft.containerLarge} onChange={(value) => set("containerLarge", value)} /><Length label="Xlarge max width" value={draft.containerXLarge} onChange={(value) => set("containerXLarge", value)} /><Length label="Page max width" value={draft.pageContainerMaxWidth} onChange={(value) => set("pageContainerMaxWidth", value)} /></Group>; }
 function GridGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Gutters"><Length label="Small gutter" value={draft.gridGutterSmall} onChange={(value) => set("gridGutterSmall", value)} /><Length label="Default gutter" value={draft.gridGutterDefault} onChange={(value) => set("gridGutterDefault", value)} /><Length label="Medium gutter" value={draft.gridGutterMedium} onChange={(value) => set("gridGutterMedium", value)} /><Length label="Large gutter" value={draft.gridGutterLarge} onChange={(value) => set("gridGutterLarge", value)} /></Group>; }
 function NavGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) {

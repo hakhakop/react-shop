@@ -1,3 +1,5 @@
+import type { BuilderShellSettings } from "@/lib/builderShell";
+
 export const SEMANTIC_BACKGROUND_ROLES = ["default", "muted", "primary", "secondary"] as const;
 
 export type SemanticBackgroundRole = (typeof SEMANTIC_BACKGROUND_ROLES)[number];
@@ -14,6 +16,15 @@ function semanticRole(value: unknown): SemanticBackgroundRole | undefined {
   return typeof value === "string" && (SEMANTIC_BACKGROUND_ROLES as readonly string[]).includes(value.toLowerCase())
     ? value.toLowerCase() as SemanticBackgroundRole
     : undefined;
+}
+
+/** Resolve the active global UIkit text context for one semantic section role. */
+export function resolveSectionColorMode(
+  shellSettings: Partial<BuilderShellSettings> | undefined,
+  role: SemanticBackgroundRole,
+): "light" | "dark" {
+  const key = `section${role.charAt(0).toUpperCase()}${role.slice(1)}ColorMode` as keyof BuilderShellSettings;
+  return shellSettings?.[key] === "dark" ? "dark" : "light";
 }
 
 function legacyOverride(value: unknown): string | undefined {

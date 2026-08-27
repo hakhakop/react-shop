@@ -85,6 +85,15 @@ export type BuilderListItem = {
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
+
+export type BuilderSubnavItem = {
+  id: string;
+  label: string;
+  url?: string;
+  target?: "_self" | "_blank";
+  /** Preserve YOOtheme's authored uk-scroll behavior for anchor links. */
+  scroll?: boolean;
+};
 export type InspectorTab =
   | "content"
   | "settings"
@@ -209,6 +218,7 @@ export type LayoutBlockKind =
   | "badgeGrid"
   | "icon"
   | "list"
+  | "subnav"
   | "menu"
   | "headerUtility"
   | "headerSearch"
@@ -599,6 +609,12 @@ export type BuilderLayoutBlock = {
   embedHeight?: number;
   fluentFormId?: string;
   columns?: number;
+  /** Canonical YOOtheme Grid filter navigation, kept separate from item tags. */
+  gridFilterControls?: { label: string; tag: string }[];
+  /** Semantic tag selected when the Grid first mounts or the document changes. */
+  gridFilterDefault?: string;
+  /** Whether a synthetic "All" control is part of this Grid's authored navigation. */
+  gridFilterShowAll?: boolean;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
   cardStyle?: "flat" | "soft" | "lined" | "none";
   cardPreset?:
@@ -675,6 +691,10 @@ export type BuilderLayoutBlock = {
   listIconColorScheme?: "default" | "gradient-cycle";
   listIconSize?: number;
   listItems?: BuilderListItem[];
+  /** Canonical UIkit Subnav links, including authored scroll targets. */
+  subnavItems?: BuilderSubnavItem[];
+  subnavStyle?: "default" | "divider" | "pill";
+  subnavAlign?: "left" | "center" | "right";
   listPresentation?: "default" | "bullet" | "divider" | "striped" | "large";
   listMarker?: "none" | "disc" | "circle" | "square";
   listAlign?: "left" | "center" | "right";

@@ -39,6 +39,15 @@ export const YOOTHEME_LESS_CAPABILITIES: Record<string, YoothemeCapability> = {
   "global-medium-gutter": { owner: "shellSettings.gridGutterMedium", status: "mapped-rendered", ui: "Global Styles › Grid › Gutters" },
   "global-large-gutter": { owner: "shellSettings.gridGutterLarge", status: "mapped-rendered", ui: "Global Styles › Grid › Gutters" },
   "section-padding-vertical": { owner: "shellSettings.sectionPaddingDefault", status: "mapped-rendered", ui: "Global Styles › Section › Padding" },
+  "section-padding-vertical-m": { owner: "shellSettings.sectionPaddingDefaultMedium", status: "mapped-rendered", ui: "Global Styles › Section › Padding › @M" },
+  "section-large-padding-vertical": { owner: "shellSettings.sectionPaddingLarge", status: "mapped-rendered", ui: "Global Styles › Section › Padding" },
+  "section-large-padding-vertical-m": { owner: "shellSettings.sectionPaddingLargeMedium", status: "mapped-rendered", ui: "Global Styles › Section › Padding › @M" },
+  "section-xlarge-padding-vertical": { owner: "shellSettings.sectionPaddingXLarge", status: "mapped-rendered", ui: "Global Styles › Section › Padding" },
+  "section-xlarge-padding-vertical-m": { owner: "shellSettings.sectionPaddingXLargeMedium", status: "mapped-rendered", ui: "Global Styles › Section › Padding › @M" },
+  "section-default-color-mode": { owner: "shellSettings.sectionDefaultColorMode", status: "mapped-rendered", ui: "Global Styles › Section › Default › Color mode" },
+  "section-muted-color-mode": { owner: "shellSettings.sectionMutedColorMode", status: "mapped-rendered", ui: "Global Styles › Section › Muted › Color mode" },
+  "section-primary-color-mode": { owner: "shellSettings.sectionPrimaryColorMode", status: "mapped-rendered", ui: "Global Styles › Section › Primary › Color mode" },
+  "section-secondary-color-mode": { owner: "shellSettings.sectionSecondaryColorMode", status: "mapped-rendered", ui: "Global Styles › Section › Secondary › Color mode" },
   "button-primary-background": { owner: "shellSettings.buttonPrimaryBackground", status: "mapped-rendered", ui: "Global Styles › Button" },
   "button-secondary-background": { owner: "shellSettings.buttonSecondaryBackground", status: "mapped-rendered", ui: "Global Styles › Button" },
   "card-default-background": { owner: "shellSettings.cardBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
@@ -124,6 +133,16 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   const imagePosition = string(props.image_position);
   const imageSize = string(props.image_size);
   const imageRepeat = string(props.image_repeat);
+  const className = string(props.class);
+  const visibility = string(props.visibility);
+  const classVisibility = className?.match(/(?:^|\s)uk-(visible|hidden)@([smlx])(?:\s|$)/);
+  const visibilityMode = visibility === "s" || visibility === "m" || visibility === "l" || visibility === "xl"
+    || visibility === "visible-s" || visibility === "visible-m" || visibility === "visible-l" || visibility === "visible-xl"
+    || visibility === "hidden-s" || visibility === "hidden-m" || visibility === "hidden-l" || visibility === "hidden-xl"
+    ? visibility
+    : classVisibility
+      ? `${classVisibility[1]}-${classVisibility[2]}`
+    : undefined;
   const sectionBackground: NonNullable<BuilderVisualStyle["background"]> | undefined = imageUrl || imagePosition || imageSize || imageRepeat
     ? {
         type: "image" as const,
@@ -158,7 +177,14 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
     ...(headerTextColor === "none" || headerTextColor === "light" || headerTextColor === "dark" ? { headerTextColor } : {}),
     ...(textColor === "none" || textColor === "light" || textColor === "dark" ? { textColor } : {}),
     ...(htmlElement === "div" || htmlElement === "section" || htmlElement === "header" || htmlElement === "footer" || htmlElement === "aside" || htmlElement === "main" ? { htmlElement } : {}),
-    ...(sectionBackground ? { visualStyle: { background: sectionBackground } } : {}),
+    ...(sectionBackground || visibilityMode
+      ? {
+          visualStyle: {
+            ...(sectionBackground ? { background: sectionBackground } : {}),
+            ...(visibilityMode ? { layout: { visibilityMode } } : {}),
+          },
+        }
+      : {}),
   };
 }
 

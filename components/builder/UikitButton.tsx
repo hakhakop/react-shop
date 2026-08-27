@@ -6,6 +6,7 @@ import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveGeneralTextAlignment } from "@/lib/builderElementShell";
 import { typographyProps } from "@/lib/builderTypography";
 import { uikitGridGapCss } from "@/lib/uikitGridStructure";
+import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
 
 type Props = {
   block: any;
@@ -50,15 +51,34 @@ export default function UikitButton({ block, scopeClassName }: Props) {
         "--uk-button-font-weight": "400",
       }
     : {};
+  const yoothemeTextButtonTokens = isImportedYoothemeButton && !rawBlock.size
+    ? {
+        // YOOtheme text links keep the global base typography even when the
+        // tenant's native Button token uses a compact control size. The font
+        // family remains a semantic global token, never a source-theme value.
+        "--uk-button-font-size": "var(--uk-base-font-size, 16px)",
+        "--uk-button-line-height": "var(--uk-base-line-height, 1.5)",
+        "--uk-button-font-family": "var(--webpages-font-primary, var(--uk-global-font-family, inherit))",
+        "--uk-button-font-weight": "400",
+      }
+    : {};
   const actionClassName = (style: string | undefined, size: string | undefined) =>
     `${getUikitButtonClass(
       // Historic native documents used `link` as a Text-button alias before
       // YOOtheme Link became a distinct, bare-`uk-button` source semantic.
       // Preserve that native alias without allowing it to collapse imported
       // YOOtheme Button items.
-      !isImportedYoothemeButton && style === "link" ? "native-link" : style,
+      !isImportedYoothemeButton && !rawBlock.headerButtonMode && style === "link"
+        ? "native-link"
+        : style,
       size,
     )} ${localOverride.className} ${isFullWidth ? "uk-width-1-1" : ""}`.trim();
+  const renderLabel = (label: unknown) => {
+    const value = String(label ?? "");
+    return isRichText(value)
+      ? <span className="shop-builder-button-label" dangerouslySetInnerHTML={{ __html: sanitizeHtml(value, { FORBID_ATTR: ["style"] }) }} />
+      : value;
+  };
 
   return (
     <div
@@ -73,10 +93,14 @@ export default function UikitButton({ block, scopeClassName }: Props) {
           <a
             className={actionClassName(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
             href={rawBlock.buttonUrl || "#"}
-            style={{ ...localOverride.style, ...defaultYoothemeButtonTokens, ...localTypography.style }}
+            style={{
+              ...localOverride.style,
+              ...(rawBlock.buttonStyle === "text" ? yoothemeTextButtonTokens : defaultYoothemeButtonTokens),
+              ...localTypography.style,
+            }}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
           >
-            {rawBlock.buttonLabel}
+            {renderLabel(rawBlock.buttonLabel)}
           </a>
         )}
         {buttonsList.map((btn: any, btnIdx: number) => (
@@ -84,10 +108,14 @@ export default function UikitButton({ block, scopeClassName }: Props) {
             key={btn.id ?? btnIdx}
             className={actionClassName(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)}
             href={btn.url || "#"}
-            style={{ ...localOverride.style, ...defaultYoothemeButtonTokens, ...localTypography.style }}
+            style={{
+              ...localOverride.style,
+              ...(btn.style === "text" ? yoothemeTextButtonTokens : defaultYoothemeButtonTokens),
+              ...localTypography.style,
+            }}
             {...builderLinkTargetProps(btn.target)}
           >
-            {btn.label || btn.text || `Button ${btnIdx + 1}`}
+            {renderLabel(btn.label || btn.text || `Button ${btnIdx + 1}`)}
           </a>
         ))}
       </div>

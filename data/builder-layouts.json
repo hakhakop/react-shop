@@ -4609,31 +4609,7 @@
     "page": "product-single",
     "targetType": "template",
     "template": "product-single",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "template-product-hero",
@@ -6089,11 +6065,13 @@
                 "id": "header-logo",
                 "kind": "image",
                 "headerBrandMode": "logo",
-                "headerBrandText": "WebPages",
+                "headerBrandText": "DevStack",
                 "imageMaxWidth": 140,
                 "imageAlignment": "left",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
-                "imageAlt": "WebPages logo"
+                "imageUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
+                "imageInverseUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
+                "imageMobileUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
+                "imageAlt": "DevStack logo"
               }
             ]
           },
@@ -6118,18 +6096,15 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "muted",
-                "elementAlign": "right"
-              },
-              {
-                "id": "header-utility-cart",
-                "kind": "headerCart",
-                "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted",
-                "elementAlign": "right"
+                "id": "header-register",
+                "kind": "button",
+                "buttonLabel": "Register",
+                "buttonUrl": "#",
+                "buttonStyle": "primary",
+                "headerButtonOverrides": {
+                  "variant": true
+                },
+                "size": "default"
               }
             ]
           }
@@ -6139,9 +6114,8 @@
         "headerVisible": true,
         "headerTransparent": true,
         "headerOverlay": true,
-        "headerHeight": "compact",
-        "headerCustomHeight": 92,
-        "headerLayout": "two-row",
+        "headerHeight": "auto",
+        "headerLayout": "wordpress",
         "headerBehavior": "sticky-on-scroll-up",
         "headerWidthMode": "boxed",
         "headerBackgroundMode": "none",
@@ -6153,7 +6127,7 @@
         "headerTopToolbarMeta": "AMD ֏"
       }
     ],
-    "updatedAt": "2026-08-25T10:01:31.705Z"
+    "updatedAt": "2026-08-25T20:32:23.505Z"
   },
   "footer": {
     "version": 1,
@@ -6463,7 +6437,6 @@
                   }
                 ],
                 "fullWidthButton": false,
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -6471,7 +6444,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               }
             ]
           },
@@ -6776,27 +6751,6 @@
                       "effects": {},
                       "card": {}
                     }
-                  },
-                  {
-                    "id": "yootheme-image-0-2-0-1",
-                    "kind": "image",
-                    "imageUrl": "https://shop2.webpages.am/wp-content/uploads/yootheme/logo.svg",
-                    "imageAlt": "Fuse",
-                    "imageSvgInline": true,
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageLinkUrl": "./",
-                    "imageLinkTarget": "_self",
-                    "imageShape": "none",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "large"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
                   }
                 ]
               }
@@ -6841,28 +6795,6 @@
                   "breakpoint": "m"
                 },
                 "elements": [
-                  {
-                    "id": "yootheme-image-0-3-0-0",
-                    "kind": "image",
-                    "imageUrl": "https://shop2.webpages.am/wp-content/uploads/yootheme/footer.jpg",
-                    "imageAlt": "",
-                    "imageMaxWidth": 320,
-                    "imageWidth": "320px",
-                    "imageSvgColor": "emphasis",
-                    "imageRatio": "natural",
-                    "imageShape": "none",
-                    "maxWidth": "medium",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "default",
-                        "maxWidth": "medium"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
-                  },
                   {
                     "id": "yootheme-text-0-3-0-1",
                     "kind": "text",
@@ -7028,7 +6960,7 @@
         "animation": "fade"
       }
     ],
-    "updatedAt": "2026-08-21T13:00:42.812Z"
+    "updatedAt": "2026-08-25T20:31:03.843Z"
   },
   "page:slider-tests": {
     "version": 1,

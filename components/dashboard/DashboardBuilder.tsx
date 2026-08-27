@@ -153,6 +153,7 @@ import {
   getContentPositioningGroupChildStyle,
 } from "@/components/builder/ContentPositioningGroup";
 import UikitList from "@/components/builder/UikitList";
+import UikitSubnav from "@/components/builder/UikitSubnav";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
 import UikitFluentForm from "@/components/builder/UikitFluentForm";
@@ -183,12 +184,16 @@ import {
   getUikitSvgColorClass,
   UIKIT_YOOTHEME_BUTTON_VARIANTS,
 } from "@/lib/uikitTokens";
-import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
-import { getGeneralElementShellClassName, getGeneralElementShellStyle } from "@/lib/builderElementShell";
+import { elementAdvancedScope, layoutAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
+import {
+  getGeneralElementShellClassName,
+  getGeneralElementShellStyle,
+  isYoothemeCenteredPositionedPanel,
+} from "@/lib/builderElementShell";
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { resolvePanelPresentation } from "@/lib/panelPresentation";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
-import { resolveSectionBackground, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
+import { resolveSectionBackground, resolveSectionColorMode, sectionBackgroundClass, sectionBackgroundImageVariables } from "@/lib/semanticBackgrounds";
 import {
   normalizeLayoutToUikitPreset,
   UIKIT_LAYOUT_PRESETS,
@@ -1101,7 +1106,7 @@ function resolveSectionColorScheme(
   }
 
   const resolvedBackground = resolveSectionBackground(section);
-  if (!resolvedBackground.override) return resolvedBackground.role === "primary" || resolvedBackground.role === "secondary" ? "dark" : "light";
+  if (!resolvedBackground.override) return "light";
   const readable = readableSchemeForColor(resolvedBackground.override);
   return readable === "inherit" ? layoutScheme : readable;
 }
@@ -11686,15 +11691,16 @@ export default function DashboardBuilder({
               </label>
             ) : null}
             {sidebarTab !== "globalStyles" && viewPageHref ? (
-              <button
-                type="button"
+              <a
                 className="builder-canvas-control"
-                onClick={() => window.open(viewPageHref, "_blank", "noopener,noreferrer")}
+                href={viewPageHref}
+                target="_blank"
+                rel="noreferrer"
                 title={builderFrontendActionLabel(builderEditorContext)}
               >
                 <ExternalLink size={14} />
                 {builderFrontendActionLabel(builderEditorContext)}
-              </button>
+              </a>
             ) : null}
             {sidebarTab !== "globalStyles" ? (
               <>
@@ -13991,6 +13997,10 @@ function PreviewCanvas({
         data-overlap-header={
           (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined
         }
+        data-section-default-color-mode={resolveSectionColorMode(shellSettings, "default")}
+        data-section-muted-color-mode={resolveSectionColorMode(shellSettings, "muted")}
+        data-section-primary-color-mode={resolveSectionColorMode(shellSettings, "primary")}
+        data-section-secondary-color-mode={resolveSectionColorMode(shellSettings, "secondary")}
       >
         <BuilderScrollAnimations key={animationSignature} dashboardMode />
         <BuilderStickyRuntime />
@@ -17516,19 +17526,26 @@ const PreviewSection = memo(function PreviewSection({
                 }}
               >
                 <div
-                  className={`${structuralRow.className} shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
+                  className={`${structuralRow.className} shop-builder-content-row builder-preview-content-row ${
+                    structuralRow.row.spacingContract === "yootheme" ? "shop-builder-content-row--yootheme " : ""
+                  }${structuralRow.style.maxWidth ? "shop-builder-content-row--contained " : ""}${builderInteractionClassName(
                     rowTarget,
                     rowInteractionState,
                   )}`}
                   data-builder-object-type="row"
                   data-builder-section-id={section.id}
                   data-builder-row-index={layoutRowIndex}
+                  data-builder-element-scope={layoutAdvancedScope("row", page, section.id, structuralRow.row.id)}
                   data-builder-interaction-state={rowInteractionState}
                   data-builder-double-click-inspector={nestingDepth === 0 ? "true" : undefined}
                   style={{
                     ...structuralRow.style,
                   }}
                 >
+                  <LayoutAdvancedStyle
+                    css={structuralRow.row.advanced?.css}
+                    scope={layoutAdvancedScope("row", page, section.id, structuralRow.row.id)}
+                  />
                   {rowChrome.showSpacing && (
                     <RowSpacingOverlay
                       item={rowItem}
@@ -17883,6 +17900,10 @@ const PreviewSection = memo(function PreviewSection({
 
                   <div
                     className={`shop-builder-column-content${
+                      structuralColumn.column.background?.videoUrl
+                        ? " shop-builder-column-content--media-sticky uk-tile uk-position-z-index"
+                        : ""
+                    }${
                       structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
                         ? " uk-flex uk-flex-middle"
                         : structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "bottom"
@@ -17891,6 +17912,17 @@ const PreviewSection = memo(function PreviewSection({
                     }`}
                     data-uk-sticky={structuralColumn.stickyDeclaration}
                   >
+                    {structuralColumn.column.background?.videoUrl ? (
+                      <video
+                        className="shop-builder-column-background-video"
+                        src={structuralColumn.column.background.videoUrl}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        aria-hidden="true"
+                      />
+                    ) : null}
                     {blocks.length === 0 && (
                       <div
                         className="builder-preview-drop-zone"
@@ -17934,7 +17966,9 @@ const PreviewSection = memo(function PreviewSection({
                         ? `is-padding-${block.elementPadding}`
                         : "";
                     const blockAlignClass =
-                      block.elementAlign && block.elementAlign !== "left"
+                      block.elementAlign &&
+                      block.elementAlign !== "left" &&
+                      !isYoothemeCenteredPositionedPanel(block)
                         ? `is-align-${block.elementAlign}`
                         : "";
                     const isElementActive =
@@ -18212,6 +18246,8 @@ const PreviewSection = memo(function PreviewSection({
                           <UikitIcon block={block} />
                         ) : block.kind === "list" ? (
                           <UikitList block={block} />
+                        ) : block.kind === "subnav" ? (
+                          <UikitSubnav block={block} />
                         ) : block.kind === "accordion" ? (
                           <UikitAccordion
                             block={block}

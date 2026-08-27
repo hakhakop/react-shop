@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Search, ChevronDown, Check, Upload, X } from "lucide-react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
@@ -111,7 +111,18 @@ type ColorPickerProps = {
   allowGradient?: boolean;
 };
 
+const DEFAULT_COLOR_PALETTE = ["#6f40f1", "#111827", "#ffffff", "#38bdf8", "#16a34a", "#dc2626", "#d97706", "#64748b"];
+const YoothemeColorPaletteContext = createContext<string[] | undefined>(undefined);
+
+/** The palette is projected from the active tenant's canonical global tokens. */
+export function YoothemeColorPaletteProvider({ colors, children }: { colors: unknown[]; children: React.ReactNode }) {
+  const palette = Array.from(new Set(colors.filter((color): color is string => isValidBackgroundPaint(color) && !isGradientBackgroundPaint(color))));
+  return <YoothemeColorPaletteContext.Provider value={palette}>{children}</YoothemeColorPaletteContext.Provider>;
+}
+
 export function YoothemeColorPicker({ label, value, onChange, allowGradient = false }: ColorPickerProps) {
+  const themePalette = useContext(YoothemeColorPaletteContext);
+  const palette = themePalette?.length ? themePalette : DEFAULT_COLOR_PALETTE;
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hexInput, setHexInput] = useState(value || "#ffffff");
@@ -356,7 +367,7 @@ export function YoothemeColorPicker({ label, value, onChange, allowGradient = fa
 
           {/* Color Preview Swatches */}
           <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
-            {["#6f40f1", "#111827", "#ffffff", "#38bdf8", "#16a34a", "#dc2626", "#d97706", "#64748b"].map((swatchHex) => (
+            {palette.map((swatchHex) => (
               <button
                 key={swatchHex}
                 type="button"

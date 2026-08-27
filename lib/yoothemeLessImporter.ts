@@ -405,8 +405,15 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "section-xsmall-padding-vertical": { destination: "shellSettings.sectionPaddingXSmall", domain: "Sections" },
   "section-small-padding-vertical": { destination: "shellSettings.sectionPaddingSmall", domain: "Sections" },
   "section-padding-vertical": { destination: "shellSettings.sectionPaddingDefault", domain: "Sections" },
+  "section-padding-vertical-m": { destination: "shellSettings.sectionPaddingDefaultMedium", domain: "Sections" },
   "section-large-padding-vertical": { destination: "shellSettings.sectionPaddingLarge", domain: "Sections" },
+  "section-large-padding-vertical-m": { destination: "shellSettings.sectionPaddingLargeMedium", domain: "Sections" },
   "section-xlarge-padding-vertical": { destination: "shellSettings.sectionPaddingXLarge", domain: "Sections" },
+  "section-xlarge-padding-vertical-m": { destination: "shellSettings.sectionPaddingXLargeMedium", domain: "Sections" },
+  "section-default-color-mode": { destination: "shellSettings.sectionDefaultColorMode", domain: "Sections" },
+  "section-muted-color-mode": { destination: "shellSettings.sectionMutedColorMode", domain: "Sections" },
+  "section-primary-color-mode": { destination: "shellSettings.sectionPrimaryColorMode", domain: "Sections" },
+  "section-secondary-color-mode": { destination: "shellSettings.sectionSecondaryColorMode", domain: "Sections" },
   "container-small-max-width": { destination: "shellSettings.containerSmall", domain: "Containers and page" },
   "container-xsmall-max-width": { destination: "shellSettings.containerXSmall", domain: "Containers and page" },
   "container-max-width": { destination: "shellSettings.containerDefault", domain: "Containers and page" },
@@ -418,6 +425,7 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "theme-page-container-width": { destination: "shellSettings.pageContainerMaxWidth", domain: "Containers and page" },
   "card-default-background": { destination: "shellSettings.cardBackground", domain: "Surfaces" },
   "card-default-backdrop-filter": { destination: "shellSettings.cardBackdropFilter", domain: "Surfaces" },
+  "card-default-color-mode": { destination: "shellSettings.cardDefaultColorMode", domain: "Surfaces" },
   "card-primary-background": { destination: "shellSettings.cardPrimaryBackground", domain: "Surfaces" },
   "card-secondary-background": { destination: "shellSettings.cardSecondaryBackground", domain: "Surfaces" },
   // DevStack expresses the visual Primary/Secondary card surfaces through
@@ -598,6 +606,8 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "heading-h1-font-size": { destination: "shellSettings.headingH1FontSize", domain: "Heading" },
   "heading-h1-font-weight": { destination: "shellSettings.headingH1FontWeight", domain: "Heading" },
   "heading-small-font-size-m": { destination: "shellSettings.headingSmallFontSizeResponsive", domain: "Heading" },
+  "heading-small-line-height": { destination: "shellSettings.headingSmallLineHeight", domain: "Heading" },
+  "heading-large-line-height": { destination: "shellSettings.headingLargeLineHeight", domain: "Heading" },
   "heading-medium-font-size-l": { destination: "shellSettings.headingMediumFontSizeResponsive", domain: "Heading" },
   "heading-medium-line-height": { destination: "shellSettings.headingMediumLineHeight", domain: "Heading" },
   "heading-small-font-weight": { destination: "shellSettings.headingSmallFontWeight", domain: "Heading" },
@@ -609,6 +619,7 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "base-mark-background": { destination: "shellSettings.baseMarkBackground", domain: "Base and Background" },
   "base-mark-color": { destination: "shellSettings.baseMarkColor", domain: "Base and Background" },
   "accordion-title-font-size": { destination: "shellSettings.accordionTitleFontSize", domain: "Accordion" },
+  "accordion-title-line-height": { destination: "shellSettings.accordionTitleLineHeight", domain: "Accordion" },
   "accordion-title-hover-color": { destination: "shellSettings.accordionTitleHoverColor", domain: "Accordion" },
   "accordion-content-margin-top": { destination: "shellSettings.accordionContentMarginTop", domain: "Accordion" },
   "accordion-title-padding-vertical": { destination: "shellSettings.accordionTitlePaddingVertical", domain: "Accordion" },
@@ -673,6 +684,22 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "nav-default-item-line-hover-right": { destination: "shellSettings.navDefaultItemLineHoverRight", domain: "Nav" },
   "nav-default-siblings-filter": { destination: "shellSettings.navDefaultSiblingsFilter", domain: "Nav" },
   "nav-default-siblings-opacity": { destination: "shellSettings.navDefaultSiblingsOpacity", domain: "Nav" },
+  "subnav-pill-item-padding-vertical": { destination: "shellSettings.subnavPillItemPaddingVertical", domain: "Nav" },
+  "subnav-pill-item-padding-horizontal": { destination: "shellSettings.subnavPillItemPaddingHorizontal", domain: "Nav" },
+  "subnav-pill-item-color": { destination: "shellSettings.subnavPillItemColor", domain: "Nav" },
+  "subnav-pill-item-hover-background": { destination: "shellSettings.subnavPillItemHoverBackground", domain: "Nav" },
+  "subnav-pill-item-hover-color": { destination: "shellSettings.subnavPillItemHoverColor", domain: "Nav" },
+  "subnav-pill-item-onclick-background": { destination: "shellSettings.subnavPillItemOnclickBackground", domain: "Nav" },
+  "subnav-pill-item-onclick-color": { destination: "shellSettings.subnavPillItemOnclickColor", domain: "Nav" },
+  "subnav-pill-item-active-background": { destination: "shellSettings.subnavPillItemActiveBackground", domain: "Nav" },
+  "subnav-pill-item-active-color": { destination: "shellSettings.subnavPillItemActiveColor", domain: "Nav" },
+  "subnav-pill-item-border-radius": { destination: "shellSettings.subnavPillItemBorderRadius", domain: "Nav" },
+  "subnav-pill-item-active-box-shadow": { destination: "shellSettings.subnavPillItemActiveBoxShadow", domain: "Nav" },
+  "internal-subnav-pill-item-mode": { destination: "shellSettings.internalSubnavPillItemMode", domain: "Nav" },
+  "internal-subnav-pill-item-glow-gradient": { destination: "shellSettings.internalSubnavPillItemGlowGradient", domain: "Nav" },
+  "internal-subnav-pill-item-glow-filter": { destination: "shellSettings.internalSubnavPillItemGlowFilter", domain: "Nav" },
+  "internal-subnav-pill-item-glow-opacity": { destination: "shellSettings.internalSubnavPillItemGlowOpacity", domain: "Nav" },
+  "internal-subnav-pill-item-hover-glow-opacity": { destination: "shellSettings.internalSubnavPillItemHoverGlowOpacity", domain: "Nav" },
   "nav-primary-item-color": { destination: "shellSettings.navPrimaryItemColor", domain: "Nav" },
   "nav-primary-item-hover-color": { destination: "shellSettings.navPrimaryItemHoverColor", domain: "Nav" },
   "nav-primary-item-active-color": { destination: "shellSettings.navPrimaryItemActiveColor", domain: "Nav" },
@@ -986,19 +1013,25 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
   // Persist that semantic default on every YOOtheme import when the source has
   // not expressly overridden it, so historical WebPages component defaults
   // cannot win over the imported global control contract.
-  const buttonBorderWidth = shellSettings.buttonBorderWidth ?? "2px";
+  // YOOtheme's UIkit button border is zero unless the source explicitly
+  // declares a border width. The old WebPages 2px fallback turns the
+  // canonical 48px control into a 44px line box after import.
+  const buttonBorderWidth = shellSettings.buttonBorderWidth ?? "0px";
+  if (!latest.has("button-font-size")) {
+    shellSettings.buttonFontSize = shellSettings.baseFontSize ?? "16px";
+  }
   if (!latest.has("button-line-height")) {
     shellSettings.buttonLineHeight = controlTextLineHeight(
       shellSettings.controlHeightDefault ?? shellSettings.buttonHeight ?? "48px",
       buttonBorderWidth,
-      "44px",
+      "48px",
     );
   }
   if (!latest.has("button-large-line-height")) {
     shellSettings.buttonLargeLineHeight = controlTextLineHeight(
       shellSettings.controlHeightLarge ?? "56px",
       buttonBorderWidth,
-      "52px",
+      "56px",
     );
   }
   if (!latest.has("button-large-padding-horizontal")) {

@@ -38,6 +38,7 @@ function panelMetaColorValue(value: unknown): string | undefined {
 export function resolvePanelColorSemantics(block: PanelLike) {
   const role = cardColorRole(block.panelVariant ?? block.panelStyle ?? block.cardVariant);
   const variant = String(block.panelVariant ?? block.panelStyle ?? block.cardVariant ?? "").trim().toLowerCase();
+  const isYoothemePanel = String(block.spacingContract ?? "").trim().toLowerCase() === "yootheme";
   const isDefaultCard = ["default", "card-default"].includes(variant);
   const isBlankPanel = ["", "blank", "none"].includes(variant);
   const explicitMetaColor = panelMetaColorValue(block.metaColor ?? block.panelMetaColor);
@@ -71,6 +72,23 @@ export function resolvePanelColorSemantics(block: PanelLike) {
       backdropFilter: "var(--uk-card-default-backdrop-filter, none)",
       WebkitBackdropFilter: "var(--uk-card-default-backdrop-filter, none)",
     };
+    if (isYoothemePanel) {
+      // YOOtheme's Grid action is a transparent, white foreground link on
+      // both default and primary cards. Keep this projection semantic so the
+      // active global theme still owns the actual color token.
+      Object.assign(style, {
+        "--uk-button-default-text": "var(--uk-card-default-title, var(--uk-global-emphasis-color, #fff))",
+        "--uk-button-default-border": "transparent",
+        "--uk-button-default-shadow": "none",
+        "--uk-button-default-hover-shadow": "none",
+        "--uk-button-default-active-shadow": "none",
+      });
+      // Let the active imported global theme provide the glow layer and its
+      // authored dark surface. The card only supplies semantic foreground.
+      delete style["--uk-button-default-background"];
+      delete style["--uk-button-default-glow-display"];
+      delete style["--uk-button-default-render-background"];
+    }
     if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
       style["--builder-card-title-color"] = "var(--uk-global-emphasis-color, var(--uk-card-default-title, inherit))";
     }
@@ -94,17 +112,18 @@ export function resolvePanelColorSemantics(block: PanelLike) {
   // Primary/Secondary classes retain their explicit global variant tokens.
   if (!hasExplicitActionColor) {
     Object.assign(style, {
-      // On a primary Card, YOOtheme's default link is the filled inverse
-      // action (white surface, dark text), not the generic outline fallback.
-      "--uk-button-default-background": role === "primary" ? text : "transparent",
-      "--uk-button-default-text": role === "primary"
+      // Native WebPages primary Cards use the filled inverse action. Imported
+      // YOOtheme Grid cards keep the source default link: transparent,
+      // foreground-colored, and without a surface shadow.
+      "--uk-button-default-background": role === "primary" && !isYoothemePanel ? text : "transparent",
+      "--uk-button-default-text": role === "primary" && !isYoothemePanel
         ? "var(--uk-global-emphasis-color, var(--uk-global-color, #111111))"
         : text,
       "--uk-button-default-border": role === "primary" ? "transparent" : text,
-      "--uk-button-default-hover-background": role === "primary"
+      "--uk-button-default-hover-background": role === "primary" && !isYoothemePanel
         ? "var(--uk-button-inverse-default-hover-background, color-mix(in srgb, var(--uk-global-inverse-color, #fff) 95%, #000))"
         : text,
-      "--uk-button-default-hover-text": role === "primary"
+      "--uk-button-default-hover-text": role === "primary" && !isYoothemePanel
         ? "var(--uk-button-inverse-default-hover-text, var(--uk-global-text-color, #111827))"
         : surface,
       "--uk-button-default-hover-border": role === "primary" ? "transparent" : text,
@@ -124,7 +143,15 @@ export function resolvePanelColorSemantics(block: PanelLike) {
       "--uk-button-primary-hover-text": "var(--uk-global-link-hover-color, var(--uk-global-emphasis-color, currentColor))",
       "--uk-button-primary-hover-border": text,
       ...(role === "primary"
-        ? {
+        ? isYoothemePanel
+          ? {
+              "--uk-button-default-shadow": "none",
+              "--uk-button-default-hover-shadow": "none",
+              "--uk-button-default-active-shadow": "none",
+              "--uk-button-default-glow-display": "none",
+              "--uk-button-default-render-background": "transparent",
+            }
+          : {
             // Project the canonical YOOtheme inverse-button tokens onto the
             // card-local default action. This prevents the normal light-card
             // shadow from leaking into the solid CTA.
@@ -134,6 +161,16 @@ export function resolvePanelColorSemantics(block: PanelLike) {
           }
         : {}),
     });
+    if (isYoothemePanel) {
+      // YOOtheme's default button mode/background are global tokens. Do not
+      // shadow them with a card-local transparent value; that would remove
+      // the authored glow and dark foreground layer from imported themes.
+      delete style["--uk-button-default-background"];
+      delete style["--uk-button-default-hover-background"];
+      delete style["--uk-button-default-hover-text"];
+      delete style["--uk-button-default-glow-display"];
+      delete style["--uk-button-default-render-background"];
+    }
   }
 
   if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {

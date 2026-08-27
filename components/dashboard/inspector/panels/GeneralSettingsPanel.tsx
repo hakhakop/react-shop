@@ -59,7 +59,12 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
     { value: "right", label: "Right" },
     { value: "justify", label: "Justify" },
   ];
-  const defaultTextAlignment = (block as any).type === "icon" ? "left" : "center";
+  const defaultTextAlignment =
+    (block as any).type === "icon"
+      ? "left"
+      : (block as any).kind === "panel"
+        ? "none"
+        : "center";
   const effectiveTextAlignment =
     layout.textAlign ??
     (block as any).textAlign ??

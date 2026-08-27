@@ -8,7 +8,7 @@ import {
   getBuilderPagesPath,
   getBuilderTemplatesPath,
 } from "@/lib/websiteBuilderData";
-import type { BuilderSection } from "@/components/dashboard/builderTypes";
+import type { BuilderSection, BuilderSubnavItem } from "@/components/dashboard/builderTypes";
 import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 import type {
   DynamicContentContextDescriptor,
@@ -120,6 +120,10 @@ export type BuilderLayoutBlock = {
   menuClickMode?: boolean;
   menuShowParentIcon?: boolean;
   menuItems?: unknown[];
+  /** Canonical UIkit Subnav links, including authored scroll targets. */
+  subnavItems?: BuilderSubnavItem[];
+  subnavStyle?: "default" | "divider" | "pill";
+  subnavAlign?: "left" | "center" | "right";
   imageInverseUrl?: string | null;
   imageMobileUrl?: string | null;
   headerNavigationOverrides?: {
@@ -517,6 +521,12 @@ export type BuilderLayoutBlock = {
   gridShowText?: boolean;
   gridShowButton?: boolean;
   gridRowGap?: "none" | "small" | "medium" | "large";
+  /** Canonical YOOtheme Grid filter navigation, kept separate from item tags. */
+  gridFilterControls?: { label: string; tag: string }[];
+  /** Semantic tag selected when the Grid first mounts or the document changes. */
+  gridFilterDefault?: string;
+  /** Whether a synthetic "All" control is part of this Grid's authored navigation. */
+  gridFilterShowAll?: boolean;
   gridItemRenderer?: "plain" | "card";
   gridCardVariant?: "default" | "primary" | "secondary" | "blank" | "card-hover" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | "tile-checked";
   gridCardSize?: "none" | "small" | "default" | "large";

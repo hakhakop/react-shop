@@ -381,7 +381,7 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
   const maxWidth = layout.maxWidth?.trim();
   const maxWidthValue = maxWidth && !layout.maxWidthBreakpoint
     ? ({
-        small: "var(--uk-container-small-max-width, 960px)",
+        small: "var(--uk-container-small-max-width, 900px)",
         medium: "var(--uk-container-default-max-width, 1200px)",
         large: "var(--uk-container-large-max-width, 1400px)",
         xlarge: "var(--uk-container-xlarge-max-width, 1600px)",

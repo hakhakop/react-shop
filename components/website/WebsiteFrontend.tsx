@@ -94,26 +94,41 @@ ${uikitCss}
 }
 
 /* The canonical preview keeps the imported Header in normal document flow
-   when overlay/pull-under are disabled. In that mode YOOtheme still paints
-   the global default surface behind the header; inherit the same semantic
-   surface on the preview document so the reserved header-height area does
-   not fall back to the host app background. */
+   when overlay/pull-under are disabled. Preserve the semantic surface on the
+   document root for the reserved header-height area, while leaving Section
+   gradients to the Section that owns them. */
 html:has([data-scoped-preview-root]),
-body:has([data-scoped-preview-root]),
-html:has([data-domain-website-root]),
-body:has([data-domain-website-root]) {
+html:has([data-domain-website-root]) {
   background-color: var(--uikit-section-default-bg, var(--page-bg)) !important;
-  background-image: var(--uikit-section-default-bg-image, var(--uikit-section-default-gradient, none)) !important;
+  /* YOOtheme paints the imported surface on Sections, not on the document
+     root. Keep the root color for the transparent header area, but do not
+     create a second gradient origin beneath the Section handoff. */
+  background-image: none !important;
   color: var(--uk-global-text-color, var(--text-main)) !important;
 }
 
-/* Keep the reserved normal-flow header area on the same imported surface as
-   the document root. Without this, the translucent header reveals the host
-   app's light .site-main fallback before the first section begins. */
+body:has([data-scoped-preview-root]),
+body:has([data-domain-website-root]) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Keep the host shell transparent so an imported Section remains the only
+   owner of its gradient/background paint. The html surface still covers the
+   reserved normal-flow header area before the first Section begins. */
 body:has([data-scoped-preview-root]) .site-main,
 body:has([data-domain-website-root]) .site-main {
-  background-color: var(--uikit-section-default-bg, var(--page-bg)) !important;
-  background-image: var(--uikit-section-default-bg-image, var(--uikit-section-default-gradient, none)) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body:has([data-scoped-preview-root]) .shop-builder-main,
+body:has([data-domain-website-root]) .shop-builder-main {
+  /* Match YOOtheme's transparent #tm-main. Section variants must be the
+     paint owner; a main-level black surface otherwise becomes visible when
+     a remove-bottom-padding section hands off to the next Section. */
+  background-color: transparent !important;
+  background-image: none !important;
 }
   `.trim();
 }
@@ -195,7 +210,7 @@ export default async function WebsiteFrontend({
   const materialization = resolvedMediaLayout
     ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
         website,
-        rootContext: dynamicItemContextOverride,
+      rootContext: dynamicItemContextOverride,
       })
     : null;
   const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;
@@ -206,8 +221,21 @@ export default async function WebsiteFrontend({
     });
 
   const hasVisibleLayout = renderLayout?.sections?.some((section) => section.visible);
+  // A newly created page can have a complete local Builder draft before its
+  // first publish. The iframe must still mount the canonical renderer so it
+  // can receive that draft snapshot; returning the not-found shell here would
+  // prevent StorefrontBuilderRenderer's draft bridge from ever mounting.
+  const mountDraftPreview = builderIframeSelection && !hasVisibleLayout && !fallbackContent;
+  const draftPreviewLayout: BuilderLayout = {
+    version: 1,
+    key: page,
+    page,
+    targetType: "page",
+    sections: [],
+    updatedAt: new Date(0).toISOString(),
+  };
 
-  if (!hasVisibleLayout && !fallbackContent) {
+  if (!hasVisibleLayout && !fallbackContent && !mountDraftPreview) {
     return (
       <main className="page">
         <h1 className="page-title">Page not found</h1>
@@ -255,9 +283,9 @@ export default async function WebsiteFrontend({
           builderDraftPreview={builderIframeSelection}
           themeSettingsOverride={{}}
         />
-        {renderLayout && hasVisibleLayout ? (
+        {renderLayout && hasVisibleLayout || mountDraftPreview ? (
           <StorefrontBuilderRenderer
-            layout={renderLayout}
+            layout={renderLayout ?? draftPreviewLayout}
             page={page}
             pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
             website={website}

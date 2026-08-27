@@ -112,6 +112,7 @@ export function GridCardsClient({
   itemProps?: (item: any, index: number) => React.HTMLAttributes<HTMLElement>;
 }) {
   const rawBlock = block as any;
+  const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
   const gridRef = useRef<HTMLDivElement>(null);
   const gridStructure = resolveUikitGridStructure(rawBlock);
   const sharedCard = rawBlock.visualStyle?.card ?? {};
@@ -119,7 +120,6 @@ export function GridCardsClient({
   // contract. The shared resolver keeps legacy aliases read-compatible while
   // preventing Grid from creating a second precedence chain.
   const itemContentAlignment = resolveGeneralTextAlignment(rawBlock) ?? "left";
-  const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Grid breakpoints are semantic values. In particular YOOtheme `auto` is a
   // real Phone Portrait mode, not a malformed number to replace with 2/3.
@@ -151,7 +151,37 @@ export function GridCardsClient({
     Array.isArray(item.tags) && item.tags.length
       ? item.tags.filter((tag: unknown) => typeof tag === "string" && tag.trim()).map((tag: string) => tag.trim())
       : [item.eyebrow || item.meta || "Default"].filter(Boolean);
-  const filterCategories = Array.from(new Set(items.flatMap(itemFilterTags)));
+  const filterSourceItems = items.slice(0, limit);
+  const itemTags = Array.from(new Set(filterSourceItems.flatMap(itemFilterTags)));
+  const configuredFilterControls = Array.isArray(rawBlock.gridFilterControls)
+    ? rawBlock.gridFilterControls
+      .filter((control: any) => control && typeof control.tag === "string" && control.tag.trim())
+      .map((control: any) => ({
+        tag: control.tag.trim(),
+        label: typeof control.label === "string" && control.label.trim() ? control.label.trim() : control.tag.trim(),
+      }))
+    : [];
+  const filterControls = configuredFilterControls.length
+    ? configuredFilterControls.filter((control: { tag: string }) => itemTags.includes(control.tag))
+    : itemTags.map((tag) => ({ label: tag, tag }));
+  const filterEnabled = rawBlock.enableFilter === true && filterControls.length > 0;
+  const showAllFilter = rawBlock.gridFilterShowAll === true || (
+    rawBlock.gridFilterShowAll === undefined && rawBlock.spacingContract !== "yootheme"
+  );
+  // Item tags are still useful metadata when filtering is disabled. They must
+  // not silently become an implicit first-item filter: ordinary YOOtheme
+  // Grids render every authored item until the Filter control is enabled.
+  const filterDefault = !filterEnabled
+    ? ""
+    : typeof rawBlock.gridFilterDefault === "string" && rawBlock.gridFilterDefault.trim()
+    ? rawBlock.gridFilterDefault.trim()
+    : filterControls[0]?.tag ?? (showAllFilter ? "all" : "");
+  const filterSignature = `${rawBlock.id ?? "grid"}:${filterControls.map((control: { tag: string }) => control.tag).join("|")}:${filterDefault}`;
+  const [filterState, setFilterState] = useState({ signature: filterSignature, value: filterDefault });
+  // A shared renderer can survive a Builder page transition. Deriving the
+  // active value from the current document signature resets that transient
+  // selection without an effect-driven cascading render.
+  const activeFilter = filterState.signature === filterSignature ? filterState.value : filterDefault;
   // Preserve source indices after filtering so Builder adapters always act on the
   // persisted items collection rather than the transient filtered list.
   // Grid item ids are the canonical identity shared by Builder and storefront.
@@ -166,9 +196,10 @@ export function GridCardsClient({
       return candidateId === id;
     }) === index;
   });
-  const filteredItems = uniqueItems
+  const renderedItems = uniqueItems.slice(0, limit);
+  const filteredItems = renderedItems
     .map((item, sourceIndex) => ({ item, sourceIndex }))
-    .filter(({ item }) => activeFilter === "all" || itemFilterTags(item).includes(activeFilter));
+    .filter(({ item }) => !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter));
 
   // Field Visibility
   const canShowTitle = (rawBlock.gridShowTitle ?? rawBlock.showTitle ?? true) !== false;
@@ -190,7 +221,7 @@ export function GridCardsClient({
     // state before that runtime sees its own click handling.
     event.preventDefault();
     event.stopPropagation();
-    setActiveFilter(filter);
+    setFilterState({ signature: filterSignature, value: filter });
   };
 
   useUikitGridRuntime(gridRef, {
@@ -200,42 +231,47 @@ export function GridCardsClient({
     parallaxJustify: gridStructure.parallaxJustify,
     parallaxStart: gridStructure.parallaxStart,
     parallaxEnd: gridStructure.parallaxEnd,
-    revision: filteredItems.map(({ item }) => `${item.id}:${item.imageUrl ?? ""}`).join("|"),
+    revision: `${activeFilter}:${renderedItems.map((item) => `${item.id}:${item.imageUrl ?? ""}`).join("|")}`,
   });
 
   return (
     <div
       className="shop-builder-grid-wrapper"
       data-uk-lightbox={rawBlock.enableLightbox ? "animation: slide" : undefined}
+      {...(rawBlock.enableFilter && filterControls.length > 0
+        ? ({ "uk-filter": "target: .js-filter; animation: false;" } as any)
+        : {})}
       data-grid-active-filter={activeFilter}
       data-grid-visible-item-count={filteredItems.length}
+      data-grid-rendered-item-count={renderedItems.length}
     >
-      {rawBlock.enableFilter && filterCategories.length > 0 && (
-        <ul className={`uk-subnav ${rawBlock.filterStyle === "pill" ? "uk-subnav-pill" : rawBlock.filterStyle === "tabs" ? "uk-tab" : ""} uk-flex-center uk-margin-bottom`}>
-          <li className={activeFilter === "all" ? "uk-active" : ""}>
-            <button
-              type="button"
-              onPointerDown={(event) => selectFilter(event, "all")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") selectFilter(event, "all");
-              }}
-              style={{ background: "none", border: "none", cursor: "pointer", font: "inherit" }}
-            >
-              All
-            </button>
-          </li>
-          {filterCategories.map((cat) => (
-            <li key={cat} className={activeFilter === cat ? "uk-active" : ""}>
-              <button
-                type="button"
-                onPointerDown={(event) => selectFilter(event, cat)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") selectFilter(event, cat);
-                }}
-                style={{ background: "none", border: "none", cursor: "pointer", font: "inherit" }}
+      {rawBlock.enableFilter && filterControls.length > 0 && (
+        <ul
+          className={`el-nav uk-subnav ${rawBlock.filterStyle === "pill" ? "uk-subnav-pill" : rawBlock.filterStyle === "tabs" ? "uk-tab" : ""} uk-flex-center uk-margin-large ${isYoothemeGrid ? "shop-builder-filter-nav--yootheme" : ""}`.trim()}
+        >
+          {showAllFilter && (
+            <li className={activeFilter === "all" ? "uk-active" : ""}>
+              <a
+                href="#"
+                onClick={(event) => selectFilter(event, "all")}
+                {...({ "uk-filter-control": JSON.stringify({ filter: ".js-filter" }) } as any)}
               >
-                {cat}
-              </button>
+                All
+              </a>
+            </li>
+          )}
+          {filterControls.map((control: { label: string; tag: string }, index: number) => (
+            <li
+              key={control.tag}
+              className={`${activeFilter === control.tag ? "uk-active " : ""}${index === 0 ? "uk-first-column" : ""}`.trim()}
+              {...({ "uk-filter-control": JSON.stringify({ filter: `[data-tag~="${control.tag.replace(/\s+/g, "-")}"]` }) } as any)}
+            >
+              <a
+                href="#"
+                onClick={(event) => selectFilter(event, control.tag)}
+              >
+                {control.label}
+              </a>
             </li>
           ))}
         </ul>
@@ -243,7 +279,7 @@ export function GridCardsClient({
 
       <div
         ref={gridRef}
-        className={`shop-builder-grid ${uikitGridStructureClassName(gridStructure)} shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)}`}
+        className={`js-filter shop-builder-grid ${uikitGridStructureClassName(gridStructure)} shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)}`}
         data-uk-grid={uikitGridAttribute(gridStructure)}
         style={
           {
@@ -277,12 +313,20 @@ export function GridCardsClient({
           } as CSSProperties
         }
       >
-        {filteredItems.slice(0, limit).map(({ item, sourceIndex }) =>
+        {renderedItems.map((item, sourceIndex) =>
           (() => {
+            const isVisible = !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter);
             // Grid Card Style is canonical. Legacy Panel aliases may only fill
             // an absent value; they can never override an explicit `None`.
+            const hasExplicitPanelStyle =
+              item.cardVariant !== undefined ||
+              block.gridCardVariant !== undefined ||
+              rawBlock.panelVariant !== undefined ||
+              rawBlock.panelStyle !== undefined ||
+              rawBlock.cardVariant !== undefined;
             const inheritedPanelStyle = item.cardVariant ?? block.gridCardVariant ?? rawBlock.panelVariant ?? rawBlock.panelStyle ?? rawBlock.cardVariant ?? "blank";
-            const panelStyle = inheritedPanelStyle === "default" &&
+            const panelStyle = !hasExplicitPanelStyle &&
+              inheritedPanelStyle === "default" &&
               rawBlock.spacingContract === "yootheme" &&
               (rawBlock.gridCardHover === true || item.cardHover === true)
               ? "card-hover"
@@ -326,12 +370,12 @@ export function GridCardsClient({
               metaColor: rawBlock.metaColor,
               contentColor: rawBlock.contentColor,
             });
-            const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
-
             // Title styling & level
             const TitleTag = (rawBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
             const titleStyleVal = rawBlock.gridTitleSize ?? rawBlock.titleStyle ?? item.titleStyle;
-            const titleHeadingClass = getUikitTitleHeadingClass(titleStyleVal) || (titleStyleVal && titleStyleVal !== "inherit" ? getUikitHeadingClass(titleStyleVal, titleStyleVal) : "");
+            const titleHeadingClass = (getUikitTitleHeadingClass(titleStyleVal) || (titleStyleVal && titleStyleVal !== "inherit" ? getUikitHeadingClass(titleStyleVal, titleStyleVal) : ""))
+              .replace(/\buk-margin-remove-top\b/g, "")
+              .trim();
             const titleDecorationClass = getUikitTitleDecorationClass(rawBlock.titleDecoration);
             const titleColorVal = rawBlock.titleColor ?? rawBlock.gridTitleColor ?? sharedCard.titleColor;
             const hasExplicitTitleColor = [rawBlock.titleColor, rawBlock.gridTitleColor, sharedCard.titleColor].some(
@@ -352,12 +396,15 @@ export function GridCardsClient({
             const titleColorClass = !(isYoothemeGrid && !hasExplicitTitleColor) && titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
               ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
               : "";
-            const titleMarginTopClass = getUikitMarginClass(rawBlock.titleMarginTop);
+            const titleMarginTopClass = getUikitMarginClass(
+              rawBlock.titleMarginTop,
+              isYoothemeGrid ? "top" : "all",
+            );
 
             // Meta styling
             const metaStyleClass = getUikitTextStyleClass(
               rawBlock.metaStyle ?? (rawBlock.spacingContract === "yootheme" ? undefined : "text-meta"),
-            ).replace(/\buk-margin-remove-top\b/g, "").trim();
+            ).replace(/\buk-margin-remove-top\b|\buk-margin-top\b/g, "").trim();
             const metaColorVal = rawBlock.metaColor;
             const hasExplicitMetaColor = typeof metaColorVal === "string" && !["", "inherit", "default", "none"].includes(metaColorVal.trim().toLowerCase());
             const metaColorClass = metaColorVal && metaColorVal !== "none" && metaColorVal !== "default"
@@ -484,8 +531,13 @@ export function GridCardsClient({
             const titleBreakpoint = rawBlock.gridTitleBreakpoint ?? "always";
             const mediaBreakpoint = rawBlock.gridMediaBreakpoint ?? "m";
             const itemMaxWidth = rawBlock.gridItemMaxWidth && rawBlock.gridItemMaxWidth !== "none"
-              ? `var(--uk-container-${rawBlock.gridItemMaxWidth === "2xlarge" ? "xlarge" : rawBlock.gridItemMaxWidth}-max-width, 100%)`
+              ? !isYoothemeGrid
+                ? `var(--uk-container-${rawBlock.gridItemMaxWidth === "2xlarge" ? "xlarge" : rawBlock.gridItemMaxWidth}-max-width, 100%)`
+                : undefined
               : undefined;
+            const itemMaxWidthClass = isYoothemeGrid && rawBlock.gridItemMaxWidth && rawBlock.gridItemMaxWidth !== "none"
+              ? `uk-width-${rawBlock.gridItemMaxWidth === "2xlarge" ? "xlarge" : rawBlock.gridItemMaxWidth}`
+              : "";
 
             const renderMeta = () => (
               canShowMeta && item.meta ? (
@@ -683,6 +735,10 @@ export function GridCardsClient({
               const cardBodyClass = panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary" || panelStyle === "card-hover" || panelStyle.startsWith("card-")
                 ? "uk-card-body"
                 : "";
+              // The Grid content wrapper is already a vertical flex column.
+              // `uk-flex-top` would set cross-axis `align-items:flex-start`,
+              // shrink-wrapping centered title/meta blocks to their text width
+              // and making them appear left-aligned in the card.
               return <div className={`${cardBodyClass} ${bodyPaddingClass} shop-builder-grid-content`.trim()}>
                 {mediaPlacement === "top" && !isFrameless && renderImage()}
                 {constrainOneColumnContent ? <div className={`uk-container uk-container-${rawBlock.panelContentWidth} shop-builder-grid-one-column-content`}>{contents}</div> : contents}
@@ -698,11 +754,13 @@ export function GridCardsClient({
             return (
               <article
                 key={item.id}
-                className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
+                data-tag={itemFilterTags(item).map((tag: string) => tag.replace(/\s+/g, "-")).join(" ")}
+                className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} ${itemMaxWidthClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
                 } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${isYoothemeGrid ? "uk-flex-1 uk-margin-remove-first-child" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
+                    display: isVisible ? undefined : "none",
                     textAlign: itemContentAlignment,
                     ...(itemMaxWidth ? { maxWidth: itemMaxWidth, marginInline: "auto", width: "100%" } : {}),
                     ...colorSemantics.style,
@@ -712,7 +770,7 @@ export function GridCardsClient({
                     // generic WebPages fallback border narrows the 270px
                     // source card's text column from 190px to 188px and
                     // changes line wrapping/row height.
-                    ...(isYoothemeGrid && ["default", "card-default"].includes(panelStyle) ? { "--uk-card-border-width": "0px" } : {}),
+                    ...(isYoothemeGrid && ["default", "card-default", "primary", "card-primary", "secondary", "card-secondary"].includes(panelStyle) ? { "--uk-card-border-width": "0px" } : {}),
                     // The YOOtheme Grid source leaves `title_color` empty,
                     // which means global emphasis — not the muted Card body
                     // color or a WebPages Card-default fallback.

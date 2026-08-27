@@ -55,10 +55,55 @@ test("YOOtheme imports own spacing once on the canonical General shell", () => {
   ]);
 
   expect(getGeneralElementShellStyle(blocks[2])).toMatchObject({ padding: "0px" });
+  expect(getGeneralElementShellStyle(blocks[2]).margin).toBeUndefined();
   expect(getGeneralElementShellStyle(blocks[1]).margin).toBeUndefined();
   expect(getGeneralElementShellClassName(blocks[1])).toContain("uk-margin");
   expect(getGeneralElementShellClassName(blocks[2])).toContain("uk-margin-medium");
   expect(getGeneralElementShellClassName(blocks[3])).toContain("uk-margin-xlarge");
+});
+
+test("an unconfigured YOOtheme divider does not invent element margin", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{ type: "column", children: [{ type: "divider", props: {} }] }],
+      }],
+    }],
+  });
+  const divider = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+
+  expect(divider).toMatchObject({ kind: "divider", spacingContract: "yootheme" });
+  expect(divider.margin).toBeUndefined();
+});
+
+test("YOOtheme Subnav preserves divider links and authored scroll targets", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{ type: "column", children: [{
+          type: "subnav",
+          props: { style: "divider" },
+          children: [
+            { type: "subnav_item", props: { content: "Further questions?", link: "#" } },
+            { type: "subnav_item", props: { content: "Visit the Help Center", link: "/?page_id=21" } },
+          ],
+        }] }],
+      }],
+    }],
+  });
+  const subnav = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+
+  expect(subnav).toMatchObject({ kind: "subnav", spacingContract: "yootheme", subnavStyle: "divider" });
+  expect(subnav.subnavItems).toEqual([
+    expect.objectContaining({ label: "Further questions?", url: "#", scroll: true }),
+    expect.objectContaining({ label: "Visit the Help Center", url: "/?page_id=21", scroll: false }),
+  ]);
 });
 
 test("native elements retain Global Element Padding inheritance", () => {

@@ -63,6 +63,7 @@ export type YoothemeImportElementKind =
   | "alert"
   | "icon"
   | "list"
+  | "subnav"
   | "accordion"
   | "table"
   | "gallery"
@@ -146,6 +147,8 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   icon: "icon",
   list: "list",
   list_item: "list",
+  subnav: "subnav",
+  subnav_item: "subnav",
   accordion: "accordion",
   accordion_item: "accordion",
   table: "table",
@@ -522,7 +525,10 @@ const sourceGeneralVisualStyle = (
 const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
   block: T,
   props: Record<string, unknown>,
-  options: { preserveLegacyAlignmentAliases?: boolean } = {},
+  options: {
+    preserveLegacyAlignmentAliases?: boolean;
+    preserveLegacyBlockAlignmentAlias?: boolean;
+  } = {},
 ): T => {
   const visualStyle = sourceGeneralVisualStyle(props);
   if (!visualStyle) return block;
@@ -530,7 +536,9 @@ const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
   const direct: Record<string, unknown> = {
     ...(layout.maxWidth ? { maxWidth: layout.maxWidth } : {}),
     ...(layout.maxWidthBreakpoint ? { maxWidthBreakpoint: layout.maxWidthBreakpoint } : {}),
-    ...(layout.blockAlign && layout.blockAlign !== "none" ? { elementAlign: layout.blockAlign } : {}),
+    ...(options.preserveLegacyBlockAlignmentAlias !== false && layout.blockAlign && layout.blockAlign !== "none"
+      ? { elementAlign: layout.blockAlign }
+      : {}),
     ...(options.preserveLegacyAlignmentAliases !== false && layout.textAlign
       ? { textAlign: layout.textAlign as any, headingAlign: layout.textAlign as any }
       : {}),
@@ -879,6 +887,27 @@ const sourceGridTags = (value: unknown): string[] | undefined => {
     .map((entry) => String(entry).trim())
     .filter(Boolean);
   return tags.length ? Array.from(new Set(tags)) : undefined;
+};
+
+/**
+ * YOOtheme's filter navigation is a separate semantic contract from the
+ * comma-separated tags on each item. When the export contains an explicit
+ * order, preserve it; otherwise retain the source's first-seen tag order.
+ * The importer persists this projection so Builder and storefront hydrate the
+ * same controls/default without inventing an "All" control.
+ */
+const sourceGridFilterControls = (
+  items: NonNullable<BuilderLayoutBlock["gridItems"]>,
+  props: Record<string, unknown>,
+): NonNullable<BuilderLayoutBlock["gridFilterControls"]> => {
+  const itemTags = items.flatMap((item) => item.tags ?? []);
+  const itemTagSet = new Set(itemTags);
+  const explicitOrder = sourceGridTags(props.filter_order) ?? [];
+  const orderedTags = [
+    ...explicitOrder.filter((tag) => itemTagSet.has(tag)),
+    ...itemTags.filter((tag, index) => !explicitOrder.includes(tag) && itemTags.indexOf(tag) === index),
+  ];
+  return orderedTags.map((tag) => ({ label: tag, tag }));
 };
 
 type DynamicImportDestination =
@@ -1655,7 +1684,8 @@ const mapStaticElement = (
       kind: "divider",
       dividerStyle,
       preset: dividerStyle,
-      margin: sourceMargin(props.margin) ?? "default",
+      spacingContract: "yootheme",
+      ...(sourceMargin(props.margin) ? { margin: sourceMargin(props.margin) } : {}),
     }, props);
   }
 
@@ -1675,6 +1705,9 @@ const mapStaticElement = (
     if (props.panel_style && !panelStyle) {
       warnings.push(`${path}: panel style '${String(props.panel_style)}' has no canonical WebPages equivalent.`);
     }
+    const filterControls = props.filter === true || props.filter === "true"
+      ? sourceGridFilterControls(items, props)
+      : [];
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_small", "grid_medium", "grid_large", "grid_xlarge",
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align", "grid_masonry", "grid_parallax", "grid_parallax_justify", "grid_parallax_start", "grid_parallax_end",
@@ -1701,6 +1734,13 @@ const mapStaticElement = (
       gridShowButton: props.show_link !== false,
       enableFilter: props.filter === true || props.filter === "true",
       filterStyle: props.filter_style === "subnav-pill" ? "pill" : props.filter_style === "tab" ? "tabs" : "subnav",
+      ...(filterControls.length ? {
+        gridFilterControls: filterControls,
+        gridFilterDefault: filterControls[0]?.tag,
+        // YOOtheme only renders an All control when it is part of the source
+        // navigation. Never synthesize one for an imported Grid.
+        gridFilterShowAll: false,
+      } : {}),
       gridItemRenderer: panelStyle || props.panel_style === "card-hover" ? "card" : "plain",
       gridCardVariant: sourceCardVariant(props.panel_style),
       gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
@@ -1829,6 +1869,16 @@ const mapStaticElement = (
   }
 
   if (type === "panel") {
+    // YOOtheme's absolutely centered Chat Features panel uses the positional
+    // uk-position-center class. Its text_align value is not a visual
+    // text-alignment override in the live theme, so do not project that source
+    // detail into WebPages General/Panel alignment during fresh import.
+    const panelGeneralProps =
+      typeof props.class === "string" &&
+      /(?:^|\s)uk-position-center(?:\s|$)/.test(props.class) &&
+      props.text_align === "center"
+        ? { ...props, text_align: undefined }
+        : props;
     if (Object.prototype.hasOwnProperty.call(props, "image") && !resolveYoothemeAssetUrl(props.image)) {
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
@@ -1849,7 +1899,9 @@ const mapStaticElement = (
       eyebrow: asString(props.meta) ?? "",
       body: asString(props.content) ?? "",
       imageUrl: resolveYoothemeAssetUrl(props.image),
-      imageAlt: asString(props.title) ?? "",
+      // Keep Panel meta and image accessibility separate. Do not manufacture
+      // image alt text from the title when YOOtheme did not author image_alt.
+      imageAlt: asString(props.image_alt) ?? "",
       imageMaxWidth: sourceImageMaxWidth(props),
       imageHeight: asString(props.image_height) ?? undefined,
       ...normalizeYoothemeMedia(props),
@@ -1897,7 +1949,7 @@ const mapStaticElement = (
       linkTitle: sourceBoolean(props.title_link) ?? false,
       titleDecoration: asString(props.title_decoration) ?? undefined,
       titleColor: asString(props.title_color) ?? undefined,
-      panelTextAlign: props.text_align === "left" || props.text_align === "center" || props.text_align === "right" ? props.text_align : undefined,
+      panelTextAlign: panelGeneralProps.text_align === "left" || panelGeneralProps.text_align === "center" || panelGeneralProps.text_align === "right" ? panelGeneralProps.text_align : undefined,
       metaStyle: asString(props.meta_style) ?? undefined,
       contentStyle: sourceTextVariant(props.content_style),
       panelMetaHtmlElement: sourcePanelMetaElement(props.meta_element),
@@ -1906,7 +1958,15 @@ const mapStaticElement = (
       contentMarginTop: props.content_margin === "remove" ? "none" : sourceMargin(props.content_margin),
       linkImage: sourceBoolean(props.image_link) ?? false,
       ...normalizeYoothemeGridPanelPresentation(props),
-    }, props);
+    }, panelGeneralProps, {
+      // `block_align` is a positional/container alignment in YOOtheme. For
+      // an absolutely positioned panel, projecting it to the legacy
+      // `elementAlign` alias would incorrectly emit WebPages' text-align CSS.
+      preserveLegacyBlockAlignmentAlias: !(
+        typeof props.class === "string" &&
+        /(?:^|\s)uk-position-center(?:\s|$)/.test(props.class)
+      ),
+    });
   }
 
   if (type === "alert") {
@@ -2016,6 +2076,33 @@ const mapStaticElement = (
       listIconSize: Number.isFinite(Number(props.icon_width)) ? Number(props.icon_width) : undefined,
       listLinkStyle: asString(props.link_style) ?? "default",
     }, props);
+  }
+
+  if (type === "subnav") {
+    const items = sourceChildren(node)
+      .filter((child) => child.type === "subnav_item")
+      .map((child, index) => {
+        const item = sourceProps(child);
+        const url = asString(item.link);
+        return {
+          id: sourcePathId(path + "." + index, "subnav-item"),
+          label: sanitizeHtml(asString(item.content) ?? asString(item.title) ?? ""),
+          url: url ?? undefined,
+          target: (item.link_target === "blank" ? "_blank" : "_self") as "_blank" | "_self",
+          scroll: url === "#" || Boolean(url?.startsWith("#")),
+        };
+      });
+    const style = asString(props.style) ?? asString(props.nav_style);
+    warnUnsupported(path, props, ["content", "show_image", "show_link", "style", "nav_style", "margin", ...GENERAL_POSITION_KEYS], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "subnav"),
+      kind: "subnav",
+      spacingContract: "yootheme",
+      subnavItems: items,
+      subnavStyle: style === "divider" ? "divider" : style === "pill" ? "pill" : "default",
+      subnavAlign: sourceAlignment(props.align ?? props.text_align),
+      ...(sourceMargin(props.margin) ? { margin: sourceMargin(props.margin) } : {}),
+    } as BuilderLayoutBlock, props);
   }
 
   if (type === "accordion") {

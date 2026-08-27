@@ -120,6 +120,69 @@ test("projects independent canonical Row and responsive Column semantics", () =>
   expect(row.columns[1].className).toContain("uk-width-1-2@m");
 });
 
+test("does not add match-height to canonical YOOtheme rows without the source modifier", () => {
+  const source = enterpriseEfficientWorkflowSection();
+  const structure = resolveBuilderSectionStructure({
+    ...source,
+    rows: [{
+      id: "canonical-row",
+      layout: "4-col-equal",
+      spacingContract: "yootheme",
+      columns: [
+        { id: "one", elements: [] },
+        { id: "two", elements: [] },
+        { id: "three", elements: [] },
+        { id: "four", elements: [] },
+      ],
+    }],
+  });
+
+  expect(structure.rows[0].className).toContain("uk-grid");
+  expect(structure.rows[0].className).not.toContain("uk-grid-match");
+});
+
+test("Panel fill projects UIkit's item-match modifier onto its owning column", () => {
+  const structure = resolveBuilderSectionStructure({
+    id: "panel-fill",
+    kind: "contentLayout",
+    rows: [{
+      id: "panel-fill-row",
+      layout: "2-col-equal",
+      spacingContract: "yootheme",
+      columns: [
+        { id: "filled-panel", elements: [{ id: "panel", kind: "panel", panelHeightExpand: true }] as any },
+        { id: "natural-column", elements: [{ id: "text", kind: "text" }] as any },
+      ],
+    }],
+  });
+
+  expect(structure.rows[0].columns[0].className).toContain("uk-grid-item-match");
+  expect(structure.rows[0].columns[1].className).not.toContain("uk-grid-item-match");
+});
+
+test("keeps authored responsive widths without an equal-column fallback", () => {
+  const structure = resolveBuilderSectionStructure({
+    id: "pricing-plan",
+    kind: "contentLayout",
+    rows: [{
+      id: "plan-row",
+      layout: "3-col-equal",
+      spacingContract: "yootheme",
+      columns: [
+        { id: "plan-copy", responsiveWidths: { default: "expand" }, elements: [] },
+        { id: "plan-free", responsiveWidths: { default: "1-4", small: "1-5" }, elements: [] },
+        { id: "plan-pro", responsiveWidths: { default: "1-4", small: "1-5" }, elements: [] },
+      ],
+    }],
+  }).rows[0];
+
+  expect(structure.columns.map(({ className }) => className)).toEqual([
+    "uk-width-expand",
+    "uk-width-1-4 uk-width-1-5@s",
+    "uk-width-1-4 uk-width-1-5@s",
+  ]);
+});
+
 test("Builder and storefront consume the shared structure outside interaction chrome", () => {
   const storefront = readFileSync(
     resolve(process.cwd(), "components/builder/StorefrontBuilderRenderer.tsx"),

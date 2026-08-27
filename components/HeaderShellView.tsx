@@ -298,11 +298,11 @@ export default function HeaderShellView({
     ? "wordpress"
     : documentSettings.layout ?? layoutOverride ?? asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
-  const headerBehavior = documentSettings.behavior;
-  const effectiveHeaderBehavior =
-    headerBehavior === "sticky" && documentSettings.stickyShowOnUp
-      ? "sticky-on-scroll-up"
-      : headerBehavior;
+  // The Header document behavior is already the canonical variant selected by
+  // the document. Do not reinterpret an explicit `sticky` value using the
+  // legacy compatibility flag: that changes the live runtime variant while
+  // leaving the persisted mapping looking correct.
+  const effectiveHeaderBehavior = documentSettings.behavior;
   const headerHeight = resolveHeaderHeightCss(
     documentSettings.height,
     documentSettings.customHeight,
@@ -606,6 +606,7 @@ export default function HeaderShellView({
       block={{
         id: buttonElement?.id ?? "header-button",
         kind: "button",
+        headerButtonMode: true,
         buttonLabel: buttonElement?.label || "Start",
         buttonUrl: buttonElement?.url || clientHref,
         buttonStyle: buttonElement?.buttonStyle || "primary",
@@ -970,7 +971,10 @@ export default function HeaderShellView({
         "--header-builder-row-gap": headerComposition.rowGap,
         "--header-builder-row-justify": headerComposition.rowJustify,
         "--header-builder-row-align": headerComposition.rowAlign,
-        "--header-builder-height": headerHeight,
+        // Auto Header height is owned by the active UIkit Navbar token. Keep
+        // the document value semantic instead of resolving a Circle-specific
+        // pixel value into the Header document.
+        "--header-builder-height": headerHeight ?? "var(--uk-navbar-nav-item-height, auto)",
         "--header-document-padding-top": documentPaddingTop,
         "--header-document-padding-bottom": documentPaddingBottom,
         ...(effectiveHeaderBackgroundMode === "default" &&

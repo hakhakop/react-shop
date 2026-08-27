@@ -4,7 +4,8 @@ import enterprise8 from "@/tests/fixtures/yootheme-compatibility/sources/enterpr
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import { findYoothemeCapability } from "@/lib/yoothemeCompatibilityRegistry";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
-import { resolveBuilderRowStyle } from "@/lib/builderRowStyles";
+import { resolveBuilderRowGap, resolveBuilderRowStyle } from "@/lib/builderRowStyles";
+import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
 
 test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
   const imported = mapYoothemeStaticContent(enterprise8);
@@ -76,7 +77,31 @@ test("keeps YOOtheme xlarge row margins on the global token", () => {
   expect(resolveBuilderRowStyle({
     spacingContract: "yootheme",
     rowBottomMargin: "xlarge",
-  }).marginBottom).toBe("var(--uk-global-margin-xlarge, 140px)");
+}).marginBottom).toBe("var(--uk-global-margin-xlarge, 140px)");
+});
+
+test("keeps YOOtheme small row width on the canonical container token", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        props: { width: "small" },
+        children: [{ type: "column", children: [] }],
+      }],
+    }],
+  });
+  const structure = resolveBuilderSectionStructure(mapped.sections[0]);
+  expect(structure.rows[0]?.style.maxWidth).toBe("var(--uk-container-small-max-width, 900px)");
+});
+
+test("does not suppress the visible UIkit row gutter for a source none margin", () => {
+  expect(resolveBuilderRowGap(
+    { spacingContract: "yootheme" },
+    "var(--builder-global-row-gap, 32px)",
+    { spacingContract: "yootheme", rowBottomMargin: "none" },
+  ).css).toBe("var(--uk-grid-gutter-medium, 40px)");
 });
 
 test("projects YOOtheme row viewport height into the shared row style", () => {
@@ -87,6 +112,19 @@ test("projects YOOtheme row viewport height into the shared row style", () => {
   expect(resolveBuilderRowStyle({
     rowHeight: { mode: "pixels", value: "640px" },
   }).minHeight).toBe("640px");
+});
+
+test("lets authored YOOtheme row CSS override inline spacing defaults", () => {
+  const style = resolveBuilderRowStyle({
+    spacingContract: "yootheme",
+    advanced: {
+      css: ".el-row { margin-top: -100vh; padding-bottom: 20vh; }",
+    },
+  });
+
+  expect(style.marginTop).toBeUndefined();
+  expect(style.paddingBottom).toBeUndefined();
+  expect(style.paddingTop).toBe("0px");
 });
 
 test("imports extended structural ownership without repeating Row state on Columns", () => {

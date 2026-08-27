@@ -61,20 +61,6 @@
   -webkit-backdrop-filter: none !important;
 }
 
-/* Builder canvases must keep the Header available for selection. A stale
-   storefront scroll state must never move it outside the preview viewport. */
-.site-header.site-header--builder-preview.site-header--scroll-hidden,
-.site-header[data-builder-preview="true"].site-header--scroll-hidden {
-  transform: none !important;
-  pointer-events: auto !important;
-  position: sticky !important;
-  top: 0 !important;
-  visibility: visible !important;
-  background: var(--header-bg, rgba(255, 255, 255, 0.92)) !important;
-  backdrop-filter: var(--uk-navbar-backdrop-filter) !important;
-  -webkit-backdrop-filter: var(--uk-navbar-backdrop-filter) !important;
-}
-
 /* Keep the editor preview navbar on one line at narrower iframe widths.
    If it wraps, the fixed header row vertically centers a multi-row nav and
    part of the menu is positioned above the preview viewport. */
@@ -290,6 +276,16 @@
   color: var(--accent-contrast, #ffffff) !important;
 }
 
+/* Transparent at rest, but restore the active global Navbar surface when a
+   show-on-up sticky header reappears. Tenant-specific background, blur, and
+   border values remain owned by the imported Navbar tokens. */
+.site-header.site-header--sticky-scrolled-glass {
+  background: var(--uk-navbar-background, var(--header-bg, rgba(255, 255, 255, 0.92))) !important;
+  border-bottom-color: var(--uk-navbar-border, var(--header-border, rgba(229, 231, 235, 0.72))) !important;
+  backdrop-filter: var(--uk-navbar-backdrop-filter, blur(20px)) !important;
+  -webkit-backdrop-filter: var(--uk-navbar-backdrop-filter, blur(20px)) !important;
+}
+
 /* Slightly tighten nav links inside pill */
 #site-header-pill[data-scrolled="true"] .site-header-nav {
   gap: 0.9rem;
@@ -314,7 +310,7 @@
 /* Pulling a section behind the Header changes layout only. A section-owned
    transparent header keeps the Header's configured visual treatment, as in
    YOOtheme; only the legacy overlay mode clears its surface. */
-.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) {
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]):not([data-header-behavior="sticky"]):not([data-header-behavior="sticky-on-scroll-up"]) {
   position: absolute !important;
   left: 0;
   right: 0;
@@ -4313,6 +4309,7 @@ body[data-storefront-preset="princity"] .category-mega-card,
    overrides remain higher priority through the --header-builder-menu-* vars. */
 @media (min-width: 901px) {
   .site-header .header-builder-element--navigation .site-header-nav {
+    flex-wrap: nowrap;
     gap: var(--header-builder-menu-gap, var(--uk-navbar-nav-gap, var(--uk-navbar-gap, 1.4rem)));
     font-size: var(--uk-navbar-nav-item-font-size, 16px);
     font-family: var(--uk-navbar-nav-item-font-family, var(--uk-global-font-family, inherit));

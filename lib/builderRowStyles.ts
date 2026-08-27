@@ -100,6 +100,8 @@ export function resolveBuilderRowStyle(
   // Preserve these structural declarations in the shared row path so
   // Builder and storefront reserve the same parallax field.
   const authoredCss = row?.advanced?.css ?? "";
+  const authoredProperty = (property: string) =>
+    new RegExp(`(?:^|[;{])\\s*${property}\\s*:`, "i").test(authoredCss);
   const authoredHeight = authoredCss.match(/(?:^|[;{])\s*height\s*:\s*([^;}]*)/i)?.[1]?.trim();
   const authoredMinHeight = authoredCss.match(/(?:^|[;{])\s*min-height\s*:\s*([^;}]*)/i)?.[1]?.trim();
   const authoredBottomMargin = authoredCss.match(/(?:^|[;{])\s*margin-bottom\s*:\s*([^;}]*)/i)?.[1]?.trim();
@@ -113,24 +115,38 @@ export function resolveBuilderRowStyle(
 
   return {
     background: row?.rowBackground || undefined,
-    paddingTop: hasSurface
-      ? inheritedSpacing(
-          row?.rowTopSpacing,
-          "rowPadding",
-          global.rowPaddingTop,
-        )
-      : "0px",
-    paddingBottom: hasSurface
-      ? inheritedSpacing(
-          row?.rowBottomSpacing,
-          "rowPadding",
-          global.rowPaddingBottom,
-        )
-      : "0px",
+    ...(authoredProperty("padding-top")
+      ? {}
+      : {
+          paddingTop: hasSurface
+            ? inheritedSpacing(
+                row?.rowTopSpacing,
+                "rowPadding",
+                global.rowPaddingTop,
+              )
+            : "0px",
+        }),
+    ...(authoredProperty("padding-bottom")
+      ? {}
+      : {
+          paddingBottom: hasSurface
+            ? inheritedSpacing(
+                row?.rowBottomSpacing,
+                "rowPadding",
+                global.rowPaddingBottom,
+              )
+            : "0px",
+        }),
     // Global row margins are intentionally not inherited. Row siblings use
     // rowGap; an explicit local margin replaces that boundary's gap.
-    marginTop: topMargin,
-    marginBottom: authoredBottomMargin || explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
+    ...(authoredProperty("margin-top") ? {} : { marginTop: topMargin }),
+    ...(authoredProperty("margin-bottom")
+      ? {}
+      : {
+          marginBottom:
+            authoredBottomMargin ||
+            explicitSpacing(row?.rowBottomMargin, "rowMargin", row?.spacingContract),
+        }),
     ...(authoredHeight ? { height: authoredHeight } : {}),
     ...(authoredMinHeight ? { minHeight: authoredMinHeight } : minHeight ? { minHeight } : {}),
     // The Builder projects UIkit's flex row as CSS grid. Authored fixed-height
@@ -147,7 +163,7 @@ export function resolveBuilderRowStyle(
     ...(row?.maxWidth && row.maxWidth !== "inherit"
       ? {
           maxWidth:
-            row.maxWidth === "small" ? "960px"
+            row.maxWidth === "small" ? "var(--uk-container-small-max-width, 900px)"
             : row.maxWidth === "xsmall" || row.maxWidth === "xs" ? "750px"
             : row.maxWidth === "default" || row.maxWidth === "medium" ? "1200px"
             : row.maxWidth === "large" || row.maxWidth === "xlarge" ? "1600px"
@@ -172,10 +188,11 @@ export function resolveBuilderRowGap(
   globalRowGap: string | undefined,
   previousRow?: BuilderRowStyleInput,
 ) {
+  const hasExplicitMargin = (value: string | undefined) =>
+    Boolean(value && value !== "inherit" && value !== "none" && value !== "default");
   const ownsBoundaryWithMargin =
-    (row?.rowTopMargin && row.rowTopMargin !== "inherit") ||
-    (previousRow?.rowBottomMargin &&
-      previousRow.rowBottomMargin !== "inherit");
+    hasExplicitMargin(row?.rowTopMargin) ||
+    hasExplicitMargin(previousRow?.rowBottomMargin);
   if (ownsBoundaryWithMargin) {
     return resolveBuilderSpacing("none", "rowGap");
   }
@@ -185,6 +202,21 @@ export function resolveBuilderRowGap(
   const rawValue = row?.rowGap && row.rowGap !== "inherit"
     ? row.rowGap
     : globalRowGap;
+  // YOOtheme's unmodified adjacent grids use the active medium UIkit gutter
+  // at their boundary. The generic Builder fallback is intentionally smaller
+  // for native layouts, so imported rows need to stay on their own contract.
+  if (
+    row?.spacingContract === "yootheme" &&
+    (!row.rowGap || row.rowGap === "inherit") &&
+    rawValue === globalRowGap
+  ) {
+    return resolveBuilderSpacingCssValue(
+      "var(--uk-grid-gutter-medium, 40px)",
+      "rowGap",
+      "Local",
+      "yootheme",
+    );
+  }
   const value = rawValue?.trim().toLowerCase();
   if (value === "small") {
     return resolveBuilderSpacingCssValue("15px", "rowGap", "Local", value);

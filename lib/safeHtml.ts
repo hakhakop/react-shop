@@ -27,7 +27,17 @@ const attribute = (attrs: string, name: string) =>
 const safeClass = (attrs: string) => {
   const match = attribute(attrs, "class");
   const value = match?.[2] ?? match?.[1];
-  return value && /^[a-z0-9_\-\s]{1,250}$/i.test(value) ? ` class="${value}"` : "";
+  // Preserve UIkit's responsive utility classes (for example
+  // `uk-visible@m`) in imported rich labels. Validate each token rather than
+  // rejecting the whole class attribute because of the breakpoint marker.
+  const classes = value && value.length <= 250
+    ? value.split(/\s+/).filter((token) => /^[a-z0-9_-]+(?:@[smlx])?$/i.test(token))
+    : [];
+  // YOOtheme's rich Grid content uses the `uk-grid` attribute as the
+  // UIkit activation hook. The fail-closed sanitizer intentionally drops
+  // unknown attributes, so retain its CSS/layout contract as a safe class.
+  if ((/\buk-grid(?:\s*=|\b)/i.test(attrs) || classes.some((token) => /^uk-grid-(?:small|medium|large|collapse)$/.test(token))) && !classes.includes("uk-grid")) classes.push("uk-grid");
+  return classes.length ? ` class="${classes.join(" ")}"` : "";
 };
 
 const safeResponsiveBreakClass = (attrs: string) => {

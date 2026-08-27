@@ -118,7 +118,11 @@ export default function HeaderFrame({
   }, [children, behavior]);
 
   React.useEffect(() => {
-    if (scrollState || builderPreviewDetected) return;
+    // A Builder preview can own its scroll inside the preview iframe. Only
+    // skip the local listener when an outer surface is actively supplying
+    // scroll state; Builder mode itself is not evidence that window/iframe
+    // scrolling is unavailable.
+    if (scrollState) return;
     const getScrollY = () => {
       const previewShell = headerRef.current?.closest<HTMLElement>(".builder-preview-shell");
       if (previewShell) {
@@ -347,8 +351,8 @@ export default function HeaderFrame({
     };
   }, [backgroundMode, textMode, scrolled, overlapHeader]);
 
-  const effectiveScrolled = scrollState?.scrolled ?? (builderPreviewDetected ? false : scrolled);
-  const effectiveHidden = scrollState?.hidden ?? (builderPreviewDetected ? false : hiddenByScroll);
+  const effectiveScrolled = scrollState?.scrolled ?? scrolled;
+  const effectiveHidden = scrollState?.hidden ?? hiddenByScroll;
   let bgClass = "";
   let borderClass = "";
   let textClass = "";
@@ -377,6 +381,13 @@ export default function HeaderFrame({
   const baseNone = "site-header";
 
   const isSticky = behavior !== "static";
+  // UIkit applies the sticky navbar surface to every non-static sticky mode.
+  // Restricting this class to show-on-up made the ordinary Sticky variant
+  // remain transparent/default instead of resolving the imported glass token.
+  const stickyScrolledGlass =
+    isSticky && effectiveScrolled
+      ? "site-header--sticky-scrolled-glass"
+      : "";
   const base = isSticky ? baseSticky : baseNone;
   const state = isSticky ? stateSticky : "";
 
@@ -388,9 +399,17 @@ export default function HeaderFrame({
       <header
         id={id}
         ref={headerRef}
-        className={`${base} ${state} ${className} ${sectionTransparent ? "site-header--section-transparent" : ""} ${effectiveHidden ? "site-header--scroll-hidden" : ""}`}
+        className={`${base} ${state} ${stickyScrolledGlass} ${className} ${sectionTransparent ? "site-header--section-transparent" : ""} ${effectiveHidden ? "site-header--scroll-hidden" : ""}`}
         style={{
           ...(isSticky ? { borderBottomColor: effectiveScrolled ? accentColor : "transparent" } : {}),
+          ...(isSticky && effectiveScrolled
+            ? {
+                // Keep the glass effect token-owned even when the generated
+                // utility stylesheet is stale during a Builder hot update.
+                backdropFilter: "var(--uk-navbar-backdrop-filter, blur(20px))",
+                WebkitBackdropFilter: "var(--uk-navbar-backdrop-filter, blur(20px))",
+              }
+            : {}),
           ...style,
         }}
         data-header-behavior={behavior}

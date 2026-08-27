@@ -4,7 +4,10 @@
   padding: 0;
   background: var(--builder-page-bg, transparent);
   color: var(--uk-global-text-color, var(--builder-text, #111111));
-  overflow-x: clip;
+  /* Imported YOOtheme sections and their positioned artwork are allowed to
+     paint through the main boundary. Clipping the root cuts full-bleed
+     backgrounds even when the owning Section itself is overflow-visible. */
+  overflow: visible;
 }
 
 [data-theme="dark"] .shop-builder-main--scheme-auto {
@@ -24,7 +27,12 @@
 
 .shop-builder-section {
   display: flow-root;
-  position: relative;
+  /* YOOtheme section roots are static by default.  Keeping every imported
+     section relative creates a stacking context for its z-index:0 children,
+     causing an earlier section's full-bleed artwork to be painted under the
+     next section instead of continuing through the boundary.  Features that
+     need a containing block opt into position:relative below. */
+  position: static;
   width: 100%;
   margin: var(--builder-section-margin-top, var(--builder-global-section-margin-top, 0px)) auto var(--builder-section-margin-bottom, var(--builder-global-section-margin-bottom, 0px));
   border: 0;
@@ -61,7 +69,10 @@
 }
 
 .shop-builder-section--has-background-video {
-  overflow: hidden;
+  /* The video is an absolute section-owned layer and needs the section as
+     its containing block. */
+  position: relative;
+  overflow: visible;
 }
 
 .shop-builder-section-background-video {
@@ -73,6 +84,80 @@
   object-fit: cover;
   pointer-events: none;
   border: 0;
+}
+
+/* YOOtheme also permits a video on the column itself. Keep it behind the
+   column content so sticky/centered content retains the same containing
+   block while the media fills the authored column height. */
+.shop-builder-column--has-background-video {
+  position: relative;
+}
+
+.shop-builder-column-background-video {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.shop-builder-column--has-background-video > .shop-builder-column-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* YOOtheme's full-width Feature List video owns the first row's section
+   canvas, even though the imported canonical data keeps it on Row 1 / Column
+   1. Remove the container gutter only for this single full-width video
+   column; ordinary column videos keep their authored column padding. */
+.shop-builder-section--content-expand
+  .shop-builder-content-layout-rows-wrapper
+  > div:first-child
+  > .shop-builder-content-row
+  > .shop-builder-column--has-background-video:only-child {
+  width: calc(100% + var(--uk-container-padding-horizontal, 15px));
+  max-width: none !important;
+  flex-shrink: 0;
+  padding-left: 0 !important;
+}
+
+@media (min-width: 640px) {
+  .shop-builder-section--content-expand
+    .shop-builder-content-layout-rows-wrapper
+    > div:first-child
+    > .shop-builder-content-row
+    > .shop-builder-column--has-background-video:only-child {
+    width: calc(100% + var(--uk-container-padding-horizontal-s, 30px));
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-section--content-expand
+    .shop-builder-content-layout-rows-wrapper
+    > div:first-child
+    > .shop-builder-content-row
+    > .shop-builder-column--has-background-video:only-child {
+    width: calc(100% + var(--uk-container-padding-horizontal-m, 40px));
+  }
+}
+
+/* Keep the media and its sticky lifecycle in one UIkit container. This lets
+   section-scoped columns remain visible while the next content row crosses
+   over them, matching YOOtheme's cinematic feature-list composition. */
+.shop-builder-column-content--media-sticky {
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* The following rows are the authored foreground of a cinematic section.
+   Raise them above the section-scoped sticky media while leaving the media
+   container itself at the UIkit z-index used by the original theme. */
+.shop-builder-section:has(.shop-builder-column-content--media-sticky)
+  .shop-builder-content-row:not(:has(.shop-builder-column-content--media-sticky)) {
+  position: relative;
+  z-index: 2;
 }
 
 .shop-builder-section--has-background-video > .shop-builder-section-content {
@@ -109,8 +194,6 @@ body.dark {
 .shop-builder-section[data-theme="dark"],
 .shop-builder-section.shop-builder-section--scheme-dark,
 .shop-builder-section.shop-builder-section--dark,
-.shop-builder-section.uk-section-primary,
-.shop-builder-section.uk-section-secondary,
 .shop-builder-section.uk-light,
 .shop-builder-main .uk-light,
 .builder-preview-shell .uk-light,
@@ -184,6 +267,12 @@ body.dark {
 .shop-builder-section.shop-builder-section--yootheme {
   --uk-grid-gutter-medium: 30px;
 }
+
+@media (min-width: 1200px) {
+  .shop-builder-section.shop-builder-section--yootheme {
+    --uk-grid-gutter-medium: 40px;
+  }
+}
 .builder-preview-section-sticky-wrapper {
   /* UIkit owns the sticky host in Builder; keep the motion wrapper in normal
      flow and let the section remain the visual target. */
@@ -234,7 +323,16 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    internal-text-background-color-gradient token. Keep imported YOOtheme text
    variants on that canonical token path instead of UIkit's blue fallback. */
 .shop-builder-section.shop-builder-section--yootheme .uk-text-background {
+  background-color: var(--uk-global-primary-background, var(--uk-button-primary-background, #1e87f0)) !important;
   background-image: var(--uk-text-background-gradient, var(--uikit-section-primary-gradient, none)) !important;
+}
+
+/* The generic Builder span reset is intentionally broad for legacy content,
+   but it must not turn YOOtheme's semantic heading wrapper into a full-width
+   block. UIkit keeps this wrapper inline so the gradient follows the glyphs. */
+.shop-builder-column-block--heading .shop-builder-title > span[class*="uk-text-"] {
+  display: inline !important;
+  font-size: inherit !important;
 }
 
 /* Imported YOOtheme primary sections can author both a background image and
@@ -2338,6 +2436,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-grid-card--yootheme.uk-card-default,
 .shop-builder-grid-card--yootheme.uk-card-hover {
   background: var(--uk-card-default-background, var(--global-background, #f7f8fc)) !important;
+  border-width: 0 !important;
+  border-style: none !important;
   box-shadow: var(--uk-card-default-box-shadow, var(--uk-card-shadow, none)) !important;
 }
 
@@ -3290,6 +3390,47 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   overflow: hidden !important;
 }
 
+/* YOOtheme keeps the card shell open and clips only the flush media frame.
+   Keeping that distinction prevents imported artwork from being cut at the
+   section/card boundary while preserving the radius on the media wrapper. */
+.shop-builder-grid-card--yootheme.is-image-frameless {
+  overflow: visible !important;
+}
+
+/* YOOtheme's Section color mode is a global UIkit context token. A dark
+   mode selects the inverse context; light mode remains on the theme's normal
+   context (Circle's normal context is its imported light text palette). */
+.shop-builder-main[data-section-default-color-mode="light"] .shop-builder-section.uk-section-default,
+.shop-builder-main[data-section-muted-color-mode="light"] .shop-builder-section.uk-section-muted,
+.shop-builder-main[data-section-primary-color-mode="light"] .shop-builder-section.uk-section-primary,
+.shop-builder-main[data-section-secondary-color-mode="light"] .shop-builder-section.uk-section-secondary {
+  --uk-inverse: light;
+}
+.shop-builder-main[data-section-default-color-mode="dark"] .shop-builder-section.uk-section-default,
+.shop-builder-main[data-section-muted-color-mode="dark"] .shop-builder-section.uk-section-muted,
+.shop-builder-main[data-section-primary-color-mode="dark"] .shop-builder-section.uk-section-primary,
+.shop-builder-main[data-section-secondary-color-mode="dark"] .shop-builder-section.uk-section-secondary {
+  --uk-inverse: dark;
+  --context-bg: transparent;
+  --context-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --context-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --context-emphasis: var(--uk-inverse-global-emphasis-color, #fff);
+  --context-surface: var(--webpages-background-secondary, #111827);
+  --uikit-text-default-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-text-lead-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --uikit-text-meta-color: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --uikit-text-muted-color: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --uikit-text-emphasis-color: var(--uk-inverse-global-emphasis-color, #fff);
+  --uikit-text-primary-color: var(--uk-inverse-global-link-color, #fff);
+  --uikit-text-secondary-color: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --builder-section-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --builder-section-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --builder-active-text: var(--uk-inverse-global-color, rgba(255, 255, 255, 0.7));
+  --builder-active-muted: var(--uk-inverse-global-muted-color, rgba(255, 255, 255, 0.5));
+  --builder-active-heading: var(--uk-inverse-global-emphasis-color, #fff);
+  --builder-active-surface: var(--webpages-background-secondary, #111827);
+}
+
 .shop-builder-panel-padding-small {
   padding: 20px !important;
 }
@@ -3521,6 +3662,26 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   color: var(--builder-card-meta-color, var(--builder-active-muted, var(--builder-muted, #5f5f58))) !important;
 }
 
+/* The source Panel wrapper carries `uk-margin-remove-first-child`, so its
+   first meta/title control does not add a second top margin. The canonical
+   panel body is the equivalent first-child boundary in WebPages. */
+.shop-builder-element-shell.yootheme-imported-spacing
+  > .shop-builder-column-block--panel
+  > .uk-card-body
+  > :first-child {
+  margin-top: 0 !important;
+}
+
+/* When a Panel has a meta heading above its title, YOOtheme places the title
+   on the normal UIkit top-margin rhythm. The first-child suppression above
+   applies only when there is no preceding meta control. */
+.shop-builder-element-shell.yootheme-imported-spacing
+  > .shop-builder-column-block--panel
+  > .uk-card-body
+  > .uk-h1:not(:first-child) {
+  margin-top: var(--uk-global-margin, 20px) !important;
+}
+
 .shop-builder-column-block--panel .shop-builder-buttons {
   width: 100%;
   margin: var(--builder-card-button-margin, 0) 0 0;
@@ -3734,6 +3895,17 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   min-width: 0;
 }
 
+/* YOOtheme's sticky media target contains a relative panel, and the
+   animation layers (including the active image) are positioned inside that
+   panel. Keep the canonical sticky wrapper as UIkit's viewport-centered
+   target; otherwise absolute imported image shells anchor to its top edge
+   and the final left panel releases at a different vertical position. */
+.shop-builder-content-layout-card
+  > .shop-builder-column-content.uk-sticky
+  > .shop-builder-content-positioning-group {
+  position: relative !important;
+}
+
 /* The structural column baseline above is intentionally transparent and
    guttered. Once a YOOtheme column surface is selected, the surface token
    must own those pixels instead of being hidden by the content-layout shell. */
@@ -3774,6 +3946,20 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title {
   margin-bottom: var(--uk-global-margin, 20px) !important;
 }
+.shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title.uk-margin-remove-vertical {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title.uk-margin-small {
+  margin-top: 0 !important;
+  margin-bottom: var(--uk-global-margin-small, 10px) !important;
+}
+.shop-builder-element-shell.yootheme-imported-spacing.uk-margin-remove-top {
+  /* UIkit's `uk-margin*` utilities are top-flow margins. WebPages' compact
+     utility projection stores the base value on the bottom edge, so a source
+     `uk-margin-remove-top` would otherwise leave a false trailing gap. */
+  margin-bottom: 0 !important;
+}
 
 /* UIkit's final child does not contribute an extra trailing margin to the
    expanded content row. Imported shells keep their authored margin between
@@ -3789,6 +3975,12 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title.uk-h1 {
   font-size: 42px !important;
   line-height: 1.2 !important;
+  /* UIkit's source H1 has a 40px top margin. The canonical element shell
+     already preserves the preceding title's 20px bottom margin in its own
+     box, so the non-collapsing wrapper needs the remaining 20px of that
+     separation; without it the section paint box ends too early around
+     transformed/parallax content. */
+  margin-top: calc(var(--uk-heading-h1-margin-top, 40px) - var(--uk-global-margin, 20px)) !important;
 }
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-column-block--image {
   line-height: 0 !important;
@@ -3799,6 +3991,32 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    the content-layout baseline must not add a second fixed 40px gutter. */
 .shop-builder-content-row > .shop-builder-content-layout-card {
   padding-left: var(--uk-container-padding-horizontal, 15px) !important;
+}
+
+/* Rows without YOOtheme's explicit match-height modifier keep their natural
+   column heights. The flex projection otherwise stretches every canonical
+   content column to a viewport-sized sibling height (most visibly in the
+   reveal footer), even though the source row is intrinsically sized. */
+.shop-builder-content-row:not(.uk-grid-match) {
+  align-items: flex-start;
+}
+
+/* Keep the normal row baseline natural, but let the explicit Panel fill
+   control opt its owning UIkit grid item into the row's available height. */
+.shop-builder-content-row:not(.uk-grid-match)
+  > .shop-builder-content-layout-card.uk-grid-item-match {
+  align-self: stretch;
+}
+
+/* YOOtheme's .tm-grid-expand stretches every column across an authored
+   sticky/parallax row. Keep the canonical projection content-height by
+   default, but restore that stretch for rows that own sticky columns. */
+.shop-builder-content-row.builder-sticky-boundary-row > .shop-builder-content-layout-card {
+  flex: 1 1 auto;
+}
+
+.shop-builder-content-row.builder-sticky-boundary-row {
+  align-items: stretch;
 }
 
 /* A sticky column's transformed/parallax descendants must be allowed to paint
@@ -3887,10 +4105,46 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   background: rgba(13, 115, 255, 0.04);
 }
 
+/* A contained imported row already owns its horizontal gutter through the
+   outer UIkit container contract. Do not add the column gutter a second time
+   or centered card tracks become narrower than the source row. */
+.shop-builder-content-row--contained > .shop-builder-content-layout-card {
+  padding-left: 0 !important;
+}
+
 .shop-builder-column-block + .shop-builder-column-block {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
+}
+
+.shop-builder-column-block--divider > .shop-builder-divider--bare {
+  margin: 0;
+  border: 0;
+  border-top: var(--uk-global-border-width, 1px) solid
+    var(--uk-global-border, var(--uk-global-border-color, #e5e5e5));
+}
+.shop-builder-element-shell:has(> .shop-builder-column-block--divider):not(:last-child)
+  .shop-builder-divider--bare {
+  margin-bottom: var(--uk-global-margin, 20px);
+}
+
+/* YOOtheme keeps the heading that follows a divider in the same column at
+   the authored heading margin. Imported heading shells carry a reset margin
+   for the generic builder, so restore that relationship only for this
+   divider/heading pair. */
+.shop-builder-element-shell:has(> .shop-builder-column-block--divider):not(:last-child)
+  + .shop-builder-element-shell .shop-builder-title.uk-h3 {
+  margin-top: var(--uk-heading-h3-margin-top, 40px) !important;
+  margin-bottom: 0 !important;
+}
+
+/* In a compact YOOtheme row the row itself owns the vertical gap. A default
+   text/button margin on the last imported shell would otherwise extend the
+   row by one extra global margin. */
+.shop-builder-content-row.uk-grid-row-small
+  .shop-builder-element-shell.yootheme-imported-spacing.uk-margin {
+  margin-bottom: 0 !important;
 }
 
 .shop-builder-column-block span,
@@ -6549,6 +6803,21 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   color: var(--uikit-accordion-content-color, var(--context-text, currentColor));
   line-height: 1.65;
 }
+
+/* Circle's imported Accordion follows YOOtheme's compact default: no title
+   min-height/padding, 18px titles at 1.4 line-height, and 15px divider
+   rhythm. The generic Builder Accordion remains unchanged. */
+.yootheme-imported-spacing .shop-builder-accordion .uk-accordion-title {
+  min-height: 0;
+  padding: var(--uk-accordion-title-padding-vertical, 0px) 0;
+  font-size: var(--uk-accordion-title-font-size, 18px);
+  line-height: var(--uk-accordion-title-line-height, 1.4);
+}
+.yootheme-imported-spacing .shop-builder-accordion--style-default > li + li,
+.yootheme-imported-spacing .shop-builder-accordion--style-divided > li + li {
+  padding-top: 15px;
+  margin-top: 15px;
+}
 @media (max-width: 760px) {
   .shop-builder-accordion .uk-accordion-title {
     min-height: 48px;
@@ -6576,11 +6845,11 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 
 /* Base HTML Element Tag Defaults */
-h1.shop-builder-title { font-size: 2.5rem; line-height: 1.2; font-weight: 700; }
-h2.shop-builder-title { font-size: 2rem; line-height: 1.3; font-weight: 600; }
-h3.shop-builder-title { font-size: 1.5rem; line-height: 1.4; font-weight: 600; }
-h4.shop-builder-title { font-size: 1.25rem; line-height: 1.4; font-weight: 600; }
-h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
+h1.shop-builder-title { font-size: 2.5rem; line-height: 1.2; font-weight: var(--uk-heading-font-weight, 700); }
+h2.shop-builder-title { font-size: 2rem; line-height: 1.3; font-weight: var(--uk-heading-font-weight, 700); }
+h3.shop-builder-title { font-size: 1.5rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
+h4.shop-builder-title { font-size: 1.25rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
+h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
 
 /* UIkit Width utilities. These are the fixed source semantics used by
    YOOtheme General → Max Width; they are intentionally not container tiers. */
@@ -6613,18 +6882,18 @@ h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
   .uk-width-xlarge\@l { width: 600px !important; box-sizing: border-box; }
   .uk-width-2xlarge\@l { width: 750px !important; box-sizing: border-box; }
 }
-h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; }
+h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: var(--uk-heading-font-weight, 700); }
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
 .shop-builder-title.uk-h3 {
   font-size: var(--uk-heading-h3-font-size, 22px) !important;
   line-height: 1.4 !important;
-  font-weight: 600 !important;
+  font-weight: var(--uk-heading-font-weight, 700) !important;
 }
-.shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, 1.0625rem) !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
+.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, 1.0625rem) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
+.shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 700) !important; }
 
 .shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
 .shop-builder-title.uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
@@ -6795,17 +7064,17 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   padding-bottom: var(--uk-section-padding-small, 40px) !important;
 }
 .uk-section-large {
-  padding-top: var(--uk-section-padding-large, 100px) !important;
-  padding-bottom: var(--uk-section-padding-large, 100px) !important;
+  padding-top: var(--uk-section-padding-large, 70px) !important;
+  padding-bottom: var(--uk-section-padding-large, 70px) !important;
 }
 
 /* Imported YOOtheme sections use the canonical large section token. Keep the
    Builder projection on the same token path as the published storefront. */
 .shop-builder-section.uk-section-large {
-  padding-top: var(--uk-section-padding-large-yootheme, 140px) !important;
+  padding-top: var(--uk-section-padding-large, 70px) !important;
 }
 .shop-builder-section.uk-section-large:not(.uk-padding-remove-bottom) {
-  padding-bottom: var(--uk-section-padding-large-yootheme, 140px) !important;
+  padding-bottom: var(--uk-section-padding-large, 70px) !important;
 }
   .uk-section-xlarge {
     padding-top: var(--uk-section-padding-xlarge, 140px) !important;
@@ -6814,18 +7083,35 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 @media (min-width: 960px) {
   .uk-section,
   .uk-section-medium {
-    padding-top: var(--uk-section-padding-default, 70px) !important;
-    padding-bottom: var(--uk-section-padding-default, 70px) !important;
+    padding-top: var(--uk-section-padding-default-m, 70px) !important;
+    padding-bottom: var(--uk-section-padding-default-m, 70px) !important;
   }
   .uk-section-large {
-    padding-top: var(--uk-section-padding-large, 100px) !important;
-    padding-bottom: var(--uk-section-padding-large, 100px) !important;
+    padding-top: var(--uk-section-padding-large-m, 140px) !important;
+    padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
+  }
+  /* Keep the Builder's imported-section selector on the same responsive
+     token path. Its two-class specificity otherwise wins over the generic
+     UIkit rule above and leaves large sections at the base 70px padding. */
+  .shop-builder-section.uk-section-large {
+    padding-top: var(--uk-section-padding-large-m, 140px) !important;
+    padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
+  }
+  .shop-builder-section.uk-section-large.uk-padding-remove-top {
+    padding-top: 0 !important;
+  }
+  .shop-builder-section.uk-section-large.uk-padding-remove-vertical {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .shop-builder-section.uk-section-large:not(.uk-padding-remove-bottom) {
+    padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
   }
   .uk-section-xlarge {
     /* Section scale is owned by imported/canonical Section tokens. Do not
        combine it with the independent global-margin scale on desktop. */
-    padding-top: calc(var(--uk-global-margin-large, 70px) + var(--uk-section-padding-xlarge, 140px)) !important;
-    padding-bottom: calc(var(--uk-global-margin-large, 70px) + var(--uk-section-padding-xlarge, 140px)) !important;
+    padding-top: var(--uk-section-padding-xlarge-m, 210px) !important;
+    padding-bottom: var(--uk-section-padding-xlarge-m, 210px) !important;
   }
 }
 .uk-padding-remove-top {
@@ -6877,6 +7163,7 @@ body.is-visual-builder-active .uk-lightbox {
 .uk-margin-remove-last-child > :last-child,
 .shop-builder-section-content > :last-child,
 .shop-builder-content-layout-rows-wrapper > :last-child,
+.shop-builder-content-layout-rows-wrapper > :last-child > .shop-builder-content-row:last-child,
 .shop-builder-content-layout-grid > :last-child,
 .builder-preview-content-layout-grid > :last-child,
 .builder-main-row-frame:last-child,
@@ -6949,6 +7236,22 @@ body.is-visual-builder-active .uk-lightbox {
   margin-bottom: 0 !important;
 }
 
+/* The imported title owns only its authored vertical margin. The native
+   Builder title fallback otherwise contributes horizontal margins and the
+   legacy remove-top utility suppresses YOOtheme's explicit top gap. */
+.shop-builder-grid-card--yootheme .shop-builder-title {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-title.uk-margin-medium-top {
+  margin-top: var(--uk-global-margin-medium, 40px) !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-title > span > :first-child {
+  margin-top: 0 !important;
+}
+
 /* UIkit heading presets can restore their own bottom margin after the
    semantic remove-bottom utility. YOOtheme Grid item titles are flush with
    the adjacent image/content row. */
@@ -6969,6 +7272,14 @@ body.is-visual-builder-active .uk-lightbox {
   margin-top: var(--uk-global-margin, 20px) !important;
 }
 
+/* The imported Grid contract stores YOOtheme's default content gap as
+   `small`, but the original rendered utility is `uk-margin-top` (20px), not
+   UIkit's 10px `uk-margin-small-top`. The generic class remains intact for
+   non-imported grids; only the shared imported projection is normalized. */
+.shop-builder-grid-card--yootheme .shop-builder-grid-content > .uk-panel.uk-margin-small-top {
+  margin-top: var(--uk-global-margin, 20px) !important;
+}
+
 /* YOOtheme's linked-panel behavior makes the whole card clickable but does
    not decorate the title/content as legacy WebPages links. */
 .shop-builder-grid-card--yootheme.uk-link-toggle .shop-builder-title a,
@@ -6983,9 +7294,111 @@ body.is-visual-builder-active .uk-lightbox {
    while preserving the authored color and margin utilities. */
 .shop-builder-grid-card--yootheme .shop-builder-grid-meta {
   font-size: var(--uk-global-font-size, 16px) !important;
+  margin-bottom: 0 !important;
   /* Preserve the canonical YOOtheme heading token (uk-h5/uk-h3).  Those
      tokens own the 700 weight and 1.4 line-height used by Grid meta/title
      rows; forcing body weight here makes the imported card visibly lighter. */
+}
+
+/* YOOtheme's Pricing filter is a pill projection of the shared Button
+   contract. Keep the filter state/content in Grid, but let the active global
+   Button tokens own its glow, surface, and foreground instead of UIkit's
+   blue subnav defaults. */
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li > a {
+  position: relative;
+  z-index: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: normal;
+  box-sizing: content-box !important;
+  min-height: 0;
+  padding: var(--uk-subnav-pill-item-padding-vertical, 8px) var(--uk-subnav-pill-item-padding-horizontal, 14px) !important;
+  font-size: var(--uk-base-font-size, 16px) !important;
+  line-height: var(--uk-base-line-height, 1.5) !important;
+  color: var(--uk-subnav-pill-item-color, var(--uk-global-emphasis-color, #fff)) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: var(--uk-subnav-pill-item-border-radius, 500px) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  isolation: isolate;
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li > a::before,
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li > a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li > a::before {
+  display: var(--uk-internal-subnav-pill-item-glow-display, block);
+  background-image: var(--uk-internal-subnav-pill-item-glow-gradient, none);
+  filter: var(--uk-internal-subnav-pill-item-glow-filter, none);
+  opacity: var(--uk-internal-subnav-pill-item-glow-opacity, 0);
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li > a::after {
+  background: transparent;
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li.uk-active > a::after {
+  background: var(--uk-subnav-pill-item-active-background, transparent);
+  box-shadow: var(--uk-subnav-pill-item-active-box-shadow, none);
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li.uk-active > a {
+  color: var(--uk-subnav-pill-item-active-color, var(--uk-global-emphasis-color, #fff)) !important;
+}
+
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li.uk-active > a::before {
+  opacity: 1;
+}
+
+/* The imported filter links remain bright in both states; only the active
+   link receives the global default button surface. */
+.shop-builder-filter-nav--yootheme.uk-subnav-pill > li:not(.uk-active) > a {
+  color: var(--uk-subnav-pill-item-color, var(--uk-global-emphasis-color, #fff)) !important;
+}
+
+.shop-builder-grid-card--yootheme .shop-builder-title > span > p:first-child {
+  color: inherit !important;
+}
+
+/* YOOtheme's card metadata is normal-weight body text even when the card
+   heading carries the global primary heading weight. Keep the projection
+   tied to the imported Grid contract instead of changing native cards. */
+.shop-builder-grid-card--yootheme .shop-builder-title > span > p.uk-text-meta {
+  font-weight: var(--uk-text-meta-font-weight, 400) !important;
+}
+
+/* Imported YOOtheme Subnav has no independent muted/uppercase component
+   preset here: its links inherit the active section foreground and the
+   global base typography. */
+.shop-builder-subnav--yootheme .uk-subnav > li > a {
+  color: var(--uk-global-emphasis-color, #fff) !important;
+  font-size: var(--uk-base-font-size, 16px) !important;
+  line-height: var(--uk-base-line-height, 1.5) !important;
+  text-transform: none !important;
+}
+
+/* The canonical renderer keeps the card body as a semantic inner wrapper,
+   while YOOtheme places the same controls directly in the card shell. Mirror
+   `uk-margin-remove-first-child` at that boundary so an authored meta margin
+   does not add an extra 10px above every imported Pricing card. */
+.shop-builder-grid-card--yootheme .shop-builder-grid-content > :first-child {
+  margin-top: 0 !important;
+}
+
+.shop-builder-main .shop-builder-grid-card--yootheme .shop-builder-grid-meta.uk-h4 {
+  font-size: var(--uk-heading-h4-font-size, 18px) !important;
+  line-height: var(--uk-heading-h4-line-height, 1.4) !important;
+  font-weight: var(--uk-heading-h4-font-weight, var(--webpages-font-primary-weight, 700)) !important;
 }
 
 /* A YOOtheme `default` section is a light surface even when the surrounding
@@ -7046,22 +7459,27 @@ body.is-visual-builder-active .uk-lightbox {
 
 /* YOOtheme Grid Card Hover is a modifier-only card in tenant previews and
    storefronts: transparent surface, 40px body, and color-only interaction. */
-[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover,
-[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover {
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary),
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary),
+.shop-builder-main .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary) {
   background: transparent !important;
+  border-width: 0 !important;
+  border-style: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
   color: var(--builder-section-text, var(--uk-global-emphasis-color, inherit)) !important;
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out, background-size 0.1s ease-in-out, border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out, transform 0.1s ease-in-out !important;
 }
 
-[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover .shop-builder-panel-padding-default,
-[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover .shop-builder-panel-padding-default {
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary) .shop-builder-panel-padding-default,
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary) .shop-builder-panel-padding-default,
+.shop-builder-main .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary) .shop-builder-panel-padding-default {
   padding: 40px 30px !important;
 }
 
-[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover.shop-builder-grid-card--hover-enabled:hover,
-[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover.shop-builder-grid-card--hover-enabled:hover {
+[data-scoped-builder-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary).shop-builder-grid-card--hover-enabled:hover,
+[data-tenant-website-root] .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary).shop-builder-grid-card--hover-enabled:hover,
+.shop-builder-main .shop-builder-grid-card--yootheme.uk-card-hover:not(.uk-card-default):not(.uk-card-primary):not(.uk-card-secondary).shop-builder-grid-card--hover-enabled:hover {
   background-color: var(--uk-card-default-hover-background, rgba(255, 255, 255, 0.1)) !important;
   border-color: transparent !important;
   box-shadow: none !important;

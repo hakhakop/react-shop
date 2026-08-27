@@ -117,7 +117,10 @@ test("YOOtheme Card Hover maps to the canonical Grid hover state", () => {
   const mapped = mapYoothemeStaticContent(cardHoverFixture);
   const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as Record<string, unknown>;
 
-  expect(grid).toMatchObject({ gridCardVariant: "default", gridCardHover: true });
+  // Card Hover is a distinct canonical surface from Card Default with its
+  // optional hover interaction. Keeping that distinction prevents the two
+  // inspector choices from collapsing to the same rendered state.
+  expect(grid).toMatchObject({ gridCardVariant: "card-hover", gridCardHover: true });
   expect(grid.gridItems).not.toEqual(expect.arrayContaining([
     expect.objectContaining({ cardHover: true }),
   ]));
@@ -147,6 +150,15 @@ test("Grid item content normalizes rich HTML, tags, and explicit Card style", ()
     imageSvgColor: "emphasis",
   });
   expect(grid).not.toHaveProperty("imageBorder");
+  expect(grid).toMatchObject({
+    gridFilterControls: [
+      { label: "Product", tag: "Product" },
+      { label: "Featured", tag: "Featured" },
+      { label: "Workflow", tag: "Workflow" },
+    ],
+    gridFilterDefault: "Product",
+    gridFilterShowAll: false,
+  });
   expect(grid).not.toHaveProperty("imageBoxShadow");
   expect(grid.gridItems).not.toEqual(expect.arrayContaining([
     expect.objectContaining({ textAlign: expect.anything() }),
@@ -159,8 +171,8 @@ test("colored Panel/Card roles use global inverse semantics while local colors r
     style: {
       "--builder-card-title-color": expect.stringContaining("--uk-card-primary-title"),
       "--builder-card-content-color": expect.stringContaining("--uk-card-primary-text"),
-      "--uk-button-default-text": expect.stringContaining("--uk-card-primary-text"),
-      "--uk-button-default-background": "transparent",
+      "--uk-button-default-text": expect.stringContaining("--uk-global-emphasis-color"),
+      "--uk-button-default-background": expect.stringContaining("--uk-card-primary-text"),
       "--uk-button-primary-gradient": "none",
       "--uk-button-primary-background": expect.stringContaining("--uk-card-primary-text"),
       "--uk-button-primary-text": expect.stringContaining("--uk-global-emphasis-color"),
@@ -177,6 +189,15 @@ test("colored Panel/Card roles use global inverse semantics while local colors r
   expect(resolvePanelColorSemantics({ panelVariant: "default" }).className).toBe("");
 });
 
+test("YOOtheme primary Grid actions stay transparent and shadowless", () => {
+  const style = resolvePanelColorSemantics({ panelVariant: "primary", spacingContract: "yootheme" }).style;
+  expect(style).toMatchObject({
+    "--uk-button-default-text": expect.stringContaining("--uk-card-primary-text"),
+    "--uk-button-default-shadow": "none",
+  });
+  expect(style).not.toHaveProperty("--uk-button-default-background");
+});
+
 test("item action style overrides the Grid default through the canonical action resolver", () => {
   const action = resolveCanonicalGridAction({
     buttonStyle: "default",
@@ -189,6 +210,21 @@ test("item action style overrides the Grid default through the canonical action 
     buttonTarget: "_blank",
   } as any);
   expect(action).toMatchObject({ style: "secondary", target: "_blank" });
+});
+
+test("YOOtheme Grid default actions retain the default UIkit button variant", () => {
+  const action = resolveCanonicalGridAction({
+    id: "yootheme-grid-pricing",
+    spacingContract: "yootheme",
+    buttonStyle: "default",
+    buttonTarget: "_self",
+  } as any, {
+    id: "free-plan",
+    cardVariant: "default",
+    buttonLabel: "Register Now",
+    buttonUrl: "#",
+  } as any);
+  expect(action.style).toBe("default");
 });
 
 test("WordPress upload URLs resolve once at the shared Builder media boundary", () => {
@@ -260,15 +296,19 @@ test("Phase 8 Grid uses one presentation renderer with Builder-only item chrome"
 
     const builderGrid = page.locator(".shop-builder-grid").first();
     await expect(builderGrid).toHaveCount(1);
-    await expect(page.getByRole("button", { name: "Product", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Product", exact: true }).click();
+    const productFilter = page.locator("ul.el-nav a").filter({ hasText: "Product" });
+    const featuredFilter = page.locator("ul.el-nav a").filter({ hasText: "Featured" });
+    await expect(productFilter).toBeVisible();
+    await productFilter.click();
     await expect(builderGrid.locator("..")).toHaveAttribute("data-grid-active-filter", "Product");
     await expect(builderGrid.locator("..")).toHaveAttribute("data-grid-visible-item-count", "2");
-    await expect(builderGrid.locator(".shop-builder-grid-card")).toHaveCount(2);
-    await page.getByRole("button", { name: "Featured", exact: true }).click();
+    await expect(builderGrid.locator(".shop-builder-grid-card")).toHaveCount(3);
+    await expect(builderGrid.locator('.shop-builder-grid-card[style*="display: none"]').first()).toBeHidden();
+    await featuredFilter.click();
     await expect(builderGrid.locator("..")).toHaveAttribute("data-grid-active-filter", "Featured");
-    await expect(builderGrid.locator(".shop-builder-grid-card")).toHaveCount(1);
-    await page.getByRole("button", { name: "Product", exact: true }).click();
+    await expect(builderGrid.locator(".shop-builder-grid-card")).toHaveCount(3);
+    await expect(builderGrid.locator("..")).toHaveAttribute("data-grid-visible-item-count", "1");
+    await productFilter.click();
 
     const builderBeforeCopy = await gridPresentation(page, true);
     expect(builderBeforeCopy).toMatchObject({
@@ -302,16 +342,18 @@ test("Phase 8 Grid uses one presentation renderer with Builder-only item chrome"
     await expect(page.getByText("Published successfully", { exact: true })).toBeVisible();
     await page.reload();
     await expect(page.locator(".shop-builder-grid").first()).toBeVisible();
-    await page.getByRole("button", { name: "Product", exact: true }).click();
-    await expect(page.locator(".shop-builder-grid").first().locator(".shop-builder-grid-card")).toHaveCount(2);
+    await page.locator("ul.el-nav a").filter({ hasText: "Product" }).click();
+    await expect(page.locator(".shop-builder-grid").first().locator(".shop-builder-grid-card")).toHaveCount(3);
+    await expect(page.locator(".shop-builder-grid").first().locator("..")).toHaveAttribute("data-grid-visible-item-count", "2");
 
     const storefront = await context.newPage();
     await storefront.setViewportSize({ width: 1280, height: 900 });
     await storefront.goto(previewUrl);
     const storefrontGrid = storefront.locator(".shop-builder-grid").first();
     await expect(storefrontGrid).toHaveCount(1);
-    await storefront.getByRole("button", { name: "Product", exact: true }).click();
-    await expect(storefrontGrid.locator(".shop-builder-grid-card")).toHaveCount(2);
+    await storefront.locator("ul.el-nav a").filter({ hasText: "Product" }).click();
+    await expect(storefrontGrid.locator(".shop-builder-grid-card")).toHaveCount(3);
+    await expect(storefrontGrid.locator("..")).toHaveAttribute("data-grid-visible-item-count", "2");
 
     const frontend = await gridPresentation(storefront, false);
     const builder = await gridPresentation(page, true);

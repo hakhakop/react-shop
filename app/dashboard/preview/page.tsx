@@ -11,6 +11,7 @@ import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   getPublishedBuilderLayout,
   normalizeBuilderLayoutKey,
+  type BuilderLayout,
 } from "@/lib/builderLayouts";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
@@ -83,8 +84,17 @@ export default async function RootPreviewPage({ searchParams }: RootPreviewPageP
     ? await materializeBuilderDynamicContent(localizedLayout)
     : null;
   const renderLayout = materialization?.renderLayout ?? localizedLayout;
+  const mountDraftPreview = builderIframeSelection && !renderLayout?.sections?.some((section) => section.visible);
+  const draftPreviewLayout: BuilderLayout = {
+    version: 1,
+    key: page,
+    page,
+    targetType: "page",
+    sections: [],
+    updatedAt: new Date(0).toISOString(),
+  };
 
-  if (!renderLayout?.sections?.some((section) => section.visible)) {
+  if (!renderLayout?.sections?.some((section) => section.visible) && !mountDraftPreview) {
     return (
       <main className="page">
         <h1 className="page-title">Page not found</h1>
@@ -110,7 +120,7 @@ export default async function RootPreviewPage({ searchParams }: RootPreviewPageP
         builderDraftPreview={builderIframeSelection}
       />
       <StorefrontBuilderRenderer
-        layout={renderLayout}
+        layout={renderLayout ?? draftPreviewLayout}
         page={page}
         shellSettings={shellSettings}
         headerOverlay={headerDocumentSettings.overlay}

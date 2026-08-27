@@ -52,11 +52,19 @@ const resolveParallaxTarget = (node: HTMLElement, selector?: string): HTMLElemen
   }
   // UIkit's `!.tm-grid-expand>*` target means the owning expanded grid item,
   // not the animated image itself. The shared renderer uses a semantic
-  // content-layout card/interaction column in place of UIkit's grid item;
-  // resolve both paths so imported parallax endpoints use the row geometry.
-  if (selector.includes(".tm-grid-expand")) {
+  // content-layout card/interaction column in place of UIkit's grid item.
+  // Keep this distinct from `!.tm-grid-expand`: YOOtheme resolves the latter
+  // to the whole expanded row, which is the interpolation boundary for the
+  // Hero image parallax. Collapsing both forms to the column makes the
+  // animation finish early and causes a jump when the sticky row releases.
+  if (selector.includes(".tm-grid-expand>*")) {
     return node.closest(
       ".shop-builder-content-layout-card, .builder-interaction-column, .uk-grid-item-match",
+    ) as HTMLElement ?? node;
+  }
+  if (selector.includes(".tm-grid-expand")) {
+    return node.closest(
+      ".shop-builder-content-row, .builder-preview-row, [data-builder-object-type=\"row\"]",
     ) as HTMLElement ?? node;
   }
   if (selector.startsWith("!")) {

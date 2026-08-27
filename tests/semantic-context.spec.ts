@@ -4,6 +4,7 @@ import path from "node:path";
 import { getUikitSemanticContextVars } from "@/lib/uikitSemanticContext";
 import { getUikitButtonLocalOverride } from "@/lib/uikitTokens";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import { normalizeBuilderShellSettings } from "@/lib/builderShell";
 import { resolveYoothemeLess } from "@/lib/yoothemeLessImporter";
 
 test("inverse semantic context supplies one UIkit role set without mutating light defaults", () => {
@@ -109,6 +110,15 @@ test("imported Nav and Navbar LESS tokens remain global UIkit variables", () => 
       @navbar-parent-icon-margin-left: .25em;
       @navbar-dropdown-nav-item-padding-horizontal: 15px;
       @navbar-dropdown-dropbar-large-padding-top: 40px;
+      @subnav-pill-item-padding-vertical: 8px;
+      @subnav-pill-item-padding-horizontal: 14px;
+      @subnav-pill-item-color: #ffffff;
+      @subnav-pill-item-active-background: rgba(27, 23, 31, .75);
+      @subnav-pill-item-active-box-shadow: 0 0 5px rgba(255, 255, 255, .15);
+      @internal-subnav-pill-item-mode: glow;
+      @internal-subnav-pill-item-glow-gradient: conic-gradient(red, blue);
+      @internal-subnav-pill-item-glow-filter: blur(10px);
+      @internal-subnav-pill-item-glow-opacity: 0;
     `,
   }]);
 
@@ -121,6 +131,15 @@ test("imported Nav and Navbar LESS tokens remain global UIkit variables", () => 
     navbarParentIconMarginLeft: ".25em",
     navbarDropdownNavItemPaddingHorizontal: "15px",
     navbarDropdownDropbarLargePaddingTop: "40px",
+    subnavPillItemPaddingVertical: "8px",
+    subnavPillItemPaddingHorizontal: "14px",
+    subnavPillItemColor: "#ffffff",
+    subnavPillItemActiveBackground: "rgba(27, 23, 31, .75)",
+    subnavPillItemActiveBoxShadow: "0 0 5px rgba(255, 255, 255, .15)",
+    internalSubnavPillItemMode: "glow",
+    internalSubnavPillItemGlowGradient: "conic-gradient(red, blue)",
+    internalSubnavPillItemGlowFilter: "blur(10px)",
+    internalSubnavPillItemGlowOpacity: "0",
   });
 
   expect(getUikitGlobalsCssVars(imported.shellSettings)).toMatchObject({
@@ -132,6 +151,15 @@ test("imported Nav and Navbar LESS tokens remain global UIkit variables", () => 
     "--uk-navbar-parent-icon-margin-left": ".25em",
     "--uk-navbar-dropdown-nav-item-padding-horizontal": "15px",
     "--uk-navbar-dropdown-dropbar-large-padding-top": "40px",
+    "--uk-subnav-pill-item-padding-vertical": "8px",
+    "--uk-subnav-pill-item-padding-horizontal": "14px",
+    "--uk-subnav-pill-item-color": "#ffffff",
+    "--uk-subnav-pill-item-active-background": "rgba(27, 23, 31, .75)",
+    "--uk-subnav-pill-item-active-box-shadow": "0 0 5px rgba(255, 255, 255, .15)",
+    "--uk-internal-subnav-pill-item-mode": "glow",
+    "--uk-internal-subnav-pill-item-glow-gradient": "conic-gradient(red, blue)",
+    "--uk-internal-subnav-pill-item-glow-filter": "blur(10px)",
+    "--uk-internal-subnav-pill-item-glow-opacity": "0",
   });
 });
 
@@ -203,4 +231,39 @@ test("button size variants inherit the active theme radius when not explicitly a
   expect(globals["--uk-button-border-radius"]).toBe("500px");
   expect(globals["--uk-button-small-radius"]).toBe("500px");
   expect(globals["--uk-button-large-radius"]).toBe("500px");
+});
+
+test("Circle Section LESS tokens preserve responsive padding, gradients, and color modes", () => {
+  const imported = resolveYoothemeLess([{
+    name: "circle-section.less",
+    precedence: 1,
+    content: `
+      @global-background: #000;
+      @global-primary-background: #F8154C;
+      @section-default-color-mode: light;
+      @section-muted-color-mode: light;
+      @section-primary-color-mode: light;
+      @section-secondary-color-mode: light;
+      @internal-section-default-gradient: radial-gradient(ellipse closest-corner at 30% 40%, rgba(242,0,123,.07), transparent 80%);
+      @internal-section-primary-gradient: linear-gradient(30deg, #812FCB 0%, #D91F71 40%, #FF1445 60%, #ED7E65 100%);
+    `,
+  }]);
+  const shell = normalizeBuilderShellSettings(imported.shellSettings);
+  const globals = getUikitGlobalsCssVars(shell);
+
+  expect(globals).toMatchObject({
+    "--uk-section-padding-default": "40px",
+    "--uk-section-padding-default-m": "70px",
+    "--uk-section-padding-large": "70px",
+    "--uk-section-padding-large-m": "140px",
+    "--uk-section-padding-xlarge": "140px",
+    "--uk-section-padding-xlarge-m": "210px",
+    "--uk-section-default-color-mode": "light",
+    "--uk-section-primary-color-mode": "light",
+    "--uikit-section-default-bg": "#000",
+    "--uikit-section-primary-bg": "#F8154C",
+    "--uikit-section-default-color": "var(--uk-global-text-color, #111827)",
+  });
+  expect(globals["--uikit-section-default-gradient"]).toContain("radial-gradient");
+  expect(globals["--uikit-section-primary-gradient"]).toContain("linear-gradient(30deg");
 });

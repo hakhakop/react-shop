@@ -74,9 +74,6 @@ export function resolveCanonicalGridAction(
   if (itemStyle == null && (cardVariant === "primary" || cardVariant === "card-primary")) {
     style = "default";
   }
-  if (raw.spacingContract === "yootheme" && style === "default" && (cardVariant === "default" || cardVariant === "card-default")) {
-    style = "primary";
-  }
   return {
     label: String(rawItem.buttonLabel ?? raw.buttonLabel ?? raw.linkText ?? "").trim(),
     url: typeof itemUrl === "string" ? itemUrl.trim() : "",

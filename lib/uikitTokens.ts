@@ -394,7 +394,7 @@ export function getUikitAccordionClass(options: {
   // treatment. Keep `default` as the document-facing value, but resolve it
   // to the canonical visual variant before emitting modifier classes.
   const indicator = options.indicator === "default" ? "plus-minus" : options.indicator ?? "default";
-  const classes = ["uk-accordion", "uk-accordion-default", ...(style === "striped" ? ["uk-list-striped"] : []), `shop-builder-accordion--style-${style}`, `shop-builder-accordion--indicator-${indicator}`, `shop-builder-accordion--indicator-${options.indicatorPosition ?? "end"}`, `shop-builder-accordion--title-${options.titleEmphasis ?? "inherit"}`, `shop-builder-accordion--items-${options.itemSpacing ?? "inherit"}`, `shop-builder-accordion--content-${options.contentSpacing ?? "inherit"}`];
+  const classes = ["uk-accordion", "uk-accordion-default", "shop-builder-accordion", ...(style === "striped" ? ["uk-list-striped"] : []), `shop-builder-accordion--style-${style}`, `shop-builder-accordion--indicator-${indicator}`, `shop-builder-accordion--indicator-${options.indicatorPosition ?? "end"}`, `shop-builder-accordion--title-${options.titleEmphasis ?? "inherit"}`, `shop-builder-accordion--items-${options.itemSpacing ?? "inherit"}`, `shop-builder-accordion--content-${options.contentSpacing ?? "inherit"}`];
   if (options.divider !== false) classes.push("shop-builder-accordion--divider");
   return classes.join(" ");
 }

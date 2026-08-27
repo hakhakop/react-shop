@@ -22,12 +22,34 @@ type GeneralElementShellBlock = {
   gridMargin?: string;
   spacingContract?: "yootheme";
   id?: string;
+  yoothemeSource?: {
+    props?: Record<string, unknown>;
+  };
 };
 
 export type GeneralTextAlignment = "left" | "center" | "right" | "justify";
 
+/**
+ * YOOtheme uses `block_align` to position an absolutely positioned panel,
+ * while its `uk-position-center` class supplies the containing-box geometry.
+ * It is not a text-alignment instruction. Older imported documents projected
+ * that value to `elementAlign`, whose WebPages class also sets text-align.
+ */
+export function isYoothemeCenteredPositionedPanel(block: GeneralElementShellBlock) {
+  const customClass = block.visualStyle?.customClass ?? "";
+  const sourceClass = typeof block.yoothemeSource?.props?.class === "string"
+    ? block.yoothemeSource.props.class
+    : "";
+  const layout = block.visualStyle?.layout;
+  const centeredAnchor = layout?.left?.trim() === "50%" && !layout.right?.trim();
+  return block.kind === "panel" &&
+    layout?.position === "absolute" &&
+    (centeredAnchor || /(?:^|\s)uk-position-center(?:\s|$)/.test(`${customClass} ${sourceClass}`));
+}
+
 /** Resolve universal General alignment; layout is canonical and aliases are read fallbacks. */
 export function resolveGeneralTextAlignment(block: GeneralElementShellBlock): GeneralTextAlignment | undefined {
+  if (isYoothemeCenteredPositionedPanel(block)) return undefined;
   const candidates = [
     block.visualStyle?.layout?.textAlign,
     block.textAlign,
@@ -107,6 +129,8 @@ function shellVisualStyle(block: GeneralElementShellBlock) {
   const visual = block.visualStyle;
   if (!visual || !usesYoothemeSpacingContract(block) || !visual.layout) return visual;
 
+  const positioned = visual.layout.position === "absolute";
+
   // Margin is emitted by getGeneralElementShellClassName() so UIkit's own
   // sibling-aware margin rules remain authoritative. Do not also emit an
   // inline margin on the same shell.
@@ -123,7 +147,17 @@ function shellVisualStyle(block: GeneralElementShellBlock) {
   const { maxWidth: legacyEffectMaxWidth, ...effects } = visual.effects ?? {};
   return {
     ...visual,
-    layout,
+    // A YOOtheme margin is already represented by the UIkit utility class
+    // emitted from `layout.marginMode`. Keeping the imported visual-margin
+    // object as inline CSS as well applies the top margin twice. UIkit's
+    // margin utility is sibling-aware (`* + .uk-margin-*`), so the class is
+    // the authoritative representation for imported flow elements.
+    margin: positioned || marginMode ? undefined : visual.margin,
+    // YOOtheme's positioned elements use `top`/`left` as their authored
+    // origin. A source `margin` value is not applied to that wrapper; keeping
+    // it in the inline layout shifts panels and decorative layers away from
+    // the same section boundary. Flow elements still retain their margin.
+    layout: positioned ? { ...layout, marginMode: undefined } : layout,
     ...(Object.keys(effects).length ? { effects } : {}),
   };
 }
@@ -137,6 +171,10 @@ export function getGeneralElementShellStyle(
   block: GeneralElementShellBlock,
 ): CSSProperties {
   const visual = shellVisualStyle(block) as BuilderVisualStyle | undefined;
+  const suppressPositionPanelTextAlignment = isYoothemeCenteredPositionedPanel(block);
+  const visualForCss = suppressPositionPanelTextAlignment && visual?.layout
+    ? { ...visual, layout: { ...visual.layout, textAlign: undefined } }
+    : visual;
   const style: CSSProperties = {};
   const localPadding = block.elementPadding?.trim().toLowerCase();
   const localMargin = (block.elementMargin ?? block.gridMargin)?.trim().toLowerCase();
@@ -180,10 +218,12 @@ export function getGeneralElementShellStyle(
     }
   }
 
-  const textAlign = resolveGeneralTextAlignment(block);
+  const textAlign = suppressPositionPanelTextAlignment
+    ? undefined
+    : resolveGeneralTextAlignment(block);
   return {
     ...style,
-    ...visualStyleToCss(visual),
+    ...visualStyleToCss(visualForCss),
     // The absolute shell is the full YOOtheme positioning wrapper. The
     // rendered image keeps its authored width inside that wrapper, allowing
     // right/center alignment to resolve against the whole column rather than
@@ -192,7 +232,9 @@ export function getGeneralElementShellStyle(
     // visual margin objects contain only `top`; do not let absent horizontal
     // sides inherit WebPages' global element margins and narrow the source
     // Grid/card geometry.
-    ...(sourceVerticalMarginOnly ? { marginLeft: 0, marginRight: 0 } : {}),
+    ...(sourceVerticalMarginOnly && !visual?.layout?.blockAlign
+      ? { marginLeft: 0, marginRight: 0 }
+      : {}),
     ...(textAlign ? { textAlign } : {}),
   };
 }

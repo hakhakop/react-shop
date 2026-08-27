@@ -153,6 +153,11 @@ export type BuilderShellSettings = {
   backgroundMuted?: string;
   backgroundPrimary?: string;
   backgroundSecondary?: string;
+  /** UIkit section color modes are global semantic context tokens. */
+  sectionDefaultColorMode?: "light" | "dark";
+  sectionMutedColorMode?: "light" | "dark";
+  sectionPrimaryColorMode?: "light" | "dark";
+  sectionSecondaryColorMode?: "light" | "dark";
   /** Optional semantic section background image/gradient layers. */
   backgroundDefaultImage?: string;
   backgroundMutedImage?: string;
@@ -250,6 +255,7 @@ export type BuilderShellSettings = {
   buttonHoverShadow?: string;
   buttonHoverGradient?: string;
   accordionTitleFontSize?: string;
+  accordionTitleLineHeight?: string;
   accordionTitleHoverColor?: string;
   accordionContentMarginTop?: string;
   accordionTitlePaddingVertical?: string;
@@ -317,6 +323,23 @@ export type BuilderShellSettings = {
   navDefaultItemLineHoverRight?: string;
   navDefaultSiblingsFilter?: string;
   navDefaultSiblingsOpacity?: string;
+  /** Canonical UIkit/YOOtheme Subnav pill tokens. */
+  subnavPillItemPaddingVertical?: string;
+  subnavPillItemPaddingHorizontal?: string;
+  subnavPillItemColor?: string;
+  subnavPillItemHoverBackground?: string;
+  subnavPillItemHoverColor?: string;
+  subnavPillItemOnclickBackground?: string;
+  subnavPillItemOnclickColor?: string;
+  subnavPillItemActiveBackground?: string;
+  subnavPillItemActiveColor?: string;
+  subnavPillItemBorderRadius?: string;
+  subnavPillItemActiveBoxShadow?: string;
+  internalSubnavPillItemMode?: string;
+  internalSubnavPillItemGlowGradient?: string;
+  internalSubnavPillItemGlowFilter?: string;
+  internalSubnavPillItemGlowOpacity?: string;
+  internalSubnavPillItemHoverGlowOpacity?: string;
   navPrimaryItemColor?: string;
   navPrimaryItemHoverColor?: string;
   navPrimaryItemActiveColor?: string;
@@ -707,6 +730,8 @@ export type BuilderShellSettings = {
   sliderDotnavStyle?: string;
   sliderDotnavPosition?: string;
   headingSmallFontSizeResponsive?: string;
+  headingSmallLineHeight?: string;
+  headingLargeLineHeight?: string;
   headingMediumFontSizeResponsive?: string;
   headingMediumLineHeight?: string;
   headingSmallFontWeight?: string;
@@ -723,9 +748,12 @@ export type BuilderShellSettings = {
   sectionPaddingXSmall?: string;
   sectionPaddingSmall?: string;
   sectionPaddingDefault?: string;
+  sectionPaddingDefaultMedium?: string;
   sectionPaddingMedium?: string;
   sectionPaddingLarge?: string;
+  sectionPaddingLargeMedium?: string;
   sectionPaddingXLarge?: string;
+  sectionPaddingXLargeMedium?: string;
   gridGutterSmall?: string;
   gridGutterDefault?: string;
   gridGutterMedium?: string;
@@ -741,6 +769,7 @@ export type BuilderShellSettings = {
   containerExpand?: boolean;
   cardBackground?: string;
   cardBackdropFilter?: string;
+  cardDefaultColorMode?: "light" | "dark";
   cardBorderRadius?: string;
   cardBorderColor?: string;
   cardShadow?: string;
@@ -845,6 +874,10 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   backgroundMuted: "#f8fafc",
   backgroundPrimary: "#111111",
   backgroundSecondary: "#64748b",
+  sectionDefaultColorMode: "light",
+  sectionMutedColorMode: "light",
+  sectionPrimaryColorMode: "light",
+  sectionSecondaryColorMode: "light",
   backgroundColor: "#ffffff",
   fontFamilyBody: "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
   fontFamilyHeading: "inherit",
@@ -870,6 +903,9 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   fontSizeLarge: "24px",
   fontSizeXLarge: "34px",
   fontSize2XLarge: "44px",
+  headingSmallLineHeight: "1.2",
+  headingLargeLineHeight: "1.1",
+  headingMediumLineHeight: "1.2",
   inverseColor: "#ffffff",
   controlHeightDefault: "48px",
   globalZIndex: "1000",
@@ -881,11 +917,14 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   visibilityTablet: true,
   visibilityMobile: true,
   sectionPaddingSmall: "40px",
-  sectionPaddingDefault: "70px",
+  sectionPaddingDefault: "40px",
+  sectionPaddingDefaultMedium: "70px",
   sectionPaddingMedium: "80px",
-  sectionPaddingLarge: "100px",
+  sectionPaddingLarge: "70px",
+  sectionPaddingLargeMedium: "140px",
   sectionPaddingXSmall: "20px",
   sectionPaddingXLarge: "140px",
+  sectionPaddingXLargeMedium: "210px",
   gridGutterSmall: "15px",
   gridGutterDefault: "30px",
   gridGutterLarge: "40px",
@@ -900,6 +939,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   containerExpand: false,
   cardBackground: "#ffffff",
   cardBackdropFilter: "none",
+  cardDefaultColorMode: "dark",
   cardPrimaryBackground: "#1991ee",
   cardSecondaryBackground: "#0c273a",
   cardBorderRadius: "8px",
@@ -1170,6 +1210,10 @@ export function normalizeBuilderShellSettings(
     backgroundMuted: normalizeOptionalString(value?.backgroundMuted) ?? normalizeOptionalString(value?.mutedBackgroundColor) ?? defaultBuilderShellSettings.backgroundMuted,
     backgroundPrimary: normalizeOptionalString(value?.backgroundPrimary) ?? normalizeOptionalString(value?.primaryColor) ?? defaultBuilderShellSettings.backgroundPrimary,
     backgroundSecondary: normalizeOptionalString(value?.backgroundSecondary) ?? normalizeOptionalString(value?.secondaryColor) ?? defaultBuilderShellSettings.backgroundSecondary,
+    sectionDefaultColorMode: value?.sectionDefaultColorMode === "dark" ? "dark" : "light",
+    sectionMutedColorMode: value?.sectionMutedColorMode === "dark" ? "dark" : "light",
+    sectionPrimaryColorMode: value?.sectionPrimaryColorMode === "dark" ? "dark" : "light",
+    sectionSecondaryColorMode: value?.sectionSecondaryColorMode === "dark" ? "dark" : "light",
     backgroundDefaultImage: normalizeOptionalString(value?.backgroundDefaultImage) ?? undefined,
     backgroundMutedImage: normalizeOptionalString(value?.backgroundMutedImage) ?? undefined,
     backgroundPrimaryImage: normalizeOptionalString(value?.backgroundPrimaryImage) ?? undefined,
@@ -1180,7 +1224,14 @@ export function normalizeBuilderShellSettings(
     headingH3FontSize: normalizeOptionalString(value?.headingH3FontSize) ?? undefined,
     headingH1FontSize: normalizeOptionalString(value?.headingH1FontSize) ?? undefined,
     headingH1FontWeight: normalizeOptionalString(value?.headingH1FontWeight) ?? undefined,
+    headingSmallLineHeight: normalizeOptionalString(value?.headingSmallLineHeight)
+      ?? defaultBuilderShellSettings.headingSmallLineHeight,
+    headingLargeLineHeight: normalizeOptionalString(value?.headingLargeLineHeight)
+      ?? defaultBuilderShellSettings.headingLargeLineHeight,
+    headingMediumLineHeight: normalizeOptionalString(value?.headingMediumLineHeight)
+      ?? defaultBuilderShellSettings.headingMediumLineHeight,
     cardBackdropFilter: normalizeOptionalString(value?.cardBackdropFilter) ?? undefined,
+    cardDefaultColorMode: value?.cardDefaultColorMode === "light" ? "light" : "dark",
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible
@@ -1242,6 +1293,30 @@ export function normalizeBuilderShellSettings(
     sectionPaddingBottom: normalizeSectionSpacing(
       value?.sectionPaddingBottom,
       defaultBuilderShellSettings.sectionPaddingBottom
+    ),
+    sectionPaddingDefault: normalizeSectionSpacing(
+      value?.sectionPaddingDefault,
+      defaultBuilderShellSettings.sectionPaddingDefault ?? "40px",
+    ),
+    sectionPaddingDefaultMedium: normalizeSectionSpacing(
+      value?.sectionPaddingDefaultMedium,
+      defaultBuilderShellSettings.sectionPaddingDefaultMedium ?? "70px",
+    ),
+    sectionPaddingLarge: normalizeSectionSpacing(
+      value?.sectionPaddingLarge,
+      defaultBuilderShellSettings.sectionPaddingLarge ?? "70px",
+    ),
+    sectionPaddingLargeMedium: normalizeSectionSpacing(
+      value?.sectionPaddingLargeMedium,
+      defaultBuilderShellSettings.sectionPaddingLargeMedium ?? "140px",
+    ),
+    sectionPaddingXLarge: normalizeSectionSpacing(
+      value?.sectionPaddingXLarge,
+      defaultBuilderShellSettings.sectionPaddingXLarge ?? "140px",
+    ),
+    sectionPaddingXLargeMedium: normalizeSectionSpacing(
+      value?.sectionPaddingXLargeMedium,
+      defaultBuilderShellSettings.sectionPaddingXLargeMedium ?? "210px",
     ),
     sectionMarginTop: normalizeSectionSpacing(
       value?.sectionMarginTop,

@@ -44,6 +44,22 @@ export function elementAdvancedScope(block: Pick<ElementAdvancedBlock, "id" | "c
   return `builder-element-${source.replace(/[^A-Za-z0-9_-]/g, "-")}`;
 }
 
+/**
+ * Layout Advanced styles must be unique across documents rendered together.
+ * YOOtheme commonly reuses section/row ids in page and footer documents, so
+ * the document key is part of the CSS scope as well as the layout identity.
+ */
+export function layoutAdvancedScope(
+  kind: "row" | "column",
+  page: string,
+  sectionId: string,
+  layoutId: string,
+) {
+  return [kind, page, sectionId, layoutId]
+    .map((value) => value.replace(/[^A-Za-z0-9_-]/g, "-"))
+    .join("-");
+}
+
 /** Parses `name=value` lines without allowing executable DOM attributes. */
 export function parseSafeElementAttributes(source?: string): Record<string, SafeAttributeValue> {
   if (!source) return {};

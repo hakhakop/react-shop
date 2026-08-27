@@ -96,7 +96,9 @@ function rowGridClass(
     // preventing it from ever entering the sticky state in tall parallax
     // rows such as the imported Product hero.
     matchHeight:
-      legacyItem?.rowMatchHeight !== false &&
+      (legacyItem
+        ? legacyItem.rowMatchHeight !== false
+        : false) &&
       !row.columns.some((column) => {
         const sticky = column.sticky;
         return Boolean(
@@ -154,14 +156,20 @@ function columnWidthClasses(
   const widths = column.responsiveWidths;
   if (!widths) return getUikitColumnWidthClass(row.layout, columnIndex);
 
-  return compactClasses(
+  const authored = compactClasses(
     widthClass(widths.default),
     widthClass(widths.small, "@s"),
-    widthClass(widths.medium, "@m") ??
-      getUikitColumnWidthClass(row.layout, columnIndex),
+    widthClass(widths.medium, "@m"),
     widthClass(widths.large, "@l"),
     widthClass(widths.xlarge, "@xl"),
   );
+
+  // An imported YOOtheme column may intentionally omit a breakpoint so the
+  // previous authored width continues through that tier. Do not synthesize
+  // the row's equal-column fallback once any responsive width was authored;
+  // doing so changes layouts such as `expand, 1-4, 1-4` into three equal
+  // `@m` columns and causes content wrapping/height drift.
+  return authored || getUikitColumnWidthClass(row.layout, columnIndex);
 }
 
 function orderClass(value: number | "first" | "last" | undefined, suffix = "") {
@@ -248,6 +256,12 @@ function columnVisibilityClass(column: BuilderColumn) {
   return classes[0];
 }
 
+function columnHasExpandedPanel(column: BuilderColumn) {
+  return (column.elements ?? []).some(
+    (element) => element.kind === "panel" && element.panelHeightExpand === true,
+  );
+}
+
 function columnClassName(
   row: BuilderRow,
   column: BuilderColumn,
@@ -269,14 +283,19 @@ function columnClassName(
     }),
     columnOrderClasses(column),
     columnVisibilityClass(column),
+    // YOOtheme's Panel "Fill the available column space" is represented by
+    // the grid-item match modifier on the owning column, not by a fixed
+    // height on the Panel itself.
+    columnHasExpandedPanel(column) ? "uk-grid-item-match" : undefined,
     columnSurfaceClass(column),
   );
 }
 
 /**
  * Canonical UIkit sticky declaration for imported column settings.  A column
- * within a row naturally uses the row as its sticky boundary, matching
- * YOOtheme's default containment without inventing a second runtime model.
+ * The boundary follows the authored scope: row sticky ends at the row, while
+ * section sticky remains active through the following rows (as used by
+ * YOOtheme's cinematic background sections).
  */
 export function getBuilderColumnStickyDeclaration(
   column: BuilderColumn,
@@ -287,11 +306,11 @@ export function getBuilderColumnStickyDeclaration(
   const declaration: string[] = [];
   if (sticky.topOffset) declaration.push(`offset: ${sticky.topOffset}`);
   if (sticky.bottomOffset) declaration.push(`offset-end: ${sticky.bottomOffset}`);
-  // YOOtheme terminates column sticky panels at their containing grid row
-  // (`end: !.tm-grid-expand`).  Use the shared WebPages row class for the
-  // same UIkit boundary; without it the panel remains sticky until document
-  // end instead of releasing when the following row enters the viewport.
-  declaration.push("end: !.shop-builder-content-row");
+  declaration.push(
+    mode === "column-within-section"
+      ? "end: !.shop-builder-section"
+      : "end: !.shop-builder-content-row",
+  );
   if (sticky.breakpoint) declaration.push(`media: @${sticky.breakpoint}`);
   if (sticky.blend) declaration.push("cls-active: uk-preserve-color");
   return declaration.length ? `${declaration.join("; ")};` : "";
@@ -348,7 +367,7 @@ export function resolveBuilderSectionStructure(
     const rowStartIndex = flatIndex;
     const legacyItem = legacyItems[rowStartIndex];
     const structuralInput = rowStyleInput(row, legacyItem);
-    const precedingGap = resolveBuilderRowGap(
+    const resolvedPrecedingGap = resolveBuilderRowGap(
       structuralInput,
       options.globalRowGap,
       previousRowInput,
@@ -395,13 +414,29 @@ export function resolveBuilderSectionStructure(
       } satisfies BuilderStructuralColumn;
     });
 
+    // A responsive duplicate can be intentionally hidden as a whole at a
+    // breakpoint. Keep that fact on the row as well as its columns so an
+    // authored viewport height cannot survive after every child is hidden.
+    const visibilityTiers = ["small", "medium", "large", "xlarge"] as const;
+    const hiddenRowTier = visibilityTiers.find((tier) =>
+      columns.length > 0 && columns.every((column) =>
+        column.className?.includes(`builder-general-hidden-from-${tier}`),
+      ),
+    );
+
     return {
       row,
       legacyItem,
       index: rowIndex,
-      className: rowGridClass(row, legacyItem),
+      className: compactClasses(
+        rowGridClass(row, legacyItem),
+        hiddenRowTier ? `shop-builder-row--hidden-from-${hiddenRowTier}` : undefined,
+      ),
       style,
-      precedingGap,
+      // Hidden responsive helper rows are still present in the canonical
+      // structure, but UIkit removes their grid item and therefore does not
+      // leave an inter-row gutter behind at that breakpoint.
+      precedingGap: hiddenRowTier ? "0px" : resolvedPrecedingGap,
       columns,
     } satisfies BuilderStructuralRow;
   });

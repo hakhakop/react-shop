@@ -16,5 +16,29 @@
     "title": "Product",
     "slug": "product-2",
     "updatedAt": "2026-08-23T18:41:37.159Z"
+  },
+  {
+    "key": "page:pricing",
+    "title": "Pricing",
+    "slug": "pricing",
+    "updatedAt": "2026-08-26T17:44:46.864Z"
+  },
+  {
+    "key": "page:careers",
+    "title": "Careers",
+    "slug": "careers",
+    "updatedAt": "2026-08-26T19:12:25.506Z"
+  },
+  {
+    "key": "page:support",
+    "title": "Support",
+    "slug": "support",
+    "updatedAt": "2026-08-26T19:37:03.765Z"
+  },
+  {
+    "key": "page:blog",
+    "title": "Blog",
+    "slug": "blog",
+    "updatedAt": "2026-08-27T05:37:25.998Z"
   }
 ]
