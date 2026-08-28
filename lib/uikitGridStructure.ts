@@ -56,6 +56,10 @@ export function uikitGridAttribute(structure: UikitGridStructure): string | unde
 export function uikitGridStructureClassName(structure: UikitGridStructure): string {
   return [
     "uk-grid",
+    // UIkit's masonry/parallax engine measures and offsets a wrapping flex
+    // track. The ordinary WebPages Grid may remain CSS Grid, but runtime
+    // effects must opt back into UIkit's canonical geometry.
+    structure.masonry || structure.parallax !== undefined ? "shop-builder-uikit-grid--runtime" : "",
     // YOOtheme applies UIkit's equal-height match to every non-masonry Grid.
     // The item composition may then decide which inner surface expands.
     !structure.masonry ? "uk-grid-match" : "",

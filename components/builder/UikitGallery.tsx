@@ -19,6 +19,10 @@ import { sanitizeHtml, isRichText } from "@/lib/safeHtml";
 import { useUikitGridRuntime } from "@/components/builder/useUikitGridRuntime";
 import { useUikitLightboxRuntime } from "@/components/builder/useUikitLightboxRuntime";
 import { resolveUikitGridStructure, uikitGridAttribute, uikitGridStructureClassName } from "@/lib/uikitGridStructure";
+import {
+  resolveGalleryImageAspectRatio,
+  resolveGalleryImageIntrinsicDimensions,
+} from "@/lib/galleryImageGeometry";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -73,18 +77,22 @@ export default function UikitGallery({ block }: Props) {
     ? rawBlock.items
     : DEFAULT_GALLERY_ITEMS;
 
-  const items = rawItems.map((item: any, idx: number) => ({
-    id: item.id || String(idx),
-    imageUrl: item.imageUrl || item.image || DEFAULT_GALLERY_ITEMS[idx % 3].imageUrl,
-    imageAlt: item.imageAlt || item.alt || item.title || "",
-    title: item.title || "",
-    meta: item.meta || "",
-    content: item.content || item.description || "",
-    linkUrl: item.linkUrl || item.url || "",
-    linkTarget: item.linkTarget || "_self",
-    linkLabel: item.linkLabel || item.buttonLabel || "",
-    linkAriaLabel: item.linkAriaLabel || "",
-  }));
+  const items = rawItems.map((item: any, idx: number) => {
+    const sourceImageUrl = item.imageUrl || item.image || "";
+    return {
+      id: item.id || String(idx),
+      imageUrl: sourceImageUrl || (isYoothemeGallery ? "" : DEFAULT_GALLERY_ITEMS[idx % 3].imageUrl),
+      imageAlt: item.imageAlt || item.alt || item.title || "",
+      title: item.title || "",
+      meta: item.meta || "",
+      content: item.content || item.description || "",
+      linkUrl: item.linkUrl || item.url || "",
+      linkTarget: item.linkTarget || "_self",
+      linkLabel: item.linkLabel || item.buttonLabel || "",
+      linkAriaLabel: item.linkAriaLabel || "",
+      isPendingImage: isYoothemeGallery && !sourceImageUrl,
+    };
+  });
 
   const columns = Number(rawBlock.columns) || 3;
   const gap = rawBlock.gridGap ?? "medium";
@@ -141,11 +149,14 @@ export default function UikitGallery({ block }: Props) {
       importedChildWidth(rawBlock.columnsLargeScreens, "@xl"),
     ].filter(Boolean).join(" ") || "uk-child-width-1-1 uk-child-width-1-3@m"
     : "";
+  const baseGridClass = uikitGridStructureClassName(gridStructure)
+    .replace("shop-builder-uikit-grid--column-center", "")
+    .trim();
   const gridClass = [
     // Gallery uses UIkit's responsive `uk-child-width-*` cascade directly.
     // The WebPages Grid-only centering helper assigns an explicit item width
     // and would override those responsive Gallery utilities.
-    uikitGridStructureClassName(gridStructure).replace("shop-builder-uikit-grid--column-center", ""),
+    isYoothemeGallery ? baseGridClass.replace("uk-grid-match", "").trim() : baseGridClass,
     importedChildWidthClass,
     gap !== "none" ? `uk-grid-${gap}` : "uk-grid-collapse",
     rowGap !== gap && rowGap !== "none" ? `uk-grid-row-${rowGap}` : "",
@@ -190,16 +201,11 @@ export default function UikitGallery({ block }: Props) {
       ? `${rawBlock.imageHeight}px`
       : String(rawBlock.imageHeight)
     : undefined;
-  const importedImageWidth = isYoothemeGallery ? imageStyle.width : undefined;
-  const importedImageHeight = isYoothemeGallery ? imageStyle.height : undefined;
-  const importedHasBothDimensions = Boolean(importedImageWidth && importedImageHeight);
-  const importedMediaWrapperStyle = isYoothemeGallery
-    ? {
-      width: importedImageWidth ?? "100%",
-      maxWidth: "100%",
-      display: "block",
-      ...(importedHasBothDimensions ? { aspectRatio: `${importedImageWidth} / ${importedImageHeight}`, position: "relative" as const } : {}),
-    }
+  const importedAspectRatio = isYoothemeGallery
+    ? resolveGalleryImageAspectRatio(rawBlock.imageWidth, rawBlock.imageHeight)
+    : undefined;
+  const importedIntrinsicDimensions = isYoothemeGallery
+    ? resolveGalleryImageIntrinsicDimensions(rawBlock.imageWidth, rawBlock.imageHeight)
     : undefined;
   const TitleTag = (rawBlock.headingLevel ?? "h2") as React.ElementType;
   const titleClass = getUikitHeadingClass(rawBlock.headingLevel ?? "h2", rawBlock.headingSize);
@@ -262,21 +268,20 @@ export default function UikitGallery({ block }: Props) {
           return (
             <div key={item.id} className={columnWidthClass}>
               <div
-                className={isYoothemeGallery ? `el-item ${overlayTextModeClass} uk-transition-toggle uk-inline-clip`.trim() : "uk-card uk-card-default uk-overflow-hidden"}
+                className={isYoothemeGallery ? `el-item ${overlayTextModeClass}`.trim() : "uk-card uk-card-default uk-overflow-hidden"}
                 style={{
                   position: "relative",
-                  overflow: "hidden",
-                  ...(isYoothemeGallery ? {} : { borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)", width: imageStyle.width, maxWidth: imageStyle.maxWidth, marginInline: imageSemantics.alignment === "left" ? "0 auto" : imageSemantics.alignment === "right" ? "0 0 0 auto" : "auto" }),
+                  ...(isYoothemeGallery ? {} : { overflow: "hidden", borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)", width: imageStyle.width, maxWidth: imageStyle.maxWidth, marginInline: imageSemantics.alignment === "left" ? "0 auto" : imageSemantics.alignment === "right" ? "0 0 0 auto" : "auto" }),
                 }}
               >
                 <div
-                  className={`uk-inline-clip uk-transition-toggle ${isYoothemeGallery ? "" : imageWrapperClass} ${isYoothemeGallery ? "" : imageDecorationClass}`.trim()}
+                  className={`${isYoothemeGallery ? "uk-flex-1" : ""} uk-inline-clip uk-transition-toggle ${isYoothemeGallery ? "" : imageWrapperClass} ${isYoothemeGallery ? "" : imageDecorationClass}`.trim()}
                   style={{
-                    ...(importedMediaWrapperStyle ?? { width: "100%", display: "block" }),
-                    cursor: isLightbox ? "pointer" : "default",
+                    ...(isYoothemeGallery ? {} : { width: "100%", display: "block" }),
+                    cursor: isLightbox ? "pointer" : undefined,
                     aspectRatio: isYoothemeGallery ? undefined : imageStyle.aspectRatio,
                     height: isYoothemeGallery ? undefined : imageStyle.aspectRatio ? undefined : imageHeight,
-                    position: isYoothemeGallery ? importedMediaWrapperStyle?.position : imageStyle.aspectRatio ? "relative" : undefined,
+                    position: isYoothemeGallery ? undefined : imageStyle.aspectRatio ? "relative" : undefined,
                   }}
                   onClick={(e) => {
                     if (isLightbox) {
@@ -286,33 +291,44 @@ export default function UikitGallery({ block }: Props) {
                     }
                   }}
                 >
-                  <img
-                    src={item.imageUrl}
-                    alt={item.imageAlt}
-                    className={`${imageClass} uk-transition-scale-up uk-transition-opaque`}
-                    loading={rawBlock.imageLoading ?? "lazy"}
-                    {...imageAttributes}
-                    style={{
-                      width: isYoothemeGallery
-                        ? importedHasBothDimensions ? "100%" : importedImageWidth ?? (importedImageHeight ? "auto" : "100%")
-                        : "100%",
-                      maxWidth: isYoothemeGallery ? "100%" : undefined,
-                      height: isYoothemeGallery
-                        ? importedHasBothDimensions ? "100%" : importedImageHeight ?? "auto"
-                        : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
-                      objectFit: isYoothemeGallery
-                        ? importedHasBothDimensions ? "cover" : imageStyle.objectFit
-                        : imageStyle.objectFit,
-                      display: "block",
-                      ...(isYoothemeGallery
-                        ? importedHasBothDimensions ? { position: "absolute" as const, inset: 0 } : {}
-                        : imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
-                    }}
-                    onError={(e) => {
-                      // Fallback to high res gradient placeholder if network image fails
-                      (e.target as HTMLImageElement).src = DEFAULT_GALLERY_ITEMS[index % 3].imageUrl;
-                    }}
-                  />
+                  {item.isPendingImage ? (
+                    <div
+                      aria-hidden="true"
+                      className="shop-builder-gallery-image-placeholder"
+                      style={{
+                        width: importedIntrinsicDimensions ? `${importedIntrinsicDimensions.width}px` : "100%",
+                        maxWidth: "100%",
+                        aspectRatio: importedAspectRatio ?? "1 / 1",
+                        background: "var(--uk-global-muted-background, #f8f8f8)",
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.imageAlt}
+                      className={`${isYoothemeGallery ? "el-image" : imageClass} uk-transition-scale-up uk-transition-opaque`}
+                      loading={rawBlock.imageLoading ?? "lazy"}
+                      width={isYoothemeGallery ? importedIntrinsicDimensions?.width : undefined}
+                      height={isYoothemeGallery ? importedIntrinsicDimensions?.height : undefined}
+                      {...imageAttributes}
+                      style={{
+                        width: isYoothemeGallery ? "auto" : "100%",
+                        maxWidth: isYoothemeGallery ? "100%" : undefined,
+                        height: isYoothemeGallery ? "auto" : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
+                        objectFit: isYoothemeGallery ? undefined : imageStyle.objectFit,
+                        display: "block",
+                        ...(!isYoothemeGallery && imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
+                      }}
+                      onError={(e) => {
+                        if (isYoothemeGallery) {
+                          e.currentTarget.style.visibility = "hidden";
+                          return;
+                        }
+                        // Native Galleries retain their authored default fallback.
+                        e.currentTarget.src = DEFAULT_GALLERY_ITEMS[index % 3].imageUrl;
+                      }}
+                    />
+                  )}
 
                   {hasOverlayLink && (
                     <a

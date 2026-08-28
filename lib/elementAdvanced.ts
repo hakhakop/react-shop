@@ -22,12 +22,22 @@ export type ElementAdvancedValues = {
 /** Minimal shared contract so Builder and storefront use the same owner. */
 export type ElementAdvancedBlock = {
   id?: string;
+  kind?: string;
   customId?: string;
   customClass?: string;
   customAttributes?: string;
   customCss?: string;
   visualStyle?: BuilderVisualStyle;
 };
+
+export function normalizeElementCompatibilityCss(source: string | undefined, block: ElementAdvancedBlock) {
+  if (!source) return source;
+  if (block.kind !== "grid") return source;
+  // YOOtheme renders each Grid item as `.uk-first-column > .el-item`.
+  // WebPages keeps the card as the direct Grid child, so both compatibility
+  // classes live on that canonical card rather than adding a layout wrapper.
+  return source.replace(/\.uk-first-column\s*>\s*\.el-item\b/g, ".uk-first-column.el-item");
+}
 
 /** Reads the canonical Advanced owner with historic top-level compatibility. */
 export function resolveElementAdvanced(block: ElementAdvancedBlock): ElementAdvancedValues {

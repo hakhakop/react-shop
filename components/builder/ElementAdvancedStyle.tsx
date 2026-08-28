@@ -1,6 +1,8 @@
-import { elementAdvancedScope, resolveElementAdvanced, scopeElementCss, type ElementAdvancedBlock } from "@/lib/elementAdvanced";
+import { elementAdvancedScope, normalizeElementCompatibilityCss, resolveElementAdvanced, scopeElementCss, type ElementAdvancedBlock } from "@/lib/elementAdvanced";
 
 export function ElementAdvancedStyle({ block }: { block: ElementAdvancedBlock }) {
-  const css = scopeElementCss(resolveElementAdvanced(block).customCss, elementAdvancedScope(block));
+  const source = resolveElementAdvanced(block).customCss;
+  const compatibilityCss = normalizeElementCompatibilityCss(source, block);
+  const css = scopeElementCss(compatibilityCss, elementAdvancedScope(block));
   return css ? <style>{css}</style> : null;
 }

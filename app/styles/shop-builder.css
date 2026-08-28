@@ -1725,6 +1725,44 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   width: min(var(--shop-builder-overlay-slide-width, 800px), 85vw) !important;
 }
 
+/* YOOtheme's auto-width Overlay Slider is height-led: each image keeps its
+   intrinsic ratio at the authored height. Swiper must not replace that with
+   the generic 800px card width. */
+.shop-builder-swiper--overlay .swiper-slide.shop-builder-overlay-slide--auto {
+  width: auto !important;
+  max-width: none !important;
+}
+
+.shop-builder-overlay-slide--auto .shop-builder-overlay-slide-card--natural {
+  width: max-content;
+  max-width: none;
+}
+
+/* Dynamic templates render briefly before their server projection arrives.
+   Reserve the authored 600px-style frame without flashing demo artwork. */
+.shop-builder-overlay-slide--auto .shop-builder-overlay-slide-card--pending {
+  width: clamp(280px, 31.2vw, 468px);
+  background: var(--global-muted-background, #f5f5f5);
+}
+
+.shop-builder-overlay-slide--auto .shop-builder-overlay-slide-card--image-loading {
+  width: clamp(280px, 31.2vw, 468px);
+  background: var(--global-muted-background, #f5f5f5);
+}
+
+.shop-builder-overlay-slide-image-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--global-muted-background, #f5f5f5);
+}
+
+.shop-builder-overlay-slide-pending {
+  width: 100%;
+  height: 100%;
+  background: var(--global-muted-background, #f5f5f5);
+}
+
 /* A missing YOOtheme overlay_style is deliberately transparent. The source
    controls whether content gets an Overlay or Tile surface; the renderer must
    not introduce a generic dark gradient as a component default. */
@@ -2409,6 +2447,29 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    leaving that flex-grid margin in place doubles the visual row gap. */
 .shop-builder-grid > .uk-grid-margin {
   margin-top: 0 !important;
+}
+
+/* UIkit masonry and grid-parallax calculate against a wrapping flex track.
+   Restore that canonical geometry only for grids using those runtime effects;
+   ordinary WebPages grids keep their CSS Grid layout. */
+.shop-builder-grid.shop-builder-uikit-grid--runtime {
+  display: flex;
+  align-content: flex-start;
+  /* UIkit writes a content height plus parallax padding. Preserve its
+     content-box calculation so the padding is not subtracted from the track. */
+  box-sizing: content-box;
+  /* UIkit supplies the vertical gutter through `uk-grid-margin`; retaining
+     CSS row-gap here would count the same authored gap twice. */
+  row-gap: 0;
+}
+
+.shop-builder-grid.shop-builder-uikit-grid--runtime > * {
+  flex: 0 0 var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
+  width: var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
+}
+
+.shop-builder-grid.shop-builder-uikit-grid--runtime > .uk-grid-margin {
+  margin-top: var(--shop-builder-grid-row-gap, var(--shop-builder-grid-gap, 0px)) !important;
 }
 
 /* YOOtheme Grid's “Center columns” is UIkit's `uk-flex-center` on the
@@ -7614,11 +7675,11 @@ body.is-visual-builder-active .uk-lightbox {
   color: var(--uk-global-text-color, #555371) !important;
 }
 
-.shop-builder-grid-card--hover-disabled,
-.shop-builder-grid-card--hover-disabled:hover,
-.shop-builder-grid-card--hover-disabled:focus,
-.shop-builder-grid-card--hover-disabled:focus-within,
-.shop-builder-grid-card--hover-disabled:active {
+.shop-builder-grid:not(.shop-builder-uikit-grid--runtime) > .shop-builder-grid-card--hover-disabled,
+.shop-builder-grid:not(.shop-builder-uikit-grid--runtime) > .shop-builder-grid-card--hover-disabled:hover,
+.shop-builder-grid:not(.shop-builder-uikit-grid--runtime) > .shop-builder-grid-card--hover-disabled:focus,
+.shop-builder-grid:not(.shop-builder-uikit-grid--runtime) > .shop-builder-grid-card--hover-disabled:focus-within,
+.shop-builder-grid:not(.shop-builder-uikit-grid--runtime) > .shop-builder-grid-card--hover-disabled:active {
   transform: none !important;
   filter: none !important;
   transition: none !important;

@@ -47,22 +47,40 @@ export function wordpressContentSchemaCapabilities(
   schema: WordPressContentSchema | null | undefined,
 ): DynamicContentSourceCapability[] {
   if (!schema) return [];
-  return schema.sources.map((source) => ({
-    key: `wordpress-${source.kind}-${source.name}-collection`,
-    label: source.label,
-    provider: "wordpress",
-    source: "content",
-    mode: "collection",
-    fields: [
+  return schema.sources.flatMap((source) => {
+    const fields = [
       ...(source.kind === "contentType" ? contentFields : taxonomyFields),
       ...source.fields,
-    ],
-    defaultQuery: {
+    ];
+    const sourceQuery = {
       sourceKind: source.kind,
       sourceName: source.name,
       graphqlSingleName: source.graphqlSingleName,
       graphqlPluralName: source.graphqlPluralName,
-      quantity: 10,
-    },
-  }));
+    };
+    return [{
+      key: `wordpress-${source.kind}-${source.name}-collection`,
+      label: source.label,
+      provider: "wordpress",
+      source: "content",
+      mode: "collection" as const,
+      fields,
+      defaultQuery: { ...sourceQuery, quantity: 10 },
+    }, {
+      key: `wordpress-${source.kind}-${source.name}-single`,
+      label: `${source.label} (Single)`,
+      provider: "wordpress",
+      source: "content",
+      mode: "single" as const,
+      fields,
+      queryControls: [{
+        key: "databaseId",
+        label: "Database ID",
+        control: "integer" as const,
+        minimum: 1,
+        placeholder: "6",
+      }],
+      defaultQuery: { ...sourceQuery, quantity: 1 },
+    }];
+  });
 }

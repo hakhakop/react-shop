@@ -13,6 +13,17 @@ test("Builder Library uses existing saved-template persistence and preserves doc
   expect(source).toContain("...current,");
   expect(source).toContain("sections: clonedSections");
   expect(source).toContain("const insertContextualLibraryTemplate = (");
+  expect(source).toContain("insertAtContextualTarget");
+  expect(source).toContain("rowId: targetRowId");
+  expect(source).toContain("if (!inserted) return;");
+  expect(source).toContain('if (action === "replace") {');
+  expect(source).toContain('label: "Replace Layout"');
+  const unifiedReplacement = source.slice(
+    source.indexOf("usesUnifiedContextualLayouts &&"),
+    source.indexOf("} else {", source.indexOf("usesUnifiedContextualLayouts &&")),
+  );
+  expect(unifiedReplacement).toContain('if (action === "replace") {');
+  expect(unifiedReplacement).not.toContain("target.sectionId");
   expect(source).toContain('mode="contextual"');
   expect(panel).toContain("Save Current Page");
   expect(panel).toContain("Save Selected Section");
@@ -21,6 +32,7 @@ test("Builder Library uses existing saved-template persistence and preserves doc
   expect(source).not.toContain("builder-routing.json");
   expect(source).not.toContain("templatePreviewIdentityStorage");
   expect(librarySurface).toContain("activeLibraryTypes");
+  expect(librarySurface).toContain("replace the entire layout");
   expect(librarySurface).toContain("imported !== false");
   expect(source).toContain("acceptedTypes.includes(importedType)");
   expect(source).toContain("templateType: importedType");

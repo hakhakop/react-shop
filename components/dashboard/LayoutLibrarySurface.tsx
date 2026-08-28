@@ -369,7 +369,9 @@ export default function LayoutLibrarySurface({
         <div className="builder-library-context-actions" aria-label="Library insertion actions">
           <span>
             {selectedTemplate
-              ? `Insert “${selectedTemplate.title}” into the current structure.`
+              ? resolvedContextualActions.some((action) => action.label === "Replace Layout")
+                ? `Insert “${selectedTemplate.title}” near the current selection, or replace the entire layout.`
+                : `Insert “${selectedTemplate.title}” into the current structure.`
               : "Select a Library composition to choose how it is inserted."}
           </span>
           <div>

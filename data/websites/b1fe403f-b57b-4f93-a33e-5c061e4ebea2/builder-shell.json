@@ -251,10 +251,22 @@
       "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
+    },
+    {
+      "id": "menu_gl2zrnk3a",
+      "label": "Discover",
+      "url": "/discover",
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     }
   ],
   "namedMenus": [],
-  "updatedAt": "2026-08-28T14:05:09.870Z",
+  "updatedAt": "2026-08-28T17:00:13.186Z",
   "buttonTextTransform": "inherit",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#000",

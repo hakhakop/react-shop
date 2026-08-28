@@ -263,6 +263,9 @@ function blockHasDynamicContent(block: BuilderLayoutBlock) {
     block.buttons?.some((btn) =>
       hasDynamicContent(btn as unknown as Record<string, unknown>),
     ) === true ||
+    block.galleryItems?.some((item) =>
+      hasDynamicContent(item as unknown as Record<string, unknown>),
+    ) === true ||
     block.badges?.some((badge) =>
       hasDynamicContent(badge as unknown as Record<string, unknown>),
     ) === true

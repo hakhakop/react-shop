@@ -67,6 +67,70 @@ test("new WPGraphQL content types become inspector capabilities without a regist
         graphqlPluralName: "excursions",
       }),
     }));
+    expect(wordpressContentSchemaCapabilities(schema)).toContainEqual(expect.objectContaining({
+      key: "wordpress-contentType-excursion-single",
+      label: "Excursions (Single)",
+      mode: "single",
+      defaultQuery: expect.objectContaining({ sourceName: "excursion", quantity: 1 }),
+    }));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("legacy YOOtheme taxonomy names resolve to the discovered source and preserve the selected term", async () => {
+  const originalFetch = globalThis.fetch;
+  let contentRequests = 0;
+  globalThis.fetch = (async (_input, init) => {
+    const body = JSON.parse(String(init?.body ?? "{}")) as { query?: string };
+    const query = body.query ?? "";
+    if (query.includes("WebPagesWordPressContentSchema")) {
+      return Response.json({ data: {
+        contentTypes: { nodes: [] },
+        taxonomies: { nodes: [{
+          name: "accommodation_cat",
+          graphqlSingleName: "accommodationCategory",
+          graphqlPluralName: "accommodationCategories",
+          label: "Accommodation Categories",
+        }] },
+      } });
+    }
+    if (query.includes("WebPagesWordPressType")) {
+      return Response.json({ errors: [{ message: "GraphQL introspection is disabled." }] });
+    }
+    if (query.includes("WebPagesGenericWordPressContent")) {
+      contentRequests += 1;
+      if (query.includes("accommodationCategoryFields")) {
+        return Response.json({ errors: [{ message: "Cannot query field accommodationCategoryFields." }] });
+      }
+      expect(query).toContain("accommodationCategories");
+      return Response.json({ data: { accommodationCategories: { nodes: [
+        { id: "term-6", databaseId: 6, name: "Norway" },
+        { id: "term-24", databaseId: 24, name: "Germany" },
+      ] } } });
+    }
+    throw new Error(`Unexpected test query: ${query}`);
+  }) as typeof fetch;
+
+  try {
+    const contexts = await resolveWordPressGenericContentContexts({
+      website: { id: "legacy-yootheme-taxonomy-test", cmsConnection: { graphqlUrl: "https://taxonomy.example/?graphql" } } as never,
+      descriptor: {
+        provider: "wordpress",
+        source: "content",
+        mode: "single",
+        query: {
+          graphqlRoot: "accommodationCats",
+          yoothemeQueryName: "accommodationCats.customAccommodationCat",
+          databaseId: 6,
+          requestedFields: ["acf.accommodation_intro_image.url"],
+        },
+      },
+    });
+    expect(contentRequests).toBe(2);
+    expect(contexts).toHaveLength(1);
+    expect(contexts[0].fields.name).toEqual({ type: "string", value: "Norway" });
+    expect(contexts[0].fields["acf.accommodation_intro_image.url"]).toBeUndefined();
   } finally {
     globalThis.fetch = originalFetch;
   }

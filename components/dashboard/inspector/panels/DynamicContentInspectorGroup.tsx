@@ -5,6 +5,7 @@ import type {
   DynamicContentData,
 } from "@/lib/dynamicContent";
 import {
+  dynamicContentCapabilityMatchesDescriptor,
   dynamicContentSourceKey,
   type DynamicContentQueryControl,
   type DynamicContentSourceCapability,
@@ -147,10 +148,7 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
     ? capabilities.find((candidate) => candidate.key === fixedSourceKey)
     : undefined;
   const descriptorCapability = capabilities.find((candidate) =>
-    candidate.provider === descriptor?.provider &&
-    candidate.source === descriptor?.source &&
-    candidate.mode === descriptor?.mode &&
-    (candidate.source !== "content" || candidate.defaultQuery?.sourceName === descriptor?.query?.sourceName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlPluralName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlRoot),
+    dynamicContentCapabilityMatchesDescriptor(candidate, descriptor),
   );
   const source = fixedSourceKey ?? descriptorCapability?.key ?? dynamicContentSourceKey(descriptor);
   const effectiveDescriptor = fixedCapability?.provider && fixedCapability.source && fixedCapability.mode

@@ -8,6 +8,7 @@ import type {
   DynamicFieldBinding,
 } from "@/lib/dynamicContent";
 import {
+  dynamicContentCapabilityMatchesDescriptor,
   dynamicBindingDestinationCapability,
   type DynamicBindingDestination,
 } from "@/lib/dynamicContentCapabilities";
@@ -43,10 +44,7 @@ export default function DynamicFieldBindingControl({
   const fields = useMemo(
     () => {
       const capability = capabilities.find((candidate) =>
-        candidate.provider === descriptor?.provider &&
-        candidate.source === descriptor?.source &&
-        candidate.mode === descriptor?.mode &&
-        (candidate.source !== "content" || candidate.defaultQuery?.sourceName === descriptor?.query?.sourceName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlPluralName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlRoot),
+        dynamicContentCapabilityMatchesDescriptor(candidate, descriptor),
       );
       return (capability?.fields ?? []).filter((field) => acceptedTypes.includes(field.valueType));
     },
@@ -71,7 +69,7 @@ export default function DynamicFieldBindingControl({
         }
       : undefined);
   const sourceLabel = capabilities.find((candidate) =>
-    candidate.provider === descriptor?.provider && candidate.source === descriptor?.source && candidate.mode === descriptor?.mode,
+    dynamicContentCapabilityMatchesDescriptor(candidate, descriptor),
   )?.label ?? "Dynamic Content";
 
   const updatePickerPosition = useCallback(() => {

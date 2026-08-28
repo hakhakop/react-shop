@@ -95,6 +95,19 @@ test("Grid parent Image settings retain YOOtheme owners during import", () => {
   });
 });
 
+test("YOOtheme Grid dimensions remain intrinsic under responsive tracks", () => {
+  const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
+  expect(renderer).toContain("height: isYoothemeGrid && !hasCropFrame");
+  expect(renderer).toContain('width={intrinsicImageWidth}');
+  expect(renderer).toContain('height={intrinsicImageHeight}');
+});
+
+test("YOOtheme Grid restores Advanced CSS item compatibility classes", () => {
+  const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
+  expect(renderer).toContain('"uk-first-column"');
+  expect(renderer).toContain('isYoothemeGrid ? "el-item uk-flex-1');
+});
+
 test("Grid parent alignment is not shadowed by synthetic item-top defaults", () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout", children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{

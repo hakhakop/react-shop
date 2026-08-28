@@ -14,6 +14,7 @@ const layout = (): BuilderLayout => ({
     rows: [{ id: "row", layout: "1-col", columns: [{ id: "column", elements: [
       { id: "list", kind: "list", listItems: [{ id: "list-template", text: "Fallback item", iconName: "check", dynamicContext: descriptor, dynamicBindings: { text: { path: "title", valueType: "string" }, url: { path: "link", valueType: "url" } } }] },
       { id: "button", kind: "button", buttons: [{ id: "button-template", label: "Fallback action", url: "/fallback", style: "primary", dynamicContext: descriptor, dynamicBindings: { label: { path: "title", valueType: "string" }, url: { path: "link", valueType: "url" } } }] },
+      { id: "gallery", kind: "gallery", galleryItems: [{ id: "gallery-template", title: "Fallback image", imageUrl: "/fallback.jpg", linkUrl: "/fallback", dynamicContext: descriptor, dynamicBindings: { title: { path: "title", valueType: "string" }, imageUrl: { path: "image", valueType: "url" }, linkUrl: { path: "link", valueType: "url" } } }] },
     ] }] }],
   }],
 });
@@ -23,16 +24,18 @@ const contexts = [1, 2, 3].map((id) => ({
   fields: {
     title: { type: "string" as const, value: `Post ${id}` },
     link: { type: "url" as const, value: `https://example.test/post-${id}` },
+    image: { type: "url" as const, value: `https://example.test/image-${id}.jpg` },
   },
 }));
 
-test("List and canonical multi-button templates expand independently", async () => {
+test("List, multi-button, and Gallery templates expand independently", async () => {
   const authored = layout();
   const snapshot = JSON.stringify(authored);
   const result = await materializeBuilderDynamicContent(authored, { resolveContexts: async () => contexts });
   const elements = result.renderLayout.sections[0].rows?.[0].columns[0].elements ?? [];
   const listItems = elements[0].listItems ?? [];
   const buttons = elements[1].buttons ?? [];
+  const galleryItems = elements[2].galleryItems ?? [];
 
   expect(listItems.map((item) => item.text)).toEqual(["Post 1", "Post 2", "Post 3"]);
   expect(listItems.map((item) => item.url)).toEqual(contexts.map((context) => context.fields.link.value));
@@ -42,6 +45,10 @@ test("List and canonical multi-button templates expand independently", async () 
   expect(buttons.every((item) => item.style === "primary")).toBe(true);
   expect(listItems.map((item) => item.id)).toEqual(contexts.map((context) => dynamicGridRenderItemId("list-template", context.id)));
   expect(buttons.map((item) => item.id)).toEqual(contexts.map((context) => dynamicGridRenderItemId("button-template", context.id)));
+  expect(galleryItems.map((item) => item.title)).toEqual(["Post 1", "Post 2", "Post 3"]);
+  expect(galleryItems.map((item) => item.imageUrl)).toEqual(contexts.map((context) => context.fields.image.value));
+  expect(galleryItems.map((item) => item.linkUrl)).toEqual(contexts.map((context) => context.fields.link.value));
+  expect(galleryItems.map((item) => item.id)).toEqual(contexts.map((context) => dynamicGridRenderItemId("gallery-template", context.id)));
   expect(JSON.stringify(authored)).toBe(snapshot);
 });
 
@@ -88,4 +95,45 @@ test("Slideshow and Overlay Slider reuse the same transient slide expansion", as
   expect(elements[1].slides?.every((slide) => slide.id?.includes("--dynamic-"))).toBe(true);
   expect(authored.sections[0].rows?.[0].columns[0].elements[0].slides).toHaveLength(1);
   expect(authored.sections[0].rows?.[0].columns[0].elements[1].slides).toHaveLength(1);
+});
+
+test("an authored single-term Overlay Slider item resolves without collection expansion", async () => {
+  const authored: BuilderLayout = {
+    version: 1,
+    key: "home",
+    page: "home",
+    updatedAt: "2026-08-28T00:00:00.000Z",
+    sections: [{
+      id: "section", kind: "content", title: "Proof", background: "#fff", visible: true,
+      rows: [{ id: "row", layout: "1-col", columns: [{ id: "column", elements: [{
+        id: "overlay", kind: "overlaySlider", slides: [{
+          id: "term-slide",
+          title: "Fallback",
+          imageUrl: "/fallback.jpg",
+          dynamicContext: {
+            provider: "wordpress", source: "content", mode: "single",
+            query: { sourceName: "accommodation_cat", databaseId: 6 },
+          },
+          dynamicBindings: {
+            title: { path: "name", valueType: "string" },
+            imageUrl: { path: "acf.accommodation_intro_image.url", valueType: "url" },
+          },
+        }],
+      }] }] }],
+    }],
+  };
+  const result = await materializeBuilderDynamicContent(authored, {
+    resolveContexts: async () => [{
+      id: 6,
+      fields: {
+        name: { type: "string", value: "Norway" },
+        "acf.accommodation_intro_image.url": { type: "url", value: "/norway.jpg" },
+      },
+    }],
+  });
+  const slides = result.renderLayout.sections[0].rows?.[0].columns[0].elements[0].slides;
+  expect(slides).toHaveLength(1);
+  expect(slides?.[0]).toMatchObject({ id: "term-slide", title: "Norway", imageUrl: "/norway.jpg" });
+  expect(result.diagnostics[0]).toMatchObject({ status: "materialized", contextCount: 1 });
+  expect(authored.sections[0].rows?.[0].columns[0].elements[0].slides?.[0].title).toBe("Fallback");
 });

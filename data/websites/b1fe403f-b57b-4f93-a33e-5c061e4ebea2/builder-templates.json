@@ -1,5 +1,3793 @@
 [
   {
+    "id": "design-discover-layout-mtd9evdp-wawy",
+    "title": "design-discover Layout",
+    "templateType": "page",
+    "description": "Page template saved from Discover",
+    "sourcePage": "page:discover",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Categories",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-overlay-slider-0-0-0-0",
+                "kind": "overlaySlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-0",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=40",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 6,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 6
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-1",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=42",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 24,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 24
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-2",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=44",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 13,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 13
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-3",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=43",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 18,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 18
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-4",
+                    "title": "Croatia",
+                    "meta": "Discover",
+                    "text": "Coming soon!",
+                    "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-croatia-intro.jpg",
+                    "imageAlt": "Croatia",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "textColor": "light"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-5",
+                    "title": "Portugal",
+                    "meta": "Discover",
+                    "text": "Coming soon!",
+                    "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-portugal-intro.jpg",
+                    "imageAlt": "Portugal",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "textColor": "light"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-6",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=41",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 30,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 30
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-7",
+                    "title": "",
+                    "meta": "Discover",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false,
+                    "buttonUrl": "?page_id=45",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "accommodationCats",
+                        "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                        "sourceName": "accommodation_cat",
+                        "databaseId": 36,
+                        "sourceQuery": {
+                          "name": "accommodationCats.customAccommodationCat",
+                          "arguments": {
+                            "id": 36
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.accommodation_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.accommodation_intro_image.alt",
+                        "valueType": "string"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "overlay-slider",
+                  "variant": "overlay",
+                  "slideMode": "overlay",
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "itemWidthMode": "auto",
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": true,
+                  "loop": true,
+                  "spaceBetween": 15,
+                  "divider": false,
+                  "cardsPerViewPhone": 2,
+                  "cardsPerViewSmall": 3,
+                  "cardsPerViewMedium": 4,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "navigationBelow": true,
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "paginationPosition": "bottom-center",
+                  "slidenavBreakpoint": "small",
+                  "headingLevel": "h2",
+                  "metaPosition": "above-title",
+                  "metaHtmlElement": "div",
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "effect": "slide",
+                  "overlayMode": "cover",
+                  "overlayDisplay": "always",
+                  "overlayPosition": "top-center",
+                  "overlayPadding": "large",
+                  "overlayStyle": "none",
+                  "overlayTextColor": "light",
+                  "imageHeight": "600px",
+                  "imageLoading": "eager",
+                  "imageHoverTransition": "scale-down"
+                },
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-overlay-slider-0-0-0-0",
+                    "kind": "overlaySlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-0",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=40",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 6,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 6
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-1",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=42",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 24,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 24
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-2",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=44",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 13,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 13
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-3",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=43",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 18,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 18
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-4",
+                        "title": "Croatia",
+                        "meta": "Discover",
+                        "text": "Coming soon!",
+                        "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-croatia-intro.jpg",
+                        "imageAlt": "Croatia",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "textColor": "light"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-5",
+                        "title": "Portugal",
+                        "meta": "Discover",
+                        "text": "Coming soon!",
+                        "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-portugal-intro.jpg",
+                        "imageAlt": "Portugal",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "textColor": "light"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-6",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=41",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 30,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 30
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-7",
+                        "title": "",
+                        "meta": "Discover",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false,
+                        "buttonUrl": "?page_id=45",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "accommodationCats",
+                            "yoothemeQueryName": "accommodationCats.customAccommodationCat",
+                            "sourceName": "accommodation_cat",
+                            "databaseId": 36,
+                            "sourceQuery": {
+                              "name": "accommodationCats.customAccommodationCat",
+                              "arguments": {
+                                "id": 36
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.accommodation_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.accommodation_intro_image.alt",
+                            "valueType": "string"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "overlay-slider",
+                      "variant": "overlay",
+                      "slideMode": "overlay",
+                      "showTitle": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "itemWidthMode": "auto",
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": true,
+                      "loop": true,
+                      "spaceBetween": 15,
+                      "divider": false,
+                      "cardsPerViewPhone": 2,
+                      "cardsPerViewSmall": 3,
+                      "cardsPerViewMedium": 4,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "navigationBelow": true,
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "paginationPosition": "bottom-center",
+                      "slidenavBreakpoint": "small",
+                      "headingLevel": "h2",
+                      "metaPosition": "above-title",
+                      "metaHtmlElement": "div",
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "effect": "slide",
+                      "overlayMode": "cover",
+                      "overlayDisplay": "always",
+                      "overlayPosition": "top-center",
+                      "overlayPadding": "large",
+                      "overlayStyle": "none",
+                      "overlayTextColor": "light",
+                      "imageHeight": "600px",
+                      "imageLoading": "eager",
+                      "imageHoverTransition": "scale-down"
+                    },
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "About",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-0-0",
+                "kind": "heading",
+                "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                "headingLevel": "h2"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-text-1-0-1-0",
+                "kind": "text",
+                "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
+                "textVariant": "default",
+                "textColumns": "1-2",
+                "textColumnBreakpoint": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-2-row-1",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-1-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                    "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                    "headingLevel": "h2"
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-1-0-1-0",
+                    "kind": "text",
+                    "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
+                    "textVariant": "default",
+                    "textColumns": "1-2",
+                    "textColumnBreakpoint": "medium",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Tags",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "bottom-left",
+            "imageSize": "contain"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 3,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-0-0-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 44,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 44
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 900,
+                "imageWidth": "900px",
+                "imageIntrinsicWidth": 900,
+                "imageIntrinsicHeight": 900,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeBottomMargin": true,
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-gallery-2-0-0-1",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-2-0-0-1-0",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 44,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 44
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-item-2-0-0-1-1",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 45,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 45
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "parallaxJustify": false,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "panelMetaPosition": "below-title",
+                "enableLightbox": false,
+                "linkText": "View Houses",
+                "imageWidth": 610,
+                "imageHeight": 610,
+                "imageLoading": "lazy",
+                "visibility": "hidden-m",
+                "visibilityMode": "hidden-m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "visibilityMode": "hidden-m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-1-column-2",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-0-1-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 45,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 45
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 900,
+                "imageWidth": "900px",
+                "imageIntrinsicWidth": 900,
+                "imageIntrinsicHeight": 440,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeBottomMargin": true,
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-gallery-2-0-1-1",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-2-0-1-1-0",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 46,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 46
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-item-2-0-1-1-1",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 47,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 47
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "parallaxJustify": false,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "panelMetaPosition": "below-title",
+                "enableLightbox": false,
+                "linkText": "View Houses",
+                "imageWidth": 610,
+                "imageHeight": 610,
+                "imageLoading": "lazy",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {},
+                  "customClass": "uk-grid-margin-small",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-1",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-1-0-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 48,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 48
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 900,
+                "imageWidth": "900px",
+                "imageIntrinsicWidth": 900,
+                "imageIntrinsicHeight": 440,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeBottomMargin": true,
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-gallery-2-1-0-1",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-2-1-0-1-0",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 48,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 48
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-item-2-1-0-1-1",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 49,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 49
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "parallaxJustify": false,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "panelMetaPosition": "below-title",
+                "enableLightbox": false,
+                "linkText": "View Houses",
+                "imageWidth": 610,
+                "imageHeight": 610,
+                "imageLoading": "lazy",
+                "removeTopMargin": true,
+                "visibility": "hidden-m",
+                "visibilityMode": "hidden-m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "removeTopMargin": true,
+                    "visibilityMode": "hidden-m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-gallery-2-1-0-2",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-2-1-0-2-0",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 56,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 56
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-item-2-1-0-2-1",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 53,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 53
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "parallaxJustify": false,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "panelMetaPosition": "below-title",
+                "enableLightbox": false,
+                "linkText": "View Houses",
+                "imageWidth": 610,
+                "imageHeight": 610,
+                "imageLoading": "lazy",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {},
+                  "customClass": "uk-grid-margin-small",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-2",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-1-1-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 49,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 49
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 1800,
+                "imageWidth": "1800px",
+                "imageIntrinsicWidth": 1800,
+                "imageIntrinsicHeight": 1800,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeBottomMargin": true,
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-3-column-1",
+            "rowId": "yootheme-section-3-row-3",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-2-0-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 57,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 57
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 900,
+                "imageWidth": "900px",
+                "imageIntrinsicWidth": 900,
+                "imageIntrinsicHeight": 440,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeBottomMargin": true,
+                "visibility": "s",
+                "visibilityMode": "s",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "visibilityMode": "s"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-2-2-0-1",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "discoverTags",
+                    "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                    "sourceName": "discover_tag",
+                    "databaseId": 57,
+                    "sourceQuery": {
+                      "name": "discoverTags.customDiscoverTag",
+                      "arguments": {
+                        "id": 57
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.image_intro.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "name",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 610,
+                "imageWidth": "610px",
+                "imageIntrinsicWidth": 610,
+                "imageIntrinsicHeight": 610,
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "linkText": "View Houses",
+                "imageShape": "none",
+                "imageTransition": "scale-down",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "contentMarginTop": "small",
+                "linkFullWidth": false,
+                "linkMarginTop": "none",
+                "imageTextColor": "light",
+                "removeTopMargin": true,
+                "visibility": "hidden-s",
+                "visibilityMode": "hidden-s",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "removeTopMargin": true,
+                    "visibilityMode": "hidden-s"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-3-column-2",
+            "rowId": "yootheme-section-3-row-3",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-gallery-2-2-1-0",
+                "kind": "gallery",
+                "galleryItems": [
+                  {
+                    "id": "yootheme-gallery-item-2-2-1-0-0",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 50,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 50
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-item-2-2-1-0-1",
+                    "title": "",
+                    "meta": "",
+                    "content": "",
+                    "tags": [],
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 51,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 51
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "linkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "gridShowTitle": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridShowHoverImage": false,
+                "gridShowHoverVideo": false,
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "parallaxJustify": false,
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-left",
+                "overlayHover": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "overlayLink": true,
+                "headingLevel": "h3",
+                "metaStyle": "text-meta",
+                "panelMetaPosition": "below-title",
+                "enableLightbox": false,
+                "linkText": "View Houses",
+                "imageWidth": 610,
+                "imageHeight": 610,
+                "imageLoading": "lazy",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-3-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "small",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-0-0-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 44,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 44
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageIntrinsicWidth": 900,
+                    "imageIntrinsicHeight": 900,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeBottomMargin": true,
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeBottomMargin": true,
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-2-0-0-1",
+                    "kind": "gallery",
+                    "galleryItems": [
+                      {
+                        "id": "yootheme-gallery-item-2-0-0-1-0",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 44,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 44
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-gallery-item-2-0-0-1-1",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 45,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 45
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "gridShowTitle": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "gridShowHoverImage": false,
+                    "gridShowHoverVideo": false,
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "parallaxJustify": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "overlayLink": true,
+                    "headingLevel": "h3",
+                    "metaStyle": "text-meta",
+                    "panelMetaPosition": "below-title",
+                    "enableLightbox": false,
+                    "linkText": "View Houses",
+                    "imageWidth": 610,
+                    "imageHeight": 610,
+                    "imageLoading": "lazy",
+                    "visibility": "hidden-m",
+                    "visibilityMode": "hidden-m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "visibilityMode": "hidden-m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-0-1-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 45,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 45
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageIntrinsicWidth": 900,
+                    "imageIntrinsicHeight": 440,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeBottomMargin": true,
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeBottomMargin": true,
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-2-0-1-1",
+                    "kind": "gallery",
+                    "galleryItems": [
+                      {
+                        "id": "yootheme-gallery-item-2-0-1-1-0",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 46,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 46
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-gallery-item-2-0-1-1-1",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 47,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 47
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "gridShowTitle": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "gridShowHoverImage": false,
+                    "gridShowHoverVideo": false,
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "parallaxJustify": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "overlayLink": true,
+                    "headingLevel": "h3",
+                    "metaStyle": "text-meta",
+                    "panelMetaPosition": "below-title",
+                    "enableLightbox": false,
+                    "linkText": "View Houses",
+                    "imageWidth": 610,
+                    "imageHeight": 610,
+                    "imageLoading": "lazy",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {},
+                      "customClass": "uk-grid-margin-small",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-2-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-2-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "small",
+            "rowGap": "small",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-1-0-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 48,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 48
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageIntrinsicWidth": 900,
+                    "imageIntrinsicHeight": 440,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeBottomMargin": true,
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeBottomMargin": true,
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-2-1-0-1",
+                    "kind": "gallery",
+                    "galleryItems": [
+                      {
+                        "id": "yootheme-gallery-item-2-1-0-1-0",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 48,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 48
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-gallery-item-2-1-0-1-1",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 49,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 49
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "gridShowTitle": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "gridShowHoverImage": false,
+                    "gridShowHoverVideo": false,
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "parallaxJustify": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "overlayLink": true,
+                    "headingLevel": "h3",
+                    "metaStyle": "text-meta",
+                    "panelMetaPosition": "below-title",
+                    "enableLightbox": false,
+                    "linkText": "View Houses",
+                    "imageWidth": 610,
+                    "imageHeight": 610,
+                    "imageLoading": "lazy",
+                    "removeTopMargin": true,
+                    "visibility": "hidden-m",
+                    "visibilityMode": "hidden-m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "removeTopMargin": true,
+                        "visibilityMode": "hidden-m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-gallery-2-1-0-2",
+                    "kind": "gallery",
+                    "galleryItems": [
+                      {
+                        "id": "yootheme-gallery-item-2-1-0-2-0",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 56,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 56
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-gallery-item-2-1-0-2-1",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 53,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 53
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "gridShowTitle": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "gridShowHoverImage": false,
+                    "gridShowHoverVideo": false,
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "parallaxJustify": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "overlayLink": true,
+                    "headingLevel": "h3",
+                    "metaStyle": "text-meta",
+                    "panelMetaPosition": "below-title",
+                    "enableLightbox": false,
+                    "linkText": "View Houses",
+                    "imageWidth": 610,
+                    "imageHeight": 610,
+                    "imageLoading": "lazy",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {},
+                      "customClass": "uk-grid-margin-small",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-1-1-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 49,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 49
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 1800,
+                    "imageWidth": "1800px",
+                    "imageIntrinsicWidth": 1800,
+                    "imageIntrinsicHeight": 1800,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeBottomMargin": true,
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeBottomMargin": true,
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-3",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-3-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-3-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "small",
+            "rowGap": "small",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-3-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-2-0-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 57,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 57
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageIntrinsicWidth": 900,
+                    "imageIntrinsicHeight": 440,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeBottomMargin": true,
+                    "visibility": "s",
+                    "visibilityMode": "s",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeBottomMargin": true,
+                        "visibilityMode": "s"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-2-2-0-1",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "discoverTags",
+                        "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                        "sourceName": "discover_tag",
+                        "databaseId": 57,
+                        "sourceQuery": {
+                          "name": "discoverTags.customDiscoverTag",
+                          "arguments": {
+                            "id": 57
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.image_intro.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 610,
+                    "imageWidth": "610px",
+                    "imageIntrinsicWidth": 610,
+                    "imageIntrinsicHeight": 610,
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "linkText": "View Houses",
+                    "imageShape": "none",
+                    "imageTransition": "scale-down",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "contentMarginTop": "small",
+                    "linkFullWidth": false,
+                    "linkMarginTop": "none",
+                    "imageTextColor": "light",
+                    "removeTopMargin": true,
+                    "visibility": "hidden-s",
+                    "visibilityMode": "hidden-s",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "removeTopMargin": true,
+                        "visibilityMode": "hidden-s"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-3-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-gallery-2-2-1-0",
+                    "kind": "gallery",
+                    "galleryItems": [
+                      {
+                        "id": "yootheme-gallery-item-2-2-1-0-0",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 50,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 50
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-gallery-item-2-2-1-0-1",
+                        "title": "",
+                        "meta": "",
+                        "content": "",
+                        "tags": [],
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "discoverTags",
+                            "yoothemeQueryName": "discoverTags.customDiscoverTag",
+                            "sourceName": "discover_tag",
+                            "databaseId": 51,
+                            "sourceQuery": {
+                              "name": "discoverTags.customDiscoverTag",
+                              "arguments": {
+                                "id": 51
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "imageUrl": {
+                            "path": "acf.image_intro.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "acf.image_intro.alt",
+                            "valueType": "string"
+                          },
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "linkUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "gridShowTitle": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "gridShowHoverImage": false,
+                    "gridShowHoverVideo": false,
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "parallaxJustify": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-left",
+                    "overlayHover": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "overlayLink": true,
+                    "headingLevel": "h3",
+                    "metaStyle": "text-meta",
+                    "panelMetaPosition": "below-title",
+                    "enableLightbox": false,
+                    "linkText": "View Houses",
+                    "imageWidth": 610,
+                    "imageHeight": 610,
+                    "imageLoading": "lazy",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "sectionPadding": "xlarge",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/discover-cta-bg.jpg",
+            "imagePosition": "bottom-left",
+            "imageSize": "contain"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-4-row-1-column-2",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-3-0-1-0",
+                "kind": "heading",
+                "headingText": "Ask Design Escapes",
+                "title": "Ask Design Escapes",
+                "headingLevel": "div",
+                "headingSize": "h6",
+                "headingAlign": "left",
+                "headingColor": "primary",
+                "textAlign": "left",
+                "removeTopMargin": true,
+                "animation": {
+                  "preset": "slide-top-small"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "removeTopMargin": true,
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-3-0-1-1",
+                "kind": "heading",
+                "headingText": "Need Help Making a Decision?",
+                "title": "Need Help Making a Decision?",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "textAlign": "left",
+                "removeTopMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "removeTopMargin": true,
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-text-3-0-1-2",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt.",
+                "textVariant": "lead",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "large",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "large",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-3-0-1-3",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-3-0-1-3-0",
+                    "label": "Contact Us",
+                    "url": "mailto:info@example.com",
+                    "target": "_self",
+                    "style": "primary"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "left",
+                "headingAlign": "left",
+                "animation": {
+                  "preset": "slide-bottom-small"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-4-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-4-row-1-column-1",
+                  "widths": {
+                    "small": "1-3",
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-4-row-1-column-2",
+                  "widths": {
+                    "small": "2-3",
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "xlarge",
+            "bottomMargin": "xlarge",
+            "columns": [
+              {
+                "id": "yootheme-section-4-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-3",
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              },
+              {
+                "id": "yootheme-section-4-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "2-3",
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-3-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Ask Design Escapes",
+                    "title": "Ask Design Escapes",
+                    "headingLevel": "div",
+                    "headingSize": "h6",
+                    "headingAlign": "left",
+                    "headingColor": "primary",
+                    "textAlign": "left",
+                    "removeTopMargin": true,
+                    "animation": {
+                      "preset": "slide-top-small"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "removeTopMargin": true,
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-3-0-1-1",
+                    "kind": "heading",
+                    "headingText": "Need Help Making a Decision?",
+                    "title": "Need Help Making a Decision?",
+                    "headingLevel": "h2",
+                    "headingAlign": "left",
+                    "textAlign": "left",
+                    "removeTopMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "removeTopMargin": true,
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-text-3-0-1-2",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt.",
+                    "textVariant": "lead",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "large",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "large",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-3-0-1-3",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-3-0-1-3-0",
+                        "label": "Contact Us",
+                        "url": "mailto:info@example.com",
+                        "target": "_self",
+                        "style": "primary"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "animation": {
+                      "preset": "slide-bottom-small"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-28T18:02:48.541Z"
+  },
+  {
     "id": "design-home-layout-mtd4drh5-4spj",
     "title": "Design-Home Layout",
     "templateType": "page",

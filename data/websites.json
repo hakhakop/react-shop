@@ -70,8 +70,8 @@
     "status": "creating",
     "creationRequestId": "8283a4a7-e3bc-4cb0-84ed-0bc7b5958d22",
     "createdAt": "2026-08-27T05:41:51.697Z",
-    "updatedAt": "2026-08-28T15:54:14.024Z",
-    "lastPublishedAt": "2026-08-28T15:54:14.024Z",
+    "updatedAt": "2026-08-28T19:34:07.248Z",
+    "lastPublishedAt": "2026-08-28T19:34:07.248Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://store.webpages.am",
@@ -156,7 +156,7 @@
     "status": "creating",
     "creationRequestId": "51ed1adf-7383-4256-ab71-0155d38622a5",
     "createdAt": "2026-08-28T06:24:34.781Z",
-    "updatedAt": "2026-08-28T12:57:03.302Z",
+    "updatedAt": "2026-08-28T18:34:38.433Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://yard.webpages.am",
@@ -171,7 +171,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-28T06:50:18.433Z"
     },
-    "lastPublishedAt": "2026-08-28T12:57:03.302Z"
+    "lastPublishedAt": "2026-08-28T18:34:38.433Z"
   },
   {
     "id": "b1fe403f-b57b-4f93-a33e-5c061e4ebea2",
@@ -199,7 +199,7 @@
     "status": "creating",
     "creationRequestId": "c11978b9-11fa-482f-bad3-3a11368649c1",
     "createdAt": "2026-08-28T12:35:35.064Z",
-    "updatedAt": "2026-08-28T15:35:55.951Z",
+    "updatedAt": "2026-08-28T18:15:55.508Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://design.webpages.am",
@@ -214,6 +214,6 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-28T12:37:02.624Z"
     },
-    "lastPublishedAt": "2026-08-28T15:35:55.951Z"
+    "lastPublishedAt": "2026-08-28T18:15:55.508Z"
   }
 ]

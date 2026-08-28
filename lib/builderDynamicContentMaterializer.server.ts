@@ -44,6 +44,15 @@ export type DynamicContentContextResolver = (
 
 type BlockLocation = MaterializedGridBlock;
 
+const descriptorCacheKey = (descriptor: DynamicContentContextDescriptor) =>
+  JSON.stringify(descriptor, (_key, value) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right)),
+    );
+  });
+
 const withRequestedBindingFields = (
   descriptor: DynamicContentContextDescriptor,
   bindings: DynamicFieldBindings | undefined,
@@ -594,12 +603,12 @@ async function materializeCarouselCollectionBlock(
       } else renderSlides.push(slide);
       continue;
     }
-    if (descriptor.mode !== "collection") {
+    if (descriptor.mode !== "collection" && descriptor.mode !== "single") {
       diagnostics.push({
         status: "fallback",
         ...location,
         templateItemId: slide.id,
-          message: `Unsupported ${block.kind} Dynamic Content mode: ${descriptor.mode}.`,
+        message: `Unsupported ${block.kind} Dynamic Content mode: ${descriptor.mode}.`,
       });
       renderSlides.push(slide);
       continue;
@@ -610,7 +619,7 @@ async function materializeCarouselCollectionBlock(
       diagnostics.push({
         status: "fallback",
         ...location,
-        message: `A collection ${block.kind} template requires a stable authored slide ID.`,
+        message: `A dynamic ${block.kind} template requires a stable authored slide ID.`,
       });
       renderSlides.push(slide);
       continue;
@@ -625,7 +634,7 @@ async function materializeCarouselCollectionBlock(
         (context): context is DynamicItemContext & { id: string | number } =>
           (typeof context.id === "string" && context.id.length > 0) ||
           (typeof context.id === "number" && Number.isFinite(context.id)),
-      );
+      ).slice(0, descriptor.mode === "single" ? 1 : undefined);
       if (identifiedContexts.length === 0) {
         diagnostics.push({
           status: "fallback",
@@ -633,7 +642,7 @@ async function materializeCarouselCollectionBlock(
           templateItemId,
           contextCount: contexts.length,
           message: contexts.length === 0
-            ? "The provider returned no collection items."
+            ? `The provider returned no ${descriptor.mode} item.`
             : "The provider returned no items with a normalized identifier.",
         });
         renderSlides.push(slide);
@@ -647,7 +656,9 @@ async function materializeCarouselCollectionBlock(
       renderSlides.push(
         ...identifiedContexts.map((context) => ({
           ...resolveDynamicItem(template, context, slide.dynamicBindings),
-          id: dynamicPanelSliderRenderItemId(templateItemId, context.id),
+          id: descriptor.mode === "single"
+            ? templateItemId
+            : dynamicPanelSliderRenderItemId(templateItemId, context.id),
         })),
       );
       changed = true;
@@ -659,7 +670,7 @@ async function materializeCarouselCollectionBlock(
         ...(identifiedContexts.length !== contexts.length
           ? { message: `${contexts.length - identifiedContexts.length} context item(s) without an identifier were skipped.` }
           : unavailableAcfPaths.length > 0
-            ? { message: `ACF value unavailable from the WordPress GraphQL Post projection: ${Array.from(new Set(unavailableAcfPaths)).join(", ")}. Static fallbacks were retained.` }
+            ? { message: `ACF value unavailable from the WordPress GraphQL content projection: ${Array.from(new Set(unavailableAcfPaths)).join(", ")}. Static fallbacks were retained.` }
             : {}),
       });
     } catch (error) {
@@ -865,7 +876,16 @@ export async function materializeBuilderDynamicContent(
 ): Promise<BuilderDynamicContentMaterialization> {
   const diagnostics: DynamicContentMaterializationDiagnostic[] = [];
   const materializedGridBlocks: MaterializedGridBlock[] = [];
-  const resolveContexts = options.resolveContexts ?? resolveDynamicContentContexts;
+  const providerResolveContexts = options.resolveContexts ?? resolveDynamicContentContexts;
+  const contextResolutionCache = new Map<string, Promise<DynamicItemContext[]>>();
+  const resolveContexts: DynamicContentContextResolver = (input) => {
+    const key = descriptorCacheKey(input.descriptor);
+    const cached = contextResolutionCache.get(key);
+    if (cached) return cached;
+    const pending = Promise.resolve().then(() => providerResolveContexts(input));
+    contextResolutionCache.set(key, pending);
+    return pending;
+  };
   let changed = false;
   const sectionGroups = await Promise.all(authoredLayout.sections.map(async (section) => {
     const renderSections = await materializeSection(

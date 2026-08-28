@@ -53,6 +53,8 @@ import "swiper/css/free-mode";
 
 export type CarouselSlide = {
   id: string;
+  /** Runtime-only unresolved state; never persisted as Library content. */
+  pendingDynamicContent?: boolean;
   imageUrl?: string | null;
   imageAlt?: string | null;
   /** Dedicated YOOtheme Thumbnav media; falls back to imageUrl when absent. */
@@ -211,6 +213,8 @@ export type CarouselSettings = {
   showNavigationThumbnail?: boolean | "true" | "false" | 1 | 0 | null;
   overlayLink?: boolean;
   itemWidthMode?: "fixed" | "auto";
+  /** Runtime-only import provenance for source-faithful geometry. */
+  sourceContract?: "yootheme";
   slideshowHeight?: "auto" | "viewport" | "section";
   slideshowViewportHeight?: number | string | null;
   slideshowHeightExpand?: boolean | "true" | "false" | 1 | 0 | null;
@@ -330,6 +334,16 @@ export default function CarouselBlock({
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const [activeSlideshowIndex, setActiveSlideshowIndex] = useState(0);
   const [activeOverlayIndex, setActiveOverlayIndex] = useState(0);
+  const [loadedOverlayImages, setLoadedOverlayImages] = useState<Set<string>>(() => new Set());
+
+  const markOverlayImageLoaded = (key: string) => {
+    setLoadedOverlayImages((current) => {
+      if (current.has(key)) return current;
+      const next = new Set(current);
+      next.add(key);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!builderGeometryCoordinator || !mainSwiper) return;
@@ -340,6 +354,17 @@ export default function CarouselBlock({
     if (!builderGeometryCoordinator || !thumbsSwiper) return;
     return builderGeometryCoordinator.register(thumbsSwiper);
   }, [builderGeometryCoordinator, thumbsSwiper]);
+
+  // Auto-width slides cannot be measured correctly until their image has an
+  // intrinsic width. Recalculate after React has committed each loaded image;
+  // otherwise Swiper can retain a zero-width slide until the user navigates.
+  useEffect(() => {
+    if (!mainSwiper || mainSwiper.destroyed || loadedOverlayImages.size === 0) return;
+    const frame = window.requestAnimationFrame(() => {
+      if (!mainSwiper.destroyed) mainSwiper.update();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [loadedOverlayImages, mainSwiper]);
 
   if (!slides || slides.length === 0) {
     return (
@@ -466,6 +491,8 @@ export default function CarouselBlock({
   const isMarquee = swiperVariant === "marquee";
   const isFreeMode = swiperVariant === "free-mode";
   const isOverlaySlider = settings?.presentation === "overlay-slider";
+  const usesYoothemeAutoWidthOverlayFlow =
+    isOverlaySlider && settings?.sourceContract === "yootheme" && settings?.itemWidthMode === "auto";
   const isFixedItemWidth =
     isOverlaySlider ||
     settings?.itemWidthMode === "fixed" ||
@@ -1302,14 +1329,31 @@ export default function CarouselBlock({
               return undefined;
             })();
 
+            const authoredOverlaySlideWidth = toCssDimension(slide.imageWidth ?? settings?.imageWidth);
+            // YOOtheme's Auto setting controls how the slider lays items out;
+            // it does not erase an authored Image Width. Only fall back to the
+            // image's natural width when the source genuinely omitted width.
+            const usesNaturalOverlayWidth = usesYoothemeAutoWidthOverlayFlow && !authoredOverlaySlideWidth;
             const overlaySlideWidth =
-              toCssDimension(slide.imageWidth ?? settings?.imageWidth) ??
-              (isOverlaySlider ? "800px" : undefined);
+              authoredOverlaySlideWidth ??
+              (isOverlaySlider && !usesNaturalOverlayWidth ? "800px" : undefined);
+            const overlayMediaHeight = toCssDimension(slide.imageHeight ?? settings?.imageHeight);
+            const overlayImageLoadKey = `${slide.id || idx}:${slide.imageUrl ?? ""}`;
+            const overlayImageLoaded = !usesNaturalOverlayWidth || loadedOverlayImages.has(overlayImageLoadKey);
+            const naturalOverlayMediaStyle = usesNaturalOverlayWidth && !cardRatio && overlayMediaHeight
+              ? {
+                  width: overlayImageLoaded ? "max-content" : "clamp(280px, 31.2vw, 468px)",
+                  height: overlayMediaHeight,
+                  maxWidth: "none",
+                } as React.CSSProperties
+              : undefined;
 
             return (
               <SwiperSlide
                 key={slide.id || idx}
-                className={isOverlaySlider ? "shop-builder-overlay-slide" : undefined}
+                className={isOverlaySlider
+                  ? `shop-builder-overlay-slide ${usesNaturalOverlayWidth ? "shop-builder-overlay-slide--auto" : ""}`.trim()
+                  : undefined}
                 style={
                   overlaySlideWidth
                     ? {
@@ -1325,24 +1369,39 @@ export default function CarouselBlock({
                 }
               >
                 <article
-                  className={`shop-builder-overlay-slide-card group relative w-full ${cardRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden ${overlayShapeClass}`.trim()}
-                  style={cardRatio ? { aspectRatio: cardRatio } : undefined}
+                  className={`shop-builder-overlay-slide-card group relative w-full ${cardRatio ? "" : "shop-builder-overlay-slide-card--natural"} ${slide.pendingDynamicContent ? "shop-builder-overlay-slide-card--pending" : ""} ${usesNaturalOverlayWidth && hasRealImage && !overlayImageLoaded ? "shop-builder-overlay-slide-card--image-loading" : ""} overflow-hidden ${overlayShapeClass}`.trim()}
+                  style={cardRatio ? { aspectRatio: cardRatio } : naturalOverlayMediaStyle}
                 >
                   {hasRealImage ? (
                     <>
                       <img
                         src={slide.imageUrl!}
                         alt={slide.imageAlt ?? slide.title ?? ""}
-                        className={`block w-full ${cardRatio || slide.imageHeight || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
+                        className={`block ${usesNaturalOverlayWidth && !cardRatio ? "w-auto h-full object-cover max-w-none" : `w-full ${cardRatio || slide.imageHeight || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"}`} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
                         style={{
-                          width: "100%",
-                          height: cardRatio ? "100%" : undefined,
-                          maxWidth: "100%",
+                          width: usesNaturalOverlayWidth && !cardRatio ? "auto" : "100%",
+                          height: cardRatio || (usesNaturalOverlayWidth && overlayMediaHeight) ? "100%" : undefined,
+                          maxWidth: usesNaturalOverlayWidth && !cardRatio ? "none" : "100%",
+                          // The image must remain paintable even if it loaded
+                          // before React hydration attached `onLoad`.
+                          position: usesNaturalOverlayWidth ? "relative" : undefined,
+                          zIndex: usesNaturalOverlayWidth ? 1 : undefined,
                           objectPosition: toCssObjectPosition(slide.imagePosition),
+                        }}
+                        ref={(image) => {
+                          if (!usesNaturalOverlayWidth || !image?.complete || image.naturalWidth <= 0) return;
+                          window.requestAnimationFrame(() => markOverlayImageLoaded(overlayImageLoadKey));
+                        }}
+                        onLoad={() => {
+                          if (!usesNaturalOverlayWidth) return;
+                          markOverlayImageLoaded(overlayImageLoadKey);
                         }}
                         sizes="(min-width: 1180px) 50vw, 100vw"
                         loading={resolveImageLoading(slide.imageLoading ?? settings?.imageLoading, idx === 0 ? "eager" : "lazy")}
                       />
+                      {usesNaturalOverlayWidth && !overlayImageLoaded && (
+                        <div className="shop-builder-overlay-slide-image-placeholder" aria-hidden="true" />
+                      )}
                       {onUploadSlideImage && (
                         <button
                           type="button"
@@ -1360,6 +1419,11 @@ export default function CarouselBlock({
                         <div className={`shop-builder-media-overlay shop-builder-media-overlay--${overlayGradient !== "none" ? overlayGradient : "subtle"}`} />
                       )}
                     </>
+                  ) : slide.pendingDynamicContent ? (
+                    <div
+                      className="shop-builder-overlay-slide-pending"
+                      aria-hidden="true"
+                    />
                   ) : (
                     <div
                       className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-850 to-slate-950 border border-slate-800/80 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-indigo-500/50 transition-all duration-300 group"

@@ -296,6 +296,26 @@ const sourceName = (node: YoothemeSourceNode, fallback: string): string => {
   return name ?? fallback;
 };
 
+/** Map a YOOtheme custom-source namespace to its WordPress registration hint. */
+const yoothemeWordPressSourceName = (queryName: string): string | undefined => {
+  const namespace = queryName.split(".")[0]?.trim();
+  if (!namespace) return undefined;
+  const parts = namespace
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^_0-9A-Za-z]+/g, "_")
+    .toLowerCase()
+    .split("_")
+    .filter(Boolean);
+  const last = parts.at(-1);
+  if (!last) return undefined;
+  parts[parts.length - 1] = last.endsWith("ies")
+    ? `${last.slice(0, -3)}y`
+    : last.endsWith("s") && !last.endsWith("ss")
+      ? last.slice(0, -1)
+      : last;
+  return parts.join("_");
+};
+
 const sourceProps = (node: YoothemeSourceNode): Record<string, unknown> =>
   typeof node.props === "object" && node.props !== null
     ? (node.props as Record<string, unknown>)
@@ -1340,6 +1360,9 @@ const mapDynamicSource = (
             query: {
               graphqlRoot: String(queryName).split(".")[0],
               yoothemeQueryName: String(queryName),
+              ...(yoothemeWordPressSourceName(String(queryName))
+                ? { sourceName: yoothemeWordPressSourceName(String(queryName))! }
+                : {}),
               ...(Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
                 ? { databaseId: Number(genericArgumentRecord.id) }
                 : {}),

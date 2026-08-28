@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
@@ -115,6 +115,7 @@ export function GridCardsClient({
   const isYoothemeGrid = rawBlock.spacingContract === "yootheme";
   const gridRef = useRef<HTMLDivElement>(null);
   const gridStructure = resolveUikitGridStructure(rawBlock);
+  const hasGridRuntimeEffect = Boolean(gridStructure.masonry || gridStructure.parallax !== undefined);
   const sharedCard = rawBlock.visualStyle?.card ?? {};
   // YOOtheme Grid owns one General alignment value for the complete item
   // contract. The shared resolver keeps legacy aliases read-compatible while
@@ -251,6 +252,38 @@ export function GridCardsClient({
     revision: `${activeFilter}:${renderedItems.map((item) => `${item.id}:${item.imageUrl ?? ""}`).join("|")}`,
   });
 
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!isYoothemeGrid || !root) return;
+
+    const markFirstColumns = () => {
+      const children = Array.from(root.children).filter(
+        (child): child is HTMLElement => child instanceof HTMLElement && getComputedStyle(child).display !== "none",
+      );
+      children.forEach((child) => child.classList.remove("uk-first-column"));
+      if (!children.length) return;
+
+      const style = getComputedStyle(root);
+      if (style.display === "grid") {
+        const columns = style.gridTemplateColumns.split(/\s+/).filter(Boolean).length || 1;
+        children.forEach((child, index) => child.classList.toggle("uk-first-column", index % columns === 0));
+        return;
+      }
+
+      const rows = new Map<number, HTMLElement[]>();
+      children.forEach((child) => {
+        const row = Math.round(child.offsetTop);
+        rows.set(row, [...(rows.get(row) ?? []), child]);
+      });
+      rows.forEach((row) => row.sort((a, b) => a.offsetLeft - b.offsetLeft)[0]?.classList.add("uk-first-column"));
+    };
+
+    markFirstColumns();
+    const observer = new ResizeObserver(markFirstColumns);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [isYoothemeGrid, renderedItems, activeFilter]);
+
   return (
     <div
       className="shop-builder-grid-wrapper"
@@ -325,8 +358,9 @@ export function GridCardsClient({
             "--shop-builder-grid-item-basis-tablet": itemBasisForColumns(tabletLandscapeColumns),
             "--shop-builder-grid-item-basis-desktop": itemBasisForColumns(desktopColumns),
             "--shop-builder-grid-item-basis-xlarge": itemBasisForColumns(largeScreenColumns),
+            "--shop-builder-grid-row-gap": rowGapCss,
             columnGap: columnGapCss,
-            rowGap: rowGapCss,
+            rowGap: hasGridRuntimeEffect ? 0 : rowGapCss,
           } as CSSProperties
         }
       >
@@ -491,6 +525,12 @@ export function GridCardsClient({
             const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
             const imageWidth = imageDimension(rawBlock.imageWidth);
             const imageHeight = imageDimension(rawBlock.imageHeight);
+            const intrinsicImageDimension = (value: unknown) => {
+              const match = String(value ?? "").trim().match(/^(\d+(?:\.\d+)?)(?:px)?$/);
+              return match ? Number(match[1]) : undefined;
+            };
+            const intrinsicImageWidth = isYoothemeGrid ? intrinsicImageDimension(rawBlock.imageWidth) : undefined;
+            const intrinsicImageHeight = isYoothemeGrid ? intrinsicImageDimension(rawBlock.imageHeight) : undefined;
             const imageMaxWidth =
               typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
                 ? `${rawBlock.imageMaxWidth}px`
@@ -639,7 +679,15 @@ export function GridCardsClient({
                 // `Auto` columns use UIkit's natural-width semantics.
                 // Numeric tiers continue to stretch media within a track.
                 width: imageWidth ?? "var(--shop-builder-grid-image-width, var(--shop-builder-grid-image-width-base, 100%))",
-                height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
+                // YOOtheme's image_width/image_height values are intrinsic
+                // image attributes, not a fixed CSS box. Keeping height auto
+                // preserves that ratio when a responsive Grid track becomes
+                // narrower than the authored image width.
+                height: isYoothemeGrid && !hasCropFrame
+                  ? "auto"
+                  : imageHeight === "auto"
+                    ? "auto"
+                    : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
                 maxWidth: "100%",
                 objectFit: mediaStyle.objectFit,
                 objectPosition: mediaStyle.backgroundPosition,
@@ -650,6 +698,8 @@ export function GridCardsClient({
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
+                  width={intrinsicImageWidth}
+                  height={intrinsicImageHeight}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   className={imageHoverTransitionClass}
                   style={{ ...imageElementStyle, ...(rawBlock.imageIconWidth && isSvgAsset ? { width: imageDimension(rawBlock.imageIconWidth) } : {}) }}
@@ -775,7 +825,7 @@ export function GridCardsClient({
                 data-tag={itemFilterTags(item).map((tag: string) => tag.replace(/\s+/g, "-")).join(" ")}
                 className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} ${itemMaxWidthClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
-                } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${isYoothemeGrid ? "uk-flex-1 uk-margin-remove-first-child" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
+                } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${isYoothemeGrid ? "el-item uk-flex-1 uk-margin-remove-first-child" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     display: isVisible ? undefined : "none",

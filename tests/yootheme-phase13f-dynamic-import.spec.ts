@@ -238,6 +238,48 @@ test("Design Get Inspired imports Overlay, Gallery, and List taxonomy sources ca
   });
 });
 
+test("imports an authored YOOtheme taxonomy Overlay Slider item as one canonical term", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "overlay-slider",
+      children: [{
+        type: "overlay-slider_item",
+        props: { meta: "Discover", link: "?page_id=40" },
+        source: {
+          query: { name: "accommodationCats.customAccommodationCat", arguments: { id: 6 } },
+          props: {
+            title: { name: "name" },
+            image: { name: "field.accommodation_intro_image.url" },
+            image_alt: { name: "field.accommodation_intro_image.alt" },
+          },
+        },
+      }],
+    }] }] }] }],
+  });
+  const slide = collectBlocks(mapped.sections).find((block) => block.kind === "overlaySlider").slides[0];
+  expect(slide).toMatchObject({
+    meta: "Discover",
+    buttonUrl: "?page_id=40",
+    dynamicContext: {
+      provider: "wordpress",
+      source: "content",
+      mode: "single",
+      query: {
+        sourceName: "accommodation_cat",
+        graphqlRoot: "accommodationCats",
+        yoothemeQueryName: "accommodationCats.customAccommodationCat",
+        databaseId: 6,
+      },
+    },
+    dynamicBindings: {
+      title: { path: "name", valueType: "string" },
+      imageUrl: { path: "acf.accommodation_intro_image.url", valueType: "url" },
+      imageAlt: { path: "acf.accommodation_intro_image.alt", valueType: "string" },
+    },
+  });
+});
+
 test("materialization requests the imported ACF fields without persisting provider metadata", async () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout",

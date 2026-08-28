@@ -250,9 +250,34 @@
       "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
+    },
+    {
+      "id": "menu_p53yzsmq0",
+      "label": "Company",
+      "url": "/company",
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
+    },
+    {
+      "id": "menu_ygri1cm28",
+      "label": "story",
+      "url": "/story",
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     }
   ],
-  "updatedAt": "2026-08-27T17:28:31.275Z",
+  "namedMenus": [],
+  "updatedAt": "2026-08-28T19:33:35.560Z",
   "buttonTextTransform": "none",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#0D0A46",

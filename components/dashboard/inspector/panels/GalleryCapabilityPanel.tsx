@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import type { BuilderLayoutBlock, InspectorTab, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import type { DynamicFieldBinding } from "@/lib/dynamicContent";
+import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import {
   InspectorDivision,
@@ -27,6 +29,7 @@ import { Plus, ImagePlus } from "lucide-react";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 import UikitGridStructureSettingsGroup from "@/components/dashboard/inspector/panels/UikitGridStructureSettingsGroup";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 
 type Props = {
@@ -54,6 +57,7 @@ export default function GalleryCapabilityPanel({
   const isImportedYoothemeGallery = rawBlock.spacingContract === "yootheme";
   const items: any[] = rawBlock.galleryItems ?? rawBlock.items ?? [];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "advanced">>({});
   const columnOptions = [
     { value: "inherit", label: "Inherit" },
     { value: "1", label: "1 Column" }, { value: "2", label: "2 Columns" },
@@ -231,9 +235,42 @@ export default function GalleryCapabilityPanel({
                 updated[index] = { ...updated[index], ...patch };
                 update({ galleryItems: updated } as any);
               };
+              const updateDynamicBinding = (
+                destination: string,
+                binding: DynamicFieldBinding | undefined,
+              ) => {
+                const nextBindings = { ...(item.dynamicBindings ?? {}) };
+                if (binding) nextBindings[destination] = binding;
+                else delete nextBindings[destination];
+                updateItem({
+                  dynamicBindings: Object.keys(nextBindings).length > 0 ? nextBindings : undefined,
+                });
+              };
+              const dynamicBinding = (destination: DynamicBindingDestination) => ({
+                destination,
+                descriptor: item.dynamicContext,
+                bindings: item.dynamicBindings,
+                onChange: updateDynamicBinding,
+              });
+              const itemKey = String(item.id ?? index);
+              const activeTab = activeItemTabs[itemKey] ?? "content";
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <InspectorFieldRow label="Image source">
+                  <InspectorPillGroup
+                    value={activeTab}
+                    options={[
+                      { value: "content", label: "Content" },
+                      { value: "advanced", label: "Advanced" },
+                    ]}
+                    onChange={(value) => setActiveItemTabs((current) => ({
+                      ...current,
+                      [itemKey]: value as "content" | "advanced",
+                    }))}
+                    ariaLabel={`Gallery item ${index + 1} tab`}
+                  />
+
+                  {activeTab === "content" ? <>
+                  <InspectorFieldRow label="Image source" dynamicBinding={dynamicBinding("imageUrl")}>
                     <BuilderImageUrlControl
                       value={item.imageUrl ?? ""}
                       onChange={(e) => updateItem({ imageUrl: e.target.value })}
@@ -250,38 +287,41 @@ export default function GalleryCapabilityPanel({
                       }
                     />
                   </InspectorFieldRow>
-                  <InspectorFieldRow label="Image alt"><InspectorTextField value={item.imageAlt ?? ""} onChange={(imageAlt) => updateItem({ imageAlt })} placeholder="Image description" /></InspectorFieldRow>
-                  <InspectorFieldRow label="Title">
+                  <InspectorFieldRow label="Image alt" dynamicBinding={dynamicBinding("imageAlt")}><InspectorTextField value={item.imageAlt ?? ""} onChange={(imageAlt) => updateItem({ imageAlt })} placeholder="Image description" /></InspectorFieldRow>
+                  <InspectorFieldRow label="Title" dynamicBinding={dynamicBinding("title")}>
                     <InspectorTextField
                       value={item.title ?? ""}
                       onChange={(title) => updateItem({ title })}
                       placeholder="Item Title"
                     />
                   </InspectorFieldRow>
-                  <InspectorFieldRow label="Meta">
+                  <InspectorFieldRow label="Meta" dynamicBinding={dynamicBinding("meta")}>
                     <InspectorTextField
                       value={item.meta ?? ""}
                       onChange={(meta) => updateItem({ meta })}
                       placeholder="Item Meta"
                     />
                   </InspectorFieldRow>
-                  <InspectorFieldRow label="Content">
+                  <InspectorFieldRow label="Content" dynamicBinding={dynamicBinding("content")}>
                     <RichTextEditor
                       value={item.content ?? ""}
                       onChange={(content) => updateItem({ content })}
                       placeholder="Item description"
                     />
                   </InspectorFieldRow>
-                  <InspectorFieldRow label="Link URL">
+                  <InspectorFieldRow label="Link URL" dynamicBinding={dynamicBinding("linkUrl")}>
                     <InspectorTextField
                       value={item.linkUrl ?? ""}
                       onChange={(linkUrl) => updateItem({ linkUrl })}
                       placeholder="https://"
                     />
                   </InspectorFieldRow>
-                  <InspectorFieldRow label="Link text"><InspectorTextField value={item.linkLabel ?? ""} onChange={(linkLabel) => updateItem({ linkLabel })} placeholder="Read more" /></InspectorFieldRow>
+                  <InspectorFieldRow label="Link text" dynamicBinding={dynamicBinding("linkLabel")}><InspectorTextField value={item.linkLabel ?? ""} onChange={(linkLabel) => updateItem({ linkLabel })} placeholder="Read more" /></InspectorFieldRow>
                   <InspectorFieldRow label="Link target"><InspectorSelect value={item.linkTarget ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(linkTarget) => updateItem({ linkTarget })} /></InspectorFieldRow>
                   <InspectorFieldRow label="ARIA label"><InspectorTextField value={item.linkAriaLabel ?? ""} onChange={(linkAriaLabel) => updateItem({ linkAriaLabel })} /></InspectorFieldRow>
+                  </> : (
+                    <DynamicContentInspectorGroup item={item} update={updateItem} />
+                  )}
                 </div>
               );
             }}

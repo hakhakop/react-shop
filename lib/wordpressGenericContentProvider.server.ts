@@ -263,8 +263,20 @@ const resolveSource = (
 ) => {
   const sourceName = stringValue(query.sourceName);
   const graphqlPluralName = stringValue(query.graphqlPluralName) ?? stringValue(query.graphqlRoot);
+  const yoothemeNamespace = stringValue(query.yoothemeQueryName)?.split(".")[0];
+  const identity = (value: string | undefined) => {
+    const compact = value?.replace(/[^0-9A-Za-z]/g, "").toLowerCase() ?? "";
+    return compact.endsWith("ies")
+      ? `${compact.slice(0, -3)}y`
+      : compact.endsWith("s") && !compact.endsWith("ss")
+        ? compact.slice(0, -1)
+        : compact;
+  };
+  const yoothemeIdentity = identity(yoothemeNamespace);
   return sources.find((source) => sourceName && source.name === sourceName) ??
-    sources.find((source) => graphqlPluralName && source.graphqlPluralName === graphqlPluralName);
+    sources.find((source) => graphqlPluralName && source.graphqlPluralName === graphqlPluralName) ??
+    sources.find((source) => yoothemeIdentity && [source.name, source.graphqlSingleName, source.graphqlPluralName]
+      .some((candidate) => identity(candidate) === yoothemeIdentity));
 };
 
 const resolveMetaRelation = (

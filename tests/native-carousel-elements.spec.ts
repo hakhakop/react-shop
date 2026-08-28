@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { createLayoutBlock } from "@/components/dashboard/builderDefaults";
 import { layoutBlockGroups, layoutBlockLabels } from "@/components/dashboard/builderRegistry";
 import { INSPECTOR_ELEMENT_CAPABILITIES } from "@/components/dashboard/inspector/inspectorRouting";
@@ -61,6 +63,44 @@ test("dynamic-only overlay slides remain authored templates", () => {
       })],
     }),
   ]));
+});
+
+test("imported dynamic Overlay Slider loading stays neutral and height-led", () => {
+  const adapter = readFileSync(resolve(process.cwd(), "components/builder/UikitSlider.tsx"), "utf8");
+  const renderer = readFileSync(resolve(process.cwd(), "components/blocks/CarouselBlock.tsx"), "utf8");
+  const styles = readFileSync(resolve(process.cwd(), "app/styles/shop-builder.css"), "utf8");
+
+  expect(adapter).toContain('pendingDynamicContent ? "" : DEFAULT_SLIDES[index % 2].imageUrl');
+  expect(adapter).toContain('sourceContract: isImportedYoothemeSlider ? "yootheme" : undefined');
+  expect(renderer).toContain('const usesNaturalOverlayWidth = usesYoothemeAutoWidthOverlayFlow && !authoredOverlaySlideWidth');
+  expect(renderer).toContain('authoredOverlaySlideWidth ??');
+  expect(renderer).toContain('isOverlaySlider && !usesNaturalOverlayWidth ? "800px" : undefined');
+  expect(renderer).toContain('slide.pendingDynamicContent ? (');
+  expect(renderer).toContain('mainSwiper.update()');
+  expect(renderer).toContain('shop-builder-overlay-slide-image-placeholder');
+  expect(renderer).toContain('image?.complete || image.naturalWidth <= 0');
+  expect(renderer).not.toContain('opacity: isYoothemeAutoWidthOverlay && !overlayImageLoaded ? 0');
+  expect(styles).toContain('.swiper-slide.shop-builder-overlay-slide--auto');
+  expect(styles).toContain('.shop-builder-overlay-slide-card--pending');
+  expect(styles).toContain('.shop-builder-overlay-slide-card--image-loading');
+});
+
+test("YOOtheme Auto overlay sliders retain an explicit image width", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "overlay-slider",
+      props: { slider_width: "", image_width: "960", slider_gap: "small" },
+      children: [{ type: "overlay-slider_item", props: { image: "about-impressions-01.jpg" } }],
+    }] }] }] }],
+  });
+  const overlay = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0];
+
+  expect(overlay?.carouselSettings).toMatchObject({
+    itemWidthMode: "auto",
+    imageWidth: "960px",
+    spaceBetween: 15,
+  });
 });
 
 test("Panel Slider preserves a whole-panel link without inventing an action label", () => {

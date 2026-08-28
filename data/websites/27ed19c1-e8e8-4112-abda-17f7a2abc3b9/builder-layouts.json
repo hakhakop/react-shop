@@ -13,8 +13,8 @@
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
-        "contentMode": "expand",
-        "maxWidth": "expand",
+        "contentMode": "none",
+        "maxWidth": "none",
         "sectionPadding": "none",
         "sectionTitlePosition": "top-left",
         "sectionTitleRotation": "left",
@@ -388,7 +388,6 @@
                 "buttonColumnGap": "small",
                 "buttonRowGap": "small",
                 "fullWidthButton": false,
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -396,7 +395,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -974,13 +974,12 @@
                     "label": "<img alt class=\"uk-margin-right\" src=\"wp-content/uploads/yootheme/icon-play.svg\" uk-svg loading=\"lazy\">Play Project Video",
                     "url": "?page_id=19",
                     "target": "_self",
-                    "style": "link"
+                    "style": "default"
                   }
                 ],
                 "buttonColumnGap": "small",
                 "buttonRowGap": "small",
                 "fullWidthButton": false,
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -988,7 +987,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               }
             ]
           }
@@ -1323,7 +1324,6 @@
                 "fullWidthButton": false,
                 "textAlign": "right",
                 "headingAlign": "right",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1333,7 +1333,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -2120,8 +2121,14 @@
                 "gridMetaHtmlElement": "div",
                 "visibility": "m",
                 "visibilityMode": "m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               },
               {
                 "id": "overlay-block-mtcyhh35-tj9eq",
@@ -2261,8 +2268,14 @@
                 "gridMetaHtmlElement": "div",
                 "visibility": "hidden-m",
                 "visibilityMode": "hidden-m",
-                "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "panelMediaAlignment": "center",
+                "panelMediaVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           }
@@ -3235,60 +3248,6 @@
                       "effects": {},
                       "card": {}
                     }
-                  },
-                  {
-                    "id": "gallery-block-mtcyhh35-irazw",
-                    "kind": "gallery",
-                    "galleryItems": [
-                      {
-                        "id": "yootheme-gallery-item-5-1-1-1-0",
-                        "title": "",
-                        "meta": "",
-                        "content": "",
-                        "tags": []
-                      }
-                    ],
-                    "gridShowTitle": true,
-                    "gridShowMeta": true,
-                    "gridShowText": true,
-                    "gridShowButton": true,
-                    "gridShowHoverImage": false,
-                    "gridShowHoverVideo": false,
-                    "gridGap": "medium",
-                    "gridRowGap": "medium",
-                    "showDividers": false,
-                    "centerColumns": false,
-                    "columnsPhonePortrait": "1",
-                    "columnsPhoneLandscape": "2",
-                    "parallaxJustify": false,
-                    "overlayMode": "cover",
-                    "overlayStyle": "overlay-primary",
-                    "overlayPosition": "bottom-left",
-                    "overlayHover": true,
-                    "overlayTransition": "fade",
-                    "overlayTextColor": "light",
-                    "overlayLink": true,
-                    "headingLevel": "h3",
-                    "headingSize": "h4",
-                    "metaStyle": "text-meta",
-                    "panelMetaPosition": "above-title",
-                    "textAlign": "left",
-                    "enableLightbox": false,
-                    "buttonStyle": "default",
-                    "imageWidth": 650,
-                    "imageHeight": 610,
-                    "imageLoading": "lazy",
-                    "headingAlign": "left",
-                    "elementPadding": "none",
-                    "spacingContract": "yootheme",
-                    "visualStyle": {
-                      "layout": {
-                        "marginMode": "default",
-                        "textAlign": "left"
-                      },
-                      "effects": {},
-                      "card": {}
-                    }
                   }
                 ]
               }
@@ -3297,7 +3256,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-28T12:57:03.266Z"
+    "updatedAt": "2026-08-28T18:34:38.412Z"
   },
   "header": {
     "version": 1,

@@ -342,6 +342,8 @@ import {
 } from "@/lib/builderRowStyles";
 import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
+import { insertAtContextualTarget } from "@/lib/contextualLibraryInsertion";
+import { dynamicContentPreviewSignature } from "@/lib/dynamicContentPreviewSignature";
 import {
   createUniqueBuilderAnchorId,
 } from "@/lib/builderAnchors";
@@ -575,57 +577,6 @@ function getBuilderTemplateDragType(
   if (dragTypes.includes(BUILDER_TEMPLATE_ROW_DND_TYPE)) return "row";
   if (dragTypes.includes(BUILDER_TEMPLATE_ELEMENT_DND_TYPE)) return "element";
   return null;
-}
-
-/** Only Dynamic Content metadata participates in the render-preview refresh key. */
-function dynamicContentPreviewSignature(sections: BuilderSection[]) {
-  const metadata: Array<Record<string, unknown>> = [];
-  const visitBlocks = (blocks: unknown[], owner: string) => {
-    blocks.forEach((candidate) => {
-      const block = candidate as Record<string, any>;
-      const gridItems = Array.isArray(block.gridItems) ? block.gridItems : [];
-      const slides = Array.isArray(block.slides) ? block.slides : [];
-      const listItems = Array.isArray(block.listItems) ? block.listItems : [];
-      const buttons = Array.isArray(block.buttons) ? block.buttons : [];
-      if (block.dynamicContext || block.dynamicBindings) {
-        metadata.push({ owner, kind: block.kind, id: block.id, dynamicContext: block.dynamicContext, dynamicBindings: block.dynamicBindings });
-      }
-      // Products render from a transient materialized collection. Any authored
-      // Products setting invalidates the render projection, even when the
-      // canonical descriptor itself is unchanged.
-      if (block.kind === "products") {
-        metadata.push({ owner, kind: block.kind, id: block.id, productBlock: block });
-      }
-      gridItems.forEach((item: Record<string, any>) => {
-        if (item.dynamicContext || item.dynamicBindings) {
-          metadata.push({ owner, kind: "grid", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
-        }
-      });
-      slides.forEach((slide: Record<string, any>) => {
-        if (slide.dynamicContext || slide.dynamicBindings) {
-          metadata.push({ owner, kind: "panel-slider", id: slide.id, dynamicContext: slide.dynamicContext, dynamicBindings: slide.dynamicBindings });
-        }
-      });
-      listItems.forEach((item: Record<string, any>) => {
-        if (item.dynamicContext || item.dynamicBindings) {
-          metadata.push({ owner, kind: "list-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
-        }
-      });
-      buttons.forEach((item: Record<string, any>) => {
-        if (item.dynamicContext || item.dynamicBindings) {
-          metadata.push({ owner, kind: "button-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
-        }
-      });
-      const nestedLayout = block.nestedLayout as { rows?: Array<{ columns?: Array<{ blocks?: unknown[]; id?: string }> }> } | undefined;
-      nestedLayout?.rows?.forEach((row) => row.columns?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? owner)));
-    });
-  };
-
-  sections.forEach((section) => {
-    section.rows?.forEach((row) => row.columns.forEach((column) => visitBlocks(column.elements, column.id)));
-    section.layoutItems?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? section.id));
-  });
-  return JSON.stringify(metadata);
 }
 
 // Memoized to prevent Swiper from remounting on every DashboardBuilder state change
@@ -2230,7 +2181,7 @@ export default function DashboardBuilder({
   const [contextualLibraryTarget, setContextualLibraryTarget] = useState<{
     page: BuilderLayoutKey;
     sectionId: string | null;
-    rowIndex: number | null;
+    rowId: string | null;
     columnKey: string | null;
     blockKey: string | null;
   } | null>(null);
@@ -2461,9 +2412,18 @@ export default function DashboardBuilder({
     () => JSON.stringify(builderState),
     [builderState],
   );
+  const initialProjectionMatchesAuthoredState =
+    initialRenderProjection?.sourceSignature === authoredRevisionSignature;
   const dynamicPreviewRequestRef = useRef(0);
-  const previousDynamicContentSignatureRef = useRef<string | null>(null);
-  const previousDynamicContentPageRef = useRef<BuilderLayoutKey | null>(null);
+  // Initial hydration already contains the server-resolved projection. Seed
+  // the refresh guards from it so mounting the client does not immediately
+  // issue the same uncached WordPress preview request a second time.
+  const previousDynamicContentSignatureRef = useRef<string | null>(
+    initialProjectionMatchesAuthoredState ? dynamicContentSignature : null,
+  );
+  const previousDynamicContentPageRef = useRef<BuilderLayoutKey | null>(
+    initialProjectionMatchesAuthoredState ? builderState.page : null,
+  );
   const previousAuthoredRevisionRef = useRef<string | null>(null);
   const authoredRevisionSignatureRef = useRef(authoredRevisionSignature);
   authoredRevisionSignatureRef.current = authoredRevisionSignature;
@@ -2819,37 +2779,15 @@ export default function DashboardBuilder({
     useState<BuilderShellSettings>(defaultShellSettings);
   const [themeSettings, setThemeSettings] = useState<BuilderThemeSettings>(defaultBuilderThemeSettings);
   const [themePreviewRevision, setThemePreviewRevision] = useState(0);
-  const dashboardGlobalCssSnapshotRef = useRef<Map<string, string | null> | null>(null);
-
-  // The app layout emits the canonical UIkit variables during SSR, but Global
-  // Styles edits happen client-side. Keep the same document/theme root live so
-  // the Builder canvas resolves the new tokens without a refresh. This does
-  // not add an inline token payload to the dashboard or preview roots.
-  useEffect(() => {
-    const root = document.documentElement;
-    const vars = getUikitGlobalsCssVars(shellSettings);
-    if (!dashboardGlobalCssSnapshotRef.current) {
-      dashboardGlobalCssSnapshotRef.current = new Map(
-        Object.keys(vars).map((name) => [name, root.style.getPropertyValue(name) || null]),
-      );
-    }
-    for (const [name, value] of Object.entries(vars)) {
-      root.style.setProperty(name, value);
-    }
+  // Tenant tokens belong to explicit Builder/preview roots, never <html>.
+  // A stylesheet keeps the DOM readable and lets portalled tenant surfaces
+  // opt in without leaking one site's theme into the application shell.
+  const dashboardTenantTokensCss = useMemo(() => {
+    const declarations = Object.entries(getUikitGlobalsCssVars(shellSettings))
+      .map(([name, value]) => `  ${name}: ${value};`)
+      .join("\n");
+    return `:where([data-builder-tenant-theme-root]) {\n${declarations}\n}`;
   }, [shellSettings]);
-
-  useEffect(() => {
-    return () => {
-      const root = document.documentElement;
-      const snapshot = dashboardGlobalCssSnapshotRef.current;
-      if (!snapshot) return;
-      for (const [name, value] of snapshot) {
-        if (value === null) root.style.removeProperty(name);
-        else root.style.setProperty(name, value);
-      }
-      dashboardGlobalCssSnapshotRef.current = null;
-    };
-  }, []);
   const [shellStatus, setShellStatus] = useState(
     `${shellSettingsStatusLabel} load from React`,
   );
@@ -9727,27 +9665,31 @@ export default function DashboardBuilder({
       !(["page", "footer", "section", "row"] as LayoutLibraryType[]).includes(templateType)
     ) {
       setTemplateStatus("Drop section templates between sections");
-      return;
+      return false;
     }
 
     const clonedSections = template.sections.map(cloneTemplateSection);
+    const currentSections = builderStateRef.current.sections;
+    const previewMutation = insertAtContextualTarget(
+      currentSections,
+      clonedSections,
+      targetSectionId,
+      placement === "above" ? "before" : placement === "below" ? "after" : "replace",
+      (section) => section.id,
+    );
+    if (!previewMutation.targetFound) {
+      setTemplateStatus("Library target changed. Select the structure item and try again.");
+      return false;
+    }
     setBuilderState((current) => {
-      const targetIndex = current.sections.findIndex(
-        (section) => section.id === targetSectionId,
+      const mutation = insertAtContextualTarget(
+        current.sections,
+        clonedSections,
+        targetSectionId,
+        placement === "above" ? "before" : placement === "below" ? "after" : "replace",
+        (section) => section.id,
       );
-      const insertIndex =
-        targetIndex < 0
-          ? current.sections.length
-          : placement === "above"
-            ? targetIndex
-            : targetIndex + 1;
-      const sections = [...current.sections];
-      sections.splice(
-        placement === "replace" && targetIndex >= 0 ? targetIndex : insertIndex,
-        placement === "replace" && targetIndex >= 0 ? 1 : 0,
-        ...clonedSections,
-      );
-      return { ...current, sections };
+      return mutation.targetFound ? { ...current, sections: mutation.items } : current;
     });
     setSelectedId(clonedSections[0]?.id ?? targetSectionId);
     setSelectedLayoutColumnKey(null);
@@ -9755,28 +9697,43 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setTemplateStatus(placement === "replace" ? "Section replaced from Library" : "Section template inserted");
+    return true;
   };
 
   const insertRowTemplateAt = (
     templateId: string,
     sectionId: string,
-    rowIndex: number,
+    targetRowId: string,
     placement: "before" | "after" | "replace",
     revealInspector = true,
   ) => {
     const template = getSavedTemplateById(templateId);
     if (!template || template.templateType !== "row") {
       setTemplateStatus("Drop row templates on row borders");
-      return;
+      return false;
     }
 
     const insertedRow = createRowFromTemplate(template);
     if (!insertedRow) {
       setTemplateStatus("Row template is empty");
-      return;
+      return false;
     }
 
-    const nextSelectedRowIndex = placement === "after" ? rowIndex + 1 : rowIndex;
+    const currentSection = builderStateRef.current.sections.find((section) => section.id === sectionId);
+    const previewMutation = currentSection && isLayoutContainerSection(currentSection)
+      ? insertAtContextualTarget(
+          normalizeBuilderSectionLayout(currentSection).rows,
+          [insertedRow],
+          targetRowId,
+          placement,
+          (row) => row.id,
+        )
+      : null;
+    if (!previewMutation?.targetFound) {
+      setTemplateStatus("Library row target changed. Select the row and try again.");
+      return false;
+    }
+    const nextSelectedRowIndex = previewMutation.insertedIndex;
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -9784,13 +9741,17 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const rows = [...normalizeBuilderSectionLayout(section).rows];
-        if (!rows[rowIndex]) return section;
-        const insertIndex = placement === "after" ? rowIndex + 1 : rowIndex;
-        rows.splice(insertIndex, placement === "replace" ? 1 : 0, insertedRow);
+        const mutation = insertAtContextualTarget(
+          normalizeBuilderSectionLayout(section).rows,
+          [insertedRow],
+          targetRowId,
+          placement,
+          (row) => row.id,
+        );
+        if (!mutation.targetFound) return section;
         return {
           ...section,
-          rows,
+          rows: mutation.items,
         };
       }),
     }));
@@ -9803,6 +9764,7 @@ export default function DashboardBuilder({
     setInspectorTab("layout");
     if (revealInspector) openInspectorPanel();
     setTemplateStatus(placement === "replace" ? "Row replaced from Library" : "Row template inserted");
+    return true;
   };
 
   const insertElementTemplateAt = ({
@@ -9823,16 +9785,37 @@ export default function DashboardBuilder({
     const template = getSavedTemplateById(templateId);
     if (!template || template.templateType !== "element") {
       setTemplateStatus("Drop element templates into columns");
-      return;
+      return false;
     }
 
     const sourceBlock = getFirstTemplateBlock(template.sections);
     if (!sourceBlock) {
       setTemplateStatus("Element template is empty");
-      return;
+      return false;
     }
 
     const insertedBlock = cloneTemplateBlock(sourceBlock);
+    const currentSection = builderStateRef.current.sections.find((section) => section.id === sectionId);
+    const currentColumn = currentSection && isLayoutContainerSection(currentSection)
+      ? findLayoutColumn(currentSection, columnKey)
+      : null;
+    if (!currentColumn) {
+      setTemplateStatus("Library column target changed. Select the element and try again.");
+      return false;
+    }
+    if (targetBlockKey) {
+      const previewMutation = insertAtContextualTarget(
+        currentColumn.blocks ?? [],
+        [insertedBlock],
+        targetBlockKey,
+        placement === "above" ? "before" : placement === "below" ? "after" : "replace",
+        (block, index) => block.id ?? `${columnKey}-block-${index}`,
+      );
+      if (!previewMutation.targetFound) {
+        setTemplateStatus("Library element target changed. Select the element and try again.");
+        return false;
+      }
+    }
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -9841,25 +9824,15 @@ export default function DashboardBuilder({
         }
         return updateLayoutColumn(section, columnKey, (item) => {
           const blocks = [...(item.blocks ?? [])];
-          const targetIndex = targetBlockKey
-            ? blocks.findIndex(
-                (block, blockIndex) =>
-                  (block.id ?? `${columnKey}-block-${blockIndex}`) ===
-                  targetBlockKey,
-              )
-            : -1;
-
-          let insertIndex = targetIndex >= 0 ? targetIndex : blocks.length;
-          if (targetIndex >= 0 && placement === "below") {
-            insertIndex = targetIndex + 1;
-          }
-
-          blocks.splice(
-            insertIndex,
-            placement === "replace" && targetIndex >= 0 ? 1 : 0,
-            insertedBlock,
+          if (!targetBlockKey) return { ...item, blocks: [...blocks, insertedBlock] };
+          const mutation = insertAtContextualTarget(
+            blocks,
+            [insertedBlock],
+            targetBlockKey,
+            placement === "above" ? "before" : placement === "below" ? "after" : "replace",
+            (block, index) => block.id ?? `${columnKey}-block-${index}`,
           );
-          return { ...item, blocks };
+          return mutation.targetFound ? { ...item, blocks: mutation.items } : item;
         });
       }),
     }));
@@ -9871,6 +9844,7 @@ export default function DashboardBuilder({
     setInspectorTab("content");
     if (revealInspector) openInspectorPanel();
     setTemplateStatus(placement === "replace" ? "Element replaced from Library" : "Element template inserted");
+    return true;
   };
 
   const openContextualLibrary = (requestedType?: LayoutLibraryType) => {
@@ -9900,10 +9874,14 @@ export default function DashboardBuilder({
                 : "page"
     );
 
+    const targetSection = builderState.sections.find((section) => section.id === selectedId);
+    const targetRowId = targetSection && selectedLayoutRowIndex !== null
+      ? normalizeBuilderSectionLayout(targetSection).rows[selectedLayoutRowIndex]?.id ?? null
+      : null;
     setContextualLibraryTarget({
       page: builderState.page,
       sectionId: selectedId || null,
-      rowIndex: selectedLayoutRowIndex,
+      rowId: targetRowId,
       columnKey: selectedLayoutColumnKey,
       blockKey: selectedLayoutBlockKey,
     });
@@ -9942,7 +9920,7 @@ export default function DashboardBuilder({
       return [
         { value: "before" as const, label: "Insert Before" },
         { value: "after" as const, label: "Insert After" },
-        { value: "replace" as const, label: "Replace" },
+        { value: "replace" as const, label: "Replace Layout" },
       ];
     }
     if (contextualLibraryType === "section") {
@@ -9955,7 +9933,7 @@ export default function DashboardBuilder({
       ];
     }
     if (contextualLibraryType === "row") {
-      return target.sectionId && target.rowIndex !== null
+      return target.sectionId && target.rowId
         ? [
             { value: "before" as const, label: "Insert Before" },
             { value: "after" as const, label: "Insert After" },
@@ -9985,7 +9963,7 @@ export default function DashboardBuilder({
       return [
         { value: "before" as const, label: "Insert Before" },
         { value: "after" as const, label: "Insert After" },
-        { value: "replace" as const, label: "Replace" },
+        { value: "replace" as const, label: "Replace Layout" },
       ];
     }
     const target = contextualLibraryTarget;
@@ -10005,7 +9983,12 @@ export default function DashboardBuilder({
   ) => {
     const target = contextualLibraryTarget;
     if (!target) return;
+    if (builderStateRef.current.page !== target.page) {
+      setTemplateStatus("Library document target changed. Reopen Library from the current structure.");
+      return;
+    }
     const templateType = template.templateType ?? "page";
+    let inserted = false;
 
     if (
       usesUnifiedContextualLayouts &&
@@ -10013,7 +9996,7 @@ export default function DashboardBuilder({
       templateType !== "header"
     ) {
       const clonedSections = template.sections.map(cloneTemplateSection);
-      if (action === "replace" && !target.sectionId) {
+      if (action === "replace") {
         setBuilderState((current) => ({ ...current, sections: clonedSections }));
         setSelectedId(clonedSections[0]?.id ?? "");
         setSelectedLayoutRowIndex(null);
@@ -10021,13 +10004,15 @@ export default function DashboardBuilder({
         setSelectedLayoutBlockKey(null);
         setOpenLayoutItemId(null);
         setTemplateStatus("Layout replaced from Library");
+        inserted = true;
       } else {
+        const currentSections = builderStateRef.current.sections;
         const sectionAnchorId = target.sectionId ?? (
           action === "before"
-            ? builderState.sections[0]?.id
-            : builderState.sections[builderState.sections.length - 1]?.id
+            ? currentSections[0]?.id
+            : currentSections[currentSections.length - 1]?.id
         ) ?? "";
-        insertSectionTemplateNear(
+        inserted = insertSectionTemplateNear(
           template.id,
           sectionAnchorId,
           action === "before" ? "above" : action === "after" ? "below" : "replace",
@@ -10035,16 +10020,19 @@ export default function DashboardBuilder({
       }
     } else if (templateType === "header" || templateType === "footer") {
       applySavedTemplate(template, { confirmReplace: false });
+      inserted = true;
     } else if (templateType === "page") {
       if (action === "replace") {
         applySavedTemplate(template, { confirmReplace: false });
+        inserted = true;
       } else {
+        const currentSections = builderStateRef.current.sections;
         const sectionAnchorId = target.sectionId ?? (
           action === "before"
-            ? builderState.sections[0]?.id
-            : builderState.sections[builderState.sections.length - 1]?.id
+            ? currentSections[0]?.id
+            : currentSections[currentSections.length - 1]?.id
         ) ?? "";
-        insertSectionTemplateNear(
+        inserted = insertSectionTemplateNear(
           template.id,
           sectionAnchorId,
           action === "before" ? "above" : "below",
@@ -10052,12 +10040,13 @@ export default function DashboardBuilder({
       }
     } else if (templateType === "section") {
       if (action === "replace" && !target.sectionId) return;
+      const currentSections = builderStateRef.current.sections;
       const sectionAnchorId = target.sectionId ?? (
         action === "before"
-          ? builderState.sections[0]?.id
-          : builderState.sections[builderState.sections.length - 1]?.id
+          ? currentSections[0]?.id
+          : currentSections[currentSections.length - 1]?.id
       ) ?? "";
-      insertSectionTemplateNear(
+      inserted = insertSectionTemplateNear(
         template.id,
         sectionAnchorId,
         action === "before" ? "above" : action === "after" ? "below" : "replace",
@@ -10065,15 +10054,15 @@ export default function DashboardBuilder({
     } else if (
       templateType === "row" &&
       target.sectionId &&
-      target.rowIndex !== null
+      target.rowId
     ) {
-      insertRowTemplateAt(template.id, target.sectionId, target.rowIndex, action, false);
+      inserted = insertRowTemplateAt(template.id, target.sectionId, target.rowId, action, false);
     } else if (
       templateType === "element" &&
       target.sectionId &&
       target.columnKey
     ) {
-      insertElementTemplateAt({
+      inserted = insertElementTemplateAt({
         templateId: template.id,
         sectionId: target.sectionId,
         columnKey: target.columnKey,
@@ -10085,6 +10074,7 @@ export default function DashboardBuilder({
       return;
     }
 
+    if (!inserted) return;
     setContextualLibraryOpen(false);
     setContextualLibraryTarget(null);
     setSidebarTab("builder");
@@ -12504,6 +12494,7 @@ export default function DashboardBuilder({
   const contextualLibraryModal = contextualLibraryOpen && contextualLibraryTarget ? (
     <div
       className="builder-layout-modal builder-dashboard-modal builder-contextual-library-modal"
+      data-builder-tenant-theme-root=""
       data-theme={dashboardTheme}
       role="dialog"
       aria-modal="true"
@@ -12662,6 +12653,7 @@ export default function DashboardBuilder({
       }${elementLibraryOpen ? " is-element-library-open" : ""} builder-preview-scheme-${
         builderState.design.colorScheme ?? "auto"
       }`}
+      data-builder-tenant-theme-root=""
       data-theme={dashboardTheme}
       style={
         {
@@ -12674,6 +12666,7 @@ export default function DashboardBuilder({
       }
       onTransitionEnd={handleDashboardTransitionEnd}
     >
+      <style data-builder-dashboard-tenant-tokens>{dashboardTenantTokensCss}</style>
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
         websiteId={websiteId}
@@ -13997,8 +13990,8 @@ function PreviewCanvas({
   onDropRowTemplate: (
     templateId: string,
     sectionId: string,
-    rowIndex: number,
-    placement: "before" | "after",
+    targetRowId: string,
+    placement: "before" | "after" | "replace",
   ) => void;
   onDropElementTemplate: (payload: {
     templateId: string;
@@ -17666,8 +17659,8 @@ const PreviewSection = memo(function PreviewSection({
   onDropRowTemplate: (
     templateId: string,
     sectionId: string,
-    rowIndex: number,
-    placement: "before" | "after",
+    targetRowId: string,
+    placement: "before" | "after" | "replace",
   ) => void;
   onDropElementTemplate: (payload: {
     templateId: string;
@@ -19888,7 +19881,7 @@ const PreviewSection = memo(function PreviewSection({
                     onDropRowTemplate(
                       templateId,
                       section.id,
-                      layoutRowIndex,
+                      normalizeBuilderSectionLayout(section).rows[layoutRowIndex].id,
                       "after",
                     )
                   }

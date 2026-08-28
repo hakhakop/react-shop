@@ -39,8 +39,11 @@ export type DynamicBindingDestination =
   | "title"
   | "meta"
   | "text"
+  | "content"
   | "label"
   | "url"
+  | "linkUrl"
+  | "linkLabel"
   | "imageUrl"
   | "imageAlt"
   | "buttonLabel"
@@ -61,8 +64,11 @@ export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   title: { label: "Title", acceptedTypes: ["string", "richText"] },
   meta: { label: "Meta", acceptedTypes: ["string", "richText"] },
   text: { label: "Content", acceptedTypes: ["string", "richText"] },
+  content: { label: "Content", acceptedTypes: ["string", "richText"] },
   label: { label: "Label", acceptedTypes: ["string", "richText"] },
   url: { label: "Link URL", acceptedTypes: ["url"] },
+  linkUrl: { label: "Link URL", acceptedTypes: ["url"] },
+  linkLabel: { label: "Link Text", acceptedTypes: ["string", "richText"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
   buttonLabel: { label: "Button Label", acceptedTypes: ["string", "richText"] },
@@ -75,6 +81,48 @@ export function dynamicBindingDestinationCapability(
   return DYNAMIC_BINDING_DESTINATION_CAPABILITIES[
     destination as DynamicBindingDestination
   ];
+}
+
+const sourceIdentity = (value: unknown) => {
+  const compact = typeof value === "string"
+    ? value.replace(/[^0-9A-Za-z]/g, "").toLowerCase()
+    : "";
+  return compact.endsWith("ies")
+    ? `${compact.slice(0, -3)}y`
+    : compact.endsWith("s") && !compact.endsWith("ss")
+      ? compact.slice(0, -1)
+      : compact;
+};
+
+export function dynamicContentCapabilityMatchesDescriptor(
+  candidate: DynamicContentSourceCapability,
+  descriptor: DynamicContentContextDescriptor | null | undefined,
+): boolean {
+  if (!descriptor) return false;
+  if (
+    candidate.provider !== descriptor.provider ||
+    candidate.source !== descriptor.source ||
+    candidate.mode !== descriptor.mode
+  ) return false;
+  if (candidate.source !== "content") return true;
+
+  const candidateQuery = candidate.defaultQuery ?? {};
+  const descriptorQuery = descriptor.query ?? {};
+  if (
+    candidateQuery.sourceName === descriptorQuery.sourceName ||
+    candidateQuery.graphqlPluralName === descriptorQuery.graphqlPluralName ||
+    candidateQuery.graphqlPluralName === descriptorQuery.graphqlRoot
+  ) return true;
+
+  const namespace = typeof descriptorQuery.yoothemeQueryName === "string"
+    ? descriptorQuery.yoothemeQueryName.split(".")[0]
+    : descriptorQuery.graphqlRoot;
+  const importedIdentity = sourceIdentity(namespace);
+  return Boolean(importedIdentity && [
+    candidateQuery.sourceName,
+    candidateQuery.graphqlSingleName,
+    candidateQuery.graphqlPluralName,
+  ].some((value) => sourceIdentity(value) === importedIdentity));
 }
 
 export const WORDPRESS_POST_COLLECTION_FIELDS: readonly DynamicContentSourceField[] = [

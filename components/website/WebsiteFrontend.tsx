@@ -276,10 +276,14 @@ export default async function WebsiteFrontend({
   const resolvedMediaLayout = localizedLayout
     ? resolveBuilderMediaUrls(localizedLayout, getWordPressBaseUrl(website))
     : localizedLayout;
-  const materialization = resolvedMediaLayout
+  // The Builder route already owns a materialized projection and sends it to
+  // its isolated iframe through the draft bridge. Materializing the published
+  // layout again here delays iframe readiness and duplicates every provider
+  // request before that bridge can deliver the authoritative projection.
+  const materialization = resolvedMediaLayout && !builderIframeSelection
     ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
         website,
-      rootContext: dynamicItemContextOverride,
+        rootContext: dynamicItemContextOverride,
       })
     : null;
   const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;

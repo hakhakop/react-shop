@@ -114,18 +114,26 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
   const sourceSlides: CarouselSlide[] = Array.isArray(rawBlock.slides)
     ? rawBlock.slides
     : DEFAULT_SLIDES;
-  const slides: CarouselSlide[] = sourceSlides.map((slide: any, index: number) => ({
+  const isImportedYoothemeSlider = rawBlock.spacingContract === "yootheme";
+  const slides: CarouselSlide[] = sourceSlides.map((slide: any, index: number) => {
+    const authoredImageUrl = slide.imageUrl || slide.image || "";
+    const pendingDynamicContent = isImportedYoothemeSlider && Boolean(slide.dynamicContext) && !authoredImageUrl;
+
+    return ({
         ...slide,
         id: slide.id ?? `${rawBlock.id || "slider"}-slide-${index}`,
-        title: slide.title || `Slide ${index + 1}`,
+        // A dynamic YOOtheme item is an unresolved template while the server
+        // projection is loading. Do not turn it into authored demo content.
+        title: slide.title || (pendingDynamicContent ? "" : `Slide ${index + 1}`),
         // `subtitle` is retained for old Carousel documents. Panel Slider owns the
         // canonical `meta` field, and both renderer paths resolve it the same way.
         meta: slide.meta ?? slide.subtitle ?? "",
         subtitle: slide.meta ?? slide.subtitle ?? "",
         text: slide.text || "",
         badge: slide.badge || "",
-        imageUrl: slide.imageUrl || slide.image || DEFAULT_SLIDES[index % 2].imageUrl,
-        imageAlt: slide.imageAlt || slide.title || "Slide Image",
+        imageUrl: authoredImageUrl || (pendingDynamicContent ? "" : DEFAULT_SLIDES[index % 2].imageUrl),
+        imageAlt: slide.imageAlt || slide.title || (pendingDynamicContent ? "" : "Slide Image"),
+        pendingDynamicContent,
         imagePadding: slide.imagePadding,
         panelStyle: slide.panelStyle ?? panelShared?.panelStyle,
         panelSize: slide.panelSize ?? panelShared?.panelSize,
@@ -165,7 +173,8 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         buttonTarget: slide.buttonTarget ?? panelShared?.linkTarget ?? "_self",
         buttonStyle: slide.buttonStyle ?? panelShared?.buttonStyle,
         buttonSize: slide.buttonSize ?? panelShared?.buttonSize,
-      }));
+      });
+  });
 
   const carousel = resolveCarouselPresentation(
     panelMode ? panelCarouselSettings : rawCarouselSettings,
@@ -225,7 +234,12 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
                 effect: rawCarouselSettings.effect ?? "slide",
                 slideMode: "panel",
               }
-            : carousel.settings
+            : {
+                ...carousel.settings,
+                // Runtime-only provenance used to preserve YOOtheme's
+                // auto-width/explicit-height overlay geometry.
+                sourceContract: isImportedYoothemeSlider ? "yootheme" : undefined,
+              }
         }
       />
     </div>

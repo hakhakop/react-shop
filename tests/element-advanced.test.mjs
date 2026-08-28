@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   elementAdvancedScope,
+  normalizeElementCompatibilityCss,
   parseSafeElementAttributes,
   resolveElementAdvanced,
   scopeElementCss,
@@ -22,6 +23,15 @@ test("shared element Advanced owner persists canonical values and safely parses 
     "data-hero": "play",
     "aria-label": "Play video",
   });
+});
+
+test("YOOtheme Grid first-column selectors target the compact canonical card", () => {
+  const source = "@media (min-width: 960px) { .uk-first-column > .el-item { margin-top: 80px; } }";
+  assert.equal(
+    normalizeElementCompatibilityCss(source, { kind: "grid" }),
+    "@media (min-width: 960px) { .uk-first-column.el-item { margin-top: 80px; } }",
+  );
+  assert.equal(normalizeElementCompatibilityCss(source, { kind: "gallery" }), source);
 });
 
 test("element CSS translates YOOtheme media selectors and isolates its keyframes", () => {

@@ -1307,7 +1307,81 @@
       "headerDialogCenter": false,
       "headerDialogPushAfter": 1,
       "themePageLayout": "full",
-      "themePageContainerAlignment": "center"
+      "themePageContainerAlignment": "center",
+      "menuItems": [
+        {
+          "id": "starter-home",
+          "label": "Home",
+          "url": "/",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-about",
+          "label": "About",
+          "url": "/#about",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-services",
+          "label": "Services",
+          "url": "/#services",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-contact",
+          "label": "Contact",
+          "url": "/#contact",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "menu_p53yzsmq0",
+          "label": "Company",
+          "url": "/company",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "menu_ygri1cm28",
+          "label": "story",
+          "url": "/story",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        }
+      ]
     },
     "headerDocument": {
       "headerArchitectureVersion": 2,
@@ -1368,5 +1442,5 @@
     ]
   },
   "unsupported": [],
-  "updatedAt": "2026-08-27T17:28:31.237Z"
+  "updatedAt": "2026-08-28T19:33:32.736Z"
 }

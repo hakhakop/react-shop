@@ -274,6 +274,26 @@ test("Builder and storefront projections are identical while authored serializat
   expect(JSON.stringify(savePayload)).not.toContain("cms.example/post-1");
 });
 
+test("identical provider descriptors are resolved once per materialization pass", async () => {
+  const authored = proofLayout();
+  const elements = authored.sections[0]!.rows![0]!.columns[0]!.elements;
+  elements.push({
+    ...structuredClone(elements[0]!),
+    id: "proof-grid-copy",
+  });
+  let requests = 0;
+
+  const result = await materializeBuilderDynamicContent(authored, {
+    resolveContexts: async () => {
+      requests += 1;
+      return [postContext(1), postContext(2), postContext(3)];
+    },
+  });
+
+  expect(requests).toBe(1);
+  expect(result.diagnostics.filter((item) => item.status === "materialized")).toHaveLength(2);
+});
+
 test("WordPress provider orchestration feeds the transient Grid projection", async () => {
   const originalFetch = globalThis.fetch;
   let requestedEndpoint = "";

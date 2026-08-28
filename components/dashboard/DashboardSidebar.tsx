@@ -346,6 +346,7 @@ export default function DashboardSidebar({
   const pageTemplateLibraryModal = pageTemplateLibraryOpen ? (
     <div
       className="builder-layout-modal builder-dashboard-modal builder-page-template-modal"
+      data-builder-tenant-theme-root=""
       data-theme={dashboardTheme}
       role="dialog"
       aria-modal="true"
@@ -439,6 +440,7 @@ export default function DashboardSidebar({
   const yoothemeImportPreviewModal = yoothemeImportPreview ? (
     <div
       className="builder-layout-modal builder-dashboard-modal"
+      data-builder-tenant-theme-root=""
       data-theme={dashboardTheme}
       role="dialog"
       aria-modal="true"
