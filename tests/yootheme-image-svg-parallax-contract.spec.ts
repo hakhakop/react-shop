@@ -15,7 +15,10 @@ import {
   runRegisteredYoothemeFreshImportAcceptance,
   type FreshImportCheck,
 } from "@/tests/support/yoothemeFreshImportAcceptance";
-import { extractSafeSvgDropShadow } from "@/components/builder/UikitStylableSvg";
+import {
+  extractSafeSvgDropShadow,
+  extractSafeSvgTransformOrigin,
+} from "@/components/builder/UikitStylableSvg";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -135,6 +138,17 @@ test("YOOtheme inline SVG accepts only asset-authored drop-shadow filters", () =
     "drop-shadow(20px 20px 20px rgba(60, 65, 124, 0.12)) drop-shadow(-20px -20px 20px rgba(255, 255, 255, 0.9))",
   );
   expect(extractSafeSvgDropShadow(`<svg><style>svg { filter: url(https://example.test/filter); }</style></svg>`)).toBeUndefined();
+});
+
+test("YOOtheme inline SVG accepts only safe parallax transform origins", () => {
+  expect(extractSafeSvgTransformOrigin("transform-origin: 50% 50%; transform: translate(0 -200px)"))
+    .toBe("50% 50%");
+  expect(extractSafeSvgTransformOrigin("transform-origin: center bottom"))
+    .toBe("center bottom");
+  expect(extractSafeSvgTransformOrigin("transform-origin: calc(50% + 1px) 50%"))
+    .toBeUndefined();
+  expect(extractSafeSvgTransformOrigin("transform-origin: 50% 50%; background: url(javascript:alert(1))"))
+    .toBe("50% 50%");
 });
 
 async function signIn(page: Page) {

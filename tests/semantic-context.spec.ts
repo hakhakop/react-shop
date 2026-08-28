@@ -37,8 +37,8 @@ test("Text and Accordion consume context roles instead of fixed light-surface co
   const css = readFileSync(path.resolve("app/styles/shop-builder.css"), "utf8");
   const dashboardCss = readFileSync(path.resolve("app/styles/dashboard.css"), "utf8");
 
-  expect(css).toContain(".uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: var(--uikit-text-local-color, var(--uikit-text-lead-color");
-  expect(css).toContain(".uk-text-meta { font-size: 0.875rem !important; color: var(--uikit-text-local-color, var(--uikit-text-meta-color");
+  expect(css).toContain(".uk-text-lead { font-size: var(--uk-text-lead-font-size");
+  expect(css).toContain(".uk-text-meta { font-size: var(--uk-text-meta-font-size");
   expect(css).toContain("color: var(--uikit-accordion-title-color");
   expect(css).toContain("var(--uikit-accordion-divider-color");
   expect(css).not.toContain(".uk-text-lead { font-size: 1.25rem !important; line-height: 1.5 !important; font-weight: 400 !important; color: #334155 !important;");
@@ -95,6 +95,34 @@ test("imported inverse Button LESS tokens reach the shared runtime token owner",
     "--uk-button-inverse-secondary-active-background": "rgba(255, 255, 255, 0.8)",
     "--uk-button-inverse-secondary-border": "#ffffff",
   });
+});
+
+test("section color roles choose readable canonical text for imported surfaces", () => {
+  const yard = getUikitGlobalsCssVars({
+    backgroundSecondary: "#1f1f1f",
+    textColor: "rgba(0, 0, 0, 0.6)",
+    inverseColor: "#fff",
+    sectionSecondaryColorMode: "light",
+  });
+  const light = getUikitGlobalsCssVars({
+    backgroundSecondary: "#fff",
+    textColor: "rgba(0, 0, 0, 0.6)",
+    inverseColor: "#fff",
+    sectionSecondaryColorMode: "light",
+  });
+
+  expect(yard["--uikit-section-secondary-color"]).toBe("var(--uk-inverse-global-color, #fff)");
+  expect(light["--uikit-section-secondary-color"]).toBe("var(--uk-global-text-color, #111827)");
+});
+
+test("YOOtheme tile surfaces keep normal color, padding, square shape, and row stretch", () => {
+  const css = readFileSync(path.resolve("app/styles/shop-builder.css"), "utf8");
+
+  expect(css).toContain(".shop-builder-content-layout-card.uk-tile-default");
+  expect(css).toContain("color: var(--uk-global-text-color, #111827) !important;");
+  expect(css).toContain("padding: var(--uk-tile-padding-vertical, 40px)");
+  expect(css).toContain("border-radius: var(--uk-tile-border-radius, 0px);");
+  expect(css).toContain(":has(> .shop-builder-content-layout-card.uk-tile)");
 });
 
 test("imported Nav and Navbar LESS tokens remain global UIkit variables", () => {
@@ -262,7 +290,7 @@ test("Circle Section LESS tokens preserve responsive padding, gradients, and col
     "--uk-section-primary-color-mode": "light",
     "--uikit-section-default-bg": "#000",
     "--uikit-section-primary-bg": "#F8154C",
-    "--uikit-section-default-color": "var(--uk-global-text-color, #111827)",
+    "--uikit-section-default-color": "var(--uk-inverse-global-color, #fff)",
   });
   expect(globals["--uikit-section-default-gradient"]).toContain("radial-gradient");
   expect(globals["--uikit-section-primary-gradient"]).toContain("linear-gradient(30deg");

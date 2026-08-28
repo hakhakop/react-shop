@@ -9,6 +9,9 @@ const homeFixture = JSON.parse(
 const blogFixture = JSON.parse(
   readFileSync("/Users/hakobjaghatspanyan/Downloads/Circle-Blog-page.json", "utf8"),
 );
+const designFixture = JSON.parse(
+  readFileSync("/Users/hakobjaghatspanyan/Downloads/Design-Home.json", "utf8"),
+);
 
 const collectBlocks = (value: unknown, result: any[] = []) => {
   if (!value || typeof value !== "object") return result;
@@ -86,7 +89,7 @@ test("preserves authored static fallbacks beside supported bindings", () => {
   });
 });
 
-test("unsupported dynamic source retains static fallback and creates no inert metadata", () => {
+test("custom WordPress source retains static fallback and becomes a discoverable provider", () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout",
     children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
@@ -100,9 +103,181 @@ test("unsupported dynamic source retains static fallback and creates no inert me
   });
   const item = collectBlocks(mapped.sections).find((block) => block.kind === "grid").gridItems[0];
   expect(item).toMatchObject({ title: "Fallback", text: "Static" });
-  expect(item.dynamicContext).toBeUndefined();
-  expect(item.dynamicBindings).toBeUndefined();
-  expect(mapped.warnings.some((warning) => warning.includes("DYNAMIC CONTENT UNSUPPORTED FOR NOW"))).toBeTruthy();
+  expect(item.dynamicContext).toMatchObject({
+    provider: "wordpress",
+    source: "content",
+    mode: "collection",
+    query: { graphqlRoot: "products", yoothemeQueryName: "products.customProducts" },
+  });
+  expect(item.dynamicBindings).toMatchObject({
+    title: { path: "title", valueType: "string" },
+  });
+  expect(mapped.warnings.some((warning) => warning.includes("DYNAMIC CONTENT PROVIDER UNRESOLVED"))).toBeFalsy();
+});
+
+test("Design Escapes custom providers retain every known canonical element template", () => {
+  const dynamicItem = (type: string, queryName: string, props: Record<string, unknown>) => ({
+    type,
+    props: {},
+    source: {
+      query: { name: queryName, arguments: { offset: 0, limit: 4 } },
+      props,
+    },
+  });
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [
+            { type: "slideshow", children: [dynamicItem("slideshow_item", "accommodations.customAccommodations", { title: { name: "field.accommodation_teaser_title" }, image: { name: "field.accommodation_teaser_image_bg.url" } })] },
+            { type: "panel-slider", children: [dynamicItem("panel-slider_item", "accommodations.customAccommodations", { title: { name: "title" }, image: { name: "field.intro_image.url" } })] },
+            { type: "grid", children: [dynamicItem("grid_item", "#parent", { title: { name: "title" }, link: { name: "link" } })] },
+            { type: "gallery", children: [dynamicItem("gallery_item", "discoverTags.customDiscoverTag", { title: { name: "name" }, image: { name: "field.image_intro.url" }, link: { name: "link" } })] },
+            { type: "list", children: [dynamicItem("list_item", "discoverTags.customDiscoverTags", { content: { name: "name" }, link: { name: "link" } })] },
+          ],
+        }],
+      }],
+    }],
+  });
+  const blocks = collectBlocks(mapped.sections);
+
+  const slideshow = blocks.find((block) => block.kind === "slideshow");
+  const panelSlider = blocks.find((block) => block.kind === "panelSlider");
+  const grid = blocks.find((block) => block.kind === "grid");
+  const gallery = blocks.find((block) => block.kind === "gallery");
+  const list = blocks.find((block) => block.kind === "list");
+
+  expect(slideshow.slides).toHaveLength(1);
+  expect(panelSlider.slides).toHaveLength(1);
+  expect(grid.gridItems).toHaveLength(1);
+  expect(gallery.galleryItems).toHaveLength(1);
+  expect(list.listItems).toHaveLength(1);
+  expect(slideshow.slides[0].dynamicContext).toMatchObject({
+    provider: "wordpress",
+    source: "content",
+    query: { graphqlRoot: "accommodations", start: 0, quantity: 4 },
+  });
+  expect(panelSlider.slides[0].dynamicBindings.imageUrl).toEqual({ path: "acf.intro_image.url", valueType: "url" });
+  expect(grid.gridItems[0].dynamicContext).toBeUndefined();
+  expect(gallery.galleryItems[0].dynamicBindings).toMatchObject({
+    title: { path: "name", valueType: "string" },
+    imageUrl: { path: "acf.image_intro.url", valueType: "url" },
+    linkUrl: { path: "link", valueType: "url" },
+  });
+  expect(list.listItems[0].dynamicBindings).toMatchObject({
+    text: { path: "name", valueType: "string" },
+    url: { path: "link", valueType: "url" },
+  });
+});
+
+test("Design Cozy Places imports a single tag context and its related Accommodation Grid", () => {
+  const mapped = mapYoothemeStaticContent(designFixture);
+  const section = mapped.sections.find((candidate) => candidate.title === "Tag Cozy Places");
+  expect(section?.dynamicContext).toMatchObject({
+    provider: "wordpress",
+    source: "content",
+    mode: "single",
+    query: {
+      graphqlRoot: "discoverTags",
+      databaseId: 56,
+    },
+  });
+  expect(section?.dynamicBindings).toEqual({
+    backgroundImageUrl: { path: "acf.image_featured.url", valueType: "url" },
+  });
+  const grid = collectBlocks(section).find((block) => block.kind === "grid");
+  expect(grid.gridItems[0]).toMatchObject({
+    dynamicContext: {
+      provider: "wordpress",
+      source: "content",
+      mode: "collection",
+      query: {
+        graphqlRoot: "accommodations",
+        parentRelation: true,
+        metaTaxonomy: "accommodation_cat",
+        start: 0,
+        quantity: 4,
+      },
+    },
+    dynamicBindings: {
+      title: { path: "title", valueType: "string" },
+      meta: { path: "metaString", valueType: "string" },
+      imageUrl: { path: "acf.intro_image.url", valueType: "url" },
+      imageAlt: { path: "acf.intro_image.alt", valueType: "string" },
+      buttonUrl: { path: "link", valueType: "url" },
+    },
+  });
+});
+
+test("Design Get Inspired imports Overlay, Gallery, and List taxonomy sources canonically", () => {
+  const mapped = mapYoothemeStaticContent(designFixture);
+  const section = mapped.sections.find((candidate) => candidate.title === "Get Inspired");
+  const blocks = collectBlocks(section);
+  const overlay = blocks.find((block) => block.kind === "overlay");
+  const gallery = blocks.find((block) => block.kind === "gallery");
+  const list = blocks.find((block) => block.kind === "list" && block.listItems?.[0].dynamicContext?.query?.quantity === 4);
+  expect(overlay).toMatchObject({
+    dynamicContext: { mode: "single", query: { graphqlRoot: "discoverTags", databaseId: 44 } },
+    dynamicBindings: {
+      imageUrl: { path: "acf.image_intro.url", valueType: "url" },
+      title: { path: "name", valueType: "string" },
+      imageLinkUrl: { path: "link", valueType: "url" },
+    },
+  });
+  expect(gallery?.galleryItems?.[0]).toMatchObject({
+    dynamicContext: { mode: "single", query: { graphqlRoot: "discoverTags", databaseId: 45 } },
+    dynamicBindings: { imageUrl: { path: "acf.image_intro.url", valueType: "url" } },
+  });
+  expect(list?.listItems?.[0]).toMatchObject({
+    dynamicContext: { mode: "collection", query: { graphqlRoot: "discoverTags", start: 0, quantity: 4 } },
+    dynamicBindings: { text: { path: "name", valueType: "string" } },
+  });
+});
+
+test("materialization requests the imported ACF fields without persisting provider metadata", async () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "slideshow",
+      children: [{
+        type: "slideshow_item",
+        props: { title: "Fallback title", image: "/fallback.jpg" },
+        source: {
+          query: { name: "accommodations.customAccommodations", arguments: { limit: 2 } },
+          props: {
+            title: { name: "field.accommodation_teaser_title" },
+            image: { name: "field.intro_image.url" },
+          },
+        },
+      }],
+    }] }] }] }],
+  });
+  const descriptors: any[] = [];
+  await materializeBuilderDynamicContent({
+    version: 1,
+    key: "page:acf-request-proof",
+    page: "page:acf-request-proof",
+    updatedAt: "2026-08-28T00:00:00.000Z",
+    sections: mapped.sections,
+  } as any, {
+    resolveContexts: async ({ descriptor }) => {
+      descriptors.push(descriptor);
+      return [];
+    },
+  });
+  expect(descriptors[0]).toMatchObject({
+    provider: "wordpress",
+    source: "content",
+    query: {
+      graphqlRoot: "accommodations",
+      quantity: 2,
+      requestedFields: ["acf.accommodation_teaser_title", "acf.intro_image.url"],
+    },
+  });
 });
 
 test("uses the same canonical metadata helper for a Panel Slider template", () => {

@@ -23,10 +23,25 @@ const templateLibraryTabs: { value: LayoutLibraryType; label: string }[] = [
   { value: "element", label: "Elements" },
 ];
 
+export type LayoutLibraryInsertionAction = "before" | "after" | "replace";
+
+export type LayoutLibraryContextAction = {
+  value: LayoutLibraryInsertionAction;
+  label: string;
+};
+
+export type LayoutLibraryGroup = {
+  value: LayoutLibraryType;
+  label: string;
+  types: LayoutLibraryType[];
+};
+
 export type LayoutLibrarySurfaceProps = {
   mode: "management" | "contextual";
   libraryType: LayoutLibraryType;
   savedTemplates: BuilderSavedTemplate[];
+  /** Show tenant-owned and shared Library sources as separate views. */
+  siteLibraryEnabled?: boolean;
   templateStatus?: string;
   onLibraryTypeChange?: (type: LayoutLibraryType) => void;
   onOpenDocument?: (type: "header" | "footer") => void;
@@ -34,10 +49,25 @@ export type LayoutLibrarySurfaceProps = {
   saveLabel?: string;
   onApply: (template: BuilderSavedTemplate) => void;
   onExport?: (template: BuilderSavedTemplate) => void;
-  onImport?: (file: File, templateType: LayoutLibraryType) => void | Promise<unknown>;
-  onImportYootheme?: (file: File, targetType: LayoutLibraryType) => void | Promise<unknown>;
+  onImport?: (
+    file: File,
+    templateType: LayoutLibraryType,
+    title: string,
+    acceptedTypes?: LayoutLibraryType[],
+  ) => void | boolean | Promise<unknown>;
+  onImportYootheme?: (file: File, targetType: LayoutLibraryType, title: string) => void | Promise<unknown>;
   onDelete?: (id: string) => void;
   onRename?: (template: BuilderSavedTemplate, title: string) => void;
+  availableLibraryTypes?: LayoutLibraryType[];
+  libraryGroups?: LayoutLibraryGroup[];
+  contextualActions?: LayoutLibraryContextAction[];
+  contextualActionsForTemplate?: (
+    template: BuilderSavedTemplate | null,
+  ) => LayoutLibraryContextAction[];
+  onContextualAction?: (
+    template: BuilderSavedTemplate,
+    action: LayoutLibraryInsertionAction,
+  ) => void;
   managementFooter?: ReactNode;
 };
 
@@ -45,6 +75,7 @@ export default function LayoutLibrarySurface({
   mode,
   libraryType,
   savedTemplates,
+  siteLibraryEnabled = false,
   templateStatus,
   onLibraryTypeChange,
   onOpenDocument,
@@ -56,25 +87,97 @@ export default function LayoutLibrarySurface({
   onImportYootheme,
   onDelete,
   onRename,
+  availableLibraryTypes,
+  libraryGroups,
+  contextualActions = [],
+  contextualActionsForTemplate,
+  onContextualAction,
   managementFooter,
 }: LayoutLibrarySurfaceProps) {
+  const [libraryScope, setLibraryScope] = useState<"site" | "shared">(
+    siteLibraryEnabled ? "site" : "shared",
+  );
   const [importInputKey, setImportInputKey] = useState(0);
   const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
   const [saveTitle, setSaveTitle] = useState("");
-  const filteredTemplates = savedTemplates.filter(
-    (template) => (template.templateType ?? "page") === libraryType,
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [pendingImport, setPendingImport] = useState<{
+    file: File;
+    source: "webpages" | "yootheme";
+  } | null>(null);
+  const [pendingImportTitle, setPendingImportTitle] = useState("");
+  const scopedTemplates = savedTemplates.filter(
+    (template) => (template.libraryScope ?? "shared") === libraryScope,
   );
-  const selectedTabLabel =
+  const visibleLibraryTabs: LayoutLibraryGroup[] = libraryGroups ?? (
+    availableLibraryTypes
+      ? templateLibraryTabs
+          .filter((tab) => availableLibraryTypes.includes(tab.value))
+          .map((tab) => ({ ...tab, types: [tab.value] }))
+      : templateLibraryTabs.map((tab) => ({ ...tab, types: [tab.value] }))
+  );
+  const activeLibraryTab = visibleLibraryTabs.find(
+    (tab) => tab.value === libraryType,
+  );
+  const activeLibraryTypes = activeLibraryTab?.types ?? [libraryType];
+  const filteredTemplates = scopedTemplates.filter(
+    (template) => activeLibraryTypes.includes(template.templateType ?? "page"),
+  );
+  const selectedTemplate = filteredTemplates.find(
+    (template) => template.id === selectedTemplateId,
+  ) ?? null;
+  const selectedTabLabel = activeLibraryTab?.label ??
     templateLibraryTabs.find((tab) => tab.value === libraryType)?.label ?? "Layouts";
+  const resolvedContextualActions = contextualActionsForTemplate
+    ? contextualActionsForTemplate(selectedTemplate)
+    : contextualActions;
+
+  const stageImport = (file: File, source: "webpages" | "yootheme") => {
+    const fileName = file.name.replace(/\.[^.]+$/, "").trim();
+    const typeLabel = selectedTabLabel.slice(0, -1);
+    setPendingImport({ file, source });
+    setPendingImportTitle(
+      source === "yootheme"
+        ? `${fileName || "YOOtheme"} ${typeLabel}`
+        : fileName || `Imported ${typeLabel}`,
+    );
+  };
+
+  const clearPendingImport = () => {
+    setPendingImport(null);
+    setPendingImportTitle("");
+    setImportInputKey((key) => key + 1);
+  };
 
   return (
     <div className={`builder-library-surface is-${mode}`}>
-      {mode === "management" ? (
+      {siteLibraryEnabled ? (
+        <div className="builder-library-scope-tabs" role="tablist" aria-label="Library source">
+          {(["site", "shared"] as const).map((scope) => (
+            <button
+              key={scope}
+              type="button"
+              role="tab"
+              aria-selected={libraryScope === scope}
+              className={libraryScope === scope ? "is-active" : ""}
+              onClick={() => {
+                setLibraryScope(scope);
+                setSelectedTemplateId(null);
+                clearPendingImport();
+              }}
+            >
+              <span>{scope === "site" ? "This Site" : "Shared"}</span>
+              <small>{savedTemplates.filter((template) => (template.libraryScope ?? "shared") === scope).length}</small>
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {mode === "management" || onLibraryTypeChange ? (
         <div className="builder-template-tabs" role="tablist" aria-label="Library types">
-          {templateLibraryTabs.map((tab) => {
-            const tabCount = savedTemplates.filter(
-              (template) => (template.templateType ?? "page") === tab.value,
+          {visibleLibraryTabs.map((tab) => {
+            const tabCount = scopedTemplates.filter(
+              (template) => tab.types.includes(template.templateType ?? "page"),
             ).length;
             return (
               <button
@@ -83,7 +186,10 @@ export default function LayoutLibrarySurface({
                 role="tab"
                 aria-selected={libraryType === tab.value}
                 className={libraryType === tab.value ? "is-active" : ""}
-                onClick={() => onLibraryTypeChange?.(tab.value)}
+                onClick={() => {
+                  setSelectedTemplateId(null);
+                  onLibraryTypeChange?.(tab.value);
+                }}
               >
                 <span>{tab.label}</span>
                 <small>{tabCount}</small>
@@ -93,7 +199,7 @@ export default function LayoutLibrarySurface({
         </div>
       ) : null}
 
-      {mode === "contextual" && onSaveCurrent ? (
+      {mode === "contextual" && onSaveCurrent && (libraryScope === "site" || !siteLibraryEnabled) ? (
         <div className="builder-template-save-card builder-library-context-save">
           <Save size={15} />
           <span>
@@ -140,6 +246,8 @@ export default function LayoutLibrarySurface({
         <div className="builder-pages-list builder-template-list">
           {filteredTemplates.map((template) => {
             const templateType = template.templateType ?? "page";
+            const templateIsShared = template.libraryScope === "shared";
+            const templateIsReadOnlyShared = siteLibraryEnabled && templateIsShared;
             const canDragTemplate = mode === "management" &&
               templateType !== "page" && templateType !== "header" && templateType !== "footer";
             const templateDragMimeType = canDragTemplate
@@ -150,7 +258,9 @@ export default function LayoutLibrarySurface({
             return (
               <div
                 key={template.id}
-                className="builder-page-row builder-template-row"
+                className={`builder-page-row builder-template-row${
+                  selectedTemplateId === template.id ? " is-selected" : ""
+                }`}
                 draggable={canDragTemplate}
                 onDragStart={(event) => {
                   if (!canDragTemplate) {
@@ -165,7 +275,17 @@ export default function LayoutLibrarySurface({
                   createDragGhost(event, template.title || "Layout");
                 }}
               >
-                <button type="button" onClick={() => onApply(template)}>
+                <button
+                  type="button"
+                  aria-pressed={onContextualAction ? selectedTemplateId === template.id : undefined}
+                  onClick={() => {
+                    if (onContextualAction) {
+                      setSelectedTemplateId(template.id);
+                      return;
+                    }
+                    onApply(template);
+                  }}
+                >
                   {renamingTemplateId === template.id ? (
                     <input
                       className="builder-template-inline-rename"
@@ -185,19 +305,32 @@ export default function LayoutLibrarySurface({
                     />
                   ) : <strong>{template.title}</strong>}
                   <span>
-                    {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
+                    {templateIsShared ? "SHARED · " : ""}{(activeLibraryTypes.length > 1
+                      ? selectedTabLabel.replace(/s$/, "")
+                      : templateType
+                    ).toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
                   </span>
                 </button>
-                <button type="button" className="builder-template-use-button" onClick={() => onApply(template)}>
+                <button
+                  type="button"
+                  className="builder-template-use-button"
+                  onClick={() => {
+                    if (onContextualAction) {
+                      setSelectedTemplateId(template.id);
+                      return;
+                    }
+                    onApply(template);
+                  }}
+                >
                   <Plus size={14} />
-                  Use
+                  {onContextualAction ? "Select" : "Use"}
                 </button>
-                {mode === "management" && onExport ? (
+                {onExport ? (
                   <button type="button" className="builder-icon-button" onClick={() => onExport(template)} aria-label={`Export ${template.title}`}>
                     <Download size={14} />
                   </button>
                 ) : null}
-                {mode === "management" && onRename ? (
+                {onRename && !templateIsReadOnlyShared ? (
                   <button
                     type="button"
                     className="builder-icon-button"
@@ -210,7 +343,7 @@ export default function LayoutLibrarySurface({
                     <Pencil size={14} />
                   </button>
                 ) : null}
-                {mode === "management" && onDelete ? (
+                {onDelete && !templateIsReadOnlyShared ? (
                   <button type="button" className="builder-icon-button" onClick={() => onDelete(template.id)} aria-label={`Delete ${template.title}`}>
                     <Trash2 size={14} />
                   </button>
@@ -223,18 +356,90 @@ export default function LayoutLibrarySurface({
         <div className="builder-template-note">
           <LibraryBig size={16} />
           <span>
-            {savedTemplates.length > 0
-              ? `No ${selectedTabLabel.toLowerCase()} saved yet.`
-              : "Saved layouts will appear here after you save from the Builder."}
+            {scopedTemplates.length > 0
+              ? `No ${selectedTabLabel.toLowerCase()} saved in ${libraryScope === "site" ? "This Site" : "Shared"}.`
+              : libraryScope === "site"
+                ? "This site has no saved layouts yet. Save or import one from the current Builder."
+                : "No shared layouts are available."}
           </span>
         </div>
       )}
 
+      {onContextualAction ? (
+        <div className="builder-library-context-actions" aria-label="Library insertion actions">
+          <span>
+            {selectedTemplate
+              ? `Insert “${selectedTemplate.title}” into the current structure.`
+              : "Select a Library composition to choose how it is inserted."}
+          </span>
+          <div>
+            {resolvedContextualActions.map((action) => (
+              <button
+                key={action.value}
+                type="button"
+                className={action.value === "replace" ? "builder-secondary-button" : "builder-primary-button"}
+                disabled={!selectedTemplate}
+                onClick={() => {
+                  if (selectedTemplate) onContextualAction(selectedTemplate, action.value);
+                }}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {templateStatus ? <small className="builder-library-status">{templateStatus}</small> : null}
-      {onImport ? (
+      {pendingImport && (libraryScope === "site" || !siteLibraryEnabled) ? (
+        <div className="builder-library-import-name-card">
+          <div>
+            <strong>Name Library item</strong>
+            <span>{pendingImport.file.name}</span>
+          </div>
+          <label className="builder-field">
+            <span>Library item name</span>
+            <input
+              value={pendingImportTitle}
+              onChange={(event) => setPendingImportTitle(event.target.value)}
+              placeholder="Enter a name"
+              autoFocus
+            />
+          </label>
+          <div className="builder-layout-actions">
+            <button type="button" className="builder-secondary-button" onClick={clearPendingImport}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="builder-primary-button"
+              disabled={!pendingImportTitle.trim()}
+              onClick={async () => {
+                const title = pendingImportTitle.trim();
+                if (!title) return;
+                let imported: unknown;
+                if (pendingImport.source === "yootheme") {
+                  imported = await onImportYootheme?.(pendingImport.file, libraryType, title);
+                } else {
+                  imported = await onImport?.(
+                    pendingImport.file,
+                    libraryType,
+                    title,
+                    activeLibraryTypes,
+                  );
+                }
+                if (imported !== false) clearPendingImport();
+              }}
+            >
+              Import to Library
+            </button>
+          </div>
+        </div>
+      ) : null}
+      {onImport && (libraryScope === "site" || !siteLibraryEnabled) ? (
         <label className="builder-template-import-control">
           <Upload size={14} />
-          <span>Upload {selectedTabLabel.slice(0, -1)} JSON</span>
+          <span>Import {selectedTabLabel.slice(0, -1)} JSON to Library</span>
           <input
             key={`${libraryType}-${importInputKey}`}
             type="file"
@@ -242,16 +447,19 @@ export default function LayoutLibrarySurface({
             onChange={async (event) => {
               const file = event.currentTarget.files?.[0];
               if (!file) return;
-              await onImport(file, libraryType);
-              setImportInputKey((key) => key + 1);
+              stageImport(file, "webpages");
             }}
           />
         </label>
       ) : null}
-      {onImportYootheme && (libraryType === "header" || libraryType === "footer") ? (
+      {onImportYootheme && (libraryScope === "site" || !siteLibraryEnabled) && (
+        mode === "contextual"
+          ? activeLibraryTypes.some((type) => type !== "element")
+          : libraryType === "header" || libraryType === "footer"
+      ) ? (
         <label className="builder-template-import-control">
           <Upload size={14} />
-          <span>Import YOOtheme JSON → {libraryType === "footer" ? "Footer document" : "Header document"}</span>
+          <span>Import YOOtheme JSON to Library</span>
           <input
             key={`yootheme-${libraryType}-${importInputKey}`}
             type="file"
@@ -259,8 +467,7 @@ export default function LayoutLibrarySurface({
             onChange={async (event) => {
               const file = event.currentTarget.files?.[0];
               if (!file) return;
-              await onImportYootheme(file, libraryType);
-              setImportInputKey((key) => key + 1);
+              stageImport(file, "yootheme");
             }}
           />
         </label>

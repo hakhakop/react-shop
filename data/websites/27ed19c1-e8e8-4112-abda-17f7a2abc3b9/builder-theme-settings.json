@@ -1,0 +1,2391 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "yard",
+  "displayName": "yard",
+  "sourceConfig": {
+    "style": "yard",
+    "site": {
+      "layout": "full",
+      "boxed": {
+        "alignment": 1
+      },
+      "image_size": "cover",
+      "image_position": "center-center",
+      "image_effect": "fixed",
+      "toolbar_width": "large",
+      "breadcrumbs_show_home": true,
+      "breadcrumbs_show_current": true,
+      "breadcrumbs_home_text": "",
+      "main_section": {
+        "height": true
+      },
+      "breadcrumbs": false,
+      "padding": "small",
+      "padding_remove_top": false,
+      "padding_remove_bottom": false
+    },
+    "header": {
+      "layout": "horizontal-center",
+      "width": "expand",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_gap": "small",
+      "search": "",
+      "social_style": false,
+      "social": "",
+      "social_items": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ]
+    },
+    "navbar": {
+      "sticky": 1,
+      "dropdown_align": "center",
+      "offcanvas": [],
+      "dropbar": true,
+      "dropdown_boundary": false,
+      "dropdown_target": true
+    },
+    "mobile": {
+      "breakpoint": "l",
+      "header": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social_gap": "small",
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 0
+      },
+      "dialog": {
+        "layout": "dropbar-top",
+        "toggle": "header-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": true
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "dropdown": [],
+        "push_index": ""
+      },
+      "search": "right",
+      "offcanvas": {
+        "overlay": true
+      }
+    },
+    "dialog": {
+      "layout": "offcanvas-top",
+      "toggle": "header:end",
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": true,
+        "overlay": true
+      },
+      "toggle_text": false
+    },
+    "mobileHeader": {
+      "layout": "horizontal-right",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_style": false,
+      "social_gap": "small",
+      "social_items": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ]
+    },
+    "mobileNavbar": {
+      "sticky": 0
+    },
+    "mobileDialog": {
+      "layout": "dropbar-top",
+      "toggle": "header-mobile:end",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "push",
+        "flip": true
+      },
+      "dropbar": {
+        "animation": "reveal-top"
+      },
+      "dropdown": [],
+      "push_index": ""
+    },
+    "mobileBreakpoint": "l",
+    "logo": {
+      "text": "yard.",
+      "image": "wp-content/uploads/yootheme/logo.svg",
+      "image_inverse": "wp-content/uploads/yootheme/logo-inverted.svg",
+      "image_mobile": "",
+      "image_width": "",
+      "image_height": ""
+    },
+    "menuPositions": {
+      "navbar": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 3
+      },
+      "header": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-left": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-right": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "navbar-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "header-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 3
+      }
+    },
+    "menuItems": {
+      "27": {
+        "justify": false,
+        "dropdown": {
+          "columns": 1,
+          "width": "",
+          "align": "",
+          "stretch": "navbar",
+          "size": true
+        },
+        "content": {
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "divider": false,
+                "layout": "4-5,1-5",
+                "width": "xlarge"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_default": "3-4",
+                    "width_xlarge": "4-5"
+                  },
+                  "children": [
+                    {
+                      "type": "fragment",
+                      "props": {
+                        "margin": "default"
+                      },
+                      "children": [
+                        {
+                          "type": "row",
+                          "props": {
+                            "layout": "1-2,1-2"
+                          },
+                          "children": [
+                            {
+                              "type": "column",
+                              "props": {
+                                "image_position": "center-center",
+                                "position_sticky_breakpoint": "m",
+                                "width_medium": "1-2"
+                              },
+                              "children": [
+                                {
+                                  "type": "headline",
+                                  "props": {
+                                    "content": "Our Latest Projects",
+                                    "title_element": "div",
+                                    "title_style": "h4"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "column",
+                              "props": {
+                                "image_position": "center-center",
+                                "position_sticky_breakpoint": "m",
+                                "vertical_align": "middle",
+                                "width_medium": "1-2"
+                              },
+                              "children": [
+                                {
+                                  "type": "button",
+                                  "props": {
+                                    "grid_column_gap": "small",
+                                    "grid_row_gap": "small",
+                                    "margin": "default",
+                                    "text_align": "right"
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "button_item",
+                                      "props": {
+                                        "button_style": "text",
+                                        "content": "See All Projects",
+                                        "icon_align": "left",
+                                        "link": "?page_id=2",
+                                        "dialog_layout": "modal",
+                                        "dialog_offcanvas_flip": true
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "gallery",
+                      "props": {
+                        "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                        "filter": false,
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_gap": "small",
+                        "grid_default": "4",
+                        "grid_large": "3",
+                        "grid_masonry": false,
+                        "grid_medium": "",
+                        "grid_row_gap": "small",
+                        "grid_xlarge": "4",
+                        "image_height": "390",
+                        "image_width": "310",
+                        "item_animation": true,
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin": "default",
+                        "meta_align": "above-title",
+                        "meta_color": "emphasis",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "overlay_hover": true,
+                        "overlay_link": true,
+                        "overlay_mode": "cover",
+                        "overlay_position": "bottom-left",
+                        "overlay_style": "overlay-default",
+                        "overlay_transition": "slide-bottom-small",
+                        "parallax_easing": "1",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "text_align": "",
+                        "text_color": "light",
+                        "title_element": "h2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h5",
+                        "lightbox_bg_close": true
+                      },
+                      "children": [
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/projects-gallery-01.jpg",
+                            "link": "?page_id=20",
+                            "meta": "Interior",
+                            "tags": "Interior",
+                            "title": "The Wall Technologies"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/projects-gallery-02.jpg",
+                            "link": "?page_id=20",
+                            "meta": "Interior",
+                            "tags": "Interior",
+                            "title": "Wessex Office Interior"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/projects-gallery-03.jpg",
+                            "link": "?page_id=20",
+                            "meta": "Housing",
+                            "tags": "Housing",
+                            "title": "Energy-Saving Homes"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/projects-gallery-04.jpg",
+                            "link": "?page_id=20",
+                            "meta": "Architecture",
+                            "tags": "Architecture",
+                            "title": "Harbour Hall"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "vertical_align": "bottom",
+                    "width_default": "1-4",
+                    "width_xlarge": "1-5"
+                  },
+                  "children": [
+                    {
+                      "type": "panel",
+                      "props": {
+                        "content": "You want to collaborate with us on one of our projects? Don’t hesitate to contact us.",
+                        "content_column_breakpoint": "m",
+                        "content_margin": "small",
+                        "content_style": "text-meta",
+                        "icon_width": 80,
+                        "image_align": "top",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_svg_color": "emphasis",
+                        "link": "tel:+44555000015",
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin": "remove-vertical",
+                        "meta": " Would you like to discuss a project?",
+                        "meta_align": "above-title",
+                        "meta_color": "muted",
+                        "meta_element": "div",
+                        "meta_margin": "remove",
+                        "meta_style": "text-meta",
+                        "title": "(+44) 55 500 00 15",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "heading",
+                        "title_link": true,
+                        "title_margin": "small",
+                        "title_style": "h4"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "version": "4.5.18",
+          "props": []
+        }
+      },
+      "28": {
+        "content": {
+          "type": "fragment",
+          "version": "4.5.18",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "divider": false,
+                "layout": "4-5,1-5",
+                "width": "xlarge"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_default": "3-4",
+                    "width_xlarge": "4-5"
+                  },
+                  "children": [
+                    {
+                      "type": "fragment",
+                      "props": {
+                        "margin": "default"
+                      },
+                      "children": [
+                        {
+                          "type": "row",
+                          "props": {
+                            "layout": "1-2,1-2"
+                          },
+                          "children": [
+                            {
+                              "type": "column",
+                              "props": {
+                                "image_position": "center-center",
+                                "position_sticky_breakpoint": "m",
+                                "width_medium": "1-2"
+                              },
+                              "children": [
+                                {
+                                  "type": "headline",
+                                  "props": {
+                                    "content": "Our Residences",
+                                    "title_element": "div",
+                                    "title_style": "h4"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "column",
+                              "props": {
+                                "image_position": "center-center",
+                                "position_sticky_breakpoint": "m",
+                                "vertical_align": "middle",
+                                "width_medium": "1-2"
+                              },
+                              "children": [
+                                {
+                                  "type": "button",
+                                  "props": {
+                                    "grid_column_gap": "small",
+                                    "grid_row_gap": "small",
+                                    "margin": "default",
+                                    "text_align": "right"
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "button_item",
+                                      "props": {
+                                        "button_style": "text",
+                                        "content": "See All Residences",
+                                        "icon_align": "left",
+                                        "link": "?page_id=6",
+                                        "dialog_layout": "modal",
+                                        "dialog_offcanvas_flip": true
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "gallery",
+                      "props": {
+                        "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                        "filter": false,
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_gap": "small",
+                        "grid_default": "3",
+                        "grid_masonry": false,
+                        "grid_medium": "",
+                        "grid_row_gap": "small",
+                        "grid_xlarge": "4",
+                        "image_height": "390",
+                        "image_width": "310",
+                        "item_animation": true,
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin": "default",
+                        "meta_align": "above-title",
+                        "meta_color": "emphasis",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "overlay_hover": true,
+                        "overlay_link": true,
+                        "overlay_mode": "cover",
+                        "overlay_position": "bottom-left",
+                        "overlay_style": "overlay-default",
+                        "overlay_transition": "slide-bottom-small",
+                        "parallax_easing": "1",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "text_align": "",
+                        "text_color": "light",
+                        "title_element": "h2",
+                        "title_hover_style": "reset",
+                        "title_margin": "small",
+                        "title_style": "h5",
+                        "lightbox_bg_close": true
+                      },
+                      "children": [
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/residences-building-01.jpg",
+                            "link": "?page_id=19",
+                            "meta": "",
+                            "tags": "Interior",
+                            "title": "Angel Court"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/residences-building-02.jpg",
+                            "link": "?page_id=19",
+                            "meta": "",
+                            "tags": "Interior",
+                            "title": "Shape Tower"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/residences-building-03.jpg",
+                            "link": "?page_id=19",
+                            "meta": "",
+                            "tags": "Interior",
+                            "title": "Alison Park"
+                          }
+                        },
+                        {
+                          "type": "gallery_item",
+                          "props": {
+                            "image": "wp-content/uploads/yootheme/residences-building-04.jpg",
+                            "link": "?page_id=19",
+                            "meta": "",
+                            "tags": "Interior",
+                            "title": "Villa Slayton"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "vertical_align": "bottom",
+                    "width_default": "1-4",
+                    "width_xlarge": "1-5"
+                  },
+                  "children": [
+                    {
+                      "type": "panel",
+                      "props": {
+                        "content": "<a href=\"tel:+44555000015\">(+44) 55 500 00 15</a> <br> <a href=\"mailto:dianna@example.com\">dianna@example.com</a>",
+                        "content_column_breakpoint": "m",
+                        "content_margin": "small",
+                        "content_style": "text-meta",
+                        "icon_width": 80,
+                        "image": "wp-content/uploads/yootheme/footer-contact-person.jpg",
+                        "image_align": "top",
+                        "image_border": "circle",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_height": "80",
+                        "image_svg_color": "emphasis",
+                        "image_width": "80",
+                        "link": "tel:+44555000015",
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin": "remove-vertical",
+                        "meta": "Contact Person",
+                        "meta_align": "above-title",
+                        "meta_color": "muted",
+                        "meta_element": "div",
+                        "meta_margin": "small",
+                        "meta_style": "text-meta",
+                        "title": "Dianna Briggs",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "heading",
+                        "title_link": true,
+                        "title_margin": "remove",
+                        "title_style": "h4"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "props": []
+        },
+        "dropdown": {
+          "columns": 1,
+          "width": "",
+          "stretch": "navbar",
+          "size": true
+        }
+      },
+      "30": {
+        "content": null,
+        "dropdown": {
+          "columns": 1,
+          "width": "400",
+          "align": "",
+          "stretch": ""
+        }
+      }
+    },
+    "menu": {
+      "items": {
+        "27": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "align": "",
+            "stretch": "navbar",
+            "size": true
+          },
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": false,
+                  "layout": "4-5,1-5",
+                  "width": "xlarge"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_default": "3-4",
+                      "width_xlarge": "4-5"
+                    },
+                    "children": [
+                      {
+                        "type": "fragment",
+                        "props": {
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "row",
+                            "props": {
+                              "layout": "1-2,1-2"
+                            },
+                            "children": [
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "headline",
+                                    "props": {
+                                      "content": "Our Latest Projects",
+                                      "title_element": "div",
+                                      "title_style": "h4"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "vertical_align": "middle",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "button",
+                                    "props": {
+                                      "grid_column_gap": "small",
+                                      "grid_row_gap": "small",
+                                      "margin": "default",
+                                      "text_align": "right"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "button_item",
+                                        "props": {
+                                          "button_style": "text",
+                                          "content": "See All Projects",
+                                          "icon_align": "left",
+                                          "link": "?page_id=2",
+                                          "dialog_layout": "modal",
+                                          "dialog_offcanvas_flip": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "gallery",
+                        "props": {
+                          "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                          "filter": false,
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "4",
+                          "grid_large": "3",
+                          "grid_masonry": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "grid_xlarge": "4",
+                          "image_height": "390",
+                          "image_width": "310",
+                          "item_animation": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": true,
+                          "overlay_link": true,
+                          "overlay_mode": "cover",
+                          "overlay_position": "bottom-left",
+                          "overlay_style": "overlay-default",
+                          "overlay_transition": "slide-bottom-small",
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "text_align": "",
+                          "text_color": "light",
+                          "title_element": "h2",
+                          "title_hover_style": "reset",
+                          "title_margin": "small",
+                          "title_style": "h5",
+                          "lightbox_bg_close": true
+                        },
+                        "children": [
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-01.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Interior",
+                              "tags": "Interior",
+                              "title": "The Wall Technologies"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-02.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Interior",
+                              "tags": "Interior",
+                              "title": "Wessex Office Interior"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-03.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Housing",
+                              "tags": "Housing",
+                              "title": "Energy-Saving Homes"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-04.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Architecture",
+                              "tags": "Architecture",
+                              "title": "Harbour Hall"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "vertical_align": "bottom",
+                      "width_default": "1-4",
+                      "width_xlarge": "1-5"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "You want to collaborate with us on one of our projects? Don’t hesitate to contact us.",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "content_style": "text-meta",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "tel:+44555000015",
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "remove-vertical",
+                          "meta": " Would you like to discuss a project?",
+                          "meta_align": "above-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_margin": "remove",
+                          "meta_style": "text-meta",
+                          "title": "(+44) 55 500 00 15",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": true,
+                          "title_margin": "small",
+                          "title_style": "h4"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          }
+        },
+        "28": {
+          "content": {
+            "type": "fragment",
+            "version": "4.5.18",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": false,
+                  "layout": "4-5,1-5",
+                  "width": "xlarge"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_default": "3-4",
+                      "width_xlarge": "4-5"
+                    },
+                    "children": [
+                      {
+                        "type": "fragment",
+                        "props": {
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "row",
+                            "props": {
+                              "layout": "1-2,1-2"
+                            },
+                            "children": [
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "headline",
+                                    "props": {
+                                      "content": "Our Residences",
+                                      "title_element": "div",
+                                      "title_style": "h4"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "vertical_align": "middle",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "button",
+                                    "props": {
+                                      "grid_column_gap": "small",
+                                      "grid_row_gap": "small",
+                                      "margin": "default",
+                                      "text_align": "right"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "button_item",
+                                        "props": {
+                                          "button_style": "text",
+                                          "content": "See All Residences",
+                                          "icon_align": "left",
+                                          "link": "?page_id=6",
+                                          "dialog_layout": "modal",
+                                          "dialog_offcanvas_flip": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "gallery",
+                        "props": {
+                          "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                          "filter": false,
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "3",
+                          "grid_masonry": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "grid_xlarge": "4",
+                          "image_height": "390",
+                          "image_width": "310",
+                          "item_animation": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": true,
+                          "overlay_link": true,
+                          "overlay_mode": "cover",
+                          "overlay_position": "bottom-left",
+                          "overlay_style": "overlay-default",
+                          "overlay_transition": "slide-bottom-small",
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "text_align": "",
+                          "text_color": "light",
+                          "title_element": "h2",
+                          "title_hover_style": "reset",
+                          "title_margin": "small",
+                          "title_style": "h5",
+                          "lightbox_bg_close": true
+                        },
+                        "children": [
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-01.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Angel Court"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-02.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Shape Tower"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-03.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Alison Park"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-04.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Villa Slayton"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "vertical_align": "bottom",
+                      "width_default": "1-4",
+                      "width_xlarge": "1-5"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "<a href=\"tel:+44555000015\">(+44) 55 500 00 15</a> <br> <a href=\"mailto:dianna@example.com\">dianna@example.com</a>",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "content_style": "text-meta",
+                          "icon_width": 80,
+                          "image": "wp-content/uploads/yootheme/footer-contact-person.jpg",
+                          "image_align": "top",
+                          "image_border": "circle",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "80",
+                          "image_svg_color": "emphasis",
+                          "image_width": "80",
+                          "link": "tel:+44555000015",
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "remove-vertical",
+                          "meta": "Contact Person",
+                          "meta_align": "above-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_margin": "small",
+                          "meta_style": "text-meta",
+                          "title": "Dianna Briggs",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": true,
+                          "title_margin": "remove",
+                          "title_style": "h4"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "stretch": "navbar",
+            "size": true
+          }
+        },
+        "30": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "400",
+            "align": "",
+            "stretch": ""
+          }
+        }
+      },
+      "positions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3
+        }
+      }
+    }
+  },
+  "page": {
+    "layout": "full",
+    "alignment": "center",
+    "colorMode": "light"
+  },
+  "header": {
+    "source": {
+      "header": {
+        "layout": "horizontal-center",
+        "width": "expand",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_gap": "small",
+        "search": "",
+        "social_style": false,
+        "social": "",
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 1,
+        "dropdown_align": "center",
+        "offcanvas": [],
+        "dropbar": true,
+        "dropdown_boundary": false,
+        "dropdown_target": true
+      },
+      "mobile": {
+        "breakpoint": "l",
+        "header": {
+          "layout": "horizontal-right",
+          "search_layout": "input-dropdown",
+          "search_dropdown.stretch": "navbar",
+          "search_dropdown.size": true,
+          "search_icon": "left",
+          "social_style": false,
+          "social_gap": "small",
+          "social_items": [
+            {
+              "link": "https://twitter.com/"
+            },
+            {
+              "link": "https://dribbble.com/"
+            },
+            {
+              "link": "https://github.com/"
+            }
+          ]
+        },
+        "navbar": {
+          "sticky": 0
+        },
+        "dialog": {
+          "layout": "dropbar-top",
+          "toggle": "header-mobile:end",
+          "close": true,
+          "menu_style": "default",
+          "offcanvas": {
+            "mode": "push",
+            "flip": true
+          },
+          "dropbar": {
+            "animation": "reveal-top"
+          },
+          "dropdown": [],
+          "push_index": ""
+        },
+        "search": "right",
+        "offcanvas": {
+          "overlay": true
+        }
+      },
+      "dialog": {
+        "layout": "offcanvas-top",
+        "toggle": "header:end",
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true,
+          "overlay": true
+        },
+        "toggle_text": false
+      },
+      "mobileHeader": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social_gap": "small",
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ]
+      },
+      "mobileNavbar": {
+        "sticky": 0
+      },
+      "mobileDialog": {
+        "layout": "dropbar-top",
+        "toggle": "header-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "push",
+          "flip": true
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "dropdown": [],
+        "push_index": ""
+      },
+      "mobileBreakpoint": "l",
+      "logo": {
+        "text": "yard.",
+        "image": "wp-content/uploads/yootheme/logo.svg",
+        "image_inverse": "wp-content/uploads/yootheme/logo-inverted.svg",
+        "image_mobile": "",
+        "image_width": "",
+        "image_height": ""
+      },
+      "menuPositions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3
+        }
+      },
+      "menuItems": {
+        "27": {
+          "justify": false,
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "align": "",
+            "stretch": "navbar",
+            "size": true
+          },
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": false,
+                  "layout": "4-5,1-5",
+                  "width": "xlarge"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_default": "3-4",
+                      "width_xlarge": "4-5"
+                    },
+                    "children": [
+                      {
+                        "type": "fragment",
+                        "props": {
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "row",
+                            "props": {
+                              "layout": "1-2,1-2"
+                            },
+                            "children": [
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "headline",
+                                    "props": {
+                                      "content": "Our Latest Projects",
+                                      "title_element": "div",
+                                      "title_style": "h4"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "vertical_align": "middle",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "button",
+                                    "props": {
+                                      "grid_column_gap": "small",
+                                      "grid_row_gap": "small",
+                                      "margin": "default",
+                                      "text_align": "right"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "button_item",
+                                        "props": {
+                                          "button_style": "text",
+                                          "content": "See All Projects",
+                                          "icon_align": "left",
+                                          "link": "?page_id=2",
+                                          "dialog_layout": "modal",
+                                          "dialog_offcanvas_flip": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "gallery",
+                        "props": {
+                          "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                          "filter": false,
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "4",
+                          "grid_large": "3",
+                          "grid_masonry": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "grid_xlarge": "4",
+                          "image_height": "390",
+                          "image_width": "310",
+                          "item_animation": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": true,
+                          "overlay_link": true,
+                          "overlay_mode": "cover",
+                          "overlay_position": "bottom-left",
+                          "overlay_style": "overlay-default",
+                          "overlay_transition": "slide-bottom-small",
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "text_align": "",
+                          "text_color": "light",
+                          "title_element": "h2",
+                          "title_hover_style": "reset",
+                          "title_margin": "small",
+                          "title_style": "h5",
+                          "lightbox_bg_close": true
+                        },
+                        "children": [
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-01.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Interior",
+                              "tags": "Interior",
+                              "title": "The Wall Technologies"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-02.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Interior",
+                              "tags": "Interior",
+                              "title": "Wessex Office Interior"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-03.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Housing",
+                              "tags": "Housing",
+                              "title": "Energy-Saving Homes"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/projects-gallery-04.jpg",
+                              "link": "?page_id=20",
+                              "meta": "Architecture",
+                              "tags": "Architecture",
+                              "title": "Harbour Hall"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "vertical_align": "bottom",
+                      "width_default": "1-4",
+                      "width_xlarge": "1-5"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "You want to collaborate with us on one of our projects? Don’t hesitate to contact us.",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "content_style": "text-meta",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "tel:+44555000015",
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "remove-vertical",
+                          "meta": " Would you like to discuss a project?",
+                          "meta_align": "above-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_margin": "remove",
+                          "meta_style": "text-meta",
+                          "title": "(+44) 55 500 00 15",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": true,
+                          "title_margin": "small",
+                          "title_style": "h4"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          }
+        },
+        "28": {
+          "content": {
+            "type": "fragment",
+            "version": "4.5.18",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "divider": false,
+                  "layout": "4-5,1-5",
+                  "width": "xlarge"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_default": "3-4",
+                      "width_xlarge": "4-5"
+                    },
+                    "children": [
+                      {
+                        "type": "fragment",
+                        "props": {
+                          "margin": "default"
+                        },
+                        "children": [
+                          {
+                            "type": "row",
+                            "props": {
+                              "layout": "1-2,1-2"
+                            },
+                            "children": [
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "headline",
+                                    "props": {
+                                      "content": "Our Residences",
+                                      "title_element": "div",
+                                      "title_style": "h4"
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "column",
+                                "props": {
+                                  "image_position": "center-center",
+                                  "position_sticky_breakpoint": "m",
+                                  "vertical_align": "middle",
+                                  "width_medium": "1-2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "button",
+                                    "props": {
+                                      "grid_column_gap": "small",
+                                      "grid_row_gap": "small",
+                                      "margin": "default",
+                                      "text_align": "right"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "button_item",
+                                        "props": {
+                                          "button_style": "text",
+                                          "content": "See All Residences",
+                                          "icon_align": "left",
+                                          "link": "?page_id=6",
+                                          "dialog_layout": "modal",
+                                          "dialog_offcanvas_flip": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "gallery",
+                        "props": {
+                          "css": "@media (max-width: 1599px) {\n\t.el-element > * > :last-child { display: none; }\n}",
+                          "filter": false,
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "3",
+                          "grid_masonry": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "grid_xlarge": "4",
+                          "image_height": "390",
+                          "image_width": "310",
+                          "item_animation": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": true,
+                          "overlay_link": true,
+                          "overlay_mode": "cover",
+                          "overlay_position": "bottom-left",
+                          "overlay_style": "overlay-default",
+                          "overlay_transition": "slide-bottom-small",
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "text_align": "",
+                          "text_color": "light",
+                          "title_element": "h2",
+                          "title_hover_style": "reset",
+                          "title_margin": "small",
+                          "title_style": "h5",
+                          "lightbox_bg_close": true
+                        },
+                        "children": [
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-01.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Angel Court"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-02.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Shape Tower"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-03.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Alison Park"
+                            }
+                          },
+                          {
+                            "type": "gallery_item",
+                            "props": {
+                              "image": "wp-content/uploads/yootheme/residences-building-04.jpg",
+                              "link": "?page_id=19",
+                              "meta": "",
+                              "tags": "Interior",
+                              "title": "Villa Slayton"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "vertical_align": "bottom",
+                      "width_default": "1-4",
+                      "width_xlarge": "1-5"
+                    },
+                    "children": [
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content": "<a href=\"tel:+44555000015\">(+44) 55 500 00 15</a> <br> <a href=\"mailto:dianna@example.com\">dianna@example.com</a>",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "content_style": "text-meta",
+                          "icon_width": 80,
+                          "image": "wp-content/uploads/yootheme/footer-contact-person.jpg",
+                          "image_align": "top",
+                          "image_border": "circle",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "80",
+                          "image_svg_color": "emphasis",
+                          "image_width": "80",
+                          "link": "tel:+44555000015",
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "remove-vertical",
+                          "meta": "Contact Person",
+                          "meta_align": "above-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_margin": "small",
+                          "meta_style": "text-meta",
+                          "title": "Dianna Briggs",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": true,
+                          "title_margin": "remove",
+                          "title_style": "h4"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "stretch": "navbar",
+            "size": true
+          }
+        },
+        "30": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "400",
+            "align": "",
+            "stretch": ""
+          }
+        }
+      }
+    },
+    "document": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "static",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "dropbar-top",
+      "headerMobileDialogTogglePosition": "mobile-end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileOffcanvasMode": "push",
+      "headerMobileOffcanvasFlip": true,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
+      "headerDropdownAlign": "center",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": true,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerInverseLogoUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+      "layout": "header-row",
+      "layoutColumns": 3,
+      "headerUtilityMigrationVersion": 3,
+      "background": "transparent",
+      "backgroundMode": "full",
+      "contentMode": "expand",
+      "colorScheme": "inherit",
+      "rows": [
+        {
+          "id": "header-toolbar-row",
+          "role": "toolbar",
+          "headerVariant": "desktop",
+          "layout": "whole",
+          "maxWidth": "large",
+          "columns": [
+            {
+              "id": "header-toolbar-column",
+              "elements": []
+            }
+          ]
+        },
+        {
+          "id": "header-main-row",
+          "headerVariant": "desktop",
+          "layout": "quarters-1-2-1",
+          "columns": [
+            {
+              "id": "header-main-left",
+              "elements": [
+                {
+                  "id": "header-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageInverseUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+                  "imageAlt": "yard.",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "yard.",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-main-center",
+              "elements": [
+                {
+                  "id": "header-navigation",
+                  "kind": "menu",
+                  "title": "Navigation",
+                  "menuSource": "main",
+                  "elementAlign": "center",
+                  "menuDropbar": true
+                }
+              ]
+            },
+            {
+              "id": "header-main-right",
+              "elements": []
+            }
+          ]
+        },
+        {
+          "id": "header-mobile-row",
+          "headerVariant": "mobile",
+          "layout": "halves",
+          "columns": [
+            {
+              "id": "header-mobile-start",
+              "elements": [
+                {
+                  "id": "header-mobile-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageInverseUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+                  "imageAlt": "yard.",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "yard.",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-mobile-end",
+              "elements": [
+                {
+                  "id": "header-mobile-search",
+                  "kind": "headerSearch",
+                  "headerUtilityAction": "search",
+                  "elementAlign": "right"
+                },
+                {
+                  "id": "header-mobile-navigation",
+                  "kind": "menu",
+                  "title": "Mobile navigation",
+                  "menuSource": "main",
+                  "elementAlign": "right",
+                  "menuDropbar": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "breakpoint": "1200px",
+    "mobileLayout": "horizontal-right",
+    "dialogLayout": "offcanvas-top",
+    "dialogToggle": "header:end"
+  },
+  "resolved": {
+    "shellSettings": {
+      "themePageLayout": "full",
+      "themePageContainerAlignment": "center"
+    },
+    "headerDocument": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "full",
+      "headerBehavior": "sticky",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "static",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "dropbar-top",
+      "headerMobileDialogTogglePosition": "mobile-end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileOffcanvasMode": "push",
+      "headerMobileOffcanvasFlip": true,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
+      "headerDropdownAlign": "center",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": true,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerInverseLogoUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+      "layout": "header-row",
+      "layoutColumns": 3,
+      "headerUtilityMigrationVersion": 3,
+      "background": "transparent",
+      "backgroundMode": "full",
+      "contentMode": "expand",
+      "colorScheme": "inherit",
+      "rows": [
+        {
+          "id": "header-toolbar-row",
+          "role": "toolbar",
+          "headerVariant": "desktop",
+          "layout": "whole",
+          "maxWidth": "large",
+          "columns": [
+            {
+              "id": "header-toolbar-column",
+              "elements": []
+            }
+          ]
+        },
+        {
+          "id": "header-main-row",
+          "headerVariant": "desktop",
+          "layout": "quarters-1-2-1",
+          "columns": [
+            {
+              "id": "header-main-left",
+              "elements": [
+                {
+                  "id": "header-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageInverseUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+                  "imageAlt": "yard.",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "yard.",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-main-center",
+              "elements": [
+                {
+                  "id": "header-navigation",
+                  "kind": "menu",
+                  "title": "Navigation",
+                  "menuSource": "main",
+                  "elementAlign": "center",
+                  "menuDropbar": true
+                }
+              ]
+            },
+            {
+              "id": "header-main-right",
+              "elements": []
+            }
+          ]
+        },
+        {
+          "id": "header-mobile-row",
+          "headerVariant": "mobile",
+          "layout": "halves",
+          "columns": [
+            {
+              "id": "header-mobile-start",
+              "elements": [
+                {
+                  "id": "header-mobile-logo",
+                  "kind": "image",
+                  "imageUrl": "wp-content/uploads/yootheme/logo.svg",
+                  "imageInverseUrl": "wp-content/uploads/yootheme/logo-inverted.svg",
+                  "imageAlt": "yard.",
+                  "headerBrandMode": "logo",
+                  "headerBrandText": "yard.",
+                  "imageAlignment": "left",
+                  "elementAlign": "left"
+                }
+              ]
+            },
+            {
+              "id": "header-mobile-end",
+              "elements": [
+                {
+                  "id": "header-mobile-search",
+                  "kind": "headerSearch",
+                  "headerUtilityAction": "search",
+                  "elementAlign": "right"
+                },
+                {
+                  "id": "header-mobile-navigation",
+                  "kind": "menu",
+                  "title": "Mobile navigation",
+                  "menuSource": "main",
+                  "elementAlign": "right",
+                  "menuDropbar": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "capabilities": {
+    "global": [],
+    "page": [
+      "site.layout",
+      "site.boxed.alignment",
+      "theme.layout",
+      "theme.alignment",
+      "theme.colorMode"
+    ],
+    "header": [
+      "site.toolbar_width",
+      "header.layout",
+      "header.width",
+      "header.search_layout",
+      "header.search_dropdown.stretch",
+      "header.search_dropdown.size",
+      "header.search_icon",
+      "header.social_gap",
+      "header.search",
+      "header.social_style",
+      "header.social",
+      "header.social_items",
+      "navbar.sticky",
+      "navbar.dropdown_align",
+      "navbar.offcanvas",
+      "navbar.dropbar",
+      "navbar.dropdown_boundary",
+      "navbar.dropdown_target",
+      "mobile.breakpoint",
+      "mobile.header",
+      "mobile.navbar",
+      "mobile.dialog",
+      "mobile.search",
+      "mobile.offcanvas",
+      "dialog.layout",
+      "dialog.toggle",
+      "dialog.menu_style",
+      "dialog.offcanvas",
+      "dialog.toggle_text",
+      "headerDocument.headerArchitectureVersion",
+      "headerDocument.headerPresetKey",
+      "headerDocument.headerLayout",
+      "headerDocument.headerWidthMode",
+      "headerDocument.headerBehavior",
+      "headerDocument.headerMobileBreakpoint",
+      "headerDocument.headerMobileLayout",
+      "headerDocument.headerMobileComposition",
+      "headerDocument.headerMobileBehavior",
+      "headerDocument.headerMobileSearchPosition",
+      "headerDocument.headerMobileSearchLayout",
+      "headerDocument.headerMobileSearchDropdownStretch",
+      "headerDocument.headerMobileSearchDropdownLarge",
+      "headerDocument.headerMobileSearchIconPosition",
+      "headerDocument.headerMobileSocialStyle",
+      "headerDocument.headerMobileSocialGap",
+      "headerDocument.headerMobileSocialItems",
+      "headerDocument.headerMobileDialogLayout",
+      "headerDocument.headerMobileDialogTogglePosition",
+      "headerDocument.headerMobileDialogClose",
+      "headerDocument.headerMobileDialogMenuStyle",
+      "headerDocument.headerMobileOffcanvasMode",
+      "headerDocument.headerMobileOffcanvasFlip",
+      "headerDocument.headerMobileOffcanvasOverlay",
+      "headerDocument.headerMobileDialogDropbarAnimation",
+      "headerDocument.headerDropdownAlign",
+      "headerDocument.headerDropdownAlignToNavbar",
+      "headerDocument.headerDropbarEnabled",
+      "headerDocument.headerSearchPosition",
+      "headerDocument.headerSearchLayout",
+      "headerDocument.headerSearchDropdownStretch",
+      "headerDocument.headerSearchDropdownLarge",
+      "headerDocument.headerSearchIconPosition",
+      "headerDocument.headerSocialPosition",
+      "headerDocument.headerSocialStyle",
+      "headerDocument.headerSocialGap",
+      "headerDocument.headerSocialItems",
+      "headerDocument.headerDialogLayout",
+      "headerDocument.headerDialogTogglePosition",
+      "headerDocument.headerDialogMenuStyle",
+      "headerDocument.headerOffcanvasMode",
+      "headerDocument.headerOffcanvasFlip",
+      "headerDocument.headerOffcanvasOverlay",
+      "headerDocument.headerInverseLogoUrl",
+      "headerDocument.layout",
+      "headerDocument.layoutColumns",
+      "headerDocument.headerUtilityMigrationVersion",
+      "headerDocument.background",
+      "headerDocument.backgroundMode",
+      "headerDocument.contentMode",
+      "headerDocument.colorScheme",
+      "headerDocument.layoutItems",
+      "headerDocument.rows"
+    ]
+  },
+  "unsupported": [],
+  "updatedAt": "2026-08-28T07:03:33.359Z"
+}

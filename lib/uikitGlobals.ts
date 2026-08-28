@@ -11,6 +11,40 @@ import { fontFamilyStack } from "@/lib/webFonts";
 import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 import { resolveSectionColorMode } from "@/lib/semanticBackgrounds";
 
+function colorLuminance(value: string): number | null {
+  const hex = value.trim().match(/^#([0-9a-f]{3,8})$/i)?.[1];
+  const rgb = hex
+    ? (hex.length === 3 || hex.length === 4
+      ? hex.slice(0, 3).split("").map((part) => part + part)
+      : [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)])
+        .map((part) => parseInt(part, 16))
+    : value.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i)?.slice(1).map(Number);
+  if (!rgb || rgb.length !== 3 || rgb.some((channel) => !Number.isFinite(channel))) return null;
+  return rgb.map((channel) => channel / 255).reduce((sum, channel, index) => {
+    const linear = channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+    return sum + linear * [0.2126, 0.7152, 0.0722][index];
+  }, 0);
+}
+
+function shouldUseInverseText(
+  mode: "light" | "dark",
+  background: string,
+  normalText: string,
+  inverseText: string,
+) {
+  if (mode === "dark") return true;
+  const bg = colorLuminance(background);
+  const normal = colorLuminance(normalText);
+  const inverse = colorLuminance(inverseText);
+  if (bg === null || normal === null || inverse === null) return false;
+  const contrast = (foreground: number) => {
+    const lighter = Math.max(bg, foreground);
+    const darker = Math.min(bg, foreground);
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+  return contrast(inverse) > contrast(normal);
+}
+
 function yoothemeButtonTextArrow(color: string) {
   const svg = `<svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><polyline fill="none" stroke="${color}" stroke-width="1.2" points="13 1 18 5.5 13 10"/><line fill="none" stroke="${color}" stroke-width="1.2" x1="0" y1="5.5" x2="18.4" y2="5.5"/></svg>`;
   return `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}")`;
@@ -154,17 +188,18 @@ export function getUikitGlobalsCssVars(
     primary: resolveSectionColorMode(shellSettings, "primary"),
     secondary: resolveSectionColorMode(shellSettings, "secondary"),
   };
-  // YOOtheme's Section color-mode labels select the normal or inverse UIkit
-  // context. In Circle, `light` is the normal light-text theme context; the
-  // imported `@global-inverse-color: #000` is used only for `dark` mode.
-  const sectionTextColor = (mode: "light" | "dark") => mode === "light"
-    ? "var(--uk-global-text-color, #111827)"
-    : "var(--uk-inverse-global-color, #000)";
   const globalText = value("textColor", "#111827");
   const globalEmphasis = value("emphasisColor", globalText);
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
   const globalBorder = value("borderColor", "transparent");
+  // Keep the authored mode, but repair imported themes where a dark semantic
+  // surface is paired with an unreadable normal text token. The existing
+  // canonical normal/inverse tokens remain the only sources of color.
+  const sectionTextColor = (mode: "light" | "dark", background: string) =>
+    shouldUseInverseText(mode, background, globalText, globalInverse)
+      ? "var(--uk-inverse-global-color, #fff)"
+      : "var(--uk-global-text-color, #111827)";
   // UIkit has three heading tiers: base, tablet/medium, and laptop/large.
   // Keep those tiers separate from HTML h1–h6 sizes. YOOtheme themes can
   // override the responsive large values (Jack Baker does for Large,
@@ -283,10 +318,10 @@ export function getUikitGlobalsCssVars(
     "--uk-section-muted-color-mode": sectionColorModes.muted,
     "--uk-section-primary-color-mode": sectionColorModes.primary,
     "--uk-section-secondary-color-mode": sectionColorModes.secondary,
-    "--uikit-section-default-color": sectionTextColor(sectionColorModes.default),
-    "--uikit-section-muted-color": sectionTextColor(sectionColorModes.muted),
-    "--uikit-section-primary-color": sectionTextColor(sectionColorModes.primary),
-    "--uikit-section-secondary-color": sectionTextColor(sectionColorModes.secondary),
+    "--uikit-section-default-color": sectionTextColor(sectionColorModes.default, backgroundDefault),
+    "--uikit-section-muted-color": sectionTextColor(sectionColorModes.muted, backgroundMuted),
+    "--uikit-section-primary-color": sectionTextColor(sectionColorModes.primary, backgroundPrimary),
+    "--uikit-section-secondary-color": sectionTextColor(sectionColorModes.secondary, backgroundSecondary),
     "--webpages-background-default-image": backgroundDefaultImage,
     "--webpages-background-muted-image": backgroundMutedImage,
     "--webpages-background-primary-image": backgroundPrimaryImage,

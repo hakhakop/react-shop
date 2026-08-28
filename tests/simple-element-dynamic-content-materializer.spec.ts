@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { BuilderLayout } from "@/lib/builderLayouts";
 import { dynamicStructureRenderId, materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import { dynamicBindingDestinationCapability } from "@/lib/dynamicContentCapabilities";
+import type { DynamicContentContextDescriptor } from "@/lib/dynamicContent";
 
 const descriptor = { provider: "wordpress", source: "post", mode: "collection" as const };
 
@@ -146,4 +147,118 @@ test("13K2 transiently multiplies canonical Section, Row, and Column templates w
     "Post A", "Post B", "Post A", "Post B", "Post A", "Post B",
   ]);
   expect(JSON.stringify(authored)).toBe(snapshot);
+});
+
+test("a parent taxonomy context supplies its database ID to a related collection", async () => {
+  const descriptors: DynamicContentContextDescriptor[] = [];
+  const layout = {
+    version: 1,
+    key: "parent-relation-proof",
+    page: "parent-relation-proof",
+    updatedAt: "2026-08-28T00:00:00.000Z",
+    sections: [{
+      id: "tag-section",
+      kind: "contentLayout",
+      title: "Tag",
+      background: "transparent",
+      visible: true,
+      dynamicContext: {
+      provider: "wordpress",
+      source: "content",
+      mode: "single",
+      query: { graphqlRoot: "discoverTags", databaseId: 56 },
+    },
+    rows: [{
+      id: "row",
+      layout: "1-col",
+      columns: [{
+        id: "column",
+        elements: [{
+          id: "grid",
+          kind: "grid",
+          gridItems: [{
+            id: "item",
+            title: "Fallback",
+            dynamicContext: {
+              provider: "wordpress",
+              source: "content",
+              mode: "collection",
+              query: {
+                graphqlRoot: "accommodations",
+                parentRelation: true,
+                sourceQuery: { name: "#parent", field: { name: "accommodations", arguments: { limit: 4 } } },
+              },
+            },
+            dynamicBindings: { title: { path: "title", valueType: "string" } },
+          }],
+        }],
+      }],
+    }],
+    }],
+  } as BuilderLayout;
+  const result = await materializeBuilderDynamicContent(layout, {
+    resolveContexts: async ({ descriptor }) => {
+      descriptors.push(descriptor);
+      if (descriptor.mode === "single") {
+        return [{ id: "tag-56", fields: { databaseId: { type: "identifier", value: 56 } } }];
+      }
+      return [{ id: "stay-1", fields: { title: { type: "string", value: "Cozy Stay" } } }];
+    },
+  });
+  expect(descriptors[1]).toMatchObject({
+    provider: "wordpress",
+    source: "content",
+    query: {
+      graphqlRoot: "accommodations",
+      quantity: 4,
+      sourceQuery: { arguments: { limit: 4, terms: [56] } },
+    },
+  });
+  expect(result.renderLayout.sections[0].rows?.[0].columns[0].elements[0].gridItems?.[0].title).toBe("Cozy Stay");
+});
+
+test("single taxonomy items materialize section backgrounds, overlays, and Gallery items", async () => {
+  const descriptor = (databaseId: number): DynamicContentContextDescriptor => ({
+    provider: "wordpress",
+    source: "content",
+    mode: "single",
+    query: { graphqlRoot: "discoverTags", databaseId },
+  });
+  const layout = {
+    version: 1,
+    key: "taxonomy-visuals",
+    page: "taxonomy-visuals",
+    updatedAt: "2026-08-28T00:00:00.000Z",
+    sections: [{
+      id: "section",
+      kind: "contentLayout",
+      title: "Tag",
+      background: "transparent",
+      visible: true,
+      dynamicContext: descriptor(56),
+      dynamicBindings: { backgroundImageUrl: { path: "acf.image_featured.url", valueType: "url" } },
+      rows: [{ id: "row", layout: "1-col", columns: [{ id: "column", elements: [
+        { id: "overlay", kind: "overlay", dynamicContext: descriptor(44), dynamicBindings: { title: { path: "name", valueType: "string" } } },
+        { id: "gallery", kind: "gallery", galleryItems: [{ id: "gallery-item", title: "Fallback", dynamicContext: descriptor(45), dynamicBindings: { title: { path: "name", valueType: "string" }, imageUrl: { path: "acf.image_intro.url", valueType: "url" } } }] },
+      ] }] }],
+    }],
+  } as BuilderLayout;
+  const result = await materializeBuilderDynamicContent(layout, {
+    resolveContexts: async ({ descriptor: source }) => {
+      const databaseId = Number(source.query?.databaseId);
+      return [{ id: databaseId, fields: {
+        name: { type: "string", value: databaseId === 44 ? "Exclusive Architecture" : "Family Vacation" },
+        "acf.image_featured.url": { type: "url", value: "/cozy-featured.jpg" },
+        "acf.image_intro.url": { type: "url", value: "/family-intro.jpg" },
+      } }];
+    },
+  });
+  const section = result.renderLayout.sections[0];
+  expect(section.visualStyle?.background).toMatchObject({ type: "image", imageUrl: "/cozy-featured.jpg" });
+  expect(section.rows?.[0].columns[0].elements[0].title).toBe("Exclusive Architecture");
+  expect(section.rows?.[0].columns[0].elements[1].galleryItems?.[0]).toMatchObject({
+    id: "gallery-item",
+    title: "Family Vacation",
+    imageUrl: "/family-intro.jpg",
+  });
 });

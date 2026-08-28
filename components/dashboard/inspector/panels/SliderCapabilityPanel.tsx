@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Plus, ImagePlus } from "lucide-react";
-import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { BuilderLayoutBlock, BuilderParallaxSettings, BuilderParallaxStop, InspectorTab } from "@/components/dashboard/builderTypes";
 import type { DynamicFieldBinding } from "@/lib/dynamicContent";
 import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import type { BuilderShellSettings } from "@/lib/builderShell";
@@ -22,6 +22,7 @@ import {
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import { ParallaxStopsEditor } from "@/components/dashboard/inspector/panels/ParallaxEditor";
 import {
   InspectorDivision,
   InspectorFieldRow,
@@ -105,6 +106,7 @@ export default function SliderCapabilityPanel({
   const inheritedDotnavPosition = isPanelSlider ? "bottom" : (shellSettings.sliderDotnavPosition ?? "bottom");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings" | "advanced">>({});
+  const [isOverlayParallaxEditorOpen, setOverlayParallaxEditorOpen] = useState(false);
 
   const updateCarousel = (patch: any) => {
     const nextCarouselSettings = {
@@ -168,6 +170,15 @@ export default function SliderCapabilityPanel({
     } as any);
   };
   const sharedSettingsBlock = { ...carouselSettings } as BuilderLayoutBlock;
+  const updateOverlayParallaxStops = (
+    key: "x" | "y" | "scale" | "rotate" | "opacity",
+    stops: BuilderParallaxStop[] | undefined,
+  ) => {
+    const overlayParallax: BuilderParallaxSettings = { ...(carouselSettings.overlayParallax ?? {}) };
+    if (stops === undefined) delete overlayParallax[key];
+    else overlayParallax[key] = stops;
+    updateCarousel({ overlayParallax });
+  };
 
   const handleAddMediaFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -1423,15 +1434,61 @@ export default function SliderCapabilityPanel({
 
         {isSlideshow && (
           <InspectorDivision title="OVERLAY">
+            <InspectorFieldRow label="Container Width">
+              <InspectorSelect
+                value={carouselSettings.overlayContainer ?? "none"}
+                onChange={(value: string) => updateCarousel({ overlayContainer: value === "none" ? undefined : value })}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "default", label: "Default" },
+                  { value: "small", label: "Small" },
+                  { value: "large", label: "Large" },
+                  { value: "xlarge", label: "X-Large" },
+                  { value: "expand", label: "Expand" },
+                ]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Container Padding">
+              <InspectorSelect
+                value={carouselSettings.overlayContainerPadding ?? "default"}
+                disabled={!carouselSettings.overlayContainer || carouselSettings.overlayContainer === "none"}
+                onChange={(value: string) => updateCarousel({ overlayContainerPadding: value === "default" ? undefined : value })}
+                options={[
+                  { value: "default", label: "Default" },
+                  { value: "xsmall", label: "X-Small" },
+                  { value: "small", label: "Small" },
+                  { value: "large", label: "Large" },
+                  { value: "xlarge", label: "X-Large" },
+                ]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Margin">
+              <InspectorSelect
+                value={carouselSettings.overlayMargin ?? "default"}
+                disabled={Boolean(carouselSettings.overlayContainer && carouselSettings.overlayContainer !== "none")}
+                onChange={(value: string) => updateCarousel({ overlayMargin: value === "default" ? undefined : value })}
+                options={[
+                  { value: "default", label: "Default" },
+                  { value: "small", label: "Small" },
+                  { value: "large", label: "Large" },
+                  { value: "none", label: "None" },
+                ]}
+              />
+            </InspectorFieldRow>
             <InspectorFieldRow label="Position">
               <InspectorSelect
-                value={carouselSettings.overlayPosition ?? "center"}
+                value={carouselSettings.overlayPosition ?? "center-left"}
                 onChange={(value: string) => updateCarousel({ overlayPosition: value })}
                 options={[
+                  { value: "top", label: "Top" },
+                  { value: "bottom", label: "Bottom" },
+                  { value: "left", label: "Left" },
+                  { value: "right", label: "Right" },
                   { value: "top-left", label: "Top Left" },
+                  { value: "top-center", label: "Top Center" },
                   { value: "top-right", label: "Top Right" },
                   { value: "center-left", label: "Center Left" },
-                  { value: "center", label: "Center" },
+                  { value: "center", label: "Center Center" },
                   { value: "center-right", label: "Center Right" },
                   { value: "bottom-left", label: "Bottom Left" },
                   { value: "bottom-center", label: "Bottom Center" },
@@ -1439,19 +1496,114 @@ export default function SliderCapabilityPanel({
                 ]}
               />
             </InspectorFieldRow>
+            <InspectorFieldRow label="Style">
+              <InspectorSelect
+                value={carouselSettings.overlayStyle ?? "none"}
+                onChange={(value: string) => updateCarousel({ overlayStyle: value === "none" ? undefined : value })}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "overlay-default", label: "Overlay Default" },
+                  { value: "overlay-primary", label: "Overlay Primary" },
+                  { value: "tile-default", label: "Tile Default" },
+                  { value: "tile-muted", label: "Tile Muted" },
+                  { value: "tile-primary", label: "Tile Primary" },
+                  { value: "tile-secondary", label: "Tile Secondary" },
+                ]}
+              />
+            </InspectorFieldRow>
             <InspectorFieldRow label="Padding">
               <InspectorSelect
                 value={carouselSettings.overlayPadding ?? "default"}
-                onChange={(value: string) => updateCarousel({ overlayPadding: value })}
+                disabled={!carouselSettings.overlayStyle || carouselSettings.overlayStyle === "none"}
+                onChange={(value: string) => updateCarousel({ overlayPadding: value === "default" ? undefined : value })}
                 options={[
-                  { value: "none", label: "None" },
-                  { value: "small", label: "Small" },
                   { value: "default", label: "Default" },
+                  { value: "small", label: "Small" },
                   { value: "large", label: "Large" },
                 ]}
               />
             </InspectorFieldRow>
+            <InspectorFieldRow label="Height">
+              <InspectorSwitch
+                checked={carouselSettings.contentExpand === true}
+                onChange={(checked: boolean) => updateCarousel({ contentExpand: checked || undefined })}
+                label="Expand content"
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Width">
+              <InspectorSelect
+                value={carouselSettings.overlayWidth ?? "none"}
+                disabled={carouselSettings.overlayPosition === "top" || carouselSettings.overlayPosition === "bottom"}
+                onChange={(value: string) => updateCarousel({ overlayWidth: value === "none" ? undefined : value })}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "small", label: "Small" },
+                  { value: "medium", label: "Medium" },
+                  { value: "large", label: "Large" },
+                  { value: "xlarge", label: "X-Large" },
+                  { value: "2xlarge", label: "2X-Large" },
+                ]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Animation">
+              <InspectorSelect
+                value={carouselSettings.overlayAnimation ?? "parallax"}
+                onChange={(value: string) => updateCarousel({ overlayAnimation: value === "parallax" ? undefined : value })}
+                options={[
+                  { value: "parallax", label: "Parallax" },
+                  { value: "fade", label: "Fade" },
+                  { value: "scale-up", label: "Scale Up" },
+                  { value: "scale-down", label: "Scale Down" },
+                  { value: "slide-top-small", label: "Slide Top Small" },
+                  { value: "slide-bottom-small", label: "Slide Bottom Small" },
+                  { value: "slide-left-small", label: "Slide Left Small" },
+                  { value: "slide-right-small", label: "Slide Right Small" },
+                  { value: "slide-top-medium", label: "Slide Top Medium" },
+                  { value: "slide-bottom-medium", label: "Slide Bottom Medium" },
+                  { value: "slide-left-medium", label: "Slide Left Medium" },
+                  { value: "slide-right-medium", label: "Slide Right Medium" },
+                  { value: "slide-top", label: "Slide Top 100%" },
+                  { value: "slide-bottom", label: "Slide Bottom 100%" },
+                  { value: "slide-left", label: "Slide Left 100%" },
+                  { value: "slide-right", label: "Slide Right 100%" },
+                ]}
+              />
+            </InspectorFieldRow>
+            {(carouselSettings.overlayAnimation ?? "parallax") === "parallax" && (
+              <InspectorFieldRow>
+                <button
+                  type="button"
+                  className="builder-button-full"
+                  onClick={() => setOverlayParallaxEditorOpen(true)}
+                >
+                  EDIT SETTINGS
+                </button>
+              </InspectorFieldRow>
+            )}
           </InspectorDivision>
+        )}
+
+        {isSlideshow && isOverlayParallaxEditorOpen && (
+          <div
+            role="dialog"
+            aria-label="Overlay Parallax"
+            style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", background: "rgba(15, 23, 42, 0.35)" }}
+            onMouseDown={(event) => { if (event.target === event.currentTarget) setOverlayParallaxEditorOpen(false); }}
+          >
+            <div style={{ width: "min(520px, 100%)", maxHeight: "min(760px, 90vh)", overflowY: "auto", background: "var(--builder-ui-surface, #fff)", borderRadius: "6px", boxShadow: "0 12px 40px rgba(15, 23, 42, 0.28)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px 0" }}>
+                <strong>Overlay Parallax</strong>
+                <button type="button" className="inspector-control" onClick={() => setOverlayParallaxEditorOpen(false)} aria-label="Close Overlay Parallax editor">Close</button>
+              </div>
+              <InspectorDivision title="PARALLAX">
+                <ParallaxStopsEditor label="Translate X" value={carouselSettings.overlayParallax?.x} onChange={(stops) => updateOverlayParallaxStops("x", stops)} placeholder="0" />
+                <ParallaxStopsEditor label="Translate Y" value={carouselSettings.overlayParallax?.y} onChange={(stops) => updateOverlayParallaxStops("y", stops)} placeholder="0" />
+                <ParallaxStopsEditor label="Scale" value={carouselSettings.overlayParallax?.scale} onChange={(stops) => updateOverlayParallaxStops("scale", stops)} placeholder="1" />
+                <ParallaxStopsEditor label="Rotate" value={carouselSettings.overlayParallax?.rotate} onChange={(stops) => updateOverlayParallaxStops("rotate", stops)} placeholder="0" />
+                <ParallaxStopsEditor label="Opacity" value={carouselSettings.overlayParallax?.opacity} onChange={(stops) => updateOverlayParallaxStops("opacity", stops)} placeholder="1" />
+              </InspectorDivision>
+            </div>
+          </div>
         )}
 
         {isSlideshow && (

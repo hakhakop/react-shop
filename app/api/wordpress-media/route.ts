@@ -47,6 +47,39 @@ type GraphQLMediaResponse = {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+type MediaDiagnosticCode =
+  | "cms_not_configured"
+  | "wordpress_authentication_failed"
+  | "upstream_forbidden"
+  | "rest_endpoint_unavailable"
+  | "graphql_endpoint_unavailable"
+  | "upstream_network_failure";
+
+function mediaDiagnostic(
+  code: MediaDiagnosticCode,
+  message: string,
+  status: number,
+  details?: Record<string, unknown>,
+) {
+  return NextResponse.json(
+    { error: code, code, message, ...(details ? { details } : {}) },
+    { status },
+  );
+}
+
+function upstreamMessage(status: number, endpoint: "REST" | "GraphQL") {
+  if (status === 401) {
+    return `WordPress rejected the ${endpoint} media request with HTTP 401. Check the WordPress username and Application Password.`;
+  }
+  if (status === 403) {
+    return `WordPress or its security/CDN layer blocked the ${endpoint} media request with HTTP 403.`;
+  }
+  if (status === 404) {
+    return `The WordPress ${endpoint} media endpoint returned HTTP 404.`;
+  }
+  return `The WordPress ${endpoint} media endpoint returned HTTP ${status}.`;
+}
+
 async function resolveMediaCms(request: NextRequest) {
   const access = await getAuthorizedWebsiteBuilderScope(request);
   if ("error" in access && access.error) {
@@ -196,7 +229,10 @@ async function loadMediaFromGraphQL({
     });
 
     if (!response.ok) {
-      throw new Error(`GraphQL media query failed: ${response.status}`);
+      throw Object.assign(
+        new Error(upstreamMessage(response.status, "GraphQL")),
+        { status: response.status },
+      );
     }
 
     const payload = (await response.json()) as GraphQLMediaResponse;
@@ -282,12 +318,10 @@ export async function GET(request: NextRequest) {
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
-    return NextResponse.json(
-      {
-        message:
-          "WordPress URL is not configured.",
-      },
-      { status: 500 }
+    return mediaDiagnostic(
+      "cms_not_configured",
+      "CMS not configured for this website. Add a WordPress site URL and credentials in Website Settings.",
+      424,
     );
   }
 
@@ -316,6 +350,8 @@ export async function GET(request: NextRequest) {
   );
   if (search) mediaUrl.searchParams.set("search", search);
 
+  let graphqlError: { code: MediaDiagnosticCode; message: string } | null = null;
+
   if (authHeaders) {
     try {
       const fallback = await loadMediaFromGraphQL({
@@ -335,7 +371,20 @@ export async function GET(request: NextRequest) {
         hasNextPage: fallback.hasNextPage ?? page < fallback.totalPages,
         source: "graphql-auth",
       });
-    } catch {
+    } catch (caught) {
+      const status = Number((caught as { status?: number })?.status);
+      graphqlError = {
+        code:
+          status === 401
+            ? "wordpress_authentication_failed"
+            : status === 403
+              ? "upstream_forbidden"
+              : "graphql_endpoint_unavailable",
+        message:
+          caught instanceof Error
+            ? caught.message
+            : "The WordPress GraphQL media endpoint is unavailable.",
+      };
       // Fall through to REST as a secondary path when authenticated GraphQL is unavailable.
     }
   }
@@ -350,23 +399,34 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const fallback = await loadMediaFromGraphQL({
-        wordpressBaseUrl,
-        graphqlUrl: cms.graphqlUrl,
-        search,
-        perPage,
-        page,
-        type,
-        authHeaders,
-      });
-      return NextResponse.json({
-        media: fallback.items,
-        total: fallback.total,
-        totalPages: fallback.totalPages,
-        page,
-        hasNextPage: fallback.hasNextPage ?? page < fallback.totalPages,
-        source: authHeaders ? "graphql-auth" : fallback.source,
-      });
+      const status = response.status;
+      if (status === 401) {
+        return mediaDiagnostic(
+          "wordpress_authentication_failed",
+          upstreamMessage(status, "REST"),
+          502,
+          { upstreamStatus: status, endpoint: "rest" },
+        );
+      }
+      if (status === 403) {
+        return mediaDiagnostic(
+          "upstream_forbidden",
+          upstreamMessage(status, "REST"),
+          502,
+          { upstreamStatus: status, endpoint: "rest" },
+        );
+      }
+
+      return mediaDiagnostic(
+        "rest_endpoint_unavailable",
+        upstreamMessage(status, "REST"),
+        502,
+        {
+          upstreamStatus: status,
+          endpoint: "rest",
+          ...(graphqlError ? { graphql: graphqlError } : {}),
+        },
+      );
     }
 
     const payload = (await response.json()) as WordPressMediaResponse[];
@@ -384,7 +444,7 @@ export async function GET(request: NextRequest) {
       hasNextPage: page < totalPages,
       source: authHeaders ? "rest-auth" : "rest",
     });
-  } catch {
+  } catch (caught) {
     try {
       const fallback = await loadMediaFromGraphQL({
         wordpressBaseUrl,
@@ -404,9 +464,15 @@ export async function GET(request: NextRequest) {
         source: authHeaders ? "graphql-auth" : fallback.source,
       });
     } catch {
-      return NextResponse.json(
-        { message: "React could not reach WordPress media library." },
-        { status: 502 }
+      return mediaDiagnostic(
+        "upstream_network_failure",
+        "The server could not connect to the WordPress media service. Check the CMS URL, network access, or security layer.",
+        502,
+        {
+          endpoint: "rest",
+          ...(caught instanceof Error ? { reason: caught.message } : {}),
+          ...(graphqlError ? { graphql: graphqlError } : {}),
+        },
       );
     }
   }
@@ -420,19 +486,19 @@ export async function POST(request: NextRequest) {
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
-    return NextResponse.json(
-      { message: "WordPress URL is not configured." },
-      { status: 500 }
+    return mediaDiagnostic(
+      "cms_not_configured",
+      "CMS not configured for this website. Add a WordPress site URL and credentials in Website Settings.",
+      424,
     );
   }
 
   if (!authHeaders) {
-    return NextResponse.json(
-      {
-        message:
-          "WordPress media upload requires WordPress username and application password.",
-      },
-      { status: 501 }
+    return mediaDiagnostic(
+      "wordpress_authentication_failed",
+      "WordPress media upload requires a WordPress username and Application Password.",
+      502,
+      { endpoint: "rest", reason: "credentials_missing" },
     );
   }
 
@@ -479,9 +545,10 @@ export async function PATCH(request: NextRequest) {
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
-    return NextResponse.json(
-      { message: "WordPress URL is not configured." },
-      { status: 500 }
+    return mediaDiagnostic(
+      "cms_not_configured",
+      "CMS not configured for this website. Add a WordPress site URL and credentials in Website Settings.",
+      424,
     );
   }
 
@@ -549,9 +616,10 @@ export async function DELETE(request: NextRequest) {
   const id = Number(request.nextUrl.searchParams.get("id"));
 
   if (!wordpressBaseUrl) {
-    return NextResponse.json(
-      { message: "WordPress URL is not configured." },
-      { status: 500 }
+    return mediaDiagnostic(
+      "cms_not_configured",
+      "CMS not configured for this website. Add a WordPress site URL and credentials in Website Settings.",
+      424,
     );
   }
 

@@ -86,6 +86,24 @@ export type BuilderListItem = {
   dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
 
+export type BuilderGalleryItem = {
+  id: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  title?: string;
+  meta?: string;
+  content?: string;
+  tags?: string[];
+  linkUrl?: string;
+  linkTarget?: "_self" | "_blank";
+  linkLabel?: string;
+  linkAriaLabel?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<
+    "imageUrl" | "imageAlt" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+  >;
+};
+
 export type BuilderSubnavItem = {
   id: string;
   label: string;
@@ -974,6 +992,7 @@ export type BuilderLayoutBlock = {
       | "buttonUrl"
     >;
   }[];
+  galleryItems?: BuilderGalleryItem[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: "bottom" | "left";
   galleryImageFit?: "contain" | "cover";
@@ -1113,6 +1132,7 @@ export type BuilderSection = {
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
   dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl">;
   /** User-facing label in Builder navigation. */
   name?: string;
   /** Optional public HTML anchor; internal Builder identity remains `id`. */
@@ -1450,12 +1470,19 @@ export type BuilderSection = {
     paginationPosition?: string;
     aspectRatio?: string;
     overlayGradient?: string;
+    overlayContainer?: "none" | "default" | "small" | "large" | "xlarge" | "expand" | string;
+    overlayContainerPadding?: "default" | "xsmall" | "small" | "large" | "xlarge" | string;
+    overlayMargin?: "default" | "small" | "large" | "none" | string;
     overlayPosition?: string;
+    overlayAnimation?: "parallax" | "fade" | "scale-up" | "scale-down" | string;
+    overlayParallax?: BuilderParallaxSettings;
     overlayColor?: string;
     overlayTextColor?: string;
     overlayMode?: "cover" | "caption";
     overlayDisplay?: "always" | "hover" | "active";
     overlayPadding?: string;
+    overlayWidth?: "none" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | string;
+    contentExpand?: boolean;
     overlayLink?: boolean;
     /** Panel/Card defaults remain inherited by items unless the item overrides. */
     panelStyle?: string;
@@ -1550,6 +1577,8 @@ export type BuilderCustomPage = {
 export type BuilderSavedTemplate = {
   id: string;
   title: string;
+  /** Library ownership supplied by the templates API. */
+  libraryScope?: "site" | "shared";
   templateType?: LayoutLibraryType;
   description?: string;
   sourcePage?: BuilderLayoutKey;

@@ -101,6 +101,27 @@
   top: auto;
 }
 
+/* Match UIkit/YOOtheme's sticky navbar geometry. The Header document owns
+   the at-rest container padding, while the sticky state collapses that
+   padding and leaves --header-builder-height as the navbar's compact height. */
+.site-header[data-header-behavior="sticky"],
+.site-header[data-header-behavior="sticky-on-scroll-up"] {
+  transition-property:
+    padding-top,
+    padding-bottom,
+    background-color,
+    border-color,
+    box-shadow,
+    backdrop-filter,
+    transform;
+}
+
+.site-header[data-header-behavior="sticky"][data-scrolled="true"],
+.site-header[data-header-behavior="sticky-on-scroll-up"][data-scrolled="true"] {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 .site-header[data-header-behavior="pill-on-scroll"][data-scrolled="true"] {
   top: var(--header-pill-top-scrolled, 12px);
   width: min(calc(100% - 24px), 1440px);

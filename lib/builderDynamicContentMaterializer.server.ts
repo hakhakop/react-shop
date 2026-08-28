@@ -14,8 +14,6 @@ import type { SaaSWebsite } from "@/lib/websites";
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
 type PanelSliderSlide = NonNullable<BuilderLayoutBlock["slides"]>[number];
-type ListItem = NonNullable<BuilderLayoutBlock["listItems"]>[number];
-type ButtonItem = NonNullable<BuilderLayoutBlock["buttons"]>[number];
 
 export type DynamicContentMaterializationDiagnostic = {
   status: "materialized" | "fallback";
@@ -46,6 +44,76 @@ export type DynamicContentContextResolver = (
 
 type BlockLocation = MaterializedGridBlock;
 
+const withRequestedBindingFields = (
+  descriptor: DynamicContentContextDescriptor,
+  bindings: DynamicFieldBindings | undefined,
+): DynamicContentContextDescriptor => {
+  if (descriptor.provider !== "wordpress" || descriptor.source !== "content") return descriptor;
+  const requestedFields = Array.from(new Set(
+    Object.values(bindings ?? {})
+      .map((binding) => binding?.path)
+      .filter((path): path is string => typeof path === "string" && path.startsWith("acf.")),
+  ));
+  if (requestedFields.length === 0) return descriptor;
+  return {
+    ...descriptor,
+    query: { ...(descriptor.query ?? {}), requestedFields },
+  };
+};
+
+const asDataRecord = (value: unknown): Record<string, unknown> =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+
+const resolveInheritedDescriptor = (
+  descriptor: DynamicContentContextDescriptor | undefined,
+  inheritedContext: DynamicItemContext | undefined,
+): DynamicContentContextDescriptor | undefined => {
+  if (!descriptor) return undefined;
+  const query = asDataRecord(descriptor.query);
+  const legacyParent = descriptor.provider === "yootheme" && descriptor.source === "#parent";
+  const sourceQuery = asDataRecord(query.sourceQuery);
+  const field = asDataRecord(sourceQuery.field);
+  const relationRoot = typeof field.name === "string" ? field.name : "";
+  const parentRelation = query.parentRelation === true || (legacyParent && Boolean(relationRoot));
+  if (legacyParent && !parentRelation) return undefined;
+  if (!parentRelation) return descriptor;
+
+  const databaseId = getDynamicItemContextValue(inheritedContext, "databaseId", "identifier");
+  const graphqlRoot = typeof query.graphqlRoot === "string" ? query.graphqlRoot : relationRoot;
+  if (!graphqlRoot || databaseId === undefined) return descriptor;
+  const relationArguments = asDataRecord(field.arguments);
+  const relationStart = typeof relationArguments.offset === "number"
+    ? relationArguments.offset
+    : undefined;
+  const relationQuantity = typeof relationArguments.limit === "number"
+    ? relationArguments.limit
+    : undefined;
+  return {
+    provider: "wordpress",
+    source: "content",
+    mode: "collection",
+    query: {
+      ...query,
+      graphqlRoot,
+      ...(typeof query.start !== "number" && relationStart !== undefined
+        ? { start: relationStart }
+        : {}),
+      ...(typeof query.quantity !== "number" && relationQuantity !== undefined
+        ? { quantity: relationQuantity }
+        : {}),
+      sourceQuery: {
+        ...sourceQuery,
+        arguments: {
+          ...relationArguments,
+          terms: [databaseId],
+        },
+      },
+    } as DynamicContentContextDescriptor["query"],
+  };
+};
+
 async function resolveInheritedContext(
   descriptor: DynamicContentContextDescriptor | undefined,
   inheritedContext: DynamicItemContext | undefined,
@@ -58,7 +126,7 @@ async function resolveInheritedContext(
 }
 
 const DYNAMIC_SINGLE_ELEMENT_KINDS = new Set([
-  "heading", "image", "text", "button", "panel", "alert",
+  "heading", "image", "overlay", "text", "button", "panel", "alert",
 ]);
 
 const safeErrorMessage = (error: unknown) =>
@@ -104,6 +172,32 @@ export function dynamicStructureRenderId(
 type StructuralNode = {
   id: string;
   dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl">;
+  visualStyle?: Record<string, unknown>;
+};
+
+const projectStructuralNode = <Node extends StructuralNode>(
+  node: Node,
+  context: DynamicItemContext | undefined,
+  renderId?: string,
+): Node => {
+  const binding = node.dynamicBindings?.backgroundImageUrl;
+  const backgroundImageUrl = binding
+    ? getDynamicItemContextValue(context, binding.path, "url")
+    : undefined;
+  const projected = { ...node, ...(renderId ? { id: renderId } : {}) } as Node & Record<string, unknown>;
+  delete projected.dynamicContext;
+  delete projected.dynamicBindings;
+  const resolvedUrl = backgroundImageUrl;
+  if (resolvedUrl) {
+    const visualStyle = asDataRecord(node.visualStyle);
+    const background = asDataRecord(visualStyle.background);
+    projected.visualStyle = {
+      ...visualStyle,
+      background: { ...background, type: "image", imageUrl: resolvedUrl },
+    };
+  }
+  return projected as Node;
 };
 
 async function expandStructuralNode<Node extends StructuralNode>(
@@ -114,11 +208,12 @@ async function expandStructuralNode<Node extends StructuralNode>(
 ): Promise<Array<{ node: Node; context?: DynamicItemContext }>> {
   const descriptor = node.dynamicContext;
   if (!descriptor) return [{ node, context: inheritedContext }];
-  const contexts = await resolveContexts({ website, descriptor });
+  const contexts = await resolveContexts({
+    website,
+    descriptor: withRequestedBindingFields(descriptor, node.dynamicBindings),
+  });
   if (descriptor.mode !== "collection") {
-    const projected = { ...node };
-    delete projected.dynamicContext;
-    return [{ node: projected, context: contexts[0] }];
+    return [{ node: projectStructuralNode(node, contexts[0]), context: contexts[0] }];
   }
   const identified = contexts.filter((context): context is DynamicItemContext & { id: string | number } =>
     (typeof context.id === "string" && context.id.length > 0) ||
@@ -126,8 +221,7 @@ async function expandStructuralNode<Node extends StructuralNode>(
   );
   if (identified.length === 0) return [{ node, context: inheritedContext }];
   return identified.map((context) => {
-    const projected = { ...node, id: dynamicStructureRenderId(node.id, context.id) };
-    delete projected.dynamicContext;
+    const projected = projectStructuralNode(node, context, dynamicStructureRenderId(node.id, context.id));
     return { node: projected, context };
   });
 }
@@ -154,14 +248,7 @@ const staticElementTemplate = (block: BuilderLayoutBlock): BuilderLayoutBlock =>
   return projected;
 };
 
-const staticListItemTemplate = (item: ListItem): ListItem => {
-  const projected = { ...item };
-  delete projected.dynamicContext;
-  delete projected.dynamicBindings;
-  return projected;
-};
-
-const staticButtonItemTemplate = (item: ButtonItem): ButtonItem => {
+const staticRepeatableItemTemplate = <Item extends RepeatableItem>(item: Item): Item => {
   const projected = { ...item };
   delete projected.dynamicContext;
   delete projected.dynamicBindings;
@@ -176,7 +263,7 @@ type RepeatableItem = {
 
 async function materializeRepeatableItems<Item extends RepeatableItem>(
   items: Item[],
-  kind: "list" | "button",
+  kind: "list" | "button" | "gallery",
   location: BlockLocation,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
@@ -186,7 +273,10 @@ async function materializeRepeatableItems<Item extends RepeatableItem>(
   const output: Item[] = [];
   let expanded = false;
   for (const item of items) {
-    const descriptor = item.dynamicContext as DynamicContentContextDescriptor | undefined;
+    const descriptor = resolveInheritedDescriptor(
+      item.dynamicContext as DynamicContentContextDescriptor | undefined,
+      inheritedContext,
+    );
     if (!descriptor) {
       output.push(inheritedContext && item.dynamicBindings
         ? resolveDynamicItem(item, inheritedContext, item.dynamicBindings) as Item
@@ -194,20 +284,33 @@ async function materializeRepeatableItems<Item extends RepeatableItem>(
       if (inheritedContext && item.dynamicBindings) expanded = true;
       continue;
     }
-    if (descriptor.mode !== "collection" || !item.id) {
+    if (descriptor.mode === "collection" && !item.id) {
       diagnostics.push({
         status: "fallback",
         ...location,
         templateItemId: item.id,
-        message: descriptor.mode !== "collection"
-          ? `Unsupported ${kind} Dynamic Content mode: ${descriptor.mode}.`
-          : `A collection ${kind} template requires a stable authored item ID.`,
+        message: `A collection ${kind} template requires a stable authored item ID.`,
       });
       output.push(item);
       continue;
     }
     try {
-      const contexts = await resolveContexts({ website, descriptor });
+      const contexts = await resolveContexts({
+        website,
+        descriptor: withRequestedBindingFields(descriptor, item.dynamicBindings),
+      });
+      if (descriptor.mode === "single") {
+        const context = contexts[0];
+        if (!context) {
+          diagnostics.push({ status: "fallback", ...location, templateItemId: item.id, contextCount: 0, message: "The provider returned no repeatable item." });
+          output.push(item);
+          continue;
+        }
+        output.push(resolveDynamicItem(staticRepeatableItemTemplate(item), context, item.dynamicBindings as DynamicFieldBindings) as Item);
+        expanded = true;
+        diagnostics.push({ status: "materialized", ...location, templateItemId: item.id, contextCount: 1 });
+        continue;
+      }
       const identified = contexts.filter((context): context is DynamicItemContext & { id: string | number } =>
         (typeof context.id === "string" && context.id.length > 0) ||
         (typeof context.id === "number" && Number.isFinite(context.id)),
@@ -217,9 +320,7 @@ async function materializeRepeatableItems<Item extends RepeatableItem>(
         output.push(item);
         continue;
       }
-      const template = kind === "list"
-        ? staticListItemTemplate(item as unknown as ListItem)
-        : staticButtonItemTemplate(item as unknown as ButtonItem);
+      const template = staticRepeatableItemTemplate(item);
       output.push(...identified.map((context) => ({
         ...resolveDynamicItem(template, context, item.dynamicBindings as DynamicFieldBindings),
         id: dynamicGridRenderItemId(String(item.id), context.id),
@@ -249,6 +350,10 @@ async function materializeRepeatableElement(
   if (block.kind === "button" && block.buttons?.length) {
     const buttons = await materializeRepeatableItems(block.buttons, "button", location, website, resolveContexts, diagnostics, inheritedContext);
     return buttons === block.buttons ? block : { ...block, buttons };
+  }
+  if (block.kind === "gallery" && block.galleryItems?.length) {
+    const galleryItems = await materializeRepeatableItems(block.galleryItems, "gallery", location, website, resolveContexts, diagnostics, inheritedContext);
+    return galleryItems === block.galleryItems ? block : { ...block, galleryItems };
   }
   return block;
 }
@@ -283,13 +388,17 @@ async function materializeElementBlock(
   }
   if (!DYNAMIC_SINGLE_ELEMENT_KINDS.has(String(block.kind))) return block;
 
-  if (!block.dynamicContext) {
+  const blockDescriptor = resolveInheritedDescriptor(block.dynamicContext, inheritedContext);
+  if (!blockDescriptor) {
     if (!inheritedContext || !block.dynamicBindings) return block;
     return resolveDynamicItem(staticElementTemplate(block), inheritedContext, block.dynamicBindings);
   }
 
   try {
-    const contexts = await resolveContexts({ website, descriptor: block.dynamicContext });
+    const contexts = await resolveContexts({
+      website,
+      descriptor: withRequestedBindingFields(blockDescriptor, block.dynamicBindings),
+    });
     const context = contexts[0];
     if (!context) {
       diagnostics.push({ status: "fallback", ...location, message: "The provider returned no item for the element context." });
@@ -360,7 +469,7 @@ async function materializeGridBlock(
   const renderItems: GridItem[] = [];
 
   for (const item of block.gridItems) {
-    const descriptor = item.dynamicContext;
+    const descriptor = resolveInheritedDescriptor(item.dynamicContext, inheritedContext);
     if (!descriptor) {
       if (inheritedContext && item.dynamicBindings) {
         renderItems.push(resolveDynamicItem(staticGridTemplate(item), inheritedContext, item.dynamicBindings));
@@ -402,7 +511,10 @@ async function materializeGridBlock(
             },
           }
         : descriptor;
-      const contexts = await resolveContexts({ website, descriptor: resolvedDescriptor });
+      const contexts = await resolveContexts({
+        website,
+        descriptor: withRequestedBindingFields(resolvedDescriptor, item.dynamicBindings),
+      });
       const identifiedContexts = contexts.filter(
         (context): context is DynamicItemContext & { id: string | number } =>
           (typeof context.id === "string" && context.id.length > 0) ||
@@ -474,7 +586,7 @@ async function materializeCarouselCollectionBlock(
   const renderSlides: PanelSliderSlide[] = [];
 
   for (const slide of block.slides) {
-    const descriptor = slide.dynamicContext;
+    const descriptor = resolveInheritedDescriptor(slide.dynamicContext, inheritedContext);
     if (!descriptor) {
       if (inheritedContext && slide.dynamicBindings) {
         renderSlides.push(resolveDynamicItem(staticPanelSliderTemplate(slide), inheritedContext, slide.dynamicBindings));
@@ -505,7 +617,10 @@ async function materializeCarouselCollectionBlock(
     }
 
     try {
-      const contexts = await resolveContexts({ website, descriptor });
+      const contexts = await resolveContexts({
+        website,
+        descriptor: withRequestedBindingFields(descriptor, slide.dynamicBindings),
+      });
       const identifiedContexts = contexts.filter(
         (context): context is DynamicItemContext & { id: string | number } =>
           (typeof context.id === "string" && context.id.length > 0) ||
@@ -595,7 +710,8 @@ async function materializeBlocks(
             inheritedContext,
           )
         : ((block.kind === "list" && Boolean(block.listItems?.length)) ||
-          (block.kind === "button" && Boolean(block.buttons?.length)))
+          (block.kind === "button" && Boolean(block.buttons?.length)) ||
+          (block.kind === "gallery" && Boolean(block.galleryItems?.length)))
           ? await materializeRepeatableElement(
               block,
               location,

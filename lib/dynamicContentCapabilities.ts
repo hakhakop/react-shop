@@ -5,16 +5,10 @@ import type {
 import { wordPressPostAcfSourceFields } from "@/lib/wordpressDynamicContentFields";
 
 export type DynamicContentSourceCapability = {
-  key:
-    | "static"
-    | "wordpress-post-collection"
-    | "wordpress-archive-post-collection"
-    | "wordpress-archive-post-single"
-    | "woocommerce-product-collection"
-    | "woocommerce-product-single";
+  key: string;
   label: string;
-  provider?: "wordpress" | "woocommerce";
-  source?: "post" | "product";
+  provider?: string;
+  source?: string;
   mode?: "collection" | "single";
   fields?: readonly DynamicContentSourceField[];
   queryControls?: readonly DynamicContentQueryControl[];
@@ -94,7 +88,9 @@ export const WORDPRESS_POST_COLLECTION_FIELDS: readonly DynamicContentSourceFiel
   { path: "modifiedDate", label: "Modified Date", valueType: "string" },
   { path: "meta", label: "Meta", valueType: "metadata" },
   { path: "categories", label: "Categories", valueType: "metadata" },
+  { path: "categories.label", label: "Category Names", valueType: "string" },
   { path: "tags", label: "Tags", valueType: "metadata" },
+  { path: "tags.label", label: "Tag Names", valueType: "string" },
   { path: "featuredImage", label: "Featured Image", valueType: "media" },
   { path: "featuredImage.url", label: "Featured Image URL", valueType: "url" },
   { path: "featuredImage.alt", label: "Featured Image Alt", valueType: "string" },
@@ -225,7 +221,7 @@ export const WOOCOMMERCE_PRODUCT_SINGLE_SOURCE =
 
 export function dynamicContentSourceKey(
   descriptor: DynamicContentContextDescriptor | null | undefined,
-): DynamicContentSourceCapability["key"] {
+): string {
   if (!descriptor) return "static";
   if (descriptor.provider === "wordpress" && descriptor.source === "post" && descriptor.mode === "collection") {
     if (descriptor.query?.archive === "single") return "wordpress-archive-post-single";

@@ -12,7 +12,6 @@ import {
   X,
   Layers3,
   Boxes,
-  LayoutTemplate,
   Sliders,
   FileText,
   History,
@@ -84,10 +83,6 @@ type DashboardSidebarProps = {
   shellSettings: BuilderShellSettings;
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
-  renameTemplateRequest?: {
-    id: string;
-    templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
-  } | null;
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
@@ -118,8 +113,14 @@ type DashboardSidebarProps = {
   onImportSavedTemplate?: (
     file: File,
     templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
+    title: string,
+    acceptedTypes?: LayoutLibraryType[],
+  ) => void | boolean | Promise<unknown>;
+  onImportYoothemePage?: (
+    file: File,
+    targetType: LayoutLibraryType,
+    title: string,
   ) => void | Promise<void>;
-  onImportYoothemePage?: (file: File, targetType?: LayoutLibraryType) => void | Promise<void>;
   onApplyYoothemeImport?: () => void;
   onChangeYoothemeImportName?: (name: string) => void;
   onCancelYoothemeImport?: () => void;
@@ -131,8 +132,6 @@ type DashboardSidebarProps = {
   onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
   sidebarCollapsed?: boolean;
   onSetSidebarCollapsed?: (collapsed: boolean) => void;
-  requestedLayoutType?: LayoutLibraryType | null;
-  requestedLayoutTypeRequestKey?: number;
 };
 
 export default function DashboardSidebar({
@@ -152,7 +151,6 @@ export default function DashboardSidebar({
   shellSettings,
   sidebarTab,
   savedTemplates,
-  renameTemplateRequest,
   templateDescriptions,
   templateLabels,
   templateStatus,
@@ -184,23 +182,18 @@ export default function DashboardSidebar({
   onReorderCustomPages,
   sidebarCollapsed = true,
   onSetSidebarCollapsed,
-  requestedLayoutType = null,
-  requestedLayoutTypeRequestKey = 0,
 }: DashboardSidebarProps) {
   // The scoped Builder route/API already authorizes the tenant. Keep root
   // platform visibility controlled by the existing capability flag, while
   // ensuring an authorized website Builder can reach the canonical editor.
   const canShowShellSettings = Boolean(websiteId) || canUseShellSettings;
   const { t } = useTranslation();
-  const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
   const [templateLibraryTab, setTemplateLibraryTab] =
     useState<TemplateLibraryTab>("section");
   const [pageTemplateLibraryOpen, setPageTemplateLibraryOpen] = useState(false);
   const [pageTemplateCategory, setPageTemplateCategory] =
     useState<PageTemplateCategory | "all">("all");
-  const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
-  const [renamingTemplateTitle, setRenamingTemplateTitle] = useState("");
   const [templateImportKey, setTemplateImportKey] = useState(0);
 
   const [corePagesOrder, setCorePagesOrder] = useState<string[]>([]);
@@ -236,26 +229,6 @@ export default function DashboardSidebar({
       return indexA - indexB;
     });
   }, [corePagesOrder]);
-
-  useEffect(() => {
-    if (!requestedLayoutType) return;
-    onSetSidebarTab("templates");
-    setNestedOpen(true);
-    setTemplateLibraryTab(requestedLayoutType);
-    setRenamingTemplateId(null);
-  }, [onSetSidebarTab, requestedLayoutType, requestedLayoutTypeRequestKey]);
-
-  useEffect(() => {
-    if (!renameTemplateRequest) return;
-    const template = savedTemplates.find(
-      (item) => item.id === renameTemplateRequest.id,
-    );
-    if (!template) return;
-    setNestedOpen(true);
-    setTemplateLibraryTab(renameTemplateRequest.templateType);
-    setRenamingTemplateId(template.id);
-    setRenamingTemplateTitle(template.title);
-  }, [renameTemplateRequest, savedTemplates]);
 
   const sidebarPanels: {
     tab: SidebarTab;
@@ -302,12 +275,6 @@ export default function DashboardSidebar({
       description: "Manage Products and Posts and their Individual Layouts.",
     },
     {
-      tab: "templates",
-      label: t("builder.navigation.templates"),
-      description: "Save reusable page starting points.",
-      count: savedTemplates.length,
-    },
-    {
       tab: "routingTemplates",
       label: "Templates",
       description: "Manage routing assignments and layouts.",
@@ -320,7 +287,6 @@ export default function DashboardSidebar({
 
   const openPanel = (tab: SidebarTab) => {
     onSetSidebarTab(tab);
-    setNestedOpen(true);
   };
   const templateTitleValue = templateDraftTitle.trim();
   const saveTemplateAndClear = (kind: "page") => {
@@ -348,7 +314,6 @@ export default function DashboardSidebar({
   const leftNavTabs = [
     { tab: "builder" as SidebarTab, label: t("builder.navigation.structure"), icon: <Layers3 size={18} /> },
     { tab: "elements" as SidebarTab, label: t("builder.navigation.blocks"), icon: <Boxes size={18} /> },
-    { tab: "templates" as SidebarTab, label: t("builder.navigation.layouts"), icon: <LayoutTemplate size={18} /> },
     { tab: "routingTemplates" as SidebarTab, label: "Templates", icon: <Route size={18} /> },
     { tab: "content" as SidebarTab, label: "Content", icon: <FileText size={18} /> },
     ...(canShowShellSettings
@@ -1015,11 +980,9 @@ export default function DashboardSidebar({
                 mode="management"
                 libraryType={templateLibraryTab}
                 savedTemplates={savedTemplates}
+                siteLibraryEnabled={Boolean(websiteId)}
                 templateStatus={templateStatus}
-                onLibraryTypeChange={(type) => {
-                  setTemplateLibraryTab(type);
-                  setRenamingTemplateId(null);
-                }}
+                onLibraryTypeChange={setTemplateLibraryTab}
                 onOpenDocument={(type) => onSwitchBuilderTarget(type)}
                 onApply={onApplySavedTemplate}
                 onExport={onExportSavedTemplate}
@@ -1109,7 +1072,8 @@ export default function DashboardSidebar({
                     onChange={async (event) => {
                       const file = event.currentTarget.files?.[0];
                       if (!file) return;
-                      await onImportYoothemePage(file);
+                      const title = file.name.replace(/\.[^.]+$/, "").trim() || "Imported Page";
+                      await onImportYoothemePage(file, "page", title);
                       setTemplateImportKey((key) => key + 1);
                     }}
                   />

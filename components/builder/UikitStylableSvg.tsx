@@ -19,6 +19,18 @@ export function extractSafeSvgDropShadow(source: string) {
   return new RegExp(`^${dropShadow}(?:\\s+${dropShadow})*$`, "i").test(value) ? value : undefined;
 }
 
+/** Keep YOOtheme's parallax pivot without restoring arbitrary inline CSS. */
+export function extractSafeSvgTransformOrigin(styleSource: string | null) {
+  const value = styleSource
+    ?.match(/(?:^|;)\s*transform-origin\s*:\s*([^;]+)/i)?.[1]
+    ?.trim();
+  if (!value) return undefined;
+  const component = String.raw`(?:left|center|right|top|bottom|0|-?(?:\d+(?:\.\d+)?|\.\d+)(?:%|px|em|rem))`;
+  return new RegExp(`^${component}(?:\\s+${component}){0,2}$`, "i").test(value)
+    ? value
+    : undefined;
+}
+
 /** Preserve the small, presentation-only surface contract used by YOOtheme
  * inline SVG assets without re-enabling arbitrary embedded SVG CSS. */
 function extractSafeSvgSurfaceStyle(source: string) {
@@ -49,6 +61,13 @@ function extractSafeSvgSurfaceStyle(source: string) {
   };
 }
 
+function isSafeEmbeddedImageReference(value: string) {
+  // Some YOOtheme decorative SVGs contain their artwork as an embedded,
+  // base64-encoded raster/SVG image. Keep those self-contained layers, but do
+  // not allow arbitrary external, javascript, or non-image references.
+  return /^data:image\/(?:png|jpe?g|gif|webp|svg\+xml);base64,[a-z0-9+/=]+$/i.test(value);
+}
+
 export function sanitizeStylableSvg(
   source: string,
   fit: "contain" | "cover" | "fill" = "contain",
@@ -60,7 +79,10 @@ export function sanitizeStylableSvg(
   const clean = DOMPurify.sanitize(source, {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ["script", "style", "foreignObject", "iframe", "object", "embed", "animate", "set"],
-    FORBID_ATTR: ["style", "onload", "onclick", "onerror"],
+    // Inline styles are read from the detached sanitized document below and
+    // then removed wholesale. Only the validated parallax transform origin is
+    // restored, so no source-authored CSS reaches the rendered page.
+    FORBID_ATTR: ["onload", "onclick", "onerror"],
   });
   const document = new DOMParser().parseFromString(clean, "image/svg+xml");
   const svg = document.documentElement as unknown as SVGSVGElement;
@@ -68,10 +90,20 @@ export function sanitizeStylableSvg(
     throw new Error("Invalid SVG document");
   }
 
+  svg.querySelectorAll("[style]").forEach((element) => {
+    const transformOrigin = element.hasAttribute("data-uk-parallax")
+      ? extractSafeSvgTransformOrigin(element.getAttribute("style"))
+      : undefined;
+    element.removeAttribute("style");
+    if (transformOrigin) (element as SVGElement).style.setProperty("transform-origin", transformOrigin);
+  });
+
   svg.querySelectorAll("*").forEach((element) => {
     for (const name of ["href", "xlink:href"]) {
       const reference = element.getAttribute(name);
-      if (reference && !/^#[a-z0-9_.:-]+$/i.test(reference)) element.removeAttribute(name);
+      if (reference && !/^#[a-z0-9_.:-]+$/i.test(reference) && !isSafeEmbeddedImageReference(reference)) {
+        element.removeAttribute(name);
+      }
     }
     // Paint inside definitions/masks is structural (for example white mask
     // strokes) and must not inherit the presentation color. UIkit's `uk-svg`
@@ -214,7 +246,7 @@ export default function UikitStylableSvg({
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   const requestKey = `${src}|${fit}|${className ?? ""}|${preserveIntrinsicSize ? "intrinsic" : "frame"}`;
-  const [result, setResult] = useState<{ key: string; markup?: string; failed?: boolean }>({ key: "" });
+  const [result, setResult] = useState<{ key: string; markup?: string; failed?: boolean; error?: string }>({ key: "" });
   const markup = result.key === requestKey ? result.markup ?? null : null;
   const failed = result.key === requestKey && result.failed === true;
   const naturalAspectRatio = intrinsicSvgAspectRatio(markup, fit);
@@ -225,7 +257,15 @@ export default function UikitStylableSvg({
     const start = () => {
       void loadSvg(src, fit, className ?? "", preserveIntrinsicSize).then(
         (value) => { if (!cancelled) setResult({ key: requestKey, markup: value }); },
-        () => { if (!cancelled) setResult({ key: requestKey, failed: true }); },
+        (error) => {
+          if (!cancelled) {
+            setResult({
+              key: requestKey,
+              failed: true,
+              error: error instanceof Error ? error.message : "SVG rendering failed",
+            });
+          }
+        },
       );
     };
     if (loading === "eager" || typeof IntersectionObserver === "undefined") {
@@ -241,7 +281,17 @@ export default function UikitStylableSvg({
     return () => { cancelled = true; observer?.disconnect(); };
   }, [className, fit, loading, preserveIntrinsicSize, requestKey, src]);
 
-  if (failed) return fallback;
+  if (failed) {
+    return (
+      <span
+        data-svg-state="failed"
+        data-svg-error={result.error}
+        style={{ display: "contents" }}
+      >
+        {fallback}
+      </span>
+    );
+  }
 
   return (
     <span

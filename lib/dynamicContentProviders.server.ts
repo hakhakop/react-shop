@@ -4,6 +4,7 @@ import type {
 } from "@/lib/dynamicContent";
 import { resolveWordPressPostContexts } from "@/lib/wordpressDynamicContentProvider.server";
 import { resolveWooCommerceProductContexts } from "@/lib/woocommerceDynamicContentProvider.server";
+import { resolveWordPressGenericContentContexts } from "@/lib/wordpressGenericContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
 
 export type DynamicContentProviderInput = {
@@ -17,6 +18,7 @@ export type DynamicContentProvider = (
 
 const providers: Readonly<Record<string, DynamicContentProvider>> = {
   "wordpress/post": resolveWordPressPostContexts,
+  "wordpress/content": resolveWordPressGenericContentContexts,
   "woocommerce/product": resolveWooCommerceProductContexts,
 };
 

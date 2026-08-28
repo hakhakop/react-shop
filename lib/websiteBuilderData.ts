@@ -72,8 +72,10 @@ export function getBuilderThemeSettingsPath(websiteId?: string) {
     : getRuntimeBuilderFilePath(BUILDER_THEME_SETTINGS_FILE);
 }
 
-export function getBuilderTemplatesPath() {
-  return getRuntimeBuilderFilePath(BUILDER_TEMPLATES_FILE);
+export function getBuilderTemplatesPath(websiteId?: string) {
+  return websiteId
+    ? path.join(getWebsiteBuilderDir(websiteId), BUILDER_TEMPLATES_FILE)
+    : getRuntimeBuilderFilePath(BUILDER_TEMPLATES_FILE);
 }
 
 export function getBuilderRoutingPath(websiteId?: string) {

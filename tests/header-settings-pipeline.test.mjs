@@ -310,6 +310,10 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
     /\.site-header--builder-overlay:not\(\[data-scrolled="true"\]\)[^{]*\{[^}]*background:\s*transparent/s,
   );
   assert.match(
+    headerCss,
+    /\.site-header\[data-header-behavior="sticky"\]\[data-scrolled="true"\][^{]*\{[^}]*padding-top:\s*0\s*!important;[^}]*padding-bottom:\s*0\s*!important;/s,
+  );
+  assert.match(
     dashboardCss,
     /:has\(\.site-header--builder-overlay\)\s+\.builder-preview-header-slot\s*\{[^}]*height:\s*0\s*!important/s,
   );

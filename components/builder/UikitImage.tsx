@@ -94,8 +94,15 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     imageLoading: resolveString(rawBlock.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
   };
   const imageSemantics = resolveUikitImageSemantics(resolvedImageBlock);
-  const imageLoading =
-    resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
+  // The Builder canvas is an editing surface, not a storefront viewport.
+  // Lazy loading is unreliable there for absolutely positioned artwork (the
+  // element can be visible to the user while remaining outside the iframe's
+  // IntersectionObserver root). Keep the published page's authored loading
+  // behavior, but always resolve canvas media so selected/imported images are
+  // immediately visible while editing.
+  const imageLoading = isCanvas || resolvedImageBlock.imageLoading === "eager"
+    ? "eager"
+    : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
   const mediaObjectFit = isImportedYoothemeOverlay
     ? rawBlock.imageFit === "contain" || rawBlock.imageFit === "fill"
@@ -194,7 +201,12 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   ) : fallbackImage;
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
-  const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
+  // Structured Builder animations are applied by the outer canonical shell.
+  // Only retain the legacy string form here; stringifying an imported
+  // animation object creates the invalid `uk-animation-[object Object]`.
+  const animationClass = typeof rawBlock.animation === "string" && rawBlock.animation !== "none"
+    ? `uk-animation-${rawBlock.animation}`
+    : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
   const hasOverlayContent = Boolean(rawBlock.overlayMode || rawBlock.overlayStyle || overlayTitle || overlayMeta || overlayBody || overlayLinkText);
   const overlayPositionClass = rawBlock.overlayPosition && rawBlock.overlayPosition !== "center"
@@ -283,7 +295,14 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     <OverlayElement
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--image ${isImportedYoothemeImage ? "shop-builder-column-block--image-yootheme" : ""} ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
-      style={{ display: "block" }}
+      style={{
+        display: "block",
+        // YOOtheme positions decorative images inside a full-width wrapper
+        // (`uk-width-1-1`) and aligns the fixed-size image within it. An
+        // absolutely positioned auto-width wrapper is shrink-to-fit, which
+        // changes both the right offset and the visible parallax geometry.
+        ...(isImportedYoothemeImage && allowsPositionedOverflow ? { width: "100%" } : {}),
+      }}
     >
       <figure
         className={`shop-builder-image-figure ${isBottomShadow ? "uk-box-shadow-bottom" : ""} ${imageAlignmentClass} ${imageTextColorClass} ${imageInverseClass}`.trim()}

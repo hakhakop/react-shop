@@ -10,6 +10,7 @@ import {
   FileText,
   Image as ImageIcon,
   Layers3,
+  LibraryBig,
   LayoutGrid,
   List,
   MoreHorizontal,
@@ -105,6 +106,7 @@ type Props = {
   hoveredTarget?: BuilderHoverTarget | null;
   actions: BuilderWireframeActions;
   renameSectionId?: string | null;
+  onOpenLibrary?: () => void;
 };
 
 function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
@@ -1630,6 +1632,7 @@ export default function BuilderWireframePanel({
   hoveredTarget = null,
   actions,
   renameSectionId = null,
+  onOpenLibrary,
 }: Props) {
   const treeRef = useRef<HTMLDivElement>(null);
   const renameDraftRef = useRef("");
@@ -1757,6 +1760,20 @@ export default function BuilderWireframePanel({
           </small>
         </div>
       </div>
+
+      {onOpenLibrary ? (
+        <div className="builder-structure-library-bar">
+          <button
+            type="button"
+            className="builder-structure-library-button"
+            onClick={onOpenLibrary}
+            aria-haspopup="dialog"
+          >
+            <LibraryBig size={12} />
+            <span>Library</span>
+          </button>
+        </div>
+      ) : null}
 
       <div
         ref={treeRef}

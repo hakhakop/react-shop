@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   isValidBuilderSection,
   normalizeBuilderLayoutKey,
@@ -6,6 +6,33 @@ import {
   type BuilderSavedTemplate,
   writeBuilderSavedTemplates,
 } from "@/lib/builderLayouts";
+import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+type LibraryScope = "site" | "shared";
+
+function withLibraryScope(
+  templates: BuilderSavedTemplate[],
+  libraryScope: LibraryScope,
+) {
+  return templates.map((template) => ({ ...template, libraryScope }));
+}
+
+async function readVisibleTemplates(scope: { websiteId?: string }) {
+  if (!scope.websiteId) {
+    return withLibraryScope(await readBuilderSavedTemplates(), "shared");
+  }
+  const [siteTemplates, sharedTemplates] = await Promise.all([
+    readBuilderSavedTemplates(scope),
+    readBuilderSavedTemplates(),
+  ]);
+  return [
+    ...withLibraryScope(siteTemplates, "site"),
+    ...withLibraryScope(sharedTemplates, "shared"),
+  ];
+}
 
 function slugifyTemplateId(value: string) {
   return value
@@ -23,12 +50,15 @@ function createTemplateId(title: string) {
     .slice(2, 6)}`;
 }
 
-export async function GET() {
-  const templates = await readBuilderSavedTemplates();
-  return NextResponse.json({ templates });
+export async function GET(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+  return NextResponse.json({ templates: await readVisibleTemplates(access.scope) });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
   const body = (await request.json()) as Partial<BuilderSavedTemplate>;
   const title = body.title?.trim() || "Saved Template";
   const sections = Array.isArray(body.sections) ? body.sections : [];
@@ -40,7 +70,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const templates = await readBuilderSavedTemplates();
+  const templates = await readBuilderSavedTemplates(access.scope);
   const existing = body.id
     ? templates.find((template) => template.id === body.id)
     : undefined;
@@ -70,22 +100,29 @@ export async function POST(request: Request) {
     template,
     ...templates.filter((entry) => entry.id !== template.id),
   ];
-  await writeBuilderSavedTemplates(nextTemplates);
+  await writeBuilderSavedTemplates(nextTemplates, access.scope);
 
-  return NextResponse.json({ template, templates: nextTemplates });
+  return NextResponse.json({
+    template: {
+      ...template,
+      libraryScope: access.scope.websiteId ? "site" : "shared",
+    },
+    templates: await readVisibleTemplates(access.scope),
+  });
 }
 
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+export async function DELETE(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+  const id = request.nextUrl.searchParams.get("id");
 
   if (!id) {
     return NextResponse.json({ error: "Template id is required" }, { status: 400 });
   }
 
-  const templates = await readBuilderSavedTemplates();
+  const templates = await readBuilderSavedTemplates(access.scope);
   const nextTemplates = templates.filter((template) => template.id !== id);
-  await writeBuilderSavedTemplates(nextTemplates);
+  await writeBuilderSavedTemplates(nextTemplates, access.scope);
 
-  return NextResponse.json({ templates: nextTemplates });
+  return NextResponse.json({ templates: await readVisibleTemplates(access.scope) });
 }

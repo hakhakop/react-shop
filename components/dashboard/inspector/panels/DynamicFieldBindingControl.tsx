@@ -9,10 +9,9 @@ import type {
 } from "@/lib/dynamicContent";
 import {
   dynamicBindingDestinationCapability,
-  dynamicContentSourceCapability,
-  dynamicContentSourceFields,
   type DynamicBindingDestination,
 } from "@/lib/dynamicContentCapabilities";
+import { useDynamicContentCapabilities } from "@/components/dashboard/inspector/DynamicContentCapabilitiesContext";
 
 type Props = {
   destination: DynamicBindingDestination;
@@ -29,6 +28,7 @@ export default function DynamicFieldBindingControl({
   binding,
   onChange,
 }: Props) {
+  const capabilities = useDynamicContentCapabilities();
   const destinationCapability = dynamicBindingDestinationCapability(destination);
   const fieldLabel = label ?? destinationCapability?.label ?? destination;
   const acceptedTypes = useMemo(
@@ -41,10 +41,16 @@ export default function DynamicFieldBindingControl({
   const pickerRef = useRef<HTMLDivElement>(null);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, width: 280 });
   const fields = useMemo(
-    () => dynamicContentSourceFields(descriptor).filter((field) =>
-      acceptedTypes.includes(field.valueType),
-    ),
-    [acceptedTypes, descriptor],
+    () => {
+      const capability = capabilities.find((candidate) =>
+        candidate.provider === descriptor?.provider &&
+        candidate.source === descriptor?.source &&
+        candidate.mode === descriptor?.mode &&
+        (candidate.source !== "content" || candidate.defaultQuery?.sourceName === descriptor?.query?.sourceName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlPluralName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlRoot),
+      );
+      return (capability?.fields ?? []).filter((field) => acceptedTypes.includes(field.valueType));
+    },
+    [acceptedTypes, capabilities, descriptor],
   );
   const visibleFields = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -64,7 +70,9 @@ export default function DynamicFieldBindingControl({
           valueType: binding.valueType ?? "string",
         }
       : undefined);
-  const sourceLabel = dynamicContentSourceCapability(descriptor)?.label ?? "Dynamic Content";
+  const sourceLabel = capabilities.find((candidate) =>
+    candidate.provider === descriptor?.provider && candidate.source === descriptor?.source && candidate.mode === descriptor?.mode,
+  )?.label ?? "Dynamic Content";
 
   const updatePickerPosition = useCallback(() => {
     const trigger = triggerRef.current;

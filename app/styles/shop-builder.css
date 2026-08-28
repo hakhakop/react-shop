@@ -4,10 +4,10 @@
   padding: 0;
   background: var(--builder-page-bg, transparent);
   color: var(--uk-global-text-color, var(--builder-text, #111111));
-  /* Imported YOOtheme sections and their positioned artwork are allowed to
-     paint through the main boundary. Clipping the root cuts full-bleed
-     backgrounds even when the owning Section itself is overflow-visible. */
-  overflow: visible;
+  /* Keep off-canvas YOOtheme decorative artwork inside the page canvas so
+     positioned images cannot expand document-level horizontal scroll. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 [data-theme="dark"] .shop-builder-main--scheme-auto {
@@ -1480,66 +1480,129 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   max-height: none;
 }
 
-/* Slideshow content is an overlay within its media frame. The Hero selector
-   previously supplied this positioning, which made the semantic Slideshow
-   add its copy height below the frame after the Hero class was removed. */
-.shop-builder-swiper--slideshow .shop-builder-swiper-content {
+/* YOOtheme Slideshow uses two distinct overlay layers: a full-cover flex
+   positioning/container frame and an inner styled content panel. Keeping
+   those owners separate is what makes container width, outer margin, panel
+   width and panel padding compose without overriding each other. */
+.shop-builder-swiper--slideshow .shop-builder-slideshow-overlay-frame {
   position: absolute;
   inset: 0;
   z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.shop-builder-swiper--slideshow .shop-builder-swiper-content {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  min-width: 0;
+  box-sizing: border-box;
   color: inherit;
+  pointer-events: auto;
 }
 
-/* Slideshow overlay placement is a presentation semantic, distinct from the
-   generic Hero copy layout. UIkit expresses it as a full-cover flex box. */
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-left .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-right .shop-builder-swiper-content {
-  justify-content: flex-start;
+/* Preserve the exact UIkit width vocabulary even when a consumer ships only
+   the Builder stylesheet rather than the complete UIkit utility bundle. */
+.shop-builder-swiper--slideshow .uk-width-small { width: 150px; max-width: 100%; }
+.shop-builder-swiper--slideshow .uk-width-medium { width: 300px; max-width: 100%; }
+.shop-builder-swiper--slideshow .uk-width-large { width: 450px; max-width: 100%; }
+.shop-builder-swiper--slideshow .uk-width-xlarge { width: 600px; max-width: 100%; }
+.shop-builder-swiper--slideshow .uk-width-2xlarge { width: 750px; max-width: 100%; }
+
+.shop-builder-swiper--slideshow .shop-builder-slideshow-overlay-frame--expand .shop-builder-swiper-content {
+  align-self: stretch;
+  min-height: 100%;
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-left .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-right .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center .shop-builder-swiper-content {
-  justify-content: center;
+.shop-builder-swiper--slideshow .shop-builder-slideshow-content-expand > a:last-child {
+  margin-top: auto !important;
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-left .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-center .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-right .shop-builder-swiper-content {
-  justify-content: flex-end;
+/* Match UIkit overlay/tile surfaces when the tenant theme does not already
+   provide them. Theme variables remain the canonical color source. */
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-overlay-default {
+  background: color-mix(in srgb, var(--builder-section-text, #111) 70%, transparent);
+  color: var(--builder-section-bg, #fff);
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-right .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-right .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-right .shop-builder-swiper-content {
-  align-items: flex-end;
-  text-align: right;
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-overlay-primary,
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-tile-primary {
+  background: var(--uk-global-primary-background, var(--global-primary-background, var(--builder-primary, #1e87f0)));
+  color: var(--global-primary-color, #fff);
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center .shop-builder-swiper-content,
-.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-center .shop-builder-swiper-content {
-  align-items: center;
-  text-align: center;
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-tile-default {
+  background: var(--uk-tile-default-background, var(--uk-global-background, var(--builder-section-bg, #fff)));
+  color: var(--builder-section-text, #111);
 }
 
-/* The default YOOtheme Slideshow overlay uses UIkit's canonical uk-padding
-   tier (40px at this desktop reference), not the generic carousel inset. */
-.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--default .shop-builder-swiper-content {
-  padding: 40px;
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-tile-muted {
+  background: var(--uk-tile-muted-background, var(--uk-global-muted-background, #f8f8f8));
+  color: var(--builder-section-text, #111);
 }
 
-/* These are the same semantic tiers exposed by UIkit's padding utilities.
-   They belong to the Slideshow content overlay, not to its image frame. */
-.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--none .shop-builder-swiper-content {
-  padding: 0;
+.shop-builder-swiper--slideshow .shop-builder-swiper-content.uk-tile-secondary {
+  background: var(--uk-tile-secondary-background, var(--uk-global-secondary-background, var(--builder-secondary, #222)));
+  color: var(--uk-tile-secondary-color, #fff);
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--small .shop-builder-swiper-content {
-  padding: 15px;
+/* Dashboard's generic carousel copy spacing must not override YOOtheme's
+   semantic overlay padding. UIkit's Large tier becomes the imported global
+   large gutter at desktop width (70px in Yard). */
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay-style--none .shop-builder-swiper-content {
+  padding: 0 !important;
 }
 
-.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--large .shop-builder-swiper-content {
-  padding: 40px;
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-style--none).shop-builder-slideshow-overlay-padding--default .shop-builder-swiper-content {
+  padding: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-style--none).shop-builder-slideshow-overlay-padding--small .shop-builder-swiper-content {
+  padding: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-style--none).shop-builder-slideshow-overlay-padding--large .shop-builder-swiper-content {
+  padding: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+@media (min-width: 1200px) {
+  .shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-style--none).shop-builder-slideshow-overlay-padding--large .shop-builder-swiper-content {
+    padding: var(--uk-global-large-gutter, 70px) !important;
+  }
+}
+
+/* UIkit transition names are persisted verbatim. Swiper's active slide is the
+   canonical activation state for the one-shot overlay animation family. */
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-animation--parallax) .shop-builder-swiper-content {
+  opacity: 0;
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-animation--parallax) .swiper-slide-active .shop-builder-swiper-content {
+  opacity: 1;
+  transform: none;
+}
+
+.shop-builder-slideshow-overlay-animation--scale-up .shop-builder-swiper-content { transform: scale(.85); }
+.shop-builder-slideshow-overlay-animation--scale-down .shop-builder-swiper-content { transform: scale(1.15); }
+.shop-builder-slideshow-overlay-animation--slide-top-small .shop-builder-swiper-content { transform: translateY(-10px); }
+.shop-builder-slideshow-overlay-animation--slide-bottom-small .shop-builder-swiper-content { transform: translateY(10px); }
+.shop-builder-slideshow-overlay-animation--slide-left-small .shop-builder-swiper-content { transform: translateX(-10px); }
+.shop-builder-slideshow-overlay-animation--slide-right-small .shop-builder-swiper-content { transform: translateX(10px); }
+.shop-builder-slideshow-overlay-animation--slide-top-medium .shop-builder-swiper-content { transform: translateY(-50px); }
+.shop-builder-slideshow-overlay-animation--slide-bottom-medium .shop-builder-swiper-content { transform: translateY(50px); }
+.shop-builder-slideshow-overlay-animation--slide-left-medium .shop-builder-swiper-content { transform: translateX(-50px); }
+.shop-builder-slideshow-overlay-animation--slide-right-medium .shop-builder-swiper-content { transform: translateX(50px); }
+.shop-builder-slideshow-overlay-animation--slide-top .shop-builder-swiper-content { transform: translateY(-100%); }
+.shop-builder-slideshow-overlay-animation--slide-bottom .shop-builder-swiper-content { transform: translateY(100%); }
+.shop-builder-slideshow-overlay-animation--slide-left .shop-builder-swiper-content { transform: translateX(-100%); }
+.shop-builder-slideshow-overlay-animation--slide-right .shop-builder-swiper-content { transform: translateX(100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-builder-swiper--slideshow .shop-builder-swiper-content {
+    transition: none !important;
+  }
 }
 
 /* Overlay Slider visibility and padding are element semantics, not image
@@ -3921,7 +3984,28 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-content-layout-card.uk-card,
 .shop-builder-content-layout-card.uk-tile {
   padding-left: 0 !important;
+}
+.shop-builder-content-layout-card.uk-card {
   border-radius: var(--uk-card-border-radius, var(--builder-card-radius, 8px));
+}
+.shop-builder-content-layout-card.uk-tile {
+  /* UIkit tiles are open, square surfaces with their own vertical rhythm;
+     they are not cards with a card radius or card padding. */
+  border-radius: var(--uk-tile-border-radius, 0px);
+  padding: var(--uk-tile-padding-vertical, 40px)
+    var(--uk-tile-padding-horizontal, 15px) !important;
+}
+.shop-builder-content-layout-card.uk-tile-default,
+.shop-builder-content-layout-card.uk-tile-muted {
+  /* A tile inside an inverse section returns to the normal global palette,
+     exactly as UIkit's tile surface does. */
+  color: var(--uk-global-text-color, #111827) !important;
+  --context-text: var(--uk-global-text-color, #111827);
+  --context-muted: var(--uk-global-muted-text-color, #6b7280);
+  --context-emphasis: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
+  --builder-section-text: var(--uk-global-text-color, #111827);
+  --builder-active-text: var(--uk-global-text-color, #111827);
+  --builder-active-heading: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
 }
 .shop-builder-content-layout-card.uk-card-default,
 .shop-builder-content-layout-card.uk-card-hover {
@@ -4016,6 +4100,22 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   align-items: flex-start;
 }
 
+/* UIkit column vertical alignment needs the selected grid item to own the
+   row's available height. Keep ordinary columns intrinsically sized, but
+   restore stretch for columns that explicitly request middle/bottom so their
+   uk-flex alignment utility has a real vertical axis to work against. */
+.shop-builder-content-row:not(.uk-grid-match)
+  > .shop-builder-content-layout-card:is(.uk-flex-middle, .uk-flex-bottom) {
+  align-self: stretch;
+}
+
+/* UIkit's tile rows use the grid's default stretch behavior. Scope the
+   restoration to rows that actually contain tile surfaces so ordinary
+   content-layout rows retain their intrinsic-height behavior. */
+.shop-builder-content-row:not(.uk-grid-match):has(> .shop-builder-content-layout-card.uk-tile) {
+  align-items: stretch;
+}
+
 /* Keep the normal row baseline natural, but let the explicit Panel fill
    control opt its owning UIkit grid item into the row's available height. */
 .shop-builder-content-row:not(.uk-grid-match)
@@ -4045,6 +4145,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card,
 .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card {
   padding-left: 0 !important;
+}
+.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card.uk-tile,
+.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card.uk-tile {
+  /* Grid-collapse removes inter-column gutters, not the tile's own surface
+     padding. UIkit keeps the latter so tile content stays inset. */
+  padding-left: var(--uk-tile-padding-horizontal, 15px) !important;
+  padding-right: var(--uk-tile-padding-horizontal, 15px) !important;
 }
 
 .shop-builder-content-row.uk-grid-small > .shop-builder-content-layout-card,
@@ -4106,6 +4213,19 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 
 @media (min-width: 960px) {
+  .shop-builder-content-layout-card.uk-tile {
+    padding-top: var(--uk-tile-padding-vertical-m, 70px) !important;
+    padding-bottom: var(--uk-tile-padding-vertical-m, 70px) !important;
+    padding-left: var(--uk-tile-padding-horizontal-m, 40px) !important;
+    padding-right: var(--uk-tile-padding-horizontal-m, 40px) !important;
+  }
+
+  .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card.uk-tile,
+  .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card.uk-tile {
+    padding-left: var(--uk-tile-padding-horizontal-m, 40px) !important;
+    padding-right: var(--uk-tile-padding-horizontal-m, 40px) !important;
+  }
+
   .shop-builder-content-layout-card {
     padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
   }
@@ -7060,6 +7180,28 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   background-image: var(--uikit-section-secondary-bg-image, none) !important;
   color: var(--uikit-section-secondary-color, #ffffff) !important;
 }
+/* Section surfaces own the inherited Builder context as well as UIkit's
+   direct section color. Keep headings, text, links, and preserved-color
+   content on the same canonical role token. */
+.shop-builder-section.uk-section-default {
+  --builder-section-text: var(--uikit-section-default-color, var(--uk-global-text-color, #111827));
+  --builder-active-text: var(--builder-section-text);
+}
+.shop-builder-section.uk-section-muted {
+  --builder-section-text: var(--uikit-section-muted-color, var(--uk-global-text-color, #111827));
+  --builder-active-text: var(--builder-section-text);
+}
+.shop-builder-section.uk-section-primary {
+  --builder-section-text: var(--uikit-section-primary-color, var(--uk-global-text-color, #111827));
+  --builder-active-text: var(--builder-section-text);
+}
+.shop-builder-section.uk-section-secondary {
+  --builder-section-text: var(--uikit-section-secondary-color, var(--uk-global-text-color, #111827));
+  --builder-active-text: var(--builder-section-text);
+}
+.shop-builder-section.uk-preserve-color {
+  color: var(--builder-section-text) !important;
+}
 .shop-builder-section--has-background-image {
   background-size: var(--builder-section-background-size, auto) !important;
   background-position: var(--builder-section-background-position, center center) !important;
@@ -7125,11 +7267,10 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
     padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
   }
   /* Keep the Builder's imported-section selector on the same responsive
-     token path. Its two-class specificity otherwise wins over the generic
-     UIkit rule above and leaves large sections at the base 70px padding. */
+     token path. Top padding is unconditional; bottom padding is owned by the
+     guarded rule below so UIkit's uk-padding-remove-bottom utility can win. */
   .shop-builder-section.uk-section-large {
     padding-top: var(--uk-section-padding-large-m, 140px) !important;
-    padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
   }
   .shop-builder-section.uk-section-large.uk-padding-remove-top {
     padding-top: 0 !important;

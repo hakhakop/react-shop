@@ -13,6 +13,24 @@ export type CmsConnection = {
   updatedAt: string;
 };
 
+/** A tenant-scoped connection must never silently become the global connection. */
+export function getUnconfiguredCmsConnection(): CmsConnection {
+  return {
+    provider: "wordpress",
+    siteUrl: "",
+    adminUrl: "",
+    graphqlUrl: "",
+    wooCommerceApiUrl: "",
+    wooCommerceConsumerKey: "",
+    wooCommerceConsumerSecret: "",
+    wordpressUsername: "",
+    wordpressApplicationPassword: "",
+    storeStatusNotes: "",
+    technicalNotes: "",
+    updatedAt: "",
+  };
+}
+
 function trimTrailingSlash(value: string) {
   return value.replace(/\/+$/, "");
 }
@@ -119,7 +137,7 @@ export function getCmsConnection(
     };
   }
   if (website === null || !website.cmsConnection) {
-    return getEnvCmsConnection();
+    return getUnconfiguredCmsConnection();
   }
 
   const conn = website.cmsConnection;
@@ -176,3 +194,7 @@ export function getWordPressMediaAuthHeaders(
     Authorization: `Basic ${Buffer.from(credentials).toString("base64")}`,
   };
 }
+
+/** Shared WordPress HTTP authentication contract. Kept as an alias for media
+ * callers while schema/content providers use the provider-neutral name. */
+export const getWordPressAuthHeaders = getWordPressMediaAuthHeaders;

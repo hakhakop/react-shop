@@ -2,7 +2,11 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { NextResponse } from "next/server";
 
-const MAX_SVG_BYTES = 1_000_000;
+// YOOtheme can package optimized raster artwork inside a stylable SVG. The
+// Design CTA asset is just over the former 1,000,000-byte ceiling, so it was
+// forced to the plain-image fallback and lost its internal UIkit parallax.
+// Keep the proxy bounded while allowing these canonical exported assets.
+const MAX_SVG_BYTES = 2 * 1024 * 1024;
 
 const privateIp = (address: string) => {
   const normalized = address.toLowerCase();

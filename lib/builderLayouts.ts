@@ -8,7 +8,11 @@ import {
   getBuilderPagesPath,
   getBuilderTemplatesPath,
 } from "@/lib/websiteBuilderData";
-import type { BuilderSection, BuilderSubnavItem } from "@/components/dashboard/builderTypes";
+import type {
+  BuilderParallaxSettings,
+  BuilderSection,
+  BuilderSubnavItem,
+} from "@/components/dashboard/builderTypes";
 import type { CanonicalButtonVariant } from "@/lib/uikitTokens";
 import type {
   DynamicContentContextDescriptor,
@@ -55,6 +59,24 @@ export type BuilderListItem = {
   dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
 
+export type BuilderGalleryItem = {
+  id: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  title?: string;
+  meta?: string;
+  content?: string;
+  tags?: string[];
+  linkUrl?: string;
+  linkTarget?: "_self" | "_blank";
+  linkLabel?: string;
+  linkAriaLabel?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<
+    "imageUrl" | "imageAlt" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+  >;
+};
+
 export type BuilderDesign = {
   preset?: string;
   colorScheme?: string;
@@ -96,7 +118,8 @@ export type BuilderLayoutBlock = {
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
     | "headingText" | "body" | "eyebrow" | "title"
-    | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
+    | "imageUrl" | "imageAlt" | "imageLinkUrl" | "linkText"
+    | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
   >;
   /** Transient canonical Product contexts; never authored persistence data. */
   dynamicProductContexts?: DynamicItemContext[];
@@ -421,12 +444,19 @@ export type BuilderLayoutBlock = {
     slideMode?: string;
     presentation?: "slideshow" | "overlay-slider" | "panel-slider";
     overlayGradient?: string;
+    overlayContainer?: "none" | "default" | "small" | "large" | "xlarge" | "expand" | string;
+    overlayContainerPadding?: "default" | "xsmall" | "small" | "large" | "xlarge" | string;
+    overlayMargin?: "default" | "small" | "large" | "none" | string;
     overlayPosition?: string;
     overlayColor?: string;
     overlayTextColor?: string;
     overlayMode?: "cover" | "caption";
     overlayDisplay?: "always" | "hover" | "active";
     overlayPadding?: string;
+    overlayAnimation?: "parallax" | "fade" | "scale-up" | "scale-down" | string;
+    overlayParallax?: BuilderParallaxSettings;
+    overlayWidth?: "none" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | string;
+    contentExpand?: boolean;
     overlayLink?: boolean;
     /** Whole-element link; distinct from an individual slide action. */
     elementLinkUrl?: string;
@@ -607,6 +637,7 @@ export type BuilderLayoutBlock = {
       | "buttonUrl"
     >;
   }[];
+  galleryItems?: BuilderGalleryItem[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: string;
   galleryImageFit?: string;
@@ -677,6 +708,8 @@ export type BuilderCustomPage = {
 export type BuilderSavedTemplate = {
   id: string;
   title: string;
+  /** Response-only Library ownership; omitted from persisted compositions. */
+  libraryScope?: "site" | "shared";
   templateType?: LayoutLibraryType;
   description?: string;
   sourcePage?: BuilderLayoutKey;
@@ -871,11 +904,13 @@ export async function writeBuilderCustomPages(
   );
 }
 
-export async function readBuilderSavedTemplates(): Promise<
+export async function readBuilderSavedTemplates(
+  scope: BuilderDataScope = {},
+): Promise<
   BuilderSavedTemplate[]
 > {
   try {
-    const raw = await readFile(getBuilderTemplatesPath(), "utf8");
+    const raw = await readFile(getBuilderTemplatesPath(scope.websiteId), "utf8");
     const parsed = JSON.parse(raw) as BuilderSavedTemplate[];
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isValidBuilderSavedTemplate);
@@ -886,8 +921,9 @@ export async function readBuilderSavedTemplates(): Promise<
 
 export async function writeBuilderSavedTemplates(
   templatesToWrite: BuilderSavedTemplate[],
+  scope: BuilderDataScope = {},
 ) {
-  const filePath = getBuilderTemplatesPath();
+  const filePath = getBuilderTemplatesPath(scope.websiteId);
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(
     filePath,

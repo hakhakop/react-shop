@@ -10,6 +10,7 @@ import {
   EffectFade,
   FreeMode,
   Navigation,
+  Parallax,
   Pagination,
   Thumbs,
 } from "swiper/modules";
@@ -177,12 +178,25 @@ export type CarouselSettings = {
   slidenavOutsideBreakpoint?: "small" | "medium" | "large" | "xlarge" | string | null;
   aspectRatio?: "auto" | "16:9" | "4:3" | "1:1" | "21:9" | "full" | string | null;
   overlayGradient?: "none" | "subtle" | "dark-glass" | "vibrant" | string | null;
+  overlayContainer?: "none" | "default" | "small" | "large" | "xlarge" | "expand" | string | null;
+  overlayContainerPadding?: "default" | "xsmall" | "small" | "large" | "xlarge" | string | null;
+  overlayMargin?: "default" | "small" | "large" | "none" | string | null;
   overlayPosition?: "bottom-left" | "bottom-center" | "bottom-right" | "center" | "top-left" | "top-right" | string | null;
+  overlayAnimation?: "parallax" | "fade" | "scale-up" | "scale-down" | string | null;
+  overlayParallax?: {
+    x?: { value: string; position?: number }[];
+    y?: { value: string; position?: number }[];
+    scale?: { value: string; position?: number }[];
+    rotate?: { value: string; position?: number }[];
+    opacity?: { value: string; position?: number }[];
+  } | null;
   overlayColor?: "dark" | "light" | "glass-dark" | "glass-light" | "brand" | string | null;
   overlayTextColor?: "auto" | "light" | "dark" | "brand" | string | null;
   overlayMode?: "cover" | "caption";
   overlayDisplay?: "always" | "hover" | "active";
   overlayPadding?: string | null;
+  overlayWidth?: "none" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | string | null;
+  contentExpand?: boolean | "true" | "false" | 1 | 0 | null;
   /** UIkit Overlay/Tile surface, independent from media fit and content position. */
   overlayStyle?: "none" | "default" | "primary" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary" | string | null;
   /** Visibility belongs to the YOOtheme carousel element, not individual slides. */
@@ -523,12 +537,19 @@ export default function CarouselBlock({
   const slideshowThumbnavNoWrap = booleanSetting(settings?.thumbnavNoWrap, false);
   const slideshowShowNavigationThumbnail = booleanSetting(settings?.showNavigationThumbnail, true);
   const overlayGradient = settings?.overlayGradient ?? "none";
-  const overlayPosition = settings?.overlayPosition ?? "bottom-left";
+  const overlayContainer = settings?.overlayContainer ?? "none";
+  const overlayContainerPadding = settings?.overlayContainerPadding ?? "default";
+  const overlayMargin = settings?.overlayMargin ?? "default";
+  const overlayPosition = settings?.overlayPosition ?? (isSlideshow ? "center-left" : "bottom-left");
+  const overlayAnimation = settings?.overlayAnimation ?? (isSlideshow ? "parallax" : "none");
+  const overlayParallax = settings?.overlayParallax ?? undefined;
   const overlayColor = settings?.overlayColor ?? "dark";
   const overlayTextColor = settings?.overlayTextColor ?? "auto";
   const overlayMode = settings?.overlayMode ?? "cover";
   const overlayDisplay = settings?.overlayDisplay ?? "always";
   const overlayPadding = settings?.overlayPadding ?? "default";
+  const overlayWidth = settings?.overlayWidth ?? "none";
+  const contentExpand = booleanSetting(settings?.contentExpand, false);
   const overlayStyle = settings?.overlayStyle ?? "none";
   const slideshowHeight = settings?.slideshowHeight ?? "auto";
   const slideshowViewportHeight = numberSetting(settings?.slideshowViewportHeight, 100, 0, 100);
@@ -553,6 +574,19 @@ export default function CarouselBlock({
       ? overlayNavigationType === "dotnav"
       : paginationStyle !== "hidden" && booleanSetting(settings?.showDots, true);
   const showThumbnav = isSlideshow && slideshowNavigationType === "thumbnav";
+
+  const overlayParallaxStop = (
+    stops: { value: string; position?: number }[] | undefined,
+    fallback?: string,
+  ) => stops?.[stops.length - 1]?.value || fallback;
+  const overlayParallaxX = overlayParallaxStop(overlayParallax?.x);
+  const overlayParallaxY = overlayParallaxStop(overlayParallax?.y);
+  const overlayParallaxScale = overlayParallaxStop(overlayParallax?.scale);
+  const overlayParallaxRotate = overlayParallaxStop(overlayParallax?.rotate);
+  const overlayParallaxOpacity = overlayParallaxStop(overlayParallax?.opacity);
+  const hasCustomOverlayParallax = Boolean(
+    overlayParallaxX || overlayParallaxY || overlayParallaxScale || overlayParallaxRotate || overlayParallaxOpacity,
+  );
 
   const explicitSlideMode = settings?.slideMode ?? "auto";
   const headingLevel = settings?.headingLevel ?? undefined;
@@ -588,7 +622,15 @@ export default function CarouselBlock({
     responsiveCardsPerView.xlarge,
     explicitSlideMode,
     arrowPosition,
+    overlayContainer,
+    overlayContainerPadding,
+    overlayMargin,
     overlayPosition,
+    overlayAnimation,
+    overlayWidth,
+    contentExpand ? "overlay-expand" : "overlay-natural",
+    overlayStyle,
+    overlayPadding,
     overlayColor,
     overlayTextColor,
     settings?.creativePreset ?? "default",
@@ -636,7 +678,12 @@ export default function CarouselBlock({
         isSlideshow && slideshowSlidenavLarger ? "shop-builder-slideshow-slidenav-large" : "",
         isSlideshow ? `shop-builder-slideshow-slidenav-margin--${slideshowSlidenavMargin}` : "",
         isSlideshow ? `shop-builder-slideshow-overlay--${overlayPosition}` : "",
-        isSlideshow ? `shop-builder-slideshow-padding--${overlayPadding}` : "",
+        isSlideshow ? `shop-builder-slideshow-overlay-animation--${overlayAnimation}` : "",
+        isSlideshow ? `shop-builder-slideshow-overlay-style--${overlayStyle}` : "",
+        isSlideshow ? `shop-builder-slideshow-overlay-padding--${overlayPadding}` : "",
+        isSlideshow ? `shop-builder-slideshow-overlay-margin--${overlayMargin}` : "",
+        isSlideshow ? `shop-builder-slideshow-overlay-width--${overlayWidth}` : "",
+        isSlideshow && contentExpand ? "shop-builder-slideshow-overlay-expand" : "",
         isSlideshow && (overlayTextColor === "light" || overlayTextColor === "dark")
           ? `shop-builder-slideshow-text--${overlayTextColor}`
           : "",
@@ -684,6 +731,7 @@ export default function CarouselBlock({
           EffectFade,
           FreeMode,
           Navigation,
+          Parallax,
           Pagination,
           Thumbs,
         ]}
@@ -695,6 +743,7 @@ export default function CarouselBlock({
         slidesPerView={swiperSlidesPerView}
         spaceBetween={swiperSpaceBetween}
         effect={swiperEffect}
+        parallax={isSlideshow && overlayAnimation === "parallax"}
         speed={transitionSpeedMs}
         centeredSlides={booleanSetting(settings?.centered, swiperVariant === "coverflow" || swiperVariant === "showcase" || isMarquee)}
         thumbs={
@@ -1367,6 +1416,47 @@ export default function CarouselBlock({
 
           if (effectiveMode === "hero") {
             // MODE 2: Full-bleed Hero Banner Slide (Clean Text Overlay over Image)
+            const overlayHasContainer = overlayContainer !== "none";
+            const overlayIsFullWidth = overlayPosition === "top" || overlayPosition === "bottom";
+            const overlayVerticalClass = contentExpand
+              ? ""
+              : overlayPosition.includes("top")
+                ? "uk-flex-top"
+                : overlayPosition.includes("bottom")
+                  ? "uk-flex-bottom"
+                  : overlayPosition === "center" || overlayPosition.startsWith("center-")
+                    ? "uk-flex-middle"
+                    : "";
+            const overlayHorizontalClass = overlayPosition.includes("left")
+              ? "uk-flex-left"
+              : overlayPosition.includes("right")
+                ? "uk-flex-right"
+                : overlayPosition === "center" || overlayPosition.endsWith("-center")
+                  ? "uk-flex-center"
+                  : "";
+            const overlayFrameClass = [
+              "shop-builder-slideshow-overlay-frame",
+              "uk-position-cover",
+              "uk-flex",
+              overlayHasContainer ? "uk-container" : "",
+              overlayHasContainer && overlayContainer !== "default" ? `uk-container-${overlayContainer}` : "",
+              overlayHasContainer ? (overlayContainerPadding === "default" ? "uk-section" : `uk-section-${overlayContainerPadding}`) : "",
+              !overlayHasContainer && overlayMargin !== "none" ? (overlayMargin === "default" ? "uk-padding" : `uk-padding-${overlayMargin}`) : "",
+              overlayVerticalClass,
+              overlayHorizontalClass,
+              contentExpand ? "shop-builder-slideshow-overlay-frame--expand" : "",
+            ].filter(Boolean).join(" ");
+            const overlayContentClass = [
+              "shop-builder-swiper-content",
+              "el-overlay",
+              "uk-margin-remove-first-child",
+              overlayIsFullWidth ? "uk-flex-1" : "",
+              overlayStyle === "none" ? "uk-panel" : `uk-overlay uk-${overlayStyle}`,
+              overlayStyle !== "none" && overlayPadding !== "default" ? `uk-padding-${overlayPadding}` : "",
+              !overlayIsFullWidth && overlayWidth !== "none" ? `uk-width-${overlayWidth}` : "",
+              overlayAnimation !== "parallax" ? `uk-transition-${overlayAnimation}` : "",
+              contentExpand ? "uk-flex uk-flex-column shop-builder-slideshow-content-expand" : "",
+            ].filter(Boolean).join(" ");
             return (
               <SwiperSlide key={slide.id || idx}>
                 <SlideshowItemElement className={`shop-builder-hero-slide-card ${slideshowItemTextContext}`.trim()}>
@@ -1403,8 +1493,16 @@ export default function CarouselBlock({
                     </div>
                   )}
 
-                  {/* Clean Text Overlay (No Giant Dark Slate Box) */}
-                  <div className="shop-builder-swiper-content">
+                  <div className={overlayFrameClass}>
+                    <div
+                      className={overlayContentClass}
+                      data-swiper-parallax={isSlideshow && overlayAnimation === "parallax" && !hasCustomOverlayParallax ? "-30%" : undefined}
+                      data-swiper-parallax-x={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxX : undefined}
+                      data-swiper-parallax-y={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxY : undefined}
+                      data-swiper-parallax-scale={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxScale : undefined}
+                      data-swiper-parallax-rotate={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxRotate : undefined}
+                      data-swiper-parallax-opacity={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxOpacity : undefined}
+                    >
                     {slide.badge && (
                       <span className="shop-builder-swiper-badge">
                         {slide.badge}
@@ -1437,6 +1535,7 @@ export default function CarouselBlock({
                         <span>{slideButtonLabel}</span>
                       </a>
                     )}
+                    </div>
                   </div>
                   {slideshowElementLink}
                 </SlideshowItemElement>

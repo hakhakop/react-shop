@@ -19,6 +19,7 @@ test("Phase 12 fixture and semantic capability registries validate their synchro
     expect(findYoothemeFixture(fixtureId)).toBeTruthy();
   }
   expect(findYoothemeCapability("panel-slider.slider_divider")?.status).toBe("SUPPORTED");
+  expect(findYoothemeCapability("slideshow.overlay_animation")?.status).toBe("SUPPORTED");
   expect(findYoothemeCapability("gallery.source")?.status).toBe("DEFERRED");
   expect(resolveYoothemeFixtureContracts("enterprise3")).toHaveLength(2);
 });

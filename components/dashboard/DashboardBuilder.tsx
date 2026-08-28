@@ -217,8 +217,14 @@ import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
+import { DynamicContentCapabilitiesProvider } from "@/components/dashboard/inspector/DynamicContentCapabilitiesContext";
+import type { DynamicContentSourceCapability } from "@/lib/dynamicContentCapabilities";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import LayoutLibrarySurface, {
+  type LayoutLibraryGroup,
+  type LayoutLibraryInsertionAction,
+} from "@/components/dashboard/LayoutLibrarySurface";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import { ElementLibraryIcon } from "@/components/dashboard/elementIconRegistry";
 import BuilderWireframePanel, {
@@ -2184,7 +2190,6 @@ export type DashboardBuilderProps = {
   enabledContentLanguages?: string[];
   /** Server-provided CMS origin for canonical imported WordPress media URLs. */
   wordpressMediaOrigin?: string | null;
-  requestedLayoutType?: LayoutLibraryType | null;
   initialPageHydration?: {
     authoredLayout: BuilderLayout | null;
     renderLayout: BuilderLayout | null;
@@ -2200,7 +2205,6 @@ export default function DashboardBuilder({
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
   wordpressMediaOrigin = null,
-  requestedLayoutType = null,
   initialPageHydration,
 }: DashboardBuilderProps) {
   const router = useRouter();
@@ -2220,9 +2224,15 @@ export default function DashboardBuilder({
   const searchParams = useSearchParams();
 
   const [activeDynamicDocumentId, setActiveDynamicDocumentId] = useState<string | null>(null);
-  const [layoutLibraryRequest, setLayoutLibraryRequest] = useState<{
-    type: LayoutLibraryType;
-    key: number;
+  const [contextualLibraryOpen, setContextualLibraryOpen] = useState(false);
+  const [contextualLibraryType, setContextualLibraryType] =
+    useState<LayoutLibraryType>("section");
+  const [contextualLibraryTarget, setContextualLibraryTarget] = useState<{
+    page: BuilderLayoutKey;
+    sectionId: string | null;
+    rowIndex: number | null;
+    columnKey: string | null;
+    blockKey: string | null;
   } | null>(null);
   const [activeRoutingTemplateId, setActiveRoutingTemplateId] = useState<string | null>(null);
   const [activeIndividualContextToken, setActiveIndividualContextToken] = useState<string | null>(null);
@@ -2349,6 +2359,26 @@ export default function DashboardBuilder({
     },
     [saasUserRole, websiteId],
   );
+  const [discoveredDynamicContentCapabilities, setDiscoveredDynamicContentCapabilities] =
+    useState<DynamicContentSourceCapability[]>([]);
+  useEffect(() => {
+    if (!websiteId) {
+      setDiscoveredDynamicContentCapabilities([]);
+      return;
+    }
+    const controller = new AbortController();
+    void fetch(builderApiUrl("/api/wordpress-content-schema"), { signal: controller.signal })
+      .then(async (response) => response.ok
+        ? response.json() as Promise<{ capabilities?: DynamicContentSourceCapability[] }>
+        : null)
+      .then((payload) => {
+        if (payload?.capabilities) setDiscoveredDynamicContentCapabilities(payload.capabilities);
+      })
+      .catch(() => {
+        // The static sources remain available when WordPress discovery is offline.
+      });
+    return () => controller.abort();
+  }, [builderApiUrl, websiteId]);
   const isWebsiteScopedBuilder = Boolean(websiteId);
   const canEditShellSettings =
     isWebsiteScopedBuilder || saasUserRole === "super_admin";
@@ -2900,10 +2930,6 @@ export default function DashboardBuilder({
   const [savedTemplates, setSavedTemplates] = useState<BuilderSavedTemplate[]>(
     [],
   );
-  const [renameTemplateRequest, setRenameTemplateRequest] = useState<{
-    id: string;
-    templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
-  } | null>(null);
   const [templateStatus, setTemplateStatus] = useState(
     "Templates save to React",
   );
@@ -3040,17 +3066,11 @@ export default function DashboardBuilder({
     if (!websiteId) {
       params.set("builderFrame", "selection");
       params.set("builderBridge", iframeDiagnosticMode);
-      if (builderState.page === "header" || builderState.page === "footer") {
-        params.set("builderContext", builderState.page);
-      }
       return `/dashboard/preview?${params.toString()}`;
     }
     const tenantRouteSegment = websiteRouteSegment ?? websiteId;
     params.set("builderFrame", "selection");
     params.set("builderBridge", iframeDiagnosticMode);
-    if (builderState.page === "header" || builderState.page === "footer") {
-      params.set("builderContext", builderState.page);
-    }
     return `/app/websites/${encodeURIComponent(tenantRouteSegment)}/preview?${params.toString()}`;
   }, [
     headerContextState.page,
@@ -3059,7 +3079,6 @@ export default function DashboardBuilder({
     templateBuilderContext?.family,
     iframeDiagnosticMode,
     themePreviewRevision,
-    builderState.page,
     websiteId,
     websiteRouteSegment,
   ]);
@@ -3960,7 +3979,7 @@ export default function DashboardBuilder({
 
     async function loadBuilderTemplates() {
       try {
-        const response = await fetch("/api/builder-templates", {
+        const response = await fetch(builderApiUrl("/api/builder-templates"), {
           cache: "no-store",
         });
         if (!response.ok) return;
@@ -3980,7 +3999,7 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [builderApiUrl]);
 
   useEffect(() => {
     let cancelled = false;
@@ -5621,6 +5640,11 @@ export default function DashboardBuilder({
   const postIframeDraftSnapshot = useCallback((state: BuilderState) => {
     const frame = iframeComparisonRef.current;
     if (!frame?.contentWindow) return;
+    frame.contentWindow.postMessage({
+      source: BUILDER_IFRAME_SELECTION_SOURCE,
+      type: "context",
+      shell: state.page === "header" || state.page === "footer" ? state.page : null,
+    }, window.location.origin);
     iframeDraftRevisionRef.current += 1;
     // The iframe is rendering the authored document represented by `state`.
     // Using the surrounding shell context here can label a Home draft as
@@ -5660,8 +5684,13 @@ export default function DashboardBuilder({
 
   const handleIframeLoad = useCallback(() => {
     window.requestAnimationFrame(() => {
-      postIframeDraftSnapshot(iframeRenderStateRef.current);
-      sendSelectionToIframe(false);
+      const loadedState = iframeRenderStateRef.current;
+      postIframeDraftSnapshot(loadedState);
+      // Entering Footer editing reloads the iframe with its shell interaction
+      // context. A non-scrolling focus leaves that new document at scrollY 0,
+      // thousands of pixels above the selected Footer. Reveal the Footer root
+      // after load while preserving the no-jump behavior for pages and Header.
+      sendSelectionToIframe(loadedState.page === "footer");
     });
   }, [postIframeDraftSnapshot, sendSelectionToIframe]);
 
@@ -5673,6 +5702,24 @@ export default function DashboardBuilder({
         event.source !== iframeComparisonRef.current?.contentWindow ||
         event.data?.source !== BUILDER_IFRAME_SELECTION_SOURCE
       ) return;
+      if (event.data.type === "ready") {
+        const loadedState = iframeRenderStateRef.current;
+        postIframeDraftSnapshot(loadedState);
+        if (loadedState.page === "footer") {
+          iframeComparisonRef.current?.contentWindow?.postMessage({
+            source: BUILDER_IFRAME_SELECTION_SOURCE,
+            type: "focus",
+            target: {
+              type: "section",
+              sectionId: loadedState.sections[0]?.id ?? "footer-document",
+            } satisfies BuilderInteractionTarget,
+            scrollIntoView: true,
+          }, window.location.origin);
+        } else {
+          sendSelectionToIframe(false);
+        }
+        return;
+      }
       if (event.data.type === "scroll-start" && iframeDiagnosticMode === "settled") {
         setIframeSelectionRect(null);
         return;
@@ -5756,7 +5803,9 @@ export default function DashboardBuilder({
     handleScopedBuilderNavigate,
     iframeComparisonMode,
     iframeDiagnosticMode,
+    postIframeDraftSnapshot,
     scopedPreviewPages,
+    sendSelectionToIframe,
     switchBuilderTargetFromNavigation,
   ]);
 
@@ -5893,27 +5942,24 @@ export default function DashboardBuilder({
     const contextKey = headerContextKey;
     const preservedPageState =
       shellPageContextState ?? pageContextStateRef.current;
-    if (!preservedPageState) return;
 
     shellTransitionRef.current = { direction: "exit", page: contextKey };
     setActiveShellEntry(null);
     setShellPageContextState(null);
-    undoHistoryRef.current = [structuredClone(preservedPageState)];
-    setCommittedBuilderStateSignature(JSON.stringify(preservedPageState));
-    setBuilderState(preservedPageState);
-    setPublishedDocumentReady(true);
-    router.replace(`${pathname}?page=${contextKey}`, { scroll: false });
-    setHeaderSelected(false);
-    setSelectedId("");
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
-    setOpenLayoutItemId(null);
-    setOpenSlideId(null);
-    setSectionSettingsOpen(false);
-    setInspectorOpen(false);
     setSidebarCollapsed(false);
     setSidebarTab("builder");
+
+    if (preservedPageState) {
+      switchBuilderTarget(contextKey, { state: preservedPageState });
+      setPublishedDocumentReady(true);
+      return;
+    }
+
+    // A direct Header/Footer URL (or a refresh while editing one) has no
+    // in-memory page snapshot to restore. Resolve the contextual page through
+    // the same canonical navigation path used by the Pages panel instead of
+    // leaving the shell document active.
+    void switchBuilderTargetFromNavigation(contextKey);
   };
 
   const openSpacingSettings = (target: SpacingInspectorTarget) => {
@@ -9179,6 +9225,20 @@ export default function DashboardBuilder({
     };
   };
 
+  const cloneTemplateRow = (row: BuilderRow, suffix = "use"): BuilderRow => {
+    const nextRow = JSON.parse(JSON.stringify(row)) as BuilderRow;
+    const seed = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    return {
+      ...nextRow,
+      id: `layout-row-${seed}-${suffix}`,
+      columns: nextRow.columns.map((column, index) => ({
+        ...column,
+        id: `layout-column-${seed}-${suffix}-${index}`,
+        elements: (column.elements ?? []).map(cloneTemplateBlock),
+      })),
+    };
+  };
+
   const cloneTemplateSection = (section: BuilderSection): BuilderSection => {
     const nextSection = JSON.parse(JSON.stringify(section)) as BuilderSection;
     const rowIdMap = new Map<string, string>();
@@ -9204,6 +9264,9 @@ export default function DashboardBuilder({
     return {
       ...nextSection,
       id: createId(nextSection.kind),
+      rows: nextSection.rows?.map((row, index) =>
+        cloneTemplateRow(row, `section-${index}`),
+      ),
       layoutItems:
         nextLayoutItems.length > 0 ? nextLayoutItems : nextSection.layoutItems,
     };
@@ -9233,27 +9296,16 @@ export default function DashboardBuilder({
     title: string,
   ): BuilderSection | null => {
     if (!isLayoutContainerSection(section)) return null;
-    const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
-    const row = rows[rowIndex];
+    const row = normalizeBuilderSectionLayout(section).rows[rowIndex];
     if (!row) return null;
-    const wrapper = createWireframeSection(
-      row.items.length || 1,
-      1,
-      row.layoutKey,
-    );
-    const rowId = `layout-row-${Date.now().toString(36)}-template`;
+    const wrapper = createWireframeSection(row.columns.length || 1, 1, row.layout);
     return {
       ...wrapper,
       title,
-      layout: row.layoutKey,
-      layoutColumns: row.items.length || 1,
-      layoutItems: row.items.map((item, index) => ({
-        ...item,
-        id: `layout-item-${Date.now().toString(36)}-row-template-${index}`,
-        rowId,
-        rowLayout: row.layoutKey,
-        blocks: (item.blocks ?? []).map(cloneTemplateBlock),
-      })),
+      layout: row.layout,
+      layoutColumns: row.columns.length || 1,
+      rows: [cloneTemplateRow(row, "template")],
+      layoutItems: undefined,
     };
   };
 
@@ -9271,7 +9323,7 @@ export default function DashboardBuilder({
     const pageTitle = getLayoutLabel(builderState.page, customPages);
     setTemplateStatus("Saving template...");
 
-    const response = await fetch("/api/builder-templates", {
+    const response = await fetch(builderApiUrl("/api/builder-templates"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -9315,15 +9367,6 @@ export default function DashboardBuilder({
         payload.template as BuilderSavedTemplate,
         ...templates.filter((template) => template.id !== payload.template?.id),
       ]);
-    }
-
-    if (savedTemplate) {
-      setSidebarCollapsed(false);
-      setSidebarTab("templates");
-      setRenameTemplateRequest({
-        id: savedTemplate.id,
-        templateType: savedTemplate.templateType ?? templateType,
-      });
     }
 
     setTemplateStatus("Template saved");
@@ -9443,9 +9486,18 @@ export default function DashboardBuilder({
     });
   };
 
-  const applySavedTemplate = (template: BuilderSavedTemplate) => {
+  const getFirstTemplateBlock = (sections: BuilderSection[]) =>
+    sections
+      .flatMap((section) => normalizeBuilderSectionLayout(section).rows)
+      .flatMap((row) => row.columns)
+      .flatMap((column) => column.elements ?? [])[0];
+
+  const applySavedTemplate = (
+    template: BuilderSavedTemplate,
+    options: { confirmReplace?: boolean } = {},
+  ) => {
     const templateType = template.templateType ?? "page";
-    if (templateType === "page" && builderState.sections.length > 0 &&
+    if (options.confirmReplace !== false && templateType === "page" && builderState.sections.length > 0 &&
       !window.confirm(`Replace the current layout with “${template.title}”?`)) {
       return;
     }
@@ -9583,9 +9635,7 @@ export default function DashboardBuilder({
     }
 
     if (templateType === "element") {
-      const block = clonedSections
-        .flatMap((section) => section.layoutItems ?? [])
-        .flatMap((item) => item.blocks ?? [])[0];
+      const block = getFirstTemplateBlock(clonedSections);
       if (
         block &&
         selectedSection &&
@@ -9596,19 +9646,13 @@ export default function DashboardBuilder({
           ...current,
           sections: current.sections.map((section) => {
             if (section.id !== selectedSection.id) return section;
-            return {
-              ...section,
-              layoutItems: (section.layoutItems ?? []).map((item, index) => {
-                const columnKey = item.id ?? `layout-item-${index}`;
-                if (columnKey !== selectedLayoutColumnKey) return item;
-                return {
-                  ...item,
-                  blocks: [...(item.blocks ?? []), cloneTemplateBlock(block)],
-                };
-              }),
-            };
+            return updateLayoutColumn(section, selectedLayoutColumnKey, (column) => ({
+              ...column,
+              blocks: [...(column.blocks ?? []), block],
+            }));
           }),
         }));
+        setSelectedLayoutBlockKey(block.id ?? null);
         setTemplateStatus("Element template added");
         return;
       }
@@ -9619,26 +9663,24 @@ export default function DashboardBuilder({
       selectedSection &&
       isLayoutContainerSection(selectedSection)
     ) {
-      const rowItems =
-        clonedSections[0]?.layoutItems?.map((item, index) => ({
-          ...item,
-          id: `layout-item-${Date.now().toString(36)}-row-use-${index}`,
-          rowId: `layout-row-${Date.now().toString(36)}-use`,
-          blocks: (item.blocks ?? []).map(cloneTemplateBlock),
-        })) ?? [];
-      if (rowItems.length > 0) {
+      const sourceRow = clonedSections[0]
+        ? normalizeBuilderSectionLayout(clonedSections[0]).rows[0]
+        : null;
+      if (sourceRow) {
+        const nextRowIndex = normalizeBuilderSectionLayout(selectedSection).rows.length;
         setBuilderState((current) => ({
           ...current,
           sections: current.sections.map((section) =>
             section.id === selectedSection.id
               ? {
                   ...section,
-                  layoutItems: [...(section.layoutItems ?? []), ...rowItems],
-                  layoutRows: (section.layoutRows ?? 1) + 1,
+                  rows: [...normalizeBuilderSectionLayout(section).rows, sourceRow],
                 }
               : section,
           ),
         }));
+        setSelectedLayoutRowIndex(nextRowIndex);
+        setSelectedLayoutColumnKey(sourceRow.columns[0]?.id ?? null);
         setTemplateStatus("Row template added");
         return;
       }
@@ -9665,27 +9707,25 @@ export default function DashboardBuilder({
   const getSavedTemplateById = (templateId: string) =>
     savedTemplates.find((template) => template.id === templateId);
 
-  const createRowItemsFromTemplate = (template: BuilderSavedTemplate) => {
+  const createRowFromTemplate = (template: BuilderSavedTemplate) => {
     const sourceSection = template.sections[0];
-    const rowId = `layout-row-${Date.now().toString(36)}-drop`;
-    return (sourceSection?.layoutItems ?? []).map((item, index) => ({
-      ...item,
-      id: `layout-item-${Date.now().toString(36)}-row-drop-${index}-${Math.random()
-        .toString(36)
-        .slice(2, 6)}`,
-      rowId,
-      rowLayout: item.rowLayout ?? sourceSection?.layout,
-      blocks: (item.blocks ?? []).map(cloneTemplateBlock),
-    }));
+    const sourceRow = sourceSection
+      ? normalizeBuilderSectionLayout(sourceSection).rows[0]
+      : null;
+    return sourceRow ? cloneTemplateRow(sourceRow, "insert") : null;
   };
 
   const insertSectionTemplateNear = (
     templateId: string,
     targetSectionId: string,
-    placement: "above" | "below",
+    placement: "above" | "below" | "replace",
   ) => {
     const template = getSavedTemplateById(templateId);
-    if (!template || (template.templateType ?? "page") !== "section") {
+    const templateType = template?.templateType ?? "page";
+    if (
+      !template ||
+      !(["page", "footer", "section", "row"] as LayoutLibraryType[]).includes(templateType)
+    ) {
       setTemplateStatus("Drop section templates between sections");
       return;
     }
@@ -9702,7 +9742,11 @@ export default function DashboardBuilder({
             ? targetIndex
             : targetIndex + 1;
       const sections = [...current.sections];
-      sections.splice(insertIndex, 0, ...clonedSections);
+      sections.splice(
+        placement === "replace" && targetIndex >= 0 ? targetIndex : insertIndex,
+        placement === "replace" && targetIndex >= 0 ? 1 : 0,
+        ...clonedSections,
+      );
       return { ...current, sections };
     });
     setSelectedId(clonedSections[0]?.id ?? targetSectionId);
@@ -9710,14 +9754,15 @@ export default function DashboardBuilder({
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
-    setTemplateStatus("Section template inserted");
+    setTemplateStatus(placement === "replace" ? "Section replaced from Library" : "Section template inserted");
   };
 
   const insertRowTemplateAt = (
     templateId: string,
     sectionId: string,
     rowIndex: number,
-    placement: "before" | "after",
+    placement: "before" | "after" | "replace",
+    revealInspector = true,
   ) => {
     const template = getSavedTemplateById(templateId);
     if (!template || template.templateType !== "row") {
@@ -9725,14 +9770,13 @@ export default function DashboardBuilder({
       return;
     }
 
-    const rowItems = createRowItemsFromTemplate(template);
-    if (rowItems.length === 0) {
+    const insertedRow = createRowFromTemplate(template);
+    if (!insertedRow) {
       setTemplateStatus("Row template is empty");
       return;
     }
 
-    const nextSelectedRowIndex =
-      placement === "before" ? rowIndex : rowIndex + 1;
+    const nextSelectedRowIndex = placement === "after" ? rowIndex + 1 : rowIndex;
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -9740,42 +9784,25 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = section.layoutItems ?? [];
-        const rows = getPreviewLayoutRows(section, layoutItems);
-        const targetRow = rows[rowIndex];
-        if (!targetRow) return section;
-        const targetItem =
-          placement === "before"
-            ? targetRow.items[0]
-            : targetRow.items[targetRow.items.length - 1];
-        const targetItemIndex = layoutItems.findIndex((item, index) => {
-          const itemKey = item.id ?? `layout-item-${index}`;
-          const targetKey = targetItem?.id;
-          return (
-            item === targetItem || (targetKey ? itemKey === targetKey : false)
-          );
-        });
-        if (targetItemIndex < 0) return section;
-        const insertIndex =
-          placement === "before" ? targetItemIndex : targetItemIndex + 1;
-        const nextLayoutItems = [...layoutItems];
-        nextLayoutItems.splice(insertIndex, 0, ...rowItems);
+        const rows = [...normalizeBuilderSectionLayout(section).rows];
+        if (!rows[rowIndex]) return section;
+        const insertIndex = placement === "after" ? rowIndex + 1 : rowIndex;
+        rows.splice(insertIndex, placement === "replace" ? 1 : 0, insertedRow);
         return {
           ...section,
-          layoutItems: nextLayoutItems,
-          layoutRows: (section.layoutRows ?? rows.length) + 1,
+          rows,
         };
       }),
     }));
 
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(nextSelectedRowIndex);
-    setSelectedLayoutColumnKey(rowItems[0]?.id ?? null);
+    setSelectedLayoutColumnKey(insertedRow.columns[0]?.id ?? null);
     setSelectedLayoutBlockKey(null);
-    setOpenLayoutItemId(rowItems[0]?.id ?? null);
+    setOpenLayoutItemId(insertedRow.columns[0]?.id ?? null);
     setInspectorTab("layout");
-    openInspectorPanel();
-    setTemplateStatus("Row template inserted");
+    if (revealInspector) openInspectorPanel();
+    setTemplateStatus(placement === "replace" ? "Row replaced from Library" : "Row template inserted");
   };
 
   const insertElementTemplateAt = ({
@@ -9784,12 +9811,14 @@ export default function DashboardBuilder({
     columnKey,
     targetBlockKey,
     placement = "above",
+    revealInspector = true,
   }: {
     templateId: string;
     sectionId: string;
     columnKey: string;
     targetBlockKey?: string;
-    placement?: "above" | "below";
+    placement?: "above" | "below" | "replace";
+    revealInspector?: boolean;
   }) => {
     const template = getSavedTemplateById(templateId);
     if (!template || template.templateType !== "element") {
@@ -9797,9 +9826,7 @@ export default function DashboardBuilder({
       return;
     }
 
-    const sourceBlock = template.sections
-      .flatMap((section) => section.layoutItems ?? [])
-      .flatMap((item) => item.blocks ?? [])[0];
+    const sourceBlock = getFirstTemplateBlock(template.sections);
     if (!sourceBlock) {
       setTemplateStatus("Element template is empty");
       return;
@@ -9812,29 +9839,28 @@ export default function DashboardBuilder({
         if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
-        return {
-          ...section,
-          layoutItems: (section.layoutItems ?? []).map((item, index) => {
-            const itemKey = item.id ?? `layout-item-${index}`;
-            if (itemKey !== columnKey) return item;
-            const blocks = [...(item.blocks ?? [])];
-            const targetIndex = targetBlockKey
-              ? blocks.findIndex(
-                  (block, blockIndex) =>
-                    (block.id ?? `${columnKey}-block-${blockIndex}`) ===
-                    targetBlockKey,
-                )
-              : -1;
+        return updateLayoutColumn(section, columnKey, (item) => {
+          const blocks = [...(item.blocks ?? [])];
+          const targetIndex = targetBlockKey
+            ? blocks.findIndex(
+                (block, blockIndex) =>
+                  (block.id ?? `${columnKey}-block-${blockIndex}`) ===
+                  targetBlockKey,
+              )
+            : -1;
 
-            let insertIndex = targetIndex >= 0 ? targetIndex : blocks.length;
-            if (targetIndex >= 0 && placement === "below") {
-              insertIndex = targetIndex + 1;
-            }
+          let insertIndex = targetIndex >= 0 ? targetIndex : blocks.length;
+          if (targetIndex >= 0 && placement === "below") {
+            insertIndex = targetIndex + 1;
+          }
 
-            blocks.splice(insertIndex, 0, insertedBlock);
-            return { ...item, blocks };
-          }),
-        };
+          blocks.splice(
+            insertIndex,
+            placement === "replace" && targetIndex >= 0 ? 1 : 0,
+            insertedBlock,
+          );
+          return { ...item, blocks };
+        });
       }),
     }));
 
@@ -9843,9 +9869,238 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(insertedBlock.id ?? null);
     setOpenLayoutItemId(columnKey);
     setInspectorTab("content");
-    openInspectorPanel();
-    setTemplateStatus("Element template inserted");
+    if (revealInspector) openInspectorPanel();
+    setTemplateStatus(placement === "replace" ? "Element replaced from Library" : "Element template inserted");
   };
+
+  const openContextualLibrary = (requestedType?: LayoutLibraryType) => {
+    const usesUnifiedLayouts = builderState.page !== "header";
+    const unifiedLayoutType: LayoutLibraryType =
+      builderState.page === "footer" ? "footer" : "page";
+    const documentRoot =
+      (builderState.page === "header" || builderState.page === "footer") &&
+      selectedLayoutRowIndex === null &&
+      !selectedLayoutColumnKey &&
+      !selectedLayoutBlockKey;
+    const preferredType: LayoutLibraryType = requestedType ?? (
+      usesUnifiedLayouts
+        ? selectedLayoutBlockKey || selectedLayoutColumnKey
+          ? "element"
+          : unifiedLayoutType
+        : selectedLayoutBlockKey
+        ? "element"
+        : selectedLayoutRowIndex !== null
+          ? "row"
+          : selectedLayoutColumnKey
+            ? "element"
+            : documentRoot
+              ? builderState.page as "header" | "footer"
+              : selectedId
+                ? "section"
+                : "page"
+    );
+
+    setContextualLibraryTarget({
+      page: builderState.page,
+      sectionId: selectedId || null,
+      rowIndex: selectedLayoutRowIndex,
+      columnKey: selectedLayoutColumnKey,
+      blockKey: selectedLayoutBlockKey,
+    });
+    setContextualLibraryType(preferredType);
+    setContextualLibraryOpen(true);
+    setSidebarTab("builder");
+    setSidebarCollapsed(false);
+  };
+
+  const usesUnifiedContextualLayouts = builderState.page !== "header";
+  const unifiedContextualLayoutType: LayoutLibraryType =
+    builderState.page === "footer" ? "footer" : "page";
+  const contextualLibraryGroups: LayoutLibraryGroup[] | undefined =
+    usesUnifiedContextualLayouts
+      ? [
+          {
+            value: unifiedContextualLayoutType,
+            label: "Layouts",
+            types: ["page", "footer", "section", "row"],
+          },
+          { value: "element", label: "Elements", types: ["element"] },
+        ]
+      : undefined;
+  const contextualLibraryTypes: LayoutLibraryType[] =
+    builderState.page === "header"
+      ? ["header", "section", "row", "element"]
+      : [unifiedContextualLayoutType, "element"];
+
+  const contextualLibraryActions = (() => {
+    const target = contextualLibraryTarget;
+    if (!target) return [];
+    if (contextualLibraryType === "header" || contextualLibraryType === "footer") {
+      return [{ value: "replace" as const, label: "Replace" }];
+    }
+    if (contextualLibraryType === "page") {
+      return [
+        { value: "before" as const, label: "Insert Before" },
+        { value: "after" as const, label: "Insert After" },
+        { value: "replace" as const, label: "Replace" },
+      ];
+    }
+    if (contextualLibraryType === "section") {
+      return [
+        { value: "before" as const, label: "Insert Before" },
+        { value: "after" as const, label: "Insert After" },
+        ...(target.sectionId
+          ? [{ value: "replace" as const, label: "Replace" }]
+          : []),
+      ];
+    }
+    if (contextualLibraryType === "row") {
+      return target.sectionId && target.rowIndex !== null
+        ? [
+            { value: "before" as const, label: "Insert Before" },
+            { value: "after" as const, label: "Insert After" },
+            { value: "replace" as const, label: "Replace" },
+          ]
+        : [];
+    }
+    if (contextualLibraryType === "element") {
+      if (!target.sectionId || !target.columnKey) return [];
+      return target.blockKey
+        ? [
+            { value: "before" as const, label: "Insert Before" },
+            { value: "after" as const, label: "Insert After" },
+            { value: "replace" as const, label: "Replace" },
+          ]
+        : [{ value: "after" as const, label: "Insert After" }];
+    }
+    return [];
+  })();
+
+  const contextualLibraryActionsForTemplate = (
+    template: BuilderSavedTemplate | null,
+  ) => {
+    if (!usesUnifiedContextualLayouts) return contextualLibraryActions;
+    const templateType = template?.templateType ?? unifiedContextualLayoutType;
+    if (templateType !== "element") {
+      return [
+        { value: "before" as const, label: "Insert Before" },
+        { value: "after" as const, label: "Insert After" },
+        { value: "replace" as const, label: "Replace" },
+      ];
+    }
+    const target = contextualLibraryTarget;
+    if (!target?.sectionId || !target.columnKey) return [];
+    return target.blockKey
+      ? [
+          { value: "before" as const, label: "Insert Before" },
+          { value: "after" as const, label: "Insert After" },
+          { value: "replace" as const, label: "Replace" },
+        ]
+      : [{ value: "after" as const, label: "Insert After" }];
+  };
+
+  const insertContextualLibraryTemplate = (
+    template: BuilderSavedTemplate,
+    action: LayoutLibraryInsertionAction,
+  ) => {
+    const target = contextualLibraryTarget;
+    if (!target) return;
+    const templateType = template.templateType ?? "page";
+
+    if (
+      usesUnifiedContextualLayouts &&
+      templateType !== "element" &&
+      templateType !== "header"
+    ) {
+      const clonedSections = template.sections.map(cloneTemplateSection);
+      if (action === "replace" && !target.sectionId) {
+        setBuilderState((current) => ({ ...current, sections: clonedSections }));
+        setSelectedId(clonedSections[0]?.id ?? "");
+        setSelectedLayoutRowIndex(null);
+        setSelectedLayoutColumnKey(null);
+        setSelectedLayoutBlockKey(null);
+        setOpenLayoutItemId(null);
+        setTemplateStatus("Layout replaced from Library");
+      } else {
+        const sectionAnchorId = target.sectionId ?? (
+          action === "before"
+            ? builderState.sections[0]?.id
+            : builderState.sections[builderState.sections.length - 1]?.id
+        ) ?? "";
+        insertSectionTemplateNear(
+          template.id,
+          sectionAnchorId,
+          action === "before" ? "above" : action === "after" ? "below" : "replace",
+        );
+      }
+    } else if (templateType === "header" || templateType === "footer") {
+      applySavedTemplate(template, { confirmReplace: false });
+    } else if (templateType === "page") {
+      if (action === "replace") {
+        applySavedTemplate(template, { confirmReplace: false });
+      } else {
+        const sectionAnchorId = target.sectionId ?? (
+          action === "before"
+            ? builderState.sections[0]?.id
+            : builderState.sections[builderState.sections.length - 1]?.id
+        ) ?? "";
+        insertSectionTemplateNear(
+          template.id,
+          sectionAnchorId,
+          action === "before" ? "above" : "below",
+        );
+      }
+    } else if (templateType === "section") {
+      if (action === "replace" && !target.sectionId) return;
+      const sectionAnchorId = target.sectionId ?? (
+        action === "before"
+          ? builderState.sections[0]?.id
+          : builderState.sections[builderState.sections.length - 1]?.id
+      ) ?? "";
+      insertSectionTemplateNear(
+        template.id,
+        sectionAnchorId,
+        action === "before" ? "above" : action === "after" ? "below" : "replace",
+      );
+    } else if (
+      templateType === "row" &&
+      target.sectionId &&
+      target.rowIndex !== null
+    ) {
+      insertRowTemplateAt(template.id, target.sectionId, target.rowIndex, action, false);
+    } else if (
+      templateType === "element" &&
+      target.sectionId &&
+      target.columnKey
+    ) {
+      insertElementTemplateAt({
+        templateId: template.id,
+        sectionId: target.sectionId,
+        columnKey: target.columnKey,
+        targetBlockKey: target.blockKey ?? undefined,
+        placement: action === "before" ? "above" : action === "after" ? "below" : "replace",
+        revealInspector: false,
+      });
+    } else {
+      return;
+    }
+
+    setContextualLibraryOpen(false);
+    setContextualLibraryTarget(null);
+    setSidebarTab("builder");
+  };
+
+  useEffect(() => {
+    if (!contextualLibraryOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setContextualLibraryOpen(false);
+        setContextualLibraryTarget(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [contextualLibraryOpen]);
 
   const renameSavedTemplate = async (
     template: BuilderSavedTemplate,
@@ -9855,7 +10110,7 @@ export default function DashboardBuilder({
     if (!title || title === template.title) return;
     setTemplateStatus("Renaming template...");
 
-    const response = await fetch("/api/builder-templates", {
+    const response = await fetch(builderApiUrl("/api/builder-templates"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -9883,11 +10138,13 @@ export default function DashboardBuilder({
 
   const exportSavedTemplate = (template: BuilderSavedTemplate) => {
     const exportedAt = new Date().toISOString();
+    const portableTemplate = { ...template };
+    delete portableTemplate.libraryScope;
     const payload = {
       exportType: "webpages-builder-template",
       exportVersion: 1,
       exportedAt,
-      template,
+      template: portableTemplate,
     };
     const templateType = template.templateType ?? "page";
     const slug =
@@ -9914,9 +10171,9 @@ export default function DashboardBuilder({
   const importSavedTemplate = async (
     file: File,
     templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
+    title: string,
+    acceptedTypes: LayoutLibraryType[] = [templateType],
   ) => {
-    setTemplateStatus("Importing template...");
-
     try {
       const parsed = JSON.parse(await file.text()) as unknown;
       const parsedObject =
@@ -9935,7 +10192,7 @@ export default function DashboardBuilder({
 
       if (!importedTemplate) {
         setTemplateStatus("Template import failed: invalid JSON");
-        return;
+        return false;
       }
 
       const importedType = importedTemplate.templateType ?? templateType;
@@ -9949,29 +10206,29 @@ export default function DashboardBuilder({
         importedType !== "element"
       ) {
         setTemplateStatus("Template import failed: unsupported type");
-        return;
+        return false;
       }
 
-      if (importedType !== templateType) {
-        setTemplateStatus(`Switch to ${importedType}s before importing this export`);
-        return;
+      if (!acceptedTypes.includes(importedType)) {
+        setTemplateStatus(`This Library view does not accept ${importedType} compositions`);
+        return false;
       }
 
       if (!Array.isArray(importedTemplate.sections)) {
         setTemplateStatus("Template import failed: missing sections");
-        return;
+        return false;
       }
 
-      const response = await fetch("/api/builder-templates", {
+      setTemplateStatus("Importing Library item...");
+
+      const response = await fetch(builderApiUrl("/api/builder-templates"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: importedTemplate.title
-            ? `${importedTemplate.title} import`
-            : "Imported Template",
-          templateType,
+          title,
+          templateType: importedType,
           description: importedTemplate.description,
           sourcePage: importedTemplate.sourcePage,
           design: importedTemplate.design,
@@ -9981,7 +10238,7 @@ export default function DashboardBuilder({
 
       if (!response.ok) {
         setTemplateStatus("Template import failed");
-        return;
+        return false;
       }
 
       const payload = (await response.json()) as {
@@ -9989,15 +10246,11 @@ export default function DashboardBuilder({
         templates?: BuilderSavedTemplate[];
       };
       setSavedTemplates(payload.templates ?? []);
-      if (payload.template) {
-        setRenameTemplateRequest({
-          id: payload.template.id,
-          templateType: payload.template.templateType ?? templateType,
-        });
-      }
-      setTemplateStatus(`${templateType} template imported`);
+      setTemplateStatus(`“${title}” added to Library`);
+      return true;
     } catch {
       setTemplateStatus("Template import failed: invalid JSON");
+      return false;
     }
   };
 
@@ -10074,6 +10327,68 @@ export default function DashboardBuilder({
           : section,
       ),
     }, wordpressMediaOrigin);
+  };
+
+  const importYoothemeLibraryItem = async (
+    file: File,
+    targetType: LayoutLibraryType,
+    title: string,
+  ) => {
+    if (targetType === "element") {
+      setTemplateStatus("Choose Layouts before importing YOOtheme JSON");
+      return false;
+    }
+
+    setTemplateStatus("Mapping YOOtheme Library item...");
+
+    try {
+      const parsed = JSON.parse(await file.text()) as unknown;
+      const mapping = mapYoothemeStaticContent(parsed);
+      let sections = resolveBuilderMediaUrls(mapping.sections, wordpressMediaOrigin);
+
+      if (
+        targetType === "header" &&
+        sections.length === 0 &&
+        Object.keys(mapping.headerDocumentPatch).length > 0
+      ) {
+        const currentHeaderState = builderStateRef.current.page === "header"
+          ? builderStateRef.current
+          : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
+              loadDraftForKey("header", storageKeys),
+              shellSettings,
+            );
+        sections = materializeImportedHeaderDocument(
+          currentHeaderState,
+          mapping.headerDocumentPatch,
+        ).sections;
+      } else if (
+        targetType === "header" &&
+        sections[0] &&
+        Object.keys(mapping.headerDocumentPatch).length > 0
+      ) {
+        sections = sections.map((section, index) =>
+          index === 0 ? { ...section, ...mapping.headerDocumentPatch } : section,
+        );
+      }
+
+      if (sections.length === 0) {
+        setTemplateStatus("YOOtheme Library import failed: no reusable structure found");
+        return false;
+      }
+
+      const savedTemplate = await persistTemplate({
+        title,
+        templateType: targetType,
+        sections,
+      });
+      if (!savedTemplate) return false;
+      setYoothemeImportWarnings(mapping.reportWarnings);
+      setTemplateStatus(`“${title}” added to Library`);
+      return true;
+    } catch {
+      setTemplateStatus("YOOtheme Library import failed: invalid JSON");
+      return false;
+    }
   };
 
   const applyYoothemeImport = () => {
@@ -10217,7 +10532,7 @@ export default function DashboardBuilder({
     // Keep the document-level Library open after an import so the next
     // deliberate action can be naming/saving the imported Footer without
     // forcing the user through another Footer entry cycle.
-    setInspectorTab(yoothemeImportPreview.targetPage === "footer" ? "library" : "layout");
+    setInspectorTab(yoothemeImportPreview.targetPage === "footer" ? "settings" : "layout");
     setSectionSettingsOpen(true);
     setInspectorOpen(true);
     setSidebarCollapsed(false);
@@ -10233,7 +10548,7 @@ export default function DashboardBuilder({
   const deleteSavedTemplate = async (id: string) => {
     setTemplateStatus("Deleting template...");
     const response = await fetch(
-      `/api/builder-templates?id=${encodeURIComponent(id)}`,
+      builderApiUrl("/api/builder-templates", { id }),
       {
         method: "DELETE",
       },
@@ -10457,7 +10772,8 @@ export default function DashboardBuilder({
   };
 
   const inspectorPanel = (
-    <DashboardInspector
+    <DynamicContentCapabilitiesProvider discovered={discoveredDynamicContentCapabilities}>
+      <DashboardInspector
       hasSections={builderState.sections.length > 0}
       builderJson={builderJson}
       copied={copied}
@@ -10509,38 +10825,7 @@ export default function DashboardBuilder({
       deleteSelectedSlide={deleteSelectedSlide}
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
-      savedTemplates={savedTemplates}
-      templateStatus={templateStatus}
       onApplyHeaderPreset={executeApplyHeaderPreset}
-      onSaveContextualLayout={(layoutType, title) => {
-        if (layoutType === "header" || layoutType === "footer") {
-          void saveTemplate(layoutType, title);
-          return;
-        }
-        if (layoutType === "section" && selectedSection) {
-          void saveSectionTemplateById(selectedSection.id);
-          return;
-        }
-        if (layoutType === "row" && selectedSection && selectedLayoutRowIndex !== null) {
-          void saveRowTemplateByIndex(selectedSection.id, selectedLayoutRowIndex);
-          return;
-        }
-        if (
-          layoutType === "element" &&
-          selectedSection &&
-          selectedLayoutColumnKey &&
-          selectedLayoutBlockKey
-        ) {
-          void saveElementTemplateByKey(
-            selectedSection.id,
-            selectedLayoutColumnKey,
-            selectedLayoutBlockKey,
-          );
-        }
-      }}
-      onApplySavedTemplate={applySavedTemplate}
-      onImportSavedTemplate={importSavedTemplate}
-      onImportYootheme={importYoothemePage}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       onUpdateColumnStyle={updateSelectedColumnStyle}
@@ -10583,7 +10868,8 @@ export default function DashboardBuilder({
       }
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
-    />
+      />
+    </DynamicContentCapabilitiesProvider>
   );
 
   const activeDocumentKindLabel = builderState.page === "footer"
@@ -10640,6 +10926,7 @@ export default function DashboardBuilder({
       hoveredTarget={hoveredBuilderTarget}
       actions={wireframeActions}
       renameSectionId={renameSectionRequestId}
+      onOpenLibrary={() => openContextualLibrary()}
     />
   );
 
@@ -12214,6 +12501,63 @@ export default function DashboardBuilder({
     </>
   );
 
+  const contextualLibraryModal = contextualLibraryOpen && contextualLibraryTarget ? (
+    <div
+      className="builder-layout-modal builder-dashboard-modal builder-contextual-library-modal"
+      data-theme={dashboardTheme}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="builder-contextual-library-title"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          setContextualLibraryOpen(false);
+          setContextualLibraryTarget(null);
+        }
+      }}
+    >
+      <div className="builder-layout-dialog">
+        <div className="builder-layout-header">
+          <div>
+            <strong id="builder-contextual-library-title">Library</strong>
+            <span>Select a saved composition, then insert it into the current Structure selection.</span>
+          </div>
+          <button
+            type="button"
+            className="builder-icon-button builder-layout-close"
+            onClick={() => {
+              setContextualLibraryOpen(false);
+              setContextualLibraryTarget(null);
+            }}
+            aria-label="Close Library"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="builder-contextual-library-body">
+          <LayoutLibrarySurface
+            mode="contextual"
+            libraryType={contextualLibraryType}
+            availableLibraryTypes={contextualLibraryTypes}
+            libraryGroups={contextualLibraryGroups}
+            savedTemplates={savedTemplates}
+            siteLibraryEnabled={Boolean(websiteId)}
+            templateStatus={templateStatus}
+            onLibraryTypeChange={setContextualLibraryType}
+            onApply={applySavedTemplate}
+            onExport={exportSavedTemplate}
+            onImport={importSavedTemplate}
+            onImportYootheme={importYoothemeLibraryItem}
+            onDelete={deleteSavedTemplate}
+            onRename={renameSavedTemplate}
+            contextualActions={contextualLibraryActions}
+            contextualActionsForTemplate={contextualLibraryActionsForTemplate}
+            onContextualAction={insertContextualLibraryTemplate}
+          />
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   const confirmPresetModal = presetToApply ? (
     <div
       className="builder-layout-modal"
@@ -12347,7 +12691,6 @@ export default function DashboardBuilder({
         newPageTitle={newPageTitle}
         pageStatus={pageStatus}
         savedTemplates={savedTemplates}
-        renameTemplateRequest={renameTemplateRequest}
         sidebarTab={sidebarTab}
         templateDescriptions={templateDescriptions}
         templateLabels={templateLabels}
@@ -12388,8 +12731,6 @@ export default function DashboardBuilder({
         onSaveMenuItems={saveMenuItems}
         sidebarCollapsed={sidebarCollapsed}
         onSetSidebarCollapsed={setSidebarCollapsedPreference}
-        requestedLayoutType={layoutLibraryRequest?.type ?? requestedLayoutType}
-        requestedLayoutTypeRequestKey={layoutLibraryRequest?.key ?? 0}
       />
 
       <main ref={builderWorkspaceRef} className="builder-workspace">
@@ -13332,6 +13673,7 @@ export default function DashboardBuilder({
           onClose={closeWordPressMediaPicker}
         />
       </div>
+      {contextualLibraryModal ? createPortal(contextualLibraryModal, document.body) : null}
       {confirmPresetModal ? createPortal(confirmPresetModal, document.body) : null}
     </div>
   );

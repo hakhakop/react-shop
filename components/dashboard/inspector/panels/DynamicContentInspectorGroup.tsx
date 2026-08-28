@@ -5,12 +5,11 @@ import type {
   DynamicContentData,
 } from "@/lib/dynamicContent";
 import {
-  DYNAMIC_CONTENT_SOURCE_CAPABILITIES,
-  dynamicContentSourceCapability,
   dynamicContentSourceKey,
   type DynamicContentQueryControl,
   type DynamicContentSourceCapability,
 } from "@/lib/dynamicContentCapabilities";
+import { useDynamicContentCapabilities } from "@/components/dashboard/inspector/DynamicContentCapabilitiesContext";
 import {
   InspectorDivision,
   InspectorFieldRow,
@@ -31,11 +30,6 @@ type Props<Item extends DynamicItem = DynamicItem> = {
   fixedSourceKey?: DynamicContentSourceCapability["key"];
   categoryTree?: CategoryTreeItem[];
 };
-
-const sourceOptions = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.map((source) => ({
-  value: source.key,
-  label: source.label,
-}));
 
 const orderOptions = [
   { value: "date", label: "Date" },
@@ -143,11 +137,22 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
   fixedSourceKey,
   categoryTree = [],
 }: Props<Item>) {
+  const capabilities = useDynamicContentCapabilities();
+  const sourceOptions = useMemo(() => capabilities.map((source) => ({
+    value: source.key,
+    label: source.label,
+  })), [capabilities]);
   const descriptor = item.dynamicContext;
   const fixedCapability = fixedSourceKey
-    ? DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((candidate) => candidate.key === fixedSourceKey)
+    ? capabilities.find((candidate) => candidate.key === fixedSourceKey)
     : undefined;
-  const source = fixedSourceKey ?? dynamicContentSourceKey(descriptor);
+  const descriptorCapability = capabilities.find((candidate) =>
+    candidate.provider === descriptor?.provider &&
+    candidate.source === descriptor?.source &&
+    candidate.mode === descriptor?.mode &&
+    (candidate.source !== "content" || candidate.defaultQuery?.sourceName === descriptor?.query?.sourceName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlPluralName || candidate.defaultQuery?.graphqlPluralName === descriptor?.query?.graphqlRoot),
+  );
+  const source = fixedSourceKey ?? descriptorCapability?.key ?? dynamicContentSourceKey(descriptor);
   const effectiveDescriptor = fixedCapability?.provider && fixedCapability.source && fixedCapability.mode
     ? {
         provider: fixedCapability.provider,
@@ -156,7 +161,7 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
         ...(descriptor?.query ? { query: descriptor.query } : {}),
       } satisfies DynamicContentContextDescriptor
     : descriptor;
-  const capability = fixedCapability ?? dynamicContentSourceCapability(effectiveDescriptor);
+  const capability = fixedCapability ?? descriptorCapability;
   const isWordPressPostCollection = capability?.provider === "wordpress" && capability.source === "post" && capability.mode === "collection";
   const query = asRecord(effectiveDescriptor?.query);
   const filters = asRecord(query.filters);
@@ -191,7 +196,7 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
       update({ dynamicContext: undefined } as Partial<Item>);
       return;
     }
-    const capability = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find(
+    const capability = capabilities.find(
       (candidate) => candidate.key === value,
     );
     if (!capability?.provider || !capability.source || !capability.mode) return;

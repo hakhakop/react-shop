@@ -7,12 +7,12 @@ export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selectio
 
 type SelectionMessage = {
   source: typeof BUILDER_IFRAME_SELECTION_SOURCE;
-  type: "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell";
+  type: "ready" | "context" | "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell";
   target?: BuilderInteractionTarget;
   scrollIntoView?: boolean;
   rect?: { x: number; y: number; width: number; height: number } | null;
   href?: string;
-  shell?: "header" | "footer";
+  shell?: "header" | "footer" | null;
 };
 
 function targetFromClick(event: MouseEvent): BuilderInteractionTarget | null {
@@ -59,21 +59,34 @@ function targetFromClick(event: MouseEvent): BuilderInteractionTarget | null {
     : null;
 }
 
-function targetSelector(target: BuilderInteractionTarget) {
+function targetSelector(
+  target: BuilderInteractionTarget,
+  editingShell: "header" | "footer" | null,
+) {
   if (target.type === "section" && target.sectionId === "header-document") return ".site-header";
   if (target.type === "section" && target.sectionId === "footer-document") return 'footer[data-builder-page-root="true"]';
   const sectionId = CSS.escape(target.sectionId);
+  const documentScope = editingShell === "footer"
+    ? 'footer[data-builder-page-root="true"]'
+    : editingShell === "header"
+      ? ".site-header"
+      : 'main[data-builder-page-root="true"]';
+  let selector: string;
   if (target.type === "section") {
-    return `[data-builder-object-type="section"][data-builder-section-id="${sectionId}"]`;
+    selector = `[data-builder-object-type="section"][data-builder-section-id="${sectionId}"]`;
+    return `${documentScope} ${selector}`;
   }
   if (target.type === "row") {
-    return `[data-builder-object-type="row"][data-builder-section-id="${sectionId}"][data-builder-row-index="${target.rowIndex}"]`;
+    selector = `[data-builder-object-type="row"][data-builder-section-id="${sectionId}"][data-builder-row-index="${target.rowIndex}"]`;
+    return `${documentScope} ${selector}`;
   }
   const columnKey = CSS.escape(target.columnKey);
   if (target.type === "column") {
-    return `[data-builder-object-type="column"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"]`;
+    selector = `[data-builder-object-type="column"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"]`;
+    return `${documentScope} ${selector}`;
   }
-  return `[data-builder-object-type="block"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"][data-builder-block-key="${CSS.escape(target.blockKey)}"]`;
+  selector = `[data-builder-object-type="block"][data-builder-section-id="${sectionId}"][data-builder-column-key="${columnKey}"][data-builder-block-key="${CSS.escape(target.blockKey)}"]`;
+  return `${documentScope} ${selector}`;
 }
 
 function targetsMatch(
@@ -96,7 +109,10 @@ export default function BuilderIframeSelectionBridge({
   useEffect(() => {
     let selectedTarget: BuilderInteractionTarget | null = null;
     const builderContext = new URLSearchParams(window.location.search).get("builderContext");
-    const editingShell = builderContext === "header" || builderContext === "footer";
+    let editingShell: "header" | "footer" | null =
+      builderContext === "header" || builderContext === "footer"
+        ? builderContext
+        : null;
     let frame = 0;
     let scrollSettleTimer = 0;
     let scrolling = false;
@@ -104,7 +120,7 @@ export default function BuilderIframeSelectionBridge({
     const reportRect = () => {
       frame = 0;
       const element = selectedTarget
-        ? document.querySelector<HTMLElement>(targetSelector(selectedTarget))
+        ? document.querySelector<HTMLElement>(targetSelector(selectedTarget, editingShell))
         : null;
       const rect = element?.getBoundingClientRect();
       const message: SelectionMessage = {
@@ -122,7 +138,7 @@ export default function BuilderIframeSelectionBridge({
       selectedResizeObserver?.disconnect();
       selectedResizeObserver = null;
       if (diagnostics !== "settled" || !selectedTarget) return;
-      const element = document.querySelector<HTMLElement>(targetSelector(selectedTarget));
+      const element = document.querySelector<HTMLElement>(targetSelector(selectedTarget, editingShell));
       if (!element) return;
       selectedResizeObserver = new ResizeObserver(() => {
         if (!scrolling) scheduleRect();
@@ -268,10 +284,17 @@ export default function BuilderIframeSelectionBridge({
     };
     const handleMessage = (event: MessageEvent<SelectionMessage>) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
-      if (event.data?.source !== BUILDER_IFRAME_SELECTION_SOURCE || event.data.type !== "focus" || !event.data.target) return;
+      if (event.data?.source !== BUILDER_IFRAME_SELECTION_SOURCE) return;
+      if (event.data.type === "context") {
+        editingShell = event.data.shell === "header" || event.data.shell === "footer"
+          ? event.data.shell
+          : null;
+        return;
+      }
+      if (event.data.type !== "focus" || !event.data.target) return;
       selectedTarget = event.data.target;
       observeSelectedElement();
-      const element = document.querySelector<HTMLElement>(targetSelector(event.data.target));
+      const element = document.querySelector<HTMLElement>(targetSelector(event.data.target, editingShell));
       if (event.data.scrollIntoView && element) {
         element.scrollIntoView({ block: "nearest", inline: "nearest" });
       }
@@ -279,6 +302,10 @@ export default function BuilderIframeSelectionBridge({
     };
     document.addEventListener("click", handleClick, true);
     window.addEventListener("message", handleMessage);
+    window.parent.postMessage({
+      source: BUILDER_IFRAME_SELECTION_SOURCE,
+      type: "ready",
+    } satisfies SelectionMessage, window.location.origin);
     if (diagnostics !== "minimal") {
       window.addEventListener("scroll", diagnostics === "settled" ? handleSettledScroll : scheduleRect, { passive: true });
       window.addEventListener("resize", scheduleRect);

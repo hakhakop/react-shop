@@ -599,7 +599,15 @@ export function normalizeWordPressPostContext(
     type: "metadata",
     value: { items: categories },
   });
+  setField(fields, "categories.label", {
+    type: "string",
+    value: categories.map((term) => term.name).filter((name): name is string => typeof name === "string").join(", "),
+  });
   setField(fields, "tags", { type: "metadata", value: { items: tags } });
+  setField(fields, "tags.label", {
+    type: "string",
+    value: tags.map((term) => term.name).filter((name): name is string => typeof name === "string").join(", "),
+  });
 
   const image = post.featuredImage?.node;
   const imageUrl = stringValue(image?.sourceUrl);

@@ -13,7 +13,7 @@ type GraphQLResponse<T> = {
 export async function graphqlFetch<T>(
   query: string,
   variables?: Record<string, unknown>,
-  options?: { endpoint?: string | null },
+  options?: { endpoint?: string | null; headers?: Record<string, string> },
 ): Promise<T> {
   const endpoint = options?.endpoint || ENDPOINT;
 
@@ -23,20 +23,40 @@ export async function graphqlFetch<T>(
     );
   }
 
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-    next: { revalidate: 5 },
-  });
+  const endpoints = [endpoint];
+  try {
+    const parsed = new URL(endpoint);
+    if (parsed.pathname.replace(/\/+$/, "") === "/graphql") {
+      parsed.pathname = "/";
+      parsed.search = "?graphql";
+      const fallback = parsed.toString();
+      if (fallback !== endpoint) endpoints.push(fallback);
+    }
+  } catch {
+    // The configured endpoint will produce the canonical fetch diagnostic.
+  }
 
-  if (!res.ok) {
-    throw new Error(`GraphQL request failed: ${res.status} ${res.statusText}`);
+  let res: Response | null = null;
+  for (const candidate of endpoints) {
+    res = await fetch(candidate, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+      },
+      body: JSON.stringify({ query, variables }),
+      next: { revalidate: 5 },
+    });
+    // Some WordPress stacks reserve `/graphql` but respond with a proxy/PHP
+    // 5xx instead of a clean 404. When the canonical query-string endpoint is
+    // available, let it answer before surfacing the transport failure.
+    if (res.ok || candidate === endpoints[endpoints.length - 1]) break;
+  }
+
+  if (!res?.ok) {
+    throw new Error(res
+      ? `GraphQL request failed: ${res.status} ${res.statusText}`
+      : "GraphQL request failed before receiving a response.");
   }
 
   const json: GraphQLResponse<T> = await res.json();
