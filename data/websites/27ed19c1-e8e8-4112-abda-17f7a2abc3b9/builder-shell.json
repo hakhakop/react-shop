@@ -559,5 +559,9 @@
   "buttonLineHeight": "46px",
   "buttonLargeLineHeight": "58px",
   "themePageLayout": "full",
-  "themePageContainerAlignment": "center"
+  "themePageContainerAlignment": "center",
+  "themePageBorderWidth": "30px",
+  "themePageBorderWidthLarge": "50px",
+  "themePageBorderTopWidth": "0",
+  "themePageBorderColor": "transparent"
 }

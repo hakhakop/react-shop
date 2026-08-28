@@ -274,6 +274,7 @@ export function getUikitGlobalsCssVars(
     "--uk-theme-page-border-mode": value("themePageBorderMode", ""),
     "--uk-theme-page-border-width": value("themePageBorderWidth", "0"),
     "--uk-theme-page-border-width-large": value("themePageBorderWidthLarge", value("themePageBorderWidth", "0")),
+    "--uk-theme-page-border-top-width": value("themePageBorderTopWidth", ""),
     "--uk-theme-page-border-color": value("themePageBorderColor", "transparent"),
     "--uk-theme-page-border-gradient": value("themePageBorderGradient", "none"),
     "--uk-theme-page-container-margin-top": value("themePageContainerMarginTop", "0"),

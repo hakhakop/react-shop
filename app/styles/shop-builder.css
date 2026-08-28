@@ -1030,6 +1030,18 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   position: relative;
 }
 
+/* Slideshow is a full media viewport in YOOtheme, not a card. Keep it square
+   even when the site theme supplies a global card radius to other carousels. */
+.shop-builder-swiper.shop-builder-swiper--slideshow {
+  border-radius: 0;
+}
+
+.shop-builder-swiper.shop-builder-swiper--slideshow .swiper-slide,
+.shop-builder-swiper.shop-builder-swiper--slideshow .shop-builder-hero-slide-card,
+.shop-builder-swiper.shop-builder-swiper--slideshow [class*="swiper-slide-shadow"] {
+  border-radius: 0 !important;
+}
+
 /* Navigation is a frame overlay by default. Keeping this wrapper distinct
    from the Swiper movement viewport gives Dotnav and Thumbnav the same
    containing block in Builder and storefront; `nav_below` alone returns it

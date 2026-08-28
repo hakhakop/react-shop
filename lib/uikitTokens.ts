@@ -162,7 +162,10 @@ export function getUikitContainerClass(preset?: string): string {
   if (p === "xlarge" || p === "xl") {
     return "uk-container uk-container-xlarge";
   }
-  if (p === "expand" || p === "full" || p === "none") {
+  if (p === "none") {
+    return "";
+  }
+  if (p === "expand" || p === "full") {
     return "uk-container uk-container-expand";
   }
 

@@ -117,17 +117,25 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   const style = string(props.style);
   const role = style === "default" || style === "muted" || style === "primary" || style === "secondary" ? style : undefined;
   const width = typeof props.width === "string" ? props.width.trim() : undefined;
-  const isUnboxedWidth = width === "none" || width === "expand" || width === "full" || width === "";
-  const contentMode = isUnboxedWidth
-    ? "expand"
-    : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
-    ? width
-    : undefined;
-  const maxWidth = isUnboxedWidth
-    ? "expand"
-    : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
-    ? width
-    : undefined;
+  // YOOtheme's empty/none Section width omits the container entirely. Keep
+  // that distinct from Expand, whose container remains full-width but still
+  // owns the canonical responsive gutter.
+  const isNoContainerWidth = width === "none" || width === "";
+  const isExpandedWidth = width === "expand" || width === "full";
+  const contentMode = isNoContainerWidth
+    ? "none"
+    : isExpandedWidth
+      ? "expand"
+      : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
+        ? width
+        : undefined;
+  const maxWidth = isNoContainerWidth
+    ? "none"
+    : isExpandedWidth
+      ? "expand"
+      : width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge"
+        ? width
+        : undefined;
   const height = string(props.height);
   const sectionHeight = height === "viewport" && bool(props.height_offset_top) ? "viewport-percent" : height === "viewport" ? "viewport" : height === "viewport-20" ? "viewport-20" : height === "viewport-percent" ? "viewport-percent" : height === "none" || height === "auto" ? "auto" : undefined;
   const padding = string(props.padding);
@@ -167,7 +175,7 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
     : undefined;
   return {
     ...(role ? { backgroundRole: role, sectionVariant: role } : {}),
-    ...(contentMode ? { contentMode, maxWidth: contentMode } : {}),
+    ...(contentMode ? { contentMode, maxWidth } : {}),
     ...(sectionHeight ? { sectionHeight } : {}),
     ...(string(props.height_offset) ? { heightOffset: string(props.height_offset) } : {}),
     ...(bool(props.height_offset_top) ? { subtractHeightAbove: true } : {}),

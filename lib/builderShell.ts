@@ -288,6 +288,8 @@ export type BuilderShellSettings = {
   themePageBorderMode?: string;
   themePageBorderWidth?: string;
   themePageBorderWidthLarge?: string;
+  /** Optional side override used by provider themes with asymmetric page frames. */
+  themePageBorderTopWidth?: string;
   themePageBorderColor?: string;
   themePageBorderGradient?: string;
   themePageContainerMarginTop?: string;

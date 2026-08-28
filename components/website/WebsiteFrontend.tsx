@@ -118,7 +118,7 @@ ${uikitCss}
 
 :where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
   position: relative;
-  border: var(--uk-theme-page-border-width, 0) solid var(--uk-theme-page-border-color, transparent);
+  border: 0 solid var(--uk-theme-page-border-color, transparent);
   border-image: var(--uk-theme-page-border-gradient, none) 1;
 }
 
@@ -145,15 +145,17 @@ ${uikitCss}
   max-width: var(--uk-page-container-max-width, 1500px);
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 960px) {
   :where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
     border-width: var(--uk-theme-page-border-width, 0);
+    border-top-width: var(--uk-theme-page-border-top-width, var(--uk-theme-page-border-width, 0));
   }
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1200px) {
   :where([data-scoped-preview-root], [data-domain-website-root]) .tm-page {
     border-width: var(--uk-theme-page-border-width-large, var(--uk-theme-page-border-width, 0));
+    border-top-width: var(--uk-theme-page-border-top-width, var(--uk-theme-page-border-width-large, var(--uk-theme-page-border-width, 0)));
   }
 }
 

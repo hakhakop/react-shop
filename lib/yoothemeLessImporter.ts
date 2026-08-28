@@ -468,6 +468,7 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "theme-page-border-mode": { destination: "shellSettings.themePageBorderMode", domain: "Theme page" },
   "theme-page-border-width": { destination: "shellSettings.themePageBorderWidth", domain: "Theme page" },
   "theme-page-border-width-l": { destination: "shellSettings.themePageBorderWidthLarge", domain: "Theme page" },
+  "theme-page-border-top-width": { destination: "shellSettings.themePageBorderTopWidth", domain: "Theme page" },
   "theme-page-border": { destination: "shellSettings.themePageBorderColor", domain: "Theme page" },
   "internal-theme-page-border-gradient": { destination: "shellSettings.themePageBorderGradient", domain: "Theme page" },
   "theme-page-container-margin-top": { destination: "shellSettings.themePageContainerMarginTop", domain: "Theme page" },

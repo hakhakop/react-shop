@@ -5826,5 +5826,186 @@
       }
     ],
     "updatedAt": "2026-06-28T17:35:46.239Z"
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {},
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "headerUtilityMigrationVersion": 3,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerHeight": "auto",
+        "headerArchitectureVersion": 2,
+        "headerLayout": "princity",
+        "headerBehavior": "pill-on-scroll",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "none",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏",
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "WebPages logo",
+                "imageMaxWidth": 161,
+                "headerBrandMode": "logo",
+                "headerBrandText": "WebPages"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "princity"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-categories",
+                "kind": "headerCategories",
+                "headerCategoriesLabel": "Categories",
+                "headerCategoriesShowLabel": true,
+                "headerCategoriesDisplay": "icon-label",
+                "headerCategoriesIcon": "menu",
+                "headerCategoriesIconPosition": "left",
+                "headerCategoriesDropdownAlign": "left",
+                "headerCategoriesShowAll": true,
+                "headerCategoriesShowCounts": true,
+                "headerCategoriesShowHierarchy": true
+              },
+              {
+                "id": "header-spacer",
+                "kind": "embed",
+                "embedMode": "code",
+                "embedCode": ""
+              },
+              {
+                "id": "header-utility-wishlist",
+                "kind": "headerWishlist",
+                "headerUtilityAction": "wishlist",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-28T16:00:53.957Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "sm",
+        "bottomSpacing": "sm",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "footer-main-left",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-copyright",
+                "kind": "text",
+                "body": "© 2025 Webpages · Headless WooCommerce demo"
+              }
+            ]
+          },
+          {
+            "id": "footer-main-right",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-platform",
+                "kind": "text",
+                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-28T16:00:53.970Z"
   }
 }
