@@ -118,24 +118,22 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
             </InspectorFieldRow>
             </>
           )}
-          <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-            <InspectorFieldRow label="Width">
+          <InspectorFieldRow label="Width / Height">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", width: "100%" }}>
               <InspectorTextField
                 value={String(isOverlay ? image.imageIntrinsicWidth ?? String(image.imageWidth ?? "").replace(/px$/i, "") : image.imageWidth ?? (isHeaderLogo ? image.imageMaxWidth ?? "" : ""))}
-                placeholder="auto"
+                placeholder="Width"
                 onChange={(value) => update(isOverlay ? { imageIntrinsicWidth: value ? Number(value) : undefined, imageWidth: value ? `${value}px` : undefined } : { imageWidth: value || undefined })}
                 ariaLabel="Image width"
               />
-            </InspectorFieldRow>
-            <InspectorFieldRow label="Height">
               <InspectorTextField
                 value={String(isOverlay ? image.imageIntrinsicHeight ?? String(image.imageHeight ?? "").replace(/px$/i, "") : image.imageHeight ?? "")}
-                placeholder="auto"
+                placeholder="Height"
                 onChange={(value) => update(isOverlay ? { imageIntrinsicHeight: value ? Number(value) : undefined, imageHeight: undefined } : { imageHeight: value || undefined })}
                 ariaLabel="Image height"
               />
-            </InspectorFieldRow>
-          </div>
+            </div>
+          </InspectorFieldRow>
           <InspectorFieldRow label="Caption">
             <InspectorTextField
               value={image.imageCaption ?? ""}

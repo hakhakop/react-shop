@@ -13,14 +13,14 @@ type Props = InspectorPanelContext & {
 /**
  * Canonical element capability composer.
  *
- * Element panels render semantic fields only. Shared General capabilities
- * are injected here, and the registry decides which semantic
- * panel sections belong in the single Settings tab.
+ * Element panels render semantic fields only. Following the Builder reference
+ * model, visual and geometry controls compose into one stable Settings surface.
+ * All panels still receive the same canonical update callback.
  */
 export default function ElementCapabilityComposer({ declaration, ...context }: Props) {
   const { panel, settingsSources = ["style"] } = declaration;
 
-  if (context.tab === "style") {
+  if (context.tab === "settings") {
     return (
       <div className="builder-inspector-stack" data-inspector-composition="settings">
         {settingsSources.map((source) => (
@@ -31,8 +31,35 @@ export default function ElementCapabilityComposer({ declaration, ...context }: P
         {declaration.composes.includes("general") && (
           <GeneralSettingsPanel
             {...context}
-            tab="style"
+            tab="layout"
             showAnimation={declaration.composes.includes("animation")}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (context.tab === "style") {
+    return (
+      <div className="builder-inspector-stack" data-inspector-composition="style">
+        {settingsSources.filter((source) => source !== "layout").map((source) => (
+          <Fragment key={source}>
+            {createElement(panel, { ...context, tab: source })}
+          </Fragment>
+        ))}
+      </div>
+    );
+  }
+
+  if (context.tab === "layout") {
+    return (
+      <div className="builder-inspector-stack" data-inspector-composition="layout">
+        {settingsSources.includes("layout") && createElement(panel, { ...context, tab: "layout" })}
+        {declaration.composes.includes("general") && (
+          <GeneralSettingsPanel
+            {...context}
+            tab="layout"
+            showAnimation={false}
           />
         )}
       </div>

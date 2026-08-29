@@ -95,7 +95,6 @@ type DashboardSidebarProps = {
     warnings: string[];
   } | null;
   onUpdateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
-  onSaveMenuItems?: (newItems: BuilderShellSettings["menuItems"]) => void | Promise<void>;
   topActionsSlot?: ReactNode;
   utilityControlsSlot?: ReactNode;
   onOpenElementLibrary?: () => void;
@@ -178,7 +177,6 @@ export default function DashboardSidebar({
   onStartSidebarResize,
   onSwitchBuilderTarget,
   onUpdateShellSettings,
-  onSaveMenuItems,
   onReorderCustomPages,
   sidebarCollapsed = true,
   onSetSidebarCollapsed,
@@ -659,7 +657,6 @@ export default function DashboardSidebar({
                 <ReactMenuEditorPanel
                   menuItems={shellSettings.menuItems ?? []}
                   onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
-                  onSaveMenuItems={onSaveMenuItems}
                   customPages={customPages}
                 />
               </motion.div>

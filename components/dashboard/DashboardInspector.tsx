@@ -54,7 +54,14 @@ import RowCapabilityPanel from "@/components/dashboard/inspector/panels/RowCapab
 import ColumnCapabilityPanel from "@/components/dashboard/inspector/panels/ColumnCapabilityPanel";
 import ElementCapabilityComposer from "@/components/dashboard/inspector/ElementCapabilityComposer";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import { InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
+import {
+  InspectorAlignmentControl,
+  InspectorDivision,
+  InspectorFieldRow,
+  InspectorSelect,
+  InspectorSwitch,
+  InspectorTextField,
+} from "@/components/dashboard/inspector/InspectorControls";
 import { getInspectorElementCapabilityDeclaration } from "@/components/dashboard/inspector/inspectorRouting";
 import type { InspectorElementKind } from "@/lib/uikitCapabilities";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
@@ -676,44 +683,54 @@ function HeaderHeightControl({
 
   return (
     <>
-      <label className="builder-field">
-        <span>Header height</span>
-        <select
-          data-testid="header-height-select"
+      <InspectorFieldRow label="Header height">
+        <InspectorSelect
+          ariaLabel="Header height"
+          testId="header-height-select"
           value={height ?? "auto"}
-          onChange={(event) => selectHeight(event.target.value)}
-        >
-          <option value="auto">Global (Navbar)</option>
-          <option value="compact">Compact (56px)</option>
-          <option value="comfortable">Comfortable (72px)</option>
-          <option value="spacious">Spacious (88px)</option>
-          <option value="showcase">Showcase (104px)</option>
-          <option value="custom">Custom</option>
-        </select>
-      </label>
+          options={[
+            { value: "auto", label: "Global (Navbar)" },
+            { value: "compact", label: "Compact (56px)" },
+            { value: "comfortable", label: "Comfortable (72px)" },
+            { value: "spacious", label: "Spacious (88px)" },
+            { value: "showcase", label: "Showcase (104px)" },
+            { value: "custom", label: "Custom" },
+          ]}
+          onChange={selectHeight}
+        />
+      </InspectorFieldRow>
       {height === "custom" ? (
-        <label className="builder-field builder-header-custom-height-field">
-          <span>Custom height</span>
-          <span className="builder-header-custom-height-input">
-            <input
-              data-testid="header-custom-height-input"
+        <InspectorFieldRow label="Custom height" className="builder-header-custom-height-field">
+          <div className="builder-header-custom-height-input">
+            <InspectorTextField
+              testId="header-custom-height-input"
               type="number"
-              inputMode="numeric"
-              min={HEADER_CUSTOM_HEIGHT_MIN}
-              max={HEADER_CUSTOM_HEIGHT_MAX}
-              step={1}
               value={customHeightDraft}
-              onChange={(event) =>
-                updateCustomHeightDraft(event.target.value)
-              }
+              onChange={updateCustomHeightDraft}
               onBlur={commitCustomHeightDraft}
-              aria-label="Custom Header height"
+              ariaLabel="Custom Header height"
             />
             <small>px</small>
-          </span>
-        </label>
+          </div>
+        </InspectorFieldRow>
       ) : null}
     </>
+  );
+}
+
+function HeaderDocumentSwitch({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <InspectorFieldRow label={label}>
+      <InspectorSwitch checked={checked} onChange={onChange} />
+    </InspectorFieldRow>
   );
 }
 
@@ -888,14 +905,7 @@ function HeaderDocumentSettings({
 }) {
   return (
     <div className="builder-inspector-stack">
-      <details className="builder-collapse" open>
-        <summary>
-          <InspectorGroupSummary
-            title="Layout"
-            description="The current Header Builder composition."
-            meta="Builder"
-          />
-        </summary>
+      <InspectorDivision title="Layout" description="The current Header Builder composition." className="builder-document-division">
         <div className="builder-header-presets-grid" aria-label="Yootheme header layouts">
           {YOOTHEME_HEADER_LAYOUT_PRESETS.map((layout) => {
             const preset = headerPresets.find((candidate) => candidate.key === layout.key);
@@ -915,37 +925,15 @@ function HeaderDocumentSettings({
           })}
         </div>
         <small>These layouts use the existing Header Builder presets and preserve website branding and global tokens.</small>
-      </details>
+      </InspectorDivision>
 
-      <details className="builder-collapse" open>
-        <summary>
-          <InspectorGroupSummary
-            title="Behavior"
-            description="Document-wide behavior shared by every Header row and element."
-            meta={headerVisible ? "visible" : "hidden"}
-          />
-        </summary>
-        <label className="builder-check">
-          <input
-            data-testid="header-visible-checkbox"
-            type="checkbox"
-            checked={headerVisible}
-            onChange={(event) => onHeaderDocumentChange({ headerVisible: event.target.checked })}
-          />
-          <span>Show website Header</span>
-        </label>
-        <label className="builder-field">
-          <span>Header Behavior</span>
-          <select
-            value={headerSettings.headerBehavior ?? "sticky"}
-            onChange={(event) => onHeaderDocumentChange({ headerBehavior: event.target.value as BuilderSection["headerBehavior"] })}
-          >
-            <option value="static">Static</option>
-            <option value="sticky">Sticky</option>
-            <option value="sticky-on-scroll-up">Sticky on scroll up</option>
-            <option value="pill-on-scroll">Pill on scroll</option>
-          </select>
-        </label>
+      <InspectorDivision title="Behavior" description="Document-wide behavior shared by every Header row and element." className="builder-document-division">
+        <InspectorFieldRow label="Show website Header">
+          <InspectorSwitch checked={headerVisible} onChange={(checked) => onHeaderDocumentChange({ headerVisible: checked })} />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Header Behavior">
+          <InspectorSelect value={headerSettings.headerBehavior ?? "sticky"} options={[{ value: "static", label: "Static" }, { value: "sticky", label: "Sticky" }, { value: "sticky-on-scroll-up", label: "Sticky on scroll up" }, { value: "pill-on-scroll", label: "Pill on scroll" }]} onChange={(headerBehavior) => onHeaderDocumentChange({ headerBehavior: headerBehavior as BuilderSection["headerBehavior"] })} ariaLabel="Header Behavior" />
+        </InspectorFieldRow>
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Header width</span>
@@ -964,24 +952,8 @@ function HeaderDocumentSettings({
           customHeight={headerCustomHeight}
           onChange={onHeaderDocumentChange}
         />
-        <div className="builder-two-column">
-          <label className="builder-check">
-            <input
-              type="checkbox"
-              checked={headerSettings.headerTransparent === true}
-              onChange={(event) => onHeaderDocumentChange({ headerTransparent: event.target.checked })}
-            />
-            <span>Transparent header</span>
-          </label>
-          <label className="builder-check">
-            <input
-              type="checkbox"
-              checked={headerSettings.headerOverlay === true}
-              onChange={(event) => onHeaderDocumentChange({ headerOverlay: event.target.checked })}
-            />
-            <span>Overlay content</span>
-          </label>
-        </div>
+        <HeaderDocumentSwitch label="Transparent header" checked={headerSettings.headerTransparent === true} onChange={(headerTransparent) => onHeaderDocumentChange({ headerTransparent })} />
+        <HeaderDocumentSwitch label="Overlay content" checked={headerSettings.headerOverlay === true} onChange={(headerOverlay) => onHeaderDocumentChange({ headerOverlay })} />
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Background mode</span>
@@ -1007,16 +979,9 @@ function HeaderDocumentSettings({
             </select>
           </label>
         </div>
-      </details>
+      </InspectorDivision>
 
-      <details className="builder-collapse">
-        <summary>
-          <InspectorGroupSummary
-            title="YOOtheme Header behavior"
-            description="Canonical document-owned responsive and interaction settings."
-            meta={headerSettings.headerDropdownAlign ?? "center"}
-          />
-        </summary>
+      <InspectorDivision title="YOOtheme Header behavior" description="Canonical document-owned responsive and interaction settings." className="builder-document-division">
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Dropdown alignment</span>
@@ -1037,11 +1002,11 @@ function HeaderDocumentSettings({
           </label>
         </div>
         <div className="builder-two-column">
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerDropdownAlignToNavbar === true} onChange={(event) => onHeaderDocumentChange({ headerDropdownAlignToNavbar: event.target.checked })} /><span>Align dropdown to navbar</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerDropbarEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerDropbarEnabled: event.target.checked })} /><span>Enable dropbar</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerParentIconEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerParentIconEnabled: event.target.checked })} /><span>Show parent icon</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerClickModeEnabled === true} onChange={(event) => onHeaderDocumentChange({ headerClickModeEnabled: event.target.checked })} /><span>Click mode on text items</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerStickyShowOnUp === true} onChange={(event) => onHeaderDocumentChange({ headerStickyShowOnUp: event.target.checked })} /><span>Show sticky header on scroll up</span></label>
+          <HeaderDocumentSwitch label="Align dropdown to navbar" checked={headerSettings.headerDropdownAlignToNavbar === true} onChange={(headerDropdownAlignToNavbar) => onHeaderDocumentChange({ headerDropdownAlignToNavbar })} />
+          <HeaderDocumentSwitch label="Enable dropbar" checked={headerSettings.headerDropbarEnabled === true} onChange={(headerDropbarEnabled) => onHeaderDocumentChange({ headerDropbarEnabled })} />
+          <HeaderDocumentSwitch label="Show parent icon" checked={headerSettings.headerParentIconEnabled === true} onChange={(headerParentIconEnabled) => onHeaderDocumentChange({ headerParentIconEnabled })} />
+          <HeaderDocumentSwitch label="Click mode on text items" checked={headerSettings.headerClickModeEnabled === true} onChange={(headerClickModeEnabled) => onHeaderDocumentChange({ headerClickModeEnabled })} />
+          <HeaderDocumentSwitch label="Show sticky header on scroll up" checked={headerSettings.headerStickyShowOnUp === true} onChange={(headerStickyShowOnUp) => onHeaderDocumentChange({ headerStickyShowOnUp })} />
         </div>
         <div className="builder-two-column">
           <label className="builder-field"><span>Sticky animation</span><input value={headerSettings.headerStickyAnimation ?? ""} placeholder="uk-animation-slide-top" onChange={(event) => onHeaderDocumentChange({ headerStickyAnimation: event.target.value || undefined })} /></label>
@@ -1054,13 +1019,13 @@ function HeaderDocumentSettings({
         <div className="builder-two-column">
           <label className="builder-field"><span>Search dropdown stretch</span><select value={headerSettings.headerSearchDropdownStretch ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSearchDropdownStretch: event.target.value })}><option value="">None</option><option value="navbar">Navbar</option><option value="navbar-container">Navbar container</option></select></label>
           <label className="builder-field"><span>Search icon</span><select value={headerSettings.headerSearchIconPosition ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSearchIconPosition: event.target.value as BuilderSection["headerSearchIconPosition"] })}><option value="">None</option><option value="left">Left</option><option value="right">Right</option></select></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerSearchDropdownLarge === true} onChange={(event) => onHeaderDocumentChange({ headerSearchDropdownLarge: event.target.checked })} /><span>Large Search dropdown padding</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerLogoPaddingRemove === true} onChange={(event) => onHeaderDocumentChange({ headerLogoPaddingRemove: event.target.checked })} /><span>Remove logo-side padding</span></label>
+          <HeaderDocumentSwitch label="Large Search dropdown padding" checked={headerSettings.headerSearchDropdownLarge === true} onChange={(headerSearchDropdownLarge) => onHeaderDocumentChange({ headerSearchDropdownLarge })} />
+          <HeaderDocumentSwitch label="Remove logo-side padding" checked={headerSettings.headerLogoPaddingRemove === true} onChange={(headerLogoPaddingRemove) => onHeaderDocumentChange({ headerLogoPaddingRemove })} />
         </div>
         <div className="builder-two-column">
           <label className="builder-field"><span>Social position</span><select value={headerSettings.headerSocialPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerSocialPosition: event.target.value })}><option value="hide">Hide</option><option value="toolbar-left-start">Toolbar left start</option><option value="toolbar-left-end">Toolbar left end</option><option value="toolbar-right-start">Toolbar right start</option><option value="toolbar-right-end">Toolbar right end</option><option value="navbar-start">Navbar start</option><option value="navbar-end">Navbar end</option><option value="header-start">Header start</option><option value="header-end">Header end</option><option value="dialog-start">Dialog start</option><option value="dialog-end">Dialog end</option><option value="logo-end">Logo end</option></select></label>
           <label className="builder-field"><span>Social gap</span><select value={headerSettings.headerSocialGap ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSocialGap: event.target.value })}><option value="collapse">None</option><option value="small">Small</option><option value="medium">Medium</option><option value="">Default</option><option value="large">Large</option></select></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerSocialStyle === true} onChange={(event) => onHeaderDocumentChange({ headerSocialStyle: event.target.checked })} /><span>Display social icons as buttons</span></label>
+          <HeaderDocumentSwitch label="Display social icons as buttons" checked={headerSettings.headerSocialStyle === true} onChange={(headerSocialStyle) => onHeaderDocumentChange({ headerSocialStyle })} />
         </div>
         <label className="builder-field"><span>Social links (one URL per line)</span><textarea value={(headerSettings.headerSocialItems ?? []).map((item) => item.link).join("\n")} onChange={(event) => onHeaderDocumentChange({ headerSocialItems: event.target.value.split(/\r?\n/).map((link) => link.trim()).filter(Boolean).map((link) => ({ link })) })} /></label>
         <div className="builder-two-column">
@@ -1068,9 +1033,9 @@ function HeaderDocumentSettings({
           <label className="builder-field"><span>Offcanvas mode</span><select value={headerSettings.headerOffcanvasMode ?? "slide"} onChange={(event) => onHeaderDocumentChange({ headerOffcanvasMode: event.target.value })}><option value="slide">Slide</option><option value="reveal">Reveal</option><option value="push">Push</option></select></label>
           <label className="builder-field"><span>Dropbar animation</span><select value={headerSettings.headerDialogDropbarAnimation ?? ""} onChange={(event) => onHeaderDocumentChange({ headerDialogDropbarAnimation: event.target.value })}><option value="">Fade</option><option value="reveal-top">Slide top</option><option value="slide-left">Slide left</option><option value="slide-right">Slide right</option></select></label>
           <label className="builder-field"><span>Push after item</span><input type="number" min={0} max={10} value={headerSettings.headerDialogPushAfter ?? 0} onChange={(event) => onHeaderDocumentChange({ headerDialogPushAfter: Number(event.target.value) || undefined })} /></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerDialogCenter === true} onChange={(event) => onHeaderDocumentChange({ headerDialogCenter: event.target.checked })} /><span>Center dialog content</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerOffcanvasFlip === true} onChange={(event) => onHeaderDocumentChange({ headerOffcanvasFlip: event.target.checked })} /><span>Offcanvas on right</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerOffcanvasOverlay === true} onChange={(event) => onHeaderDocumentChange({ headerOffcanvasOverlay: event.target.checked })} /><span>Overlay site</span></label>
+          <HeaderDocumentSwitch label="Center dialog content" checked={headerSettings.headerDialogCenter === true} onChange={(headerDialogCenter) => onHeaderDocumentChange({ headerDialogCenter })} />
+          <HeaderDocumentSwitch label="Offcanvas on right" checked={headerSettings.headerOffcanvasFlip === true} onChange={(headerOffcanvasFlip) => onHeaderDocumentChange({ headerOffcanvasFlip })} />
+          <HeaderDocumentSwitch label="Overlay site" checked={headerSettings.headerOffcanvasOverlay === true} onChange={(headerOffcanvasOverlay) => onHeaderDocumentChange({ headerOffcanvasOverlay })} />
         </div>
         <div className="builder-two-column">
           <label className="builder-field">
@@ -1099,13 +1064,13 @@ function HeaderDocumentSettings({
           <label className="builder-field"><span>Mobile Search layout</span><select value={headerSettings.headerMobileSearchLayout ?? "input-dropdown"} onChange={(event) => onHeaderDocumentChange({ headerMobileSearchLayout: event.target.value })}><option value="input-dropdown">Input dropdown</option><option value="dropdown">Toggle dropdown</option><option value="input-dropbar">Input dropbar</option><option value="dropbar">Toggle dropbar</option><option value="modal">Toggle modal</option></select></label>
           <label className="builder-field"><span>Mobile Search icon</span><select value={headerSettings.headerMobileSearchIconPosition ?? ""} onChange={(event) => onHeaderDocumentChange({ headerMobileSearchIconPosition: event.target.value as BuilderSection["headerMobileSearchIconPosition"] })}><option value="">None</option><option value="left">Left</option><option value="right">Right</option></select></label>
           <label className="builder-field"><span>Mobile Search stretch</span><select value={headerSettings.headerMobileSearchDropdownStretch ?? ""} onChange={(event) => onHeaderDocumentChange({ headerMobileSearchDropdownStretch: event.target.value })}><option value="">None</option><option value="navbar">Navbar</option><option value="navbar-container">Navbar container</option></select></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileSearchDropdownLarge === true} onChange={(event) => onHeaderDocumentChange({ headerMobileSearchDropdownLarge: event.target.checked })} /><span>Large mobile Search padding</span></label>
+          <HeaderDocumentSwitch label="Large mobile Search padding" checked={headerSettings.headerMobileSearchDropdownLarge === true} onChange={(headerMobileSearchDropdownLarge) => onHeaderDocumentChange({ headerMobileSearchDropdownLarge })} />
         </div>
         <div className="builder-two-column">
           <label className="builder-field"><span>Mobile Social position</span><select value={headerSettings.headerMobileSocialPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerMobileSocialPosition: event.target.value })}><option value="hide">Hide</option><option value="navbar-mobile-start">Navbar start</option><option value="navbar-mobile-end">Navbar end</option><option value="mobile-start">Header start</option><option value="mobile-end">Header end</option><option value="dialog-mobile-start">Dialog start</option><option value="dialog-mobile-end">Dialog end</option><option value="logo-mobile-end">Logo end</option></select></label>
           <label className="builder-field"><span>Mobile Social gap</span><select value={headerSettings.headerMobileSocialGap ?? ""} onChange={(event) => onHeaderDocumentChange({ headerMobileSocialGap: event.target.value })}><option value="collapse">None</option><option value="small">Small</option><option value="medium">Medium</option><option value="">Default</option><option value="large">Large</option></select></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileSocialStyle === true} onChange={(event) => onHeaderDocumentChange({ headerMobileSocialStyle: event.target.checked })} /><span>Mobile social icon buttons</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileLogoPaddingRemove === true} onChange={(event) => onHeaderDocumentChange({ headerMobileLogoPaddingRemove: event.target.checked })} /><span>Remove mobile logo-side padding</span></label>
+          <HeaderDocumentSwitch label="Mobile social icon buttons" checked={headerSettings.headerMobileSocialStyle === true} onChange={(headerMobileSocialStyle) => onHeaderDocumentChange({ headerMobileSocialStyle })} />
+          <HeaderDocumentSwitch label="Remove mobile logo-side padding" checked={headerSettings.headerMobileLogoPaddingRemove === true} onChange={(headerMobileLogoPaddingRemove) => onHeaderDocumentChange({ headerMobileLogoPaddingRemove })} />
         </div>
         <label className="builder-field"><span>Mobile social links (one URL per line)</span><textarea value={(headerSettings.headerMobileSocialItems ?? []).map((item) => item.link).join("\n")} onChange={(event) => onHeaderDocumentChange({ headerMobileSocialItems: event.target.value.split(/\r?\n/).map((link) => link.trim()).filter(Boolean).map((link) => ({ link })) })} /></label>
         <div className="builder-two-column">
@@ -1115,25 +1080,15 @@ function HeaderDocumentSettings({
           <label className="builder-field"><span>Mobile offcanvas mode</span><select value={headerSettings.headerMobileOffcanvasMode ?? "slide"} onChange={(event) => onHeaderDocumentChange({ headerMobileOffcanvasMode: event.target.value })}><option value="slide">Slide</option><option value="reveal">Reveal</option><option value="push">Push</option></select></label>
           <label className="builder-field"><span>Mobile dropbar animation</span><select value={headerSettings.headerMobileDialogDropbarAnimation ?? ""} onChange={(event) => onHeaderDocumentChange({ headerMobileDialogDropbarAnimation: event.target.value })}><option value="">Fade</option><option value="reveal-top">Slide top</option><option value="slide-left">Slide left</option><option value="slide-right">Slide right</option></select></label>
           <label className="builder-field"><span>Mobile push after item</span><input type="number" min={0} max={10} value={headerSettings.headerMobileDialogPushAfter ?? 0} onChange={(event) => onHeaderDocumentChange({ headerMobileDialogPushAfter: Number(event.target.value) || undefined })} /></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileDialogClose !== false} onChange={(event) => onHeaderDocumentChange({ headerMobileDialogClose: event.target.checked })} /><span>Show mobile close button</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileDialogCenter === true} onChange={(event) => onHeaderDocumentChange({ headerMobileDialogCenter: event.target.checked })} /><span>Center mobile dialog</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileOffcanvasFlip === true} onChange={(event) => onHeaderDocumentChange({ headerMobileOffcanvasFlip: event.target.checked })} /><span>Mobile offcanvas on right</span></label>
-          <label className="builder-check"><input type="checkbox" checked={headerSettings.headerMobileOffcanvasOverlay === true} onChange={(event) => onHeaderDocumentChange({ headerMobileOffcanvasOverlay: event.target.checked })} /><span>Mobile overlay site</span></label>
+          <HeaderDocumentSwitch label="Show mobile close button" checked={headerSettings.headerMobileDialogClose !== false} onChange={(headerMobileDialogClose) => onHeaderDocumentChange({ headerMobileDialogClose })} />
+          <HeaderDocumentSwitch label="Center mobile dialog" checked={headerSettings.headerMobileDialogCenter === true} onChange={(headerMobileDialogCenter) => onHeaderDocumentChange({ headerMobileDialogCenter })} />
+          <HeaderDocumentSwitch label="Mobile offcanvas on right" checked={headerSettings.headerMobileOffcanvasFlip === true} onChange={(headerMobileOffcanvasFlip) => onHeaderDocumentChange({ headerMobileOffcanvasFlip })} />
+          <HeaderDocumentSwitch label="Mobile overlay site" checked={headerSettings.headerMobileOffcanvasOverlay === true} onChange={(headerMobileOffcanvasOverlay) => onHeaderDocumentChange({ headerMobileOffcanvasOverlay })} />
         </div>
-      </details>
+      </InspectorDivision>
 
-      <details className="builder-collapse">
-        <summary>
-          <InspectorGroupSummary
-            title="Advanced"
-            description="Header-wide announcement and support metadata."
-            meta={headerSettings.headerTopToolbarVisible ? "visible" : "hidden"}
-          />
-        </summary>
-        <label className="builder-check">
-          <input type="checkbox" checked={headerSettings.headerTopToolbarVisible ?? true} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarVisible: event.target.checked })} />
-          <span>Show top toolbar</span>
-        </label>
+      <InspectorDivision title="Advanced" description="Header-wide announcement and support metadata." className="builder-document-division">
+        <HeaderDocumentSwitch label="Show top toolbar" checked={headerSettings.headerTopToolbarVisible ?? true} onChange={(headerTopToolbarVisible) => onHeaderDocumentChange({ headerTopToolbarVisible })} />
         <label className="builder-field">
           <span>Toolbar text</span>
           <input value={headerSettings.headerTopToolbarText ?? ""} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarText: event.target.value })} />
@@ -1148,7 +1103,7 @@ function HeaderDocumentSettings({
             <input value={headerSettings.headerTopToolbarMeta ?? ""} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarMeta: event.target.value })} />
           </label>
         </div>
-      </details>
+      </InspectorDivision>
 
       <div className="builder-shell-note">
         <strong>Page visibility rules</strong>
@@ -1446,11 +1401,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     if (tab === "layout") return t("builder.inspector.layout");
     if (tab === "spacing") return t("builder.inspector.spacing");
     if (tab === "appearance") return "Appearance";
-    if (tab === "style") {
-      return selectedElementCapabilityDeclaration?.settingsLabel === "Settings"
-        ? "Settings"
-        : t("builder.inspector.styling");
-    }
+    if (tab === "style") return "Style";
     if (tab === "typography") return t("builder.inspector.typography");
     if (tab === "behavior") return "Behavior";
     if (tab === "effects") return "Effects";
@@ -1458,10 +1409,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   };
   const canonicalBlockTabs: [InspectorTab, string][] =
     selectedElementCapabilityDeclaration
-      ? selectedElementCapabilityDeclaration.capabilities.map((tab) => [
-          tab,
-          inspectorTabLabel(tab),
-        ])
+      ? (() => {
+          const declared = selectedElementCapabilityDeclaration.capabilities;
+          const tabs: [InspectorTab, string][] = [];
+          if (declared.includes("content")) tabs.push(["content", t("builder.inspector.content")]);
+          if (declared.some((tab) => tab !== "content" && tab !== "advanced")) tabs.push(["settings", "Settings"]);
+          if (declared.includes("advanced")) tabs.push(["advanced", t("builder.inspector.advanced")]);
+          return tabs;
+        })()
       : blockTabs;
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
@@ -1480,7 +1435,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           ]
       : isCanonicalColumnSelection
         ? [
-            ["content", t("builder.inspector.content")],
             ["settings", "Settings"],
             ["advanced", t("builder.inspector.advanced")],
           ]
@@ -1604,8 +1558,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         selectedLayoutBlock.kind,
         selectedSection?.id,
       );
-      if (declaration && !declaration.capabilities.includes(inspectorTab)) {
-        setInspectorTab(declaration.capabilities[0] ?? "content");
+      const supportsComposedSettings =
+        inspectorTab === "settings" && declaration?.capabilities.some((tab) => tab !== "content" && tab !== "advanced");
+      if (declaration && !declaration.capabilities.includes(inspectorTab) && !supportsComposedSettings) {
+        setInspectorTab(declaration.capabilities.includes("content") ? "content" : "settings");
         return;
       }
       const supported = getSupportedTypographyAreas(
@@ -1622,12 +1578,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         ? ["settings", "advanced"]
         : ["layout", "spacing", "style", "advanced"];
       if (!validTabs.includes(inspectorTab)) {
-        setInspectorTab(isCanonicalRowSelection ? "settings" : "layout");
+        setInspectorTab("settings");
       }
       return;
     }
     if (isCanonicalColumnSelection) {
-      if (!["content", "settings", "advanced"].includes(inspectorTab)) {
+      if (!["settings", "advanced"].includes(inspectorTab)) {
         setInspectorTab("settings");
       }
       return;
@@ -2153,11 +2109,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               ? "Element Typography"
               : "Element Advanced"
     : isCanonicalColumnSelection
-      ? inspectorTab === "content"
-        ? "Column Content"
-        : inspectorTab === "settings"
-          ? "Column Settings"
-          : "Column Advanced"
+      ? inspectorTab === "settings"
+        ? "Column Settings"
+        : "Column Advanced"
     : selectedLayoutRow
       ? selectedColumnIndex >= 0 || selectedNestedColumn
         ? inspectorTab === "layout"
@@ -2233,18 +2187,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       ? `${isFooterDocumentRoot ? "Footer" : "Header"} · Document`
                       : `${selectedSection.name || sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
                 </strong>
-                {selectedLayoutBlock && (
-                  <button
-                    type="button"
-                    className="builder-inspector-back-btn"
-                    onClick={() => {
-                      setSelectedLayoutBlockKey(null);
-                      setInspectorTab("layout");
-                    }}
-                  >
-                    Back to section
-                  </button>
-                )}
               </div>
 
               <div className="builder-inspector-header-actions">

@@ -24,7 +24,7 @@ type Props = {
 
 export default function GeneralSettingsPanel({ block, shellSettings, tab, update, showAnimation = false }: Props) {
   const [isParallaxEditorOpen, setParallaxEditorOpen] = useState(false);
-  if (tab !== "style") return null;
+  if (tab !== "layout" && tab !== "style") return null;
 
   const visual = (block.visualStyle as BuilderVisualStyle | undefined) ?? {};
   const layout = visual.layout ?? {};
@@ -73,8 +73,11 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
 
   return (
     <section className="builder-general-settings-panel" data-uikit-capability="general-settings">
-      <InspectorDivision title="GENERAL">
-        <div className="builder-style-section-content" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <InspectorDivision
+        title="POSITION"
+        summary={(layout.position ?? "static").replace(/^./, (character) => character.toUpperCase())}
+      >
+        <div className="builder-style-section-content" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           
           {/* Position */}
           <InspectorFieldRow label="Position">
@@ -143,6 +146,15 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
               <span>Blend with page content</span>
             </label>
           </InspectorFieldRow>
+
+        </div>
+      </InspectorDivision>
+
+      <InspectorDivision
+        title="SPACING & WIDTH"
+        summary={(layout as any).marginMode ?? (block as any).margin ?? "Keep existing"}
+      >
+        <div className="builder-style-section-content" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
 
           {/* Margin */}
           <InspectorFieldRow label="Margin">
@@ -233,6 +245,15 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
               ariaLabel="Max Width Breakpoint"
             />
           </InspectorFieldRow>
+
+        </div>
+      </InspectorDivision>
+
+      <InspectorDivision
+        title="ALIGNMENT & VISIBILITY"
+        summary={effectiveTextAlignment === "none" ? "Default" : String(effectiveTextAlignment)}
+      >
+        <div className="builder-style-section-content" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
 
           {/* Block Alignment */}
           <InspectorFieldRow label="Block Alignment">

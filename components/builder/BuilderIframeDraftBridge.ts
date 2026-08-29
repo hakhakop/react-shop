@@ -1,4 +1,5 @@
 import type { BuilderState } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 export const BUILDER_IFRAME_DRAFT_SOURCE = "webpages-builder-draft";
 export const BUILDER_IFRAME_DRAFT_MESSAGE = "draft-snapshot";
@@ -9,4 +10,5 @@ export type BuilderIframeDraftMessage = {
   documentKey: string;
   revision: number;
   state: BuilderState;
+  shellSettings?: BuilderShellSettings;
 };

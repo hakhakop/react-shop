@@ -251,10 +251,22 @@
       "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
+    },
+    {
+      "id": "menu_cnfl7u27j",
+      "label": "About",
+      "url": "/about",
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     }
   ],
   "namedMenus": [],
-  "updatedAt": "2026-08-28T07:08:17.679Z",
+  "updatedAt": "2026-08-29T11:33:37.401Z",
   "buttonTextTransform": "none",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#000",

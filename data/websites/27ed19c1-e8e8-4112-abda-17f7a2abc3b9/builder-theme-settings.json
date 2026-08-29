@@ -2124,7 +2124,69 @@
       "themePageBorderWidth": "30px",
       "themePageBorderWidthLarge": "50px",
       "themePageBorderTopWidth": "0",
-      "themePageBorderColor": "transparent"
+      "themePageBorderColor": "transparent",
+      "menuItems": [
+        {
+          "id": "starter-home",
+          "label": "Home",
+          "url": "/",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-about",
+          "label": "About",
+          "url": "/#about",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-services",
+          "label": "Services",
+          "url": "/#services",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "starter-contact",
+          "label": "Contact",
+          "url": "/#contact",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        },
+        {
+          "id": "menu_cnfl7u27j",
+          "label": "About",
+          "url": "/about",
+          "parentId": null,
+          "iconName": null,
+          "iconUrl": null,
+          "subtitle": null,
+          "mobileUrl": null,
+          "target": "_self",
+          "visibility": "all"
+        }
+      ]
     },
     "headerDocument": {
       "headerArchitectureVersion": 2,
@@ -2391,5 +2453,5 @@
     ]
   },
   "unsupported": [],
-  "updatedAt": "2026-08-28T07:03:33.359Z"
+  "updatedAt": "2026-08-29T11:32:34.822Z"
 }

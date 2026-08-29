@@ -5465,33 +5465,6 @@ export default function DashboardBuilder({
     columnKey: string,
     shouldOpenInspector = false,
   ) => {
-    const section = builderState.sections.find((item) => item.id === sectionId);
-    const rowIndex = section
-      ? normalizeBuilderSectionLayout(section).rows.findIndex((row) =>
-          row.columns.some((column) => column.id === columnKey),
-        )
-      : -1;
-
-    // Page-document columns belong to a Row. Shell documents retain direct
-    // column selection so Header and Footer expose the same Inspector contract.
-    if (
-      sectionId !== "header-document" &&
-      builderState.page !== "footer" &&
-      rowIndex >= 0
-    ) {
-      setHeaderSelected(false);
-      setFooterSelected(false);
-      setSelectedId(sectionId);
-      setSelectedLayoutRowIndex(rowIndex);
-      setSelectedLayoutColumnKey(null);
-      setSelectedLayoutBlockKey(null);
-      setOpenLayoutItemId(null);
-      setInspectorTab("settings");
-      if (shouldOpenInspector) openInspectorPanel();
-      revealCanvasTarget(normalizeBuilderSectionLayout(section!).rows[rowIndex]?.id);
-      return;
-    }
-
     setHeaderSelected(false);
     setFooterSelected(false);
     setSelectedId(sectionId);
@@ -5595,12 +5568,16 @@ export default function DashboardBuilder({
       documentKey,
       revision: iframeDraftRevisionRef.current,
       state,
+      shellSettings,
     }, window.location.origin);
-  }, [headerContextState.page]);
+  }, [shellSettings]);
 
   useEffect(() => {
     if (!iframeComparisonMode) return;
-    const signature = JSON.stringify(iframeRenderState);
+    const signature = JSON.stringify({
+      state: iframeRenderState,
+      shellSettings,
+    });
     if (iframeDraftSignatureRef.current === signature) return;
     iframeDraftSignatureRef.current = signature;
     iframeDraftPendingRef.current = iframeRenderState;
@@ -5611,7 +5588,7 @@ export default function DashboardBuilder({
       iframeDraftPendingRef.current = null;
       if (pending) postIframeDraftSnapshot(pending);
     });
-  }, [iframeComparisonMode, iframeRenderState, postIframeDraftSnapshot]);
+  }, [iframeComparisonMode, iframeRenderState, postIframeDraftSnapshot, shellSettings]);
 
   useEffect(() => () => {
     if (iframeDraftFrameRef.current !== null) {
@@ -8951,27 +8928,6 @@ export default function DashboardBuilder({
     updateShellSettings(preset.shellSettings);
   };
 
-  const saveMenuItems = async (menuItems: BuilderShellSettings["menuItems"]) => {
-    if (!canEditShellSettings) {
-      setShellStatus("Platform global settings require super admin access.");
-      return;
-    }
-
-    const nextSettings = { ...shellSettings, menuItems };
-    setShellSettings(nextSettings);
-    setShellStatus("Saving menu...");
-
-    if (shellAutoSaveTimer.current) {
-      window.clearTimeout(shellAutoSaveTimer.current);
-      shellAutoSaveTimer.current = null;
-    }
-
-    await saveShellSettings(
-      nextSettings,
-      `${isWebsiteScopedBuilder ? "Website" : "Global"} menu saved`,
-    );
-  };
-
   const updateMenuPresentation = (
     itemId: string,
     patch: Partial<MenuPresentationSettings>,
@@ -10759,6 +10715,29 @@ export default function DashboardBuilder({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+  };
+
+  const resizeInspectorWithKeyboard = (
+    event: ReactKeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (!inspectorResizeEnabled) return;
+    const step = event.shiftKey ? 40 : 10;
+    let nextWidth: number | null = null;
+    if (event.key === "ArrowLeft") nextWidth = clampedInspectorWidth + step;
+    if (event.key === "ArrowRight") nextWidth = clampedInspectorWidth - step;
+    if (event.key === "Home") nextWidth = INSPECTOR_MIN_WIDTH;
+    if (event.key === "End") nextWidth = inspectorMaxWidth;
+    if (nextWidth === null) return;
+    event.preventDefault();
+    const clampedWidth = Math.min(
+      inspectorMaxWidth,
+      Math.max(INSPECTOR_MIN_WIDTH, nextWidth),
+    );
+    setInspectorWidth(clampedWidth);
+    window.localStorage.setItem(
+      INSPECTOR_WIDTH_STORAGE_KEY,
+      String(Math.round(clampedWidth)),
+    );
   };
 
   const inspectorPanel = (
@@ -12721,7 +12700,6 @@ export default function DashboardBuilder({
         }
         shellSettings={shellSettings}
         onUpdateShellSettings={updateShellSettings}
-        onSaveMenuItems={saveMenuItems}
         sidebarCollapsed={sidebarCollapsed}
         onSetSidebarCollapsed={setSidebarCollapsedPreference}
       />
@@ -13599,6 +13577,8 @@ export default function DashboardBuilder({
               aria-valuemin={INSPECTOR_MIN_WIDTH}
               aria-valuemax={inspectorMaxWidth}
               aria-valuenow={Math.round(clampedInspectorWidth)}
+              tabIndex={0}
+              onKeyDown={resizeInspectorWithKeyboard}
               onPointerDown={startInspectorResize}
               onPointerMove={moveInspectorResize}
               onPointerUp={stopInspectorResize}

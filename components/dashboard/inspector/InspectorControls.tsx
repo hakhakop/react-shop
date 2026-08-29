@@ -80,7 +80,10 @@ export function InspectorFieldRow({
     />
   ) : null;
   return (
-    <div className={`builder-field inspector-field-row ${isOverridden ? "has-override" : ""} ${className}`.trim()}>
+    <div
+      className={`builder-field inspector-field-row ${isOverridden ? "has-override" : ""} ${className}`.trim()}
+      title={description || undefined}
+    >
       {label && (
         <div className="inspector-field-row-label">
           <div className="inspector-field-label-inline">
@@ -97,7 +100,7 @@ export function InspectorFieldRow({
                 title={`Reset ${label} to default (${inheritedValueText || "Global"})`}
                 aria-label={`Reset ${label} to default`}
               >
-                <RotateCcw size={11} />
+                <RotateCcw size={10} />
               </button>
             )}
             {isOverridden && !onReset && (
@@ -107,15 +110,16 @@ export function InspectorFieldRow({
               />
             )}
           </div>
-          {help && <InspectorHelpText>{help}</InspectorHelpText>}
         </div>
       )}
       <div className="inspector-field-row-control">
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "4px" }}>
-          {children}
-          {description && <div className="builder-inspector-row-desc">{description}</div>}
-        </div>
+        {children}
       </div>
+      {(help || description) && (
+        <div className="inspector-field-row-help">
+          <InspectorHelpText>{help || description}</InspectorHelpText>
+        </div>
+      )}
     </div>
   );
 }
@@ -124,20 +128,51 @@ export function InspectorFieldRow({
 export function InspectorSection({ title, description, children, className = "" }: FieldProps & { title: string }) {
   return (
     <section className={`inspector-section ${className}`.trim()}>
-      <div className="inspector-section-heading"><h3>{title}</h3>{description && <InspectorHelpText>{description}</InspectorHelpText>}</div>
+      <div className="inspector-section-heading">
+        <h3>{title}</h3>
+        {description && <p>{description}</p>}
+      </div>
       {children}
     </section>
   );
 }
 
-export function InspectorDivision({ title, children }: { title: string; children: ReactNode }) {
+export function InspectorDivision({
+  title,
+  description,
+  children,
+  onResetAll,
+  className = "",
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+  onResetAll?: () => void;
+  summary?: ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+}) {
   return (
-    <div className="builder-inspector-division">
-      <div className="builder-inspector-division-header">
-        <div className="builder-inspector-division-title">{title}</div>
+    <section className={`builder-inspector-division ${className}`.trim()}>
+      <div className="builder-inspector-division-header" title={description || undefined}>
+        <span className="builder-inspector-division-title-group">
+          <span className="builder-inspector-division-title">{title}</span>
+        </span>
+        {onResetAll && (
+          <button
+            type="button"
+            className="builder-inspector-division-reset-btn"
+            onClick={onResetAll}
+            title={`Reset all ${title} settings to global defaults`}
+          >
+            <RotateCcw size={11} />
+            <span>Reset</span>
+          </button>
+        )}
       </div>
       <div className="builder-inspector-division-content">{children}</div>
-    </div>
+      {description && <p className="builder-inspector-division-desc">{description}</p>}
+    </section>
   );
 }
 
@@ -147,14 +182,15 @@ export function InspectorHelpText({ children }: { children: ReactNode }) {
   return <small className="inspector-help-text">{children}</small>;
 }
 
-export function InspectorSelect<T extends string = string>({ value, options, onChange, disabled = false, ariaLabel }: {
+export function InspectorSelect<T extends string = string>({ value, options, onChange, disabled = false, ariaLabel, testId }: {
   value: T | undefined;
   options: readonly InspectorOption<T>[];
   onChange: (value: T) => void;
   disabled?: boolean;
   ariaLabel?: string;
+  testId?: string;
 }) {
-  return <select className="inspector-control inspector-select" aria-label={ariaLabel} value={value} disabled={disabled} onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value as T)}>{options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}</select>;
+  return <select className="inspector-control inspector-select" data-testid={testId} aria-label={ariaLabel} value={value} disabled={disabled} onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value as T)}>{options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}</select>;
 }
 
 export function InspectorSegmentedControl<T extends string = string>({ value, options, onChange, ariaLabel }: {
@@ -309,8 +345,8 @@ export function InspectorSwitch({ checked, onChange, label, disabled = false }: 
   return <label className="inspector-switch"><input type="checkbox" role="switch" aria-label={label} checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} /><span className="inspector-switch-track" aria-hidden="true"><span /></span>{label && <span className="inspector-switch-label">{label}</span>}</label>;
 }
 
-export function InspectorTextField({ value, onChange, placeholder, ariaLabel, disabled = false }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string; disabled?: boolean }) {
-  return <input className="inspector-control inspector-text-field" aria-label={ariaLabel} value={value} placeholder={placeholder} disabled={disabled} onChange={(event) => onChange(event.target.value)} />;
+export function InspectorTextField({ value, onChange, placeholder, ariaLabel, disabled = false, testId, onBlur, type = "text" }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string; disabled?: boolean; testId?: string; onBlur?: () => void; type?: "text" | "number" }) {
+  return <input className="inspector-control inspector-text-field" data-testid={testId} type={type} aria-label={ariaLabel} value={value} placeholder={placeholder} disabled={disabled} onChange={(event) => onChange(event.target.value)} onBlur={onBlur} />;
 }
 
 export function InspectorTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {

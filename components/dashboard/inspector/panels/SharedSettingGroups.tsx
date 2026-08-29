@@ -774,7 +774,6 @@ export function ImageSettingsGroup({
           <InspectorSwitch
             checked={values[keys.loading] === "eager" || values[keys.loading] === true}
             onChange={(checked) => update({ [keys.loading]: checked ? "eager" : undefined })}
-            label="Load image eagerly"
           />
         </InspectorFieldRow>
       ) : <InspectorFieldRow
@@ -820,7 +819,6 @@ export function ImageSettingsGroup({
           <InspectorSwitch
             checked={Boolean(values.linkImage)}
             onChange={(checked) => update({ linkImage: checked })}
-            label="Link image"
           />
         </InspectorFieldRow>
       )}
@@ -901,8 +899,8 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
-      {showInverse && <InspectorFieldRow label="" isOverridden={values.imageInverse !== undefined} inheritedValueText="Off" onReset={() => update({ imageInverse: undefined })}>
-        <InspectorSwitch checked={values.imageInverse === true} onChange={(checked) => update({ imageInverse: checked || undefined })} label="Inverse style" />
+      {showInverse && <InspectorFieldRow label="Inverse Style" isOverridden={values.imageInverse !== undefined} inheritedValueText="Off" onReset={() => update({ imageInverse: undefined })}>
+        <InspectorSwitch checked={values.imageInverse === true} onChange={(checked) => update({ imageInverse: checked || undefined })} />
       </InspectorFieldRow>}
 
       {showSvgControls && <InspectorFieldRow
@@ -914,7 +912,6 @@ export function ImageSettingsGroup({
         <InspectorSwitch
           checked={values[svgInlineKey] === true}
           onChange={(checked) => update({ [svgInlineKey]: checked || undefined })}
-          label="Make SVG stylable with CSS"
         />
       </InspectorFieldRow>}
 
@@ -940,16 +937,16 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
-      {showSvgAnimate && <InspectorFieldRow label="" isOverridden={values.imageSvgAnimate !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgAnimate: undefined })}>
-        <InspectorSwitch checked={values.imageSvgAnimate === true} onChange={(checked) => update({ imageSvgAnimate: checked || undefined })} label="Animate strokes" disabled={values[svgInlineKey] !== true} />
+      {showSvgAnimate && <InspectorFieldRow label="Animate SVG" isOverridden={values.imageSvgAnimate !== undefined} inheritedValueText="Off" onReset={() => update({ imageSvgAnimate: undefined })}>
+        <InspectorSwitch checked={values.imageSvgAnimate === true} onChange={(checked) => update({ imageSvgAnimate: checked || undefined })} disabled={values[svgInlineKey] !== true} />
       </InspectorFieldRow>}
 
       {showHeightControls && <>
-        <InspectorFieldRow label="Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="Auto" onReset={() => update({ imageHeight: undefined })}>
-          <InspectorSwitch checked={values.imageHeight === "column"} onChange={(checked) => update({ imageHeight: checked ? "column" : undefined })} label="Fill the available column space" />
+        <InspectorFieldRow label="Fill Height" isOverridden={values.imageHeight !== undefined} inheritedValueText="Auto" onReset={() => update({ imageHeight: undefined })}>
+          <InspectorSwitch checked={values.imageHeight === "column"} onChange={(checked) => update({ imageHeight: checked ? "column" : undefined })} />
         </InspectorFieldRow>
-        <InspectorFieldRow label="" isOverridden={values.imageHeight === "viewport"} inheritedValueText="Off" onReset={() => update({ imageHeight: undefined })}>
-          <InspectorSwitch checked={values.imageHeight === "viewport"} onChange={(checked) => update({ imageHeight: checked ? "viewport" : undefined })} label="Force viewport height" />
+        <InspectorFieldRow label="Viewport Height" isOverridden={values.imageHeight === "viewport"} inheritedValueText="Off" onReset={() => update({ imageHeight: undefined })}>
+          <InspectorSwitch checked={values.imageHeight === "viewport"} onChange={(checked) => update({ imageHeight: checked ? "viewport" : undefined })} />
         </InspectorFieldRow>
       </>}
 

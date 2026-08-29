@@ -10304,31 +10304,7 @@
     "key": "page:story",
     "page": "page:story",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "contentLayout-mtdco577-2akv2",
@@ -10936,7 +10912,8 @@
                       "card": {}
                     }
                   }
-                ]
+                ],
+                "verticalAlign": "middle"
               }
             ]
           }
@@ -12982,6 +12959,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-28T19:34:07.225Z"
+    "updatedAt": "2026-08-29T11:47:03.572Z"
   }
 }

@@ -199,10 +199,14 @@ export default function HeaderShellView({
   scrollState,
 }: HeaderShellViewProps) {
   const [liveHeaderComposition, setLiveHeaderComposition] = useState<HeaderBuilderComposition | null>(null);
+  const [liveShellSettings, setLiveShellSettings] = useState<Partial<BuilderShellSettings> | null>(null);
   const liveHeaderRevisionRef = useRef(0);
+  const liveShellRevisionRef = useRef(0);
   useEffect(() => {
     liveHeaderRevisionRef.current = 0;
+    liveShellRevisionRef.current = 0;
     setLiveHeaderComposition(null);
+    setLiveShellSettings(null);
     if (!builderDraftPreview) return;
 
     const handleDraftMessage = (event: MessageEvent) => {
@@ -210,10 +214,20 @@ export default function HeaderShellView({
         event.origin !== window.location.origin ||
         event.source !== window.parent ||
         event.data?.source !== BUILDER_IFRAME_DRAFT_SOURCE ||
-        event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE ||
-        event.data?.documentKey !== "header"
+        event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE
       ) return;
       const revision = Number(event.data.revision);
+      const nextShellSettings = event.data.shellSettings as Partial<BuilderShellSettings> | undefined;
+      if (
+        Number.isFinite(revision) &&
+        revision > liveShellRevisionRef.current &&
+        nextShellSettings &&
+        typeof nextShellSettings === "object"
+      ) {
+        liveShellRevisionRef.current = revision;
+        setLiveShellSettings(nextShellSettings);
+      }
+      if (event.data.documentKey !== "header") return;
       const state = event.data.state as BuilderState | undefined;
       if (!Number.isFinite(revision) || revision <= liveHeaderRevisionRef.current) return;
       if (!state || state.page !== "header" || !Array.isArray(state.sections)) return;
@@ -233,11 +247,12 @@ export default function HeaderShellView({
     window.addEventListener("message", handleDraftMessage);
     return () => window.removeEventListener("message", handleDraftMessage);
   }, [builderDraftPreview]);
+  const effectiveShellSettings = liveShellSettings ?? shellSettings;
   const headerComposition = liveHeaderComposition ?? initialHeaderComposition;
   const canonicalRows = headerComposition.rows ?? [];
   const hasCanonicalMobileRows = canonicalRows.some((row) => row.headerVariant === "mobile");
   const mobileBreakpoint = normalizeHeaderMobileBreakpoint(
-    headerComposition.documentMobileBreakpoint ?? shellSettings.headerMobileBreakpoint,
+    headerComposition.documentMobileBreakpoint ?? effectiveShellSettings.headerMobileBreakpoint,
   );
   const [activeHeaderVariant, setActiveHeaderVariant] = useState<"desktop" | "mobile">("desktop");
   useEffect(() => {
@@ -281,11 +296,11 @@ export default function HeaderShellView({
   const documentLogo = activeDocumentElements.find((item) => item.type === "logo");
   const documentNavigation = activeDocumentElements.find((item) => item.type === "navigation");
   const primaryColor =
-    asString(shellSettings.primaryColor) ||
+    asString(effectiveShellSettings.primaryColor) ||
     asString(settings.primary_color) ||
     "#111827";
   const accentColor =
-    asString(shellSettings.accentColor) ||
+    asString(effectiveShellSettings.accentColor) ||
     asString(settings.accent_color) ||
     "#ec4899";
   const logoField = settings.logo || settings.site_logo || settings.store_logo;
@@ -318,7 +333,7 @@ export default function HeaderShellView({
   const currencyLabel = asString(settings.currency_label, "AMD ֏");
   const documentSettings = resolveHeaderDocumentSettings(
     headerComposition,
-    shellSettings,
+    effectiveShellSettings,
   );
   // `wordpress` is the canonical persisted name for YOOtheme's
   // horizontal-justify preset. Do not fall back to the legacy theme setting,
@@ -402,20 +417,20 @@ export default function HeaderShellView({
   );
   const headerMustBeTransparent = documentSettings.transparent;
   const effectiveHeaderTextMode = documentSettings.textMode;
-  const effectiveLogoUrl = documentLogo?.imageUrl || shellSettings.headerLogoUrl || logoUrl;
+  const effectiveLogoUrl = documentLogo?.imageUrl || effectiveShellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
-    documentLogo?.headerBrandText || shellSettings.headerBrandText ||
+    documentLogo?.headerBrandText || effectiveShellSettings.headerBrandText ||
     (brandName ? brandName : serviceHomepageMode ? "WebPages" : null);
   const effectiveLogoAlt =
-    documentLogo?.imageAlt || shellSettings.headerLogoAlt || effectiveBrandText || "Store logo";
+    documentLogo?.imageAlt || effectiveShellSettings.headerLogoAlt || effectiveBrandText || "Store logo";
   const effectiveBrandMode =
-    documentLogo?.headerBrandMode || shellSettings.headerBrandMode || (serviceHomepageMode ? "brand" : "logo");
+    documentLogo?.headerBrandMode || effectiveShellSettings.headerBrandMode || (serviceHomepageMode ? "brand" : "logo");
   const effectiveLogoMaxWidth =
-    documentLogo?.imageMaxWidth || shellSettings.headerLogoMaxWidth || headerSettings.logoMaxWidth;
+    documentLogo?.imageMaxWidth || effectiveShellSettings.headerLogoMaxWidth || headerSettings.logoMaxWidth;
   const effectiveInverseLogoUrl =
     documentLogo?.imageInverseUrl || documentSettings.inverseLogoUrl || null;
   const effectiveIconVariant =
-    shellSettings.headerIconVariant || headerSettings.iconVariant;
+    effectiveShellSettings.headerIconVariant || headerSettings.iconVariant;
   const effectiveActiveIndicator =
     documentNavigation?.menuActiveIndicator ||
     (layout === "princity" ? "princity" : "underline");
@@ -431,32 +446,32 @@ export default function HeaderShellView({
       : "disabled"
     : navigationHoverLine
       ? navigationHoverLine === "none" ? "disabled" : "enabled"
-      : shellSettings.navbarNavItemLineMode === "true" ? "enabled" : "disabled";
+      : effectiveShellSettings.navbarNavItemLineMode === "true" ? "enabled" : "disabled";
   const navbarLinePosition = ["top", "bottom", "left", "right"].includes(
     navigationHoverLine && navigationHoverLine !== "none"
       ? navigationHoverLine
-      : shellSettings.navbarNavItemLinePositionMode ?? "",
+      : effectiveShellSettings.navbarNavItemLinePositionMode ?? "",
   )
     ? navigationHoverLine && navigationHoverLine !== "none"
       ? navigationHoverLine
-      : shellSettings.navbarNavItemLinePositionMode
+      : effectiveShellSettings.navbarNavItemLinePositionMode
     : "bottom";
   const navbarLineSlide = ["fixed", "center", "left", "right"].includes(
-    shellSettings.navbarNavItemLineSlideMode ?? "",
+    effectiveShellSettings.navbarNavItemLineSlideMode ?? "",
   )
-    ? shellSettings.navbarNavItemLineSlideMode
+    ? effectiveShellSettings.navbarNavItemLineSlideMode
     : "center";
   const navigationDividerMode = documentNavigation?.headerNavigationOverrides?.divider
     ? documentNavigation.menuDividerMode
     : undefined;
   const navbarVerticalBorder = ["partial", "all"].includes(
-    navigationDividerMode ?? shellSettings.navbarModeBorderVertical ?? "",
+    navigationDividerMode ?? effectiveShellSettings.navbarModeBorderVertical ?? "",
   )
-    ? navigationDividerMode ?? shellSettings.navbarModeBorderVertical
+    ? navigationDividerMode ?? effectiveShellSettings.navbarModeBorderVertical
     : "none";
   const dropdownIndicator = documentNavigation?.headerNavigationOverrides?.dropdownIndicator
     ? documentNavigation.menuDropdownIndicator ?? "none"
-    : shellSettings.navbarDropdownIndicator === "chevron" ? "chevron" : "none";
+    : effectiveShellSettings.navbarDropdownIndicator === "chevron" ? "chevron" : "none";
   const parentIconEnabled = documentNavigation?.menuShowParentIcon ??
     (documentSettings.parentIconEnabled || dropdownIndicator === "chevron");
   const clickModeEnabled = documentNavigation?.menuClickMode ?? documentSettings.clickModeEnabled;
@@ -509,14 +524,14 @@ export default function HeaderShellView({
       effectiveBrandMode === "both" ||
       !showLogo);
   const defaultMenuItems =
-    Array.isArray(shellSettings.menuItems) && shellSettings.menuItems.length > 0
-      ? buildReactMenuTree(shellSettings.menuItems)
+    Array.isArray(effectiveShellSettings.menuItems) && effectiveShellSettings.menuItems.length > 0
+      ? buildReactMenuTree(effectiveShellSettings.menuItems)
       : [
           { id: "home", label: "Home", url: "/", path: "/" },
           { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
         ];
   const menuPresentation =
-    (shellSettings.menuPresentation as BuilderMenuPresentationMap | undefined) ??
+    (effectiveShellSettings.menuPresentation as BuilderMenuPresentationMap | undefined) ??
     {};
   const categories = categoriesContent ?? null;
   const renderCategoriesMega = (element?: HeaderBuilderElement) =>
@@ -545,11 +560,11 @@ export default function HeaderShellView({
     ) : null;
   const renderNavigation = (element: HeaderBuilderElement) => {
     const source = element.menuSource?.trim();
-    const sourceItems = resolveHeaderMenuSourceItems(shellSettings, source);
+    const sourceItems = resolveHeaderMenuSourceItems(effectiveShellSettings, source);
     const hasNamedSource = Boolean(
       source &&
       source !== "main" &&
-      shellSettings.namedMenus?.some((menu) => menu.id === source),
+      effectiveShellSettings.namedMenus?.some((menu) => menu.id === source),
     );
     const menuItems = hasNamedSource
       ? buildReactMenuTree(sourceItems)
@@ -737,28 +752,28 @@ export default function HeaderShellView({
     const localGradient = localBackground?.includes("gradient(") ? localBackground : undefined;
     const localColor = localGradient ? undefined : localBackground;
     const resolvedTopPadding = rowComp.rowTopSpacing !== undefined
-      ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", shellSettings.rowPaddingTop).css
+      ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", effectiveShellSettings.rowPaddingTop).css
       : visualStyles.paddingTop === undefined
         ? (headerHeight ? "0px" : resolveBuilderSpacing(
-            normalizeLegacyHeaderSpacing(shellSettings.rowPaddingTop) ?? "none",
+            normalizeLegacyHeaderSpacing(effectiveShellSettings.rowPaddingTop) ?? "none",
             "rowPadding",
           ).css)
         : undefined;
     const resolvedBottomPadding = rowComp.rowBottomSpacing !== undefined
-      ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", shellSettings.rowPaddingBottom).css
+      ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", effectiveShellSettings.rowPaddingBottom).css
       : visualStyles.paddingBottom === undefined
         ? (headerHeight ? "0px" : resolveBuilderSpacing(
-            normalizeLegacyHeaderSpacing(shellSettings.rowPaddingBottom) ?? "none",
+            normalizeLegacyHeaderSpacing(effectiveShellSettings.rowPaddingBottom) ?? "none",
             "rowPadding",
           ).css)
         : undefined;
     const resolvedTopMargin = rowComp.rowTopMargin !== undefined
-      ? resolveBuilderSpacing(rowComp.rowTopMargin, "rowMargin", shellSettings.rowMarginTop).css
+      ? resolveBuilderSpacing(rowComp.rowTopMargin, "rowMargin", effectiveShellSettings.rowMarginTop).css
       : visualStyles.marginTop === undefined
         ? resolveBuilderSpacing("none", "rowMargin").css
         : undefined;
     const resolvedBottomMargin = rowComp.rowBottomMargin !== undefined
-      ? resolveBuilderSpacing(rowComp.rowBottomMargin, "rowMargin", shellSettings.rowMarginBottom).css
+      ? resolveBuilderSpacing(rowComp.rowBottomMargin, "rowMargin", effectiveShellSettings.rowMarginBottom).css
       : visualStyles.marginBottom === undefined
         ? resolveBuilderSpacing("none", "rowMargin").css
         : undefined;

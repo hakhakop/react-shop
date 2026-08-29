@@ -219,7 +219,7 @@
     {
       "id": "starter-about",
       "label": "About",
-      "url": "/#about",
+      "url": "/about",
       "parentId": null,
       "iconName": null,
       "iconUrl": null,
@@ -266,7 +266,7 @@
     }
   ],
   "namedMenus": [],
-  "updatedAt": "2026-08-28T17:00:13.186Z",
+  "updatedAt": "2026-08-29T11:02:17.612Z",
   "buttonTextTransform": "inherit",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#000",

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent, ReactNode, useState } from "react";
-import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw, ChevronDown, Check } from "lucide-react";
+import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw, ChevronDown } from "lucide-react";
 import {
   resolveBuilderSpacing,
   BUILDER_SPACING_SCALE,
@@ -11,6 +11,7 @@ import {
 import type { CategoryTreeItem } from "@/lib/categories";
 import { useInspector } from "@/components/dashboard/context/InspectorContext";
 import { InspectorSegmentedControl } from "@/components/dashboard/inspector/InspectorControls";
+export { InspectorDivision } from "@/components/dashboard/inspector/InspectorControls";
 
 /**
  * Visual pill/indicator showing whether a property is inheriting from Global Settings or locally overridden.
@@ -58,47 +59,6 @@ export function OneClickReset({
     >
       <RotateCcw size={11} />
     </button>
-  );
-}
-
-/**
- * YOOtheme-style Inspector Division Card grouping related rows with section title,
- * optional description, and optional 1-click section reset.
- */
-export function InspectorDivision({
-  title,
-  description,
-  onResetAll,
-  children,
-  className = "",
-}: {
-  title: string;
-  description?: string;
-  onResetAll?: () => void;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`builder-inspector-division ${className}`}>
-      <div className="builder-inspector-division-header">
-        <div className="builder-inspector-division-title-group">
-          <span className="builder-inspector-division-title">{title}</span>
-          {description && <span className="builder-inspector-division-desc">{description}</span>}
-        </div>
-        {onResetAll && (
-          <button
-            type="button"
-            className="builder-inspector-division-reset-btn"
-            onClick={onResetAll}
-            title={`Reset all ${title} settings to global defaults`}
-          >
-            <RotateCcw size={10} />
-            <span>Reset Division</span>
-          </button>
-        )}
-      </div>
-      <div className="builder-inspector-division-content">{children}</div>
-    </div>
   );
 }
 
@@ -389,8 +349,8 @@ export function BuilderImageUrlControl({
   const hasImage = Boolean(value && value.trim());
 
   return (
-    <div className="builder-media-url-row">
-      <div className="builder-media-url-input-wrap">
+    <div className={`builder-media-source-card${hasImage ? " has-media" : " is-empty"}`}>
+      <button type="button" onClick={onChoose} className="builder-media-source-summary">
         {hasImage ? (
           <img
             src={value}
@@ -402,15 +362,17 @@ export function BuilderImageUrlControl({
           />
         ) : (
           <div className="builder-media-url-thumbnail-empty">
-            <ImageIcon size={14} />
+            <ImageIcon size={22} />
           </div>
         )}
-        <input value={value} placeholder={placeholder} onChange={onChange} />
-      </div>
-      <button type="button" onClick={onChoose} className="builder-media-url-choose-btn">
-        <GalleryHorizontal size={14} />
-        {chooseLabel}
+        <span className="builder-media-source-copy" aria-hidden="true">
+          <GalleryHorizontal size={15} />
+          <strong>{hasImage ? "Replace Media" : chooseLabel}</strong>
+        </span>
       </button>
+      <div className="builder-media-url-input-wrap">
+        <input value={value} placeholder={placeholder} onChange={onChange} aria-label="Media source URL" />
+      </div>
     </div>
   );
 }

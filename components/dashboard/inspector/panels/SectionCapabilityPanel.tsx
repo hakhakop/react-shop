@@ -11,6 +11,7 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import {
   InspectorFieldRow,
+  InspectorDivision,
   InspectorSelect,
   InspectorSwitch,
   InspectorTextField,
@@ -44,11 +45,13 @@ function normalizeVideoUrl(value: string) {
     : trimmed;
 }
 
-function Group({ title, children }: { title?: string; children: ReactNode }) {
-  return <section className="builder-inspector-section">{title && <h3>{title}</h3>}{children}</section>;
+function Group({ title, children, defaultOpen = true, summary }: { title?: string; children: ReactNode; defaultOpen?: boolean; summary?: ReactNode }) {
+  return title
+    ? <InspectorDivision title={title} defaultOpen={defaultOpen} summary={summary}>{children}</InspectorDivision>
+    : <section className="builder-inspector-section">{children}</section>;
 }
 
-/** Canonical Section inspector following YOOtheme's Content / Settings / Advanced contract. */
+/** Canonical Section inspector grouped by layout, visual style, behavior and advanced identity. */
 export default function SectionCapabilityPanel({ section, tab, isFirstVisible, update, openWordPressMediaPicker }: Props) {
   const resolvedBackground = resolveSectionBackground(section);
   const background = section.visualStyle?.background;
@@ -75,7 +78,7 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="section-content">
-        <Group title="Content">
+        <Group title="Background" summary={imageUrl ? "Image" : resolvedBackground.role}>
           <InspectorFieldRow label="Image" description="Section background image source.">
             <BuilderImageUrlControl value={imageUrl} placeholder="http://" onChange={(event) => updateBackgroundImage({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Section Background Image", currentUrl: imageUrl || undefined, onSelect: (media) => updateBackgroundImage({ imageUrl: media.sourceUrl }) })} />
           </InspectorFieldRow>
@@ -116,29 +119,38 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
   }
 
   return (
-    <div className="builder-inspector-stack" data-uikit-capability="section-settings">
-      <Group title="Appearance">
+    <div className="builder-inspector-stack" data-uikit-capability={`section-${tab}`}>
+      {tab === "settings" ? <>
+      <Group title="Appearance" summary={resolvedBackground.role}>
         <InspectorFieldRow label="Style"><InspectorSelect value={resolvedBackground.role} options={[{ value: "default", label: "Default" }, { value: "muted", label: "Muted" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }]} onChange={(value) => update({ backgroundRole: value as BuilderSection["backgroundRole"], sectionVariant: value as BuilderSection["sectionVariant"] })} ariaLabel="Section style" /></InspectorFieldRow>
-        <InspectorFieldRow label="Preserve Text Color" description="Preserve the text color, for example when using cards. Section overlap is not supported by all styles and may have no visual effect."><InspectorSwitch checked={section.preserveColor === true} onChange={(preserveColor) => update({ preserveColor })} label="Preserve nested element colors" /></InspectorFieldRow>
-        <InspectorFieldRow label="Text Color" description="Force a light or dark color for text, buttons and controls on the image or video background."><InspectorSelect value={section.textColor ?? "none"} options={[{ value: "none", label: "Auto" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} onChange={(textColor) => update({ textColor: textColor as BuilderSection["textColor"] })} ariaLabel="Section text color" /></InspectorFieldRow>
+        <InspectorFieldRow label="Preserve Text Color" description="Preserve the text color, for example when using cards."><InspectorSwitch checked={section.preserveColor === true} onChange={(preserveColor) => update({ preserveColor })} /></InspectorFieldRow>
+        <InspectorFieldRow label="Text Color" description="Force a light or dark foreground on image or video backgrounds."><InspectorSelect value={section.textColor ?? "none"} options={[{ value: "none", label: "Auto" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} onChange={(textColor) => update({ textColor: textColor as BuilderSection["textColor"] })} ariaLabel="Section text color" /></InspectorFieldRow>
       </Group>
       <Group title="Container">
         <InspectorFieldRow label="Max Width" description="Set the maximum content width."><InspectorSelect value={section.maxWidth ?? section.contentMode ?? "default"} options={["none", "xsmall", "small", "default", "medium", "large", "xlarge", "expand"].map((value) => ({ value, label: value.replace(/^./, (letter) => letter.toUpperCase()) }))} onChange={(value) => update({ maxWidth: value as BuilderSection["maxWidth"], contentMode: value as BuilderSection["contentMode"] })} ariaLabel="Section max width" /></InspectorFieldRow>
-        <InspectorFieldRow label="Remove Horizontal Padding"><InspectorSwitch checked={section.removeHorizontalPadding === true} onChange={(removeHorizontalPadding) => update({ removeHorizontalPadding })} label="Remove left and right padding" /></InspectorFieldRow>
+        <InspectorFieldRow label="Remove Horizontal Padding"><InspectorSwitch checked={section.removeHorizontalPadding === true} onChange={(removeHorizontalPadding) => update({ removeHorizontalPadding })} /></InspectorFieldRow>
         <InspectorFieldRow label="Expand One Side" description="Expand the width of one side to the left or right while the other side keeps within the constraints of the max width."><InspectorSelect value={section.expandOneSide ?? "none"} options={[{ value: "none", label: "Don't expand" }, { value: "left", label: "Expand Left" }, { value: "right", label: "Expand Right" }]} onChange={(expandOneSide) => update({ expandOneSide: expandOneSide as BuilderSection["expandOneSide"] })} ariaLabel="Section one-sided expansion" /></InspectorFieldRow>
       </Group>
       <Group title="Height & Alignment">
         <InspectorFieldRow label="Height" description="Set a fixed height, and optionally subtract the header height to fill the first visible viewport. Alternatively, expand the height so the next section also fits the viewport, or on smaller pages to fill the viewport."><InspectorSelect value={section.sectionHeight ?? "none"} options={[{ value: "none", label: "Auto" }, { value: "viewport", label: "Viewport" }, { value: "viewport-20", label: "Viewport minus 20%" }, { value: "viewport-80", label: "Viewport 80%" }, { value: "viewport-percent", label: "Viewport minus section above" }, { value: "auto", label: "Auto" }]} onChange={(sectionHeight) => update({ sectionHeight: sectionHeight as BuilderSection["sectionHeight"] })} ariaLabel="Section height" /></InspectorFieldRow>
-        <InspectorFieldRow label="Subtract Height Above Section"><InspectorSwitch checked={section.subtractHeightAbove === true} onChange={(subtractHeightAbove) => update({ subtractHeightAbove })} label="Subtract preceding layout height" /></InspectorFieldRow>
+        <InspectorFieldRow label="Subtract Height Above Section"><InspectorSwitch checked={section.subtractHeightAbove === true} onChange={(subtractHeightAbove) => update({ subtractHeightAbove })} /></InspectorFieldRow>
         <InspectorFieldRow label="Vertical Alignment" description="Align the section content vertically, if the section height is larger than the content itself."><InspectorSelect value={section.contentVerticalAlign ?? "top"} options={[{ value: "top", label: "Top" }, { value: "center", label: "Middle" }, { value: "bottom", label: "Bottom" }]} onChange={(contentVerticalAlign) => update({ contentVerticalAlign: contentVerticalAlign as BuilderSection["contentVerticalAlign"] })} ariaLabel="Section vertical alignment" /></InspectorFieldRow>
       </Group>
       <Group title="Spacing">
         <InspectorFieldRow label="Padding"><InspectorSelect value={section.sectionPadding ?? "default"} options={[{ value: "none", label: "None" }, { value: "xsmall", label: "X-Small" }, { value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} onChange={(sectionPadding) => update({ sectionPadding: sectionPadding as BuilderSection["sectionPadding"] })} ariaLabel="Section padding" /></InspectorFieldRow>
-        <InspectorFieldRow label="Remove Top Padding"><InspectorSwitch checked={section.removeTopPadding === true} onChange={(removeTopPadding) => update({ removeTopPadding, topSpacing: removeTopPadding ? "none" : undefined })} label="Remove top padding" /></InspectorFieldRow>
-        <InspectorFieldRow label="Remove Bottom Padding"><InspectorSwitch checked={section.removeBottomPadding === true} onChange={(removeBottomPadding) => update({ removeBottomPadding, bottomSpacing: removeBottomPadding ? "none" : undefined })} label="Remove bottom padding" /></InspectorFieldRow>
+        <InspectorFieldRow label="Remove Top Padding"><InspectorSwitch checked={section.removeTopPadding === true} onChange={(removeTopPadding) => update({ removeTopPadding, topSpacing: removeTopPadding ? "none" : undefined })} /></InspectorFieldRow>
+        <InspectorFieldRow label="Remove Bottom Padding"><InspectorSwitch checked={section.removeBottomPadding === true} onChange={(removeBottomPadding) => update({ removeBottomPadding, bottomSpacing: removeBottomPadding ? "none" : undefined })} /></InspectorFieldRow>
+      </Group>
+      <Group title="Structure" defaultOpen={false} summary={section.htmlElement ?? "div"}>
+        <InspectorFieldRow label="HTML Element"><InspectorSelect value={section.htmlElement ?? "div"} options={["div", "section", "header", "footer", "aside", "main"].map((value) => ({ value, label: value }))} onChange={(htmlElement) => update({ htmlElement: htmlElement as BuilderSection["htmlElement"] })} ariaLabel="Section HTML element" /></InspectorFieldRow>
+      </Group>
+      <Group title="Decorative Title" defaultOpen={false} summary={normalizeSectionTitlePosition(section.sectionTitlePosition) === "none" ? "Off" : normalizeSectionTitlePosition(section.sectionTitlePosition)}>
+        <InspectorFieldRow label="Title Position"><InspectorSelect value={normalizeSectionTitlePosition(section.sectionTitlePosition)} options={[{ value: "none", label: "None" }, { value: "left-top", label: "Left Top" }, { value: "right-top", label: "Right Top" }, { value: "left-center", label: "Left Center" }, { value: "right-center", label: "Right Center" }]} onChange={(sectionTitlePosition) => update({ sectionTitlePosition })} ariaLabel="Section title position" /></InspectorFieldRow>
+        <InspectorFieldRow label="Title Rotation"><InspectorSelect value={section.sectionTitleRotation ?? "none"} options={[{ value: "none", label: "None" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]} onChange={(sectionTitleRotation) => update({ sectionTitleRotation: sectionTitleRotation as BuilderSection["sectionTitleRotation"] })} ariaLabel="Section title rotation" /></InspectorFieldRow>
+        <InspectorFieldRow label="Title Breakpoint"><InspectorSelect value={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)} options={[{ value: "xlarge", label: "X-Large" }, { value: "large", label: "Large" }, { value: "medium", label: "Medium" }, { value: "small", label: "Small" }]} onChange={(sectionTitleBreakpoint) => update({ sectionTitleBreakpoint })} ariaLabel="Section title breakpoint" /></InspectorFieldRow>
       </Group>
       <Group title="Behavior">
-        <InspectorFieldRow label="Overlap Following Section"><InspectorSwitch checked={section.overlap === true} onChange={(overlap) => update({ overlap })} label="Overlap the next section" /></InspectorFieldRow>
+        <InspectorFieldRow label="Overlap Following Section"><InspectorSwitch checked={section.overlap === true} onChange={(overlap) => update({ overlap })} /></InspectorFieldRow>
         <InspectorFieldRow label="Transparent Header" description={isFirstVisible ? "Make the Header transparent over this section." : "Available only on the first visible section."}>
           <InspectorSwitch
             checked={section.headerTransparent === true}
@@ -147,7 +159,6 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
               headerTransparent,
               ...(!headerTransparent ? { pullUnderHeader: false } : {}),
             })}
-            label="Make header transparent"
           />
         </InspectorFieldRow>
         <InspectorFieldRow label="Pull Content Behind Header" description={isFirstVisible ? "Overlay this section behind the transparent Header." : "Available only on the first visible section."}>
@@ -155,7 +166,6 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
             checked={section.pullUnderHeader === true}
             disabled={!isFirstVisible || section.headerTransparent !== true}
             onChange={(pullUnderHeader) => update({ pullUnderHeader })}
-            label="Pull content behind header"
           />
         </InspectorFieldRow>
         <InspectorFieldRow label="Header Text Color" description="Force a light or dark color for Header text, links and controls over this section.">
@@ -177,14 +187,7 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
         <InspectorFieldRow label="Animation"><AnimationControl value={section.animation} onChange={(animation) => update({ animation })} allowPause allowScrub /></InspectorFieldRow>
         <InspectorFieldRow label="Visibility"><InspectorSelect value={section.visualStyle?.visibility?.desktop === true ? "visible" : section.visualStyle?.visibility?.desktop === false ? "hidden" : "inherit"} options={[{ value: "inherit", label: "Inherit" }, { value: "visible", label: "Visible" }, { value: "hidden", label: "Hidden" }]} onChange={(value) => updateVisualStyle({ visibility: { ...(section.visualStyle?.visibility ?? {}), desktop: value === "inherit" ? undefined : value === "visible" } })} ariaLabel="Section visibility" /></InspectorFieldRow>
       </Group>
-      <Group title="Structure">
-        <InspectorFieldRow label="HTML Element"><InspectorSelect value={section.htmlElement ?? "div"} options={["div", "section", "header", "footer", "aside", "main"].map((value) => ({ value, label: value }))} onChange={(htmlElement) => update({ htmlElement: htmlElement as BuilderSection["htmlElement"] })} ariaLabel="Section HTML element" /></InspectorFieldRow>
-      </Group>
-      <Group title="Decorative Title">
-        <InspectorFieldRow label="Title Position"><InspectorSelect value={normalizeSectionTitlePosition(section.sectionTitlePosition)} options={[{ value: "none", label: "None" }, { value: "left-top", label: "Left Top" }, { value: "right-top", label: "Right Top" }, { value: "left-center", label: "Left Center" }, { value: "right-center", label: "Right Center" }]} onChange={(sectionTitlePosition) => update({ sectionTitlePosition })} ariaLabel="Section title position" /></InspectorFieldRow>
-        <InspectorFieldRow label="Title Rotation"><InspectorSelect value={section.sectionTitleRotation ?? "none"} options={[{ value: "none", label: "None" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]} onChange={(sectionTitleRotation) => update({ sectionTitleRotation: sectionTitleRotation as BuilderSection["sectionTitleRotation"] })} ariaLabel="Section title rotation" /></InspectorFieldRow>
-        <InspectorFieldRow label="Title Breakpoint"><InspectorSelect value={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)} options={[{ value: "xlarge", label: "X-Large" }, { value: "large", label: "Large" }, { value: "medium", label: "Medium" }, { value: "small", label: "Small" }]} onChange={(sectionTitleBreakpoint) => update({ sectionTitleBreakpoint })} ariaLabel="Section title breakpoint" /></InspectorFieldRow>
-      </Group>
+      </> : null}
     </div>
   );
 }

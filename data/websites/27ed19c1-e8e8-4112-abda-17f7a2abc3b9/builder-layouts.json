@@ -5203,5 +5203,2574 @@
         ]
       }
     ]
+  },
+  "page:dashboard": {
+    "version": 1,
+    "key": "page:dashboard",
+    "page": "page:dashboard",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "page:dashboard-content",
+        "kind": "contentLayout",
+        "title": "Page introduction",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layoutItems": [
+          {
+            "id": "page:dashboard-content-column",
+            "rowId": "page:dashboard-content-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "page:dashboard-hero",
+                "kind": "hero",
+                "eyebrow": "New page",
+                "title": "Dashboard",
+                "body": "Introduce this page with a clear headline, useful context, and a focused next step.",
+                "buttonLabel": "Get Started",
+                "buttonUrl": "#",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-29T11:32:36.841Z"
+  },
+  "page:about": {
+    "version": 1,
+    "key": "page:about",
+    "page": "page:about",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mteayys0-41cg1",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "transparent",
+        "backgroundRole": "secondary",
+        "sectionVariant": "secondary",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-left-small",
+        "animationDelay": 200,
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys0-0-zwma",
+            "rowId": "layout-row-mteayys0-0",
+            "rowLayout": "2-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "layout-item-mteayys0-1-n6st",
+            "rowId": "layout-row-mteayys0-0",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys0-3kihj",
+                "kind": "heading",
+                "headingText": "About Us",
+                "title": "About Us",
+                "headingLevel": "h1",
+                "headingSize": "h6",
+                "elementAlign": "center",
+                "headingColor": "primary",
+                "maxWidth": "xlarge",
+                "maxWidthBreakpoint": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "blockAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "heading-block-mteayys0-0h8if",
+                "kind": "heading",
+                "headingText": "We've Pursued the Same Goal Since the Beginning",
+                "title": "We've Pursued the Same Goal Since the Beginning",
+                "headingLevel": "div",
+                "headingSize": "h1",
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "maxWidthBreakpoint": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "blockAlign": "center",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "text-block-mteayys0-dy6m2",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+                "textVariant": "default",
+                "elementAlign": "center",
+                "textColumnBreakpoint": "xlarge",
+                "maxWidth": "xlarge",
+                "maxWidthBreakpoint": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "blockAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mteayys0-eu6e6",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-1-3-0",
+                    "label": "Latest News",
+                    "url": "?post_type=post",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "maxWidthBreakpoint": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "blockAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys0-leyl-section-0",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mteayys0-leyl-section-0-0",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-hero-bg.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "advanced": {
+                  "css": ".el-column {\n\tmin-height: 500px;\n}"
+                },
+                "elements": []
+              },
+              {
+                "id": "layout-column-mteayys0-leyl-section-0-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "style": "tile-secondary",
+                "padding": "xlarge",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys0-lsia9",
+                    "kind": "heading",
+                    "headingText": "About Us",
+                    "title": "About Us",
+                    "headingLevel": "h1",
+                    "headingSize": "h6",
+                    "elementAlign": "center",
+                    "headingColor": "primary",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "maxWidth": "xlarge",
+                        "maxWidthBreakpoint": "large",
+                        "blockAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "heading-block-mteayys0-nuimr",
+                    "kind": "heading",
+                    "headingText": "We've Pursued the Same Goal Since the Beginning",
+                    "title": "We've Pursued the Same Goal Since the Beginning",
+                    "headingLevel": "div",
+                    "headingSize": "h1",
+                    "elementAlign": "center",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium",
+                        "maxWidth": "xlarge",
+                        "maxWidthBreakpoint": "large",
+                        "blockAlign": "center",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "text-block-mteayys0-sd30k",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+                    "textVariant": "default",
+                    "elementAlign": "center",
+                    "textColumnBreakpoint": "xlarge",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "maxWidth": "xlarge",
+                        "maxWidthBreakpoint": "large",
+                        "blockAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mteayys0-h4ly1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-1-3-0",
+                        "label": "Latest News",
+                        "url": "?post_type=post",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementAlign": "center",
+                    "maxWidth": "xlarge",
+                    "maxWidthBreakpoint": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge",
+                        "maxWidth": "xlarge",
+                        "maxWidthBreakpoint": "large",
+                        "blockAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mteayys1-py2oj",
+        "kind": "contentLayout",
+        "title": "History",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "large",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-left-medium",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys1-0-ukxi",
+            "rowId": "layout-row-mteayys1-0",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys1-c253u",
+                "kind": "heading",
+                "headingText": "History",
+                "title": "History",
+                "headingLevel": "h2",
+                "headingSize": "h6",
+                "headingColor": "primary"
+              },
+              {
+                "id": "heading-block-mteayys1-ett21",
+                "kind": "heading",
+                "headingText": "We Have a Long and Successful History",
+                "title": "We Have a Long and Successful History",
+                "headingLevel": "div",
+                "headingSize": "h1",
+                "maxWidth": "xlarge",
+                "removeTopMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large",
+                    "removeTopMargin": true,
+                    "maxWidth": "xlarge",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "text-block-mteayys1-bzh0q",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+                "textVariant": "default",
+                "textColumns": "1-2",
+                "textColumnBreakpoint": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "grid-block-mteayys1-txnf0",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-1-0-0-3-0",
+                    "imageUrl": "",
+                    "imageAlt": "1990",
+                    "title": "1990",
+                    "meta": "Since",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h1"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-3-1",
+                    "imageUrl": "",
+                    "imageAlt": "250+",
+                    "title": "250+",
+                    "meta": "Employees",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h1"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-3-2",
+                    "imageUrl": "",
+                    "imageAlt": "1500+",
+                    "title": "1500+",
+                    "meta": "Buildings",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h1"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "blank",
+                "gridCardSize": "none",
+                "gridCardHover": false,
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelExpand": "none",
+                "panelContentWidth": "auto",
+                "gridItemMaxWidth": "none",
+                "gridTitlePlacement": "top",
+                "gridTitleWidth": "1-2",
+                "gridTitleColumnGap": "default",
+                "gridTitleRowGap": "default",
+                "gridTitleBreakpoint": "m",
+                "gridMediaPlacement": "top",
+                "gridGap": "large",
+                "showDividers": false,
+                "centerColumns": false,
+                "centerRows": false,
+                "gridParallaxJustify": false,
+                "columnsPhonePortrait": "auto",
+                "columnsPhoneLandscape": "3",
+                "gridMediaWidth": "1-2",
+                "gridMediaColumnGap": "default",
+                "gridMediaRowGap": "default",
+                "gridMediaBreakpoint": "m",
+                "gridMediaVerticalAlign": false,
+                "imageSvgColor": "emphasis",
+                "imageMarginTop": "default",
+                "imageShape": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "imageIconWidth": "80",
+                "linkImage": false,
+                "enableLightbox": false,
+                "linkTitle": false,
+                "panelTitleHoverStyle": "none",
+                "panelTitleAlign": "top",
+                "panelTitleGridWidth": "1-2",
+                "panelTitleGridBreakpoint": "medium",
+                "panelTitleGridColumnGap": "default",
+                "panelTitleGridRowGap": "default",
+                "gridTitleSize": "h1",
+                "metaColor": "muted",
+                "gridMetaAlign": "below-title",
+                "gridMetaHtmlElement": "div",
+                "gridContentAlign": false,
+                "gridContentDropcap": false,
+                "gridContentColumn": "none",
+                "gridContentColumnDivider": false,
+                "gridContentColumnBreakpoint": "m",
+                "metaMarginTop": "remove",
+                "contentMarginTop": "small",
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin-large)"
+                  },
+                  "card": {
+                    "titleMargin": "0",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "large",
+                    "maxWidth": "xlarge"
+                  },
+                  "effects": {}
+                },
+                "maxWidth": "xlarge",
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys1-1-rts1",
+            "rowId": "layout-row-mteayys1-0",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "image-block-mteayys1-u1kn8",
+                "kind": "image",
+                "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-history.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 1200,
+                "imageWidth": "1200px",
+                "imageHeight": "1570px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys1-0iro-section-0",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "medium": "3-5"
+                  },
+                  "order": {
+                    "medium": "first"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "medium": "2-5"
+                  },
+                  "order": {
+                    "default": "first"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "divider": false,
+            "spacingContract": "yootheme",
+            "topMargin": "large",
+            "bottomMargin": "large",
+            "columns": [
+              {
+                "id": "layout-column-mteayys1-0iro-section-0-0",
+                "responsiveWidths": {
+                  "medium": "3-5"
+                },
+                "order": {
+                  "medium": "first"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys1-fd5vt",
+                    "kind": "heading",
+                    "headingText": "History",
+                    "title": "History",
+                    "headingLevel": "h2",
+                    "headingSize": "h6",
+                    "headingColor": "primary"
+                  },
+                  {
+                    "id": "heading-block-mteayys1-3dmw6",
+                    "kind": "heading",
+                    "headingText": "We Have a Long and Successful History",
+                    "title": "We Have a Long and Successful History",
+                    "headingLevel": "div",
+                    "headingSize": "h1",
+                    "maxWidth": "xlarge",
+                    "removeTopMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large",
+                        "removeTopMargin": true,
+                        "maxWidth": "xlarge",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "text-block-mteayys1-bmhzk",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+                    "textVariant": "default",
+                    "textColumns": "1-2",
+                    "textColumnBreakpoint": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "grid-block-mteayys1-c4kty",
+                    "kind": "grid",
+                    "gridSource": "static",
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-1-0-0-3-0",
+                        "imageUrl": "",
+                        "imageAlt": "1990",
+                        "title": "1990",
+                        "meta": "Since",
+                        "text": "",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h1"
+                      },
+                      {
+                        "id": "yootheme-grid-item-1-0-0-3-1",
+                        "imageUrl": "",
+                        "imageAlt": "250+",
+                        "title": "250+",
+                        "meta": "Employees",
+                        "text": "",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h1"
+                      },
+                      {
+                        "id": "yootheme-grid-item-1-0-0-3-2",
+                        "imageUrl": "",
+                        "imageAlt": "1500+",
+                        "title": "1500+",
+                        "meta": "Buildings",
+                        "text": "",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h1"
+                      }
+                    ],
+                    "gridShowImage": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "enableFilter": false,
+                    "filterStyle": "tabs",
+                    "gridItemRenderer": "plain",
+                    "gridCardVariant": "blank",
+                    "gridCardSize": "none",
+                    "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelExpand": "none",
+                    "panelContentWidth": "auto",
+                    "gridItemMaxWidth": "none",
+                    "gridTitlePlacement": "top",
+                    "gridTitleWidth": "1-2",
+                    "gridTitleColumnGap": "default",
+                    "gridTitleRowGap": "default",
+                    "gridTitleBreakpoint": "m",
+                    "gridMediaPlacement": "top",
+                    "gridGap": "large",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "centerRows": false,
+                    "gridParallaxJustify": false,
+                    "columnsPhonePortrait": "auto",
+                    "columnsPhoneLandscape": "3",
+                    "gridMediaWidth": "1-2",
+                    "gridMediaColumnGap": "default",
+                    "gridMediaRowGap": "default",
+                    "gridMediaBreakpoint": "m",
+                    "gridMediaVerticalAlign": false,
+                    "imageSvgColor": "emphasis",
+                    "imageMarginTop": "default",
+                    "imageShape": "none",
+                    "imageBoxDecoration": "none",
+                    "imageHoverTransition": "none",
+                    "imageIconWidth": "80",
+                    "linkImage": false,
+                    "enableLightbox": false,
+                    "linkTitle": false,
+                    "panelTitleHoverStyle": "none",
+                    "panelTitleAlign": "top",
+                    "panelTitleGridWidth": "1-2",
+                    "panelTitleGridBreakpoint": "medium",
+                    "panelTitleGridColumnGap": "default",
+                    "panelTitleGridRowGap": "default",
+                    "gridTitleSize": "h1",
+                    "metaColor": "muted",
+                    "gridMetaAlign": "below-title",
+                    "gridMetaHtmlElement": "div",
+                    "gridContentAlign": false,
+                    "gridContentDropcap": false,
+                    "gridContentColumn": "none",
+                    "gridContentColumnDivider": false,
+                    "gridContentColumnBreakpoint": "m",
+                    "metaMarginTop": "remove",
+                    "contentMarginTop": "small",
+                    "buttonLabel": "Read more",
+                    "buttonStyle": "default",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin-large)"
+                      },
+                      "card": {
+                        "titleMargin": "0",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "large",
+                        "maxWidth": "xlarge"
+                      },
+                      "effects": {}
+                    },
+                    "maxWidth": "xlarge",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              },
+              {
+                "id": "layout-column-mteayys1-0iro-section-0-1",
+                "responsiveWidths": {
+                  "medium": "2-5"
+                },
+                "order": {
+                  "default": "first"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "image-block-mteayys1-ek0l9",
+                    "kind": "image",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-history.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 1200,
+                    "imageWidth": "1200px",
+                    "imageHeight": "1570px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mteayys1-otux1",
+        "kind": "contentLayout",
+        "title": "Offices",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "xlarge",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/home-residences-bg.svg",
+            "imagePosition": "top-left",
+            "imageSize": "contain"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-right-medium",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys1-0-36yz",
+            "rowId": "layout-row-mteayys1-0",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "overlaySlider-block-mteayys1-kvvyf",
+                "kind": "overlaySlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-0-0",
+                    "title": "Take a Time Out",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-01.jpg",
+                    "imageAlt": "Take a Time Out",
+                    "thumbnailUrl": "",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-0-1",
+                    "title": "Room for Creativity",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-02.jpg",
+                    "imageAlt": "Room for Creativity",
+                    "thumbnailUrl": "",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-0-2",
+                    "title": "Relaxed Communication Environment",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-03.jpg",
+                    "imageAlt": "Relaxed Communication Environment",
+                    "thumbnailUrl": "",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-0-3",
+                    "title": "Time to Relax",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-04.jpg",
+                    "imageAlt": "Time to Relax",
+                    "thumbnailUrl": "",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-0-4",
+                    "title": "Free Coffee &amp; Drinks",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-05.jpg",
+                    "imageAlt": "Free Coffee & Drinks",
+                    "thumbnailUrl": "",
+                    "showAction": false
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "overlay-slider",
+                  "variant": "overlay",
+                  "slideMode": "overlay",
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "itemWidthMode": "fixed",
+                  "autoplay": true,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 30,
+                  "divider": false,
+                  "cardsPerViewPhone": 1,
+                  "cardsPerViewSmall": 2,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "navigationBelow": true,
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "paginationPosition": "bottom-center",
+                  "slidenavBreakpoint": "small",
+                  "headingLevel": "div",
+                  "headingSize": "h5",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "meta",
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "effect": "slide",
+                  "overlayMode": "cover",
+                  "overlayDisplay": "always",
+                  "overlayPosition": "bottom-left",
+                  "overlayPadding": "small",
+                  "overlayStyle": "none",
+                  "overlayTextColor": "light",
+                  "imageWidth": "640px"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys1-1-523e",
+            "rowId": "layout-row-mteayys1-0",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys1-qw44y",
+                "kind": "heading",
+                "headingText": "Our Offices",
+                "title": "Our Offices",
+                "headingLevel": "h2",
+                "headingSize": "h6",
+                "headingColor": "primary"
+              },
+              {
+                "id": "heading-block-mteayys1-autxl",
+                "kind": "heading",
+                "headingText": "Our Work Areas Have Been Designed for High Productivity",
+                "title": "Our Work Areas Have Been Designed for High Productivity",
+                "headingLevel": "div",
+                "headingSize": "h1",
+                "maxWidth": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "maxWidth": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "text-block-mteayys1-pp90d",
+                "kind": "text",
+                "body": "",
+                "textVariant": "default",
+                "textColumnBreakpoint": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mteayys1-u0kon",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-2-0-1-3-0",
+                    "label": "Meet Our Team",
+                    "url": "?page_id=8",
+                    "target": "_self",
+                    "style": "default"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys1-k0fr-section-0",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-1-column-1",
+                  "widths": {
+                    "large": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-1-column-2",
+                  "widths": {
+                    "large": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "spacingContract": "yootheme",
+            "topMargin": "xlarge",
+            "bottomMargin": "xlarge",
+            "columns": [
+              {
+                "id": "layout-column-mteayys1-k0fr-section-0-0",
+                "responsiveWidths": {
+                  "large": "2-3"
+                },
+                "background": {
+                  "position": "top-left"
+                },
+                "padding": "none",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "overlaySlider-block-mteayys1-5g0eg",
+                    "kind": "overlaySlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-0-0",
+                        "title": "Take a Time Out",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-01.jpg",
+                        "imageAlt": "Take a Time Out",
+                        "thumbnailUrl": "",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-0-1",
+                        "title": "Room for Creativity",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-02.jpg",
+                        "imageAlt": "Room for Creativity",
+                        "thumbnailUrl": "",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-0-2",
+                        "title": "Relaxed Communication Environment",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-03.jpg",
+                        "imageAlt": "Relaxed Communication Environment",
+                        "thumbnailUrl": "",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-0-3",
+                        "title": "Time to Relax",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-04.jpg",
+                        "imageAlt": "Time to Relax",
+                        "thumbnailUrl": "",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-0-4",
+                        "title": "Free Coffee &amp; Drinks",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-studio-slide-05.jpg",
+                        "imageAlt": "Free Coffee & Drinks",
+                        "thumbnailUrl": "",
+                        "showAction": false
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "overlay-slider",
+                      "variant": "overlay",
+                      "slideMode": "overlay",
+                      "showTitle": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "itemWidthMode": "fixed",
+                      "autoplay": true,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 30,
+                      "divider": false,
+                      "cardsPerViewPhone": 1,
+                      "cardsPerViewSmall": 2,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "navigationBelow": true,
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "paginationPosition": "bottom-center",
+                      "slidenavBreakpoint": "small",
+                      "headingLevel": "div",
+                      "headingSize": "h5",
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "meta",
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "effect": "slide",
+                      "overlayMode": "cover",
+                      "overlayDisplay": "always",
+                      "overlayPosition": "bottom-left",
+                      "overlayPadding": "small",
+                      "overlayStyle": "none",
+                      "overlayTextColor": "light",
+                      "imageWidth": "640px"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "layout-column-mteayys1-k0fr-section-0-1",
+                "responsiveWidths": {
+                  "large": "1-3"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys1-22bbh",
+                    "kind": "heading",
+                    "headingText": "Our Offices",
+                    "title": "Our Offices",
+                    "headingLevel": "h2",
+                    "headingSize": "h6",
+                    "headingColor": "primary"
+                  },
+                  {
+                    "id": "heading-block-mteayys1-2rz9o",
+                    "kind": "heading",
+                    "headingText": "Our Work Areas Have Been Designed for High Productivity",
+                    "title": "Our Work Areas Have Been Designed for High Productivity",
+                    "headingLevel": "div",
+                    "headingSize": "h1",
+                    "maxWidth": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "maxWidth": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "text-block-mteayys1-qjrqc",
+                    "kind": "text",
+                    "body": "",
+                    "textVariant": "default",
+                    "textColumnBreakpoint": "medium",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mteayys1-etxpl",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-2-0-1-3-0",
+                        "label": "Meet Our Team",
+                        "url": "?page_id=8",
+                        "target": "_self",
+                        "style": "default"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mteayys1-tkfm4",
+        "kind": "contentLayout",
+        "title": "Services",
+        "background": "transparent",
+        "backgroundRole": "muted",
+        "sectionVariant": "muted",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "xlarge",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-bottom-small",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys1-0-kfz7",
+            "rowId": "layout-row-mteayys1-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys1-izpbu",
+                "kind": "heading",
+                "headingText": "Main Services",
+                "title": "Main Services",
+                "headingLevel": "h2",
+                "headingSize": "h6",
+                "headingColor": "primary"
+              },
+              {
+                "id": "heading-block-mteayys1-oy4il",
+                "kind": "heading",
+                "headingText": "A Wide Range of Architectural Services",
+                "title": "A Wide Range of Architectural Services",
+                "headingLevel": "div",
+                "headingSize": "h1",
+                "maxWidth": "xlarge",
+                "removeTopMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large",
+                    "removeTopMargin": true,
+                    "maxWidth": "xlarge",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "text-block-mteayys1-h53i0",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                "textVariant": "default",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "2xlarge",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "maxWidth": "2xlarge"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "grid-block-mteayys1-wv5ng",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-3-0-0-3-0",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-01.svg",
+                    "imageAlt": "Consulting",
+                    "title": "Consulting",
+                    "meta": "01",
+                    "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Structure</li>\n    <li>Management</li>\n    <li>Profitability</li>\n    <li>Strategy</li>\n</ul>",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-3-1",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-02.svg",
+                    "imageAlt": "Architecture",
+                    "title": "Architecture",
+                    "meta": "02",
+                    "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Civil</li>\n    <li>Commercial</li>\n    <li>Education</li>\n    <li>Medical</li>\n</ul>",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-3-2",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-03.svg",
+                    "imageAlt": "Interior Design",
+                    "title": "Interior Design",
+                    "meta": "03",
+                    "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Planning</li>\n    <li>Material</li>\n    <li>Furnishing</li>\n    <li>Lightning Design</li>\n</ul>",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
+                "gridItemRenderer": "card",
+                "gridCardVariant": "secondary",
+                "gridCardSize": "large",
+                "gridCardHover": false,
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelExpand": "none",
+                "panelContentWidth": "auto",
+                "gridItemMaxWidth": "none",
+                "gridTitlePlacement": "top",
+                "gridTitleWidth": "1-2",
+                "gridTitleColumnGap": "default",
+                "gridTitleRowGap": "default",
+                "gridTitleBreakpoint": "m",
+                "gridMediaPlacement": "top",
+                "showDividers": false,
+                "centerColumns": false,
+                "centerRows": false,
+                "gridParallaxJustify": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "columnsTabletLandscape": "3",
+                "gridMediaWidth": "1-2",
+                "gridMediaColumnGap": "default",
+                "gridMediaRowGap": "default",
+                "gridMediaBreakpoint": "m",
+                "gridMediaVerticalAlign": false,
+                "imageWidth": "100px",
+                "imageHeight": "100px",
+                "imageSvgInline": true,
+                "imageSvgColor": "primary",
+                "imageMarginTop": "default",
+                "imageMaxWidth": 100,
+                "imageShape": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "enableLightbox": false,
+                "linkTitle": false,
+                "panelTitleHoverStyle": "none",
+                "panelTitleAlign": "top",
+                "panelTitleGridWidth": "1-2",
+                "panelTitleGridBreakpoint": "medium",
+                "panelTitleGridColumnGap": "default",
+                "panelTitleGridRowGap": "default",
+                "titleColor": "primary",
+                "metaStyle": "h4",
+                "gridMetaAlign": "above-title",
+                "gridMetaHtmlElement": "div",
+                "gridContentAlign": false,
+                "gridContentDropcap": false,
+                "gridContentColumn": "none",
+                "gridContentColumnDivider": false,
+                "gridContentColumnBreakpoint": "m",
+                "titleMarginTop": "remove",
+                "contentMarginTop": "small",
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin-medium)"
+                  },
+                  "card": {
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "effects": {}
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys1-yz0g-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "topMargin": "small",
+            "bottomMargin": "small",
+            "columns": [
+              {
+                "id": "layout-column-mteayys1-yz0g-section-0-0",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys2-7l7n7",
+                    "kind": "heading",
+                    "headingText": "Main Services",
+                    "title": "Main Services",
+                    "headingLevel": "h2",
+                    "headingSize": "h6",
+                    "headingColor": "primary"
+                  },
+                  {
+                    "id": "heading-block-mteayys2-zrfta",
+                    "kind": "heading",
+                    "headingText": "A Wide Range of Architectural Services",
+                    "title": "A Wide Range of Architectural Services",
+                    "headingLevel": "div",
+                    "headingSize": "h1",
+                    "maxWidth": "xlarge",
+                    "removeTopMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large",
+                        "removeTopMargin": true,
+                        "maxWidth": "xlarge",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "text-block-mteayys2-lgrvh",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                    "textVariant": "default",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "2xlarge",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "maxWidth": "2xlarge"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "grid-block-mteayys2-mezxs",
+                    "kind": "grid",
+                    "gridSource": "static",
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-3-0-0-3-0",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-01.svg",
+                        "imageAlt": "Consulting",
+                        "title": "Consulting",
+                        "meta": "01",
+                        "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Structure</li>\n    <li>Management</li>\n    <li>Profitability</li>\n    <li>Strategy</li>\n</ul>",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3"
+                      },
+                      {
+                        "id": "yootheme-grid-item-3-0-0-3-1",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-02.svg",
+                        "imageAlt": "Architecture",
+                        "title": "Architecture",
+                        "meta": "02",
+                        "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Civil</li>\n    <li>Commercial</li>\n    <li>Education</li>\n    <li>Medical</li>\n</ul>",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3"
+                      },
+                      {
+                        "id": "yootheme-grid-item-3-0-0-3-2",
+                        "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-services-03.svg",
+                        "imageAlt": "Interior Design",
+                        "title": "Interior Design",
+                        "meta": "03",
+                        "text": "<ul class=\"uk-list uk-list-large uk-margin-medium-top\">\n    <li>Planning</li>\n    <li>Material</li>\n    <li>Furnishing</li>\n    <li>Lightning Design</li>\n</ul>",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3"
+                      }
+                    ],
+                    "gridShowImage": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "enableFilter": false,
+                    "filterStyle": "tabs",
+                    "gridItemRenderer": "card",
+                    "gridCardVariant": "secondary",
+                    "gridCardSize": "large",
+                    "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelExpand": "none",
+                    "panelContentWidth": "auto",
+                    "gridItemMaxWidth": "none",
+                    "gridTitlePlacement": "top",
+                    "gridTitleWidth": "1-2",
+                    "gridTitleColumnGap": "default",
+                    "gridTitleRowGap": "default",
+                    "gridTitleBreakpoint": "m",
+                    "gridMediaPlacement": "top",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "centerRows": false,
+                    "gridParallaxJustify": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsPhoneLandscape": "2",
+                    "columnsTabletLandscape": "3",
+                    "gridMediaWidth": "1-2",
+                    "gridMediaColumnGap": "default",
+                    "gridMediaRowGap": "default",
+                    "gridMediaBreakpoint": "m",
+                    "gridMediaVerticalAlign": false,
+                    "imageWidth": "100px",
+                    "imageHeight": "100px",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "primary",
+                    "imageMarginTop": "default",
+                    "imageMaxWidth": 100,
+                    "imageShape": "none",
+                    "imageBoxDecoration": "none",
+                    "imageHoverTransition": "none",
+                    "linkImage": false,
+                    "enableLightbox": false,
+                    "linkTitle": false,
+                    "panelTitleHoverStyle": "none",
+                    "panelTitleAlign": "top",
+                    "panelTitleGridWidth": "1-2",
+                    "panelTitleGridBreakpoint": "medium",
+                    "panelTitleGridColumnGap": "default",
+                    "panelTitleGridRowGap": "default",
+                    "titleColor": "primary",
+                    "metaStyle": "h4",
+                    "gridMetaAlign": "above-title",
+                    "gridMetaHtmlElement": "div",
+                    "gridContentAlign": false,
+                    "gridContentDropcap": false,
+                    "gridContentColumn": "none",
+                    "gridContentColumnDivider": false,
+                    "gridContentColumnBreakpoint": "m",
+                    "titleMarginTop": "remove",
+                    "contentMarginTop": "small",
+                    "buttonLabel": "Read more",
+                    "buttonStyle": "default",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin-medium)"
+                      },
+                      "card": {
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "effects": {}
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mteayys2-roeft",
+        "kind": "contentLayout",
+        "title": "Team",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "xlarge",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-bottom-small",
+        "animationDelay": 200,
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys2-0-hph8",
+            "rowId": "layout-row-mteayys2-0",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys2-zj873",
+                "kind": "heading",
+                "headingText": "People",
+                "title": "People",
+                "headingLevel": "h2",
+                "headingSize": "h6",
+                "headingColor": "primary"
+              },
+              {
+                "id": "heading-block-mteayys2-dms8u",
+                "kind": "heading",
+                "headingText": "An International Team Takes Care of the Architectural Designs",
+                "title": "An International Team Takes Care of the Architectural Designs",
+                "headingLevel": "div",
+                "headingSize": "h2",
+                "maxWidth": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "maxWidth": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "image-block-mteayys2-k0b67",
+                "kind": "image",
+                "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-01.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 900,
+                "imageWidth": "900px",
+                "imageHeight": "560px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "xlarge"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys2-1-wyge",
+            "rowId": "layout-row-mteayys2-0",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "image-block-mteayys2-uqz1y",
+                "kind": "image",
+                "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-02.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 1050,
+                "imageWidth": "1050px",
+                "imageHeight": "700px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys2-2-phvl",
+            "rowId": "layout-row-mteayys2-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "image-block-mteayys2-5b19j",
+                "kind": "image",
+                "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-03.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 930,
+                "imageWidth": "930px",
+                "imageHeight": "560px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys2-3-4rep",
+            "rowId": "layout-row-mteayys2-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "text-block-mteayys2-b3yrc",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren.",
+                "textVariant": "default",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "xlarge",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "xlarge"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mteayys2-olap5",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-1-1-1-0",
+                    "label": "Meet Our Team",
+                    "url": "?page_id=8",
+                    "target": "_self",
+                    "style": "default"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys2-4vgj-section-0",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-1-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-1-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "small",
+            "rowGap": "small",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mteayys2-4vgj-section-0-0",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "verticalAlign": "bottom",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys2-3a1sj",
+                    "kind": "heading",
+                    "headingText": "People",
+                    "title": "People",
+                    "headingLevel": "h2",
+                    "headingSize": "h6",
+                    "headingColor": "primary"
+                  },
+                  {
+                    "id": "heading-block-mteayys2-u3esz",
+                    "kind": "heading",
+                    "headingText": "An International Team Takes Care of the Architectural Designs",
+                    "title": "An International Team Takes Care of the Architectural Designs",
+                    "headingLevel": "div",
+                    "headingSize": "h2",
+                    "maxWidth": "large",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "maxWidth": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "image-block-mteayys2-qgge7",
+                    "kind": "image",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-01.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 900,
+                    "imageWidth": "900px",
+                    "imageHeight": "560px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "xlarge"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "layout-column-mteayys2-4vgj-section-0-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "verticalAlign": "bottom",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "image-block-mteayys2-lt8b8",
+                    "kind": "image",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-02.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 1050,
+                    "imageWidth": "1050px",
+                    "imageHeight": "700px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mteayys2-p7o1-section-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-2-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-2-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "maxWidth": "large",
+            "spacingContract": "yootheme",
+            "topMargin": "small",
+            "bottomMargin": "small",
+            "columns": [
+              {
+                "id": "layout-column-mteayys2-p7o1-section-1-0",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "top-right",
+                  "size": "contain"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "image-block-mteayys2-j8pvt",
+                    "kind": "image",
+                    "imageUrl": "https://yard.webpages.am/wp-content/uploads/yootheme/about-team-03.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 930,
+                    "imageWidth": "930px",
+                    "imageHeight": "560px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "layout-column-mteayys2-p7o1-section-1-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "text-block-mteayys2-xu2h9",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren.",
+                    "textVariant": "default",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "xlarge",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "xlarge"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mteayys2-oirjs",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-1-1-1-0",
+                        "label": "Meet Our Team",
+                        "url": "?page_id=8",
+                        "target": "_self",
+                        "style": "default"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mteayys2-54jy8",
+        "kind": "contentLayout",
+        "title": "Awards",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "xlarge",
+        "removeTopPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "layout-item-mteayys2-0-6ff7",
+            "rowId": "layout-row-mteayys2-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mteayys2-pmrmh",
+                "kind": "heading",
+                "headingText": "Awards",
+                "title": "Awards",
+                "headingLevel": "h2",
+                "headingSize": "h6",
+                "headingColor": "primary"
+              },
+              {
+                "id": "heading-block-mteayys2-m668q",
+                "kind": "heading",
+                "headingText": "Thanks to Our Excellent Architects, We Received Many Awards",
+                "title": "Thanks to Our Excellent Architects, We Received Many Awards",
+                "headingLevel": "div",
+                "headingSize": "h2",
+                "maxWidth": "2xlarge",
+                "removeTopMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large",
+                    "removeTopMargin": true,
+                    "maxWidth": "2xlarge",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mteayys2-1-ppri",
+            "rowId": "layout-row-mteayys2-1",
+            "rowLayout": "2-col-equal",
+            "blocks": []
+          },
+          {
+            "id": "layout-item-mteayys2-2-a775",
+            "rowId": "layout-row-mteayys2-1",
+            "rowLayout": "2-col-equal",
+            "blocks": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mteayys2-7hk5-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mteayys2-7hk5-section-0-0",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mteayys2-ddmsj",
+                    "kind": "heading",
+                    "headingText": "Awards",
+                    "title": "Awards",
+                    "headingLevel": "h2",
+                    "headingSize": "h6",
+                    "headingColor": "primary"
+                  },
+                  {
+                    "id": "heading-block-mteayys2-znivw",
+                    "kind": "heading",
+                    "headingText": "Thanks to Our Excellent Architects, We Received Many Awards",
+                    "title": "Thanks to Our Excellent Architects, We Received Many Awards",
+                    "headingLevel": "div",
+                    "headingSize": "h2",
+                    "maxWidth": "2xlarge",
+                    "removeTopMargin": true,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large",
+                        "removeTopMargin": true,
+                        "maxWidth": "2xlarge",
+                        "textAlignBreakpoint": "medium",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mteayys2-r9bz-section-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-6-row-2-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-6-row-2-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "spacingContract": "yootheme",
+            "topMargin": "xlarge",
+            "bottomMargin": "xlarge",
+            "columns": [
+              {
+                "id": "layout-column-mteayys2-r9bz-section-1-0",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              },
+              {
+                "id": "layout-column-mteayys2-r9bz-section-1-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-29T11:34:18.580Z"
   }
 }
