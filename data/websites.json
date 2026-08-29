@@ -24,10 +24,10 @@
     "enabledLanguages": [
       "hy"
     ],
-    "status": "maintenance",
+    "status": "active",
     "creationRequestId": "eb7e0384-62f2-4c88-b866-2d836df014df",
     "createdAt": "2026-08-21T15:24:17.584Z",
-    "updatedAt": "2026-08-27T09:54:58.547Z",
+    "updatedAt": "2026-08-29T13:57:00.285Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://circle.webpages.am",
@@ -199,7 +199,7 @@
     "status": "creating",
     "creationRequestId": "c11978b9-11fa-482f-bad3-3a11368649c1",
     "createdAt": "2026-08-28T12:35:35.064Z",
-    "updatedAt": "2026-08-29T11:31:32.423Z",
+    "updatedAt": "2026-08-29T18:14:25.277Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://design.webpages.am",
@@ -209,10 +209,10 @@
       "wooCommerceConsumerKey": "",
       "wooCommerceConsumerSecret": "",
       "wordpressUsername": "hakhakop",
-      "wordpressApplicationPassword": "Rbpu xtl8 J70l QSwt hfxe dXJ7",
+      "wordpressApplicationPassword": "fBUH Pj6J vSh5 RfPT WP5I 9Shy",
       "storeStatusNotes": "",
       "technicalNotes": "",
-      "updatedAt": "2026-08-28T12:37:02.624Z"
+      "updatedAt": "2026-08-29T18:14:25.276Z"
     },
     "lastPublishedAt": "2026-08-29T11:31:32.423Z"
   }
