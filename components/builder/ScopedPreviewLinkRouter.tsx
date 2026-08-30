@@ -7,10 +7,12 @@ import {
   resolveTenantPathHref,
   type ScopedPreviewPage,
 } from "@/lib/scopedPreviewLinks";
+import type { NavigationRouteAlias } from "@/lib/navigationTargets";
 
 type ScopedPreviewLinkRouterProps = {
   websiteId?: string;
   pages?: ScopedPreviewPage[];
+  systemRouteAliases?: NavigationRouteAlias[];
   /** The same router is used by the standalone preview and the Builder shell. */
   mode?: "preview" | "builder" | "tenant-path";
   /** Limit interception to a rendered preview boundary when mounted in Builder. */
@@ -22,6 +24,7 @@ type ScopedPreviewLinkRouterProps = {
 export default function ScopedPreviewLinkRouter({
   websiteId,
   pages,
+  systemRouteAliases,
   mode = "preview",
   scopeSelector,
   onNavigate,
@@ -63,10 +66,10 @@ export default function ScopedPreviewLinkRouter({
       if (!href) return;
       const resolvedHref = websiteId
         ? mode === "builder"
-          ? resolveScopedBuilderHref(href, { websiteId, pages })
+          ? resolveScopedBuilderHref(href, { websiteId, pages, systemRouteAliases })
           : mode === "tenant-path"
-            ? resolveTenantPathHref(href, { websiteId, pages })
-            : resolveScopedPreviewHref(href, { websiteId, pages })
+            ? resolveTenantPathHref(href, { websiteId, pages, systemRouteAliases })
+            : resolveScopedPreviewHref(href, { websiteId, pages, systemRouteAliases })
         : href;
       const navigationHandled = onNavigate?.(href, resolvedHref) === true;
       if (navigationHandled) {
@@ -87,7 +90,7 @@ export default function ScopedPreviewLinkRouter({
         delete header.dataset.scopedPreviewHidden;
       });
     };
-  }, [mode, onNavigate, pages, scopeSelector, websiteId]);
+  }, [mode, onNavigate, pages, scopeSelector, systemRouteAliases, websiteId]);
 
   return (
     <style>{`

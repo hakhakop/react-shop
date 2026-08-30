@@ -1,0 +1,60 @@
+{
+  "format": "webpages.navigation",
+  "version": 1,
+  "exportedAt": "2026-08-30T09:20:00.000Z",
+  "menu": {
+    "name": "Main Navigation",
+    "intendedLocation": "PRIMARY",
+    "items": [
+      {
+        "key": "lab-a-home",
+        "parentKey": null,
+        "order": 0,
+        "label": "Home",
+        "target": { "kind": "system", "pageKey": "home", "uri": "/" },
+        "linkTarget": "_self"
+      },
+      {
+        "key": "lab-a-about",
+        "parentKey": null,
+        "order": 1,
+        "label": "About Lab",
+        "target": { "kind": "webpages-page", "pageKey": "page:about-lab", "slug": "about-lab", "uri": "/about-lab" },
+        "linkTarget": "_self",
+        "presentation": {
+          "showHeading": false,
+          "icon": null,
+          "submenuLayout": "list",
+          "submenuColumns": 3,
+          "submenuWidth": null,
+          "mobileAccordion": true,
+          "badgeText": "Lab"
+        }
+      },
+      {
+        "key": "lab-a-child",
+        "parentKey": "lab-a-about",
+        "order": 2,
+        "label": "Nested Child",
+        "target": { "kind": "webpages-page", "pageKey": "page:about-lab", "slug": "about-lab", "uri": "/about-lab" },
+        "linkTarget": "_self"
+      },
+      {
+        "key": "lab-a-anchor",
+        "parentKey": null,
+        "order": 3,
+        "label": "Details",
+        "target": { "kind": "anchor", "url": "#details" },
+        "linkTarget": "_self"
+      },
+      {
+        "key": "lab-a-external",
+        "parentKey": null,
+        "order": 4,
+        "label": "External",
+        "target": { "kind": "custom", "url": "https://example.org/navigation-lab" },
+        "linkTarget": "_self"
+      }
+    ]
+  }
+}

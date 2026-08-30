@@ -345,7 +345,7 @@ export function getUikitPanelMediaClass(
 
 export function getUikitPanelLayoutClass(
   placement: UikitPanelMediaPlacement = "top",
-  mediaWidth: "small" | "medium" | "large" | "1-2" | "2-5" | "3-5" = "medium",
+  mediaWidth: string = "medium",
 ): string {
   return `shop-builder-panel--media-${placement} shop-builder-panel--media-width-${mediaWidth}`;
 }

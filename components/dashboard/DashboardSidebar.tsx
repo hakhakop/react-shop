@@ -81,6 +81,8 @@ type DashboardSidebarProps = {
   shellSettingsShortLabel?: string;
   pageStatus: string;
   shellSettings: BuilderShellSettings;
+  wordpressOrigin?: string | null;
+  wordpressSiteUrl?: string | null;
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
   templateDescriptions: Record<BuilderTemplate, string>;
@@ -135,6 +137,8 @@ type DashboardSidebarProps = {
 
 export default function DashboardSidebar({
   websiteId,
+  wordpressOrigin,
+  wordpressSiteUrl,
   dashboardTheme,
   availableLayoutBlockKinds,
   builderState,
@@ -657,7 +661,14 @@ export default function DashboardSidebar({
                 <ReactMenuEditorPanel
                   menuItems={shellSettings.menuItems ?? []}
                   onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
+                  namedMenus={shellSettings.namedMenus ?? []}
+                  onChangeNamedMenus={(namedMenus) => onUpdateShellSettings({ namedMenus })}
+                  menuPresentation={shellSettings.menuPresentation ?? {}}
+                  onUpdateNavigation={onUpdateShellSettings}
                   customPages={customPages}
+                  websiteId={websiteId}
+                  wordpressOrigin={wordpressOrigin}
+                  wordpressSiteUrl={wordpressSiteUrl}
                 />
               </motion.div>
             )}
@@ -881,7 +892,7 @@ export default function DashboardSidebar({
                           <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
                           <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
                             <strong>{page.title}</strong>
-                            <span>/{page.slug}</span>
+                            <span>/{page.slug}{page.systemRole ? ` · ${page.systemRole === "shop" ? "Shop Page" : page.systemRole}` : ""}</span>
                           </button>
                           <span
                             className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}

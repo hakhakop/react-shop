@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import {
   isBuilderCustomPageKey,
   readBuilderCustomPages,
@@ -6,6 +7,7 @@ import {
   readBuilderLayoutStore,
   type BuilderCustomPage,
   type BuilderCustomPageKey,
+  isBuilderPageSystemRole,
 } from "@/lib/builderLayouts";
 import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 
@@ -66,14 +68,21 @@ export async function POST(request: NextRequest) {
   const body = (await request.json()) as {
     title?: string;
     slug?: string;
+    systemRole?: string;
+    sourceDatabaseId?: number;
   };
   const title = body.title?.trim() || "New Page";
   const existingPages = await readBuilderCustomPages(access.scope);
   const slug = uniqueSlug(slugify(body.slug || title), existingPages);
   const page: BuilderCustomPage = {
+    id: randomUUID(),
     key: `page:${slug}` as BuilderCustomPageKey,
     title,
     slug,
+    ...(isBuilderPageSystemRole(body.systemRole) ? { systemRole: body.systemRole } : {}),
+    ...(Number.isInteger(body.sourceDatabaseId) && Number(body.sourceDatabaseId) > 0
+      ? { sourceDatabaseId: Number(body.sourceDatabaseId) }
+      : {}),
     updatedAt: new Date().toISOString(),
   };
 

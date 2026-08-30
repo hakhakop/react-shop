@@ -4,6 +4,8 @@ import {
   builderKeyFromLayoutDocumentId,
   builderLayoutDocumentId,
   createLegacyPostSingleRoutingTemplate,
+  createLegacyPostCategoryRoutingTemplate,
+  createLegacyProductCategoryRoutingTemplate,
   createLegacyProductSingleRoutingTemplate,
   parseLayoutDocumentId,
   parseRoutingTemplateId,
@@ -149,7 +151,7 @@ function parseTemplate(value: unknown): RoutingTemplate {
   if (
     !isRecord(value) || typeof value.name !== "string" || !value.name.trim() ||
     typeof value.enabled !== "boolean" || typeof value.order !== "number" ||
-    !Number.isFinite(value.order) || value.view !== "singular" || !Array.isArray(value.conditions)
+    !Number.isFinite(value.order) || (value.view !== "singular" && value.view !== "archive") || !Array.isArray(value.conditions)
   ) {
     throw new Error("Invalid routing template.");
   }
@@ -268,6 +270,47 @@ export async function ensureProductSingleRoutingCompatibility(
   };
   await writeLayoutRoutingRegistry(next, scope);
   return next;
+}
+
+async function ensureArchiveRoutingCompatibility(
+  scope: BuilderDataScope,
+  input: {
+    id: string;
+    layoutKey: "product-category" | "post-category";
+    create: (layoutId: ReturnType<typeof builderLayoutDocumentId>) => RoutingTemplate;
+  },
+) {
+  const registry = await readLayoutRoutingRegistry(scope);
+  if (registry.routingTemplates.some((template) => template.id === input.id)) return registry;
+  const layouts = await readBuilderLayoutStore(scope);
+  if (!layouts[input.layoutKey]) return registry;
+  const next = {
+    ...registry,
+    routingTemplates: [
+      ...registry.routingTemplates,
+      input.create(builderLayoutDocumentId(input.layoutKey)),
+    ],
+  };
+  await writeLayoutRoutingRegistry(next, scope);
+  return next;
+}
+
+/** Metadata-only migration: the authored Product Category layout is never generated here. */
+export function ensureProductCategoryRoutingCompatibility(scope: BuilderDataScope = {}) {
+  return ensureArchiveRoutingCompatibility(scope, {
+    id: "routing:legacy-product-category",
+    layoutKey: "product-category",
+    create: createLegacyProductCategoryRoutingTemplate,
+  });
+}
+
+/** Metadata-only migration for an already persisted Post Category/Archive document. */
+export function ensurePostCategoryRoutingCompatibility(scope: BuilderDataScope = {}) {
+  return ensureArchiveRoutingCompatibility(scope, {
+    id: "routing:legacy-post-category",
+    layoutKey: "post-category",
+    create: createLegacyPostCategoryRoutingTemplate,
+  });
 }
 
 /** Strict document lookup; no legacy key normalization or Shop fallback. */

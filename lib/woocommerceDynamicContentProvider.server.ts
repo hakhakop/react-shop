@@ -4,6 +4,7 @@ import type {
   DynamicItemContext,
   DynamicItemContextValue,
 } from "@/lib/dynamicContent";
+import { getDynamicItemContextValue } from "@/lib/dynamicContent";
 import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 import {
   getWooCommerceConnection,
@@ -26,7 +27,47 @@ export type WooCommerceProductCollectionOrder =
 export type CompiledWooCommerceProductRequest = {
   path: string;
   mode: "single" | "collection";
+  postFilterCategoryIds?: number[];
+  postFilterStart?: number;
+  postFilterQuantity?: number;
 };
+
+/**
+ * Compose a transient Product Category route constraint with an authored
+ * WooCommerce collection query. Authored filters remain intact; only the
+ * canonical route category is injected. Ordinary Pages and singular contexts
+ * do not expose this normalized route identity and therefore remain unchanged.
+ */
+export function composeWooCommerceProductDescriptorWithInheritedContext(
+  descriptor: DynamicContentContextDescriptor,
+  inheritedContext: DynamicItemContext | undefined,
+): DynamicContentContextDescriptor {
+  if (
+    descriptor.provider !== "woocommerce" ||
+    descriptor.source !== "product" ||
+    descriptor.mode !== "collection" ||
+    getDynamicItemContextValue(inheritedContext, "kind", "string") !== "product-category" ||
+    getDynamicItemContextValue(inheritedContext, "taxonomy", "string") !== "product_cat"
+  ) return descriptor;
+
+  const termId = getDynamicItemContextValue(inheritedContext, "termId", "identifier");
+  const numericTermId = typeof termId === "number"
+    ? termId
+    : typeof termId === "string" && /^\d+$/.test(termId)
+      ? Number(termId)
+      : undefined;
+  if (!numericTermId || numericTermId < 1) return descriptor;
+
+  return {
+    ...descriptor,
+    query: {
+      ...(descriptor.query ?? {}),
+      // This field exists only in the transient render descriptor. It is not
+      // persisted and cannot be replaced by element-authored query controls.
+      routeCategory: numericTermId,
+    },
+  };
+}
 
 type WooCommerceImage = {
   id?: unknown;
@@ -166,7 +207,7 @@ export function compileWooCommerceProductRequest(
   }
 
   if (descriptor.mode !== "collection") throw new Error(`Unsupported WooCommerce Product Dynamic Content mode: ${descriptor.mode}.`);
-  assertAllowedKeys(query, ["start", "quantity", "order", "direction", "search", "categories", "featured", "onSale", "stockStatus", "include", "exclude"], "WooCommerce Product collection query");
+  assertAllowedKeys(query, ["start", "quantity", "order", "direction", "search", "categories", "featured", "onSale", "stockStatus", "include", "exclude", "routeCategory"], "WooCommerce Product collection query");
   const start = readInteger(query.start, 0, "query.start", 0);
   const quantity = readInteger(query.quantity, DEFAULT_QUANTITY, "query.quantity", 1);
   if (start + quantity > MAX_QUERY_WINDOW) throw new Error(`WooCommerce Product collection start + quantity cannot exceed ${MAX_QUERY_WINDOW}.`);
@@ -174,22 +215,35 @@ export function compileWooCommerceProductRequest(
   const direction = readEnum(query.direction, "desc", ["asc", "desc"] as const, "query.direction");
   const stockStatus = query.stockStatus === undefined ? undefined : readEnum(query.stockStatus, "instock", ["instock", "outofstock", "onbackorder"] as const, "query.stockStatus");
   const categories = readNumericIds(query.categories, "query.categories");
+  const routeCategories = readNumericIds(query.routeCategory === undefined ? undefined : [query.routeCategory], "query.routeCategory");
+  const routeCategory = routeCategories[0];
+  const postFilterCategoryIds = routeCategory && categories.length && !categories.includes(routeCategory)
+    ? categories
+    : [];
   const include = readNumericIds(query.include, "query.include");
   const exclude = readNumericIds(query.exclude, "query.exclude");
   const parameters = encodeQuery({
-    offset: start,
-    per_page: quantity,
+    offset: postFilterCategoryIds.length ? 0 : start,
+    per_page: postFilterCategoryIds.length ? MAX_QUERY_WINDOW : quantity,
     order: direction,
     orderby: ORDER_FIELDS[order],
     search: readText(query.search, "query.search"),
-    category: categories.length ? categories.join(",") : undefined,
+    // Route ownership is mandatory. Element categories may refine the route,
+    // but must never replace it. The common case sends the canonical route ID.
+    category: routeCategory ?? (categories.length ? categories.join(",") : undefined),
     featured: readBoolean(query.featured, "query.featured"),
     on_sale: readBoolean(query.onSale, "query.onSale"),
     stock_status: stockStatus,
     include: include.length ? include.join(",") : undefined,
     exclude: exclude.length ? exclude.join(",") : undefined,
   });
-  return { mode: "collection", path: `products?${parameters}` };
+  return {
+    mode: "collection",
+    path: `products?${parameters}`,
+    ...(postFilterCategoryIds.length
+      ? { postFilterCategoryIds, postFilterStart: start, postFilterQuantity: quantity }
+      : {}),
+  };
 }
 
 const stringValue = (value: unknown) => typeof value === "string" ? value : undefined;
@@ -337,9 +391,30 @@ export async function resolveWooCommerceProductContexts(input: {
   website?: SaaSWebsite | null;
   descriptor: DynamicContentContextDescriptor;
 }): Promise<DynamicItemContext[]> {
+  const products = await fetchWooCommerceProductRecords(input);
+  return products.map((product) => normalizeWooCommerceProductContext(product));
+}
+
+/** Fetch through the canonical authenticated WooCommerce product provider. */
+export async function fetchWooCommerceProductRecords(input: {
+  website?: SaaSWebsite | null;
+  descriptor: DynamicContentContextDescriptor;
+}): Promise<WooCommerceProductRecord[]> {
   const compiled = compileWooCommerceProductRequest(input.descriptor);
   const connection = getWooCommerceConnection(input.website);
   const payload = await wooCommerceFetch<WooCommerceProductRecord | WooCommerceProductRecord[]>(connection, compiled.path);
   const products = Array.isArray(payload) ? payload : [payload];
-  return products.filter(isRecord).map((product) => normalizeWooCommerceProductContext(product));
+  const records = products.filter(isRecord);
+  if (!compiled.postFilterCategoryIds?.length) return records;
+  const filtered = records.filter((product) => {
+    const categoryIds = Array.isArray(product.categories)
+      ? product.categories.filter(isRecord).flatMap((category) => {
+          const id = identifierValue(category.id);
+          return typeof id === "number" ? [id] : typeof id === "string" && /^\d+$/.test(id) ? [Number(id)] : [];
+        })
+      : [];
+    return compiled.postFilterCategoryIds!.some((id) => categoryIds.includes(id));
+  });
+  const start = compiled.postFilterStart ?? 0;
+  return filtered.slice(start, start + (compiled.postFilterQuantity ?? DEFAULT_QUANTITY));
 }

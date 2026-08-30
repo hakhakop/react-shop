@@ -7,6 +7,10 @@ import { parseLayoutDocumentId, type StableContentIdentity } from "@/lib/layoutR
 import { getBuilderLayoutByDocumentId } from "@/lib/layoutRoutingStore.server";
 import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
 import type { SaaSWebsite } from "@/lib/websites";
+import {
+  getCanonicalProductCategoryById,
+  getDefaultCanonicalProductCategory,
+} from "@/lib/productCategoryContext.server";
 
 export class TemplateBuilderContextMismatchError extends Error {}
 export class TemplatePreviewIdentityNotFoundError extends Error {}
@@ -21,22 +25,22 @@ export type TemplateBuilderContext = {
   documentId: string;
   routingTemplateId: string;
   displayName: string;
-  family: "product" | "post";
-  familyLabel: "Single Product" | "Single Post";
+  family: "product" | "post" | "product-category" | "post-category";
+  familyLabel: "Single Product" | "Single Post" | "Product Category" | "Post Category/Archive";
   provider: "woocommerce" | "wordpress";
-  source: "product" | "post";
+  source: "product" | "post" | "product-category" | "post-category";
   websiteId?: string;
-  assignmentSummary: "All Products" | "All Posts";
+  assignmentSummary: "All Products" | "All Posts" | "All Product Categories" | "All Post Categories/Archives";
 };
 
 function familyOf(conditions: readonly { subject: string; operator: string; contentType?: string }[]) {
   const types = conditions.filter((condition) =>
     condition.subject === "content-type" && condition.operator === "include",
   ).map((condition) => condition.contentType);
-  if (types.length !== 1 || (types[0] !== "product" && types[0] !== "post")) {
+  if (types.length !== 1 || !["product", "post", "product-category", "post-category"].includes(types[0] ?? "")) {
     throw new TemplateBuilderContextMismatchError("Routing Template has an unsupported content family.");
   }
-  return types[0];
+  return types[0] as "product" | "post" | "product-category" | "post-category";
 }
 
 function descriptor(family: "product" | "post"): DynamicContentContextDescriptor {
@@ -96,11 +100,27 @@ export async function resolveTemplateBuilderContext(input: {
   const persistedLayout = await readLayout(input.documentId, scope);
   const layout = input.authoredLayout ?? persistedLayout;
   const resolveContexts = input.resolveContexts ?? resolveDynamicContentContexts;
-  const contexts = await resolveContexts({ website: input.website, descriptor: descriptor(family) });
-  const entries = contexts.flatMap((rootContext) => {
-    const candidate = candidateFromContext(family, rootContext);
-    return candidate ? [{ candidate, rootContext }] : [];
-  });
+  const entries = family === "product-category"
+    ? await (async () => {
+        const category = input.previewIdentity?.contentId
+          ? await getCanonicalProductCategoryById(input.previewIdentity.contentId, input.website)
+          : await getDefaultCanonicalProductCategory(input.website);
+        if (!category) throw new TemplatePreviewIdentityNotFoundError("Preview Product Category is not available in this website.");
+        return [{
+          candidate: {
+            identity: { provider: "woocommerce", contentType: "product-category", contentId: String(category.category.id) },
+            label: category.category.name,
+            storefrontHref: `/product-category/${category.category.slug}`,
+          },
+          rootContext: category.dynamicContext,
+        }];
+      })()
+    : family === "post-category"
+      ? []
+      : (await resolveContexts({ website: input.website, descriptor: descriptor(family) })).flatMap((rootContext) => {
+          const candidate = candidateFromContext(family, rootContext);
+          return candidate ? [{ candidate, rootContext }] : [];
+        });
   const candidates = entries.map((entry) => entry.candidate);
   let selectedIndex = 0;
   if (input.previewIdentity) {
@@ -118,16 +138,23 @@ export async function resolveTemplateBuilderContext(input: {
     rootContext,
     resolveContexts,
   });
+  const labels = {
+    product: { familyLabel: "Single Product", provider: "woocommerce", assignmentSummary: "All Products" },
+    post: { familyLabel: "Single Post", provider: "wordpress", assignmentSummary: "All Posts" },
+    "product-category": { familyLabel: "Product Category", provider: "woocommerce", assignmentSummary: "All Product Categories" },
+    "post-category": { familyLabel: "Post Category/Archive", provider: "wordpress", assignmentSummary: "All Post Categories/Archives" },
+  } as const;
+  const familyMeta = labels[family];
   const context: TemplateBuilderContext = {
     documentId: input.documentId,
     routingTemplateId: template.id,
     displayName: template.name,
     family,
-    familyLabel: family === "product" ? "Single Product" : "Single Post",
-    provider: family === "product" ? "woocommerce" : "wordpress",
+    familyLabel: familyMeta.familyLabel,
+    provider: familyMeta.provider,
     source: family,
     websiteId: scope.websiteId,
-    assignmentSummary: family === "product" ? "All Products" : "All Posts",
+    assignmentSummary: familyMeta.assignmentSummary,
   };
   return {
     layout,

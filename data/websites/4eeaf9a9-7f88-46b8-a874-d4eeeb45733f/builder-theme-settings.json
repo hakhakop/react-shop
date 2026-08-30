@@ -1381,7 +1381,358 @@
           "target": "_self",
           "visibility": "all"
         }
-      ]
+      ],
+      "namedMenus": [
+        {
+          "id": "main-menu",
+          "name": "Main Menu",
+          "items": [
+            {
+              "id": "main-menu-nav-bz8fzd",
+              "label": "Why DevStack?",
+              "url": "/why-devstack/",
+              "parentId": null,
+              "target": "_self",
+              "portableKey": "nav-bz8fzd",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "why-devstack",
+                "uri": "/why-devstack/",
+                "sourceDatabaseId": 19
+              }
+            },
+            {
+              "id": "main-menu-nav-r7f9k3",
+              "label": "Deployment",
+              "url": "/?page_id=19#deployment",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-r7f9k3",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#deployment"
+              }
+            },
+            {
+              "id": "main-menu-nav-1ip7hnx",
+              "label": "CI/CD",
+              "url": "/?page_id=19#ci-cd",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-1ip7hnx",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#ci-cd"
+              }
+            },
+            {
+              "id": "main-menu-nav-uhrthf",
+              "label": "Security",
+              "url": "/?page_id=19#security",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-uhrthf",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#security"
+              }
+            },
+            {
+              "id": "main-menu-nav-1pw6ksr",
+              "label": "Features",
+              "url": "/?page_id=19#features",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-1pw6ksr",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#features"
+              }
+            },
+            {
+              "id": "main-menu-nav-du3abv",
+              "label": "Automation",
+              "url": "/?page_id=19#automation",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-du3abv",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#automation"
+              }
+            },
+            {
+              "id": "main-menu-nav-rn8hmf",
+              "label": "Infrastructure",
+              "url": "/?page_id=19#infrastructure",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-rn8hmf",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#infrastructure"
+              }
+            },
+            {
+              "id": "main-menu-nav-wt4x0z",
+              "label": "Integrations",
+              "url": "/?page_id=19#integrations",
+              "parentId": "main-menu-nav-bz8fzd",
+              "target": "_self",
+              "portableKey": "nav-wt4x0z",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#integrations"
+              }
+            },
+            {
+              "id": "main-menu-nav-12f81ng",
+              "label": "Enterprise",
+              "url": "/enterprise/",
+              "parentId": null,
+              "target": "_self",
+              "portableKey": "nav-12f81ng",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "enterprise",
+                "uri": "/enterprise/",
+                "sourceDatabaseId": 2
+              }
+            },
+            {
+              "id": "main-menu-nav-mk3ir2",
+              "label": "Powerful API",
+              "url": "/?page_id=2#powerful-api",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-mk3ir2",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#powerful-api"
+              }
+            },
+            {
+              "id": "main-menu-nav-1oxpqls",
+              "label": "Project Management",
+              "url": "/?page_id=2#project-management",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-1oxpqls",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#project-management"
+              }
+            },
+            {
+              "id": "main-menu-nav-1tav2x6",
+              "label": "Customer Stories",
+              "url": "/?page_id=2#customer-stories",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-1tav2x6",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#customer-stories"
+              }
+            },
+            {
+              "id": "main-menu-nav-lw88oo",
+              "label": "Efficient Workflow",
+              "url": "/?page_id=2#efficient-workflow",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-lw88oo",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#efficient-workflow"
+              }
+            },
+            {
+              "id": "main-menu-nav-dhnd35",
+              "label": "Collaboration",
+              "url": "/?page_id=2#collaboration",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-dhnd35",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#collaboration"
+              }
+            },
+            {
+              "id": "main-menu-nav-1dumps9",
+              "label": "Community",
+              "url": "/?page_id=2#community",
+              "parentId": "main-menu-nav-12f81ng",
+              "target": "_self",
+              "portableKey": "nav-1dumps9",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=2#community"
+              }
+            },
+            {
+              "id": "main-menu-nav-1dhtv25",
+              "label": "Pricing",
+              "url": "/pricing/",
+              "parentId": null,
+              "target": "_self",
+              "portableKey": "nav-1dhtv25",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "pricing",
+                "uri": "/pricing/",
+                "sourceDatabaseId": 21
+              }
+            },
+            {
+              "id": "main-menu-nav-16nwafo",
+              "label": "Developers",
+              "url": "/feature-index/",
+              "parentId": null,
+              "target": "_self",
+              "portableKey": "nav-16nwafo",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "feature-index",
+                "uri": "/feature-index/",
+                "sourceDatabaseId": 20
+              }
+            },
+            {
+              "id": "main-menu-nav-tkvjwf",
+              "label": "Getting Started",
+              "url": "/?page_id=24",
+              "parentId": "main-menu-nav-16nwafo",
+              "target": "_self",
+              "portableKey": "nav-tkvjwf",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=24"
+              }
+            },
+            {
+              "id": "main-menu-nav-yacrqi",
+              "label": "Learn the Basics",
+              "url": "/?page_id=24",
+              "parentId": "main-menu-nav-16nwafo",
+              "target": "_self",
+              "portableKey": "nav-yacrqi",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=24"
+              }
+            },
+            {
+              "id": "main-menu-nav-xvq0o1",
+              "label": "Configurations",
+              "url": "/?page_id=24",
+              "parentId": "main-menu-nav-16nwafo",
+              "target": "_self",
+              "portableKey": "nav-xvq0o1",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=24"
+              }
+            },
+            {
+              "id": "main-menu-nav-18tg7o2",
+              "label": "Company",
+              "url": "/about/",
+              "parentId": null,
+              "target": "_self",
+              "portableKey": "nav-18tg7o2",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "about",
+                "uri": "/about/",
+                "sourceDatabaseId": 4
+              }
+            },
+            {
+              "id": "main-menu-nav-aech2w",
+              "label": "About",
+              "url": "/about/",
+              "parentId": "main-menu-nav-18tg7o2",
+              "target": "_self",
+              "portableKey": "nav-aech2w",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "about",
+                "uri": "/about/",
+                "sourceDatabaseId": 4
+              }
+            },
+            {
+              "id": "main-menu-nav-1sf1hxw",
+              "label": "Our Story",
+              "url": "/our-story/",
+              "parentId": "main-menu-nav-18tg7o2",
+              "target": "_self",
+              "portableKey": "nav-1sf1hxw",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "our-story",
+                "uri": "/our-story/",
+                "sourceDatabaseId": 23
+              }
+            },
+            {
+              "id": "main-menu-nav-6nyv72",
+              "label": "Careers",
+              "url": "/careers/",
+              "parentId": "main-menu-nav-18tg7o2",
+              "target": "_self",
+              "portableKey": "nav-6nyv72",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "careers",
+                "uri": "/careers/",
+                "sourceDatabaseId": 3
+              }
+            },
+            {
+              "id": "main-menu-nav-60ytv2",
+              "label": "Job Description",
+              "url": "/job-description/",
+              "parentId": "main-menu-nav-18tg7o2",
+              "target": "_self",
+              "portableKey": "nav-60ytv2",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "job-description",
+                "uri": "/job-description/",
+                "sourceDatabaseId": 22
+              }
+            },
+            {
+              "id": "main-menu-nav-1ld5o4f",
+              "label": "Blog",
+              "url": "/blog/",
+              "parentId": "main-menu-nav-18tg7o2",
+              "target": "_self",
+              "portableKey": "nav-1ld5o4f",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "blog",
+                "uri": "/blog/",
+                "sourceDatabaseId": 65
+              }
+            }
+          ]
+        }
+      ],
+      "menuPresentation": {}
     },
     "headerDocument": {
       "headerArchitectureVersion": 2,
@@ -1442,5 +1793,5 @@
     ]
   },
   "unsupported": [],
-  "updatedAt": "2026-08-29T11:47:02.733Z"
+  "updatedAt": "2026-08-30T09:18:34.057Z"
 }

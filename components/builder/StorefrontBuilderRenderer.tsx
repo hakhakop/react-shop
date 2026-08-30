@@ -557,18 +557,16 @@ body:has(.shop-builder-main[data-builder-page-root]) .site-main {
 `;
 }
 
-async function BuilderProductsSection({
+function BuilderProductsSection({
   section,
   products: productsOverride,
   categoryTree,
   activeCategorySlug,
-  website,
 }: {
   section: BuilderSection;
   products?: ProductNode[];
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
-  website?: SaaSWebsite | null;
 }) {
   const isPaginationEnabled = section.pagination?.enabled ?? false;
   const pageSize = isPaginationEnabled
@@ -576,19 +574,7 @@ async function BuilderProductsSection({
     : typeof section.gridLimit === "number" && section.gridLimit >= 4
       ? Math.min(Math.round(section.gridLimit), 48)
       : 24;
-  const fetchLimit = isPaginationEnabled ? 200 : Math.max(pageSize, 48);
-  const source =
-    section.source === "featured" || section.source === "category"
-      ? section.source
-      : "all";
-  const products =
-    productsOverride ??
-    (await getProductsForGrid({
-      limit: fetchLimit,
-      source,
-      categoryId: section.categoryId,
-      website,
-    }));
+  const products = productsOverride ?? [];
 
   if (section.layoutVariant === "carousel") {
     return (
@@ -612,8 +598,7 @@ async function BuilderProductsSection({
       />
     );
   }
-  const resolvedCategoryTree =
-    categoryTree ?? (await getCategoryTree({ website }).catch(() => []));
+  const resolvedCategoryTree = categoryTree ?? [];
 
   return (
     <CategoryWithFilters
@@ -3212,7 +3197,6 @@ function BuilderSectionRenderer({
             products={products}
             categoryTree={categoryTree}
             activeCategorySlug={activeCategorySlug}
-            website={website}
           />
         </Suspense>
       </SectionFrame>

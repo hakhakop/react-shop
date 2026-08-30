@@ -1657,8 +1657,31 @@
     "key": "header",
     "page": "header",
     "targetType": "header",
-    "updatedAt": "2026-08-30T08:05:49.932Z",
-    "design": {},
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
     "sections": [
       {
         "id": "header-document",
@@ -1697,7 +1720,7 @@
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
-                "menuSource": "main",
+                "menuSource": "main-menu",
                 "menuActiveIndicator": "underline"
               }
             ]
@@ -1712,7 +1735,8 @@
                 "kind": "button",
                 "buttonLabel": "Contact Us",
                 "buttonUrl": "#contact",
-                "buttonStyle": "primary"
+                "buttonStyle": "primary",
+                "size": "default"
               }
             ]
           }
@@ -1735,7 +1759,8 @@
         "headerTopToolbarPhone": "",
         "headerTopToolbarMeta": ""
       }
-    ]
+    ],
+    "updatedAt": "2026-08-30T09:26:09.587Z"
   },
   "footer": {
     "version": 1,
@@ -1868,5 +1893,839 @@
         "visible": true
       }
     ]
+  },
+  "page:new-in": {
+    "version": 1,
+    "key": "page:new-in",
+    "page": "page:new-in",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#ffffff",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#17211d",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "shop-template-hero",
+        "kind": "hero",
+        "title": "Shop",
+        "eyebrow": "Woolberry collection",
+        "body": "Explore the latest products.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "split",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "visible": true,
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "layoutItems": [
+          {
+            "id": "layout-row-mtfstwto-column-1",
+            "rowId": "layout-row-mtfstwto",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "grid-block-mtfsu14n-ndidp",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridCardHover": false,
+                "gridRowGap": "medium",
+                "gridStacking": "inherit",
+                "gridItems": [
+                  {
+                    "id": "grid-block-mtfsu14n-ndidp-1",
+                    "eyebrow": "01",
+                    "title": "Strategy with a practical point of view",
+                    "meta": "Clarity before complexity",
+                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                    "buttonLabel": "Explore Strategy",
+                    "buttonUrl": "/",
+                    "titleElement": "h3",
+                    "titleStyle": "inherit",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Warm architectural forms representing strategic planning",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection"
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "price",
+                        "valueType": "string"
+                      },
+                      "text": {
+                        "path": "description",
+                        "valueType": "richText"
+                      },
+                      "imageUrl": {
+                        "path": "image.url",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-block-mtfsu14n-ndidp-2",
+                    "eyebrow": "02",
+                    "title": "Design that feels distinctive and effortless",
+                    "meta": "Made for real people",
+                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                    "buttonLabel": "View Selected Work",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial composition representing interface design"
+                  },
+                  {
+                    "id": "grid-block-mtfsu14n-ndidp-3",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "16:9",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "shop-template-products",
+        "kind": "productArchive",
+        "title": "All Products",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "columns": 4,
+        "filterPosition": "left",
+        "cardStyle": "flat",
+        "cardPreset": "standard",
+        "source": "all",
+        "gridLimit": 100,
+        "layoutVariant": "grid",
+        "pagination": {
+          "enabled": true,
+          "perPage": 12,
+          "mode": "pageNumbers",
+          "infiniteScroll": false
+        },
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-30T12:42:34.889Z"
+  },
+  "product-category": {
+    "version": 1,
+    "key": "product-category",
+    "page": "product-category",
+    "targetType": "template",
+    "template": "product-category",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#ffffff",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#17211d",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "product-category-template-hero",
+        "kind": "hero",
+        "title": "Product Category",
+        "eyebrow": "Woolberry collection",
+        "body": "Products from the selected category.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "split",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "visible": true,
+        "layoutItems": [
+          {
+            "id": "layout-row-mtfuancf-column-1",
+            "rowId": "layout-row-mtfuancf",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "grid-block-mtfuarxt-3d3c3",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridCardHover": false,
+                "gridRowGap": "medium",
+                "gridStacking": "inherit",
+                "gridItems": [
+                  {
+                    "id": "grid-block-mtfuarxt-3d3c3-1",
+                    "eyebrow": "01",
+                    "title": "Strategy with a practical point of view",
+                    "meta": "Clarity before complexity",
+                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                    "buttonLabel": "Explore Strategy",
+                    "buttonUrl": "/",
+                    "titleElement": "h3",
+                    "titleStyle": "inherit",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Warm architectural forms representing strategic planning",
+      "dynamicContext": {
+        "provider": "woocommerce",
+        "source": "product",
+        "mode": "collection"
+      },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "excerpt",
+                        "valueType": "richText"
+                      },
+                      "text": {
+                        "path": "description",
+                        "valueType": "richText"
+                      },
+                      "imageUrl": {
+                        "path": "image.url",
+                        "valueType": "url"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-block-mtfuarxt-3d3c3-2",
+                    "eyebrow": "02",
+                    "title": "Design that feels distinctive and effortless",
+                    "meta": "Made for real people",
+                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                    "buttonLabel": "View Selected Work",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial composition representing interface design"
+                  },
+                  {
+                    "id": "grid-block-mtfuarxt-3d3c3-3",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "16:9",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "product-category-template-products",
+        "kind": "productArchive",
+        "title": "Category Products",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "columns": 4,
+        "filterPosition": "left",
+        "cardStyle": "flat",
+        "cardPreset": "standard",
+        "source": "category",
+        "gridLimit": 100,
+        "layoutVariant": "grid",
+        "pagination": {
+          "enabled": true,
+          "perPage": 12,
+          "mode": "pageNumbers",
+          "infiniteScroll": false
+        },
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-30T14:55:23.561Z"
+  },
+  "post-category": {
+    "version": 1,
+    "key": "post-category",
+    "page": "post-category",
+    "targetType": "template",
+    "template": "post-category",
+    "displayName": "Global Post Category",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#ffffff",
+      "textColor": "#111111",
+      "accentColor": "#17211d"
+    },
+    "updatedAt": "2026-08-30T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "post-category-template-content",
+        "kind": "contentLayout",
+        "title": "Post Category",
+        "background": "transparent",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "post-category-column",
+            "rowId": "post-category-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "post-category-title",
+                "kind": "heading",
+                "headingText": "Category title",
+                "dynamicBindings": {
+                  "headingText": {
+                    "path": "title",
+                    "valueType": "string"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "product-single": {
+    "version": 1,
+    "key": "product-single",
+    "page": "product-single",
+    "targetType": "template",
+    "template": "product-single",
+    "displayName": "Product Single",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#ffffff",
+      "textColor": "#111111",
+      "accentColor": "#17211d"
+    },
+    "updatedAt": "2026-08-30T11:33:54.019Z",
+    "sections": [
+      {
+        "id": "product-single-template-content",
+        "kind": "contentLayout",
+        "title": "Product",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "product-single-media",
+            "blocks": [
+              {
+                "id": "product-single-gallery",
+                "kind": "productGallery",
+                "title": "Product Gallery"
+              }
+            ]
+          },
+          {
+            "id": "product-single-summary",
+            "blocks": [
+              {
+                "id": "product-single-title",
+                "kind": "productTitle",
+                "title": "Product Title"
+              },
+              {
+                "id": "product-single-price",
+                "kind": "productPrice",
+                "title": "Product Price"
+              },
+              {
+                "id": "product-single-cart",
+                "kind": "productAddToCart",
+                "title": "Add To Cart"
+              },
+              {
+                "id": "product-single-attributes",
+                "kind": "productAttributes",
+                "title": "Product Attributes"
+              },
+              {
+                "id": "product-single-description",
+                "kind": "productDescription",
+                "title": "Product Description"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  },
+  "post-single": {
+    "version": 1,
+    "page": "post-single",
+    "targetType": "template",
+    "template": "post-single",
+    "updatedAt": "1970-01-01T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "post-single-content",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "visible": true,
+        "contentMode": "default",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "post-single-column",
+            "rowId": "post-single-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "post-single-heading",
+                "kind": "heading",
+                "headingText": "Post title",
+                "dynamicBindings": {
+                  "headingText": {
+                    "path": "title",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-image",
+                "kind": "image",
+                "imageUrl": "",
+                "imageAlt": "",
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "featuredImage.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "featuredImage.alt",
+                    "valueType": "string"
+                  }
+                }
+              },
+              {
+                "id": "post-single-content-body",
+                "kind": "text",
+                "body": "Post content",
+                "dynamicBindings": {
+                  "body": {
+                    "path": "content",
+                    "valueType": "richText"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "shop": {
+    "version": 1,
+    "key": "shop",
+    "page": "shop",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mtfsqbiy-uq5b8",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-mtfsqbix-1-column-1",
+            "rowId": "layout-row-mtfsqbix-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "grid-block-mtfssq18-ng4di",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridCardHover": false,
+                "gridRowGap": "medium",
+                "gridStacking": "inherit",
+                "gridItems": [
+                  {
+                    "id": "grid-block-mtfssq18-ng4di-1",
+                    "eyebrow": "01",
+                    "title": "Strategy with a practical point of view",
+                    "meta": "Clarity before complexity",
+                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                    "buttonLabel": "Explore Strategy",
+                    "buttonUrl": "/",
+                    "titleElement": "h3",
+                    "titleStyle": "inherit",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Warm architectural forms representing strategic planning",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection"
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "image.url",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-block-mtfssq18-ng4di-2",
+                    "eyebrow": "02",
+                    "title": "Design that feels distinctive and effortless",
+                    "meta": "Made for real people",
+                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                    "buttonLabel": "View Selected Work",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial composition representing interface design"
+                  },
+                  {
+                    "id": "grid-block-mtfssq18-ng4di-3",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "16:9",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mtfsqcsc-column-1",
+            "rowId": "layout-row-mtfsqcsc",
+            "rowLayout": "1-col",
+            "blocks": []
+          }
+        ],
+        "layoutRows": 2
+      }
+    ],
+    "updatedAt": "2026-08-30T12:41:40.606Z"
   }
 }

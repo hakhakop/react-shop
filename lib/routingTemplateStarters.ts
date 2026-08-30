@@ -5,7 +5,7 @@ export type RoutingTemplateStarter = "blank" | "minimal";
 
 const id = (kind: string) => `starter-${kind}-${randomUUID()}`;
 
-function contentSection(contentType: "product" | "post", blocks: BuilderLayoutBlock[]): BuilderSection {
+function contentSection(contentType: "product" | "post" | "product-category" | "post-category", blocks: BuilderLayoutBlock[]): BuilderSection {
   const sectionId = id(`${contentType}-section`);
   const rowId = id(`${contentType}-row`);
   const columnId = id(`${contentType}-column`);
@@ -83,11 +83,19 @@ export function createMinimalProductStarterSections(): BuilderSection[] {
 }
 
 export function createRoutingTemplateStarterSections(
-  contentType: "product" | "post",
+  contentType: "product" | "post" | "product-category" | "post-category",
   starter: RoutingTemplateStarter,
 ) {
   if (starter === "blank") return undefined;
-  return contentType === "product"
-    ? createMinimalProductStarterSections()
-    : createMinimalPostStarterSections();
+  if (contentType === "product") return createMinimalProductStarterSections();
+  if (contentType === "post") return createMinimalPostStarterSections();
+  if (contentType === "product-category") {
+    return [contentSection(contentType, [{ id: id("category-products"), kind: "products" }])];
+  }
+  return [contentSection(contentType, [{
+    id: id("category-title"),
+    kind: "heading",
+    headingText: "Category title",
+    dynamicBindings: { headingText: { path: "title", valueType: "string" } },
+  }])];
 }

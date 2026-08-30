@@ -12,7 +12,7 @@ type RoutingTemplate = {
   name: string;
   enabled: boolean;
   order: number;
-  view: "singular";
+  view: "singular" | "archive";
   conditions: TemplateCondition[];
   layoutId: string;
 };
@@ -25,7 +25,7 @@ function assignmentSummary(template: RoutingTemplate) {
   );
   const exclusions = template.conditions.filter((condition) => condition.operator === "exclude");
   const base = includeType?.subject === "content-type"
-    ? includeType.contentType === "product" ? "All Products" : "All Posts"
+    ? ({ product: "All Products", post: "All Posts", "product-category": "All Product Categories", "post-category": "All Post Categories/Archives" }[includeType.contentType] ?? "Dynamic content")
     : "Singular content";
   if (!exclusions.length) return base;
   return `${base} · Excluding ${exclusions.length} rule${exclusions.length === 1 ? "" : "s"}`;
@@ -43,7 +43,7 @@ export default function RoutingTemplatesPanel({ websiteId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
-  const [contentType, setContentType] = useState<"product" | "post">("product");
+  const [contentType, setContentType] = useState<"product" | "post" | "product-category" | "post-category">("product");
   const [starter, setStarter] = useState<"minimal" | "blank">("minimal");
 
   const apiUrl = useMemo(() => {
@@ -142,7 +142,9 @@ export default function RoutingTemplatesPanel({ websiteId }: Props) {
 
   const groups = [
     { type: "product", title: "Single Product", empty: "No product templates yet." },
+    { type: "product-category", title: "Product Category", empty: "No product-category templates yet." },
     { type: "post", title: "Single Post", empty: "No post templates yet." },
+    { type: "post-category", title: "Post Category / Archive", empty: "No post-category templates yet." },
   ];
 
   return (
@@ -155,13 +157,13 @@ export default function RoutingTemplatesPanel({ websiteId }: Props) {
         {creating && (
           <div className="routing-template-create-form" role="form" aria-label="Create template">
             <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Template name" aria-label="Name" autoFocus />
-            <select value={contentType} onChange={(event) => setContentType(event.target.value as "product" | "post")} aria-label="Type">
-              <option value="product">Single Product</option><option value="post">Single Post</option>
+            <select value={contentType} onChange={(event) => setContentType(event.target.value as typeof contentType)} aria-label="Type">
+              <option value="product">Single Product</option><option value="product-category">Product Category</option><option value="post">Single Post</option><option value="post-category">Post Category/Archive</option>
             </select>
             <select value={starter} onChange={(event) => setStarter(event.target.value as "minimal" | "blank")} aria-label="Starting Layout">
               <option value="minimal">Starter</option><option value="blank">Blank</option>
             </select>
-            <small>{contentType === "product" ? "All Products" : "All Posts"}</small>
+            <small>{{ product: "All Products", post: "All Posts", "product-category": "All Product Categories", "post-category": "All Post Categories/Archives" }[contentType]}</small>
             <div><button type="button" className="builder-primary-button" onClick={() => void createTemplate()}>Create {starter === "minimal" ? "starter" : "blank"}</button><button type="button" className="builder-secondary-button" onClick={() => setCreating(false)}>Cancel</button></div>
           </div>
         )}

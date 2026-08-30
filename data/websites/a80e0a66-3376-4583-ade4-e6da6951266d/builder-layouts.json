@@ -1,0 +1,190 @@
+{
+  "home": {
+    "version": 1,
+    "key": "home",
+    "page": "home",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mtfleqaa-hwabd",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-mtfleqaa-1-column-1",
+            "rowId": "layout-row-mtfleqaa-1",
+            "rowLayout": "1-col",
+            "blocks": []
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-30T09:14:14.816Z"
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "headerBrandMode": "brand",
+                "headerBrandText": "Navigation Lab A",
+                "imageMaxWidth": 140,
+                "imageAlignment": "left",
+                "imageUrl": null,
+                "imageAlt": "Navigation Lab A logo"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "underline",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              }
+            ]
+          }
+        ],
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerHeight": "auto",
+        "headerLayout": "simple",
+        "headerBehavior": "sticky",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": ""
+      }
+    ],
+    "updatedAt": "2026-08-30T09:13:29.991Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "updatedAt": "2026-08-30T09:10:42.614Z",
+    "design": {},
+    "sections": []
+  }
+}

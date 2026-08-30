@@ -1,4 +1,5 @@
-import type { BuilderLayout, BuilderLayoutKey } from "@/lib/builderLayouts";
+import type { BuilderCustomPage, BuilderLayout, BuilderLayoutKey } from "@/lib/builderLayouts";
+import type { LayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 
 export type StarterWebsiteId =
@@ -9,7 +10,8 @@ export type StarterWebsiteId =
 
 export type StarterWebsiteData = {
   layouts: Partial<Record<BuilderLayoutKey, BuilderLayout>>;
-  pages: Array<{ key: `page:${string}`; title: string; slug: string; updatedAt: string }>;
+  pages: BuilderCustomPage[];
+  routing?: LayoutRoutingRegistry;
   shell: BuilderShellSettings;
 };
 

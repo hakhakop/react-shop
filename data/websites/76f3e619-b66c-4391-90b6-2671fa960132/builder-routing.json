@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "routingTemplates": [
+    {
+      "id": "routing:legacy-product-single",
+      "name": "Product Single",
+      "enabled": true,
+      "order": 0,
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product"
+        }
+      ],
+      "layoutId": "layout:builder:product-single"
+    },
+    {
+      "id": "routing:legacy-post-single",
+      "name": "Single Post",
+      "enabled": true,
+      "order": 0,
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "post"
+        }
+      ],
+      "layoutId": "layout:builder:post-single"
+    },
+    {
+      "id": "routing:legacy-product-category",
+      "name": "Global Product Category",
+      "enabled": true,
+      "order": 20,
+      "view": "archive",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product-category"
+        }
+      ],
+      "layoutId": "layout:builder:product-category"
+    },
+    {
+      "id": "routing:legacy-post-category",
+      "name": "Global Post Category",
+      "enabled": true,
+      "order": 30,
+      "view": "archive",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "post-category"
+        }
+      ],
+      "layoutId": "layout:builder:post-category"
+    }
+  ],
+  "individualOverrides": []
+}

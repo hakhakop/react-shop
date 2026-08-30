@@ -1,0 +1,29 @@
+{
+  "home": {
+    "version": 1,
+    "key": "home",
+    "page": "home",
+    "targetType": "page",
+    "updatedAt": "2026-08-30T09:11:03.591Z",
+    "design": {},
+    "sections": []
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "updatedAt": "2026-08-30T09:11:03.591Z",
+    "design": {},
+    "sections": []
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "updatedAt": "2026-08-30T09:11:03.591Z",
+    "design": {},
+    "sections": []
+  }
+}

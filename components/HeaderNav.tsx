@@ -24,6 +24,7 @@ import {
   resolveTenantPathHref,
   type ScopedPreviewPage,
 } from "../lib/scopedPreviewLinks";
+import type { NavigationRouteAlias } from "@/lib/navigationTargets";
 import type { BuilderLayoutKey } from "../lib/builderLayouts";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
@@ -36,6 +37,7 @@ interface HeaderNavProps {
   scopedPreviewWebsiteId?: string;
   activePageKey?: BuilderLayoutKey;
   scopedPreviewPages?: ScopedPreviewPage[];
+  systemRouteAliases?: NavigationRouteAlias[];
   scopedLinkMode?: "builder" | "preview" | "tenant-path";
   activeContentLanguage?: string;
   dropdownIndicator?: "none" | "chevron";
@@ -367,6 +369,7 @@ export default function HeaderNav({
   scopedPreviewWebsiteId,
   activePageKey,
   scopedPreviewPages,
+  systemRouteAliases,
   scopedLinkMode = "preview",
   activeContentLanguage,
   dropdownIndicator = "none",
@@ -479,15 +482,17 @@ export default function HeaderNav({
   const hrefResolver = activeScopedWebsiteId
     ? (href: string) =>
         scopedLinkMode === "tenant-path"
-          ? resolveTenantPathHref(href, { websiteId: activeScopedWebsiteId, pages: scopedPreviewPages })
+          ? resolveTenantPathHref(href, { websiteId: activeScopedWebsiteId, pages: scopedPreviewPages, systemRouteAliases })
           : scopedLinkMode === "builder"
           ? resolveScopedBuilderHref(href, {
               websiteId: activeScopedWebsiteId,
               pages: scopedPreviewPages,
+              systemRouteAliases,
             })
           : resolveScopedPreviewHref(href, {
               websiteId: activeScopedWebsiteId,
               pages: scopedPreviewPages,
+              systemRouteAliases,
             })
     : undefined;
 

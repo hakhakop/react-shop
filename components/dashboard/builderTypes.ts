@@ -3,6 +3,7 @@ export type BuilderPage = "home" | "shop" | "client" | BuilderCustomPageKey;
 export type BuilderTemplate =
   | "product-single"
   | "post-single"
+  | "post-category"
   | "product-category"
   | "product-category-specific"
   | "search-results";
@@ -1568,9 +1569,12 @@ export type BuilderState = {
 };
 
 export type BuilderCustomPage = {
+  id: string;
   key: BuilderCustomPageKey;
   title: string;
   slug: string;
+  systemRole?: "shop" | "cart" | "checkout" | "my-account" | "front-page" | "posts-page";
+  sourceDatabaseId?: number;
   updatedAt?: string;
 };
 

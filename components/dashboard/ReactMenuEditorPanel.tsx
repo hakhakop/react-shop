@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import {
   ArrowUp,
   ArrowDown,
@@ -11,24 +11,47 @@ import {
   Trash2,
   FolderTree,
   Link,
-  ChevronRight as ArrowRight
+  Download,
+  RefreshCw,
+  Upload,
 } from "lucide-react";
-import type { ReactMenuItem } from "@/lib/builderShell";
+import type {
+  BuilderMenuPresentation,
+  BuilderMenuPresentationMap,
+  BuilderNamedMenu,
+  ReactMenuItem,
+} from "@/lib/builderShell";
 import type { BuilderCustomPage } from "@/components/dashboard/builderTypes";
+import {
+  createPortableNavigationPackage,
+  materializePortableNavigation,
+  parsePortableNavigationPackage,
+  portableTargetHref,
+  previewPortableNavigationPackage,
+  type NavigationInstallPreview,
+  type PortableNavigationPackage,
+} from "@/lib/navigationPackage";
 
 type ReactMenuEditorPanelProps = {
   menuItems: ReactMenuItem[];
   onChangeMenuItems: (newItems: ReactMenuItem[]) => void;
+  namedMenus: BuilderNamedMenu[];
+  onChangeNamedMenus: (newMenus: BuilderNamedMenu[]) => void;
+  menuPresentation: BuilderMenuPresentationMap;
+  onUpdateNavigation: (patch: {
+    menuItems?: ReactMenuItem[];
+    namedMenus?: BuilderNamedMenu[];
+    menuPresentation?: BuilderMenuPresentationMap;
+  }) => void;
   customPages: BuilderCustomPage[];
+  websiteId?: string;
+  wordpressOrigin?: string | null;
+  wordpressSiteUrl?: string | null;
 };
 
-interface TreeItem {
-  id: string;
-  label: string;
-  url: string;
-  parentId: string | null;
+type TreeItem = ReactMenuItem & {
   children: TreeItem[];
-}
+};
 
 interface FlattenedNode {
   id: string;
@@ -40,6 +63,16 @@ interface FlattenedNode {
   hasNextSibling: boolean;
 }
 
+const defaultMenuPresentation: BuilderMenuPresentation = {
+  showHeading: false,
+  icon: null,
+  submenuLayout: "list",
+  submenuColumns: 3,
+  submenuWidth: null,
+  mobileAccordion: true,
+  badgeText: null,
+};
+
 function buildMenuTree(items: ReactMenuItem[]): TreeItem[] {
   const itemMap: Record<string, TreeItem> = {};
   const rootItems: TreeItem[] = [];
@@ -47,9 +80,7 @@ function buildMenuTree(items: ReactMenuItem[]): TreeItem[] {
   // Create tree items
   items.forEach((item) => {
     itemMap[item.id] = {
-      id: item.id,
-      label: item.label,
-      url: item.url,
+      ...item,
       parentId: item.parentId || null,
       children: [],
     };
@@ -73,14 +104,13 @@ function flattenMenuTree(tree: TreeItem[]): ReactMenuItem[] {
 
   function traverse(nodes: TreeItem[]) {
     nodes.forEach((node) => {
+      const { children, ...item } = node;
       result.push({
-        id: node.id,
-        label: node.label,
-        url: node.url,
-        parentId: node.parentId,
+        ...item,
+        parentId: node.parentId || null,
       });
-      if (node.children && node.children.length > 0) {
-        traverse(node.children);
+      if (children.length > 0) {
+        traverse(children);
       }
     });
   }
@@ -96,7 +126,7 @@ function getFlattenedNodes(tree: TreeItem[], depth = 0): FlattenedNode[] {
       id: node.id,
       label: node.label,
       url: node.url,
-      parentId: node.parentId,
+      parentId: node.parentId ?? null,
       depth,
       hasPreviousSibling: index > 0,
       hasNextSibling: index < tree.length - 1,
@@ -109,13 +139,41 @@ function getFlattenedNodes(tree: TreeItem[], depth = 0): FlattenedNode[] {
 }
 
 export default function ReactMenuEditorPanel({
-  menuItems,
-  onChangeMenuItems,
+  menuItems: mainMenuItems,
+  onChangeMenuItems: onChangeMainMenuItems,
+  namedMenus,
+  onChangeNamedMenus,
+  menuPresentation,
+  onUpdateNavigation,
   customPages,
+  websiteId,
+  wordpressOrigin,
+  wordpressSiteUrl,
 }: ReactMenuEditorPanelProps) {
+  const [selectedMenuSource, setSelectedMenuSource] = useState("main");
+  const [newMenuName, setNewMenuName] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draggingMenuId, setDraggingMenuId] = useState<string | null>(null);
   const [dragOverMenuId, setDragOverMenuId] = useState<string | null>(null);
+  const [portablePreview, setPortablePreview] = useState<NavigationInstallPreview | null>(null);
+  const [previewSource, setPreviewSource] = useState<"wordpress" | "upload" | null>(null);
+  const [navigationStatus, setNavigationStatus] = useState("");
+  const [navigationBusy, setNavigationBusy] = useState(false);
+  const [mappingSlugs, setMappingSlugs] = useState<Record<string, string>>({});
+  const uploadRef = useRef<HTMLInputElement>(null);
+
+  const selectedNamedMenu = namedMenus.find((menu) => menu.id === selectedMenuSource) ?? null;
+  const menuItems = selectedNamedMenu?.items ?? mainMenuItems;
+  const activeMenuName = selectedNamedMenu?.name ?? "Main Navigation";
+  const onChangeMenuItems = (newItems: ReactMenuItem[]) => {
+    if (!selectedNamedMenu) {
+      onChangeMainMenuItems(newItems);
+      return;
+    }
+    onChangeNamedMenus(namedMenus.map((menu) =>
+      menu.id === selectedNamedMenu.id ? { ...menu, items: newItems } : menu,
+    ));
+  };
 
   const treeItems = useMemo(() => buildMenuTree(menuItems), [menuItems]);
   const flattenedNodes = useMemo(() => getFlattenedNodes(treeItems), [treeItems]);
@@ -184,23 +242,259 @@ export default function ReactMenuEditorPanel({
   };
 
   const coreRoutes = useMemo(() => [
-    { label: "Home", url: "/" },
-    { label: "Shop", url: "/shop" },
-    { label: "Cart", url: "/cart" },
-    { label: "Checkout", url: "/checkout" },
-    { label: "My Account", url: "/my-account" },
+    { label: "Home", url: "/", target: { kind: "system" as const, pageKey: "home", uri: "/" } },
+    { label: "Shop", url: "/shop", target: { kind: "system" as const, pageKey: "shop", uri: "/shop" } },
+    { label: "Cart", url: "/cart", target: { kind: "system" as const, pageKey: "cart", uri: "/cart" } },
+    { label: "Checkout", url: "/checkout", target: { kind: "system" as const, pageKey: "checkout", uri: "/checkout" } },
+    { label: "My Account", url: "/my-account", target: { kind: "system" as const, pageKey: "my-account", uri: "/my-account" } },
   ], []);
 
   const builderPageRoutes = useMemo(() => {
     return customPages.map((page) => ({
       label: page.title,
       url: page.slug.startsWith("/") ? page.slug : `/${page.slug}`,
+      target: {
+        kind: "webpages-page" as const,
+        pageKey: page.key,
+        slug: page.slug.replace(/^\/+/, ""),
+        uri: page.slug.startsWith("/") ? page.slug : `/${page.slug}`,
+      },
     }));
   }, [customPages]);
 
   const allDestinations = useMemo(() => {
     return [...coreRoutes, ...builderPageRoutes];
   }, [coreRoutes, builderPageRoutes]);
+
+  const navigationApiUrl = websiteId
+    ? `/api/wordpress-navigation?websiteId=${encodeURIComponent(websiteId)}`
+    : "/api/wordpress-navigation";
+
+  const currentPackage = () => createPortableNavigationPackage({
+    name: activeMenuName,
+    intendedLocation: selectedNamedMenu ? null : "PRIMARY",
+    sourceOrigin: wordpressOrigin,
+    items: menuItems,
+    presentation: menuPresentation,
+    targetsByItemId: Object.fromEntries(menuItems.map((item) => {
+      const authoredTarget = item.navigationTarget;
+      const destinationTarget = allDestinations.find((destination) => destination.url === item.url)?.target;
+      return [item.id, authoredTarget ?? destinationTarget];
+    }).filter((entry): entry is [string, NonNullable<ReactMenuItem["navigationTarget"]>] => Boolean(entry[1]))),
+  });
+
+  const downloadPackage = () => {
+    const packageValue = currentPackage();
+    const blob = new Blob([JSON.stringify(packageValue, null, 2)], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.download = `webpages-${activeMenuName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "navigation"}.v1.json`;
+    anchor.click();
+    URL.revokeObjectURL(href);
+    setNavigationStatus(`Exported ${packageValue.menu.items.length} navigation items.`);
+  };
+
+  const previewPackage = async (
+    packageValue: PortableNavigationPackage,
+    source: "wordpress" | "upload",
+    resolveWordPressTargets = Boolean(wordpressSiteUrl),
+  ) => {
+    const localPreview = previewPortableNavigationPackage(packageValue, Boolean(wordpressSiteUrl));
+    setPortablePreview(localPreview);
+    setPreviewSource(source);
+    setNavigationStatus("Preview ready. No WebPages menu has been changed.");
+
+    const hasWordPressTargets = packageValue.menu.items.some((item) =>
+      ["page", "post", "product", "term"].includes(item.target.kind),
+    );
+    if (!resolveWordPressTargets || !wordpressSiteUrl || !hasWordPressTargets) return;
+
+    setNavigationBusy(true);
+    setNavigationStatus("Preview ready; resolving optional WordPress targets…");
+    try {
+      const response = await fetch(navigationApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ package: packageValue }),
+      });
+      const payload = await response.json() as { preview?: NavigationInstallPreview; error?: string };
+      if (!response.ok || !payload.preview) throw new Error(payload.error || "WordPress target resolution failed.");
+      setPortablePreview(payload.preview);
+      setNavigationStatus("Preview ready. WordPress targets were resolved where available.");
+    } catch (error) {
+      setNavigationStatus(
+        `${error instanceof Error ? error.message : "WordPress target resolution failed."} The package can still be installed as a WebPages menu.`,
+      );
+    } finally {
+      setNavigationBusy(false);
+    }
+  };
+
+  const refreshFromWordPress = async () => {
+    setNavigationBusy(true);
+    setNavigationStatus("Reading menus from the connected WordPress site…");
+    try {
+      const response = await fetch(navigationApiUrl);
+      const payload = await response.json() as { packages?: PortableNavigationPackage[]; error?: string };
+      if (!response.ok) throw new Error(payload.error || "WordPress menu retrieval failed.");
+      const packageValue = payload.packages?.find((item) =>
+        ["PRIMARY", "NAVBAR"].includes(item.menu.intendedLocation ?? ""),
+      ) ?? payload.packages?.[0];
+      if (!packageValue) throw new Error("The connected WordPress site did not return any menus.");
+      await previewPackage(parsePortableNavigationPackage(packageValue), "wordpress", true);
+    } catch (error) {
+      setPortablePreview(null);
+      setNavigationStatus(error instanceof Error ? error.message : "WordPress menu retrieval failed.");
+      setNavigationBusy(false);
+    }
+  };
+
+  const uploadPackage = async (file: File) => {
+    try {
+      const packageValue = parsePortableNavigationPackage(JSON.parse(await file.text()));
+      await previewPackage(packageValue, "upload");
+    } catch (error) {
+      setPortablePreview(null);
+      setNavigationStatus(error instanceof Error ? error.message : "Navigation package is invalid.");
+    } finally {
+      if (uploadRef.current) uploadRef.current.value = "";
+    }
+  };
+
+  const resolveExplicitMapping = async (key: string) => {
+    if (!portablePreview) return;
+    const slug = mappingSlugs[key]?.trim();
+    if (!slug) {
+      setNavigationStatus("Enter the slug of an existing destination target.");
+      return;
+    }
+    const mappedPackage = parsePortableNavigationPackage({
+      ...portablePreview.package,
+      menu: {
+        ...portablePreview.package.menu,
+        items: portablePreview.package.menu.items.map((item) =>
+          item.key === key ? { ...item, target: { ...item.target, slug } } : item,
+        ),
+      },
+    });
+    await previewPackage(mappedPackage, previewSource ?? "upload", true);
+  };
+
+  const destinationMenuId = (name: string) => {
+    const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "navigation";
+    const used = new Set(namedMenus.map((menu) => menu.id));
+    let id = base;
+    let suffix = 2;
+    while (id === "main" || used.has(id)) id = `${base}-${suffix++}`;
+    return id;
+  };
+
+  const destinationMenuName = (name: string) => {
+    const used = new Set(["Main Navigation", ...namedMenus.map((menu) => menu.name)]);
+    if (!used.has(name)) return name;
+    const base = `${name} (Imported)`;
+    let candidate = base;
+    let suffix = 2;
+    while (used.has(candidate)) candidate = `${base} ${suffix++}`;
+    return candidate;
+  };
+
+  const materializeForWebPages = (packageValue: PortableNavigationPackage, menuId: string) => {
+    const destinationIds = Object.fromEntries(packageValue.menu.items.map((item) => [
+      item.key,
+      `${menuId}-${item.key}`,
+    ]));
+    return materializePortableNavigation(packageValue, destinationIds);
+  };
+
+  const installAsNamedMenu = () => {
+    if (!portablePreview) return;
+    const menuName = destinationMenuName(portablePreview.package.menu.name);
+    const menuId = destinationMenuId(menuName);
+    const next = materializeForWebPages(portablePreview.package, menuId);
+    const nextNamedMenus = [...namedMenus, {
+      id: menuId,
+      name: menuName,
+      items: next.items,
+    }];
+    onUpdateNavigation({
+      namedMenus: nextNamedMenus,
+      menuPresentation: { ...menuPresentation, ...next.presentation },
+    });
+    setSelectedMenuSource(menuId);
+    setPortablePreview(null);
+    setPreviewSource(null);
+    setNavigationStatus(
+      `Installed “${menuName}” as a WebPages named menu${portablePreview.unresolvedCount ? ` with ${portablePreview.unresolvedCount} unresolved WordPress target(s) retained` : ""}.`,
+    );
+  };
+
+  const replaceSelectedMenu = async () => {
+    if (!portablePreview) return;
+    if (!window.confirm(`Replace “${activeMenuName}” with “${portablePreview.package.menu.name}”?`)) return;
+    if (previewSource === "wordpress") {
+      const response = await fetch(navigationApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ package: portablePreview.package, installAssignedPages: true }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { error?: string };
+        setNavigationStatus(payload.error || "Assigned WordPress Pages could not be materialized.");
+        return;
+      }
+    }
+    const menuId = selectedNamedMenu?.id ?? "main";
+    const next = materializeForWebPages(portablePreview.package, menuId);
+    const activeIds = new Set(menuItems.map((item) => item.id));
+    const nextPresentation = Object.fromEntries(
+      Object.entries(menuPresentation).filter(([id]) => !activeIds.has(id)),
+    );
+    const claimedCurrentIds = new Set<string>();
+    for (const portableItem of portablePreview.package.menu.items) {
+      const nextItem = next.items.find((item) => item.portableKey === portableItem.key);
+      if (!nextItem || nextPresentation[nextItem.id]) continue;
+      const current = menuItems.find((item) =>
+        !claimedCurrentIds.has(item.id) && (
+          item.portableKey === portableItem.key ||
+          (item.label === portableItem.label && item.url === portableTargetHref(portableItem.target))
+        ),
+      );
+      if (current) {
+        claimedCurrentIds.add(current.id);
+        if (menuPresentation[current.id]) nextPresentation[nextItem.id] = menuPresentation[current.id];
+      }
+    }
+    const mergedPresentation = { ...nextPresentation, ...next.presentation };
+    if (selectedNamedMenu) {
+      onUpdateNavigation({
+        namedMenus: namedMenus.map((menu) =>
+          menu.id === selectedNamedMenu.id
+            ? { ...menu, name: portablePreview.package.menu.name, items: next.items }
+            : menu,
+        ),
+        menuPresentation: mergedPresentation,
+      });
+    } else {
+      onUpdateNavigation({ menuItems: next.items, menuPresentation: mergedPresentation });
+    }
+    setPortablePreview(null);
+    setPreviewSource(null);
+    setNavigationStatus(
+      `${previewSource === "wordpress" ? "Imported WordPress snapshot into" : "Installed package in"} “${activeMenuName}”.`,
+    );
+  };
+
+  const createNamedMenu = () => {
+    const name = newMenuName.trim();
+    if (!name) return;
+    const id = destinationMenuId(name);
+    onChangeNamedMenus([...namedMenus, { id, name, items: [] }]);
+    setSelectedMenuSource(id);
+    setNewMenuName("");
+    setSelectedId(null);
+  };
 
   const handleMove = (itemId: string, direction: "up" | "down") => {
     const tree = buildMenuTree(menuItems);
@@ -373,6 +667,22 @@ export default function ReactMenuEditorPanel({
     onChangeMenuItems(nextItems);
   };
 
+  const handleUpdatePresentation = (
+    itemId: string,
+    patch: Partial<BuilderMenuPresentation>,
+  ) => {
+    onUpdateNavigation({
+      menuPresentation: {
+        ...menuPresentation,
+        [itemId]: {
+          ...defaultMenuPresentation,
+          ...menuPresentation[itemId],
+          ...patch,
+        },
+      },
+    });
+  };
+
   // Prevent circular relationships by filtering out descendants and the item itself
   const validParents = useMemo(() => {
     if (!selectedId) return [];
@@ -410,7 +720,7 @@ export default function ReactMenuEditorPanel({
   const handleDestinationChange = (urlVal: string) => {
     if (!selectedItem) return;
     if (urlVal === "custom") {
-      handleUpdateItem(selectedItem.id, { url: "" });
+      handleUpdateItem(selectedItem.id, { url: "", navigationTarget: undefined });
       return;
     }
 
@@ -422,7 +732,10 @@ export default function ReactMenuEditorPanel({
         selectedItem.label === "New Item" ||
         selectedItem.label === "New Menu Item";
 
-      const patch: Partial<ReactMenuItem> = { url: matched.url };
+      const patch: Partial<ReactMenuItem> = {
+        url: matched.url,
+        navigationTarget: matched.target,
+      };
       if (isGeneric) {
         patch.label = matched.label;
       }
@@ -432,6 +745,109 @@ export default function ReactMenuEditorPanel({
 
   return (
     <div className="builder-sidebar-panel" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+      <div className="builder-card" style={{ display: "grid", gap: "8px", padding: "10px" }}>
+        <label className="builder-field">
+          <span>WebPages menu</span>
+          <select
+            aria-label="WebPages menu"
+            value={selectedNamedMenu?.id ?? "main"}
+            onChange={(event) => {
+              setSelectedMenuSource(event.target.value);
+              setSelectedId(null);
+              setPortablePreview(null);
+            }}
+          >
+            <option value="main">Main Navigation</option>
+            {namedMenus.map((menu) => <option key={menu.id} value={menu.id}>{menu.name}</option>)}
+          </select>
+        </label>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <input
+            type="text"
+            aria-label="New named menu name"
+            value={newMenuName}
+            onChange={(event) => setNewMenuName(event.target.value)}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter") createNamedMenu();
+            }}
+            placeholder="New named menu"
+            style={{ minWidth: 0, flex: 1 }}
+          />
+          <button type="button" className="builder-secondary-button" disabled={!newMenuName.trim()} onClick={createNamedMenu}>
+            <Plus size={12} /> Create
+          </button>
+        </div>
+      </div>
+      <div className="builder-card" style={{ display: "grid", gap: "8px", padding: "10px" }}>
+        <strong style={{ fontSize: "11px" }}>Portable WebPages navigation</strong>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+          <button
+            type="button"
+            className="builder-secondary-button"
+            disabled={navigationBusy || !wordpressSiteUrl}
+            title={!wordpressSiteUrl ? "Connect WordPress to import a WordPress menu." : undefined}
+            onClick={refreshFromWordPress}
+          >
+            <RefreshCw size={12} /> Import from WordPress
+          </button>
+          <button type="button" className="builder-secondary-button" onClick={downloadPackage}>
+            <Download size={12} /> Export package
+          </button>
+          <button type="button" className="builder-secondary-button" onClick={() => uploadRef.current?.click()}>
+            <Upload size={12} /> Install package
+          </button>
+          <input
+            ref={uploadRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(event) => event.target.files?.[0] && void uploadPackage(event.target.files[0])}
+          />
+        </div>
+        {navigationStatus ? <p role="status" style={{ margin: 0, fontSize: "10px", color: "var(--builder-ui-muted)" }}>{navigationStatus}</p> : null}
+        {portablePreview ? (
+          <div style={{ display: "grid", gap: "6px", padding: "8px", border: "1px solid var(--builder-ui-border)", borderRadius: "5px" }}>
+            <strong style={{ fontSize: "11px" }}>{portablePreview.package.menu.name}</strong>
+            <span style={{ fontSize: "10px" }}>
+              {portablePreview.package.menu.intendedLocation ?? "Unassigned location"} · {portablePreview.package.menu.items.length} items · {portablePreview.portableCount} portable · {portablePreview.resolvedCount} WordPress-resolved · {portablePreview.unresolvedCount} unresolved
+            </span>
+            {portablePreview.resolutions.filter((item) => item.status === "unresolved").map((item) => (
+              <div key={item.key} style={{ display: "grid", gap: "4px" }}>
+                <span style={{ fontSize: "10px", color: "#b45309" }}>{item.message}</span>
+                {wordpressSiteUrl ? <div style={{ display: "flex", gap: "4px" }}>
+                  <input
+                    type="text"
+                    aria-label={`Map ${item.target.taxonomy ?? item.target.postType ?? item.target.kind} target`}
+                    value={mappingSlugs[item.key] ?? ""}
+                    onChange={(event) => setMappingSlugs((current) => ({ ...current, [item.key]: event.target.value }))}
+                    placeholder="Existing target slug"
+                    style={{ minWidth: 0, flex: 1, fontSize: "10px" }}
+                  />
+                  <button type="button" className="builder-secondary-button" disabled={navigationBusy} onClick={() => void resolveExplicitMapping(item.key)}>
+                    Map
+                  </button>
+                </div> : null}
+              </div>
+            ))}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              <button
+                type="button"
+                className="builder-secondary-button"
+                onClick={installAsNamedMenu}
+              >
+                Install as new WebPages menu
+              </button>
+              <button type="button" className="builder-secondary-button" onClick={replaceSelectedMenu}>
+                Replace selected menu…
+              </button>
+            </div>
+            <p style={{ margin: 0, fontSize: "10px", color: "var(--builder-ui-muted)" }}>
+              Installation writes only to the canonical WebPages menu system. WordPress targets that cannot be resolved retain their portable URI and structured descriptor.
+            </p>
+          </div>
+        ) : null}
+      </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h4 style={{ margin: 0, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--builder-ui-muted)" }}>
           Navigation Structure
@@ -690,7 +1106,7 @@ export default function ReactMenuEditorPanel({
                       <input
                         type="text"
                         value={selectedItem.url}
-                        onChange={(e) => handleUpdateItem(node.id, { url: e.target.value })}
+                        onChange={(e) => handleUpdateItem(node.id, { url: e.target.value, navigationTarget: undefined })}
                         onKeyDown={(event) => event.stopPropagation()}
                         placeholder="e.g. /shop"
                         style={{ width: "100%", padding: "6px 8px", fontSize: "12px" }}
@@ -715,6 +1131,28 @@ export default function ReactMenuEditorPanel({
                         ))}
                       </select>
                     </label>
+
+                    <fieldset style={{ display: "grid", gap: "8px", border: "1px solid var(--builder-ui-border)", borderRadius: "5px", padding: "8px" }}>
+                      <legend style={{ padding: "0 4px", fontSize: "10px", color: "var(--builder-ui-muted)" }}>Menu Presentation</legend>
+                      <label className="builder-field">
+                        <span>Badge text</span>
+                        <input
+                          type="text"
+                          value={menuPresentation[node.id]?.badgeText ?? ""}
+                          onChange={(event) => handleUpdatePresentation(node.id, { badgeText: event.target.value.trim() || null })}
+                          onKeyDown={(event) => event.stopPropagation()}
+                          placeholder="Optional badge"
+                        />
+                      </label>
+                      <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
+                        <input
+                          type="checkbox"
+                          checked={menuPresentation[node.id]?.mobileAccordion !== false}
+                          onChange={(event) => handleUpdatePresentation(node.id, { mobileAccordion: event.target.checked })}
+                        />
+                        Mobile accordion
+                      </label>
+                    </fieldset>
                   </div>
                 )}
               </div>
@@ -735,7 +1173,7 @@ export default function ReactMenuEditorPanel({
           <FolderTree size={20} style={{ marginBottom: "8px", opacity: 0.6 }} />
           <p style={{ margin: 0, fontSize: "12px" }}>No React menu items found.</p>
           <p style={{ margin: "4px 0 0 0", fontSize: "11px", opacity: 0.8 }}>
-            Click "Add Item" to start building your menu.
+            Click &quot;Add Item&quot; to start building your menu.
           </p>
         </div>
       )}

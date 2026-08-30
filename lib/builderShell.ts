@@ -61,6 +61,10 @@ export type ReactMenuItem = {
   mobileUrl?: string | null;
   target?: "_self" | "_blank";
   visibility?: "all" | "desktop" | "mobile";
+  /** Stable cross-install identity used by versioned navigation packages. */
+  portableKey?: string;
+  /** Structured portable target; rendering intentionally continues to use url. */
+  navigationTarget?: import("@/lib/navigationPackage").PortableNavigationTarget;
 };
 
 /** A normal WebPages menu resource addressable by Builder Menu elements. */
@@ -1668,6 +1672,11 @@ function normalizeMenuItems(
         mobileUrl: typeof raw.mobileUrl === "string" ? raw.mobileUrl.trim() || null : null,
         target: raw.target === "_blank" ? "_blank" : "_self",
         visibility,
+        portableKey: typeof raw.portableKey === "string" ? raw.portableKey.trim() || undefined : undefined,
+        navigationTarget:
+          raw.navigationTarget && typeof raw.navigationTarget === "object" && !Array.isArray(raw.navigationTarget)
+            ? raw.navigationTarget as ReactMenuItem["navigationTarget"]
+            : undefined,
       });
     }
   }

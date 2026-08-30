@@ -263,4 +263,11 @@ export async function initializeWebsiteBuilderData(input: {
       ),
     ),
   );
+  if (starter.routing) {
+    await writeFile(
+      path.join(dir, BUILDER_ROUTING_FILE),
+      `${JSON.stringify(starter.routing, null, 2)}\n`,
+      "utf8",
+    );
+  }
 }

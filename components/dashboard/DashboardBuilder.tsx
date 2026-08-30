@@ -374,6 +374,7 @@ import {
   getStorefrontHrefFromScopedPreviewHref,
   resolveTenantPathHref,
 } from "@/lib/scopedPreviewLinks";
+import { getSystemRouteAliases } from "@/lib/navigationTargets";
 import {
   builderAnimationClassName as previewAnimationClassName,
   builderAnimationDataAttributes as previewAnimationAttrs,
@@ -963,9 +964,13 @@ function getLayoutLabel(
 function builderDocumentKindLabel(context: BuilderEditorContext | null) {
   if (!context) return "Page";
   if (context.document.kind === "routing-template") {
-    return context.content.family === "product"
-      ? "Single Product Template"
-      : "Single Post Template";
+    if (!context.content.family) return "Routing Template";
+    return ({
+      product: "Single Product Template",
+      post: "Single Post Template",
+      "product-category": "Product Category Template",
+      "post-category": "Post Category / Archive Template",
+    } as const)[context.content.family];
   }
   if (context.document.kind === "individual") {
     return context.content.family === "product"
@@ -994,7 +999,13 @@ function builderDocumentOwnershipLabel(context: BuilderEditorContext | null) {
 function builderFrontendActionLabel(context: BuilderEditorContext | null) {
   if (!context) return "View Page";
   if (context.document.kind === "routing-template" || context.document.kind === "individual") {
-    return context.content.family === "product" ? "View Product" : "View Post";
+    if (!context.content.family) return "Open Frontend";
+    return ({
+      product: "View Product",
+      post: "View Post",
+      "product-category": "View Product Category",
+      "post-category": "View Post Category",
+    } as const)[context.content.family];
   }
   return context.document.kind === "page" ? "View Page" : "Open Frontend";
 }
@@ -2141,6 +2152,8 @@ export type DashboardBuilderProps = {
   enabledContentLanguages?: string[];
   /** Server-provided CMS origin for canonical imported WordPress media URLs. */
   wordpressMediaOrigin?: string | null;
+  /** Explicit connected WordPress site URL; unlike media origin, never falls back to the tenant domain. */
+  wordpressSiteUrl?: string | null;
   initialPageHydration?: {
     authoredLayout: BuilderLayout | null;
     renderLayout: BuilderLayout | null;
@@ -2156,6 +2169,7 @@ export default function DashboardBuilder({
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
   wordpressMediaOrigin = null,
+  wordpressSiteUrl = null,
   initialPageHydration,
 }: DashboardBuilderProps) {
   const router = useRouter();
@@ -2218,12 +2232,12 @@ export default function DashboardBuilder({
     documentId: string;
     routingTemplateId: string;
     displayName: string;
-    family: "product" | "post";
-    familyLabel: "Single Product" | "Single Post";
+    family: "product" | "post" | "product-category" | "post-category";
+    familyLabel: "Single Product" | "Single Post" | "Product Category" | "Post Category/Archive";
     provider: "woocommerce" | "wordpress";
-    source: "product" | "post";
+    source: "product" | "post" | "product-category" | "post-category";
     websiteId?: string;
-    assignmentSummary: "All Products" | "All Posts";
+    assignmentSummary: "All Products" | "All Posts" | "All Product Categories" | "All Post Categories/Archives";
   } | null>(null);
   const [individualBuilderContext, setIndividualBuilderContext] = useState<{
     mode: "individual";
@@ -2995,10 +3009,25 @@ export default function DashboardBuilder({
   );
   const iframeComparisonHref = useMemo(() => {
     const params = new URLSearchParams({ page: headerContextState.page });
+    const categorySlug = searchParams.get("category");
+    const selectedTemplateCandidate = templatePreviewCandidates.find((candidate) =>
+      candidate.identity.provider === templatePreviewIdentity?.provider &&
+      candidate.identity.contentType === templatePreviewIdentity?.contentType &&
+      candidate.identity.contentId === templatePreviewIdentity?.contentId,
+    );
+    const candidateProductSlug = selectedTemplateCandidate?.storefrontHref
+      ?.match(/\/product\/([^/?#]+)/)?.[1];
+    const candidateCategorySlug = selectedTemplateCandidate?.storefrontHref
+      ?.match(/\/product-category\/([^/?#]+)/)?.[1];
     const productSlug = individualBuilderContext?.slug ??
+      candidateProductSlug ??
+      searchParams.get("product") ??
       (templateBuilderContext?.family === "product" ? previewProducts[0]?.slug : undefined);
     if (headerContextState.page === "product-single" && productSlug) {
       params.set("product", productSlug);
+    }
+    if (headerContextState.page === "product-category" && (categorySlug || candidateCategorySlug)) {
+      params.set("category", categorySlug || candidateCategorySlug!);
     }
     if (themePreviewRevision > 0) params.set("themeRevision", String(themePreviewRevision));
     if (!websiteId) {
@@ -3014,7 +3043,10 @@ export default function DashboardBuilder({
     headerContextState.page,
     individualBuilderContext?.slug,
     previewProducts,
+    searchParams,
     templateBuilderContext?.family,
+    templatePreviewCandidates,
+    templatePreviewIdentity,
     iframeDiagnosticMode,
     themePreviewRevision,
     websiteId,
@@ -3537,8 +3569,13 @@ export default function DashboardBuilder({
       customPages.map((page) => ({
         key: page.key,
         slug: page.slug,
+        systemRole: page.systemRole,
       })),
     [customPages],
+  );
+  const systemRouteAliases = useMemo(
+    () => getSystemRouteAliases(shellSettings),
+    [shellSettings.menuItems, shellSettings.namedMenus],
   );
   const resolvedHeaderSettings = useMemo<HeaderSettings>(
     () => ({
@@ -12287,7 +12324,7 @@ export default function DashboardBuilder({
           <div className="builder-document-actions" aria-label="Document actions">
             {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
               <label className="builder-template-preview-select">
-                <span>Preview {builderEditorContext.content.family === "product" ? "Product" : "Post"}</span>
+                <span>Preview {builderEditorContext.content.family ? ({ product: "Product", post: "Post", "product-category": "Product Category", "post-category": "Post Category" } as const)[builderEditorContext.content.family] : "Content"}</span>
                 {templatePreviewCandidates.length ? (
                   <select
                     value={templatePreviewIdentity?.contentId ?? builderEditorContext.content.identity?.contentId ?? ""}
@@ -12300,7 +12337,7 @@ export default function DashboardBuilder({
                       <option key={`${candidate.identity.provider}:${candidate.identity.contentType}:${candidate.identity.contentId}`} value={candidate.identity.contentId}>{candidate.label}</option>
                     ))}
                   </select>
-                ) : <small>No live {builderEditorContext.content.family === "product" ? "products" : "posts"} available</small>}
+                ) : <small>No live {builderEditorContext.content.family ? ({ product: "products", post: "posts", "product-category": "product categories", "post-category": "post categories" } as const)[builderEditorContext.content.family] : "content"} available</small>}
               </label>
             ) : null}
             {sidebarTab !== "globalStyles" ? (
@@ -12649,6 +12686,8 @@ export default function DashboardBuilder({
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
         websiteId={websiteId}
+        wordpressOrigin={wordpressMediaOrigin}
+        wordpressSiteUrl={wordpressSiteUrl}
         dashboardTheme={dashboardTheme}
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
@@ -12816,6 +12855,7 @@ export default function DashboardBuilder({
             <ScopedPreviewLinkRouter
               websiteId={websiteRouteSegment}
               pages={scopedPreviewPages}
+              systemRouteAliases={systemRouteAliases}
               mode="builder"
               scopeSelector='[data-builder-editable-canvas="true"]'
               onNavigate={handleScopedBuilderNavigate}
@@ -15030,6 +15070,7 @@ function PreviewCanvas({
                     </div>
                     <PreviewSection
                       device={device}
+                      page={page}
                       section={section}
                       shellSettings={shellSettings}
                       previewProducts={previewProducts}
@@ -17380,6 +17421,7 @@ const previewSectionPropsEqual = (
 
 const PreviewSection = memo(function PreviewSection({
   device,
+  page,
   section,
   shellSettings,
   previewProducts,
@@ -17450,6 +17492,7 @@ const PreviewSection = memo(function PreviewSection({
   nestedOwnerColumnKey = null,
 }: {
   device: PreviewDevice;
+  page: BuilderLayoutKey;
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
   previewProducts: ProductNode[];
@@ -18355,6 +18398,7 @@ const PreviewSection = memo(function PreviewSection({
                   <div className="builder-nested-layout">
                     <PreviewSection
                       device={device}
+                      page={page}
                       section={nestedSection}
                       shellSettings={shellSettings}
                       previewProducts={previewProducts}

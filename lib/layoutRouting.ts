@@ -23,8 +23,11 @@ export type SingularRouteContext = {
   taxonomyTerms: readonly RouteTaxonomyTerm[];
 };
 
-/** Future view families are explicit without pretending they are implemented. */
-export type CanonicalRouteContext = SingularRouteContext;
+export type ArchiveRouteContext = Omit<SingularRouteContext, "view"> & {
+  view: "archive";
+};
+
+export type CanonicalRouteContext = SingularRouteContext | ArchiveRouteContext;
 
 export type StableContentIdentity = Readonly<{
   provider: string;
@@ -132,7 +135,7 @@ export type RoutingTemplate = {
   enabled: boolean;
   /** Lower order wins. Registry position breaks equal-order ties deterministically. */
   order: number;
-  view: "singular";
+  view: "singular" | "archive";
   conditions: readonly SingularTemplateCondition[];
   layoutId: LayoutDocumentId;
 };
@@ -166,7 +169,7 @@ export function sameContentIdentity(
 }
 
 function conditionMatches(
-  context: SingularRouteContext,
+  context: CanonicalRouteContext,
   condition: SingularTemplateCondition,
 ) {
   if (condition.subject === "content-type") {
@@ -178,6 +181,14 @@ function conditionMatches(
   return context.taxonomyTerms.some(
     (term) => term.taxonomy === condition.taxonomy && term.id === condition.termId,
   );
+}
+
+/** Entity → relationship/taxonomy → global type. Order only breaks ties. */
+export function routingTemplateSpecificity(template: RoutingTemplate) {
+  const includes = template.conditions.filter((condition) => condition.operator === "include");
+  if (includes.some((condition) => condition.subject === "content-identity")) return 3;
+  if (includes.some((condition) => condition.subject === "taxonomy-term")) return 2;
+  return 1;
 }
 
 export function routingTemplateMatches(
@@ -202,7 +213,11 @@ export function resolveLayout(input: LayoutResolverInput): LayoutResolution {
   const template = input.routingTemplates
     .map((item, registryIndex) => ({ item, registryIndex }))
     .filter(({ item }) => routingTemplateMatches(input.context, item))
-    .sort((left, right) => left.item.order - right.item.order || left.registryIndex - right.registryIndex)[0]
+    .sort((left, right) =>
+      routingTemplateSpecificity(right.item) - routingTemplateSpecificity(left.item) ||
+      left.item.order - right.item.order ||
+      left.registryIndex - right.registryIndex,
+    )[0]
     ?.item;
   if (template) {
     return { outcome: "routing-template", layoutId: template.layoutId, template };
@@ -238,6 +253,34 @@ export function createLegacyPostSingleRoutingTemplate(
     order: 0,
     view: "singular",
     conditions: [{ subject: "content-type", operator: "include", contentType: "post" }],
+    layoutId,
+  };
+}
+
+export function createLegacyProductCategoryRoutingTemplate(
+  layoutId: LayoutDocumentId,
+): RoutingTemplate {
+  return {
+    id: parseRoutingTemplateId("routing:legacy-product-category"),
+    name: "Global Product Category",
+    enabled: true,
+    order: 20,
+    view: "archive",
+    conditions: [{ subject: "content-type", operator: "include", contentType: "product-category" }],
+    layoutId,
+  };
+}
+
+export function createLegacyPostCategoryRoutingTemplate(
+  layoutId: LayoutDocumentId,
+): RoutingTemplate {
+  return {
+    id: parseRoutingTemplateId("routing:legacy-post-category"),
+    name: "Global Post Category",
+    enabled: true,
+    order: 30,
+    view: "archive",
+    conditions: [{ subject: "content-type", operator: "include", contentType: "post-category" }],
     layoutId,
   };
 }

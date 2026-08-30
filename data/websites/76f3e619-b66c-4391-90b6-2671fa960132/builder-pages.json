@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "wordpress-page:1416",
+    "key": "page:new-in",
+    "title": "New In",
+    "slug": "new-in",
+    "systemRole": "shop",
+    "sourceDatabaseId": 1416,
+    "updatedAt": "2026-08-30T00:00:00.000Z"
+  }
+]

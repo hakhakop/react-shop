@@ -14,6 +14,7 @@ import {
 } from "@/lib/individualBuilderContext.server";
 import {
   resolveLayout,
+  type CanonicalRouteContext,
   type LayoutResolution,
   type SingularRouteContext,
   type StableContentIdentity,
@@ -21,6 +22,8 @@ import {
 import {
   ensurePostSingleRoutingCompatibility,
   ensureProductSingleRoutingCompatibility,
+  ensureProductCategoryRoutingCompatibility,
+  ensurePostCategoryRoutingCompatibility,
   type LayoutRoutingRegistry,
 } from "@/lib/layoutRoutingStore.server";
 import {
@@ -260,8 +263,8 @@ export async function resolveBuilderEditorSession(input: {
 
 type EditableRequest =
   | {
-      kind: "singular";
-      context: SingularRouteContext;
+      kind: "dynamic" | "singular";
+      context: CanonicalRouteContext;
       storefrontHref?: string;
       label?: string;
     }
@@ -271,7 +274,7 @@ type EditableRequest =
     };
 
 async function canonicalRegistry(
-  context: SingularRouteContext,
+  context: CanonicalRouteContext,
   scope: BuilderDataScope,
 ): Promise<LayoutRoutingRegistry | null> {
   if (context.provider === "woocommerce" && context.contentType === "product") {
@@ -280,13 +283,19 @@ async function canonicalRegistry(
   if (context.provider === "wordpress" && context.contentType === "post") {
     return ensurePostSingleRoutingCompatibility(scope);
   }
+  if (context.provider === "woocommerce" && context.contentType === "product-category") {
+    return ensureProductCategoryRoutingCompatibility(scope);
+  }
+  if (context.provider === "wordpress" && context.contentType === "post-category") {
+    return ensurePostCategoryRoutingCompatibility(scope);
+  }
   return null;
 }
 
 export async function getEditableLayoutTargetForCurrentRequest(input: {
   request: EditableRequest;
   scope?: BuilderDataScope;
-  readRegistry?: (context: SingularRouteContext, scope: BuilderDataScope) => Promise<LayoutRoutingRegistry | null>;
+  readRegistry?: (context: CanonicalRouteContext, scope: BuilderDataScope) => Promise<LayoutRoutingRegistry | null>;
 }): Promise<EditableLayoutTarget | null> {
   const scope = input.scope ?? {};
   if (input.request.kind === "page") {
@@ -321,10 +330,12 @@ export async function getEditableLayoutTargetForCurrentRequest(input: {
   }
   if (resolution.outcome === "routing-template") {
     return {
-      label:
-        input.request.context.contentType === "post"
-          ? "Edit Single Post Template"
-          : "Edit Product Template",
+      label: ({
+        post: "Edit Single Post Template",
+        product: "Edit Product Template",
+        "product-category": "Edit Product Category Template",
+        "post-category": "Edit Post Category Template",
+      } as const)[input.request.context.contentType as "post" | "product" | "product-category" | "post-category"] ?? "Edit Product Template",
       targetKind: "routing-template",
       builderHref: builderHref(scope, {
         document: resolution.layoutId,
@@ -332,6 +343,9 @@ export async function getEditableLayoutTargetForCurrentRequest(input: {
         previewProvider: identity.provider,
         previewContentType: identity.contentType,
         previewContentId: identity.contentId,
+        ...(input.request.context.contentType === "product-category"
+          ? { category: input.request.context.slug }
+          : {}),
       }),
       effectiveSource: resolution.outcome,
       documentId: resolution.layoutId,
@@ -340,10 +354,15 @@ export async function getEditableLayoutTargetForCurrentRequest(input: {
     };
   }
   if (resolution.outcome === "native-fallback") {
+    const category = input.request.context.contentType.endsWith("-category");
     return {
-      label: "Create Layout",
+      label: input.request.context.contentType === "product-category"
+        ? "Create Global Product Category Template"
+        : input.request.context.contentType === "post-category"
+          ? "Create Global Post Category Template"
+          : "Create Layout",
       targetKind: "content-management",
-      builderHref: managementHref(scope, "content"),
+      builderHref: managementHref(scope, category ? "templates" : "content"),
       effectiveSource: resolution.outcome,
       individualIdentity: identity,
     };

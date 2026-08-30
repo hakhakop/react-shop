@@ -19,6 +19,8 @@ import {
 } from "@/lib/builderLayoutDocuments.server";
 import {
   ensurePostSingleRoutingCompatibility,
+  ensurePostCategoryRoutingCompatibility,
+  ensureProductCategoryRoutingCompatibility,
   ensureProductSingleRoutingCompatibility,
   getBuilderLayoutByDocumentId,
   mutateLayoutRoutingRegistry,
@@ -38,9 +40,11 @@ const GENERATED_TEMPLATE_ID = /^routing:template:([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0
 const COMPATIBILITY_TEMPLATE_IDS = new Set([
   "routing:legacy-product-single",
   "routing:legacy-post-single",
+  "routing:legacy-product-category",
+  "routing:legacy-post-category",
 ]);
 
-export type RoutingTemplateContentType = "product" | "post";
+export type RoutingTemplateContentType = "product" | "post" | "product-category" | "post-category";
 
 export class InvalidRoutingTemplateRequestError extends Error {}
 export class RoutingTemplateNotFoundError extends Error {}
@@ -98,8 +102,8 @@ function contentTypeOf(template: RoutingTemplate): RoutingTemplateContentType | 
       ? [condition.contentType]
       : [],
   );
-  return values.length === 1 && (values[0] === "product" || values[0] === "post")
-    ? values[0]
+  return values.length === 1 && ["product", "post", "product-category", "post-category"].includes(values[0] ?? "")
+    ? values[0] as RoutingTemplateContentType
     : null;
 }
 
@@ -125,7 +129,7 @@ function validateConditions(
       throw new InvalidRoutingTemplateRequestError("Invalid condition operator.");
     }
     if (condition.subject === "content-type") {
-      if (condition.contentType !== "product" && condition.contentType !== "post") {
+      if (!["product", "post", "product-category", "post-category"].includes(condition.contentType)) {
         throw new InvalidRoutingTemplateRequestError("Unsupported routing content type.");
       }
       if (condition.operator === "include" && condition.contentType === contentType) {
@@ -152,7 +156,7 @@ function validateConditions(
   }
   if (matchingTypeConditions !== 1) {
     throw new InvalidRoutingTemplateRequestError(
-      `A Single ${contentType === "product" ? "Product" : "Post"} template requires one matching include condition.`,
+      `A ${contentType} template requires one matching include condition.`,
     );
   }
   if (positiveIdentityConditions > 1) {
@@ -169,7 +173,9 @@ function normalizeOrder(templates: readonly RoutingTemplate[]) {
 
 async function compatibilityRegistry(scope: BuilderDataScope) {
   await ensureProductSingleRoutingCompatibility(scope);
-  return ensurePostSingleRoutingCompatibility(scope);
+  await ensurePostSingleRoutingCompatibility(scope);
+  await ensureProductCategoryRoutingCompatibility(scope);
+  return ensurePostCategoryRoutingCompatibility(scope);
 }
 
 export function createRoutingTemplatesService(
@@ -272,8 +278,8 @@ export function createRoutingTemplatesService(
       layout?: DynamicBuilderDocumentCreateInput;
       starter?: RoutingTemplateStarter;
     }) {
-      if (input.contentType !== "product" && input.contentType !== "post") {
-        throw new InvalidRoutingTemplateRequestError("Only Single Product and Single Post are supported.");
+      if (!["product", "post", "product-category", "post-category"].includes(input.contentType)) {
+        throw new InvalidRoutingTemplateRequestError("Unsupported Routing Template content type.");
       }
       const name = cleanName(input.name);
       const conditions = validateConditions(input.contentType, input.conditions);
@@ -288,7 +294,7 @@ export function createRoutingTemplatesService(
         name,
         enabled: input.enabled ?? true,
         order: registry.routingTemplates.length * 10,
-        view: "singular",
+        view: input.contentType.endsWith("-category") ? "archive" : "singular",
         conditions,
         layoutId: document.documentId,
       };

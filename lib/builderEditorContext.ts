@@ -39,7 +39,7 @@ export type BuilderEditorContext = {
   };
   content: {
     mode: "none" | "preview" | "fixed";
-    family?: "product" | "post";
+    family?: "product" | "post" | "product-category" | "post-category";
     identity?: StableContentIdentity;
     label?: string;
     availability?: "published" | "unpublished" | "unknown" | "missing";
@@ -65,7 +65,7 @@ export type BuilderEditorContext = {
 };
 
 export type EditableLayoutTarget = {
-  label: "Edit Individual Layout" | "Edit Single Post Template" | "Edit Product Template" | "Create Layout" | "Edit Page";
+  label: "Edit Individual Layout" | "Edit Single Post Template" | "Edit Product Template" | "Edit Product Category Template" | "Edit Post Category Template" | "Create Layout" | "Create Global Product Category Template" | "Create Global Post Category Template" | "Edit Page";
   targetKind: "individual" | "routing-template" | "content-management" | "page";
   builderHref: string;
   effectiveSource: BuilderEditorLayoutSource | "page";

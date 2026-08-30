@@ -7,6 +7,7 @@ import {
   type DynamicItemContext,
 } from "@/lib/dynamicContent";
 import {
+  composeDynamicContentDescriptorWithInheritedContext,
   resolveDynamicContentContexts,
   type DynamicContentProviderInput,
 } from "@/lib/dynamicContentProviders.server";
@@ -87,11 +88,15 @@ const resolveInheritedDescriptor = (
   const relationRoot = typeof field.name === "string" ? field.name : "";
   const parentRelation = query.parentRelation === true || (legacyParent && Boolean(relationRoot));
   if (legacyParent && !parentRelation) return undefined;
-  if (!parentRelation) return descriptor;
+  if (!parentRelation) {
+    return composeDynamicContentDescriptorWithInheritedContext(descriptor, inheritedContext);
+  }
 
   const databaseId = getDynamicItemContextValue(inheritedContext, "databaseId", "identifier");
   const graphqlRoot = typeof query.graphqlRoot === "string" ? query.graphqlRoot : relationRoot;
-  if (!graphqlRoot || databaseId === undefined) return descriptor;
+  if (!graphqlRoot || databaseId === undefined) {
+    return composeDynamicContentDescriptorWithInheritedContext(descriptor, inheritedContext);
+  }
   const relationArguments = asDataRecord(field.arguments);
   const relationStart = typeof relationArguments.offset === "number"
     ? relationArguments.offset
@@ -99,7 +104,7 @@ const resolveInheritedDescriptor = (
   const relationQuantity = typeof relationArguments.limit === "number"
     ? relationArguments.limit
     : undefined;
-  return {
+  return composeDynamicContentDescriptorWithInheritedContext({
     provider: "wordpress",
     source: "content",
     mode: "collection",
@@ -120,7 +125,7 @@ const resolveInheritedDescriptor = (
         },
       },
     } as DynamicContentContextDescriptor["query"],
-  };
+  }, inheritedContext);
 };
 
 async function resolveInheritedContext(
@@ -130,7 +135,9 @@ async function resolveInheritedContext(
   resolveContexts: DynamicContentContextResolver,
 ) {
   if (!descriptor) return inheritedContext;
-  const contexts = await resolveContexts({ website, descriptor });
+  const resolvedDescriptor = resolveInheritedDescriptor(descriptor, inheritedContext);
+  if (!resolvedDescriptor) return inheritedContext;
+  const contexts = await resolveContexts({ website, descriptor: resolvedDescriptor });
   return contexts[0];
 }
 
@@ -215,7 +222,7 @@ async function expandStructuralNode<Node extends StructuralNode>(
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
 ): Promise<Array<{ node: Node; context?: DynamicItemContext }>> {
-  const descriptor = node.dynamicContext;
+  const descriptor = resolveInheritedDescriptor(node.dynamicContext, inheritedContext);
   if (!descriptor) return [{ node, context: inheritedContext }];
   const contexts = await resolveContexts({
     website,
@@ -376,12 +383,12 @@ async function materializeElementBlock(
   inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
   if (block.kind === "products") {
-    const productDescriptor = block.dynamicContext ?? {
+    const productDescriptor = resolveInheritedDescriptor(block.dynamicContext ?? {
       provider: "woocommerce",
       source: "product",
       mode: "collection" as const,
       query: { quantity: 8 },
-    };
+    }, inheritedContext)!;
     try {
       const contexts = await resolveContexts({ website, descriptor: productDescriptor });
       if (productDescriptor.mode !== "collection") {
@@ -441,12 +448,12 @@ async function materializeGridBlock(
     try {
       const contexts = await resolveContexts({
         website,
-        descriptor: {
+        descriptor: resolveInheritedDescriptor({
           provider: "woocommerce",
           source: "product",
           mode: "collection",
           query: { quantity },
-        },
+        }, inheritedContext)!,
       });
       const gridItems: GridItem[] = contexts.slice(0, quantity).map((context, index) => {
         const image = getDynamicItemContextValue(context, "image", "media");

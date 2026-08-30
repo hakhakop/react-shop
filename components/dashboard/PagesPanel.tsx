@@ -258,7 +258,7 @@ export default function PagesPanel({
                   <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
                   <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
                     <strong>{page.title}</strong>
-                    <span>/{page.slug}</span>
+                    <span>/{page.slug}{page.systemRole ? ` · ${page.systemRole === "shop" ? "Shop Page" : page.systemRole}` : ""}</span>
                   </button>
                   <span
                     className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}

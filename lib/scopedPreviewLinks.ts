@@ -1,10 +1,16 @@
 import type { BuilderCustomPage, BuilderLayoutKey } from "@/lib/builderLayouts";
+import {
+  resolveNavigationRouteAlias,
+  resolveSystemRouteAlias,
+  type NavigationRouteAlias,
+} from "@/lib/navigationTargets";
 
-export type ScopedPreviewPage = Pick<BuilderCustomPage, "key" | "slug">;
+export type ScopedPreviewPage = Pick<BuilderCustomPage, "key" | "slug" | "systemRole">;
 
 export type ScopedWebsiteLinkContext = {
   websiteId: string;
   pages?: ScopedPreviewPage[];
+  systemRouteAliases?: NavigationRouteAlias[];
 };
 
 function isExternalOrSpecialHref(href: string) {
@@ -57,6 +63,7 @@ function isSaaSRoute(path: string) {
 export function getBuilderPageKeyForHref(
   href: string | null | undefined,
   pages: Array<{ key: string; slug?: string }> = [],
+  systemRouteAliases: readonly NavigationRouteAlias[] = [],
 ): BuilderLayoutKey | null {
   if (!href) return null;
 
@@ -83,6 +90,12 @@ export function getBuilderPageKeyForHref(
   const { path } = normalizeHrefPath(trimmed);
   if (isSaaSRoute(path)) return null;
 
+  const routeAlias = resolveNavigationRouteAlias(path, systemRouteAliases);
+  const aliasedPage = routeAlias?.pageKey === "product-category" || routeAlias?.pageKey === "product-single"
+    ? routeAlias.pageKey
+    : resolveSystemRouteAlias(path, systemRouteAliases.filter((alias) => alias.pageKey !== "product-category" && alias.pageKey !== "product-single"));
+  if (aliasedPage) return aliasedPage;
+
   if (path === "/") return "home";
   if (path === "/shop") return "shop";
   if (path === "/client") return "client";
@@ -92,6 +105,7 @@ export function getBuilderPageKeyForHref(
   if (path === "/search") return "search-results";
   if (path === "/categories") return "product-category";
   if (path.startsWith("/category/")) return "product-category-specific";
+  if (path.startsWith("/product-category/")) return "product-category";
   if (path === "/product" || path.startsWith("/product/")) {
     return "product-single";
   }
@@ -115,6 +129,7 @@ export function getBuilderPageKeyForTenantPath(
   pathname: string | null | undefined,
   pages: Array<{ key: string; slug?: string }> = [],
   tenantRouteSegment?: string | null,
+  systemRouteAliases: readonly NavigationRouteAlias[] = [],
 ) {
   const rawPath = pathname?.trim() || "/";
   const normalizedPath = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
@@ -126,7 +141,7 @@ export function getBuilderPageKeyForTenantPath(
     ? normalizedPath.slice(encodedTenant.length) || "/"
     : normalizedPath;
 
-  return getBuilderPageKeyForHref(tenantRelativePath, pages);
+  return getBuilderPageKeyForHref(tenantRelativePath, pages, systemRouteAliases);
 }
 
 export function getPreviewActivePathForPageKey(pageKey: BuilderLayoutKey) {
@@ -192,6 +207,7 @@ export function resolveTenantPathHref(
 ) {
   const websiteId = typeof context === "string" ? context : context.websiteId;
   const pages = typeof context === "string" ? [] : context.pages ?? [];
+  const systemRouteAliases = typeof context === "string" ? [] : context.systemRouteAliases ?? [];
   if (!href) return "#";
 
   const trimmed = href.trim();
@@ -212,7 +228,7 @@ export function resolveTenantPathHref(
   const dynamicSinglePath = /^\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/i.test(path);
   if (
     isExternalOrSpecialHref(trimmed) ||
-    (!getBuilderPageKeyForHref(trimmed, pages) && !dynamicSinglePath)
+    (!getBuilderPageKeyForHref(trimmed, pages, systemRouteAliases) && !dynamicSinglePath)
   ) {
     return href;
   }
@@ -234,21 +250,36 @@ function resolveScopedWebsiteHref(
 ) {
   const websiteId = typeof context === "string" ? context : context.websiteId;
   const pages = typeof context === "string" ? [] : context.pages ?? [];
+  const systemRouteAliases = typeof context === "string" ? [] : context.systemRouteAliases ?? [];
   if (!href) return "#";
 
   const trimmed = href.trim();
   if (!trimmed || trimmed === "#" || trimmed.startsWith("#")) return href;
 
-  const pageKey = getBuilderPageKeyForHref(trimmed, pages);
+  const pageKey = getBuilderPageKeyForHref(trimmed, pages, systemRouteAliases);
   if (!pageKey) return href;
 
   const { hash } = normalizeHrefPath(trimmed);
-  const previewPage =
-    pageKey.startsWith("page:") ? pageKey.slice("page:".length) : pageKey;
+  const assignedPage = pageKey === "shop"
+    ? pages.find((page) => page.systemRole === "shop")
+    : undefined;
+  const effectivePageKey = mode === "builder" && assignedPage ? assignedPage.key : pageKey;
+  const previewPage = mode === "builder"
+    ? effectivePageKey
+    : effectivePageKey.startsWith("page:")
+      ? effectivePageKey.slice("page:".length)
+      : effectivePageKey;
   const params = new URLSearchParams({ page: previewPage });
   const { path } = normalizeHrefPath(trimmed);
+  const routeAlias = resolveNavigationRouteAlias(path, systemRouteAliases);
 
-  if (path.startsWith("/product/")) {
+  if (routeAlias?.pageKey === "product-category" && routeAlias.target.slug) {
+    params.set("category", routeAlias.target.slug);
+  }
+
+  if (routeAlias?.pageKey === "product-single" && routeAlias.target.slug) {
+    params.set("product", routeAlias.target.slug);
+  } else if (path.startsWith("/product/")) {
     const productSlug = path.replace(/^\/product\/+/, "").split("/")[0];
     if (productSlug) params.set("product", productSlug);
   }

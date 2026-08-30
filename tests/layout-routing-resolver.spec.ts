@@ -6,6 +6,7 @@ import {
   parseRoutingTemplateId,
   resolveLayout,
   type IndividualLayoutOverride,
+  type ArchiveRouteContext,
   type RoutingTemplate,
   type SingularRouteContext,
 } from "@/lib/layoutRouting";
@@ -164,3 +165,36 @@ test("existing product-single document is representable without renderer changes
   })).toMatchObject({ outcome: "routing-template", layoutId: productLayout });
 });
 
+test("archive routing prefers taxonomy-specific conditions over global conditions", () => {
+  const context: ArchiveRouteContext = {
+    view: "archive",
+    provider: "woocommerce",
+    contentType: "product-category",
+    contentId: "gid://woocommerce/product-category/24",
+    databaseId: 24,
+    slug: "clothing",
+    uri: "/product-category/women/clothing/",
+    taxonomyTerms: [{ taxonomy: "product_cat", id: "24", slug: "clothing" }],
+  };
+  const global = template({
+    id: parseRoutingTemplateId("routing:global-product-category"),
+    layoutId: productLayout,
+    view: "archive",
+    order: 0,
+    conditions: [{ subject: "content-type", operator: "include", contentType: "product-category" }],
+  });
+  const taxonomy = template({
+    id: parseRoutingTemplateId("routing:clothing-category"),
+    layoutId: individualLayout,
+    view: "archive",
+    order: 999,
+    conditions: [{ subject: "taxonomy-term", operator: "include", taxonomy: "product_cat", termId: "24" }],
+  });
+
+  expect(resolveLayout({
+    context,
+    individualOverrides: [],
+    routingTemplates: [global, taxonomy],
+    nativeFallbackAvailable: false,
+  })).toMatchObject({ outcome: "routing-template", layoutId: individualLayout });
+});

@@ -8,6 +8,7 @@ import StorefrontBuilderRenderer, {
 import type { ReactNode } from "react";
 import {
   getPublishedBuilderLayout,
+  getBuilderPageBySystemRole,
   isBuilderCustomPageKey,
   normalizeBuilderLayoutKey,
   readBuilderCustomPages,
@@ -42,6 +43,16 @@ import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMat
 import type { DynamicItemContext } from "@/lib/dynamicContent";
 import BuilderIframeSelectionBridge from "@/components/builder/BuilderIframeSelectionBridge";
 import BuilderDocumentRuntime from "@/components/builder/BuilderDocumentRuntime";
+import {
+  getNavigationRouteAliases,
+  resolveCommerceRouteCandidate,
+  resolveNavigationRouteAlias,
+  resolveSystemRouteAlias,
+} from "@/lib/navigationTargets";
+import DefaultShopSurface from "@/components/website/DefaultShopSurface";
+import { resolveCommerceRouteProjection } from "@/lib/commerceRouteProjection.server";
+import type { CommerceRouteAlias } from "@/lib/navigationTargets";
+import { getShopProducts } from "@/lib/shopProducts.server";
 
 type WebsiteFrontendMode = "preview" | "domain" | "tenant-path";
 
@@ -247,19 +258,51 @@ export default async function WebsiteFrontend({
   await ensureWebsiteBuilderData(website.id);
 
   const scope = { websiteId: website.id };
-  const customPages = await readBuilderCustomPages(scope);
-  const scopedPreviewPages = customPages.map((item) => ({
-    key: item.key,
-    slug: item.slug,
-  }));
-  const websiteRouteSegment = getWebsiteRouteSegment(website);
-  const page = resolveWebsitePageKey(requestedPage, customPages);
-
-  const [layout, baseShellSettings, themeSettings] = await Promise.all([
-    layoutOverride ?? getPublishedBuilderLayout(page, scope),
+  const [customPages, baseShellSettings, themeSettings] = await Promise.all([
+    readBuilderCustomPages(scope),
     getBuilderShellSettings(scope),
     getBuilderThemeSettings(scope),
   ]);
+  const scopedPreviewPages = customPages.map((item) => ({
+    key: item.key,
+    slug: item.slug,
+    systemRole: item.systemRole,
+  }));
+  const websiteRouteSegment = getWebsiteRouteSegment(website);
+  const systemRouteAliases = getNavigationRouteAliases(baseShellSettings);
+  const tenantRelativeRequest = requestedPage === websiteRouteSegment
+    ? "/"
+    : requestedPage.startsWith(`${websiteRouteSegment}/`)
+      ? `/${requestedPage.slice(websiteRouteSegment.length + 1)}`
+      : `/${requestedPage}`;
+  const routeAlias = resolveNavigationRouteAlias(tenantRelativeRequest, systemRouteAliases)
+    ?? resolveCommerceRouteCandidate(tenantRelativeRequest);
+  const resolvedPage = routeAlias?.pageKey === "product-category" || routeAlias?.pageKey === "product-single"
+    ? routeAlias.pageKey
+    : resolveSystemRouteAlias(
+        tenantRelativeRequest,
+        systemRouteAliases.filter((alias) => alias.pageKey !== "product-category" && alias.pageKey !== "product-single"),
+      ) ?? resolveWebsitePageKey(requestedPage, customPages);
+  const assignedShopPage = getBuilderPageBySystemRole(customPages, "shop");
+  const page = resolvedPage === "shop" && assignedShopPage ? assignedShopPage.key : resolvedPage;
+  const isShopPage = resolvedPage === "shop" || assignedShopPage?.key === page;
+
+  const commerceProjection = routeAlias && (
+    routeAlias.pageKey === "product-category" || routeAlias.pageKey === "product-single"
+  ) ? await resolveCommerceRouteProjection({
+      alias: routeAlias as CommerceRouteAlias,
+      website,
+      scope,
+    }) : null;
+  const layout = layoutOverride ?? commerceProjection?.layout ?? await getPublishedBuilderLayout(page, scope);
+  const shopProducts = isShopPage && layout && !rendererProps?.products
+    ? await getShopProducts(website)
+    : undefined;
+  const effectiveRendererProps = {
+    ...(shopProducts ? { products: shopProducts } : {}),
+    ...(commerceProjection?.rendererProps ?? {}),
+    ...(rendererProps ?? {}),
+  };
   const shellSettings = applyBuilderThemeSettings(baseShellSettings, themeSettings);
   const headerDocumentSettings = await getPublishedHeaderDocumentSettings(
     shellSettings,
@@ -281,12 +324,15 @@ export default async function WebsiteFrontend({
   // layout again here delays iframe readiness and duplicates every provider
   // request before that bridge can deliver the authoritative projection.
   const materialization = resolvedMediaLayout && !builderIframeSelection
-    ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
+      ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
         website,
-        rootContext: dynamicItemContextOverride,
+        rootContext: dynamicItemContextOverride ?? commerceProjection?.dynamicContext,
       })
     : null;
   const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;
+  const effectiveFallbackContent = fallbackContent ?? (
+    isShopPage ? <DefaultShopSurface website={website} /> : undefined
+  );
   materialization?.diagnostics
     .filter((diagnostic) => diagnostic.status === "fallback")
     .forEach((diagnostic) => {
@@ -298,7 +344,7 @@ export default async function WebsiteFrontend({
   // first publish. The iframe must still mount the canonical renderer so it
   // can receive that draft snapshot; returning the not-found shell here would
   // prevent StorefrontBuilderRenderer's draft bridge from ever mounting.
-  const mountDraftPreview = builderIframeSelection && !hasVisibleLayout && !fallbackContent;
+  const mountDraftPreview = builderIframeSelection && !hasVisibleLayout && !effectiveFallbackContent;
   const draftPreviewLayout: BuilderLayout = {
     version: 1,
     key: page,
@@ -308,7 +354,7 @@ export default async function WebsiteFrontend({
     updatedAt: new Date(0).toISOString(),
   };
 
-  if (!hasVisibleLayout && !fallbackContent && !mountDraftPreview) {
+  if (!hasVisibleLayout && !effectiveFallbackContent && !mountDraftPreview) {
     return (
       <main className="page">
         <h1 className="page-title">Page not found</h1>
@@ -334,6 +380,7 @@ export default async function WebsiteFrontend({
         <ScopedPreviewLinkRouter
           websiteId={websiteRouteSegment}
           pages={scopedPreviewPages}
+          systemRouteAliases={systemRouteAliases}
           mode={isTenantPath ? "tenant-path" : "preview"}
         />
       )}
@@ -367,16 +414,16 @@ export default async function WebsiteFrontend({
               <StorefrontBuilderRenderer
                 layout={renderLayout ?? draftPreviewLayout}
                 page={page}
-                pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+                pageLabel={pageLabelOverride ?? commerceProjection?.pageLabel ?? pageLabel(page, customPages)}
                 website={website}
                 headerOverlay={headerDocumentSettings.overlay}
-                {...rendererProps}
-                builderInteractionIdentity={builderIframeSelection || rendererProps?.builderInteractionIdentity}
+                {...effectiveRendererProps}
+                builderInteractionIdentity={builderIframeSelection || effectiveRendererProps.builderInteractionIdentity}
                 shellSettings={shellSettings}
                 documentRuntimeOwnedExternally
               />
             ) : (
-              fallbackContent
+              effectiveFallbackContent
             )}
             <FooterShell
               website={website}

@@ -201,6 +201,7 @@ export default function FrontendAdminBar({
       setRoutedContentTarget(null);
       try {
         const params = new URLSearchParams({ href: window.location.href });
+        if (scopedWebsiteId) params.set("websiteId", scopedWebsiteId);
         const response = await fetch(
           `/api/builder-editor-context?${params.toString()}`,
           { cache: "no-store" },
@@ -217,7 +218,7 @@ export default function FrontendAdminBar({
     return () => {
       cancelled = true;
     };
-  }, [pathname, saasUser]);
+  }, [pathname, saasUser, scopedWebsiteId]);
 
   useEffect(() => {
     if (!scopedWebsiteId || !saasUser) {

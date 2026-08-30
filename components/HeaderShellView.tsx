@@ -34,6 +34,7 @@ import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderMenuSourceItems } from "@/lib/headerMenuSources";
+import { getNavigationRouteAliases } from "@/lib/navigationTargets";
 import {
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
@@ -142,7 +143,7 @@ type HeaderShellViewProps = {
   clientHref?: string;
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
-  scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
+  scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug" | "systemRole">[];
   scopedLinkMode?: "builder" | "preview" | "tenant-path";
   hideSaaSEntry?: boolean;
   categoriesContent?: ReactNode;
@@ -583,6 +584,7 @@ export default function HeaderShellView({
         scopedPreviewWebsiteId={scopedPreviewWebsiteId}
         activePageKey={scopedPreviewPage}
         scopedPreviewPages={scopedPreviewPages}
+        systemRouteAliases={getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings)}
         scopedLinkMode={scopedLinkMode}
         activeContentLanguage={activeContentLanguage}
         dropdownIndicator={dropdownIndicator}

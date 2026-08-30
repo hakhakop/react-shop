@@ -18,6 +18,7 @@ import { createContentDiscoveryService } from "@/lib/contentDiscovery.server";
 import {
   builderLayoutDocumentId,
   parseRoutingTemplateId,
+  type ArchiveRouteContext,
   type SingularRouteContext,
 } from "@/lib/layoutRouting";
 import type { LayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
@@ -223,6 +224,39 @@ test("editable target projection uses canonical route identity and resolved layo
     documentId: postLayout,
     routingTemplateId: postTemplate.id,
   });
+
+  const categoryRoute: ArchiveRouteContext = {
+    view: "archive",
+    provider: "woocommerce",
+    contentType: "product-category",
+    contentId: "24",
+    databaseId: 24,
+    slug: "clothing",
+    uri: "/product-category/women/clothing/",
+    taxonomyTerms: [{ taxonomy: "product_cat", id: "24", slug: "clothing" }],
+  };
+  const categoryLayout = builderLayoutDocumentId("product-category");
+  const categoryTemplate = {
+    ...postTemplate,
+    id: parseRoutingTemplateId("routing:test-product-category"),
+    name: "Product Category Template",
+    view: "archive" as const,
+    conditions: [{ subject: "content-type" as const, operator: "include" as const, contentType: "product-category" }],
+    layoutId: categoryLayout,
+  };
+  const category = await getEditableLayoutTargetForCurrentRequest({
+    request: { kind: "dynamic", context: categoryRoute },
+    scope,
+    readRegistry: async () => ({ version: 1, routingTemplates: [categoryTemplate], individualOverrides: [] }),
+  });
+  expect(category).toMatchObject({
+    label: "Edit Product Category Template",
+    targetKind: "routing-template",
+    documentId: categoryLayout,
+    routingTemplateId: categoryTemplate.id,
+  });
+  expect(category?.builderHref).toContain("previewContentType=product-category");
+  expect(category?.builderHref).toContain("previewContentId=24");
 
   const productTemplateRegistry: LayoutRoutingRegistry = {
     version: 1,

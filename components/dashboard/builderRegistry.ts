@@ -251,6 +251,7 @@ export const templateLabels: Record<BuilderTemplate, string> = {
   "product-single": "Single Product",
   "post-single": "Single Post",
   "product-category": "Product Category",
+  "post-category": "Post Category / Archive",
   "product-category-specific": "Specific Category",
   "search-results": "Search Results",
 };
@@ -259,6 +260,7 @@ export const templateDescriptions: Record<BuilderTemplate, string> = {
   "product-single": "Default layout for every product detail page.",
   "post-single": "Default layout for single blog posts.",
   "product-category": "Default layout for product category archive pages.",
+  "post-category": "Default layout for post category and archive pages.",
   "product-category-specific":
     "Override layout for one chosen product category.",
   "search-results": "Default layout for search result pages.",

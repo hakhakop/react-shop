@@ -11,7 +11,7 @@ import {
   getWebsiteRouteSegment,
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
-import { getWordPressMediaOrigin } from "@/lib/wordpressUrl";
+import { getWordPressBaseUrl, getWordPressMediaOrigin } from "@/lib/wordpressUrl";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
@@ -132,6 +132,7 @@ export default async function WebsiteBuilderPage({
           primaryContentLanguage={website.primaryLanguage}
           enabledContentLanguages={website.enabledLanguages}
           wordpressMediaOrigin={getWordPressMediaOrigin(website)}
+          wordpressSiteUrl={getWordPressBaseUrl(website)}
           initialPageHydration={initialPageHydration}
         />
       </Suspense>

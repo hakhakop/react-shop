@@ -27,6 +27,7 @@ export type BuilderPage = "home" | "shop" | "client" | BuilderCustomPageKey;
 export type BuilderTemplate =
   | "product-single"
   | "post-single"
+  | "post-category"
   | "product-category"
   | "product-category-specific"
   | "search-results";
@@ -699,11 +700,37 @@ export type BuilderLayout = {
 
 type BuilderLayoutStore = Partial<Record<BuilderLayoutKey, BuilderLayout>>;
 export type BuilderCustomPage = {
+  /** Stable identity; titles, slugs, and layout keys remain editable projections. */
+  id: string;
   key: BuilderCustomPageKey;
   title: string;
   slug: string;
+  systemRole?: BuilderPageSystemRole;
+  sourceDatabaseId?: number;
   updatedAt: string;
 };
+
+export const BUILDER_PAGE_SYSTEM_ROLES = [
+  "shop",
+  "cart",
+  "checkout",
+  "my-account",
+  "front-page",
+  "posts-page",
+] as const;
+
+export type BuilderPageSystemRole = typeof BUILDER_PAGE_SYSTEM_ROLES[number];
+
+export function isBuilderPageSystemRole(value: unknown): value is BuilderPageSystemRole {
+  return typeof value === "string" && BUILDER_PAGE_SYSTEM_ROLES.includes(value as BuilderPageSystemRole);
+}
+
+export function getBuilderPageBySystemRole(
+  pages: readonly BuilderCustomPage[],
+  role: BuilderPageSystemRole,
+) {
+  return pages.find((page) => page.systemRole === role) ?? null;
+}
 
 export type BuilderSavedTemplate = {
   id: string;
@@ -725,6 +752,7 @@ const pages = new Set(["home", "shop", "client"]);
 const templates = new Set([
   "product-single",
   "post-single",
+  "post-category",
   "product-category",
   "product-category-specific",
   "search-results",
@@ -873,12 +901,18 @@ export async function readBuilderCustomPages(
     const raw = await readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as BuilderCustomPage[];
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (page) =>
-        isBuilderCustomPageKey(page.key) &&
-        typeof page.title === "string" &&
-        typeof page.slug === "string",
-    );
+    return parsed.flatMap((page) => {
+      if (
+        !isBuilderCustomPageKey(page.key) ||
+        typeof page.title !== "string" ||
+        typeof page.slug !== "string"
+      ) return [];
+      return [{
+        ...page,
+        id: typeof page.id === "string" && page.id.trim() ? page.id : `legacy:${page.key}`,
+        ...(isBuilderPageSystemRole(page.systemRole) ? { systemRole: page.systemRole } : {}),
+      }];
+    });
   } catch {
     return [];
   }
@@ -888,6 +922,17 @@ export async function writeBuilderCustomPages(
   pagesToWrite: BuilderCustomPage[],
   scope: BuilderDataScope = {},
 ) {
+  const ids = new Set<string>();
+  const roles = new Set<BuilderPageSystemRole>();
+  for (const page of pagesToWrite) {
+    if (!page.id?.trim() || ids.has(page.id)) throw new Error("Builder Page IDs must be unique and non-empty.");
+    ids.add(page.id);
+    if (page.systemRole) {
+      if (!isBuilderPageSystemRole(page.systemRole)) throw new Error("Invalid Builder Page system role.");
+      if (roles.has(page.systemRole)) throw new Error(`Only one Page may be assigned to ${page.systemRole}.`);
+      roles.add(page.systemRole);
+    }
+  }
   const filePath = getBuilderPagesPath(scope.websiteId);
   console.log("[builder-scope] write builder-pages", {
     websiteId: scope.websiteId ?? null,

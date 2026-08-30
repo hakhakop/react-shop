@@ -3,7 +3,10 @@ import type {
   DynamicItemContext,
 } from "@/lib/dynamicContent";
 import { resolveWordPressPostContexts } from "@/lib/wordpressDynamicContentProvider.server";
-import { resolveWooCommerceProductContexts } from "@/lib/woocommerceDynamicContentProvider.server";
+import {
+  composeWooCommerceProductDescriptorWithInheritedContext,
+  resolveWooCommerceProductContexts,
+} from "@/lib/woocommerceDynamicContentProvider.server";
 import { resolveWordPressGenericContentContexts } from "@/lib/wordpressGenericContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
 
@@ -21,6 +24,14 @@ const providers: Readonly<Record<string, DynamicContentProvider>> = {
   "wordpress/content": resolveWordPressGenericContentContexts,
   "woocommerce/product": resolveWooCommerceProductContexts,
 };
+
+/** Provider-owned composition at the shared template inheritance boundary. */
+export function composeDynamicContentDescriptorWithInheritedContext(
+  descriptor: DynamicContentContextDescriptor,
+  inheritedContext: DynamicItemContext | undefined,
+) {
+  return composeWooCommerceProductDescriptorWithInheritedContext(descriptor, inheritedContext);
+}
 
 /** Server/data-layer orchestration. Presentation components must not call providers. */
 export async function resolveDynamicContentContexts(

@@ -15,7 +15,8 @@ test("Templates surface is a thin scoped consumer of the routing API", async () 
   expect(panel).toContain("?${params.toString()}");
   expect(panel).toContain("Single Product");
   expect(panel).toContain("Single Post");
+  expect(panel).toContain("Product Category");
+  expect(panel).toContain("Post Category / Archive");
   expect(panel).not.toContain("builder-templates");
-  expect(panel).not.toContain("archive");
   expect(panel).not.toContain("search-results");
 });

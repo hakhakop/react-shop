@@ -95,6 +95,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           primaryContentLanguage="hy"
           enabledContentLanguages={["hy", "en", "ru"]}
           wordpressMediaOrigin={getWordPressBaseUrl()}
+          wordpressSiteUrl={getWordPressBaseUrl()}
           initialPageHydration={initialPageHydration}
         />
       </Suspense>

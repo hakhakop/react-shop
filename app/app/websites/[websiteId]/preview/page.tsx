@@ -7,12 +7,12 @@ import MyAccountPageContent from "@/components/MyAccountPageContent";
 import WebsiteFrontend from "@/components/website/WebsiteFrontend";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { getStorefrontBuilderProductBySlug } from "@/lib/storefrontProduct";
 import {
   canAccessWebsiteBuilder,
   getWebsiteByIdOrSlug,
 } from "@/lib/websites";
 import { getWooCommerceConnection } from "@/lib/woocommerce";
+import { resolveCommerceRouteProjection } from "@/lib/commerceRouteProjection.server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,15 +23,17 @@ type WebsitePreviewPageProps = {
   searchParams?: Promise<{
     page?: string;
     product?: string;
+    category?: string;
     builderFrame?: string;
     builderBridge?: string;
   }>;
 };
 
-function previewPathWithSearch(websiteId: string, page?: string, product?: string) {
+function previewPathWithSearch(websiteId: string, page?: string, product?: string, category?: string) {
   const params = new URLSearchParams();
   if (page) params.set("page", page);
   if (product) params.set("product", product);
+  if (category) params.set("category", category);
   const query = params.toString();
   const path = `/app/websites/${websiteId}/preview`;
   return query ? `${path}?${query}` : path;
@@ -48,10 +50,12 @@ export default async function WebsitePreviewPage({
   ]);
   const requestedPage = query?.page ?? "home";
   const productSlug = query?.product;
+  const categorySlug = query?.category;
   const requestedPath = previewPathWithSearch(
     websiteId,
     requestedPage,
     productSlug,
+    categorySlug,
   );
 
   if (!user) {
@@ -63,10 +67,31 @@ export default async function WebsitePreviewPage({
     return <AccessDenied />;
   }
 
-  const productData =
-    requestedPage === "product-single" && productSlug
-      ? await getStorefrontBuilderProductBySlug(productSlug, {
+  const commerceSlug = requestedPage === "product-category" ? categorySlug : productSlug;
+  const commerceProjection =
+    (requestedPage === "product-category" || requestedPage === "product-single") && commerceSlug
+      ? await resolveCommerceRouteProjection({
+          alias: {
+            path: requestedPage === "product-category"
+              ? `/product-category/${commerceSlug}`
+              : `/product/${commerceSlug}`,
+            pageKey: requestedPage,
+            target: requestedPage === "product-category"
+              ? {
+                  kind: "term",
+                  taxonomy: "product_cat",
+                  slug: commerceSlug,
+                  uri: `/product-category/${commerceSlug}`,
+                }
+              : {
+                  kind: "product",
+                  postType: "product",
+                  slug: commerceSlug,
+                  uri: `/product/${commerceSlug}`,
+                },
+          },
           website,
+          scope: { websiteId: website.id },
         }).catch(() => null)
       : null;
   const connection = getWooCommerceConnection(website);
@@ -96,21 +121,14 @@ export default async function WebsitePreviewPage({
       website={website}
       requestedPage={requestedPage}
       mode="preview"
-      pageLabelOverride={productData?.product.name}
+      pageLabelOverride={commerceProjection?.pageLabel}
       rendererProps={
-        productData
-          ? {
-              breadcrumbItems: [
-                { label: "Home", href: "/" },
-                { label: "Shop", href: "/shop" },
-                { label: productData.product.name },
-              ],
-              product: productData.product,
-            }
-          : corePageContent
+        commerceProjection?.rendererProps ?? (corePageContent
             ? { pageContent: corePageContent }
-            : undefined
+            : undefined)
       }
+      layoutOverride={commerceProjection?.layout ?? undefined}
+      dynamicItemContextOverride={commerceProjection?.dynamicContext}
       fallbackContent={corePageFallback}
       builderIframeSelection={query?.builderFrame === "selection"}
       builderIframeDiagnostics={
