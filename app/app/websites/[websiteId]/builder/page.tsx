@@ -11,7 +11,7 @@ import {
   getWebsiteRouteSegment,
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getWordPressMediaOrigin } from "@/lib/wordpressUrl";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
@@ -117,7 +117,7 @@ export default async function WebsiteBuilderPage({
           website,
           contentLanguage,
           primaryContentLanguage: website.primaryLanguage,
-          wordpressMediaOrigin: getWordPressBaseUrl(website),
+          wordpressMediaOrigin: getWordPressMediaOrigin(website),
         })
       : undefined;
 
@@ -131,7 +131,7 @@ export default async function WebsiteBuilderPage({
           saasUserRole={user.role}
           primaryContentLanguage={website.primaryLanguage}
           enabledContentLanguages={website.enabledLanguages}
-          wordpressMediaOrigin={getWordPressBaseUrl(website)}
+          wordpressMediaOrigin={getWordPressMediaOrigin(website)}
           initialPageHydration={initialPageHydration}
         />
       </Suspense>

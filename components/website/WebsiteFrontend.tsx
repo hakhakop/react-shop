@@ -37,7 +37,7 @@ import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { getBuilderPageKeyForTenantPath } from "@/lib/scopedPreviewLinks";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getWordPressMediaOrigin } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
 import BuilderIframeSelectionBridge from "@/components/builder/BuilderIframeSelectionBridge";
@@ -274,7 +274,7 @@ export default async function WebsiteFrontend({
     ? { ...layout, sections: resolveContentSections(layout.sections as never, activeContentLanguage, website.primaryLanguage) as typeof layout.sections }
     : layout;
   const resolvedMediaLayout = localizedLayout
-    ? resolveBuilderMediaUrls(localizedLayout, getWordPressBaseUrl(website))
+    ? resolveBuilderMediaUrls(localizedLayout, getWordPressMediaOrigin(website))
     : localizedLayout;
   // The Builder route already owns a materialized projection and sends it to
   // its isolated iframe through the draft bridge. Materializing the published
