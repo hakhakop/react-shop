@@ -140,15 +140,16 @@ test("Routing Templates service owns atomic website-scoped lifecycle", async () 
   await expect(serviceA.get("bad-id")).rejects.toBeInstanceOf(InvalidRoutingTemplateRequestError);
   await expect(serviceA.reorder([...(await serviceA.list()).map((item) => item.id), sharedId]))
     .rejects.toBeInstanceOf(InvalidRoutingTemplateRequestError);
-  await expect(serviceA.create({
-    name: "Ambiguous",
+  const groupedAssignment = await serviceA.create({
+    name: "Grouped assignment",
     contentType: "product",
     conditions: [
       { subject: "content-type", operator: "include", contentType: "product" },
       { subject: "content-identity", operator: "include", identity: productContext },
       { subject: "taxonomy-term", operator: "include", taxonomy: "category", termId: "1" },
     ],
-  })).rejects.toBeInstanceOf(InvalidRoutingTemplateRequestError);
+  });
+  expect(groupedAssignment.template.conditions).toHaveLength(3);
 
   const serialized = await readFile(path.join(dataDir, "websites", "site-a", "builder-routing.json"), "utf8");
   expect(serialized).not.toContain("featuredImage");

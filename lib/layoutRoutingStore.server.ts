@@ -14,6 +14,7 @@ import {
   type RoutingTemplate,
   type SingularTemplateCondition,
 } from "@/lib/layoutRouting";
+import { legacyTemplatePageType } from "@/lib/templatePageTypes";
 import {
   mutateBuilderLayoutStore,
   readBuilderLayoutStore,
@@ -58,16 +59,25 @@ function parseCondition(value: unknown): SingularTemplateCondition {
       operator: value.operator,
       taxonomy: value.taxonomy,
       termId: value.termId,
+      ...(["exclude", "include", "only"].includes(String(value.children))
+        ? { children: value.children as "exclude" | "include" | "only" }
+        : {}),
     };
   }
+  if (
+    value.subject === "request-taxonomy-term" &&
+    typeof value.taxonomy === "string" && value.taxonomy &&
+    typeof value.termId === "string" && value.termId
+  ) {
+    return { subject: value.subject, operator: value.operator, taxonomy: value.taxonomy, termId: value.termId };
+  }
+  if (value.subject === "page-number" && value.operator === "include" && (value.page === "first" || value.page === "except-first")) {
+    return { subject: value.subject, operator: value.operator, page: value.page };
+  }
+  if (value.subject === "language" && typeof value.language === "string" && value.language) {
+    return { subject: value.subject, operator: value.operator, language: value.language };
+  }
   throw new Error("Invalid routing-template condition.");
-}
-
-function isExplicitPostTemplate(template: RoutingTemplate) {
-  return template.view === "singular" && template.conditions.some(
-    (condition) => condition.subject === "content-type" &&
-      condition.operator === "include" && condition.contentType === "post",
-  );
 }
 
 function createPostSingleCompatibilityLayout(): BuilderLayout {
@@ -155,13 +165,20 @@ function parseTemplate(value: unknown): RoutingTemplate {
   ) {
     throw new Error("Invalid routing template.");
   }
+  const conditions = value.conditions.map(parseCondition);
+  const legacyContentType = conditions.find((condition) =>
+    condition.subject === "content-type" && condition.operator === "include",
+  );
   return {
     id: parseRoutingTemplateId(value.id),
     name: value.name,
     enabled: value.enabled,
     order: value.order,
+    pageType: typeof value.pageType === "string" && value.pageType.trim()
+      ? value.pageType
+      : legacyTemplatePageType(value.view, legacyContentType?.subject === "content-type" ? legacyContentType.contentType : "unknown"),
     view: value.view,
-    conditions: value.conditions.map(parseCondition),
+    conditions,
     layoutId: parseLayoutDocumentId(value.layoutId),
   };
 }
@@ -240,13 +257,6 @@ export async function mutateLayoutRoutingRegistry<Result>(
     release();
     if (registryMutationQueues.get(queueKey) === queued) registryMutationQueues.delete(queueKey);
   }
-}
-
-function isExplicitProductTemplate(template: RoutingTemplate) {
-  return template.view === "singular" && template.conditions.some(
-    (condition) => condition.subject === "content-type" &&
-      condition.operator === "include" && condition.contentType === "product",
-  );
 }
 
 /** Idempotently exposes the existing document through the new routing model. */

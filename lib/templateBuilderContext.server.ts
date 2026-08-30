@@ -1,16 +1,17 @@
 import type { BuilderDataScope, BuilderLayout } from "@/lib/builderLayouts";
 import { readDynamicBuilderDocument } from "@/lib/builderLayoutDocuments.server";
 import { materializeBuilderDynamicContent, type DynamicContentContextResolver } from "@/lib/builderDynamicContentMaterializer.server";
-import { getDynamicItemContextValue, type DynamicContentContextDescriptor, type DynamicItemContext } from "@/lib/dynamicContent";
-import { resolveDynamicContentContexts } from "@/lib/dynamicContentProviders.server";
-import { parseLayoutDocumentId, type StableContentIdentity } from "@/lib/layoutRouting";
-import { getBuilderLayoutByDocumentId } from "@/lib/layoutRoutingStore.server";
+import { getDynamicItemContextValue } from "@/lib/dynamicContent";
+import { parseLayoutDocumentId, resolveLayout, type StableContentIdentity } from "@/lib/layoutRouting";
+import { getBuilderLayoutByDocumentId, readLayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
 import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
+import { legacyTemplatePageType } from "@/lib/templatePageTypes";
 import type { SaaSWebsite } from "@/lib/websites";
 import {
-  getCanonicalProductCategoryById,
-  getDefaultCanonicalProductCategory,
-} from "@/lib/productCategoryContext.server";
+  getTemplatePageTypeCatalog,
+  resolveTemplatePagePreviewEntries,
+  type TemplatePagePreviewEntry,
+} from "@/lib/templatePageTypes.server";
 
 export class TemplateBuilderContextMismatchError extends Error {}
 export class TemplatePreviewIdentityNotFoundError extends Error {}
@@ -25,44 +26,14 @@ export type TemplateBuilderContext = {
   documentId: string;
   routingTemplateId: string;
   displayName: string;
-  family: "product" | "post" | "product-category" | "post-category";
-  familyLabel: "Single Product" | "Single Post" | "Product Category" | "Post Category/Archive";
-  provider: "woocommerce" | "wordpress";
-  source: "product" | "post" | "product-category" | "post-category";
+  family: string;
+  familyLabel: string;
+  pageType: string;
+  provider: string;
+  source: string;
   websiteId?: string;
-  assignmentSummary: "All Products" | "All Posts" | "All Product Categories" | "All Post Categories/Archives";
+  assignmentSummary: string;
 };
-
-function familyOf(conditions: readonly { subject: string; operator: string; contentType?: string }[]) {
-  const types = conditions.filter((condition) =>
-    condition.subject === "content-type" && condition.operator === "include",
-  ).map((condition) => condition.contentType);
-  if (types.length !== 1 || !["product", "post", "product-category", "post-category"].includes(types[0] ?? "")) {
-    throw new TemplateBuilderContextMismatchError("Routing Template has an unsupported content family.");
-  }
-  return types[0] as "product" | "post" | "product-category" | "post-category";
-}
-
-function descriptor(family: "product" | "post"): DynamicContentContextDescriptor {
-  return family === "product"
-    ? { provider: "woocommerce", source: "product", mode: "collection" as const, query: { quantity: 24, order: "date", direction: "desc" } }
-    : { provider: "wordpress", source: "post", mode: "collection" as const, query: { quantity: 24, order: "date", direction: "desc", filters: {} } };
-}
-
-function candidateFromContext(family: "product" | "post", context: DynamicItemContext): TemplatePreviewCandidate | null {
-  if (context.id === undefined || context.id === null) return null;
-  const title = getDynamicItemContextValue(context, "title", "string")?.trim();
-  const storefrontHref = getDynamicItemContextValue(context, "storefront.href", "url");
-  return {
-    identity: {
-      provider: family === "product" ? "woocommerce" : "wordpress",
-      contentType: family,
-      contentId: String(context.id),
-    },
-    label: title || `${family === "product" ? "Product" : "Post"} ${String(context.id)}`,
-    ...(storefrontHref ? { storefrontHref } : {}),
-  };
-}
 
 async function readLayout(documentId: string, scope: BuilderDataScope) {
   try {
@@ -92,69 +63,115 @@ export async function resolveTemplateBuilderContext(input: {
   if (typeof input.documentId !== "string") {
     throw new TemplateBuilderContextMismatchError("Invalid Builder document ID.");
   }
-  const template = await createRoutingTemplatesService(scope).get(input.routingTemplateId);
+  const pageTypes = await getTemplatePageTypeCatalog(input.website);
+  const service = createRoutingTemplatesService(scope, {}, { pageTypes });
+  const template = await service.get(input.routingTemplateId);
   if (template.layoutId !== input.documentId) {
     throw new TemplateBuilderContextMismatchError("Routing Template does not own this Builder document.");
   }
-  const family = familyOf(template.conditions);
+  const legacyContentType = template.conditions.find((condition) =>
+    condition.subject === "content-type" && condition.operator === "include",
+  );
+  const templatePageType = template.pageType ?? legacyTemplatePageType(
+    template.view,
+    legacyContentType?.subject === "content-type" ? legacyContentType.contentType : "unknown",
+  );
+  const definition = pageTypes.find((item) => item.id === templatePageType);
+  if (!definition) throw new TemplateBuilderContextMismatchError("Routing Template Page type is not registered.");
+  const assignedIdentity = template.conditions
+    .filter((condition) => condition.operator === "include")
+    .flatMap((condition): StableContentIdentity[] => {
+      if (condition.subject === "content-identity") return [condition.identity];
+      if (condition.subject === "taxonomy-term" && condition.taxonomy === definition.taxonomy) {
+        return [{
+          provider: definition.provider,
+          contentType: definition.contentType,
+          contentId: condition.termId,
+        }];
+      }
+      return [];
+    })[0];
+  // YOOtheme opens a template against a context that satisfies its assignment.
+  // An explicit preview selection wins; otherwise use the first assigned entity/term.
+  const requestedPreviewIdentity = input.previewIdentity ?? assignedIdentity;
   const persistedLayout = await readLayout(input.documentId, scope);
   const layout = input.authoredLayout ?? persistedLayout;
-  const resolveContexts = input.resolveContexts ?? resolveDynamicContentContexts;
-  const entries = family === "product-category"
-    ? await (async () => {
-        const category = input.previewIdentity?.contentId
-          ? await getCanonicalProductCategoryById(input.previewIdentity.contentId, input.website)
-          : await getDefaultCanonicalProductCategory(input.website);
-        if (!category) throw new TemplatePreviewIdentityNotFoundError("Preview Product Category is not available in this website.");
+  const resolveContexts = input.resolveContexts;
+  const entries: TemplatePagePreviewEntry[] = resolveContexts && definition.previewDescriptor
+    ? (await resolveContexts({ website: input.website, descriptor: definition.previewDescriptor })).flatMap((rootContext) => {
+        if (rootContext.id === undefined || rootContext.id === null) return [];
+        const identity = { provider: definition.provider, contentType: definition.contentType, contentId: String(rootContext.id) };
+        const label = getDynamicItemContextValue(rootContext, "title", "string") ??
+          getDynamicItemContextValue(rootContext, "name", "string") ?? `${definition.label} ${String(rootContext.id)}`;
+        const storefrontHref = getDynamicItemContextValue(rootContext, "storefront.href", "url") ??
+          getDynamicItemContextValue(rootContext, "link", "url");
         return [{
-          candidate: {
-            identity: { provider: "woocommerce", contentType: "product-category", contentId: String(category.category.id) },
-            label: category.category.name,
-            storefrontHref: `/product-category/${category.category.slug}`,
+          identity,
+          label,
+          ...(storefrontHref ? { storefrontHref } : {}),
+          routeContext: {
+            view: definition.view, pageType: definition.id, provider: identity.provider,
+            contentType: identity.contentType, contentId: identity.contentId, slug: identity.contentId,
+            uri: "/", taxonomyTerms: [], pageNumber: 1,
           },
-          rootContext: category.dynamicContext,
+          rootContext,
         }];
-      })()
-    : family === "post-category"
-      ? []
-      : (await resolveContexts({ website: input.website, descriptor: descriptor(family) })).flatMap((rootContext) => {
-          const candidate = candidateFromContext(family, rootContext);
-          return candidate ? [{ candidate, rootContext }] : [];
-        });
-  const candidates = entries.map((entry) => entry.candidate);
+      })
+    : await resolveTemplatePagePreviewEntries({ definition, website: input.website, preferredIdentity: requestedPreviewIdentity });
+  const candidates: TemplatePreviewCandidate[] = entries.map((entry) => ({
+    identity: entry.identity,
+    label: entry.label,
+    ...(entry.storefrontHref ? { storefrontHref: entry.storefrontHref } : {}),
+  }));
   let selectedIndex = 0;
-  if (input.previewIdentity) {
+  if (requestedPreviewIdentity) {
     selectedIndex = candidates.findIndex((candidate) =>
-      candidate.identity.provider === input.previewIdentity!.provider &&
-      candidate.identity.contentType === input.previewIdentity!.contentType &&
-      candidate.identity.contentId === input.previewIdentity!.contentId,
+      candidate.identity.provider === requestedPreviewIdentity.provider &&
+      candidate.identity.contentType === requestedPreviewIdentity.contentType &&
+      candidate.identity.contentId === requestedPreviewIdentity.contentId,
     );
     if (selectedIndex < 0) throw new TemplatePreviewIdentityNotFoundError("Preview entity is not available in this website.");
   }
   const previewIdentity = candidates[selectedIndex]?.identity;
   const rootContext = previewIdentity ? entries[selectedIndex]?.rootContext : undefined;
+  const routeContext = previewIdentity ? entries[selectedIndex]?.routeContext : undefined;
+  if (!routeContext) throw new TemplatePreviewIdentityNotFoundError(`Preview ${definition.label} is not available in this website.`);
+  const registry = await readLayoutRoutingRegistry(scope);
+  const resolution = resolveLayout({
+    context: routeContext,
+    individualOverrides: [],
+    routingTemplates: registry.routingTemplates,
+    nativeFallbackAvailable: true,
+    editorTemplateId: template.id,
+  });
+  if (resolution.outcome !== "routing-template" || resolution.template.id !== template.id) {
+    throw new TemplateBuilderContextMismatchError("Routing Template does not match its contextual preview.");
+  }
+  // Editing/previewing a Template is intentionally forced, including when it
+  // is disabled. The active Template must remain the unforced storefront
+  // result for this exact context.
+  const activeResolution = resolveLayout({
+    context: routeContext,
+    individualOverrides: registry.individualOverrides,
+    routingTemplates: registry.routingTemplates,
+    nativeFallbackAvailable: true,
+  });
   const materialization = await materializeBuilderDynamicContent(layout, {
     website: input.website,
     rootContext,
     resolveContexts,
   });
-  const labels = {
-    product: { familyLabel: "Single Product", provider: "woocommerce", assignmentSummary: "All Products" },
-    post: { familyLabel: "Single Post", provider: "wordpress", assignmentSummary: "All Posts" },
-    "product-category": { familyLabel: "Product Category", provider: "woocommerce", assignmentSummary: "All Product Categories" },
-    "post-category": { familyLabel: "Post Category/Archive", provider: "wordpress", assignmentSummary: "All Post Categories/Archives" },
-  } as const;
-  const familyMeta = labels[family];
   const context: TemplateBuilderContext = {
     documentId: input.documentId,
     routingTemplateId: template.id,
     displayName: template.name,
-    family,
-    familyLabel: familyMeta.familyLabel,
-    provider: familyMeta.provider,
-    source: family,
+    family: definition.contentType,
+    familyLabel: definition.label,
+    pageType: definition.id,
+    provider: definition.provider,
+    source: definition.source,
     websiteId: scope.websiteId,
-    assignmentSummary: familyMeta.assignmentSummary,
+    assignmentSummary: definition.label,
   };
   return {
     layout,
@@ -163,5 +180,6 @@ export async function resolveTemplateBuilderContext(input: {
     context,
     candidates,
     previewIdentity,
+    activeResolution,
   };
 }

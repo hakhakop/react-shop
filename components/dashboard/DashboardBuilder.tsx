@@ -398,7 +398,8 @@ import {
   type BuilderThemeSettings,
 } from "@/lib/builderThemeSettings";
 import { invalidateImportedBuilderDraft } from "@/lib/builderDraftInvalidation";
-import type { BuilderEditorContext } from "@/lib/builderEditorContext";
+import type { BuilderEditorContext, BuilderTemplateCreationContext } from "@/lib/builderEditorContext";
+import { deriveTemplateCreationContext } from "@/lib/templateCreationContext";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -2157,6 +2158,7 @@ export type DashboardBuilderProps = {
   initialPageHydration?: {
     authoredLayout: BuilderLayout | null;
     renderLayout: BuilderLayout | null;
+    editorContext: BuilderEditorContext;
   };
 };
 
@@ -2227,22 +2229,26 @@ export default function DashboardBuilder({
     }
     strictBuilderTargetRef.current = hasStrictBuilderTarget;
   }, [hasStrictBuilderTarget, strictBuilderTargetIdentity]);
-  const [builderEditorContext, setBuilderEditorContext] = useState<BuilderEditorContext | null>(null);
+  const [builderEditorContext, setBuilderEditorContext] = useState<BuilderEditorContext | null>(
+    initialPageHydration?.editorContext ?? null,
+  );
   const [templateBuilderContext, setTemplateBuilderContext] = useState<{
     documentId: string;
     routingTemplateId: string;
     displayName: string;
-    family: "product" | "post" | "product-category" | "post-category";
-    familyLabel: "Single Product" | "Single Post" | "Product Category" | "Post Category/Archive";
-    provider: "woocommerce" | "wordpress";
-    source: "product" | "post" | "product-category" | "post-category";
+    family: string;
+    familyLabel: string;
+    pageType: string;
+    provider: string;
+    source: string;
     websiteId?: string;
-    assignmentSummary: "All Products" | "All Posts" | "All Product Categories" | "All Post Categories/Archives";
+    assignmentSummary: string;
   } | null>(null);
   const [individualBuilderContext, setIndividualBuilderContext] = useState<{
     mode: "individual";
     documentId: string;
     identity: { provider: string; contentType: "product" | "post"; contentId: string };
+    pageType: string;
     family: "product" | "post";
     familyLabel: "Individual Product Layout" | "Individual Post Layout";
     title: string | null;
@@ -2262,6 +2268,13 @@ export default function DashboardBuilder({
     contentType: string;
     contentId: string;
   } | null>(null);
+  const templateCreationContext = useMemo<BuilderTemplateCreationContext | undefined>(() =>
+    deriveTemplateCreationContext({
+      editorContext: builderEditorContext,
+      templatePageType: templateBuilderContext?.pageType,
+      previewIdentity: templatePreviewIdentity,
+      previewCandidates: templatePreviewCandidates,
+    }), [builderEditorContext, templateBuilderContext?.pageType, templatePreviewCandidates, templatePreviewIdentity]);
   const [headerContextKey, setHeaderContextKey] = useState<BuilderLayoutKey>(() => {
     const requestedContext = parseBuilderLayoutKey(searchParams.get("context"));
     return requestedContext && requestedContext !== "header" ? requestedContext : "shop";
@@ -2492,6 +2505,24 @@ export default function DashboardBuilder({
   }, []);
   const builderStateRef = useRef(builderState);
   builderStateRef.current = builderState;
+  const refreshRoutingTemplateManagerContext = useCallback(async () => {
+    const params: Record<string, string> = {};
+    const documentId = searchParams.get("document") ?? activeDynamicDocumentId;
+    const routingTemplateId = searchParams.get("routingTemplate") ?? activeRoutingTemplateId;
+    const individual = searchParams.get("individual") ?? activeIndividualContextToken;
+    if (documentId) params.document = documentId;
+    if (routingTemplateId) params.routingTemplate = routingTemplateId;
+    if (individual) params.individual = individual;
+    for (const queryKey of ["previewProvider", "previewContentType", "previewContentId"] as const) {
+      const value = searchParams.get(queryKey);
+      if (value) params[queryKey] = value;
+    }
+    if (!documentId && !routingTemplateId && !individual) params.page = builderStateRef.current.page;
+    const response = await fetch(builderApiUrl("/api/builder-editor-context", params), { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json() as { editorContext?: BuilderEditorContext };
+    if (payload.editorContext) setBuilderEditorContext(payload.editorContext);
+  }, [activeDynamicDocumentId, activeIndividualContextToken, activeRoutingTemplateId, builderApiUrl, searchParams]);
 
   const refreshDynamicContentPreview = useCallback(async () => {
     const requestedState = builderStateRef.current;
@@ -8404,6 +8435,7 @@ export default function DashboardBuilder({
           payload: {
             layout: initialPageHydration!.authoredLayout,
             renderLayout: initialPageHydration!.renderLayout,
+            editorContext: initialPageHydration!.editorContext,
           } as PublishedBuilderLayoutPayload,
         }
       : await fetchPublishedLayoutOnce(requestUrl);
@@ -12686,6 +12718,9 @@ export default function DashboardBuilder({
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
         websiteId={websiteId}
+        templateCreationContext={templateCreationContext}
+        builderEditorContext={builderEditorContext}
+        onRoutingTemplatesChanged={refreshRoutingTemplateManagerContext}
         wordpressOrigin={wordpressMediaOrigin}
         wordpressSiteUrl={wordpressSiteUrl}
         dashboardTheme={dashboardTheme}

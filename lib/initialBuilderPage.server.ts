@@ -8,6 +8,7 @@ import {
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
+import { resolveOrdinaryBuilderEditorContext } from "@/lib/builderEditorContext.server";
 
 export async function resolveInitialBuilderPage(input: {
   page: BuilderLayoutKey;
@@ -18,10 +19,16 @@ export async function resolveInitialBuilderPage(input: {
   wordpressMediaOrigin?: string | null;
 }) {
   const authoredLayout = await getPublishedBuilderLayout(input.page, input.scope);
+  const editorContext = await resolveOrdinaryBuilderEditorContext({
+    page: input.page,
+    scope: input.scope,
+    layout: authoredLayout,
+  });
   if (!authoredLayout) {
     return {
       authoredLayout: null,
       renderLayout: null,
+      editorContext,
     };
   }
 
@@ -46,8 +53,10 @@ export async function resolveInitialBuilderPage(input: {
   return {
     authoredLayout,
     renderLayout: materialization.renderLayout,
+    editorContext,
   } satisfies {
     authoredLayout: BuilderLayout;
     renderLayout: BuilderLayout;
+    editorContext: Awaited<ReturnType<typeof resolveOrdinaryBuilderEditorContext>>;
   };
 }

@@ -17,11 +17,17 @@ import { createIndividualLayoutsService } from "@/lib/individualLayoutsService.s
 import { createContentDiscoveryService } from "@/lib/contentDiscovery.server";
 import {
   builderLayoutDocumentId,
+  createLegacyPostSingleRoutingTemplate,
+  createLegacyProductCategoryRoutingTemplate,
+  createLegacyProductSingleRoutingTemplate,
   parseRoutingTemplateId,
   type ArchiveRouteContext,
   type SingularRouteContext,
 } from "@/lib/layoutRouting";
-import type { LayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
+import {
+  type LayoutRoutingRegistry,
+  writeLayoutRoutingRegistry,
+} from "@/lib/layoutRoutingStore.server";
 import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
 import { normalizeWooCommerceProductContext } from "@/lib/woocommerceDynamicContentProvider.server";
 import { normalizeWordPressPostContext } from "@/lib/wordpressDynamicContentProvider.server";
@@ -70,7 +76,7 @@ test("canonical editor contexts distinguish Page, Template preview, and fixed In
     });
     expect(page).toMatchObject({
       document: { kind: "page", displayName: "Home" },
-      content: { mode: "none" },
+      content: { mode: "none", pageType: "singular:page" },
       navigation: { returnLabel: "Back to Pages", frontendHref: "/" },
       capabilities: { canChangePreview: false, canOpenFrontend: true },
     });
@@ -91,12 +97,15 @@ test("canonical editor contexts distinguish Page, Template preview, and fixed In
       document: { id: template.template.layoutId, kind: "routing-template", displayName: "Post Story" },
       content: {
         mode: "preview",
+        pageType: "singular:post",
         family: "post",
         identity: { provider: "wordpress", contentType: "post", contentId: "post-15" },
         label: "Performance Testing",
         storefrontHref: "/performance-testing",
       },
       ownership: {
+        resolved: { source: "routing-template" },
+        activeTemplate: { templateId: "routing:legacy-post-single" },
         effective: { source: "routing-template", layoutId: template.template.layoutId },
         assignedTemplate: { templateId: template.template.id },
       },
@@ -121,8 +130,9 @@ test("canonical editor contexts distinguish Page, Template preview, and fixed In
     const individualContext = projectIndividualBuilderEditorContext(individualResolution, scope);
     expect(individualContext).toMatchObject({
       document: { id: individual.document.documentId, kind: "individual", displayName: "Wool Blend Coat" },
-      content: { mode: "fixed", family: "product", identity: productIdentity, storefrontHref: "/product/wool-blend-coat" },
+      content: { mode: "fixed", pageType: "singular:product", family: "product", identity: productIdentity, storefrontHref: "/product/wool-blend-coat" },
       ownership: {
+        resolved: { source: "individual", layoutId: individual.document.documentId },
         effective: { source: "individual", layoutId: individual.document.documentId },
         individual: { layoutId: individual.document.documentId },
         assignedTemplate: { name: "All Products" },
@@ -133,6 +143,46 @@ test("canonical editor contexts distinguish Page, Template preview, and fixed In
     });
     expect(JSON.stringify(individualContext)).not.toContain("Fetched product payload");
     expect(JSON.stringify(templateSession.editorContext)).not.toContain("Fetched post payload");
+  } finally {
+    if (previous === undefined) delete process.env.WEBPAGES_DATA_DIR;
+    else process.env.WEBPAGES_DATA_DIR = previous;
+    await rm(dataDir, { recursive: true, force: true });
+  }
+});
+
+test("ordinary Builder canvases derive template creation type from their registered layout owner", async () => {
+  const dataDir = await mkdtemp(path.join(os.tmpdir(), "webpages-ordinary-page-types-"));
+  const previous = process.env.WEBPAGES_DATA_DIR;
+  process.env.WEBPAGES_DATA_DIR = dataDir;
+  const scope = { websiteId: "ordinary-page-types" };
+  try {
+    await writeLayoutRoutingRegistry({
+      version: 1,
+      routingTemplates: [
+        createLegacyPostSingleRoutingTemplate(builderLayoutDocumentId("post-single")),
+        createLegacyProductSingleRoutingTemplate(builderLayoutDocumentId("product-single")),
+        createLegacyProductCategoryRoutingTemplate(builderLayoutDocumentId("product-category")),
+      ],
+      individualOverrides: [],
+    }, scope);
+    for (const item of [
+      { page: "post-single", pageType: "singular:post" },
+      { page: "product-single", pageType: "singular:product" },
+      { page: "product-category", pageType: "taxonomy:product_cat" },
+    ] as const) {
+      const context = await resolveOrdinaryBuilderEditorContext({
+        page: item.page,
+        scope,
+        layout: {
+          version: 1,
+          page: item.page,
+          targetType: "template",
+          sections,
+          updatedAt: "2026-08-30T00:00:00.000Z",
+        },
+      });
+      expect(context.content.pageType).toBe(item.pageType);
+    }
   } finally {
     if (previous === undefined) delete process.env.WEBPAGES_DATA_DIR;
     else process.env.WEBPAGES_DATA_DIR = previous;

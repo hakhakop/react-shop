@@ -6,6 +6,7 @@
       "name": "Product Single",
       "enabled": true,
       "order": 0,
+      "pageType": "singular:product",
       "view": "singular",
       "conditions": [
         {
@@ -21,6 +22,7 @@
       "name": "Single Post",
       "enabled": true,
       "order": 10,
+      "pageType": "singular:post",
       "view": "singular",
       "conditions": [
         {
@@ -36,6 +38,7 @@
       "name": "Single Post",
       "enabled": true,
       "order": 20,
+      "pageType": "singular:post",
       "view": "singular",
       "conditions": [
         {
@@ -45,6 +48,22 @@
         }
       ],
       "layoutId": "layout:builder:post-single"
+    },
+    {
+      "id": "routing:legacy-product-category",
+      "name": "Global Product Category",
+      "enabled": true,
+      "order": 20,
+      "pageType": "taxonomy:product_cat",
+      "view": "archive",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product-category"
+        }
+      ],
+      "layoutId": "layout:builder:product-category"
     }
   ],
   "individualOverrides": []

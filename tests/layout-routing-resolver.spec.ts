@@ -73,7 +73,7 @@ test("individual overrides outrank templates and removal reveals the template", 
   });
 });
 
-test("matching templates use explicit order and ignore disabled templates", () => {
+test("matching templates use registry position and ignore disabled templates", () => {
   const disabledFirst = template({
     id: parseRoutingTemplateId("routing:disabled"),
     layoutId: individualLayout,
@@ -95,7 +95,7 @@ test("matching templates use explicit order and ignore disabled templates", () =
     individualOverrides: [],
     routingTemplates: [disabledFirst, later, earlier],
     nativeFallbackAvailable: true,
-  })).toMatchObject({ outcome: "routing-template", layoutId: productLayout });
+  })).toMatchObject({ outcome: "routing-template", layoutId: postLayout });
 });
 
 test("stable identity survives slug changes", () => {
@@ -165,7 +165,7 @@ test("existing product-single document is representable without renderer changes
   })).toMatchObject({ outcome: "routing-template", layoutId: productLayout });
 });
 
-test("archive routing prefers taxonomy-specific conditions over global conditions", () => {
+test("archive routing uses first matching template without hidden specificity", () => {
   const context: ArchiveRouteContext = {
     view: "archive",
     provider: "woocommerce",
@@ -196,5 +196,26 @@ test("archive routing prefers taxonomy-specific conditions over global condition
     individualOverrides: [],
     routingTemplates: [global, taxonomy],
     nativeFallbackAvailable: false,
+  })).toMatchObject({ outcome: "routing-template", layoutId: productLayout });
+  expect(resolveLayout({
+    context,
+    individualOverrides: [],
+    routingTemplates: [taxonomy, global],
+    nativeFallbackAvailable: false,
   })).toMatchObject({ outcome: "routing-template", layoutId: individualLayout });
+});
+
+test("a selected disabled template is forced only for editor preview", () => {
+  const disabled = template({
+    id: parseRoutingTemplateId("routing:disabled-editor-preview"),
+    layoutId: individualLayout,
+    enabled: false,
+    conditions: [{ subject: "content-type", operator: "include", contentType: "product" }],
+  });
+  const input = { context: product, individualOverrides: [], routingTemplates: [disabled], nativeFallbackAvailable: true };
+  expect(resolveLayout(input)).toEqual({ outcome: "native-fallback" });
+  expect(resolveLayout({ ...input, editorTemplateId: disabled.id })).toMatchObject({
+    outcome: "routing-template",
+    layoutId: individualLayout,
+  });
 });

@@ -39,6 +39,7 @@ export type IndividualBuilderContext = {
   mode: "individual";
   documentId: string;
   identity: StableContentIdentity;
+  pageType: string;
   family: "product" | "post";
   familyLabel: "Individual Product Layout" | "Individual Post Layout";
   title: string | null;
@@ -84,6 +85,7 @@ export async function resolveIndividualBuilderContext(input: {
     mode: "individual",
     documentId: input.documentId,
     identity,
+    pageType: `singular:${identity.contentType}`,
     family,
     familyLabel: family === "product" ? "Individual Product Layout" : "Individual Post Layout",
     title: entity.availability === "missing" ? null : entity.item.title,

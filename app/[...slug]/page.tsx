@@ -48,6 +48,7 @@ async function renderCanonicalPost(
   const { post } = canonical;
   const context: SingularRouteContext = {
     view: "singular",
+    pageType: "singular:post",
     provider: "wordpress",
     contentType: "post",
     contentId: post.id,

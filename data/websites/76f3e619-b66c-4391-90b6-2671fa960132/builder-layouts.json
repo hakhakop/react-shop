@@ -2204,11 +2204,11 @@
                     "titleStyle": "inherit",
                     "imageUrl": "/builder-image-placeholder.svg",
                     "imageAlt": "Warm architectural forms representing strategic planning",
-      "dynamicContext": {
-        "provider": "woocommerce",
-        "source": "product",
-        "mode": "collection"
-      },
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection"
+                    },
                     "dynamicBindings": {
                       "title": {
                         "path": "title",

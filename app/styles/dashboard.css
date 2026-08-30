@@ -20083,7 +20083,8 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
 .routing-template-row { display: flex; align-items: center; gap: 9px; min-height: 62px; padding: 9px; border: 1px solid var(--builder-ui-border); border-radius: 8px; background: var(--builder-ui-surface); }
 .routing-template-row.is-disabled { opacity: .58; }
 .routing-template-order { display: grid; place-items: center; width: 23px; height: 23px; flex: 0 0 23px; border-radius: 50%; background: var(--builder-ui-accent); color: white; font-size: 11px; font-weight: 700; }
-.routing-template-row-main { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.routing-template-row-main { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; border: 0; padding: 0; background: transparent; text-align: left; cursor: pointer; font: inherit; }
+.routing-template-row-main:hover strong, .routing-template-row-main:focus-visible strong { text-decoration: underline; }
 .routing-template-row-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--builder-ui-text); font-size: 12px; }
 .routing-template-row-main span { color: var(--builder-ui-muted); font-size: 10px; }
 .routing-template-row-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; justify-content: flex-end; }

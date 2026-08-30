@@ -39,13 +39,18 @@ export type BuilderEditorContext = {
   };
   content: {
     mode: "none" | "preview" | "fixed";
-    family?: "product" | "post" | "product-category" | "post-category";
+    pageType?: string;
+    family?: string;
     identity?: StableContentIdentity;
     label?: string;
     availability?: "published" | "unpublished" | "unknown" | "missing";
     storefrontHref?: string;
   };
   ownership: {
+    /** Storefront-equivalent resolution for the canvas context. */
+    resolved?: BuilderEditorLayoutReference;
+    /** Present only when the canonical resolver selected a Routing Template. */
+    activeTemplate?: BuilderEditorTemplateReference;
     effective?: BuilderEditorLayoutReference;
     individual?: { layoutId: string };
     assignedTemplate?: BuilderEditorTemplateReference;
@@ -64,8 +69,16 @@ export type BuilderEditorContext = {
   };
 };
 
+/** Current validated canvas context used to seed new Routing Templates. */
+export type BuilderTemplateCreationContext = {
+  pageType: string;
+  previewIdentity?: StableContentIdentity;
+  previewLabel?: string;
+  storefrontHref?: string;
+};
+
 export type EditableLayoutTarget = {
-  label: "Edit Individual Layout" | "Edit Single Post Template" | "Edit Product Template" | "Edit Product Category Template" | "Edit Post Category Template" | "Create Layout" | "Create Global Product Category Template" | "Create Global Post Category Template" | "Edit Page";
+  label: string;
   targetKind: "individual" | "routing-template" | "content-management" | "page";
   builderHref: string;
   effectiveSource: BuilderEditorLayoutSource | "page";

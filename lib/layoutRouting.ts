@@ -4,6 +4,7 @@
  * This module deliberately owns selection only. Content fetching, dynamic
  * content materialization, rendering, and persistence adapters live elsewhere.
  */
+import { legacyTemplatePageType } from "@/lib/templatePageTypes";
 
 export type RouteTaxonomyTerm = {
   taxonomy: string;
@@ -13,6 +14,8 @@ export type RouteTaxonomyTerm = {
 
 export type SingularRouteContext = {
   view: "singular";
+  /** Registered template page/view type. Legacy callers may omit during migration. */
+  pageType?: string;
   provider: string;
   contentType: string;
   /** Stable provider identity. Slugs and URIs must never be used instead. */
@@ -21,6 +24,9 @@ export type SingularRouteContext = {
   slug: string;
   uri: string;
   taxonomyTerms: readonly RouteTaxonomyTerm[];
+  requestTaxonomyTerms?: readonly RouteTaxonomyTerm[];
+  pageNumber?: number;
+  language?: string;
 };
 
 export type ArchiveRouteContext = Omit<SingularRouteContext, "view"> & {
@@ -127,7 +133,16 @@ export type SingularTemplateCondition =
       operator: "include" | "exclude";
       taxonomy: string;
       termId: string;
-    };
+      children?: "exclude" | "include" | "only";
+    }
+  | {
+      subject: "request-taxonomy-term";
+      operator: "include" | "exclude";
+      taxonomy: string;
+      termId: string;
+    }
+  | { subject: "page-number"; operator: "include"; page: "first" | "except-first" }
+  | { subject: "language"; operator: "include" | "exclude"; language: string };
 
 export type RoutingTemplate = {
   id: RoutingTemplateId;
@@ -135,6 +150,8 @@ export type RoutingTemplate = {
   enabled: boolean;
   /** Lower order wins. Registry position breaks equal-order ties deterministically. */
   order: number;
+  /** Canonical registered page/view assignment. */
+  pageType?: string;
   view: "singular" | "archive";
   conditions: readonly SingularTemplateCondition[];
   layoutId: LayoutDocumentId;
@@ -157,6 +174,8 @@ export type LayoutResolverInput = {
   /** Provider says the resolved entity has a native renderable fallback. */
   nativeFallbackAvailable: boolean;
   notFoundLayoutId?: LayoutDocumentId;
+  /** Editor-only forced template. Disabled templates remain invisible otherwise. */
+  editorTemplateId?: RoutingTemplateId;
 };
 
 export function sameContentIdentity(
@@ -178,9 +197,25 @@ function conditionMatches(
   if (condition.subject === "content-identity") {
     return sameContentIdentity(context, condition.identity);
   }
-  return context.taxonomyTerms.some(
-    (term) => term.taxonomy === condition.taxonomy && term.id === condition.termId,
-  );
+  if (condition.subject === "taxonomy-term") {
+    const matches = context.taxonomyTerms.filter((term) => term.taxonomy === condition.taxonomy);
+    const current = matches[0];
+    if (condition.children === "include") return matches.some((term) => term.id === condition.termId);
+    if (condition.children === "only") {
+      return current?.id !== condition.termId && matches.some((term) => term.id === condition.termId);
+    }
+    return current?.id === condition.termId || matches.some((term) => term.id === condition.termId);
+  }
+  if (condition.subject === "request-taxonomy-term") {
+    return (context.requestTaxonomyTerms ?? []).some(
+      (term) => term.taxonomy === condition.taxonomy && term.id === condition.termId,
+    );
+  }
+  if (condition.subject === "page-number") {
+    const page = context.pageNumber ?? 1;
+    return condition.page === "first" ? page === 1 : page > 1;
+  }
+  return context.language === condition.language;
 }
 
 /** Entity → relationship/taxonomy → global type. Order only breaks ties. */
@@ -194,12 +229,30 @@ export function routingTemplateSpecificity(template: RoutingTemplate) {
 export function routingTemplateMatches(
   context: CanonicalRouteContext,
   template: RoutingTemplate,
+  options: { includeDisabled?: boolean } = {},
 ) {
-  if (!template.enabled || template.view !== context.view) return false;
+  if ((!template.enabled && !options.includeDisabled) || template.view !== context.view) return false;
+  const legacyType = template.conditions.find((condition) =>
+    condition.subject === "content-type" && condition.operator === "include",
+  );
+  const pageType = template.pageType ?? legacyTemplatePageType(
+    template.view,
+    legacyType?.subject === "content-type" ? legacyType.contentType : context.contentType,
+  );
+  if (context.pageType && pageType !== context.pageType) return false;
   const includes = template.conditions.filter((condition) => condition.operator === "include");
   const excludes = template.conditions.filter((condition) => condition.operator === "exclude");
   if (excludes.some((condition) => conditionMatches(context, condition))) return false;
-  return includes.length === 0 || includes.every((condition) => conditionMatches(context, condition));
+  const groups = new Map<string, SingularTemplateCondition[]>();
+  for (const condition of includes) {
+    // Multiple values inside one YOOtheme assignment control are OR. Separate
+    // controls (page, language, taxonomy, request taxonomy) compose with AND.
+    const key = condition.subject === "taxonomy-term" || condition.subject === "request-taxonomy-term"
+      ? `${condition.subject}:${condition.taxonomy}`
+      : condition.subject;
+    groups.set(key, [...(groups.get(key) ?? []), condition]);
+  }
+  return Array.from(groups.values()).every((group) => group.some((condition) => conditionMatches(context, condition)));
 }
 
 /** Pure, deterministic layout ownership resolution. */
@@ -210,15 +263,13 @@ export function resolveLayout(input: LayoutResolverInput): LayoutResolution {
     return { outcome: "individual", layoutId: override.layoutId, override };
   }
 
-  const template = input.routingTemplates
-    .map((item, registryIndex) => ({ item, registryIndex }))
-    .filter(({ item }) => routingTemplateMatches(input.context, item))
-    .sort((left, right) =>
-      routingTemplateSpecificity(right.item) - routingTemplateSpecificity(left.item) ||
-      left.item.order - right.item.order ||
-      left.registryIndex - right.registryIndex,
-    )[0]
-    ?.item;
+  const forced = input.editorTemplateId
+    ? input.routingTemplates.find((item) =>
+        item.id === input.editorTemplateId && routingTemplateMatches(input.context, item, { includeDisabled: true }),
+      )
+    : undefined;
+  // YOOtheme contract: list position is loading priority; first match wins.
+  const template = forced ?? input.routingTemplates.find((item) => routingTemplateMatches(input.context, item));
   if (template) {
     return { outcome: "routing-template", layoutId: template.layoutId, template };
   }
@@ -236,6 +287,7 @@ export function createLegacyProductSingleRoutingTemplate(
     name: "Product Single",
     enabled: true,
     order: 0,
+    pageType: "singular:product",
     view: "singular",
     conditions: [{ subject: "content-type", operator: "include", contentType: "product" }],
     layoutId,
@@ -251,6 +303,7 @@ export function createLegacyPostSingleRoutingTemplate(
     name: "Single Post",
     enabled: true,
     order: 0,
+    pageType: "singular:post",
     view: "singular",
     conditions: [{ subject: "content-type", operator: "include", contentType: "post" }],
     layoutId,
@@ -265,6 +318,7 @@ export function createLegacyProductCategoryRoutingTemplate(
     name: "Global Product Category",
     enabled: true,
     order: 20,
+    pageType: "taxonomy:product_cat",
     view: "archive",
     conditions: [{ subject: "content-type", operator: "include", contentType: "product-category" }],
     layoutId,
@@ -279,6 +333,7 @@ export function createLegacyPostCategoryRoutingTemplate(
     name: "Global Post Category",
     enabled: true,
     order: 30,
+    pageType: "taxonomy:category",
     view: "archive",
     conditions: [{ subject: "content-type", operator: "include", contentType: "post-category" }],
     layoutId,

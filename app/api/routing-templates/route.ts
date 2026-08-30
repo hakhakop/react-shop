@@ -6,6 +6,7 @@ import {
   RoutingTemplateNotFoundError,
   createRoutingTemplatesService,
 } from "@/lib/routingTemplatesService.server";
+import { getTemplatePageTypeCatalog } from "@/lib/templatePageTypes.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,13 +27,14 @@ function serviceError(error: unknown) {
 export async function GET(request: NextRequest) {
   const access = await getAuthorizedWebsiteBuilderScope(request);
   if ("error" in access) return access.error;
-  const service = createRoutingTemplatesService(access.scope);
+  const pageTypes = await getTemplatePageTypeCatalog("website" in access ? access.website : null);
+  const service = createRoutingTemplatesService(access.scope, {}, { pageTypes });
   try {
     const id = request.nextUrl.searchParams.get("id");
     if (id) return NextResponse.json({ template: await service.get(id) });
     const layoutId = request.nextUrl.searchParams.get("referencesForLayout");
     if (layoutId) return NextResponse.json({ references: await service.inspectReferences(layoutId) });
-    return NextResponse.json({ templates: await service.list() });
+    return NextResponse.json({ templates: await service.list(), pageTypes });
   } catch (error) {
     return serviceError(error);
   }
@@ -41,7 +43,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const access = await getAuthorizedWebsiteBuilderScope(request);
   if ("error" in access) return access.error;
-  const service = createRoutingTemplatesService(access.scope);
+  const pageTypes = await getTemplatePageTypeCatalog("website" in access ? access.website : null);
+  const service = createRoutingTemplatesService(access.scope, {}, { pageTypes });
   const body = await request.json();
   try {
     if (body.action === "create") {
@@ -68,7 +71,8 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const access = await getAuthorizedWebsiteBuilderScope(request);
   if ("error" in access) return access.error;
-  const service = createRoutingTemplatesService(access.scope);
+  const pageTypes = await getTemplatePageTypeCatalog("website" in access ? access.website : null);
+  const service = createRoutingTemplatesService(access.scope, {}, { pageTypes });
   try {
     return NextResponse.json(await service.delete(
       request.nextUrl.searchParams.get("id"),

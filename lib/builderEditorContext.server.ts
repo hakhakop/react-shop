@@ -16,7 +16,6 @@ import {
   resolveLayout,
   type CanonicalRouteContext,
   type LayoutResolution,
-  type SingularRouteContext,
   type StableContentIdentity,
 } from "@/lib/layoutRouting";
 import {
@@ -24,8 +23,11 @@ import {
   ensureProductSingleRoutingCompatibility,
   ensureProductCategoryRoutingCompatibility,
   ensurePostCategoryRoutingCompatibility,
+  readLayoutRoutingRegistry,
   type LayoutRoutingRegistry,
 } from "@/lib/layoutRoutingStore.server";
+import { legacyTemplatePageType } from "@/lib/templatePageTypes";
+import { BUILTIN_TEMPLATE_PAGE_TYPES } from "@/lib/templatePageTypes";
 import {
   resolveTemplateBuilderContext,
   type TemplatePreviewCandidate,
@@ -82,6 +84,19 @@ function selectedTemplateCandidate(resolution: TemplateResolution): TemplatePrev
   );
 }
 
+function resolvedOwnership(resolution: LayoutResolution): BuilderEditorLayoutReference {
+  if (resolution.outcome === "individual") return { source: "individual", layoutId: resolution.layoutId };
+  if (resolution.outcome === "routing-template") return { source: "routing-template", layoutId: resolution.layoutId };
+  if (resolution.outcome === "native-fallback") return { source: "native-fallback" };
+  return { source: "not-found", ...(resolution.layoutId ? { layoutId: resolution.layoutId } : {}) };
+}
+
+function activeTemplateReference(resolution: LayoutResolution) {
+  return resolution.outcome === "routing-template"
+    ? { templateId: resolution.template.id, name: resolution.template.name, layoutId: resolution.template.layoutId }
+    : undefined;
+}
+
 export function projectTemplateBuilderEditorContext(
   resolution: TemplateResolution,
   scope: BuilderDataScope = {},
@@ -99,12 +114,17 @@ export function projectTemplateBuilderEditorContext(
     scope: { ...(scope.websiteId ? { websiteId: scope.websiteId } : {}) },
     content: {
       mode: "preview",
+      pageType: owner.pageType,
       family: owner.family,
       ...(resolution.previewIdentity ? { identity: resolution.previewIdentity } : {}),
       ...(candidate?.label ? { label: candidate.label } : {}),
       ...(frontendHref ? { storefrontHref: frontendHref } : {}),
     },
     ownership: {
+      resolved: resolvedOwnership(resolution.activeResolution),
+      ...(activeTemplateReference(resolution.activeResolution)
+        ? { activeTemplate: activeTemplateReference(resolution.activeResolution) }
+        : {}),
       effective: { source: "routing-template", layoutId: owner.documentId },
       assignedTemplate,
       fallback: { source: "native-fallback" },
@@ -139,6 +159,7 @@ export function projectIndividualBuilderEditorContext(
     scope: { ...(scope.websiteId ? { websiteId: scope.websiteId } : {}) },
     content: {
       mode: "fixed",
+      pageType: owner.pageType,
       family: owner.family,
       identity: owner.identity,
       ...(owner.title ? { label: owner.title } : {}),
@@ -146,6 +167,10 @@ export function projectIndividualBuilderEditorContext(
       ...(frontendHref ? { storefrontHref: frontendHref } : {}),
     },
     ownership: {
+      resolved: layoutReference(status.effective),
+      ...(status.effective.source === "routing-template" && status.assignedTemplate
+        ? { activeTemplate: status.assignedTemplate }
+        : {}),
       effective: layoutReference(status.effective),
       ...(status.individualLayout ? { individual: status.individualLayout } : {}),
       ...(status.assignedTemplate ? { assignedTemplate: status.assignedTemplate } : {}),
@@ -189,18 +214,60 @@ export async function resolveOrdinaryBuilderEditorContext(input: {
   const customPage = isBuilderCustomPageKey(page)
     ? (await readBuilderCustomPages(scope)).find((item) => item.key === page)
     : undefined;
-  const displayName = layout?.displayName ?? customPage?.title ?? PAGE_LABELS[page] ?? "Page";
   const frontendHref = ordinaryPageFrontendHref(page, customPage?.slug);
   const kind = page === "header" ? "header" : page === "footer" ? "footer" : "page";
+  const documentId = layout?.documentId ?? `layout:builder:${page}`;
+  const routingOwner = kind === "page"
+    ? (await readLayoutRoutingRegistry(scope)).routingTemplates.find(
+        (template) => template.layoutId === documentId,
+      )
+    : undefined;
+  const pageType = routingOwner?.pageType ?? (
+    kind === "page" && layout?.targetType !== "template"
+      ? legacyTemplatePageType("singular", "page")
+      : undefined
+  );
+  const displayName = layout?.displayName ?? routingOwner?.name ?? customPage?.title ?? PAGE_LABELS[page] ?? "Page";
+  let canvasResolution: LayoutResolution | undefined;
+  if (routingOwner) {
+    const registry = await readLayoutRoutingRegistry(scope);
+    const definition = BUILTIN_TEMPLATE_PAGE_TYPES.find((item) => item.id === pageType);
+    const typeCondition = routingOwner.conditions.find(
+      (condition): condition is Extract<typeof condition, { subject: "content-type" }> =>
+        condition.subject === "content-type" && condition.operator === "include",
+    );
+    const contentType = definition?.contentType ?? typeCondition?.contentType ?? page;
+    canvasResolution = resolveLayout({
+      context: {
+        view: routingOwner.view,
+        ...(pageType ? { pageType } : {}),
+        provider: definition?.provider ?? "webpages",
+        contentType,
+        contentId: `builder-canvas:${page}`,
+        slug: String(page),
+        uri: frontendHref ?? "/",
+        taxonomyTerms: [],
+        pageNumber: 1,
+      },
+      individualOverrides: registry.individualOverrides,
+      routingTemplates: registry.routingTemplates,
+      nativeFallbackAvailable: true,
+    });
+  }
   return {
     document: {
-      id: layout?.documentId ?? `layout:builder:${page}`,
+      id: documentId,
       kind,
       displayName,
     },
     scope: { ...(scope.websiteId ? { websiteId: scope.websiteId } : {}) },
-    content: { mode: "none" },
-    ownership: {},
+    content: { mode: "none", ...(pageType ? { pageType } : {}) },
+    ownership: canvasResolution ? {
+      resolved: resolvedOwnership(canvasResolution),
+      ...(activeTemplateReference(canvasResolution)
+        ? { activeTemplate: activeTemplateReference(canvasResolution) }
+        : {}),
+    } : { resolved: { source: "native-fallback" } },
     navigation: {
       returnHref: managementHref(scope, "pages"),
       returnLabel: "Back to Pages",
@@ -274,22 +341,16 @@ type EditableRequest =
     };
 
 async function canonicalRegistry(
-  context: CanonicalRouteContext,
+  _context: CanonicalRouteContext,
   scope: BuilderDataScope,
 ): Promise<LayoutRoutingRegistry | null> {
-  if (context.provider === "woocommerce" && context.contentType === "product") {
-    return ensureProductSingleRoutingCompatibility(scope);
-  }
-  if (context.provider === "wordpress" && context.contentType === "post") {
-    return ensurePostSingleRoutingCompatibility(scope);
-  }
-  if (context.provider === "woocommerce" && context.contentType === "product-category") {
-    return ensureProductCategoryRoutingCompatibility(scope);
-  }
-  if (context.provider === "wordpress" && context.contentType === "post-category") {
-    return ensurePostCategoryRoutingCompatibility(scope);
-  }
-  return null;
+  // Compatibility helpers only expose pre-existing layouts. Page-type
+  // ownership belongs to the registry and is no longer gated by four families.
+  await ensureProductSingleRoutingCompatibility(scope);
+  await ensurePostSingleRoutingCompatibility(scope);
+  await ensureProductCategoryRoutingCompatibility(scope);
+  await ensurePostCategoryRoutingCompatibility(scope);
+  return readLayoutRoutingRegistry(scope);
 }
 
 export async function getEditableLayoutTargetForCurrentRequest(input: {
@@ -329,13 +390,14 @@ export async function getEditableLayoutTargetForCurrentRequest(input: {
     };
   }
   if (resolution.outcome === "routing-template") {
+    const knownLabel = ({
+      post: "Edit Single Post Template",
+      product: "Edit Product Template",
+      "product-category": "Edit Product Category Template",
+      "post-category": "Edit Post Category Template",
+    } as const)[input.request.context.contentType as "post" | "product" | "product-category" | "post-category"];
     return {
-      label: ({
-        post: "Edit Single Post Template",
-        product: "Edit Product Template",
-        "product-category": "Edit Product Category Template",
-        "post-category": "Edit Post Category Template",
-      } as const)[input.request.context.contentType as "post" | "product" | "product-category" | "post-category"] ?? "Edit Product Template",
+      label: knownLabel ?? `Edit ${input.request.context.contentType} Template`,
       targetKind: "routing-template",
       builderHref: builderHref(scope, {
         document: resolution.layoutId,

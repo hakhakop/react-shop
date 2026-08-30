@@ -136,6 +136,7 @@ const priceFormatted =
 
   const routeContext: SingularRouteContext = {
     view: "singular",
+    pageType: "singular:product",
     provider: "woocommerce",
     contentType: "product",
     contentId: p.id,

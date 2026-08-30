@@ -30,6 +30,7 @@ export async function resolveCommerceRouteProjection(input: {
     if (!resolved) return null;
     const routeContext: ArchiveRouteContext = {
       view: "archive",
+      pageType: "taxonomy:product_cat",
       provider: "woocommerce",
       contentType: "product-category",
       contentId: String(resolved.category.id),
@@ -75,6 +76,7 @@ export async function resolveCommerceRouteProjection(input: {
   const product = canonical.product;
   const routeContext: SingularRouteContext = {
     view: "singular",
+    pageType: "singular:product",
     provider: "woocommerce",
     contentType: "product",
     contentId: product.id,

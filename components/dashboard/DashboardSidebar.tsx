@@ -54,6 +54,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
+import type { BuilderEditorContext, BuilderTemplateCreationContext } from "@/lib/builderEditorContext";
 
 type TemplateLibraryTab = LayoutLibraryType;
 
@@ -68,6 +69,9 @@ const corePages = [
 
 type DashboardSidebarProps = {
   websiteId?: string;
+  templateCreationContext?: BuilderTemplateCreationContext;
+  builderEditorContext?: BuilderEditorContext | null;
+  onRoutingTemplatesChanged?: () => void | Promise<void>;
   dashboardTheme: "light" | "dark";
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
@@ -137,6 +141,9 @@ type DashboardSidebarProps = {
 
 export default function DashboardSidebar({
   websiteId,
+  templateCreationContext,
+  builderEditorContext,
+  onRoutingTemplatesChanged,
   wordpressOrigin,
   wordpressSiteUrl,
   dashboardTheme,
@@ -946,7 +953,7 @@ export default function DashboardSidebar({
 
           {sidebarTab === "routingTemplates" && (
             <motion.div key="routingTemplates" initial={{ opacity: 0, scale: 0.985 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.995 }} transition={{ duration: 0.12, ease: "easeOut" }}>
-              <RoutingTemplatesPanel websiteId={websiteId} />
+              <RoutingTemplatesPanel websiteId={websiteId} creationContext={templateCreationContext} editorContext={builderEditorContext} onTemplatesChanged={onRoutingTemplatesChanged} />
             </motion.div>
           )}
 

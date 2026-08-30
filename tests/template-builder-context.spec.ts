@@ -69,6 +69,25 @@ test("template-aware context validates ownership and rematerializes Product/Post
   });
   expect(secondProduct.renderLayout.sections[0]?.layoutItems?.[0]?.blocks?.[0]?.headingText).toBe("Pink Jumper");
 
+  await service.update(product.template.id, {
+    conditions: [
+      { subject: "content-type", operator: "include", contentType: "product" },
+      {
+        subject: "content-identity",
+        operator: "include",
+        identity: { provider: "woocommerce", contentType: "product", contentId: "102" },
+      },
+    ],
+  });
+  const assignedProduct = await resolveTemplateBuilderContext({
+    documentId: product.template.layoutId,
+    routingTemplateId: product.template.id,
+    scope,
+    resolveContexts: resolveContexts as never,
+  });
+  expect(assignedProduct.previewIdentity?.contentId).toBe("102");
+  expect(assignedProduct.renderLayout.sections[0]?.layoutItems?.[0]?.blocks?.[0]?.headingText).toBe("Pink Jumper");
+
   const firstPost = await resolveTemplateBuilderContext({
     documentId: post.template.layoutId,
     routingTemplateId: post.template.id,
@@ -104,4 +123,3 @@ test("template-aware context validates ownership and rematerializes Product/Post
   expect(storedLayouts).not.toContain("Pink Jumper");
   expect(storedLayouts).not.toContain("Customer Story: Ambitech");
 });
-

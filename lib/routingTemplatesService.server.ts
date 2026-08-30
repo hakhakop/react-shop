@@ -35,6 +35,12 @@ import {
 } from "@/lib/layoutDocumentReferences.server";
 import type { BuilderDataScope } from "@/lib/builderLayouts";
 import { createRoutingTemplateStarterSections, type RoutingTemplateStarter } from "@/lib/routingTemplateStarters";
+import {
+  BUILTIN_TEMPLATE_PAGE_TYPES,
+  findTemplatePageType,
+  legacyTemplatePageType,
+  type TemplatePageTypeDefinition,
+} from "@/lib/templatePageTypes";
 
 const GENERATED_TEMPLATE_ID = /^routing:template:([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$/i;
 const COMPATIBILITY_TEMPLATE_IDS = new Set([
@@ -44,7 +50,7 @@ const COMPATIBILITY_TEMPLATE_IDS = new Set([
   "routing:legacy-post-category",
 ]);
 
-export type RoutingTemplateContentType = "product" | "post" | "product-category" | "post-category";
+export type RoutingTemplateContentType = string;
 
 export class InvalidRoutingTemplateRequestError extends Error {}
 export class RoutingTemplateNotFoundError extends Error {}
@@ -96,17 +102,6 @@ function cleanName(value: unknown) {
   return value.trim();
 }
 
-function contentTypeOf(template: RoutingTemplate): RoutingTemplateContentType | null {
-  const values = template.conditions.flatMap((condition) =>
-    condition.subject === "content-type" && condition.operator === "include"
-      ? [condition.contentType]
-      : [],
-  );
-  return values.length === 1 && ["product", "post", "product-category", "post-category"].includes(values[0] ?? "")
-    ? values[0] as RoutingTemplateContentType
-    : null;
-}
-
 function validateConditions(
   contentType: RoutingTemplateContentType,
   input?: readonly SingularTemplateCondition[],
@@ -122,16 +117,12 @@ function validateConditions(
   if (!conditions.length) {
     throw new InvalidRoutingTemplateRequestError("At least one assignment condition is required.");
   }
-  let positiveIdentityConditions = 0;
   let matchingTypeConditions = 0;
   for (const condition of conditions) {
     if (condition.operator !== "include" && condition.operator !== "exclude") {
       throw new InvalidRoutingTemplateRequestError("Invalid condition operator.");
     }
     if (condition.subject === "content-type") {
-      if (!["product", "post", "product-category", "post-category"].includes(condition.contentType)) {
-        throw new InvalidRoutingTemplateRequestError("Unsupported routing content type.");
-      }
       if (condition.operator === "include" && condition.contentType === contentType) {
         matchingTypeConditions += 1;
       }
@@ -142,14 +133,28 @@ function validateConditions(
       if (!identity?.provider?.trim() || !identity.contentType?.trim() || !identity.contentId?.trim()) {
         throw new InvalidRoutingTemplateRequestError("Invalid content identity condition.");
       }
-      if (condition.operator === "include") positiveIdentityConditions += 1;
       continue;
     }
     if (condition.subject === "taxonomy-term") {
       if (!condition.taxonomy?.trim() || !condition.termId?.trim()) {
         throw new InvalidRoutingTemplateRequestError("Invalid taxonomy condition.");
       }
-      if (condition.operator === "include") positiveIdentityConditions += 1;
+      continue;
+    }
+    if (condition.subject === "request-taxonomy-term") {
+      if (!condition.taxonomy?.trim() || !condition.termId?.trim()) {
+        throw new InvalidRoutingTemplateRequestError("Invalid request-taxonomy condition.");
+      }
+      continue;
+    }
+    if (condition.subject === "page-number") {
+      if (condition.operator !== "include" || !["first", "except-first"].includes(condition.page)) {
+        throw new InvalidRoutingTemplateRequestError("Invalid page-number condition.");
+      }
+      continue;
+    }
+    if (condition.subject === "language") {
+      if (!condition.language?.trim()) throw new InvalidRoutingTemplateRequestError("Invalid language condition.");
       continue;
     }
     throw new InvalidRoutingTemplateRequestError("Unsupported routing condition.");
@@ -157,11 +162,6 @@ function validateConditions(
   if (matchingTypeConditions !== 1) {
     throw new InvalidRoutingTemplateRequestError(
       `A ${contentType} template requires one matching include condition.`,
-    );
-  }
-  if (positiveIdentityConditions > 1) {
-    throw new InvalidRoutingTemplateRequestError(
-      "Multiple positive identity conditions have unsupported AND semantics.",
     );
   }
   return conditions;
@@ -181,8 +181,19 @@ async function compatibilityRegistry(scope: BuilderDataScope) {
 export function createRoutingTemplatesService(
   scope: BuilderDataScope = {},
   dependencies: Partial<ServiceDependencies> = {},
+  options: { pageTypes?: readonly TemplatePageTypeDefinition[] } = {},
 ) {
   const deps = { ...defaultDependencies, ...dependencies };
+  const pageTypes = options.pageTypes ?? BUILTIN_TEMPLATE_PAGE_TYPES;
+
+  function definitionFor(value: unknown) {
+    if (typeof value !== "string" || !value.trim()) {
+      throw new InvalidRoutingTemplateRequestError("Template Page assignment is required.");
+    }
+    const definition = findTemplatePageType(pageTypes, value);
+    if (!definition) throw new InvalidRoutingTemplateRequestError("Unsupported Template Page assignment.");
+    return definition;
+  }
 
   async function readRegistry() {
     if (dependencies.readRegistry) return deps.readRegistry(scope);
@@ -272,29 +283,32 @@ export function createRoutingTemplatesService(
     get,
     async create(input: {
       name: string;
-      contentType: RoutingTemplateContentType;
+      pageType?: string;
+      contentType?: RoutingTemplateContentType;
       conditions?: readonly SingularTemplateCondition[];
       enabled?: boolean;
       layout?: DynamicBuilderDocumentCreateInput;
       starter?: RoutingTemplateStarter;
     }) {
-      if (!["product", "post", "product-category", "post-category"].includes(input.contentType)) {
-        throw new InvalidRoutingTemplateRequestError("Unsupported Routing Template content type.");
-      }
+      const legacyPageType = input.contentType
+        ? legacyTemplatePageType(input.contentType.endsWith("-category") ? "archive" : "singular", input.contentType)
+        : undefined;
+      const definition = definitionFor(input.pageType ?? legacyPageType);
       const name = cleanName(input.name);
-      const conditions = validateConditions(input.contentType, input.conditions);
+      const conditions = validateConditions(definition.contentType, input.conditions);
       const registry = await readRegistry();
       const document = await deps.createDocument({
         ...input.layout,
         displayName: input.layout?.displayName ?? name,
-        sections: input.layout?.sections ?? createRoutingTemplateStarterSections(input.contentType, input.starter ?? "blank"),
+        sections: input.layout?.sections ?? createRoutingTemplateStarterSections(definition.contentType, input.starter ?? "blank"),
       }, scope);
       const template: RoutingTemplate = {
         id: generatedTemplateId(),
         name,
         enabled: input.enabled ?? true,
         order: registry.routingTemplates.length * 10,
-        view: input.contentType.endsWith("-category") ? "archive" : "singular",
+        pageType: definition.id,
+        view: definition.view,
         conditions,
         layoutId: document.documentId,
       };
@@ -309,6 +323,7 @@ export function createRoutingTemplatesService(
     async update(value: unknown, input: {
       name?: string;
       enabled?: boolean;
+      pageType?: string;
       conditions?: readonly SingularTemplateCondition[];
     }) {
       const id = parseServiceTemplateId(value);
@@ -316,14 +331,25 @@ export function createRoutingTemplatesService(
       const index = registry.routingTemplates.findIndex((item) => item.id === id);
       if (index < 0) throw new RoutingTemplateNotFoundError("Routing Template not found.");
       const current = registry.routingTemplates[index]!;
-      const contentType = contentTypeOf(current);
-      if (!contentType) throw new RoutingTemplateConflictError("Template has unsupported assignment conditions.");
+      const legacyContentType = current.conditions.find((condition) =>
+        condition.subject === "content-type" && condition.operator === "include",
+      );
+      const currentPageType = current.pageType ?? legacyTemplatePageType(
+        current.view,
+        legacyContentType?.subject === "content-type" ? legacyContentType.contentType : "unknown",
+      );
+      const definition = definitionFor(input.pageType ?? currentPageType);
+      const contentType = definition.contentType;
       const template: RoutingTemplate = {
         ...current,
         name: input.name === undefined ? current.name : cleanName(input.name),
         enabled: input.enabled ?? current.enabled,
+        pageType: definition.id,
+        view: definition.view,
         conditions: input.conditions === undefined
-          ? current.conditions
+          ? input.pageType && input.pageType !== currentPageType
+            ? validateConditions(contentType)
+            : current.conditions
           : validateConditions(contentType, input.conditions),
       };
       const templates = [...registry.routingTemplates];

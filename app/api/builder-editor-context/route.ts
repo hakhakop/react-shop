@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
               kind: "dynamic",
               context: {
                 view: "archive",
+                pageType: "taxonomy:product_cat",
                 provider: "woocommerce",
                 contentType: "product-category",
                 contentId: String(category.category.id),
@@ -99,6 +100,7 @@ export async function GET(request: NextRequest) {
               kind: "dynamic",
               context: {
                 view: "singular",
+                pageType: "singular:product",
                 provider: "woocommerce",
                 contentType: "product",
                 contentId: canonical.product.id,
@@ -134,6 +136,7 @@ export async function GET(request: NextRequest) {
           kind: "singular",
           context: {
             view: "singular",
+            pageType: `singular:${item.identity.contentType}`,
             provider: item.identity.provider,
             contentType: item.identity.contentType,
             contentId: item.identity.contentId,

@@ -6,6 +6,7 @@
       "name": "Product Single",
       "enabled": true,
       "order": 0,
+      "pageType": "singular:product",
       "view": "singular",
       "conditions": [
         {
@@ -20,7 +21,8 @@
       "id": "routing:legacy-post-single",
       "name": "Single Post",
       "enabled": true,
-      "order": 0,
+      "order": 10,
+      "pageType": "singular:post",
       "view": "singular",
       "conditions": [
         {
@@ -36,6 +38,7 @@
       "name": "Global Product Category",
       "enabled": true,
       "order": 20,
+      "pageType": "taxonomy:product_cat",
       "view": "archive",
       "conditions": [
         {
@@ -51,6 +54,7 @@
       "name": "Global Post Category",
       "enabled": true,
       "order": 30,
+      "pageType": "taxonomy:category",
       "view": "archive",
       "conditions": [
         {
