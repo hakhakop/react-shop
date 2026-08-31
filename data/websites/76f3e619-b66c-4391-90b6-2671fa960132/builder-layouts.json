@@ -1687,62 +1687,69 @@
         "id": "header-document",
         "kind": "contentLayout",
         "title": "Header",
-        "background": "#ffffff",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "layout": "thirds",
+        "layout": "header-row",
         "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-document-column-1",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
                 "headerBrandMode": "brand",
                 "headerBrandText": "Woolberry",
-                "imageAlt": "Woolberry logo",
-                "imageMaxWidth": 180
+                "imageMaxWidth": 140,
+                "imageAlignment": "left",
+                "imageUrl": null,
+                "imageAlt": "Woolberry logo"
               }
             ]
           },
           {
-            "id": "header-document-column-2",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
-                "menuSource": "main-menu",
-                "menuActiveIndicator": "underline"
+                "menuSource": "main",
+                "menuActiveIndicator": "underline",
+                "elementAlign": "center"
               }
             ]
           },
           {
-            "id": "header-document-column-3",
-            "rowId": "header-document-row",
-            "rowLayout": "thirds",
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Contact Us",
-                "buttonUrl": "#contact",
-                "buttonStyle": "primary",
-                "size": "default"
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
               }
             ]
           }
         ],
         "visible": true,
-        "headerUtilityMigrationVersion": 3,
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": false,
@@ -1757,10 +1764,65 @@
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "",
         "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerTopToolbarMeta": "",
+        "rows": [
+          {
+            "id": "header-main-row",
+            "layout": "3-col-equal",
+            "columns": [
+              {
+                "id": "header-main-left",
+                "elements": [
+                  {
+                    "id": "header-logo",
+                    "kind": "image",
+                    "headerBrandMode": "brand",
+                    "headerBrandText": "Woolberry",
+                    "imageMaxWidth": 140,
+                    "imageAlignment": "left",
+                    "imageUrl": null,
+                    "imageAlt": "Woolberry logo"
+                  }
+                ]
+              },
+              {
+                "id": "header-main-center",
+                "elements": [
+                  {
+                    "id": "header-navigation",
+                    "kind": "menu",
+                    "title": "Navigation",
+                    "menuSource": "main",
+                    "menuActiveIndicator": "underline",
+                    "elementAlign": "center"
+                  }
+                ]
+              },
+              {
+                "id": "header-main-right",
+                "elements": [
+                  {
+                    "id": "header-utility-search",
+                    "kind": "headerSearch",
+                    "headerUtilityAction": "search",
+                    "headerUtilityVariant": "muted",
+                    "elementAlign": "right"
+                  },
+                  {
+                    "id": "header-utility-cart",
+                    "kind": "headerCart",
+                    "headerUtilityAction": "cart",
+                    "headerUtilityVariant": "muted",
+                    "elementAlign": "right"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
-    "updatedAt": "2026-08-30T09:26:09.587Z"
+    "updatedAt": "2026-08-31T07:21:40.562Z"
   },
   "footer": {
     "version": 1,

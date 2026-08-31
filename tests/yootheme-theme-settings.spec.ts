@@ -253,3 +253,31 @@ test("renders Jack Baker's imported Navbar line as a semantic strike-through", (
   expect(headerCss).toContain("right: calc(100% - var(--uk-navbar-nav-item-line-margin-horizontal, 0px))");
   expect(headerCss).toContain("background: var(--uk-navbar-nav-item-line-hover-background, currentColor)");
 });
+
+test("keeps Header row layout on the shared inspector path", () => {
+  const inspector = readFileSync("components/dashboard/DashboardInspector.tsx", "utf8");
+
+  expect(inspector).not.toContain('The current Header Builder composition.');
+  expect(inspector).not.toContain("builder-header-active-row-layout");
+  expect(inspector).not.toContain("Choose Header row layout");
+  expect(inspector).toContain('title="Header row behavior"');
+  expect(inspector).toContain("<div className=\"builder-layout-picker-grid is-inline\">");
+  expect(inspector).toContain("builderRowLayoutPresets.map((preset) =>");
+  expect(inspector).toContain("const isCanonicalRowSelection = Boolean(\n    selectedInspectorRow,\n  );");
+  expect(inspector).not.toContain("selectedInspectorRow &&\n      !isHeaderDocumentSection");
+});
+
+test("exposes YOOtheme Navbar Nav Item controls and preserves the height token bridge", () => {
+  const panel = readFileSync(
+    "components/dashboard/global-styles/CanonicalGlobalStylesPanel.tsx",
+    "utf8",
+  );
+  const headerCss = readFileSync("app/styles/header.css", "utf8");
+  const variables = getUikitGlobalsCssVars({ navbarNavItemHeight: "80px" });
+
+  expect(panel).toContain('navbar: ["Surface", "Nav Item"');
+  expect(panel).toContain('<Length label="Item height" value={draft.navbarNavItemHeight}');
+  expect(variables["--uk-navbar-nav-item-height"]).toBe("80px");
+  expect(headerCss).toContain("height: var(--header-builder-height);");
+  expect(headerCss).toContain("--uk-navbar-nav-item-height");
+});

@@ -75,7 +75,6 @@ import {
   resolveBuilderSpacing,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
-import { headerPresets } from "./headerPresets";
 import {
   resolveTypographyInput,
   updateTypographyArea,
@@ -545,7 +544,6 @@ type DashboardInspectorProps = {
   duplicateSelected: LooseHandler;
   duplicateSelectedRow?: LooseHandler;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
-  onApplyHeaderPreset?: (presetKey: string) => void;
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: {
@@ -807,126 +805,21 @@ type HeaderDocumentSettingsValues = Pick<
 
 type HeaderDocumentPatch = Partial<HeaderDocumentSettingsValues>;
 
-/**
- * The names and ordering mirror Yootheme's Header layout chooser.  They are
- * intentionally backed by the existing WebPages header preset pipeline; the
- * inspector is only exposing the canonical choices, not creating a second
- * header model.
- */
-const YOOTHEME_HEADER_LAYOUT_PRESETS = [
-  { key: "minimal", label: "Horizontal Left", description: "Logo, navigation, and actions aligned from the left." },
-  { key: "centered-logo", label: "Horizontal Center", description: "Balanced single-row navigation with centered branding." },
-  { key: "business", label: "Horizontal Right", description: "Navigation and actions weighted toward the right." },
-  { key: "wordpress", label: "Horizontal Justify", description: "Full-width single row with space between positions." },
-  { key: "centered-logo", label: "Horizontal Center Logo", description: "Centered logo composition with navigation around it." },
-  { key: "two-row", label: "Stacked Center A", description: "Two-row header with centered primary navigation." },
-  { key: "business", label: "Stacked Center B", description: "Two-level business header with utility actions." },
-  { key: "ecommerce", label: "Stacked Center C", description: "Two-level commerce-ready header composition." },
-  { key: "two-row", label: "Stacked Center Split A", description: "Stacked header with split utility positions." },
-  { key: "compact", label: "Stacked Center Split B", description: "Compact stacked composition for dense navigation." },
-  { key: "simple", label: "Stacked Left", description: "Stacked header with left-aligned content." },
-  { key: "wordpress", label: "Stacked Justify", description: "Stacked header preserving justified positions." },
-] as const;
-
-function YoothemeHeaderLayoutDiagram({ label }: { label: string }) {
-  const search = (x: number, y: number) => (
-    <g>
-      <circle cx={x} cy={y} r="4" />
-      <path d={`M${x + 3} ${y + 3}l4 4`} />
-    </g>
-  );
-  const menu = (positions: number[], y: number) =>
-    positions.map((x) => <path key={`${x}-${y}`} d={`M${x} ${y}h11`} />);
-  const logo = (x: number, y: number) => <path d={`M${x} ${y}h18`} />;
-  const more = (x: number, y: number) => <path d={`M${x} ${y}h1m4 0h1m3 0h1`} />;
-
-  let marks: React.ReactNode;
-  switch (label) {
-    case "Horizontal Left":
-      marks = <>{logo(15, 22)}{menu([48, 65, 82], 22)}{search(157, 21)}</>;
-      break;
-    case "Horizontal Center":
-      marks = <>{logo(16, 22)}{menu([77, 94, 111], 22)}{search(157, 21)}</>;
-      break;
-    case "Horizontal Right":
-      marks = <>{logo(16, 22)}{menu([105, 122, 139], 22)}{search(157, 21)}</>;
-      break;
-    case "Horizontal Justify":
-      marks = <>{logo(15, 22)}{menu([59, 92, 125], 22)}{search(157, 21)}</>;
-      break;
-    case "Horizontal Center Logo":
-      marks = <>{menu([15, 32, 49], 22)}{logo(82, 22)}{search(157, 21)}</>;
-      break;
-    case "Stacked Center A":
-      marks = <>{search(90, 18)}{menu([70, 87, 104], 30)}</>;
-      break;
-    case "Stacked Center B":
-      marks = <>{logo(82, 17)}{menu([70, 87, 104], 29)}{search(90, 34)}</>;
-      break;
-    case "Stacked Center C":
-      marks = <>{search(18, 18)}{menu([83, 100, 117], 30)}{more(147, 18)}</>;
-      break;
-    case "Stacked Center Split A":
-      marks = <>{menu([43, 60, 94, 111], 18)}{logo(76, 30)}{search(90, 34)}</>;
-      break;
-    case "Stacked Center Split B":
-      marks = <>{menu([15, 32, 76, 127, 144], 18)}{search(90, 34)}</>;
-      break;
-    case "Stacked Left":
-      marks = <>{menu([15, 32], 18)}{search(157, 18)}{more(149, 30)}{menu([15, 32, 49], 30)}</>;
-      break;
-    default:
-      marks = <>{menu([15, 32, 65, 82, 115], 18)}{search(157, 18)}{menu([15, 49, 82, 115, 148], 30)}</>;
-  }
-
-  return (
-    <svg className="builder-yootheme-layout-diagram" viewBox="0 0 180 92" aria-hidden="true">
-      <rect x="4" y="4" width="172" height="82" />
-      <path d="M4 40h172" />
-      {marks}
-    </svg>
-  );
-}
-
 function HeaderDocumentSettings({
   headerSettings,
   headerVisible,
   headerHeight,
   headerCustomHeight,
-  onApplyHeaderPreset,
   onHeaderDocumentChange,
 }: {
   headerSettings: HeaderDocumentSettingsValues;
   headerVisible: boolean;
   headerHeight?: string;
   headerCustomHeight?: number;
-  onApplyHeaderPreset?: (presetKey: string) => void;
   onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
 }) {
   return (
     <div className="builder-inspector-stack">
-      <InspectorDivision title="Layout" description="The current Header Builder composition." className="builder-document-division">
-        <div className="builder-header-presets-grid" aria-label="Yootheme header layouts">
-          {YOOTHEME_HEADER_LAYOUT_PRESETS.map((layout) => {
-            const preset = headerPresets.find((candidate) => candidate.key === layout.key);
-            if (!preset || !onApplyHeaderPreset) return null;
-            return (
-              <button
-                key={layout.label}
-                type="button"
-                className="builder-preset-btn builder-header-layout-preset"
-                onClick={() => onApplyHeaderPreset(preset.key)}
-                title={layout.description}
-              >
-                <YoothemeHeaderLayoutDiagram label={layout.label} />
-                <span>{layout.label}</span>
-              </button>
-            );
-          })}
-        </div>
-        <small>These layouts use the existing Header Builder presets and preserve website branding and global tokens.</small>
-      </InspectorDivision>
-
       <InspectorDivision title="Behavior" description="Document-wide behavior shared by every Header row and element." className="builder-document-division">
         <InspectorFieldRow label="Show website Header">
           <InspectorSwitch checked={headerVisible} onChange={(checked) => onHeaderDocumentChange({ headerVisible: checked })} />
@@ -1201,7 +1094,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const { t } = useTranslation();
   const [categoryHideSearch, setCategoryHideSearch] = useState("");
   const [openNestedCardId, setOpenNestedCardId] = useState<string | null>(null);
-  const [rowLayoutPickerOpen, setRowLayoutPickerOpen] = useState(false);
   const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
     area: "title" | "body" | "button" | "eyebrow";
     blockKey: string | null;
@@ -1260,7 +1152,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     duplicateSelected,
     duplicateSelectedRow = () => undefined,
     applySelectedRowLayoutPreset = () => undefined,
-    onApplyHeaderPreset = () => undefined,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
     onUpdateColumnStyle = () => undefined,
@@ -1286,9 +1177,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     uploadSelectedLayoutBlockSlideImage,
     uploadSelectedSlideImage,
   } = props;
-  useEffect(() => {
-    setRowLayoutPickerOpen(false);
-  }, [selectedLayoutRowIndex, selectedLayoutColumnKey, selectedSection?.id]);
   const isHeaderDocumentSection =
     headerDocumentRoot || selectedSection?.id === "header-document";
   const hasLocalButtonStyles = (block: BuilderLayoutBlock) =>
@@ -1365,12 +1253,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isCanonicalColumnSelection = Boolean(
     selectedCanonicalColumnLocation &&
       !selectedLayoutBlock &&
-      !selectedLayoutRow &&
-      !isHeaderDocumentSection,
+      !selectedLayoutRow,
   );
   const isCanonicalRowSelection = Boolean(
-    selectedInspectorRow &&
-      !isHeaderDocumentSection,
+    selectedInspectorRow,
   );
   const supportedAreas = selectedLayoutBlock
     ? getSupportedTypographyAreas(
@@ -2430,27 +2316,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerVisible={selectedSection.headerVisible ?? shellSettings.headerVisible ?? true}
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
-                onApplyHeaderPreset={onApplyHeaderPreset}
                 onHeaderDocumentChange={updateSelected}
               />
             ) : null}
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
-              {isHeaderDocumentSection ? (
-                <div className="builder-header-active-row-layout">
-                  <span>Active row preset</span>
-                  <strong>{selectedRowLayoutSummary}</strong>
-                  <button
-                    type="button"
-                    className="builder-secondary-button"
-                    onClick={() => setRowLayoutPickerOpen(true)}
-                  >
-                    Change layout
-                  </button>
-                </div>
-              ) : null}
-              <details className="builder-collapse" open={!isHeaderDocumentSection}>
+              <details className="builder-collapse" open>
                 <summary>
                   <InspectorGroupSummary
                     title="Row Layout"
@@ -2467,7 +2339,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   </small>
                 </label>
 
-                {isHeaderDocumentSection ? (
+                {!isHeaderDocumentSection ? null : (
+                  <details className="builder-collapse" open>
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Header row behavior"
+                        meta="Header-specific row metadata"
+                      />
+                    </summary>
                   <>
                     <div className="builder-two-column">
                       <label className="builder-field">
@@ -2568,33 +2447,32 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       />
                     </label>
                   </>
-                ) : null}
+                  </details>
+                )}
 
-                {!isHeaderDocumentSection ? (
-                  <div className="builder-layout-picker-grid is-inline">
-                    {builderRowLayoutPresets.map((preset) => {
-                      const isActive = selectedRowLayoutPreset?.key === preset.key;
-                      return (
-                        <button
-                          key={preset.key}
-                          type="button"
-                          className={`builder-layout-picker-card ${isActive ? "is-active" : ""}`}
-                          onClick={() => applySelectedRowLayoutPreset(preset.key)}
-                        >
-                          <span className="builder-layout-picker-card-copy">
-                            <strong>{preset.label}</strong>
-                            <small>{preset.description}</small>
-                          </span>
-                          <span className="builder-layout-picker-preview" aria-hidden="true">
-                            {preset.ratios.map((ratio, index) => (
-                              <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
-                            ))}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
+                <div className="builder-layout-picker-grid is-inline">
+                  {builderRowLayoutPresets.map((preset) => {
+                    const isActive = selectedRowLayoutPreset?.key === preset.key;
+                    return (
+                      <button
+                        key={preset.key}
+                        type="button"
+                        className={`builder-layout-picker-card ${isActive ? "is-active" : ""}`}
+                        onClick={() => applySelectedRowLayoutPreset(preset.key)}
+                      >
+                        <span className="builder-layout-picker-card-copy">
+                          <strong>{preset.label}</strong>
+                          <small>{preset.description}</small>
+                        </span>
+                        <span className="builder-layout-picker-preview" aria-hidden="true">
+                          {preset.ratios.map((ratio, index) => (
+                            <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
+                          ))}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </details>
 
               <details className="builder-collapse">
@@ -2634,61 +2512,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               />
             </div>
           )}
-
-          {selectedLayoutRow && isHeaderDocumentSection && rowLayoutPickerOpen
-            ? createPortal(
-                <div
-                  className="builder-layout-modal"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="builder-header-row-layout-picker-title"
-                  onClick={() => setRowLayoutPickerOpen(false)}
-                >
-                  <div className="builder-layout-dialog" onClick={(event) => event.stopPropagation()}>
-                    <div className="builder-layout-header">
-                      <div>
-                        <strong id="builder-header-row-layout-picker-title">Choose Header row layout</strong>
-                        <span>Select a UIkit/YOOtheme column structure.</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="builder-layout-close"
-                        onClick={() => setRowLayoutPickerOpen(false)}
-                        aria-label="Close Header row layout picker"
-                      >
-                        <X size={15} />
-                      </button>
-                    </div>
-                    <div className="builder-layout-picker-body">
-                      <div className="builder-layout-picker-grid">
-                        {builderRowLayoutPresets.map((preset) => (
-                          <button
-                            key={preset.key}
-                            type="button"
-                            className={`builder-layout-picker-card ${selectedRowLayoutPreset?.key === preset.key ? "is-active" : ""}`}
-                            onClick={() => {
-                              applySelectedRowLayoutPreset(preset.key);
-                              setRowLayoutPickerOpen(false);
-                            }}
-                          >
-                            <span className="builder-layout-picker-card-copy">
-                              <strong>{preset.label}</strong>
-                              <small>{preset.description}</small>
-                            </span>
-                            <span className="builder-layout-picker-preview" aria-hidden="true">
-                              {preset.ratios.map((ratio, index) => (
-                                <i key={`${preset.key}-modal-${index}`} style={{ flex: ratio }} />
-                              ))}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>,
-                document.body,
-              )
-            : null}
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "spacing" && (
             <div className="builder-inspector-stack">

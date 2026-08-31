@@ -8050,30 +8050,22 @@ export default function DashboardBuilder({
 
   const applySelectedRowLayoutPreset = (presetKey: string) => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
-    if (selectedSection.id !== "header-document") {
-      const preset = getBuilderRowLayoutPreset(presetKey);
-      if (!preset) return;
-      setBuilderState((current) => ({
-        ...current,
-        sections: current.sections.map((section) =>
-          section.id === selectedSection.id && isLayoutContainerSection(section)
-            ? applyCanonicalBuilderRowLayout(
-                section,
-                selectedLayoutRowIndex,
-                preset.key,
-                preset.ratios.length,
-              )
-            : section,
-        ),
-      }));
-      setPublishStatus("Row layout updated");
-      return;
-    }
-    applyContentRowLayoutPreset(
-      selectedSection.id,
-      selectedLayoutRowIndex,
-      presetKey,
-    );
+    const preset = getBuilderRowLayoutPreset(presetKey);
+    if (!preset) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) =>
+        section.id === selectedSection.id && isLayoutContainerSection(section)
+          ? applyCanonicalBuilderRowLayout(
+              section,
+              selectedLayoutRowIndex,
+              preset.key,
+              preset.ratios.length,
+            )
+          : section,
+      ),
+    }));
+    setPublishStatus("Row layout updated");
   };
 
   const updateSelectedRowStyle = (
@@ -8854,6 +8846,12 @@ export default function DashboardBuilder({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nextThemeSettings),
+        }).then((response) => {
+          if (!response.ok) throw new Error("Theme settings autosave failed");
+          // The preview is an isolated server-rendered document. Bump its
+          // identity after persistence so semantic token edits, including
+          // Navbar → Nav Item height, are read by the Header renderer.
+          setThemePreviewRevision((revision) => revision + 1);
         }).catch(() => {
           setShellStatus("Theme settings autosave failed");
         });
@@ -10863,7 +10861,6 @@ export default function DashboardBuilder({
       deleteSelectedSlide={deleteSelectedSlide}
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
-      onApplyHeaderPreset={executeApplyHeaderPreset}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       onUpdateColumnStyle={updateSelectedColumnStyle}

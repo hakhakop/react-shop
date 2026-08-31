@@ -2046,7 +2046,7 @@
       ]
     }
   ],
-  "updatedAt": "2026-08-30T11:34:48.459Z",
+  "updatedAt": "2026-08-31T07:04:57.737Z",
   "buttonTextTransform": "none",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#000000",
@@ -2347,5 +2347,8 @@
     "buttonSecondaryHoverShadow": "inherit"
   },
   "buttonLineHeight": "38px",
-  "buttonLargeLineHeight": "53px"
+  "buttonLargeLineHeight": "53px",
+  "themePageLayout": "full",
+  "themePageContainerAlignment": "center",
+  "navbarNavItemHeight": "80px"
 }
