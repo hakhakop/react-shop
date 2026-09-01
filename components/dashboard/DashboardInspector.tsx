@@ -581,8 +581,14 @@ type DashboardInspectorProps = {
 };
 
 function isLayoutContainerSection(section: BuilderSection | null | undefined) {
-  return (
-    section?.kind === "contentLayout" || section?.kind === "scrollPinnedDemo"
+  return Boolean(
+    section && (
+      section.kind === "contentLayout" ||
+      section.kind === "hero" ||
+      section.kind === "scrollPinnedDemo" ||
+      (Array.isArray(section.rows) && section.rows.length > 0) ||
+      (Array.isArray(section.layoutItems) && section.layoutItems.length > 0)
+    )
   );
 }
 

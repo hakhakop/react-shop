@@ -388,6 +388,12 @@ import {
   buttonColorInputValue,
   getBuilderButtonPresetKey,
 } from "@/lib/builderButtons";
+
+type BuilderElementInsertionTarget = {
+  sectionId: string;
+  columnKey: string;
+  insertionIndex?: number;
+};
 import {
   getBuilderImageAspectRatio,
   getBuilderImageObjectFit,
@@ -1922,10 +1928,14 @@ function migrateProductTemplateSections(sections: BuilderSection[]) {
 }
 
 function isLayoutContainerSection(section: BuilderSection | null | undefined) {
-  return (
-    section?.kind === "contentLayout" ||
-    section?.kind === "hero" ||
-    section?.kind === "scrollPinnedDemo"
+  return Boolean(
+    section && (
+      section.kind === "contentLayout" ||
+      section.kind === "hero" ||
+      section.kind === "scrollPinnedDemo" ||
+      (Array.isArray(section.rows) && section.rows.length > 0) ||
+      (Array.isArray(section.layoutItems) && section.layoutItems.length > 0)
+    )
   );
 }
 
@@ -2764,10 +2774,8 @@ export default function DashboardBuilder({
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [inspectorRendered, setInspectorRendered] = useState(false);
   const [elementLibraryOpen, setElementLibraryOpen] = useState(false);
-  const [elementLibraryTarget, setElementLibraryTarget] = useState<{
-    sectionId: string;
-    columnKey: string;
-  } | null>(null);
+  const [elementLibraryTarget, setElementLibraryTarget] =
+    useState<BuilderElementInsertionTarget | null>(null);
   const previousInspectorOpenRef = useRef(false);
   const [inspectorMode, setInspectorMode] = useState<InspectorMode>("docked");
   const [inspectorWidth, setInspectorWidth] = useState(INSPECTOR_DEFAULT_WIDTH);
@@ -5445,7 +5453,7 @@ export default function DashboardBuilder({
     }));
   };
 
-  const openElementsPanel = (target?: { sectionId: string; columnKey: string }) => {
+  const openElementsPanel = (target?: BuilderElementInsertionTarget) => {
     // A Structure column action selects the column and requests its Inspector
     // in the same event turn before opening Library. Treat that target as the
     // appropriate Inspector return state even when the prior panel was closed.
@@ -5700,6 +5708,18 @@ export default function DashboardBuilder({
           }, window.location.origin);
         } else {
           sendSelectionToIframe(false);
+        }
+        return;
+      }
+      if (event.data.type === "insert") {
+        const target = event.data.target as BuilderInteractionTarget | undefined;
+        const insertionIndex = Number(event.data.insertionIndex);
+        if (target?.type === "column" && Number.isInteger(insertionIndex)) {
+          openElementsPanel({
+            sectionId: target.sectionId,
+            columnKey: target.columnKey,
+            insertionIndex,
+          });
         }
         return;
       }
@@ -7062,12 +7082,14 @@ export default function DashboardBuilder({
     targetColumnKey,
     kind,
     targetBlockKey,
+    insertionIndex,
     placement = "above",
   }: {
     sectionId: string;
     targetColumnKey: string;
     kind: LayoutBlockKind;
     targetBlockKey?: string;
+    insertionIndex?: number;
     placement?: "above" | "below";
   }) => {
     const block = createLayoutBlock(kind);
@@ -7089,7 +7111,11 @@ export default function DashboardBuilder({
             )
           : -1;
 
-        let insertIndex = targetIndex >= 0 ? targetIndex : targetBlocks.length;
+        let insertIndex = insertionIndex === undefined
+          ? targetIndex >= 0
+            ? targetIndex
+            : targetBlocks.length
+          : Math.max(0, Math.min(insertionIndex, targetBlocks.length));
         if (targetIndex >= 0 && placement === "below") {
           insertIndex = targetIndex + 1;
         }
@@ -7113,7 +7139,7 @@ export default function DashboardBuilder({
     preferredHeaderColumnKey?: string,
     targetHeaderBlockId?: string,
     placement: "above" | "below" = "below",
-    explicitTarget?: { sectionId: string; columnKey: string },
+    explicitTarget?: BuilderElementInsertionTarget,
   ) => {
     if (builderState.page === "header") {
       const headerElementByKind: Partial<Record<LayoutBlockKind, BuilderLayoutBlock>> = {
@@ -7303,7 +7329,9 @@ export default function DashboardBuilder({
       sectionId: targetSection.id,
       targetColumnKey,
       kind,
+      insertionIndex: explicitTarget?.insertionIndex,
     });
+    setInspectorTab("content");
   };
 
   const addSelectedLayoutItem = (target?: {
@@ -10579,24 +10607,57 @@ export default function DashboardBuilder({
     setTemplateStatus("Template deleted");
   };
 
-  const startSidebarResize = (clientX: number) => {
-    const startX = clientX;
+  const startSidebarResize = (
+    event: ReactPointerEvent<HTMLButtonElement> | number,
+  ) => {
+    if (typeof event === "number") {
+      const startX = event;
+      const startWidth = sidebarWidth;
+      setSidebarResizing(true);
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const nextWidth = startWidth + moveEvent.clientX - startX;
+        setSidebarWidth(Math.min(720, Math.max(280, nextWidth)));
+      };
+
+      const stopResize = () => {
+        setSidebarResizing(false);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", stopResize);
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", stopResize);
+      return;
+    }
+
+    const pointerId = event.pointerId;
+    const startX = event.clientX;
     const startWidth = sidebarWidth;
+    event.currentTarget.setPointerCapture(pointerId);
+    document.documentElement.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
     setSidebarResizing(true);
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
       const nextWidth = startWidth + moveEvent.clientX - startX;
-      setSidebarWidth(Math.min(620, Math.max(300, nextWidth)));
+      setSidebarWidth(Math.min(720, Math.max(280, nextWidth)));
     };
 
-    const stopResize = () => {
+    const stopResize = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
       setSidebarResizing(false);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", stopResize);
+      document.documentElement.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointercancel", stopResize);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", stopResize);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointercancel", stopResize);
   };
 
   const startInspectorResize = (
@@ -10907,6 +10968,8 @@ export default function DashboardBuilder({
     </DynamicContentCapabilitiesProvider>
   );
 
+  const canvasElementLibraryOpen = elementLibraryOpen && Boolean(elementLibraryTarget);
+
   const activeDocumentKindLabel = builderState.page === "footer"
     ? "Footer"
     : builderState.page === "header"
@@ -10954,10 +11017,10 @@ export default function DashboardBuilder({
       structureLabel={`${activeDocumentKindLabel} structure`}
       structureAriaLabel={`${activeDocumentKindLabel} structure`}
       sections={builderState.sections}
-      selectedSectionId={elementLibraryOpen ? elementLibraryTarget?.sectionId ?? selectedId : selectedId}
-      selectedLayoutRowIndex={elementLibraryOpen && elementLibraryTarget ? null : selectedLayoutRowIndex}
-      selectedLayoutColumnKey={elementLibraryOpen ? elementLibraryTarget?.columnKey ?? selectedLayoutColumnKey : selectedLayoutColumnKey}
-      selectedLayoutBlockKey={elementLibraryOpen && elementLibraryTarget ? null : selectedLayoutBlockKey}
+      selectedSectionId={selectedId}
+      selectedLayoutRowIndex={selectedLayoutRowIndex}
+      selectedLayoutColumnKey={selectedLayoutColumnKey}
+      selectedLayoutBlockKey={selectedLayoutBlockKey}
       hoveredTarget={hoveredBuilderTarget}
       actions={wireframeActions}
       renameSectionId={renameSectionRequestId}
@@ -12743,6 +12806,7 @@ export default function DashboardBuilder({
         topActionsSlot={sidebarTopActions}
         utilityControlsSlot={sidebarUtilityControls}
         onOpenElementLibrary={openElementsPanel}
+        onAddElementFromLibrary={(kind) => addElementFromLibrary(kind)}
         onCreateBuilderPage={createBuilderPage}
         onCreateBuilderPageFromTemplate={createBuilderPageFromTemplate}
         onDeleteBuilderPage={deleteBuilderPage}
@@ -13552,7 +13616,7 @@ export default function DashboardBuilder({
         ) : null}
       </main>
 
-      {(elementLibraryOpen || inspectorOpen || inspectorRendered) && selectedSection ? (
+      {(elementLibraryOpen && !canvasElementLibraryOpen || inspectorOpen || inspectorRendered) && selectedSection ? (
         <div
           ref={inspectorPanelRef}
           className={`builder-floating-inspector is-${effectiveInspectorMode}${
@@ -13659,7 +13723,7 @@ export default function DashboardBuilder({
             />
           ) : null}
           {!elementLibraryOpen ? inspectorPanel : null}
-          {elementLibraryOpen ? (
+          {elementLibraryOpen && !canvasElementLibraryOpen ? (
             <div className="builder-inspector builder-panel is-open">
               <ElementLibrary
                 availableLayoutBlockKinds={availableLayoutBlockKinds}
@@ -13688,6 +13752,60 @@ export default function DashboardBuilder({
           ) : null}
         </div>
       ) : null}
+
+      {canvasElementLibraryOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="builder-layout-modal builder-dashboard-modal builder-element-library-modal"
+              data-builder-tenant-theme-root=""
+              data-theme={dashboardTheme}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Add element"
+              onClick={() => closeElementLibrary(true)}
+            >
+              <div
+                className="builder-layout-dialog builder-element-library-dialog"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="builder-layout-header">
+                  <div>
+                    <strong>Add element</strong>
+                    <span>Choose an element to insert at this position.</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="builder-layout-close"
+                    onClick={() => closeElementLibrary(true)}
+                    aria-label="Close element library"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+                <div className="builder-element-library-modal-body">
+                  <ElementLibrary
+                    availableLayoutBlockKinds={availableLayoutBlockKinds}
+                    onAddElement={(kind) => {
+                      const target = elementLibraryTarget;
+                      addElementFromLibrary(
+                        kind,
+                        undefined,
+                        undefined,
+                        "below",
+                        target ?? undefined,
+                      );
+                      closeElementLibrary(false);
+                      setInspectorOpen(true);
+                    }}
+                    onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
+                    headerMode={builderState.page === "header"}
+                  />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       {!elementLibraryOpen && !inspectorOpen && !inspectorRendered && selectedSection ? (
         <button
@@ -14056,7 +14174,7 @@ function PreviewCanvas({
   onDeleteSection: (sectionId: string) => void;
   onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onSetSidebarTab: (tab: SidebarTab) => void;
-  onOpenElementsPanel: () => void;
+  onOpenElementsPanel: (target?: BuilderElementInsertionTarget) => void;
   onDeleteButton: (
     sectionId: string,
     columnKey: string,
@@ -16093,6 +16211,30 @@ function BuilderElementToolbar({
   );
 }
 
+function CanvasElementInsertionControl({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="builder-canvas-element-insertion-control"
+      aria-label={label}
+      title={label}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      }}
+    >
+      <Plus size={14} aria-hidden="true" />
+    </button>
+  );
+}
+
 function IframeBuilderInteractionLayer({
   target,
   rect,
@@ -17756,7 +17898,7 @@ const PreviewSection = memo(function PreviewSection({
     toIndex: number,
   ) => void;
   onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
-  onOpenElementsPanel: () => void;
+  onOpenElementsPanel: (target?: BuilderElementInsertionTarget) => void;
   onChangeLayout: (sectionId: string, rowIndex: number) => void;
   spacingOverlayEnabled: boolean;
   nestingDepth?: number;
@@ -18695,25 +18837,17 @@ const PreviewSection = memo(function PreviewSection({
                       />
                     ) : null}
                     {blocks.length === 0 && (
-                      <div
-                        className="builder-preview-drop-zone"
-                        aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
+                      <CanvasElementInsertionControl
+                        label={`Insert element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                        onClick={() => {
                           onSelectColumn(section.id, columnKey);
-                          onOpenElementsPanel();
+                          onOpenElementsPanel({
+                            sectionId: section.id,
+                            columnKey,
+                            insertionIndex: 0,
+                          });
                         }}
-                      >
-                        <span className="builder-structural-placeholder-mark">
-                          <Plus size={14} />
-                        </span>
-                        <span className="builder-structural-placeholder-copy">
-                          <strong>
-                            Column {(rowMeta?.columnIndex ?? index) + 1}
-                          </strong>
-                          <small>Add element</small>
-                        </span>
-                      </div>
+                      />
                     )}
 
                   <ContentPositioningGroup blocks={blocks}>
@@ -18772,8 +18906,19 @@ const PreviewSection = memo(function PreviewSection({
                     });
 
                     return (
+                      <Fragment key={blockKey}>
+                        <CanvasElementInsertionControl
+                          label={`Insert element before ${layoutBlockLabels[block.kind ?? "text"] ?? "element"}`}
+                          onClick={() => {
+                            onSelectColumn(section.id, columnKey);
+                            onOpenElementsPanel({
+                              sectionId: section.id,
+                              columnKey,
+                              insertionIndex: blockIndex,
+                            });
+                          }}
+                        />
                       <div
-                        key={blockKey}
                         id={blockKey}
                         data-builder-object-type="block"
                         data-builder-section-id={section.id}
@@ -19920,8 +20065,20 @@ const PreviewSection = memo(function PreviewSection({
                           </div>
                         )}
                       </div>
+                      </Fragment>
                     );
                     })}
+                    <CanvasElementInsertionControl
+                      label="Insert element at end of column"
+                      onClick={() => {
+                        onSelectColumn(section.id, columnKey);
+                        onOpenElementsPanel({
+                          sectionId: section.id,
+                          columnKey,
+                          insertionIndex: blocks.length,
+                        });
+                      }}
+                    />
                   </ContentPositioningGroup>
                   </div>
                 </article>

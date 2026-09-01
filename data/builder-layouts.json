@@ -43,7 +43,7 @@
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
-        "layoutRows": 2,
+        "layoutRows": 3,
         "layoutItems": [
           {
             "id": "yootheme-section-1-row-1-column-1",
@@ -587,6 +587,16 @@
             ]
           },
           {
+            "id": "layout-row-mthbklrj",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mthbklrj-column-1",
+                "elements": []
+              }
+            ]
+          },
+          {
             "id": "yootheme-section-1-row-2",
             "layout": "1-col",
             "spacingContract": "yootheme",
@@ -1109,7 +1119,7 @@
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
-        "layoutRows": 2,
+        "layoutRows": 5,
         "layoutItems": [
           {
             "id": "yootheme-section-3-row-1-column-1",
@@ -1543,41 +1553,119 @@
             ]
           },
           {
+            "id": "layout-row-mthbg09m",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mthbg09m-column-1",
+                "elements": [
+                  {
+                    "id": "products-block-mthbhm9a-u2vl6",
+                    "kind": "products",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "quantity": 8
+                      }
+                    },
+                    "title": "Objects chosen for everyday rituals",
+                    "source": "all",
+                    "layoutVariant": "grid",
+                    "columns": 4,
+                    "gridLimit": 8,
+                    "filterPosition": "left",
+                    "cardStyle": "soft",
+                    "cardPreset": "editorial",
+                    "panelStyle": "clean-shadow",
+                    "elementPadding": "sm",
+                    "typography": {
+                      "eyebrow": {
+                        "variant": "subheading",
+                        "fontSize": "12px",
+                        "fontWeight": "700",
+                        "lineHeight": "1.2",
+                        "letterSpacing": "0.12em",
+                        "textTransform": "uppercase"
+                      },
+                      "title": {
+                        "variant": "heading",
+                        "fontSize": "clamp(28px, 3vw, 46px)",
+                        "fontWeight": "720",
+                        "lineHeight": "1.06",
+                        "letterSpacing": "-0.025em"
+                      },
+                      "body": {
+                        "variant": "body",
+                        "fontSize": "16px",
+                        "fontWeight": "400",
+                        "lineHeight": "1.7"
+                      },
+                      "button": {
+                        "variant": "button",
+                        "fontSize": "14px",
+                        "fontWeight": "700",
+                        "lineHeight": "1",
+                        "letterSpacing": "0.01em"
+                      }
+                    },
+                    "visualStyle": {
+                      "customClass": "builder-premium-starter",
+                      "card": {
+                        "preset": "soft",
+                        "hoverPreset": "lift-soft",
+                        "imageRatio": "4:5",
+                        "imageFit": "cover",
+                        "imageRadius": "14px",
+                        "titleSize": "clamp(22px, 2vw, 30px)",
+                        "titleWeight": "720",
+                        "titleMargin": "0",
+                        "metaSize": "11px",
+                        "metaTransform": "uppercase",
+                        "metaSpacing": "0",
+                        "contentSize": "15px",
+                        "contentLineHeight": "1.65",
+                        "buttonMargin": "8px 0 0",
+                        "cardGap": "14px",
+                        "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                      },
+                      "border": {
+                        "radius": "18px"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mthbg5av",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mthbg5av-column-1",
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mthbgdlx",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mthbgdlx-column-1",
+                "elements": []
+              }
+            ]
+          },
+          {
             "id": "yootheme-section-3-row-2",
             "layout": "3-col-equal",
-            "customLayout": {
-              "template": "1-3,1-3,1-3",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-3-row-2-column-1",
-                  "widths": {
-                    "small": "1-2",
-                    "large": "1-3"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-3-row-2-column-2",
-                  "widths": {
-                    "small": "1-2",
-                    "large": "1-3"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-3-row-2-column-3",
-                  "widths": {
-                    "large": "1-3"
-                  }
-                }
-              ]
-            },
             "spacingContract": "yootheme",
             "columns": [
               {
                 "id": "yootheme-section-3-row-2-column-1",
-                "responsiveWidths": {
-                  "small": "1-2",
-                  "large": "1-3"
-                },
                 "background": {
                   "position": "center-center"
                 },
@@ -1681,10 +1769,6 @@
               },
               {
                 "id": "yootheme-section-3-row-2-column-2",
-                "responsiveWidths": {
-                  "small": "1-2",
-                  "large": "1-3"
-                },
                 "background": {
                   "position": "center-center"
                 },
@@ -1785,19 +1869,7 @@
                 ]
               },
               {
-                "id": "yootheme-section-3-row-2-column-3",
-                "responsiveWidths": {
-                  "large": "1-3"
-                },
-                "background": {
-                  "position": "center-center"
-                },
-                "sticky": {
-                  "breakpoint": "m"
-                },
-                "advanced": {
-                  "css": "@media (min-width: 639px) and (max-width: 1199px) {\n    .el-column {\n        width: 50%;\n        flex-grow: 0;\n\t}\n}"
-                },
+                "id": "layout-column-mthbd5c0",
                 "elements": [
                   {
                     "id": "yootheme-image-2-1-2-0",
@@ -4025,7 +4097,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-28T15:47:58.012Z"
+    "updatedAt": "2026-08-31T14:26:14.608Z"
   },
   "shop": {
     "version": 1,

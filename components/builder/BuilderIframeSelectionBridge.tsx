@@ -7,12 +7,13 @@ export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selectio
 
 type SelectionMessage = {
   source: typeof BUILDER_IFRAME_SELECTION_SOURCE;
-  type: "ready" | "context" | "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell";
+  type: "ready" | "context" | "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell" | "insert";
   target?: BuilderInteractionTarget;
   scrollIntoView?: boolean;
   rect?: { x: number; y: number; width: number; height: number } | null;
   href?: string;
   shell?: "header" | "footer" | null;
+  insertionIndex?: number;
 };
 
 function targetFromClick(event: MouseEvent): BuilderInteractionTarget | null {
@@ -184,6 +185,25 @@ export default function BuilderIframeSelectionBridge({
       if (diagnostics !== "minimal") scheduleRect();
     };
     const handleClick = (event: MouseEvent) => {
+      const insertionControl = event.target instanceof Element
+        ? event.target.closest<HTMLElement>("[data-builder-insertion-index]")
+        : null;
+      if (insertionControl) {
+        const sectionId = insertionControl.dataset.builderSectionId;
+        const columnKey = insertionControl.dataset.builderColumnKey;
+        const insertionIndex = Number(insertionControl.dataset.builderInsertionIndex);
+        if (sectionId && columnKey && Number.isInteger(insertionIndex)) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.parent.postMessage({
+            source: BUILDER_IFRAME_SELECTION_SOURCE,
+            type: "insert",
+            target: { type: "column", sectionId, columnKey },
+            insertionIndex,
+          } satisfies SelectionMessage, window.location.origin);
+        }
+        return;
+      }
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
       // Header navigation links belong to the scoped preview router. They
       // synchronize the Builder document on the first click. Hash-only links

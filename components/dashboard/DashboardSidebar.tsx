@@ -23,6 +23,7 @@ import {
   useState,
   useMemo,
   type Dispatch,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type SetStateAction,
 } from "react";
@@ -45,6 +46,7 @@ import RoutingTemplatesPanel from "@/components/dashboard/RoutingTemplatesPanel"
 import ContentPanel from "@/components/dashboard/ContentPanel";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
 import LayoutLibrarySurface from "@/components/dashboard/LayoutLibrarySurface";
+import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import {
   pageTemplateCategories,
   pageTemplateLibrary,
@@ -104,6 +106,7 @@ type DashboardSidebarProps = {
   topActionsSlot?: ReactNode;
   utilityControlsSlot?: ReactNode;
   onOpenElementLibrary?: () => void;
+  onAddElementFromLibrary?: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
   onCreateBuilderPageFromTemplate?: (
     template: BuilderSavedTemplate | PageTemplateLibraryItem,
@@ -132,7 +135,7 @@ type DashboardSidebarProps = {
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
-  onStartSidebarResize: (clientX: number) => void;
+  onStartSidebarResize: (event: ReactPointerEvent<HTMLButtonElement> | number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
   onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
   sidebarCollapsed?: boolean;
@@ -169,6 +172,7 @@ export default function DashboardSidebar({
   topActionsSlot,
   utilityControlsSlot,
   onOpenElementLibrary,
+  onAddElementFromLibrary,
   onCreateBuilderPage,
   onCreateBuilderPageFromTemplate = () => undefined,
   onDeleteBuilderPage,
@@ -600,11 +604,6 @@ export default function DashboardSidebar({
                 type="button"
                 className={`builder-sidebar-nav-tile${isActive ? " is-active" : ""}`}
                 onClick={() => {
-                  if (item.tab === "elements") {
-                    onOpenElementLibrary?.();
-                    onSetSidebarCollapsed?.(false);
-                    return;
-                  }
                   if (sidebarCollapsed) {
                     onSetSidebarTab(item.tab);
                     onSetSidebarCollapsed?.(false);
@@ -654,6 +653,37 @@ export default function DashboardSidebar({
                 transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 {builderSlot}
+              </motion.div>
+            )}
+
+            {sidebarTab === "elements" && (
+              <motion.div
+                key="elements"
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
+              >
+                <div className="builder-sidebar-panel">
+                  <div className="builder-structure-header">
+                    <div className="builder-structure-header-row">
+                      <div className="builder-structure-header-title-wrap">
+                        <Boxes size={13} className="builder-structure-header-icon" />
+                        <strong>Blocks Library</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: "8px" }}>
+                    <ElementLibrary
+                      availableLayoutBlockKinds={availableLayoutBlockKinds}
+                      onAddElement={(kind) => {
+                        onAddElementFromLibrary?.(kind);
+                      }}
+                      onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
+                      headerMode={builderState.page === "header"}
+                    />
+                  </div>
+                </div>
               </motion.div>
             )}
 
@@ -1106,9 +1136,11 @@ export default function DashboardSidebar({
       <button
         type="button"
         className="builder-sidebar-resize-handle"
-        onMouseDown={(event) => {
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
           event.preventDefault();
-          onStartSidebarResize(event.clientX);
+          event.stopPropagation();
+          onStartSidebarResize(event);
         }}
         aria-label="Resize dashboard panel"
         title="Resize panel"

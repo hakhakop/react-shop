@@ -7763,6 +7763,36 @@ body.is-visual-builder-active .uk-lightbox {
   box-shadow: var(--uk-card-default-box-shadow, var(--uk-card-shadow, none)) !important;
 }
 
+.builder-iframe-element-insertion-control {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: 4px auto;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(.82);
+  transition: opacity .14s ease, transform .14s ease, background-color .14s ease;
+}
+
+[data-builder-object-type="column"]:hover .builder-iframe-element-insertion-control,
+.builder-iframe-element-insertion-control:focus-visible,
+.builder-iframe-element-insertion-control:hover {
+  opacity: .82;
+  transform: scale(1);
+}
+
+.builder-iframe-element-insertion-control:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:hover,
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus,
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:focus-within,

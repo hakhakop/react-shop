@@ -1,17 +1,20 @@
 "use client";
 
 import {
+  AlertCircle,
   Box,
   ChevronDown,
   ChevronRight,
   ChevronUp,
   Columns2,
   Copy,
+  Database,
+  ExternalLink,
   FileText,
   Image as ImageIcon,
   Layers3,
-  LibraryBig,
   LayoutGrid,
+  LibraryBig,
   List,
   MoreHorizontal,
   MousePointerClick,
@@ -59,7 +62,11 @@ export type BuilderWireframeActions = {
   ) => void;
   addColumnAfter?: (target: { sectionId: string; columnKey: string }) => void;
   deleteColumn?: (target: { sectionId: string; columnKey: string }) => void;
-  openElements?: (target: { sectionId: string; columnKey: string }) => void;
+  openElements?: (target: {
+    sectionId: string;
+    columnKey: string;
+    insertionIndex?: number;
+  }) => void;
   selectSection: (sectionId: string) => void;
   selectRow: (sectionId: string, rowIndex: number) => void;
   selectColumn: (sectionId: string, columnKey: string) => void;
@@ -129,22 +136,38 @@ function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
 }
 
 function wireframeLayout(row: BuilderLayoutRow, fallback: number[]) {
-  const mediumWidths = row.items.map(
-    (item) =>
-      item.responsiveWidths?.medium ??
-      item.columnWidthMedium ??
-      item.widthMedium ??
-      item.width_medium,
-  );
-  if (
-    mediumWidths.length > 1 &&
-    mediumWidths.every(
-      (width: string | undefined) => width === "1-1" || width === "full",
-    )
-  ) {
-    return { ratios: mediumWidths.map(() => 1), stacked: true };
+  const count = row.items.length;
+  if (count <= 1) {
+    return { ratios: [1], stacked: false };
   }
-  return { ratios: fallback, stacked: false };
+  const ratios =
+    fallback.length === count ? fallback : row.items.map(() => 1);
+  return { ratios, stacked: false };
+}
+
+function findColumnKeyForBlock(
+  section: BuilderSection,
+  blockKey: string,
+): string | null {
+  for (const row of getWireframeRows(section)) {
+    for (const item of row.items) {
+      const column =
+        item as NonNullable<BuilderSection["layoutItems"]>[number];
+      if (column.blocks?.some((b) => b.id === blockKey)) {
+        return column.id;
+      }
+      if (column.nestedLayout?.rows) {
+        for (const nRow of column.nestedLayout.rows) {
+          for (const nCol of nRow.columns) {
+            if (nCol.blocks?.some((b) => b.id === blockKey)) {
+              return nCol.id;
+            }
+          }
+        }
+      }
+    }
+  }
+  return null;
 }
 
 function structureKey(target: BuilderHoverTarget | null | undefined) {
@@ -235,6 +258,7 @@ function blockIcon(kind: string) {
   if (["hero", "productHero", "scrollPinnedDemo"].includes(kind))
     return <Sparkles {...props} />;
   if (kind === "list") return <List {...props} />;
+  if (kind === "alert" || kind === "notice") return <AlertCircle {...props} />;
   return <Box {...props} />;
 }
 
@@ -263,16 +287,13 @@ function blockHasDynamicContent(block: BuilderLayoutBlock) {
     block.buttons?.some((btn) =>
       hasDynamicContent(btn as unknown as Record<string, unknown>),
     ) === true ||
-    block.galleryItems?.some((item) =>
-      hasDynamicContent(item as unknown as Record<string, unknown>),
-    ) === true ||
     block.badges?.some((badge) =>
       hasDynamicContent(badge as unknown as Record<string, unknown>),
     ) === true
   );
 }
 
-function StructureOverflow({
+export function StructureOverflow({
   label = "More actions",
   children,
 }: {
@@ -291,11 +312,10 @@ function StructureOverflow({
     if (!triggerRef.current) return;
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const menuEl = menuRef.current;
-    const menuWidth = menuEl ? menuEl.offsetWidth : 156;
-    const menuHeight = menuEl ? menuEl.offsetHeight : 160;
+    const menuWidth = menuEl ? menuEl.offsetWidth : 144;
+    const menuHeight = menuEl ? menuEl.offsetHeight : 140;
     const viewportPadding = 8;
 
-    // Check vertical space
     const spaceBelow =
       window.innerHeight - triggerRect.bottom - viewportPadding;
     const spaceAbove = triggerRect.top - viewportPadding;
@@ -308,7 +328,6 @@ function StructureOverflow({
           triggerRect.bottom + 4,
         );
 
-    // Check horizontal space: align right edge of menu to right edge of trigger
     let left = triggerRect.right - menuWidth;
     if (left < viewportPadding) {
       left = viewportPadding;
@@ -392,7 +411,7 @@ function StructureOverflow({
           setIsOpen((prev) => !prev);
         }}
       >
-        <MoreHorizontal size={12} />
+        <MoreHorizontal size={11} />
       </button>
 
       {isOpen && typeof document !== "undefined"
@@ -447,13 +466,16 @@ const WireframeBlock = memo(function WireframeBlock({
 
   return (
     <div
-      className={`builder-structure-item builder-structure-item--element builder-wireframe-item builder-wireframe-item--block${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+      className={`builder-structure-element-card builder-structure-item builder-structure-item--element builder-wireframe-item builder-wireframe-item--block${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
       data-structure-key={`block:${sectionId}:${columnKey}:${blockKey}`}
       onMouseEnter={() =>
         actions.hover?.({ type: "block", sectionId, columnKey, blockKey })
       }
       onMouseLeave={() => actions.hover?.(null)}
-      onClick={() => actions.selectBlock(sectionId, columnKey, blockKey)}
+      onClick={(e) => {
+        e.stopPropagation();
+        actions.selectBlock(sectionId, columnKey, blockKey);
+      }}
       role="treeitem"
       tabIndex={0}
       aria-selected={selected}
@@ -466,26 +488,39 @@ const WireframeBlock = memo(function WireframeBlock({
         title={blockTitle(block, index, true)}
       >
         <strong className="builder-structure-title">{blockLabel}</strong>
-        {snippet ? (
+        {snippet && snippet !== blockLabel ? (
           <span className="builder-structure-snippet">{snippet}</span>
         ) : null}
       </span>
       <div className="builder-structure-meta builder-wireframe-meta">
         {isDynamic ? (
           <span
-            className="builder-structure-badge builder-structure-badge--dynamic builder-wireframe-badge builder-wireframe-badge--dynamic"
-            title="Dynamic content"
+            className="builder-structure-badge builder-structure-badge--dynamic"
+            title="Dynamic content bound"
             aria-label="Dynamic content"
           >
-            <Sparkles size={10} />
+            <Database size={9} />
           </span>
         ) : null}
         <div className="builder-structure-actions builder-wireframe-actions">
           <StructureOverflow label="Element actions">
+            {actions.duplicateBlock && (
+              <button
+                type="button"
+                className="builder-structure-menu-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actions.duplicateBlock?.({ sectionId, columnKey, blockKey });
+                }}
+                title="Duplicate element"
+              >
+                <Copy size={11} /> <span>Duplicate</span>
+              </button>
+            )}
             {actions.moveBlock && (
               <button
                 type="button"
-                className="builder-structure-menu-btn builder-wireframe-action-btn"
+                className="builder-structure-menu-btn"
                 onClick={(e) => {
                   e.stopPropagation();
                   actions.moveBlock?.({
@@ -504,7 +539,7 @@ const WireframeBlock = memo(function WireframeBlock({
             {actions.moveBlock && (
               <button
                 type="button"
-                className="builder-structure-menu-btn builder-wireframe-action-btn"
+                className="builder-structure-menu-btn"
                 onClick={(e) => {
                   e.stopPropagation();
                   actions.moveBlock?.({
@@ -520,23 +555,10 @@ const WireframeBlock = memo(function WireframeBlock({
                 <ChevronDown size={11} /> <span>Move down</span>
               </button>
             )}
-            {actions.duplicateBlock && (
-              <button
-                type="button"
-                className="builder-structure-menu-btn builder-wireframe-action-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  actions.duplicateBlock?.({ sectionId, columnKey, blockKey });
-                }}
-                title="Duplicate element"
-              >
-                <Copy size={11} /> <span>Duplicate</span>
-              </button>
-            )}
             {actions.deleteBlock && (
               <button
                 type="button"
-                className="builder-structure-menu-btn builder-structure-menu-btn--danger builder-wireframe-action-btn builder-wireframe-action-btn--danger"
+                className="builder-structure-menu-btn builder-structure-menu-btn--danger"
                 onClick={(e) => {
                   e.stopPropagation();
                   actions.deleteBlock?.({ sectionId, columnKey, blockKey });
@@ -620,7 +642,7 @@ function sameColumn(
   );
 }
 
-const WireframeColumn = memo(
+export const WireframeColumn = memo(
   function WireframeColumn({
     sectionId,
     item,
@@ -656,197 +678,101 @@ const WireframeColumn = memo(
     const selected = selectedColumnKey === columnKey && !selectedBlockKey;
     const hovered = hoveredColumnKey === columnKey && !hoveredBlockKey;
     const blocks = item.blocks ?? [];
-    const pct = stacked
-      ? 100
-      : totalRatio
-        ? Math.round((ratio / totalRatio) * 100)
-        : 100;
     const nested = item.nestedLayout;
-    const hasChildren = nested ? nested.rows.length > 0 : blocks.length > 0;
-    const columnToggleKey = `${sectionId}:${columnKey}`;
 
     return (
       <div
-        className={`builder-structure-branch builder-structure-branch--column builder-wireframe-column${selected ? " is-selected" : ""}`}
+        className={`builder-structure-column-box builder-structure-branch builder-structure-branch--column builder-wireframe-column${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+        data-structure-key={`column:${sectionId}:${columnKey}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          actions.selectColumn(sectionId, columnKey);
+        }}
+        onMouseEnter={() =>
+          actions.hover?.({ type: "column", sectionId, columnKey })
+        }
+        onMouseLeave={() => actions.hover?.(null)}
       >
-        <div
-          className={`builder-structure-item builder-structure-item--column builder-wireframe-item builder-wireframe-item--column${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
-          data-structure-key={`column:${sectionId}:${columnKey}`}
-          onMouseEnter={() =>
-            actions.hover?.({ type: "column", sectionId, columnKey })
-          }
-          onMouseLeave={() => actions.hover?.(null)}
-          onClick={() => actions.selectColumn(sectionId, columnKey)}
-          role="treeitem"
-          tabIndex={0}
-          aria-selected={selected}
-          aria-expanded={hasChildren ? !collapsed : undefined}
-        >
-          {hasChildren ? (
-            <button
-              type="button"
-              className={`builder-structure-toggle builder-wireframe-toggle${collapsed ? "" : " is-expanded"}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle(columnToggleKey);
-              }}
-              aria-label={collapsed ? "Expand column" : "Collapse column"}
-            >
-              <ChevronRight size={12} />
-            </button>
+        <div className="builder-structure-column-elements builder-structure-children--elements builder-wireframe-children--blocks">
+          {nested ? (
+            <div className="builder-structure-nested-layout builder-wireframe-nested-layout">
+              {nested.rows.map((row, rowIndex) => (
+                <div
+                  key={row.id}
+                  className="builder-structure-nested-row builder-wireframe-nested-row"
+                >
+                  <div className="builder-structure-nested-row-label builder-wireframe-nested-row-label">
+                    Nested row {rowIndex + 1}
+                  </div>
+                  {row.columns.map((column, columnIndex) => (
+                    <WireframeColumn
+                      key={column.id}
+                      sectionId={sectionId}
+                      item={
+                        column as NonNullable<
+                          BuilderSection["layoutItems"]
+                        >[number]
+                      }
+                      index={columnIndex}
+                      flatIndex={columnIndex}
+                      ratio={1}
+                      totalRatio={row.columns.length}
+                      stacked={false}
+                      selectedColumnKey={selectedColumnKey}
+                      selectedBlockKey={selectedBlockKey}
+                      hoveredColumnKey={hoveredColumnKey}
+                      hoveredBlockKey={hoveredBlockKey}
+                      collapsed={false}
+                      onToggle={onToggle}
+                      actions={actions}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
           ) : (
-            <span className="builder-structure-toggle-placeholder" />
-          )}
-          <span className="builder-structure-icon builder-structure-icon--column">
-            <Columns2 size={12} />
-          </span>
-          <span
-            className="builder-structure-label-wrap builder-wireframe-label-wrap"
-            title={`${item.title || `Column ${index + 1}`} (${pct}%)`}
-          >
-            <strong className="builder-structure-title">
-              {item.title || `Column ${index + 1}`}
-            </strong>
-          </span>
-          <div className="builder-structure-meta builder-wireframe-meta">
-            <span
-              className="builder-structure-badge builder-structure-badge--column builder-wireframe-badge builder-wireframe-badge--column-pct"
-              title={`Column width: ${pct}%`}
-            >
-              {pct}%
-            </span>
-            {blocks.length > 0 && (
-              <span
-                className="builder-structure-badge builder-structure-badge--count builder-wireframe-count"
-                title={`${blocks.length} elements`}
-              >
-                {blocks.length}
-              </span>
-            )}
-            <div className="builder-structure-actions builder-wireframe-actions">
-              <StructureOverflow label="Column actions">
+            <>
+              {blocks.map((block, blockIndex) => {
+                const blockKey =
+                  block.id ?? `${columnKey}-block-${blockIndex}`;
+                return (
+                  <WireframeBlock
+                    key={blockKey}
+                    sectionId={sectionId}
+                    columnKey={columnKey}
+                    block={block}
+                    index={blockIndex}
+                    count={blocks.length}
+                    selected={
+                      selectedColumnKey === columnKey &&
+                      selectedBlockKey === blockKey
+                    }
+                    hovered={hoveredBlockKey === `${columnKey}:${blockKey}`}
+                    actions={actions}
+                  />
+                );
+              })}
+              {actions.openElements ? (
                 <button
                   type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
+                  className="builder-structure-add-element-btn builder-structure-empty-target"
                   onClick={(e) => {
                     e.stopPropagation();
                     actions.selectColumn(sectionId, columnKey);
+                    actions.openElements?.({ sectionId, columnKey });
                   }}
-                  title="Edit column settings"
+                  title={`Add element to ${item.title || `Column ${index + 1}`}`}
+                  aria-label="Add element"
                 >
-                  <Pencil size={11} /> <span>Edit column</span>
+                  <Plus size={10} />
+                  <span className="builder-structure-empty-label">
+                    {blocks.length === 0 ? "Add element" : "Add Element"}
+                  </span>
                 </button>
-                {actions.addColumnAfter && !nested && (
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-wireframe-action-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      actions.addColumnAfter?.({ sectionId, columnKey });
-                    }}
-                    title="Add column after"
-                  >
-                    <Plus size={11} /> <span>Add column after</span>
-                  </button>
-                )}
-                {actions.deleteColumn && !nested && (
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-structure-menu-btn--danger builder-wireframe-action-btn builder-wireframe-action-btn--danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      actions.deleteColumn?.({ sectionId, columnKey });
-                    }}
-                    title="Delete column"
-                  >
-                    <Trash2 size={11} /> <span>Delete column</span>
-                  </button>
-                )}
-              </StructureOverflow>
-            </div>
-          </div>
+              ) : null}
+            </>
+          )}
         </div>
-
-        {!collapsed && (
-          <div className="builder-structure-children builder-structure-children--elements builder-wireframe-children builder-wireframe-children--blocks">
-            {nested ? (
-              <div className="builder-structure-nested-layout builder-wireframe-nested-layout">
-                {nested.rows.map((row, rowIndex) => (
-                  <div
-                    key={row.id}
-                    className="builder-structure-nested-row builder-wireframe-nested-row"
-                  >
-                    <div className="builder-structure-nested-row-label builder-wireframe-nested-row-label">
-                      Nested row {rowIndex + 1}
-                    </div>
-                    {row.columns.map((column, columnIndex) => (
-                      <WireframeColumn
-                        key={column.id}
-                        sectionId={sectionId}
-                        item={
-                          column as NonNullable<
-                            BuilderSection["layoutItems"]
-                          >[number]
-                        }
-                        index={columnIndex}
-                        flatIndex={columnIndex}
-                        ratio={1}
-                        totalRatio={row.columns.length}
-                        stacked={false}
-                        selectedColumnKey={selectedColumnKey}
-                        selectedBlockKey={selectedBlockKey}
-                        hoveredColumnKey={hoveredColumnKey}
-                        hoveredBlockKey={hoveredBlockKey}
-                        collapsed={false}
-                        onToggle={onToggle}
-                        actions={actions}
-                      />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <>
-                {blocks.map((block, blockIndex) => {
-                  const blockKey =
-                    block.id ?? `${columnKey}-block-${blockIndex}`;
-                  return (
-                    <WireframeBlock
-                      key={blockKey}
-                      sectionId={sectionId}
-                      columnKey={columnKey}
-                      block={block}
-                      index={blockIndex}
-                      count={blocks.length}
-                      selected={
-                        selectedColumnKey === columnKey &&
-                        selectedBlockKey === blockKey
-                      }
-                      hovered={hoveredBlockKey === `${columnKey}:${blockKey}`}
-                      actions={actions}
-                    />
-                  );
-                })}
-                {actions.openElements ? (
-                  <button
-                    type="button"
-                    className="builder-structure-add-element-btn builder-structure-empty-target"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      actions.selectColumn(sectionId, columnKey);
-                      actions.openElements?.({ sectionId, columnKey });
-                    }}
-                    title="Add element to this column"
-                    aria-label="Add element"
-                  >
-                    <Plus size={10} />
-                    <span className="builder-structure-empty-label">Add Element</span>
-                  </button>
-                ) : null}
-              </>
-            )}
-          </div>
-        )}
       </div>
     );
   },
@@ -906,7 +832,7 @@ function sameRow(
   );
 }
 
-const WireframeRow = memo(function WireframeRow({
+export const WireframeRow = memo(function WireframeRow({
   sectionId,
   row,
   index,
@@ -937,7 +863,6 @@ const WireframeRow = memo(function WireframeRow({
   onToggleColumn: (key: string) => void;
   actions: BuilderWireframeActions;
 }) {
-  const rowKey = `${sectionId}:${index}`;
   const preset = getBuilderRowLayoutPreset(row.layoutKey);
   const { ratios, stacked } = wireframeLayout(row, preset.ratios);
   const totalRatio = ratios.reduce((a, b) => a + b, 0);
@@ -947,7 +872,6 @@ const WireframeRow = memo(function WireframeRow({
         item as NonNullable<BuilderSection["layoutItems"]>[number],
       ),
   );
-  const count = row.items.length;
   const isMultiColumn = row.items.length > 1;
 
   const selectedColIndex = row.items.findIndex((item) =>
@@ -956,314 +880,187 @@ const WireframeRow = memo(function WireframeRow({
       selectedColumnKey,
     ),
   );
-  const hoveredColIndex = row.items.findIndex((item) =>
-    columnOwns(
-      item as NonNullable<BuilderSection["layoutItems"]>[number],
-      hoveredColumnKey,
-    ),
-  );
-
-  const [localActiveColumnIndex, setLocalActiveColumnIndex] = useState(0);
-
-  const activeColumnIndex =
-    selectedColIndex !== -1
-      ? selectedColIndex
-      : localActiveColumnIndex < row.items.length
-        ? localActiveColumnIndex
-        : 0;
-
-  const activeItem = row.items[activeColumnIndex];
+  const activeColumnIndex = selectedColIndex !== -1 ? selectedColIndex : 0;
 
   return (
     <div
-      className={`builder-structure-branch builder-structure-branch--row builder-wireframe-row${selected ? " is-selected" : ""}`}
+      className={`builder-structure-row-card builder-structure-branch builder-structure-branch--row builder-wireframe-row${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+      data-structure-key={`row:${sectionId}:${index}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        actions.selectRow(sectionId, index);
+      }}
+      onMouseEnter={() =>
+        actions.hover?.({ type: "row", sectionId, rowIndex: index })
+      }
+      onMouseLeave={() => actions.hover?.(null)}
+      role="treeitem"
+      tabIndex={0}
+      aria-selected={selected}
     >
+      {/* Row Header with Preset Badge & Actions */}
       <div
-        className={`builder-structure-item builder-structure-item--row builder-wireframe-item builder-wireframe-item--row${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
-        data-structure-key={`row:${sectionId}:${index}`}
-        onMouseEnter={() =>
-          actions.hover?.({ type: "row", sectionId, rowIndex: index })
-        }
-        onMouseLeave={() => actions.hover?.(null)}
-        onClick={() => actions.selectRow(sectionId, index)}
-        role="treeitem"
-        tabIndex={0}
-        aria-selected={selected}
-        aria-expanded={!collapsed}
+        className="builder-structure-row-header"
+        onClick={(e) => {
+          e.stopPropagation();
+          actions.selectRow(sectionId, index);
+        }}
+        style={{ cursor: "pointer" }}
       >
-        <button
-          type="button"
-          className={`builder-structure-toggle builder-wireframe-toggle${collapsed ? "" : " is-expanded"}`}
+        <div
+          className="builder-structure-row-title-wrap"
           onClick={(e) => {
             e.stopPropagation();
-            onToggleRow(rowKey);
+            actions.selectRow(sectionId, index);
           }}
-          aria-label={collapsed ? "Expand row" : "Collapse row"}
+          style={{ cursor: "pointer" }}
         >
-          <ChevronRight size={12} />
-        </button>
-        <span className="builder-structure-icon builder-structure-icon--row">
-          <LayoutGrid size={12} />
-        </span>
-        <span className="builder-structure-label-wrap builder-wireframe-label-wrap">
-          <strong className="builder-structure-title">Row {index + 1}</strong>
-        </span>
-        <div className="builder-structure-meta builder-wireframe-meta">
-          <span
-            className="builder-structure-badge builder-structure-badge--row builder-wireframe-badge builder-wireframe-badge--row"
-            title="Row layout preset"
-          >
-            {stacked ? "Stacked" : preset.label || `${row.items.length} Col`}
+          <span className="builder-structure-row-name">Row {index + 1}</span>
+          <span className="builder-structure-badge builder-structure-badge--row">
+            {preset.label || `${row.items.length} Col`}
           </span>
-          <div className="builder-structure-actions builder-wireframe-actions">
-            <StructureOverflow label="Row actions">
-              {actions.addRow && (
-                <button
-                  type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.addRow?.(sectionId, index, "before", "1-col");
-                  }}
-                  title="Add row before"
-                >
-                  <Plus size={11} /> <span>Add row before</span>
-                </button>
-              )}
-              {actions.addRow && (
-                <button
-                  type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.addRow?.(sectionId, index, "after", "1-col");
-                  }}
-                  title="Add row after"
-                >
-                  <Plus size={11} /> <span>Add row after</span>
-                </button>
-              )}
-              {actions.moveRow && (
-                <button
-                  type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.moveRow?.(sectionId, index, -1);
-                  }}
-                  disabled={index === 0}
-                  title="Move row up"
-                >
-                  <ChevronUp size={11} /> <span>Move up</span>
-                </button>
-              )}
-              {actions.moveRow && (
-                <button
-                  type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.moveRow?.(sectionId, index, 1);
-                  }}
-                  disabled={index === count - 1}
-                  title="Move row down"
-                >
-                  <ChevronDown size={11} /> <span>Move down</span>
-                </button>
-              )}
-              {actions.duplicateRow && (
-                <button
-                  type="button"
-                  className="builder-structure-menu-btn builder-wireframe-action-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.duplicateRow?.(sectionId, index);
-                  }}
-                  title="Duplicate row"
-                >
-                  <Copy size={11} /> <span>Duplicate row</span>
-                </button>
-              )}
-              {actions.deleteRow && (
-                <>
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-structure-menu-btn--danger builder-wireframe-action-btn builder-wireframe-action-btn--danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (empty) actions.deleteRow?.(sectionId, index);
-                    }}
-                    disabled={!empty}
-                    title={
-                      empty
-                        ? "Delete empty row"
-                        : "Remove elements before deleting this row"
-                    }
-                  >
-                    <Trash2 size={11} /> <span>Delete row</span>
-                  </button>
-                  {!empty && (
-                    <span className="builder-structure-menu-note builder-wireframe-overflow-reason">
-                      Remove elements before deleting this row.
-                    </span>
-                  )}
-                </>
-              )}
-            </StructureOverflow>
-          </div>
+        </div>
+        <div className="builder-structure-actions builder-wireframe-actions">
+          {actions.addRow && (
+            <button
+              type="button"
+              className="builder-structure-action-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                actions.addRow?.(sectionId, index, "after", "1-col");
+              }}
+              title="Add row below"
+            >
+              <Plus size={10} />
+            </button>
+          )}
+          {actions.duplicateRow && (
+            <button
+              type="button"
+              className="builder-structure-action-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                actions.duplicateRow?.(sectionId, index);
+              }}
+              title="Duplicate row"
+            >
+              <Copy size={10} />
+            </button>
+          )}
+          {actions.deleteRow && (
+            <button
+              type="button"
+              className="builder-structure-action-btn builder-structure-action-btn--danger"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (empty) actions.deleteRow?.(sectionId, index);
+              }}
+              disabled={!empty}
+              title={
+                empty
+                  ? "Delete empty row"
+                  : "Remove elements before deleting this row"
+              }
+            >
+              <Trash2 size={10} />
+            </button>
+          )}
+          <StructureOverflow label="Row actions">
+            {actions.addRow && (
+              <button
+                type="button"
+                className="builder-structure-menu-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actions.addRow?.(sectionId, index, "before", "1-col");
+                }}
+                title="Add row before"
+              >
+                <Plus size={11} /> <span>Add row before</span>
+              </button>
+            )}
+            {actions.moveRow && (
+              <button
+                type="button"
+                className="builder-structure-menu-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actions.moveRow?.(sectionId, index, -1);
+                }}
+                disabled={index === 0}
+                title="Move row up"
+              >
+                <ChevronUp size={11} /> <span>Move up</span>
+              </button>
+            )}
+            {actions.moveRow && (
+              <button
+                type="button"
+                className="builder-structure-menu-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actions.moveRow?.(sectionId, index, 1);
+                }}
+                title="Move row down"
+              >
+                <ChevronDown size={11} /> <span>Move down</span>
+              </button>
+            )}
+          </StructureOverflow>
         </div>
       </div>
 
-      {!collapsed && (
-        <div className="builder-structure-children builder-structure-children--columns builder-wireframe-children builder-wireframe-children--columns">
-          {isMultiColumn ? (
-            <>
-              {/* Sibling columns grouped horizontal summary bar with contextual add column buttons */}
-              <div
-                className="builder-structure-row-columns-bar"
-                role="tablist"
-                aria-label={`Row ${index + 1} columns`}
-              >
-                {row.items.map((item, columnIndex) => {
-                  const columnKey =
-                    item.id ?? `layout-item-${row.startIndex + columnIndex}`;
-                  const isSelected = selectedColIndex === columnIndex;
-                  const isHovered = hoveredColIndex === columnIndex;
-                  const isActive = activeColumnIndex === columnIndex;
-                  const pct = stacked
-                    ? 100
-                    : totalRatio
-                      ? Math.round(
-                          ((ratios[columnIndex] ?? 1) / totalRatio) * 100,
-                        )
-                      : Math.round(100 / row.items.length);
-                  const colBlocks = (
-                    item as NonNullable<BuilderSection["layoutItems"]>[number]
-                  ).blocks;
-                  const colBlocksCount = colBlocks?.length ?? 0;
-                  const shortColLabel =
-                    row.items.length >= 4
-                      ? `${columnIndex + 1}`
-                      : item.title || `Col ${columnIndex + 1}`;
+      {/* Row Columns rendered side-by-side horizontally representing the canvas layout */}
+      <div
+        className="builder-structure-row-columns-container builder-structure-row-columns-bar"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          alignItems: "stretch",
+        }}
+      >
+        {row.items.map((item, columnIndex) => {
+          const columnKey =
+            item.id ?? `layout-item-${row.startIndex + columnIndex}`;
+          const ratio = ratios[columnIndex] ?? 1;
+          const colPct = totalRatio > 0 ? (ratio / totalRatio) * 100 : 100;
 
-                  return (
-                    <div
-                      key={columnKey}
-                      className="builder-structure-col-segment-wrapper"
-                      style={{
-                        flex: `${ratios[columnIndex] ?? 1} ${ratios[columnIndex] ?? 1} 0%`,
-                      }}
-                    >
-                      <button
-                        type="button"
-                        className={`builder-structure-col-segment${isActive ? " is-active" : ""}${isSelected ? " is-selected" : ""}${isHovered ? " is-hovered" : ""}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLocalActiveColumnIndex(columnIndex);
-                          actions.selectColumn(sectionId, columnKey);
-                        }}
-                        onMouseEnter={() =>
-                          actions.hover?.({
-                            type: "column",
-                            sectionId,
-                            columnKey,
-                          })
-                        }
-                        onMouseLeave={() => actions.hover?.(null)}
-                        title={`${item.title || `Column ${columnIndex + 1}`} (${pct}%)`}
-                        aria-selected={isActive}
-                        role="tab"
-                      >
-                        <span className="builder-structure-col-segment-label">
-                          {shortColLabel}
-                        </span>
-                        <span className="builder-structure-col-segment-pct">
-                          {pct}%
-                        </span>
-                        {colBlocksCount > 0 && (
-                          <span
-                            className="builder-structure-col-segment-count"
-                            title={`${colBlocksCount} elements`}
-                          >
-                            {colBlocksCount}
-                          </span>
-                        )}
-                      </button>
-                      {actions.addColumnAfter && (
-                        <button
-                          type="button"
-                          className="builder-structure-insert-col-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            actions.addColumnAfter?.({ sectionId, columnKey });
-                          }}
-                          title={`Add column after ${item.title || `Column ${columnIndex + 1}`}`}
-                          aria-label="Add column after"
-                        >
-                          <Plus size={8} />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Active Column Details & Elements */}
-              {activeItem && (
-                <WireframeColumn
-                  key={
-                    activeItem.id ??
-                    `layout-item-${row.startIndex + activeColumnIndex}`
-                  }
-                  sectionId={sectionId}
-                  item={
-                    activeItem as NonNullable<
-                      BuilderSection["layoutItems"]
-                    >[number]
-                  }
-                  index={activeColumnIndex}
-                  flatIndex={row.startIndex + activeColumnIndex}
-                  ratio={ratios[activeColumnIndex] ?? 1}
-                  totalRatio={totalRatio}
-                  stacked={stacked}
-                  selectedColumnKey={selectedColumnKey}
-                  selectedBlockKey={selectedBlockKey}
-                  hoveredColumnKey={hoveredColumnKey}
-                  hoveredBlockKey={hoveredBlockKey}
-                  collapsed={false}
-                  onToggle={onToggleColumn}
-                  actions={actions}
-                />
-              )}
-            </>
-          ) : (
-            /* 1-Column Row: Show column directly */
-            row.items.map((item, columnIndex) => (
+          return (
+            <div
+              key={columnKey}
+              className="builder-structure-col-segment-wrapper builder-structure-col-segment"
+              style={{
+                flex: `${ratio} ${ratio} 0%`,
+                width: `${colPct}%`,
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <WireframeColumn
-                key={item.id ?? `layout-item-${row.startIndex + columnIndex}`}
+                key={columnKey}
                 sectionId={sectionId}
                 item={
                   item as NonNullable<BuilderSection["layoutItems"]>[number]
                 }
                 index={columnIndex}
                 flatIndex={row.startIndex + columnIndex}
-                ratio={ratios[columnIndex] ?? 1}
+                ratio={ratio}
                 totalRatio={totalRatio}
-                stacked={stacked}
+                stacked={false}
                 selectedColumnKey={selectedColumnKey}
                 selectedBlockKey={selectedBlockKey}
                 hoveredColumnKey={hoveredColumnKey}
                 hoveredBlockKey={hoveredBlockKey}
-                collapsed={collapsedColumns.has(
-                  `${sectionId}:${item.id ?? `layout-item-${row.startIndex + columnIndex}`}`,
-                )}
+                collapsed={collapsedColumns.has(`${sectionId}:${columnKey}`)}
                 onToggle={onToggleColumn}
                 actions={actions}
               />
-            ))
-          )}
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }, sameRow);
@@ -1275,25 +1072,34 @@ function targetRowIndex(
   if (!target || target.sectionId !== section.id) return null;
   if (target.type === "row") return target.rowIndex;
   if (target.type === "section") return null;
-  return getWireframeRows(section).findIndex((row) =>
+  const idx = getWireframeRows(section).findIndex((row) =>
     row.items.some((item) => {
       const column =
         item as NonNullable<BuilderSection["layoutItems"]>[number];
       return (
-        column.id === target.columnKey ||
+        (target.columnKey && column.id === target.columnKey) ||
         Boolean(
-          column.nestedLayout?.rows.some((nested) =>
-            nested.columns.some(
-              (nestedColumn) => nestedColumn.id === target.columnKey,
+          (target.blockKey &&
+            column.blocks?.some((b) => b.id === target.blockKey)) ||
+            column.nestedLayout?.rows.some((nested) =>
+              nested.columns.some(
+                (nestedColumn) =>
+                  (target.columnKey &&
+                    nestedColumn.id === target.columnKey) ||
+                  (target.blockKey &&
+                    nestedColumn.blocks?.some(
+                      (b) => b.id === target.blockKey,
+                    )),
+              ),
             ),
-          ),
         )
       );
     }),
   );
+  return idx >= 0 ? idx : null;
 }
 
-const WireframeSection = memo(function WireframeSection({
+export const WireframeSection = memo(function WireframeSection({
   section,
   index,
   total,
@@ -1343,7 +1149,7 @@ const WireframeSection = memo(function WireframeSection({
   const hoveredRow = targetRowIndex(section, hoveredTarget);
 
   useEffect(() => {
-    if (selectedRow === null) return;
+    if (selectedRow === null || selectedRow < 0) return;
     const key = `${section.id}:${selectedRow}`;
     setCollapsedRows((current) =>
       current.has(key)
@@ -1353,7 +1159,7 @@ const WireframeSection = memo(function WireframeSection({
   }, [section.id, selectedRow]);
 
   useEffect(() => {
-    if (hoveredRow === null) return;
+    if (hoveredRow === null || hoveredRow < 0) return;
     const key = `${section.id}:${hoveredRow}`;
     setCollapsedRows((current) =>
       current.has(key)
@@ -1388,14 +1194,14 @@ const WireframeSection = memo(function WireframeSection({
 
   return (
     <div
-      className={`builder-structure-branch builder-structure-branch--section builder-wireframe-section${selected ? " is-selected" : ""}`}
+      className={`builder-structure-section-card builder-structure-branch builder-structure-branch--section builder-wireframe-section${selected ? " is-selected" : ""}`}
       data-structure-has-selected-descendant={
         hasSelectedDescendant || undefined
       }
       data-structure-has-hovered-descendant={hasHoveredDescendant || undefined}
     >
       <div
-        className={`builder-structure-item builder-structure-item--section builder-wireframe-item builder-wireframe-item--section${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+        className={`builder-structure-section-header builder-structure-item builder-structure-item--section builder-wireframe-item builder-wireframe-item--section${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
         data-structure-key={`section:${section.id}`}
         onMouseEnter={() =>
           actions.hover?.({ type: "section", sectionId: section.id })
@@ -1409,7 +1215,6 @@ const WireframeSection = memo(function WireframeSection({
         role="treeitem"
         tabIndex={0}
         aria-selected={selected}
-        aria-expanded={!collapsed}
       >
         <button
           type="button"
@@ -1420,10 +1225,10 @@ const WireframeSection = memo(function WireframeSection({
           }}
           aria-label={collapsed ? "Expand section" : "Collapse section"}
         >
-          <ChevronRight size={13} />
+          <ChevronRight size={12} />
         </button>
         <span className="builder-structure-icon builder-structure-icon--section">
-          <Layers3 size={13} />
+          <Layers3 size={12} />
         </span>
         {editing ? (
           <input
@@ -1455,24 +1260,50 @@ const WireframeSection = memo(function WireframeSection({
           )}
           {!header && (
             <div className="builder-structure-actions builder-wireframe-actions">
+              {actions.renameSection && (
+                <button
+                  type="button"
+                  className="builder-structure-action-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onStartRename(section);
+                  }}
+                  title="Rename section"
+                >
+                  <Pencil size={10} />
+                </button>
+              )}
+              {actions.duplicateSection && (
+                <button
+                  type="button"
+                  className="builder-structure-action-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    actions.duplicateSection?.(section.id);
+                  }}
+                  title="Duplicate section"
+                >
+                  <Copy size={10} />
+                </button>
+              )}
+              {actions.deleteSection && (
+                <button
+                  type="button"
+                  className="builder-structure-action-btn builder-structure-action-btn--danger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    actions.deleteSection?.(section.id);
+                  }}
+                  title="Delete section"
+                >
+                  <Trash2 size={10} />
+                </button>
+              )}
               <StructureOverflow label="Section actions">
-                {actions.renameSection && (
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-wireframe-action-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartRename(section);
-                    }}
-                    title="Rename section"
-                  >
-                    <Type size={11} /> <span>Rename</span>
-                  </button>
-                )}
                 {actions.moveSection && (
                   <button
                     type="button"
-                    className="builder-structure-menu-btn builder-wireframe-action-btn"
+                    className="builder-structure-menu-btn"
                     onClick={(e) => {
                       e.stopPropagation();
                       actions.moveSection?.(section.id, -1);
@@ -1486,7 +1317,7 @@ const WireframeSection = memo(function WireframeSection({
                 {actions.moveSection && (
                   <button
                     type="button"
-                    className="builder-structure-menu-btn builder-wireframe-action-btn"
+                    className="builder-structure-menu-btn"
                     onClick={(e) => {
                       e.stopPropagation();
                       actions.moveSection?.(section.id, 1);
@@ -1497,32 +1328,6 @@ const WireframeSection = memo(function WireframeSection({
                     <ChevronDown size={11} /> <span>Move down</span>
                   </button>
                 )}
-                {actions.duplicateSection && (
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-wireframe-action-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      actions.duplicateSection?.(section.id);
-                    }}
-                    title="Duplicate section"
-                  >
-                    <Copy size={11} /> <span>Duplicate</span>
-                  </button>
-                )}
-                {actions.deleteSection && (
-                  <button
-                    type="button"
-                    className="builder-structure-menu-btn builder-structure-menu-btn--danger builder-wireframe-action-btn builder-wireframe-action-btn--danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      actions.deleteSection?.(section.id);
-                    }}
-                    title="Delete section"
-                  >
-                    <Trash2 size={11} /> <span>Delete</span>
-                  </button>
-                )}
               </StructureOverflow>
             </div>
           )}
@@ -1530,7 +1335,7 @@ const WireframeSection = memo(function WireframeSection({
       </div>
 
       {!collapsed && (
-        <div className="builder-structure-children builder-structure-children--rows builder-wireframe-children">
+        <div className="builder-structure-section-rows builder-structure-children--rows builder-wireframe-children">
           {rows.length === 0 ? (
             <div className="builder-structure-empty-slot">
               {actions.addRow ? (
@@ -1542,7 +1347,9 @@ const WireframeSection = memo(function WireframeSection({
                   }
                 >
                   <Plus size={10} />
-                  <span className="builder-structure-empty-label">Add first row</span>
+                  <span className="builder-structure-empty-label">
+                    Add first row
+                  </span>
                 </button>
               ) : null}
             </div>
@@ -1598,7 +1405,12 @@ const WireframeSection = memo(function WireframeSection({
                         type="button"
                         className="builder-structure-insert-row-btn"
                         onClick={() =>
-                          actions.addRow?.(section.id, rowIndex, "after", "1-col")
+                          actions.addRow?.(
+                            section.id,
+                            rowIndex,
+                            "after",
+                            "1-col",
+                          )
                         }
                         aria-label={`Add row after Row ${rowIndex + 1}`}
                         title="Add row here"
@@ -1645,21 +1457,32 @@ export default function BuilderWireframePanel({
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
 
-  const selected = useMemo(
-    () =>
-      selectedKey(
-        selectedSectionId,
-        selectedLayoutRowIndex,
-        selectedLayoutColumnKey,
-        selectedLayoutBlockKey,
-      ),
-    [
+  const selected = useMemo(() => {
+    let resolvedColumnKey = selectedLayoutColumnKey;
+    if (selectedLayoutBlockKey && !resolvedColumnKey) {
+      const activeSection = sections.find(
+        (sec) => sec.id === selectedSectionId,
+      );
+      if (activeSection) {
+        resolvedColumnKey = findColumnKeyForBlock(
+          activeSection,
+          selectedLayoutBlockKey,
+        );
+      }
+    }
+    return selectedKey(
       selectedSectionId,
       selectedLayoutRowIndex,
-      selectedLayoutColumnKey,
+      resolvedColumnKey,
       selectedLayoutBlockKey,
-    ],
-  );
+    );
+  }, [
+    selectedSectionId,
+    selectedLayoutRowIndex,
+    selectedLayoutColumnKey,
+    selectedLayoutBlockKey,
+    sections,
+  ]);
 
   const hovered = useMemo(() => structureKey(hoveredTarget), [hoveredTarget]);
   const header = page === "header";
@@ -1770,10 +1593,9 @@ export default function BuilderWireframePanel({
             type="button"
             className="builder-structure-library-button"
             onClick={onOpenLibrary}
-            aria-haspopup="dialog"
           >
             <LibraryBig size={12} />
-            <span>Library</span>
+            <span>Element Library</span>
           </button>
         </div>
       ) : null}
@@ -1804,20 +1626,32 @@ export default function BuilderWireframePanel({
           sections.map((section, index) => {
             const sectionSelectedKey = `section:${section.id}`;
             const sectionHoveredKey = sectionSelectedKey;
+            let resolvedColKey = selectedLayoutColumnKey;
+            if (
+              selectedSectionId === section.id &&
+              selectedLayoutBlockKey &&
+              !resolvedColKey
+            ) {
+              resolvedColKey = findColumnKeyForBlock(
+                section,
+                selectedLayoutBlockKey,
+              );
+            }
+
             const selectedTarget =
               selectedSectionId === section.id
                 ? selectedLayoutBlockKey
                   ? {
                       type: "block" as const,
                       sectionId: selectedSectionId,
-                      columnKey: selectedLayoutColumnKey!,
+                      columnKey: resolvedColKey || "",
                       blockKey: selectedLayoutBlockKey,
                     }
-                  : selectedLayoutColumnKey
+                  : resolvedColKey
                     ? {
                         type: "column" as const,
                         sectionId: selectedSectionId,
-                        columnKey: selectedLayoutColumnKey,
+                        columnKey: resolvedColKey,
                       }
                     : selectedLayoutRowIndex !== null
                       ? {

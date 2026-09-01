@@ -82,9 +82,44 @@ test("Structure panel provides consistent contextual insertion affordances where
   expect(panelSource).toContain("builder-structure-insert-row-btn");
   expect(cssSource).toContain(".builder-structure-insert-row-btn");
 
-  // Column Add Column affordance between sibling segments in column strip
-  expect(panelSource).toContain("builder-structure-insert-col-btn");
-  expect(cssSource).toContain(".builder-structure-insert-col-btn");
+  // Column layout is controlled from row inspector, so ambiguous add column plus buttons are removed from structure outline
+  expect(panelSource).not.toContain("builder-structure-insert-col-btn");
 });
+
+test("Structure panel and sidebar support YOOtheme canvas representation and robust pointer resize", () => {
+  const panelSource = readFileSync(
+    resolve(process.cwd(), "components/dashboard/BuilderWireframePanel.tsx"),
+    "utf8",
+  );
+  const sidebarSource = readFileSync(
+    resolve(process.cwd(), "components/dashboard/DashboardSidebar.tsx"),
+    "utf8",
+  );
+  const builderSource = readFileSync(
+    resolve(process.cwd(), "components/dashboard/DashboardBuilder.tsx"),
+    "utf8",
+  );
+  const cssSource = readFileSync(
+    resolve(process.cwd(), "app/styles/dashboard.css"),
+    "utf8",
+  );
+
+  // Sidebar resize pointer capture
+  expect(sidebarSource).toContain("onPointerDown");
+  expect(builderSource).toContain("setPointerCapture");
+  expect(cssSource).toContain(".builder-dashboard.is-sidebar-resizing iframe");
+  expect(cssSource).toContain("pointer-events: none !important");
+
+  // YOOtheme side-by-side row columns and minimal element card design
+  expect(panelSource).toContain("builder-structure-row-columns-container");
+  expect(panelSource).toContain("builder-structure-element-card");
+  expect(cssSource).toContain(".builder-structure-row-columns-container");
+  expect(cssSource).toContain(".builder-structure-element-card");
+
+  // Blocks tab renders inside sidebar content without hijacking inspector
+  expect(sidebarSource).toContain('sidebarTab === "elements"');
+  expect(sidebarSource).toContain("<ElementLibrary");
+});
+
 
 

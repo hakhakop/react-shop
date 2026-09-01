@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, memo, useEffect, useRef, useState } from "react";
+import { Fragment, Suspense, memo, useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
@@ -2900,19 +2900,32 @@ function ContentLayoutSection({
                   columnBlocks.map((block, blockIndex) => {
                     if (block.kind === "scrollPinnedDemo") {
                       return (
-                        <ContentLayoutBlock
-                          key={block.id ?? blockIndex}
-                          block={block}
-                          product={product}
-                          breadcrumbItems={breadcrumbItems}
-                          page={page}
-                          pageContent={pageContent}
-                          categoryTree={categoryTree}
-                          activeCategorySlug={activeCategorySlug}
-                          website={website}
-                          shellSettings={shellSettings}
-                          parentScheme={rowColorScheme}
-                        />
+                        <Fragment key={block.id ?? blockIndex}>
+                          {builderInteractionIdentity ? (
+                            <button
+                              type="button"
+                              className="builder-iframe-element-insertion-control"
+                              aria-label={`Insert element before ${block.kind}`}
+                              data-builder-insertion-index={blockIndex}
+                              data-builder-section-id={section.id}
+                              data-builder-column-key={columnKey}
+                            >
+                              +
+                            </button>
+                          ) : null}
+                          <ContentLayoutBlock
+                            block={block}
+                            product={product}
+                            breadcrumbItems={breadcrumbItems}
+                            page={page}
+                            pageContent={pageContent}
+                            categoryTree={categoryTree}
+                            activeCategorySlug={activeCategorySlug}
+                            website={website}
+                            shellSettings={shellSettings}
+                            parentScheme={rowColorScheme}
+                          />
+                        </Fragment>
                       );
                     }
 
@@ -2920,8 +2933,20 @@ function ContentLayoutSection({
                       block.animation,
                     );
                     return (
-                      <div
-                        key={block.id ?? blockIndex}
+                      <Fragment key={block.id ?? blockIndex}>
+                        {builderInteractionIdentity ? (
+                          <button
+                            type="button"
+                            className="builder-iframe-element-insertion-control"
+                            aria-label={`Insert element before ${block.kind}`}
+                            data-builder-insertion-index={blockIndex}
+                            data-builder-section-id={section.id}
+                            data-builder-column-key={columnKey}
+                          >
+                            +
+                          </button>
+                        ) : null}
+                        <div
                         data-builder-block-id={block.id}
                         data-builder-object-type={builderInteractionIdentity ? "block" : undefined}
                         data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
@@ -2950,7 +2975,8 @@ function ContentLayoutSection({
                           shellSettings={shellSettings}
                           parentScheme={rowColorScheme}
                         />
-                      </div>
+                        </div>
+                      </Fragment>
                     );
                   });
                 const nestedLayout = item?.nestedLayout ?? null;
@@ -3029,7 +3055,31 @@ function ContentLayoutSection({
                           />
                         ) : null}
                         <ContentPositioningGroup blocks={blocks}>
+                          {builderInteractionIdentity && blocks.length === 0 ? (
+                            <button
+                              type="button"
+                              className="builder-iframe-element-insertion-control"
+                              aria-label="Insert element into column"
+                              data-builder-insertion-index="0"
+                              data-builder-section-id={section.id}
+                              data-builder-column-key={columnKey}
+                            >
+                              +
+                            </button>
+                          ) : null}
                           {renderColumnBlocks(blocks)}
+                          {builderInteractionIdentity && blocks.length > 0 ? (
+                            <button
+                              type="button"
+                              className="builder-iframe-element-insertion-control"
+                              aria-label="Insert element at end of column"
+                              data-builder-insertion-index={blocks.length}
+                              data-builder-section-id={section.id}
+                              data-builder-column-key={columnKey}
+                            >
+                              +
+                            </button>
+                          ) : null}
                         </ContentPositioningGroup>
                       </div>
                     )}

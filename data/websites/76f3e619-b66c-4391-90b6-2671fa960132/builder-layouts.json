@@ -4,31 +4,7 @@
     "key": "home",
     "page": "home",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f3",
-      "textColor": "#17211d",
-      "mutedTextColor": "#66716c",
-      "accentColor": "#2f6657",
-      "surfaceColor": "#e9eee9",
-      "buttonBackground": "#17211d",
-      "buttonTextColor": "#ffffff",
-      "radius": "14px",
-      "sectionMaxWidth": "1280px",
-      "sectionGutter": "clamp(20px, 4vw, 64px)",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 6vw, 84px)",
-      "headingWeight": "720",
-      "headingLineHeight": "1.02",
-      "cardBg": "#ffffff",
-      "cardRadius": "14px",
-      "cardBorder": "rgba(20,20,20,0.09)",
-      "cardShadow": "0 10px 30px rgba(20,20,20,0.05)",
-      "cardShadowHover": "0 16px 38px rgba(20,20,20,0.09)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
+    "design": {},
     "sections": [
       {
         "id": "contentLayout-mtfiz5v1-oxsjq",
@@ -137,7 +113,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -146,7 +121,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -325,7 +301,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -334,7 +309,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -380,7 +356,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -389,7 +364,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -398,23 +374,6 @@
           {
             "id": "layout-row-mtfiz5v1-nb3i-section-0",
             "layout": "2-col-equal",
-            "customLayout": {
-              "template": "1-2,1-2",
-              "columns": [
-                {
-                  "columnId": "yootheme-section-2-row-1-column-1",
-                  "widths": {
-                    "medium": "1-2"
-                  }
-                },
-                {
-                  "columnId": "yootheme-section-2-row-1-column-2",
-                  "widths": {
-                    "medium": "1-2"
-                  }
-                }
-              ]
-            },
             "columnGap": "none",
             "rowGap": "none",
             "height": {
@@ -426,9 +385,6 @@
             "columns": [
               {
                 "id": "layout-column-mtfiz5v1-nb3i-section-0-0",
-                "responsiveWidths": {
-                  "medium": "1-2"
-                },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-women.jpg",
@@ -492,9 +448,6 @@
               },
               {
                 "id": "layout-column-mtfiz5v1-nb3i-section-0-1",
-                "responsiveWidths": {
-                  "medium": "1-2"
-                },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-men.jpg",
@@ -699,7 +652,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -707,7 +659,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               },
               {
                 "id": "panelSlider-block-mtfiz5v1-p3h0i",
@@ -975,43 +929,13 @@
                         "showAction": false,
                         "itemElement": "article",
                         "dynamicContext": {
-                          "provider": "wordpress",
-                          "source": "content",
-                          "mode": "collection",
-                          "query": {
-                            "graphqlRoot": "products",
-                            "yoothemeQueryName": "products.customProducts",
-                            "sourceName": "product",
-                            "start": 0,
-                            "quantity": 8,
-                            "sourceQuery": {
-                              "name": "products.customProducts",
-                              "arguments": {
-                                "users": [],
-                                "users_operator": "IN",
-                                "offset": 0,
-                                "limit": 8,
-                                "order": "date",
-                                "order_direction": "DESC",
-                                "terms": [
-                                  23,
-                                  43
-                                ],
-                                "product_cat_operator": "IN",
-                                "product_tag_operator": "IN",
-                                "product_visibility_operator": "IN",
-                                "product_cat_include_children": "only"
-                              }
-                            }
-                          }
+                          "provider": "woocommerce",
+                          "source": "product",
+                          "mode": "collection"
                         },
                         "dynamicBindings": {
-                          "title": {
-                            "path": "title",
-                            "valueType": "string"
-                          },
                           "imageUrl": {
-                            "path": "featuredImage.url",
+                            "path": "image.url",
                             "valueType": "url"
                           },
                           "imageAlt": {
@@ -1021,6 +945,10 @@
                           "buttonUrl": {
                             "path": "link",
                             "valueType": "url"
+                          },
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
                           }
                         }
                       }
@@ -1029,8 +957,6 @@
                       "presentation": "panel-slider",
                       "variant": "panel",
                       "slideMode": "panel",
-                      "imageWidth": "660",
-                      "imageHeight": "882",
                       "imageSvgColor": "emphasis",
                       "showTitle": true,
                       "showImage": true,
@@ -1198,7 +1124,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1207,7 +1132,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -1393,7 +1319,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1402,7 +1327,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -1455,7 +1381,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1464,7 +1389,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -1650,7 +1576,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-30T08:06:10.403Z"
+    "updatedAt": "2026-08-31T17:20:54.723Z"
   },
   "header": {
     "version": 1,
@@ -1776,11 +1702,11 @@
                   {
                     "id": "header-logo",
                     "kind": "image",
-                    "headerBrandMode": "brand",
+                    "headerBrandMode": "logo",
                     "headerBrandText": "Woolberry",
                     "imageMaxWidth": 140,
                     "imageAlignment": "left",
-                    "imageUrl": null,
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg",
                     "imageAlt": "Woolberry logo"
                   }
                 ]
@@ -1822,7 +1748,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-31T07:21:40.562Z"
+    "updatedAt": "2026-08-31T17:29:10.663Z"
   },
   "footer": {
     "version": 1,
