@@ -5,6 +5,7 @@ import { getBuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { getOrCreateFooterBuilderLayout } from "@/lib/footerBuilderDocument";
 import type { SaaSWebsite } from "@/lib/websites";
+import type { WebsiteLinkProjection } from "@/lib/scopedPreviewLinks";
 
 type FooterShellProps = {
   website?: SaaSWebsite | null;
@@ -12,6 +13,7 @@ type FooterShellProps = {
   builderInteractionIdentity?: boolean;
   shellSettingsOverride?: BuilderShellSettings;
   documentRuntimeOwnedExternally?: boolean;
+  websiteLinkProjection?: WebsiteLinkProjection;
 };
 
 export default async function FooterShell({
@@ -20,6 +22,7 @@ export default async function FooterShell({
   builderInteractionIdentity = false,
   shellSettingsOverride,
   documentRuntimeOwnedExternally = false,
+  websiteLinkProjection,
 }: FooterShellProps) {
   const scope = website ? { websiteId: website.id } : {};
   const [layout, shellSettings] = await Promise.all([
@@ -54,6 +57,7 @@ export default async function FooterShell({
       rootElement="footer"
       builderInteractionIdentity={builderInteractionIdentity}
       documentRuntimeOwnedExternally={documentRuntimeOwnedExternally}
+      websiteLinkProjection={websiteLinkProjection}
     />
   );
 }

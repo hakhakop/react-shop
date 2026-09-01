@@ -57,6 +57,7 @@ test("compiles only the approved WooCommerce Product query vocabulary", () => {
       direction: "asc",
       search: "denim",
       categories: [3],
+      tags: [5],
       featured: true,
       onSale: true,
       stockStatus: "instock",
@@ -73,6 +74,7 @@ test("compiles only the approved WooCommerce Product query vocabulary", () => {
     orderby: "price",
     search: "denim",
     category: "3",
+    tag: "5",
     featured: "true",
     on_sale: "true",
     stock_status: "instock",
@@ -153,6 +155,60 @@ test("resolves collection and single Products through provider/source dispatch",
       "https://tenant.example/wp-json/wc/v3/products?offset=0&per_page=1&order=desc&orderby=date",
       "https://tenant.example/wp-json/wc/v3/products?slug=denim-overall&per_page=1",
     ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("projects imported YOOtheme commerce namespaces to the registered WooCommerce adapters", async () => {
+  const originalFetch = globalThis.fetch;
+  const requested: string[] = [];
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    requested.push(url);
+    if (url.includes("products/categories?include=")) return Response.json([{ id: 3 }]);
+    if (url.includes("products/tags?include=")) return Response.json([]);
+    if (url.includes("/products?")) return Response.json([product]);
+    if (url.endsWith("products/categories/3")) return Response.json({
+      id: 3,
+      name: "Clothing",
+      slug: "clothing",
+      description: "Seasonal clothing",
+    });
+    throw new Error(`Unexpected WooCommerce request: ${url}`);
+  };
+  try {
+    const products = await resolveDynamicContentContexts({
+      website: websiteWithWooCommerce(),
+      descriptor: {
+        provider: "wordpress",
+        source: "content",
+        mode: "collection",
+        query: {
+          sourceName: "product",
+          graphqlRoot: "products",
+          quantity: 1,
+          sourceQuery: { arguments: { terms: [3], order: "date", order_direction: "DESC" } },
+        },
+      },
+    });
+    const category = await resolveDynamicContentContexts({
+      website: websiteWithWooCommerce(),
+      descriptor: {
+        provider: "wordpress",
+        source: "content",
+        mode: "single",
+        query: { sourceName: "product_cat", graphqlRoot: "productCats", databaseId: 3 },
+      },
+    });
+    expect(products[0].fields.title).toEqual({ type: "string", value: "Denim Overall" });
+    expect(category[0].fields).toMatchObject({
+      name: { type: "string", value: "Clothing" },
+      link: { type: "url", value: "/product-category/clothing" },
+      taxonomy: { type: "string", value: "product_cat" },
+    });
+    expect(requested.find((url) => url.includes("/products?"))).toContain("category=3");
+    expect(requested.some((url) => url.includes("graphql"))).toBe(false);
   } finally {
     globalThis.fetch = originalFetch;
   }

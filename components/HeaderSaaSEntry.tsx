@@ -39,14 +39,14 @@ export default function HeaderSaaSEntry() {
 
   if (userName) {
     return (
-      <Link href="/app" className="site-header-action-pill site-header-saas-cta">
+      <Link href="/app" className="site-header-action-pill site-header-saas-cta" data-website-link-owner="application">
         Dashboard
       </Link>
     );
   }
 
   return (
-    <Link href="/login" className="site-header-action-pill site-header-saas-cta">
+    <Link href="/login" className="site-header-action-pill site-header-saas-cta" data-website-link-owner="application">
       Login
     </Link>
   );

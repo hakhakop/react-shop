@@ -286,7 +286,7 @@
         {
           "id": "main-menu-nav-10kp0a5",
           "label": "Women",
-          "url": "/women/",
+          "url": "/women",
           "parentId": null,
           "iconName": null,
           "iconUrl": null,
@@ -296,11 +296,10 @@
           "visibility": "all",
           "portableKey": "nav-10kp0a5",
           "navigationTarget": {
-            "kind": "page",
-            "postType": "page",
+            "kind": "webpages-page",
+            "pageKey": "page:women",
             "slug": "women",
-            "uri": "/women/",
-            "sourceDatabaseId": 19
+            "uri": "/women"
           }
         },
         {
@@ -2046,7 +2045,7 @@
       ]
     }
   ],
-  "updatedAt": "2026-08-31T07:04:57.737Z",
+  "updatedAt": "2026-09-01T19:30:21.892Z",
   "buttonTextTransform": "none",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#000000",

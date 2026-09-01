@@ -10,6 +10,7 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import { projectImportedDynamicContentProvider } from "@/lib/importedDynamicContentProvider";
 import { decodeHtmlEntities, sanitizeHtml } from "@/lib/safeHtml";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import {
@@ -1314,7 +1315,7 @@ const mapDynamicSource = (
   return {
     hasSource: true,
     supported: supportsWordPressPostQuery || discoverableWordPressRoot || inheritedParent,
-    context: supportsWordPressPostQuery
+    context: projectImportedDynamicContentProvider(supportsWordPressPostQuery
       ? {
           provider: "wordpress",
           source: "post",
@@ -1384,7 +1385,7 @@ const mapDynamicSource = (
           ...(query && typeof query === "object" && !Array.isArray(query)
             ? { query: { sourceQuery: query as DynamicContentData } }
             : {}),
-        },
+        }),
     ...(Object.keys(bindings).length > 0 ? { bindings } : {}),
   };
 };

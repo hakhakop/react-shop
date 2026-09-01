@@ -2,9 +2,7 @@
 
 import { useEffect } from "react";
 import {
-  resolveScopedBuilderHref,
-  resolveScopedPreviewHref,
-  resolveTenantPathHref,
+  projectWebsiteHref,
   type ScopedPreviewPage,
 } from "@/lib/scopedPreviewLinks";
 import type { NavigationRouteAlias } from "@/lib/navigationTargets";
@@ -61,15 +59,15 @@ export default function ScopedPreviewLinkRouter({
       if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) {
         return;
       }
+      if (anchor.closest('[data-website-link-owner="application"]')) return;
 
       const href = anchor.getAttribute("href");
       if (!href) return;
       const resolvedHref = websiteId
-        ? mode === "builder"
-          ? resolveScopedBuilderHref(href, { websiteId, pages, systemRouteAliases })
-          : mode === "tenant-path"
-            ? resolveTenantPathHref(href, { websiteId, pages, systemRouteAliases })
-            : resolveScopedPreviewHref(href, { websiteId, pages, systemRouteAliases })
+        ? projectWebsiteHref(href, {
+            mode,
+            context: { websiteId, pages, systemRouteAliases },
+          })
         : href;
       const navigationHandled = onNavigate?.(href, resolvedHref) === true;
       if (navigationHandled) {

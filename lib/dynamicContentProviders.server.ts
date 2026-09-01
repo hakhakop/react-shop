@@ -8,6 +8,8 @@ import {
   resolveWooCommerceProductContexts,
 } from "@/lib/woocommerceDynamicContentProvider.server";
 import { resolveWordPressGenericContentContexts } from "@/lib/wordpressGenericContentProvider.server";
+import { projectImportedDynamicContentProvider } from "@/lib/importedDynamicContentProvider";
+import { resolveWooCommerceTermContexts } from "@/lib/woocommerceTermContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
 
 export type DynamicContentProviderInput = {
@@ -23,6 +25,8 @@ const providers: Readonly<Record<string, DynamicContentProvider>> = {
   "wordpress/post": resolveWordPressPostContexts,
   "wordpress/content": resolveWordPressGenericContentContexts,
   "woocommerce/product": resolveWooCommerceProductContexts,
+  "woocommerce/product-category": resolveWooCommerceTermContexts,
+  "woocommerce/product-tag": resolveWooCommerceTermContexts,
 };
 
 /** Provider-owned composition at the shared template inheritance boundary. */
@@ -37,19 +41,20 @@ export function composeDynamicContentDescriptorWithInheritedContext(
 export async function resolveDynamicContentContexts(
   input: DynamicContentProviderInput,
 ): Promise<DynamicItemContext[]> {
-  const providerKey = `${input.descriptor.provider}/${input.descriptor.source}`;
+  const descriptor = projectImportedDynamicContentProvider(input.descriptor);
+  const providerKey = `${descriptor.provider}/${descriptor.source}`;
   const provider = providers[providerKey];
   if (!provider) {
     const providerExists = Object.keys(providers).some((key) =>
-      key.startsWith(`${input.descriptor.provider}/`),
+      key.startsWith(`${descriptor.provider}/`),
     );
     throw new Error(
       providerExists
-        ? input.descriptor.provider === "wordpress"
-          ? `Unsupported WordPress Dynamic Content source: ${input.descriptor.source}.`
+        ? descriptor.provider === "wordpress"
+          ? `Unsupported WordPress Dynamic Content source: ${descriptor.source}.`
           : `Unsupported Dynamic Content source: ${providerKey}.`
-        : `Unsupported Dynamic Content provider: ${input.descriptor.provider}.`,
+        : `Unsupported Dynamic Content provider: ${descriptor.provider}.`,
     );
   }
-  return provider(input);
+  return provider({ ...input, descriptor });
 }

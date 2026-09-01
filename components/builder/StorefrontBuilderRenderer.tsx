@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, Suspense, memo, useEffect, useRef, useState } from "react";
+import { Fragment, Suspense, memo, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
@@ -152,6 +152,11 @@ import {
   BUILDER_IFRAME_DRAFT_SOURCE,
 } from "@/components/builder/BuilderIframeDraftBridge";
 import type { BuilderState } from "@/components/dashboard/builderTypes";
+import {
+  projectWebsiteAuthoredLinks,
+  projectWebsiteHref,
+  type WebsiteLinkProjection,
+} from "@/lib/scopedPreviewLinks";
 
 export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -176,6 +181,8 @@ export type StorefrontBuilderRendererProps = {
   builderInteractionIdentity?: boolean;
   /** Canonical WebsiteFrontend owns one document-global runtime after hydration. */
   documentRuntimeOwnedExternally?: boolean;
+  /** Transient delivery projection; canonical layout URLs remain portable. */
+  websiteLinkProjection?: WebsiteLinkProjection;
 };
 
 export type StorefrontBuilderProduct = {
@@ -2901,18 +2908,6 @@ function ContentLayoutSection({
                     if (block.kind === "scrollPinnedDemo") {
                       return (
                         <Fragment key={block.id ?? blockIndex}>
-                          {builderInteractionIdentity ? (
-                            <button
-                              type="button"
-                              className="builder-iframe-element-insertion-control"
-                              aria-label={`Insert element before ${block.kind}`}
-                              data-builder-insertion-index={blockIndex}
-                              data-builder-section-id={section.id}
-                              data-builder-column-key={columnKey}
-                            >
-                              +
-                            </button>
-                          ) : null}
                           <ContentLayoutBlock
                             block={block}
                             product={product}
@@ -2934,18 +2929,6 @@ function ContentLayoutSection({
                     );
                     return (
                       <Fragment key={block.id ?? blockIndex}>
-                        {builderInteractionIdentity ? (
-                          <button
-                            type="button"
-                            className="builder-iframe-element-insertion-control"
-                            aria-label={`Insert element before ${block.kind}`}
-                            data-builder-insertion-index={blockIndex}
-                            data-builder-section-id={section.id}
-                            data-builder-column-key={columnKey}
-                          >
-                            +
-                          </button>
-                        ) : null}
                         <div
                         data-builder-block-id={block.id}
                         data-builder-object-type={builderInteractionIdentity ? "block" : undefined}
@@ -3055,31 +3038,7 @@ function ContentLayoutSection({
                           />
                         ) : null}
                         <ContentPositioningGroup blocks={blocks}>
-                          {builderInteractionIdentity && blocks.length === 0 ? (
-                            <button
-                              type="button"
-                              className="builder-iframe-element-insertion-control"
-                              aria-label="Insert element into column"
-                              data-builder-insertion-index="0"
-                              data-builder-section-id={section.id}
-                              data-builder-column-key={columnKey}
-                            >
-                              +
-                            </button>
-                          ) : null}
                           {renderColumnBlocks(blocks)}
-                          {builderInteractionIdentity && blocks.length > 0 ? (
-                            <button
-                              type="button"
-                              className="builder-iframe-element-insertion-control"
-                              aria-label="Insert element at end of column"
-                              data-builder-insertion-index={blocks.length}
-                              data-builder-section-id={section.id}
-                              data-builder-column-key={columnKey}
-                            >
-                              +
-                            </button>
-                          ) : null}
                         </ContentPositioningGroup>
                       </div>
                     )}
@@ -3318,6 +3277,7 @@ function StorefrontBuilderRendererBase({
   rootElement = "main",
   builderInteractionIdentity = false,
   documentRuntimeOwnedExternally = false,
+  websiteLinkProjection,
 }: StorefrontBuilderRendererProps) {
   const [liveDraft, setLiveDraft] = useState<BuilderState | null>(null);
   const liveRevisionRef = useRef(0);
@@ -3348,7 +3308,7 @@ function StorefrontBuilderRendererBase({
 
   // Keep the canonical renderer and its DOM/runtime instances mounted. A
   // draft snapshot only replaces the data prop that drives this render tree.
-  const layout = liveDraft?.page === page
+  const authoredLayout = liveDraft?.page === page
     ? {
         ...initialLayout,
         ...liveDraft,
@@ -3356,6 +3316,12 @@ function StorefrontBuilderRendererBase({
         updatedAt: initialLayout.updatedAt,
       }
     : initialLayout;
+  const layout = useMemo(
+    () => websiteLinkProjection
+      ? projectWebsiteAuthoredLinks(authoredLayout, websiteLinkProjection)
+      : authoredLayout,
+    [authoredLayout, websiteLinkProjection],
+  );
   const label =
     pageLabel ??
     pageLabels[page as BuilderPage] ??
@@ -3367,11 +3333,19 @@ function StorefrontBuilderRendererBase({
           .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join(" ")
       : "Page");
-  const resolvedBreadcrumbItems =
+  const authoredBreadcrumbItems =
     breadcrumbItems ??
     (page === "home"
       ? [{ label: "Home" }]
       : [{ label: "Home", href: "/" }, { label }]);
+  const resolvedBreadcrumbItems = useMemo(
+    () => websiteLinkProjection
+      ? authoredBreadcrumbItems.map((item) => item.href
+          ? { ...item, href: projectWebsiteHref(item.href, websiteLinkProjection) }
+          : item)
+      : authoredBreadcrumbItems,
+    [authoredBreadcrumbItems, websiteLinkProjection],
+  );
 
   const isPageDocument = rootElement === "main";
   const isHomePage = isPageDocument && page === "home";

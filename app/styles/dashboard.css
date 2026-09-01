@@ -14991,30 +14991,7 @@ body:has(.builder-dashboard[data-theme="light"]) .builder-row-layout-modal {
 }
 
 .builder-canvas-element-insertion-control {
-  position: relative;
-  z-index: 18;
-  width: 22px;
-  height: 22px;
-  margin: 3px auto;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--builder-ui-accent) 44%, var(--builder-ui-border));
-  border-radius: 999px;
-  background: var(--builder-ui-panel-solid);
-  color: var(--builder-ui-accent);
-  cursor: pointer;
-  opacity: 0;
-  transform: scale(.82);
-  transition: opacity 140ms ease, transform 140ms ease, background 140ms ease, color 140ms ease;
-}
-
-.builder-preview-content-row:hover .builder-canvas-element-insertion-control,
-.builder-canvas-element-insertion-control:focus-visible,
-.builder-canvas-element-insertion-control:hover {
-  opacity: 1;
-  transform: scale(1);
+  display: none !important;
 }
 
 .builder-canvas-element-insertion-control:hover,
@@ -17220,16 +17197,7 @@ body:has(.builder-dashboard.is-inspector-docked)
 }
 
 .builder-fixed-add-control {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.builder-fixed-add-control > button {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--builder-ui-accent, #0d73ff);
-  color: #ffffff;
+  display: none !important;
 }
 
 .builder-fixed-add-menu {

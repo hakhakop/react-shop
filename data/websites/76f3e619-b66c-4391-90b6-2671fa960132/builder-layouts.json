@@ -514,6 +514,296 @@
         ]
       },
       {
+        "id": "contentLayout-mtj1il1h-dopqa",
+        "kind": "contentLayout",
+        "title": "Categories 01 Copy",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtfiz5v1-0-1urc",
+            "rowId": "layout-row-mtfiz5v1-0",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "heading-block-mtfiz5v1-nu117",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mtfiz5v1-6tzwl",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-0-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=19",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                },
+                "buttonStyle": "default"
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mtfiz5v1-1-jub7",
+            "rowId": "layout-row-mtfiz5v1-0",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "heading-block-mtfiz5v1-fsisr",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mtfiz5v1-x4oiq",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-1-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=20",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                },
+                "buttonStyle": "default"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtfiz5v1-nb3i-section-0",
+            "layout": "2-col-equal",
+            "columnGap": "none",
+            "rowGap": "none",
+            "height": {
+              "mode": "viewport"
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "layout-column-mtfiz5v1-nb3i-section-0-0",
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-women.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtfiz5v1-2i9w5",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mtfiz5v1-tki8b",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-0-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=19",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "layout-column-mtfiz5v1-nb3i-section-0-1",
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-men.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtfiz5v1-oh7z1",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mtfiz5v1-agmo7",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-1-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=20",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
         "id": "contentLayout-mtfiz5v1-sjvir",
         "kind": "contentLayout",
         "title": "Latest Products",
@@ -1576,7 +1866,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-31T17:20:54.723Z"
+    "updatedAt": "2026-09-01T19:30:21.706Z"
   },
   "header": {
     "version": 1,
@@ -1718,7 +2008,7 @@
                     "id": "header-navigation",
                     "kind": "menu",
                     "title": "Navigation",
-                    "menuSource": "main",
+                    "menuSource": "main-menu",
                     "menuActiveIndicator": "underline",
                     "elementAlign": "center"
                   }
@@ -1748,7 +2038,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-31T17:29:10.663Z"
+    "updatedAt": "2026-09-01T19:11:33.231Z"
   },
   "footer": {
     "version": 1,
@@ -2715,5 +3005,1752 @@
       }
     ],
     "updatedAt": "2026-08-30T12:41:40.606Z"
+  },
+  "page:women": {
+    "version": 1,
+    "key": "page:women",
+    "page": "page:women",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mtj2dtg4-26kd1",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "dynamicContext": {
+          "provider": "wordpress",
+          "source": "content",
+          "mode": "single",
+          "query": {
+            "graphqlRoot": "productTags",
+            "yoothemeQueryName": "productTags.customProductTag",
+            "sourceName": "product_tag",
+            "databaseId": 71,
+            "sourceQuery": {
+              "name": "productTags.customProductTag",
+              "arguments": {
+                "id": 71
+              }
+            }
+          }
+        },
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "expand",
+        "maxWidth": "expand",
+        "sectionHeight": "viewport-percent",
+        "subtractHeightAbove": true,
+        "contentVerticalAlign": "center",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center",
+            "imageSize": "cover"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtj2dtg4-0-p9bb",
+            "rowId": "layout-row-mtj2dtg4-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mtj2dtg4-wuerg",
+                "kind": "heading",
+                "headingText": "",
+                "title": "",
+                "headingLevel": "div",
+                "headingSize": "h5",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "heading-block-mtj2dtg4-arzlu",
+                "kind": "heading",
+                "headingText": "",
+                "title": "",
+                "headingLevel": "h1",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mtj2dtg4-vmxp4",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-2-0",
+                    "label": "Discover Collection",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtj2dtg4-sfku-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mtj2dtg4-sfku-section-0-0",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtj2dtg5-owxhm",
+                    "kind": "heading",
+                    "headingText": "",
+                    "title": "",
+                    "headingLevel": "div",
+                    "headingSize": "h5",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "heading-block-mtj2dtg5-pzuns",
+                    "kind": "heading",
+                    "headingText": "",
+                    "title": "",
+                    "headingLevel": "h1",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mtj2dtg5-psd2h",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-0-2-0",
+                        "label": "Discover Collection",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mtj2dtg5-6nu8p",
+        "kind": "contentLayout",
+        "title": "Latest Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtj2dtg5-0-a3e3",
+            "rowId": "layout-row-mtj2dtg5-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mtj2dtg5-4l0xn",
+                "kind": "heading",
+                "headingText": "Explore Our Latest Arrivals",
+                "title": "Explore Our Latest Arrivals",
+                "headingLevel": "h2",
+                "headingSize": "h3",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mtj2dtg5-n0v9x",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-0-1-0",
+                    "label": "Shop Now",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "panelSlider-block-mtj2dtg5-m1mr9",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-1-0-0-2-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "itemElement": "article",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "collection",
+                      "query": {
+                        "graphqlRoot": "products",
+                        "yoothemeQueryName": "products.customProducts",
+                        "sourceName": "product",
+                        "start": 0,
+                        "quantity": 8,
+                        "sourceQuery": {
+                          "name": "products.customProducts",
+                          "arguments": {
+                            "users": [],
+                            "users_operator": "IN",
+                            "offset": 0,
+                            "limit": 8,
+                            "order": "date",
+                            "order_direction": "DESC",
+                            "terms": [
+                              23
+                            ],
+                            "product_cat_operator": "IN",
+                            "product_tag_operator": "IN",
+                            "product_visibility_operator": "IN",
+                            "product_cat_include_children": "only"
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "panel-slider",
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "imageWidth": "660",
+                  "imageHeight": "882",
+                  "imageSvgColor": "emphasis",
+                  "showTitle": true,
+                  "showImage": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "h6",
+                  "headingLevel": "h3",
+                  "headingSize": "h5",
+                  "imageFit": "natural",
+                  "imageRatio": "natural",
+                  "linkPanel": false,
+                  "panelStyle": "tile-default",
+                  "panelSize": "small",
+                  "panelImageNoPadding": true,
+                  "panelHeightExpand": false,
+                  "panelExpand": "none",
+                  "panelMatch": true,
+                  "panelHover": false,
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "fullWidthButton": false,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "itemWidthMode": "fixed",
+                  "cardsPerViewPhone": 1.25,
+                  "cardsPerViewSmall": 3,
+                  "cardsPerViewMedium": 4,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "slidenavHoverOnly": true,
+                  "slidenavLarger": false,
+                  "slidenavOutsideBreakpoint": "xlarge",
+                  "effect": "slide"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "customClass": "uk-grid-xsmall",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtj2dtg5-l7mc-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mtj2dtg5-l7mc-section-0-0",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtj2dtg5-2k1d5",
+                    "kind": "heading",
+                    "headingText": "Explore Our Latest Arrivals",
+                    "title": "Explore Our Latest Arrivals",
+                    "headingLevel": "h2",
+                    "headingSize": "h3",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mtj2dtg5-lzsz3",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-0-1-0",
+                        "label": "Shop Now",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "panelSlider-block-mtj2dtg5-h2oa4",
+                    "kind": "panelSlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-1-0-0-2-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "itemElement": "article",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "collection",
+                          "query": {
+                            "graphqlRoot": "products",
+                            "yoothemeQueryName": "products.customProducts",
+                            "sourceName": "product",
+                            "start": 0,
+                            "quantity": 8,
+                            "sourceQuery": {
+                              "name": "products.customProducts",
+                              "arguments": {
+                                "users": [],
+                                "users_operator": "IN",
+                                "offset": 0,
+                                "limit": 8,
+                                "order": "date",
+                                "order_direction": "DESC",
+                                "terms": [
+                                  23
+                                ],
+                                "product_cat_operator": "IN",
+                                "product_tag_operator": "IN",
+                                "product_visibility_operator": "IN",
+                                "product_cat_include_children": "only"
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "featuredImage.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "panel-slider",
+                      "variant": "panel",
+                      "slideMode": "panel",
+                      "imageWidth": "660",
+                      "imageHeight": "882",
+                      "imageSvgColor": "emphasis",
+                      "showTitle": true,
+                      "showImage": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "h6",
+                      "headingLevel": "h3",
+                      "headingSize": "h5",
+                      "imageFit": "natural",
+                      "imageRatio": "natural",
+                      "linkPanel": false,
+                      "panelStyle": "tile-default",
+                      "panelSize": "small",
+                      "panelImageNoPadding": true,
+                      "panelHeightExpand": false,
+                      "panelExpand": "none",
+                      "panelMatch": true,
+                      "panelHover": false,
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "fullWidthButton": false,
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "itemWidthMode": "fixed",
+                      "cardsPerViewPhone": 1.25,
+                      "cardsPerViewSmall": 3,
+                      "cardsPerViewMedium": 4,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "slidenavHoverOnly": true,
+                      "slidenavLarger": false,
+                      "slidenavOutsideBreakpoint": "xlarge",
+                      "effect": "slide"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "customClass": "uk-grid-xsmall",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mtj2dtg5-klqxv",
+        "kind": "contentLayout",
+        "title": "Collection",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center",
+            "imageSize": "cover"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtj2dtg5-0-de6z",
+            "rowId": "layout-row-mtj2dtg5-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "overlay-block-mtj2dtg5-00lbm",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "wordpress",
+                  "source": "content",
+                  "mode": "single",
+                  "query": {
+                    "graphqlRoot": "productTags",
+                    "yoothemeQueryName": "productTags.customProductTag",
+                    "sourceName": "product_tag",
+                    "databaseId": 73,
+                    "sourceQuery": {
+                      "name": "productTags.customProductTag",
+                      "arguments": {
+                        "id": 73
+                      }
+                    }
+                  }
+                },
+                "dynamicBindings": {
+                  "imageAlt": {
+                    "path": "acf.image_intro.alt",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "description",
+                    "valueType": "richText"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 2560,
+                "imageWidth": "2560px",
+                "imageIntrinsicWidth": 2560,
+                "imageMinHeight": "600px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?product_cat=women",
+                "imageLinkTarget": "_self",
+                "linkText": "Discover Collection",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayPosition": "center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "heading-small",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h2",
+                "metaStyle": "h5",
+                "metaAlignment": "above-title",
+                "metaElement": "div",
+                "linkStyle": "text",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtj2dtg5-foj7-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mtj2dtg5-foj7-section-0-0",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "overlay-block-mtj2dtg5-il1cv",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productTags",
+                        "yoothemeQueryName": "productTags.customProductTag",
+                        "sourceName": "product_tag",
+                        "databaseId": 73,
+                        "sourceQuery": {
+                          "name": "productTags.customProductTag",
+                          "arguments": {
+                            "id": 73
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageAlt": {
+                        "path": "acf.image_intro.alt",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "description",
+                        "valueType": "richText"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 2560,
+                    "imageWidth": "2560px",
+                    "imageIntrinsicWidth": 2560,
+                    "imageMinHeight": "600px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?product_cat=women",
+                    "imageLinkTarget": "_self",
+                    "linkText": "Discover Collection",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayPosition": "center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "heading-small",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h2",
+                    "metaStyle": "h5",
+                    "metaAlignment": "above-title",
+                    "metaElement": "div",
+                    "linkStyle": "text",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mtj2dtg5-f8k44",
+        "kind": "contentLayout",
+        "title": "Popular Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtj2dtg5-0-v7w9",
+            "rowId": "layout-row-mtj2dtg5-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mtj2dtg5-yvnd3",
+                "kind": "heading",
+                "headingText": "Popular Products",
+                "title": "Popular Products",
+                "headingLevel": "h2",
+                "headingSize": "h3",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "button-block-mtj2dtg5-xa5tq",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-3-0-0-1-0",
+                    "label": "Shop Now",
+                    "url": "?product_cat=women&orderby=popularity",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "panelSlider-block-mtj2dtg5-djpsi",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-3-0-0-2-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "itemElement": "article",
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "collection",
+                      "query": {
+                        "graphqlRoot": "products",
+                        "yoothemeQueryName": "products.customProducts",
+                        "sourceName": "product",
+                        "start": 0,
+                        "quantity": 8,
+                        "sourceQuery": {
+                          "name": "products.customProducts",
+                          "arguments": {
+                            "users": [],
+                            "users_operator": "IN",
+                            "offset": 0,
+                            "limit": 8,
+                            "order": "views",
+                            "order_direction": "all",
+                            "terms": [
+                              23
+                            ],
+                            "product_cat_operator": "IN",
+                            "product_tag_operator": "IN",
+                            "product_visibility_operator": "IN",
+                            "product_cat_include_children": "only"
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "panel-slider",
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "imageWidth": "660",
+                  "imageHeight": "882",
+                  "imageSvgColor": "emphasis",
+                  "showTitle": true,
+                  "showImage": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "h6",
+                  "headingLevel": "h3",
+                  "headingSize": "h5",
+                  "imageFit": "natural",
+                  "imageRatio": "natural",
+                  "linkPanel": false,
+                  "panelStyle": "tile-default",
+                  "panelSize": "small",
+                  "panelImageNoPadding": true,
+                  "panelHeightExpand": false,
+                  "panelExpand": "none",
+                  "panelMatch": true,
+                  "panelHover": false,
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "fullWidthButton": false,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "itemWidthMode": "fixed",
+                  "cardsPerViewPhone": 1.25,
+                  "cardsPerViewSmall": 3,
+                  "cardsPerViewMedium": 4,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "slidenavHoverOnly": true,
+                  "slidenavLarger": false,
+                  "slidenavOutsideBreakpoint": "xlarge",
+                  "effect": "slide"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtj2dtg5-1fbv-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mtj2dtg5-1fbv-section-0-0",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtj2dtg5-9ig0o",
+                    "kind": "heading",
+                    "headingText": "Popular Products",
+                    "title": "Popular Products",
+                    "headingLevel": "h2",
+                    "headingSize": "h3",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "button-block-mtj2dtg5-zt7kf",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-3-0-0-1-0",
+                        "label": "Shop Now",
+                        "url": "?product_cat=women&orderby=popularity",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "panelSlider-block-mtj2dtg5-3fu45",
+                    "kind": "panelSlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-3-0-0-2-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "itemElement": "article",
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "collection",
+                          "query": {
+                            "graphqlRoot": "products",
+                            "yoothemeQueryName": "products.customProducts",
+                            "sourceName": "product",
+                            "start": 0,
+                            "quantity": 8,
+                            "sourceQuery": {
+                              "name": "products.customProducts",
+                              "arguments": {
+                                "users": [],
+                                "users_operator": "IN",
+                                "offset": 0,
+                                "limit": 8,
+                                "order": "views",
+                                "order_direction": "all",
+                                "terms": [
+                                  23
+                                ],
+                                "product_cat_operator": "IN",
+                                "product_tag_operator": "IN",
+                                "product_visibility_operator": "IN",
+                                "product_cat_include_children": "only"
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "featuredImage.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "panel-slider",
+                      "variant": "panel",
+                      "slideMode": "panel",
+                      "imageWidth": "660",
+                      "imageHeight": "882",
+                      "imageSvgColor": "emphasis",
+                      "showTitle": true,
+                      "showImage": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "h6",
+                      "headingLevel": "h3",
+                      "headingSize": "h5",
+                      "imageFit": "natural",
+                      "imageRatio": "natural",
+                      "linkPanel": false,
+                      "panelStyle": "tile-default",
+                      "panelSize": "small",
+                      "panelImageNoPadding": true,
+                      "panelHeightExpand": false,
+                      "panelExpand": "none",
+                      "panelMatch": true,
+                      "panelHover": false,
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "fullWidthButton": false,
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "itemWidthMode": "fixed",
+                      "cardsPerViewPhone": 1.25,
+                      "cardsPerViewSmall": 3,
+                      "cardsPerViewMedium": 4,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "slidenavHoverOnly": true,
+                      "slidenavLarger": false,
+                      "slidenavOutsideBreakpoint": "xlarge",
+                      "effect": "slide"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mtj2dtg5-q0104",
+        "kind": "contentLayout",
+        "title": "Categories",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mtj2dtg5-0-tg09",
+            "rowId": "layout-row-mtj2dtg5-0",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "heading-block-mtj2dtg5-ynxkh",
+                "kind": "heading",
+                "headingText": "Discover More",
+                "title": "Discover More",
+                "headingLevel": "h3",
+                "headingAlign": "center",
+                "elementAlign": "center",
+                "maxWidth": "2xlarge",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium",
+                    "maxWidth": "2xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "overlaySlider-block-mtj2dtg5-mbmi7",
+                "kind": "overlaySlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-4-0-0-1-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 24,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 24
+                          },
+                          "field": {
+                            "name": "children",
+                            "directives": [
+                              {
+                                "name": "slice",
+                                "arguments": {
+                                  "offset": 0
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.products_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "thumbnail.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slide-4-0-0-1-1",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "dynamicContext": {
+                      "provider": "wordpress",
+                      "source": "content",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 34,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 34
+                          },
+                          "field": {
+                            "name": "children",
+                            "directives": [
+                              {
+                                "name": "slice",
+                                "arguments": {
+                                  "offset": 0
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "acf.products_intro_image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "thumbnail.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "overlay-slider",
+                  "variant": "overlay",
+                  "slideMode": "overlay",
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "itemWidthMode": "fixed",
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "cardsPerViewPhone": 1,
+                  "cardsPerViewSmall": 2,
+                  "cardsPerViewMedium": 3,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "navigationBelow": true,
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "paginationPosition": "bottom-center",
+                  "headingLevel": "h3",
+                  "headingSize": "small",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "meta",
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "effect": "slide",
+                  "overlayMode": "cover",
+                  "overlayDisplay": "always",
+                  "overlayPosition": "center",
+                  "overlayPadding": "default",
+                  "overlayStyle": "none",
+                  "overlayTextColor": "light",
+                  "imageWidth": "855px",
+                  "imageHoverTransition": "scale-up"
+                },
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "layout-row-mtj2dtg5-038z-section-0",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "layout-column-mtj2dtg5-038z-section-0-0",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "heading-block-mtj2dtg5-p5d9f",
+                    "kind": "heading",
+                    "headingText": "Discover More",
+                    "title": "Discover More",
+                    "headingLevel": "h3",
+                    "headingAlign": "center",
+                    "elementAlign": "center",
+                    "maxWidth": "2xlarge",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium",
+                        "maxWidth": "2xlarge",
+                        "blockAlign": "center",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "overlaySlider-block-mtj2dtg6-yim5a",
+                    "kind": "overlaySlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-4-0-0-1-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 24,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 24
+                              },
+                              "field": {
+                                "name": "children",
+                                "directives": [
+                                  {
+                                    "name": "slice",
+                                    "arguments": {
+                                      "offset": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.products_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "thumbnail.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-panel-slide-4-0-0-1-1",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "dynamicContext": {
+                          "provider": "wordpress",
+                          "source": "content",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 34,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 34
+                              },
+                              "field": {
+                                "name": "children",
+                                "directives": [
+                                  {
+                                    "name": "slice",
+                                    "arguments": {
+                                      "offset": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "acf.products_intro_image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "thumbnail.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "overlay-slider",
+                      "variant": "overlay",
+                      "slideMode": "overlay",
+                      "showTitle": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "itemWidthMode": "fixed",
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "cardsPerViewPhone": 1,
+                      "cardsPerViewSmall": 2,
+                      "cardsPerViewMedium": 3,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "navigationBelow": true,
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "paginationPosition": "bottom-center",
+                      "headingLevel": "h3",
+                      "headingSize": "small",
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "meta",
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "effect": "slide",
+                      "overlayMode": "cover",
+                      "overlayDisplay": "always",
+                      "overlayPosition": "center",
+                      "overlayPadding": "default",
+                      "overlayStyle": "none",
+                      "overlayTextColor": "light",
+                      "imageWidth": "855px",
+                      "imageHoverTransition": "scale-up"
+                    },
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-01T19:32:48.137Z"
   }
 }

@@ -19,9 +19,7 @@ import type { MenuItem } from "../lib/navigation";
 import {
   getScopedWebsiteIdFromPath,
   getPreviewActivePathForPageKey,
-  resolveScopedBuilderHref,
-  resolveScopedPreviewHref,
-  resolveTenantPathHref,
+  projectWebsiteHref,
   type ScopedPreviewPage,
 } from "../lib/scopedPreviewLinks";
 import type { NavigationRouteAlias } from "@/lib/navigationTargets";
@@ -481,19 +479,14 @@ export default function HeaderNav({
     scopedPreviewWebsiteId ?? getScopedWebsiteIdFromPath(rawPathname);
   const hrefResolver = activeScopedWebsiteId
     ? (href: string) =>
-        scopedLinkMode === "tenant-path"
-          ? resolveTenantPathHref(href, { websiteId: activeScopedWebsiteId, pages: scopedPreviewPages, systemRouteAliases })
-          : scopedLinkMode === "builder"
-          ? resolveScopedBuilderHref(href, {
-              websiteId: activeScopedWebsiteId,
-              pages: scopedPreviewPages,
-              systemRouteAliases,
-            })
-          : resolveScopedPreviewHref(href, {
-              websiteId: activeScopedWebsiteId,
-              pages: scopedPreviewPages,
-              systemRouteAliases,
-            })
+        projectWebsiteHref(href, {
+          mode: scopedLinkMode,
+          context: {
+            websiteId: activeScopedWebsiteId,
+            pages: scopedPreviewPages,
+            systemRouteAliases,
+          },
+        })
     : undefined;
 
   return (

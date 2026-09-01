@@ -207,7 +207,7 @@ export function compileWooCommerceProductRequest(
   }
 
   if (descriptor.mode !== "collection") throw new Error(`Unsupported WooCommerce Product Dynamic Content mode: ${descriptor.mode}.`);
-  assertAllowedKeys(query, ["start", "quantity", "order", "direction", "search", "categories", "featured", "onSale", "stockStatus", "include", "exclude", "routeCategory"], "WooCommerce Product collection query");
+  assertAllowedKeys(query, ["start", "quantity", "order", "direction", "search", "categories", "tags", "featured", "onSale", "stockStatus", "include", "exclude", "routeCategory"], "WooCommerce Product collection query");
   const start = readInteger(query.start, 0, "query.start", 0);
   const quantity = readInteger(query.quantity, DEFAULT_QUANTITY, "query.quantity", 1);
   if (start + quantity > MAX_QUERY_WINDOW) throw new Error(`WooCommerce Product collection start + quantity cannot exceed ${MAX_QUERY_WINDOW}.`);
@@ -215,6 +215,7 @@ export function compileWooCommerceProductRequest(
   const direction = readEnum(query.direction, "desc", ["asc", "desc"] as const, "query.direction");
   const stockStatus = query.stockStatus === undefined ? undefined : readEnum(query.stockStatus, "instock", ["instock", "outofstock", "onbackorder"] as const, "query.stockStatus");
   const categories = readNumericIds(query.categories, "query.categories");
+  const tags = readNumericIds(query.tags, "query.tags");
   const routeCategories = readNumericIds(query.routeCategory === undefined ? undefined : [query.routeCategory], "query.routeCategory");
   const routeCategory = routeCategories[0];
   const postFilterCategoryIds = routeCategory && categories.length && !categories.includes(routeCategory)
@@ -231,6 +232,7 @@ export function compileWooCommerceProductRequest(
     // Route ownership is mandatory. Element categories may refine the route,
     // but must never replace it. The common case sends the canonical route ID.
     category: routeCategory ?? (categories.length ? categories.join(",") : undefined),
+    tag: tags.length ? tags.join(",") : undefined,
     featured: readBoolean(query.featured, "query.featured"),
     on_sale: readBoolean(query.onSale, "query.onSale"),
     stock_status: stockStatus,
@@ -400,8 +402,9 @@ export async function fetchWooCommerceProductRecords(input: {
   website?: SaaSWebsite | null;
   descriptor: DynamicContentContextDescriptor;
 }): Promise<WooCommerceProductRecord[]> {
-  const compiled = compileWooCommerceProductRequest(input.descriptor);
   const connection = getWooCommerceConnection(input.website);
+  const descriptor = await normalizeImportedProductDescriptor(input.descriptor, connection);
+  const compiled = compileWooCommerceProductRequest(descriptor);
   const payload = await wooCommerceFetch<WooCommerceProductRecord | WooCommerceProductRecord[]>(connection, compiled.path);
   const products = Array.isArray(payload) ? payload : [payload];
   const records = products.filter(isRecord);
@@ -417,4 +420,67 @@ export async function fetchWooCommerceProductRecords(input: {
   });
   const start = compiled.postFilterStart ?? 0;
   return filtered.slice(start, start + (compiled.postFilterQuantity ?? DEFAULT_QUANTITY));
+}
+
+async function normalizeImportedProductDescriptor(
+  descriptor: DynamicContentContextDescriptor,
+  connection: ReturnType<typeof getWooCommerceConnection>,
+): Promise<DynamicContentContextDescriptor> {
+  const query = isRecord(descriptor.query) ? descriptor.query : {};
+  const sourceQuery = isRecord(query.sourceQuery) ? query.sourceQuery : null;
+  if (!sourceQuery) return descriptor;
+  if (descriptor.mode === "single") {
+    return {
+      provider: "woocommerce",
+      source: "product",
+      mode: "single",
+      query: {
+        ...(query.databaseId !== undefined ? { id: query.databaseId } : {}),
+        ...(query.slug !== undefined ? { slug: query.slug } : {}),
+      },
+    };
+  }
+  const argumentsValue = isRecord(sourceQuery.arguments) ? sourceQuery.arguments : {};
+  const termIds = Array.isArray(argumentsValue.terms)
+    ? argumentsValue.terms.flatMap((value) => {
+        const id = typeof value === "number" ? value : typeof value === "string" && /^\d+$/.test(value) ? Number(value) : NaN;
+        return Number.isInteger(id) && id > 0 ? [id] : [];
+      })
+    : [];
+  const include = termIds.join(",");
+  const lookup = async (path: string) => {
+    if (!include) return [] as number[];
+    try {
+      const values = await wooCommerceFetch<Array<{ id?: unknown }>>(connection, `${path}?include=${include}&per_page=100&hide_empty=false`);
+      return values.flatMap((value) => {
+        const id = Number(value.id);
+        return Number.isInteger(id) && id > 0 ? [id] : [];
+      });
+    } catch {
+      return [] as number[];
+    }
+  };
+  const [categories, tags] = await Promise.all([
+    lookup("products/categories"),
+    lookup("products/tags"),
+  ]);
+  const orderValue = stringValue(argumentsValue.order)?.toLowerCase();
+  const order = orderValue === "title" || orderValue === "price" || orderValue === "rating"
+    ? orderValue
+    : orderValue === "views" ? "popularity" : "date";
+  const direction = stringValue(argumentsValue.order_direction)?.toLowerCase() === "asc" ? "asc" : "desc";
+  return {
+    provider: "woocommerce",
+    source: "product",
+    mode: descriptor.mode,
+    query: {
+      ...(query.databaseId !== undefined ? { id: query.databaseId } : {}),
+      ...(query.start !== undefined ? { start: query.start } : {}),
+      ...(query.quantity !== undefined ? { quantity: query.quantity } : {}),
+      order,
+      direction,
+      ...(categories.length ? { categories } : {}),
+      ...(tags.length ? { tags } : {}),
+    },
+  };
 }

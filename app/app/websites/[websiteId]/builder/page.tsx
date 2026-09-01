@@ -85,7 +85,7 @@ export default async function WebsiteBuilderPage({
   });
 
   const requestedTargetValue =
-    resolvedSearchParams?.page ?? resolvedSearchParams?.template ?? "home";
+    resolvedSearchParams?.page ?? resolvedSearchParams?.template ?? resolvedSearchParams?.path ?? "home";
   const requestedTarget = Array.isArray(requestedTargetValue)
     ? requestedTargetValue[0] ?? "home"
     : requestedTargetValue;

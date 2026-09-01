@@ -104,8 +104,8 @@ test("custom WordPress source retains static fallback and becomes a discoverable
   const item = collectBlocks(mapped.sections).find((block) => block.kind === "grid").gridItems[0];
   expect(item).toMatchObject({ title: "Fallback", text: "Static" });
   expect(item.dynamicContext).toMatchObject({
-    provider: "wordpress",
-    source: "content",
+    provider: "woocommerce",
+    source: "product",
     mode: "collection",
     query: { graphqlRoot: "products", yoothemeQueryName: "products.customProducts" },
   });

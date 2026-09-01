@@ -13,8 +13,21 @@ export type ScopedWebsiteLinkContext = {
   systemRouteAliases?: NavigationRouteAlias[];
 };
 
+export type WebsiteLinkDeliveryMode = "domain" | "tenant-path" | "preview" | "builder";
+
+export type WebsiteLinkProjection = {
+  mode: WebsiteLinkDeliveryMode;
+  context: ScopedWebsiteLinkContext;
+};
+
 function isExternalOrSpecialHref(href: string) {
   return /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
+}
+
+/** Website-authored paths use the website root, never the hosting app root. */
+export function isWebsiteRootRelativeHref(href: string | null | undefined) {
+  const trimmed = href?.trim() ?? "";
+  return trimmed.startsWith("/") && !trimmed.startsWith("//");
 }
 
 function isLocalPreviewHost(host: string) {
@@ -167,7 +180,7 @@ export function getStorefrontHrefFromScopedPreviewHref(
 ) {
   try {
     const url = new URL(href, "https://webpages.local");
-    const match = url.pathname.match(/^\/app\/websites\/([^/]+)\/preview\/?$/);
+    const match = url.pathname.match(/^\/app\/websites\/([^/]+)\/(?:preview|builder)\/?$/);
     if (!match || decodeURIComponent(match[1]) !== websiteId) return href;
     const requestedPage = url.searchParams.get("page");
     if (!requestedPage) return href;
@@ -200,18 +213,94 @@ export function resolveScopedBuilderHref(
   return resolveScopedWebsiteHref(href, context, "builder");
 }
 
+/** Canonical render-boundary projection for every website-authored href. */
+export function projectWebsiteHref(
+  href: string | null | undefined,
+  projection: WebsiteLinkProjection,
+) {
+  if (!href) return "#";
+  if (!isWebsiteRootRelativeHref(href)) return href;
+  if (projection.mode === "domain") return href;
+  if (projection.mode === "preview" || projection.mode === "builder") {
+    try {
+      const parsed = new URL(href, "https://webpages.local");
+      const scopedRoot = `/app/websites/${encodeURIComponent(projection.context.websiteId)}/${projection.mode}`;
+      if (parsed.pathname === scopedRoot || parsed.pathname.startsWith(`${scopedRoot}/`)) {
+        return href;
+      }
+    } catch {
+      return href;
+    }
+  }
+  if (projection.mode === "tenant-path") {
+    return resolveTenantPathHref(href, projection.context);
+  }
+  return resolveScopedWebsiteHref(href, projection.context, projection.mode);
+}
+
+const WEBSITE_AUTHORED_LINK_FIELDS = new Set([
+  "url",
+  "linkUrl",
+  "buttonUrl",
+  "secondaryButtonUrl",
+  "ctaUrl",
+  "imageLinkUrl",
+  "alertLinkUrl",
+  "elementLinkUrl",
+  "loggedOutUrl",
+  "loggedInUrl",
+]);
+
+/**
+ * Project a transient Builder render tree without mutating portable authored
+ * data. Asset fields such as imageUrl, videoUrl and embedUrl are deliberately
+ * excluded from this website-navigation boundary.
+ */
+export function projectWebsiteAuthoredLinks<T>(
+  value: T,
+  projection: WebsiteLinkProjection,
+): T {
+  function visit(current: unknown, field?: string): unknown {
+    if (typeof current === "string") {
+      return field && WEBSITE_AUTHORED_LINK_FIELDS.has(field)
+        ? projectWebsiteHref(current, projection)
+        : current;
+    }
+    if (Array.isArray(current)) {
+      let changed = false;
+      const projected = current.map((item) => {
+        const next = visit(item);
+        if (next !== item) changed = true;
+        return next;
+      });
+      return changed ? projected : current;
+    }
+    if (!current || typeof current !== "object") return current;
+    let changed = false;
+    const source = current as Record<string, unknown>;
+    const projected: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(source)) {
+      const next = visit(item, key);
+      projected[key] = next;
+      if (next !== item) changed = true;
+    }
+    return changed ? projected : current;
+  }
+
+  return visit(value) as T;
+}
+
 /** Resolve an internal storefront link beneath a tenant's local slug prefix. */
 export function resolveTenantPathHref(
   href: string | null | undefined,
   context: ScopedWebsiteLinkContext | string,
 ) {
   const websiteId = typeof context === "string" ? context : context.websiteId;
-  const pages = typeof context === "string" ? [] : context.pages ?? [];
-  const systemRouteAliases = typeof context === "string" ? [] : context.systemRouteAliases ?? [];
   if (!href) return "#";
 
   const trimmed = href.trim();
   if (!trimmed || trimmed === "#" || trimmed.startsWith("#")) return href;
+  if (!isWebsiteRootRelativeHref(trimmed)) return href;
   const encodedPrefix = `/${encodeURIComponent(websiteId)}`;
   try {
     const existingUrl = new URL(trimmed, "https://webpages.local");
@@ -224,15 +313,6 @@ export function resolveTenantPathHref(
   } catch {
     return href;
   }
-  const { path } = normalizeHrefPath(trimmed);
-  const dynamicSinglePath = /^\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/i.test(path);
-  if (
-    isExternalOrSpecialHref(trimmed) ||
-    (!getBuilderPageKeyForHref(trimmed, pages, systemRouteAliases) && !dynamicSinglePath)
-  ) {
-    return href;
-  }
-
   try {
     const url = new URL(trimmed, "https://webpages.local");
     const path = url.pathname.replace(/^\/+/, "");
@@ -255,9 +335,13 @@ function resolveScopedWebsiteHref(
 
   const trimmed = href.trim();
   if (!trimmed || trimmed === "#" || trimmed.startsWith("#")) return href;
+  if (!isWebsiteRootRelativeHref(trimmed)) return href;
 
   const pageKey = getBuilderPageKeyForHref(trimmed, pages, systemRouteAliases);
-  if (!pageKey) return href;
+  if (!pageKey) {
+    const params = new URLSearchParams({ path: trimmed });
+    return `/app/websites/${encodeURIComponent(websiteId)}/${mode}?${params.toString()}`;
+  }
 
   const { hash } = normalizeHrefPath(trimmed);
   const assignedPage = pageKey === "shop"

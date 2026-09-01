@@ -372,7 +372,9 @@ import {
 import {
   getBuilderPageKeyForHref,
   getStorefrontHrefFromScopedPreviewHref,
+  projectWebsiteAuthoredLinks,
   resolveTenantPathHref,
+  type WebsiteLinkProjection,
 } from "@/lib/scopedPreviewLinks";
 import { getSystemRouteAliases } from "@/lib/navigationTargets";
 import {
@@ -3101,6 +3103,28 @@ export default function DashboardBuilder({
       return resolved;
     },
     [contentLanguage, headerContextState.sections, primaryContentLanguage],
+  );
+  const builderWebsiteLinkProjection = useMemo<WebsiteLinkProjection>(() => ({
+    mode: "builder",
+    context: {
+      websiteId: websiteRouteSegment ?? websiteId ?? "root",
+      pages: customPages.map((customPage) => ({
+        key: customPage.key,
+        slug: customPage.slug,
+        systemRole: customPage.systemRole,
+      })),
+      systemRouteAliases: getSystemRouteAliases(shellSettings),
+    },
+  }), [customPages, shellSettings, websiteId, websiteRouteSegment]);
+  const projectedHeaderContextSections = useMemo(
+    () => projectWebsiteAuthoredLinks(headerContextSections, builderWebsiteLinkProjection),
+    [builderWebsiteLinkProjection, headerContextSections],
+  );
+  const projectedMaterializedPreviewSections = useMemo(
+    () => materializedPreviewSections
+      ? projectWebsiteAuthoredLinks(materializedPreviewSections, builderWebsiteLinkProjection)
+      : null,
+    [builderWebsiteLinkProjection, materializedPreviewSections],
   );
   const headerDocumentState = useMemo(
     () => builderState.page === "header"
@@ -13380,12 +13404,12 @@ export default function DashboardBuilder({
                 previewWidth={previewCanvasWidth}
                 interactionScale={device === "desktop" ? 1 : previewScale}
                 continuousGeometryUpdates={isResizingDevice}
-                sections={headerContextSections}
+                sections={projectedHeaderContextSections}
                 interactionSections={builderState.page === "footer" ? localizedSections : undefined}
                 externalInteractionRootRef={builderState.page === "footer" ? footerPreviewSlotRef : undefined}
                 renderSections={
                   builderState.page !== "header" && builderState.page !== "footer"
-                    ? materializedPreviewSections ?? undefined
+                    ? projectedMaterializedPreviewSections ?? undefined
                     : undefined
                 }
                 page={headerContextState.page}
@@ -13505,6 +13529,7 @@ export default function DashboardBuilder({
                   rootElement="footer"
                   shellSettings={shellSettings}
                   builderInteractionIdentity={builderState.page === "footer"}
+                  websiteLinkProjection={builderWebsiteLinkProjection}
                 />
                 {builderState.page !== "footer" ? (
                   <button
@@ -16211,28 +16236,11 @@ function BuilderElementToolbar({
   );
 }
 
-function CanvasElementInsertionControl({
-  label,
-  onClick,
-}: {
+function CanvasElementInsertionControl(_props: {
   label: string;
   onClick: () => void;
 }) {
-  return (
-    <button
-      type="button"
-      className="builder-canvas-element-insertion-control"
-      aria-label={label}
-      title={label}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        onClick();
-      }}
-    >
-      <Plus size={14} aria-hidden="true" />
-    </button>
-  );
+  return null;
 }
 
 function IframeBuilderInteractionLayer({
@@ -16330,11 +16338,6 @@ function IframeBuilderInteractionLayer({
         {target.type === "column" || target.type === "block" ? <button type="button" onClick={() => onSelectTarget({ type: "column", sectionId: target.sectionId, columnKey: target.columnKey })}>Column</button> : null}
       </nav>
       <div className="builder-fixed-selection-actions">{actions}</div>
-      <div className="builder-fixed-add-control">
-        <button type="button" onClick={() => onAddSection(target.sectionId)}><Plus size={13} /> Section</button>
-        {rowIndex >= 0 ? <button type="button" onClick={() => onAddRow(target.sectionId, rowIndex)}><Plus size={13} /> Row</button> : null}
-        <button type="button" onClick={onAddBlock}><Plus size={13} /> Block</button>
-      </div>
     </div>
   </>, document.body);
 }
@@ -16741,23 +16744,6 @@ function BuilderInteractionLayer({
           </nav>
           <div className="builder-fixed-selection-actions">
             {renderToolbar(selectedVisualTarget)}
-          </div>
-          <div className="builder-fixed-add-control">
-            <button type="button" onClick={() => setAddMenuOpen((open) => !open)} aria-expanded={addMenuOpen}>
-              <Plus size={14} /> Add
-            </button>
-            {addMenuOpen ? (
-              <div className="builder-fixed-add-menu">
-                <button type="button" onClick={() => { onAddSection(selectedVisualTarget.sectionId, "below"); setAddMenuOpen(false); }}>
-                  Add section
-                </button>
-                {selectedHierarchy.rowIndex >= 0 ? (
-                  <button type="button" onClick={() => { onRequestAddRow(selectedVisualTarget.sectionId, selectedHierarchy.rowIndex); setAddMenuOpen(false); }}>
-                    Add row
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
           </div>
         </div>
       ) : null}

@@ -8,7 +8,11 @@ import {
 } from "@/lib/navigationTargets";
 import {
   getBuilderPageKeyForHref,
+  getStorefrontHrefFromScopedPreviewHref,
+  projectWebsiteAuthoredLinks,
+  projectWebsiteHref,
   resolveScopedBuilderHref,
+  resolveScopedPreviewHref,
   resolveTenantPathHref,
 } from "@/lib/scopedPreviewLinks";
 
@@ -114,4 +118,55 @@ test("canonical commerce paths remain direct hard-reload candidates outside menu
     target: { postType: "product", slug: "black-oversized-blouse" },
   });
   expect(resolveCommerceRouteCandidate("/about/")).toBeNull();
+});
+
+test("every website-authored root path projects without route-shape guessing", () => {
+  const context = { websiteId: "woolberry", pages: [] };
+  expect(resolveTenantPathHref("/something/", context)).toBe("/woolberry/something/");
+  expect(resolveTenantPathHref("/foo/bar/?size=m#details", context))
+    .toBe("/woolberry/foo/bar/?size=m#details");
+  expect(resolveScopedPreviewHref("/foo/bar/", context))
+    .toBe("/app/websites/woolberry/preview?path=%2Ffoo%2Fbar%2F");
+  expect(resolveScopedBuilderHref("/foo/bar/", context))
+    .toBe("/app/websites/woolberry/builder?path=%2Ffoo%2Fbar%2F");
+  expect(getStorefrontHrefFromScopedPreviewHref(
+    "/app/websites/woolberry/builder?page=shop",
+    "woolberry",
+  )).toBe("/shop");
+});
+
+test("the shared projector preserves domain and explicit non-website destinations", () => {
+  const context = { websiteId: "woolberry" };
+  expect(projectWebsiteHref("/something/", { mode: "domain", context })).toBe("/something/");
+  for (const href of [
+    "https://example.com/path",
+    "//example.com/path",
+    "mailto:hello@example.com",
+    "tel:+123456789",
+    "sms:+123456789",
+    "#details",
+  ]) {
+    expect(projectWebsiteHref(href, { mode: "tenant-path", context })).toBe(href);
+  }
+});
+
+test("render projection does not mutate canonical authored data or asset URLs", () => {
+  const canonical = {
+    sections: [{
+      buttonUrl: "/something/",
+      imageUrl: "/media/hero.jpg",
+      rows: [{ items: [{ url: "/foo/bar/" }, { url: "https://example.com" }] }],
+    }],
+  };
+  const projected = projectWebsiteAuthoredLinks(canonical, {
+    mode: "tenant-path",
+    context: { websiteId: "woolberry" },
+  });
+  expect(projected).not.toBe(canonical);
+  expect(projected.sections[0]?.buttonUrl).toBe("/woolberry/something/");
+  expect(projected.sections[0]?.imageUrl).toBe("/media/hero.jpg");
+  expect(projected.sections[0]?.rows[0]?.items[0]?.url).toBe("/woolberry/foo/bar/");
+  expect(projected.sections[0]?.rows[0]?.items[1]?.url).toBe("https://example.com");
+  expect(canonical.sections[0]?.buttonUrl).toBe("/something/");
+  expect(canonical.sections[0]?.rows[0]?.items[0]?.url).toBe("/foo/bar/");
 });

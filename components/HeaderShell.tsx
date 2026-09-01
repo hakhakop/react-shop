@@ -9,7 +9,7 @@ import {
   type BuilderCustomPage,
   type BuilderLayoutKey,
 } from "../lib/builderLayouts";
-import { resolveScopedPreviewHref } from "../lib/scopedPreviewLinks";
+import { projectWebsiteHref } from "../lib/scopedPreviewLinks";
 import type { SaaSWebsite } from "@/lib/websites";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderShellView from "./HeaderShellView";
@@ -107,6 +107,17 @@ export default async function HeaderShell({
   const categoryElement = headerComposition.elements.find(
     (element) => element.type === "categories",
   );
+  const scopedLinkMode = tenantPathMode
+    ? "tenant-path"
+    : builderPreviewMode
+      ? "builder"
+      : "preview";
+  const projectHeaderHref = (href: string) => navigationWebsiteId
+    ? projectWebsiteHref(href, {
+        mode: scopedLinkMode,
+        context: { websiteId: navigationWebsiteId, pages: scopedPreviewPages },
+      })
+    : href;
 
   return (
     <HeaderShellView
@@ -116,23 +127,15 @@ export default async function HeaderShell({
       headerSettings={headerSettings}
       serviceHomepageMode={serviceHomepageMode}
       homeHref={
-        navigationWebsiteId
-          ? tenantPathMode
-            ? `/${encodeURIComponent(navigationWebsiteId)}`
-            : resolveScopedPreviewHref("/", { websiteId: navigationWebsiteId, pages: scopedPreviewPages })
-          : "/"
+        projectHeaderHref("/")
       }
       clientHref={
-        navigationWebsiteId
-          ? tenantPathMode
-            ? `/${encodeURIComponent(navigationWebsiteId)}/client`
-            : resolveScopedPreviewHref("/client", { websiteId: navigationWebsiteId, pages: scopedPreviewPages })
-          : "/client"
+        projectHeaderHref("/client")
       }
       scopedPreviewWebsiteId={navigationWebsiteId}
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
-      scopedLinkMode={tenantPathMode ? "tenant-path" : undefined}
+      scopedLinkMode={scopedLinkMode}
       hideSaaSEntry={hideSaaSEntry}
       categoriesContent={categoryElement ? (
         <CategoryMegaMenu

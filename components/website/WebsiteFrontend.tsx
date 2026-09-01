@@ -37,7 +37,10 @@ import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumen
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
-import { getBuilderPageKeyForTenantPath } from "@/lib/scopedPreviewLinks";
+import {
+  getBuilderPageKeyForTenantPath,
+  type WebsiteLinkProjection,
+} from "@/lib/scopedPreviewLinks";
 import { getWordPressMediaOrigin } from "@/lib/wordpressUrl";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
@@ -270,7 +273,9 @@ export default async function WebsiteFrontend({
   }));
   const websiteRouteSegment = getWebsiteRouteSegment(website);
   const systemRouteAliases = getNavigationRouteAliases(baseShellSettings);
-  const tenantRelativeRequest = requestedPage === websiteRouteSegment
+  const tenantRelativeRequest = requestedPage.startsWith("/")
+    ? requestedPage
+    : requestedPage === websiteRouteSegment
     ? "/"
     : requestedPage.startsWith(`${websiteRouteSegment}/`)
       ? `/${requestedPage.slice(websiteRouteSegment.length + 1)}`
@@ -367,6 +372,14 @@ export default async function WebsiteFrontend({
 
   const isPreview = mode === "preview";
   const isTenantPath = mode === "tenant-path";
+  const websiteLinkProjection: WebsiteLinkProjection = {
+    mode: builderIframeSelection ? "builder" : mode,
+    context: {
+      websiteId: websiteRouteSegment,
+      pages: scopedPreviewPages,
+      systemRouteAliases,
+    },
+  };
 
   return (
     <div className={builderGlobalVisibilityClassName({
@@ -381,7 +394,7 @@ export default async function WebsiteFrontend({
           websiteId={websiteRouteSegment}
           pages={scopedPreviewPages}
           systemRouteAliases={systemRouteAliases}
-          mode={isTenantPath ? "tenant-path" : "preview"}
+          mode={builderIframeSelection ? "builder" : isTenantPath ? "tenant-path" : "preview"}
         />
       )}
       <style
@@ -421,6 +434,7 @@ export default async function WebsiteFrontend({
                 builderInteractionIdentity={builderIframeSelection || effectiveRendererProps.builderInteractionIdentity}
                 shellSettings={shellSettings}
                 documentRuntimeOwnedExternally
+                websiteLinkProjection={websiteLinkProjection}
               />
             ) : (
               effectiveFallbackContent
@@ -431,6 +445,7 @@ export default async function WebsiteFrontend({
               builderInteractionIdentity={builderIframeSelection}
               shellSettingsOverride={shellSettings}
               documentRuntimeOwnedExternally
+              websiteLinkProjection={websiteLinkProjection}
             />
           </div>
         </div>

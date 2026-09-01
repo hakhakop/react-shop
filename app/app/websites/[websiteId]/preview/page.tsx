@@ -24,14 +24,16 @@ type WebsitePreviewPageProps = {
     page?: string;
     product?: string;
     category?: string;
+    path?: string;
     builderFrame?: string;
     builderBridge?: string;
   }>;
 };
 
-function previewPathWithSearch(websiteId: string, page?: string, product?: string, category?: string) {
+function previewPathWithSearch(websiteId: string, page?: string, product?: string, category?: string, websitePath?: string) {
   const params = new URLSearchParams();
-  if (page) params.set("page", page);
+  if (websitePath) params.set("path", websitePath);
+  else if (page) params.set("page", page);
   if (product) params.set("product", product);
   if (category) params.set("category", category);
   const query = params.toString();
@@ -48,7 +50,7 @@ export default async function WebsitePreviewPage({
     getCurrentUser(await cookies()),
     searchParams,
   ]);
-  const requestedPage = query?.page ?? "home";
+  const requestedPage = query?.path ?? query?.page ?? "home";
   const productSlug = query?.product;
   const categorySlug = query?.category;
   const requestedPath = previewPathWithSearch(
@@ -56,6 +58,7 @@ export default async function WebsitePreviewPage({
     requestedPage,
     productSlug,
     categorySlug,
+    query?.path,
   );
 
   if (!user) {
