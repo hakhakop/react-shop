@@ -1,8 +1,8 @@
-import type { BuilderDataScope, BuilderLayout } from "@/lib/builderLayouts";
+import { getPublishedBuilderLayout, type BuilderDataScope, type BuilderLayout, type BuilderLayoutKey } from "@/lib/builderLayouts";
 import { readDynamicBuilderDocument } from "@/lib/builderLayoutDocuments.server";
 import { materializeBuilderDynamicContent, type DynamicContentContextResolver } from "@/lib/builderDynamicContentMaterializer.server";
 import { getDynamicItemContextValue } from "@/lib/dynamicContent";
-import { parseLayoutDocumentId, resolveLayout, type StableContentIdentity } from "@/lib/layoutRouting";
+import { builderLayoutDocumentId, parseLayoutDocumentId, resolveLayout, type StableContentIdentity } from "@/lib/layoutRouting";
 import { getBuilderLayoutByDocumentId, readLayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
 import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
 import { legacyTemplatePageType } from "@/lib/templatePageTypes";
@@ -34,6 +34,40 @@ export type TemplateBuilderContext = {
   websiteId?: string;
   assignmentSummary: string;
 };
+
+/**
+ * Converts a compatibility `?page=` entry for a template-owned Builder layout
+ * into the same strict document + preview identity used by normal contextual
+ * storefront editing. The legacy page key is only an entry point; it is not a
+ * second owner for template preview state.
+ */
+export async function resolveLegacyTemplateBuilderEntry(input: {
+  page: BuilderLayoutKey;
+  scope?: BuilderDataScope;
+  website?: SaaSWebsite | null;
+}) {
+  const scope = input.scope ?? {};
+  const layout = await getPublishedBuilderLayout(input.page, scope);
+  if (!layout) return null;
+  const documentId = layout.documentId ?? builderLayoutDocumentId(input.page);
+  const registry = await readLayoutRoutingRegistry(scope);
+  const template = registry.routingTemplates.find((item) => item.layoutId === documentId);
+  if (!template) return null;
+  const definitions = await getTemplatePageTypeCatalog(input.website);
+  const definition = definitions.find((item) => item.id === template.pageType);
+  if (!definition) return null;
+  const [preview] = await resolveTemplatePagePreviewEntries({
+    definition,
+    website: input.website,
+  });
+  if (!preview) return null;
+  return {
+    documentId,
+    routingTemplateId: template.id,
+    previewIdentity: preview.identity,
+    storefrontHref: preview.storefrontHref,
+  };
+}
 
 async function readLayout(documentId: string, scope: BuilderDataScope) {
   try {

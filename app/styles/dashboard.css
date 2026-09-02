@@ -716,13 +716,12 @@ body:has(.builder-dashboard) .site-header--service {
   display: grid;
   gap: 8px;
   padding: 10px 12px;
+  container-name: builder-document-header;
+  container-type: inline-size;
 }
 
 .builder-document-header .builder-document-language-top {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  z-index: 1;
+  position: static;
 }
 
 .builder-document-breadcrumb {
@@ -733,6 +732,13 @@ body:has(.builder-dashboard) .site-header--service {
   color: var(--builder-ui-muted);
   font-size: 10px;
   font-weight: 600;
+}
+
+.builder-document-breadcrumb > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .builder-document-back,
@@ -765,7 +771,8 @@ body:has(.builder-dashboard) .site-header--service {
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 6px;
-  flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .builder-document-identity {
@@ -924,6 +931,48 @@ body:has(.builder-dashboard) .site-header--service {
   .builder-canvas-controls-label {
     flex: 1 0 100%;
     margin-right: 0;
+  }
+}
+
+@container builder-document-header (max-width: 900px) {
+  .builder-document-header-main {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .builder-document-actions {
+    justify-content: flex-start;
+  }
+}
+
+@container builder-document-header (max-width: 520px) {
+  .builder-document-actions .builder-template-preview-select,
+  .builder-document-actions .builder-document-language-top {
+    flex: 1 1 calc(50% - 3px);
+    min-width: 0;
+  }
+
+  .builder-document-actions .builder-template-preview-select select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .builder-document-actions .builder-document-language-top {
+    height: auto;
+    min-height: 46px;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .builder-document-actions .builder-document-language-top select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .builder-document-actions .builder-canvas-control:not(.builder-icon-only-control) {
+    flex: 1 1 180px;
   }
 }
 

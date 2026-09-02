@@ -3059,7 +3059,10 @@ export default function DashboardBuilder({
     const candidateProductSlug = selectedTemplateCandidate?.storefrontHref
       ?.match(/\/product\/([^/?#]+)/)?.[1];
     const candidateCategorySlug = selectedTemplateCandidate?.storefrontHref
-      ?.match(/\/product-category\/([^/?#]+)/)?.[1];
+      ?.split(/[?#]/, 1)[0]
+      ?.split("/")
+      .filter(Boolean)
+      .at(-1);
     const productSlug = individualBuilderContext?.slug ??
       candidateProductSlug ??
       searchParams.get("product") ??
@@ -3571,20 +3574,29 @@ export default function DashboardBuilder({
         : getLayoutBlockKindsForState(),
     [builderState.page],
   );
-  const frontendHref = builderEditorContext?.navigation.frontendHref;
+  const selectedTemplatePreviewCandidate = templatePreviewCandidates.find((candidate) =>
+    candidate.identity.provider === templatePreviewIdentity?.provider &&
+    candidate.identity.contentType === templatePreviewIdentity?.contentType &&
+    candidate.identity.contentId === templatePreviewIdentity?.contentId,
+  );
+  const frontendHref = builderEditorContext?.content.mode === "preview"
+    ? selectedTemplatePreviewCandidate?.storefrontHref ?? builderEditorContext.navigation.frontendHref
+    : builderEditorContext?.navigation.frontendHref;
   const rawViewPageHref =
     frontendHref ?? ordinaryBuilderFrontendHref(builderState.page, customPages);
-  const localTenantHref = websiteId
+  const localTenantHref = websiteId && rawViewPageHref
     ? resolveTenantPathHref(rawViewPageHref, {
         websiteId: websiteRouteSegment ?? websiteId,
         pages: customPages.map((page) => ({ key: page.key, slug: page.slug })),
       })
     : undefined;
-  const viewPageHref = resolveWebsiteStorefrontHref(
-    rawViewPageHref,
-    websitePrimaryDomain,
-    localTenantHref,
-  );
+  const viewPageHref = rawViewPageHref
+    ? resolveWebsiteStorefrontHref(
+        rawViewPageHref,
+        websitePrimaryDomain,
+        localTenantHref,
+      )
+    : undefined;
   const handleScopedBuilderNavigate = useCallback(
     (href: string) => {
       // A strict routing-template document already owns the live preview

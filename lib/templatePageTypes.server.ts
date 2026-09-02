@@ -19,6 +19,16 @@ export type TemplatePagePreviewEntry = {
   rootContext?: DynamicItemContext;
 };
 
+export function productCategoryStorefrontHref(category: {
+  slug: string;
+  ancestry: Array<{ slug: string }>;
+}) {
+  const path = [...category.ancestry, category]
+    .map((item) => encodeURIComponent(item.slug))
+    .join("/");
+  return `/product-category/${path}`;
+}
+
 const taxonomyContentType = (name: string) => ({
   category: "post-category",
   post_tag: "post-tag",
@@ -174,10 +184,11 @@ export async function resolveTemplatePagePreviewEntries(input: {
       : await getDefaultCanonicalProductCategory(website);
     if (!category) return [];
     const identity = { provider: "woocommerce", contentType: definition.contentType, contentId: String(category.category.id) };
+    const storefrontHref = productCategoryStorefrontHref(category.category);
     return [{
       identity,
       label: category.category.name,
-      storefrontHref: `/product-category/${category.category.slug}`,
+      storefrontHref,
       routeContext: {
         view: "archive",
         pageType: definition.id,
@@ -186,7 +197,7 @@ export async function resolveTemplatePagePreviewEntries(input: {
         contentId: identity.contentId,
         databaseId: category.category.id,
         slug: category.category.slug,
-        uri: `/product-category/${category.category.slug}`,
+        uri: storefrontHref,
         taxonomyTerms: [
           { taxonomy: "product_cat", id: identity.contentId, slug: category.category.slug },
           ...category.category.ancestry.map((item) => ({ taxonomy: "product_cat", id: String(item.id), slug: item.slug })),

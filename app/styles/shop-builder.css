@@ -441,6 +441,18 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   min-height: calc(100svh - var(--shop-builder-section-height-offset, 0px));
 }
 
+/* UIkit's later `.uk-section` reset uses `display: flow-root`. A viewport
+   section must retain a flex column so its authored vertical alignment has a
+   real free-space axis. The extra class specificity keeps this projection
+   authoritative without changing ordinary auto-height sections. */
+.shop-builder-section.shop-builder-section--height-viewport,
+.shop-builder-section.shop-builder-section--height-viewport-80,
+.shop-builder-section.shop-builder-section--height-viewport-20,
+.shop-builder-section.shop-builder-section--height-viewport-percent {
+  display: flex;
+  flex-direction: column;
+}
+
 .shop-builder-section--height-viewport.shop-builder-section--align-top
   > .shop-builder-section-content,
 .shop-builder-section--height-viewport-80.shop-builder-section--align-top

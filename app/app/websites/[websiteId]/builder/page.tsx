@@ -16,6 +16,7 @@ import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
 import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
+import { resolveLegacyTemplateBuilderEntry } from "@/lib/templateBuilderContext.server";
 
 export const metadata = {
   title: "Website Builder",
@@ -104,6 +105,27 @@ export default async function WebsiteBuilderPage({
     resolvedSearchParams?.routingTemplate ||
     resolvedSearchParams?.individual,
   );
+  if (!hasStrictDocumentTarget) {
+    const strictTemplateEntry = await resolveLegacyTemplateBuilderEntry({
+      page: initialHydrationPage,
+      scope: { websiteId: website.id },
+      website,
+    });
+    if (strictTemplateEntry) {
+      const nextSearchParams = new URLSearchParams();
+      Object.entries(resolvedSearchParams ?? {}).forEach(([key, value]) => {
+        if (["page", "template", "path", "context", "category", "product"].includes(key)) return;
+        if (Array.isArray(value)) value.forEach((item) => nextSearchParams.append(key, item));
+        else if (typeof value === "string") nextSearchParams.set(key, value);
+      });
+      nextSearchParams.set("document", strictTemplateEntry.documentId);
+      nextSearchParams.set("routingTemplate", strictTemplateEntry.routingTemplateId);
+      nextSearchParams.set("previewProvider", strictTemplateEntry.previewIdentity.provider);
+      nextSearchParams.set("previewContentType", strictTemplateEntry.previewIdentity.contentType);
+      nextSearchParams.set("previewContentId", strictTemplateEntry.previewIdentity.contentId);
+      redirect(`/app/websites/${websiteId}/builder?${nextSearchParams.toString()}`);
+    }
+  }
   const cookieStore = await cookies();
   const languageCookie = cookieStore.get(`website_content_language_${website.id}`)?.value;
   const contentLanguage = website.enabledLanguages.includes(languageCookie as never)

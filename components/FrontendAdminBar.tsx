@@ -345,7 +345,11 @@ export default function FrontendAdminBar({
   }
 
   return (
-    <aside className="frontend-admin-bar" aria-label="Frontend editor tools">
+    <aside
+      className="frontend-admin-bar"
+      aria-label="Frontend editor tools"
+      data-website-link-owner="application"
+    >
       <div>
         <strong>{target.context}</strong>
         <span>{target.legacy ? "Root website editor" : "Website builder"}</span>
