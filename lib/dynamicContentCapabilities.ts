@@ -46,6 +46,7 @@ export type DynamicBindingDestination =
   | "linkLabel"
   | "imageUrl"
   | "imageAlt"
+  | "hoverVideoUrl"
   | "buttonLabel"
   | "buttonUrl";
 
@@ -71,6 +72,7 @@ export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   linkLabel: { label: "Link Text", acceptedTypes: ["string", "richText"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
+  hoverVideoUrl: { label: "Hover Video", acceptedTypes: ["url"] },
   buttonLabel: { label: "Button Label", acceptedTypes: ["string", "richText"] },
   buttonUrl: { label: "Button URL", acceptedTypes: ["url"] },
 };
@@ -159,6 +161,7 @@ export const WOOCOMMERCE_PRODUCT_FIELDS: readonly DynamicContentSourceField[] = 
   { path: "image", label: "Image", valueType: "media" },
   { path: "image.url", label: "Image URL", valueType: "url" },
   { path: "image.alt", label: "Image Alt", valueType: "string" },
+  { path: "acf.product_video.url", label: "Video Url", valueType: "url" },
   { path: "gallery", label: "Gallery", valueType: "metadata" },
   { path: "price", label: "Price", valueType: "string" },
   { path: "price.amount", label: "Price Amount", valueType: "number" },

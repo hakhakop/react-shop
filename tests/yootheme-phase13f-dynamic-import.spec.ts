@@ -107,7 +107,7 @@ test("custom WordPress source retains static fallback and becomes a discoverable
     provider: "woocommerce",
     source: "product",
     mode: "collection",
-    query: { graphqlRoot: "products", yoothemeQueryName: "products.customProducts" },
+    query: { start: 0, quantity: 3 },
   });
   expect(item.dynamicBindings).toMatchObject({
     title: { path: "title", valueType: "string" },
@@ -332,7 +332,12 @@ test("uses the same canonical metadata helper for a Panel Slider template", () =
         props: { title: "Fallback slide", link_text: "Read More" },
         source: {
           query: { name: "posts.customPosts", arguments: { offset: 0, limit: 3 } },
-          props: { title: { name: "title" }, content: { name: "excerpt" }, link: { name: "link" } },
+          props: {
+            title: { name: "title" },
+            content: { name: "excerpt" },
+            link: { name: "link" },
+            video_hover: { name: "link" },
+          },
         },
       }],
     }] }] }] }],
@@ -347,6 +352,7 @@ test("uses the same canonical metadata helper for a Panel Slider template", () =
       title: { path: "title", valueType: "string" },
       text: { path: "excerpt", valueType: "richText" },
       buttonUrl: { path: "link", valueType: "url" },
+      hoverVideoUrl: { path: "link", valueType: "url" },
     },
   });
 });

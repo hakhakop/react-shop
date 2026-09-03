@@ -99,6 +99,7 @@ test("Product exposes only canonical normalized provider fields", () => {
   expect(fields).toEqual(expect.arrayContaining([
     { path: "title", label: "Title", valueType: "string" },
     { path: "image", label: "Image", valueType: "media" },
+    { path: "acf.product_video.url", label: "Video Url", valueType: "url" },
     { path: "price.amount", label: "Price Amount", valueType: "number" },
     { path: "categories.label", label: "Category Labels", valueType: "string" },
     { path: "attributes", label: "Attributes", valueType: "metadata" },

@@ -42,6 +42,7 @@ const product = {
   categories: [{ id: 3, name: "Clothing", slug: "clothing" }],
   tags: [{ id: 5, name: "Denim", slug: "denim" }],
   attributes: [{ id: 2, name: "Size", slug: "pa_size", visible: true, variation: true, options: ["S", "M"] }],
+  acf: { product_video: { url: "https://tenant.example/product-video.mp4" } },
   rawProviderObject: "must-not-escape",
 };
 
@@ -111,12 +112,19 @@ test("normalizes Product records without leaking raw REST objects or inventing v
       "origin.permalink": { type: "url", value: "https://tenant.example/product/denim-overall/" },
       image: { type: "media", value: { id: 9, url: "https://tenant.example/denim.jpg", alt: "Blue denim overall" } },
       "image.url": { type: "url", value: "https://tenant.example/denim.jpg" },
+      "acf.product_video.url": { type: "url", value: "https://tenant.example/product-video.mp4" },
       "price.amount": { type: "number", value: 49.5 },
       "categories.label": { type: "string", value: "Clothing" },
     },
   });
   expect(JSON.stringify(context)).not.toContain("rawProviderObject");
   expect(JSON.stringify(context)).not.toContain("secret");
+
+  const unresolvedAttachment = normalizeWooCommerceProductContext({
+    ...product,
+    acf: { product_video: "2409" },
+  });
+  expect(unresolvedAttachment.fields["acf.product_video.url"]).toBeUndefined();
 
   const variable = normalizeWooCommerceProductContext({
     ...product,

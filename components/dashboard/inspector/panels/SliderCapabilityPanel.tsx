@@ -27,6 +27,7 @@ import {
   InspectorDivision,
   InspectorFieldRow,
   InspectorPillGroup,
+  InspectorRange,
   InspectorSelect,
   InspectorSwitch,
   InspectorTextField,
@@ -513,6 +514,15 @@ export default function SliderCapabilityPanel({
                         </>
                       </InspectorFieldRow>}
 
+                      {isPanelSlider && <InspectorFieldRow label="Hover Video" dynamicBinding={dynamicBinding("hoverVideoUrl")}>
+                        <InspectorTextField
+                          value={slide.hoverVideoUrl ?? ""}
+                          onChange={(value: string) => updateSlide({ hoverVideoUrl: value || undefined })}
+                          placeholder="https://..."
+                          ariaLabel={`${itemLabel} ${index + 1} hover video`}
+                        />
+                      </InspectorFieldRow>}
+
                       {!isPanelSlider && !isSlideshow && !isOverlaySlider && <InspectorFieldRow label="Icon">
                         <IconPicker
                           value={slide.iconName}
@@ -694,6 +704,19 @@ export default function SliderCapabilityPanel({
           />
         </InspectorDivision>
 
+        {isPanelSlider && (
+          <InspectorDivision title="DISPLAY">
+            <InspectorFieldRow label="Title"><InspectorSwitch checked={carouselSettings.showTitle !== false} onChange={(checked: boolean) => updateCarousel({ showTitle: checked })} label="Show title" /></InspectorFieldRow>
+            <InspectorFieldRow label="Meta"><InspectorSwitch checked={carouselSettings.showMeta !== false} onChange={(checked: boolean) => updateCarousel({ showMeta: checked })} label="Show meta" /></InspectorFieldRow>
+            <InspectorFieldRow label="Content"><InspectorSwitch checked={carouselSettings.showContent !== false} onChange={(checked: boolean) => updateCarousel({ showContent: checked })} label="Show content" /></InspectorFieldRow>
+            <InspectorFieldRow label="Image"><InspectorSwitch checked={carouselSettings.showImage !== false} onChange={(checked: boolean) => updateCarousel({ showImage: checked })} label="Show image" /></InspectorFieldRow>
+            <InspectorFieldRow label="Video"><InspectorSwitch checked={carouselSettings.showVideo !== false} onChange={(checked: boolean) => updateCarousel({ showVideo: checked })} label="Show video" /></InspectorFieldRow>
+            <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.showLink !== false} onChange={(checked: boolean) => updateCarousel({ showLink: checked })} label="Show link" /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover Image"><InspectorSwitch checked={carouselSettings.showHoverImage !== false} onChange={(checked: boolean) => updateCarousel({ showHoverImage: checked })} label="Show hover image" /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover Video"><InspectorSwitch checked={carouselSettings.showHoverVideo !== false} onChange={(checked: boolean) => updateCarousel({ showHoverVideo: checked })} label="Show hover video" /></InspectorFieldRow>
+          </InspectorDivision>
+        )}
+
         {isSlideshow && (
           <>
             <InspectorDivision title="DISPLAY">
@@ -766,36 +789,68 @@ export default function SliderCapabilityPanel({
         <div className="builder-inspector-stack" data-uikit-capability="panel-slider-settings">
           <InspectorDivision title="SLIDER">
             <InspectorFieldRow label="Item Width Mode">
-              <InspectorPillGroup
+              <InspectorSelect
                 value={carouselSettings.itemWidthMode ?? "auto"}
                 options={[{ value: "auto", label: "Auto" }, { value: "fixed", label: "Fixed" }]}
                 onChange={(value: string) => updateCarousel({ itemWidthMode: value })}
                 ariaLabel="Item Width Mode"
               />
             </InspectorFieldRow>
-            <InspectorFieldRow label="Gap">
+            <InspectorFieldRow label="Fill Column"><InspectorSwitch checked={carouselSettings.fillColumnSpace === true} onChange={(checked: boolean) => updateCarousel({ fillColumnSpace: checked })} label="Fill the available column space" /></InspectorFieldRow>
+            <InspectorFieldRow label="Column Gap">
               <InspectorSelect value={String(carouselSettings.spaceBetween ?? 30)} onChange={(value: string) => updateCarousel({ spaceBetween: Number(value) })} options={[{ value: "0", label: "None" }, { value: "15", label: "Small" }, { value: "30", label: "Default" }, { value: "40", label: "Large" }]} />
             </InspectorFieldRow>
             <InspectorFieldRow label="Divider">
               <InspectorSwitch checked={carouselSettings.divider === true} onChange={(checked: boolean) => updateCarousel({ divider: checked })} label="Show dividers" />
             </InspectorFieldRow>
-            <InspectorFieldRow label="Center slides"><InspectorSwitch checked={carouselSettings.centered === true} onChange={(checked: boolean) => updateCarousel({ centered: checked })} label="Center" /></InspectorFieldRow>
-            <InspectorFieldRow label="Finite"><InspectorSwitch checked={carouselSettings.loop === false} onChange={(checked: boolean) => updateCarousel({ loop: !checked })} label="Stop at the last item" /></InspectorFieldRow>
-            <InspectorFieldRow label="Autoplay"><InspectorSwitch checked={carouselSettings.autoplay === true} onChange={(checked: boolean) => updateCarousel({ autoplay: checked })} label="Enable autoplay" /></InspectorFieldRow>
-            <InspectorFieldRow label="Pause on hover"><InspectorSwitch checked={carouselSettings.pauseOnHover !== false} onChange={(checked: boolean) => updateCarousel({ pauseOnHover: checked })} label="Pause autoplay on hover" /></InspectorFieldRow>
           </InspectorDivision>
 
           <InspectorDivision title="ITEM WIDTH">
             {itemWidth("cardsPerViewPhone", "Phone Portrait", 1)}
             {itemWidth("cardsPerViewSmall", "Phone Landscape")}
-            {itemWidth("cardsPerViewMedium", "Medium (Tablet Landscape)", 3)}
-            {itemWidth("cardsPerViewLarge", "Large (Desktop)")}
-            {itemWidth("cardsPerViewXLarge", "X-Large (Large Screens)")}
+            {itemWidth("cardsPerViewMedium", "Tablet Landscape", 3)}
+            {itemWidth("cardsPerViewLarge", "Desktop")}
+            {itemWidth("cardsPerViewXLarge", "Large Screens")}
+          </InspectorDivision>
+
+          <InspectorDivision title="ANIMATION">
+            <InspectorFieldRow label="Sets"><InspectorSwitch checked={carouselSettings.sets === true} onChange={(checked: boolean) => updateCarousel({ sets: checked })} label="Slide all visible items at once" /></InspectorFieldRow>
+            <InspectorFieldRow label="Center"><InspectorSwitch checked={carouselSettings.centered === true} onChange={(checked: boolean) => updateCarousel({ centered: checked })} label="Center the active slide" /></InspectorFieldRow>
+            <InspectorFieldRow label="Finite"><InspectorSwitch checked={carouselSettings.loop === false} onChange={(checked: boolean) => updateCarousel({ loop: !checked })} label="Disable infinite scrolling" /></InspectorFieldRow>
+            <InspectorFieldRow label="Velocity">
+              <div className="inspector-range-value-row"><InspectorRange min={0.2} max={3} step={0.1} value={carouselSettings.velocity ?? 1} onChange={(velocity) => updateCarousel({ velocity })} ariaLabel="Slider velocity" className="inspector-range--grow" /><InspectorTextField type="number" value={String(carouselSettings.velocity ?? 1)} onChange={(value) => updateCarousel({ velocity: Number(value) || 1 })} ariaLabel="Slider velocity value" /></div>
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Autoplay"><InspectorSwitch checked={carouselSettings.autoplay === true} onChange={(checked: boolean) => updateCarousel({ autoplay: checked })} label="Enable autoplay" /></InspectorFieldRow>
+            <InspectorFieldRow label="Pause on hover"><InspectorSwitch checked={carouselSettings.pauseOnHover !== false} onChange={(checked: boolean) => updateCarousel({ pauseOnHover: checked })} label="Pause autoplay on hover" /></InspectorFieldRow>
+            <InspectorFieldRow label="Autoplay Interval">
+              <div className="inspector-range-value-row">
+                <InspectorRange
+                  min={1}
+                  max={15}
+                  value={Math.max(1, Math.min(15, Math.round((carouselSettings.autoplayDelayMs ?? 7000) / 1000)))}
+                  onChange={(seconds) => updateCarousel({ autoplayDelayMs: seconds * 1000 })}
+                  ariaLabel="Autoplay interval in seconds"
+                  className="inspector-range--grow"
+                />
+                <InspectorTextField
+                  type="number"
+                  value={String(Math.round((carouselSettings.autoplayDelayMs ?? 7000) / 1000))}
+                  onChange={(value) => updateCarousel({ autoplayDelayMs: Math.max(1, Number(value) || 1) * 1000 })}
+                  ariaLabel="Autoplay interval seconds"
+                />
+              </div>
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Parallax"><InspectorSwitch checked={carouselSettings.sliderParallax === true} onChange={(checked: boolean) => updateCarousel({ sliderParallax: checked })} label="Enable parallax effect" /></InspectorFieldRow>
+            <InspectorFieldRow label="Parallax Easing"><div className="inspector-range-value-row"><InspectorRange min={-2} max={2} step={0.1} value={carouselSettings.sliderParallaxEasing ?? 0} onChange={(sliderParallaxEasing) => updateCarousel({ sliderParallaxEasing })} ariaLabel="Parallax easing" className="inspector-range--grow" /><InspectorTextField type="number" value={String(carouselSettings.sliderParallaxEasing ?? 0)} onChange={(value) => updateCarousel({ sliderParallaxEasing: Number(value) || 0 })} ariaLabel="Parallax easing value" /></div></InspectorFieldRow>
+            <InspectorFieldRow label="Parallax Target"><InspectorSelect value={carouselSettings.sliderParallaxTarget ?? "element"} onChange={(sliderParallaxTarget: string) => updateCarousel({ sliderParallaxTarget })} options={[{ value: "element", label: "Element" }, { value: "viewport", label: "Viewport" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Parallax Start/End"><div className="inspector-range-value-row"><InspectorTextField value={carouselSettings.sliderParallaxStart ?? ""} onChange={(sliderParallaxStart) => updateCarousel({ sliderParallaxStart })} ariaLabel="Parallax start" /><InspectorTextField value={carouselSettings.sliderParallaxEnd ?? ""} onChange={(sliderParallaxEnd) => updateCarousel({ sliderParallaxEnd })} ariaLabel="Parallax end" /></div></InspectorFieldRow>
           </InspectorDivision>
 
           <InspectorDivision title="NAVIGATION">
             <InspectorFieldRow label="Navigation"><InspectorSelect value={carouselSettings.navigationType ?? (carouselSettings.showDots ? "dotnav" : "none")} onChange={(value: string) => updateCarousel({ navigationType: value, showDots: value === "dotnav" })} options={[{ value: "none", label: "None" }, { value: "dotnav", label: "Dotnav" }]} /></InspectorFieldRow>
-            <InspectorFieldRow label="Position"><InspectorSelect value={carouselSettings.paginationPosition ?? "bottom"} onChange={(value: string) => updateCarousel({ paginationPosition: value })} options={[{ value: "bottom", label: "Bottom" }, { value: "top", label: "Top" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Position"><InspectorSelect value={carouselSettings.paginationPosition ?? "center"} onChange={(value: string) => updateCarousel({ paginationPosition: value })} disabled={(carouselSettings.navigationType ?? (carouselSettings.showDots ? "dotnav" : "none")) === "none"} options={[{ value: "center", label: "Center" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Margin"><InspectorSelect value={carouselSettings.navigationMargin ?? "medium"} onChange={(navigationMargin: string) => updateCarousel({ navigationMargin })} disabled={(carouselSettings.navigationType ?? (carouselSettings.showDots ? "dotnav" : "none")) === "none"} options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Breakpoint"><InspectorSelect value={carouselSettings.navigationBreakpoint ?? ""} onChange={(navigationBreakpoint: string) => updateCarousel({ navigationBreakpoint: navigationBreakpoint || undefined })} disabled={(carouselSettings.navigationType ?? (carouselSettings.showDots ? "dotnav" : "none")) === "none"} options={[{ value: "", label: "Always" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} /></InspectorFieldRow>
           </InspectorDivision>
 
           <InspectorDivision title="SLIDENAV">
@@ -807,32 +862,71 @@ export default function SliderCapabilityPanel({
             <InspectorFieldRow label="Outside Breakpoint"><InspectorSelect value={carouselSettings.slidenavOutsideBreakpoint ?? ""} onChange={(value: string) => updateCarousel({ slidenavOutsideBreakpoint: value || undefined })} options={[{ value: "", label: "Always" }, { value: "small", label: "Small" }, { value: "medium", label: "Medium" }, { value: "large", label: "Large" }, { value: "xlarge", label: "X-Large" }]} /></InspectorFieldRow>
           </InspectorDivision>
 
-          <InspectorDivision title="ITEM">
-            <InspectorFieldRow label="Title"><InspectorSwitch checked={carouselSettings.showTitle !== false} onChange={(checked: boolean) => updateCarousel({ showTitle: checked })} label="Show title" /></InspectorFieldRow>
-            <InspectorFieldRow label="Meta"><InspectorSwitch checked={carouselSettings.showMeta !== false} onChange={(checked: boolean) => updateCarousel({ showMeta: checked })} label="Show meta" /></InspectorFieldRow>
-            <InspectorFieldRow label="Content"><InspectorSwitch checked={carouselSettings.showContent !== false} onChange={(checked: boolean) => updateCarousel({ showContent: checked })} label="Show content" /></InspectorFieldRow>
-            <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.showLink !== false} onChange={(checked: boolean) => updateCarousel({ showLink: checked })} label="Show link" /></InspectorFieldRow>
+          <InspectorDivision title="PANEL">
+            <InspectorFieldRow label="Style"><InspectorSelect value={carouselSettings.panelStyle ?? "tile-default"} onChange={(panelStyle: string) => updateCarousel({ panelStyle })} options={[{ value: "blank", label: "None" }, { value: "default", label: "Card Default" }, { value: "primary", label: "Card Primary" }, { value: "secondary", label: "Card Secondary" }, { value: "tile-default", label: "Tile Default" }, { value: "tile-muted", label: "Tile Muted" }, { value: "tile-primary", label: "Tile Primary" }, { value: "tile-secondary", label: "Tile Secondary" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Clipping"><InspectorSwitch checked={carouselSettings.panelClippingOffset === true} onChange={(panelClippingOffset: boolean) => updateCarousel({ panelClippingOffset })} label="Add clipping offset" /></InspectorFieldRow>
+            <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.linkPanel === true} onChange={(linkPanel: boolean) => updateCarousel({ linkPanel })} label="Link panel" /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover Style"><InspectorSwitch checked={carouselSettings.panelHover === true} onChange={(panelHover: boolean) => updateCarousel({ panelHover })} label="Add hover style" /></InspectorFieldRow>
+            <InspectorFieldRow label="Padding"><InspectorSelect value={carouselSettings.panelSize ?? "small"} onChange={(panelSize: string) => updateCarousel({ panelSize })} options={[{ value: "none", label: "None" }, { value: "small", label: "Small" }, { value: "default", label: "Default" }, { value: "large", label: "Large" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Image"><InspectorSwitch checked={carouselSettings.panelImageNoPadding === true} onChange={(panelImageNoPadding: boolean) => updateCarousel({ panelImageNoPadding })} label="Align image without padding" /></InspectorFieldRow>
+            <InspectorFieldRow label="Height"><InspectorSwitch checked={carouselSettings.panelMatch !== false} onChange={(panelMatch: boolean) => updateCarousel({ panelMatch })} label="Match panel heights" /></InspectorFieldRow>
+            <InspectorFieldRow label="Expand Content"><InspectorSelect value={carouselSettings.panelExpand ?? "none"} onChange={(panelExpand: string) => updateCarousel({ panelExpand })} options={[{ value: "none", label: "None" }, { value: "image", label: "Image" }, { value: "content", label: "Content" }, { value: "both", label: "Image and Content" }]} /></InspectorFieldRow>
           </InspectorDivision>
 
-          <CardSettingsGroup
-            block={sharedSettingsBlock}
-            update={updateCarousel}
-            title="PANEL"
-            showLink
-            showHeight
-            showMatch
-            showImageNoPadding
-            heightLabel="Fill the available column space"
-            imageNoPaddingLabel="Align image without padding"
-            surfaceOptions={[
-              { value: "blank", label: "None" },
-              { value: "default", label: "Default" },
-              { value: "primary", label: "Primary" },
-              { value: "secondary", label: "Secondary" },
-            ]}
-            defaultSize="none"
-            keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
-          />
+          <InspectorDivision title="TITLE">
+            <InspectorFieldRow label="Style"><InspectorSelect value={carouselSettings.headingSize ?? "h5"} onChange={(headingSize: string) => updateCarousel({ headingSize })} options={["none", "h1", "h2", "h3", "h4", "h5", "h6", "small", "medium", "large"].map((value) => ({ value, label: value === "none" ? "None" : value.startsWith("h") ? `Heading ${value.toUpperCase()}` : value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.titleLink !== false} onChange={(titleLink: boolean) => updateCarousel({ titleLink })} label="Link title" /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover Style"><InspectorSelect value={carouselSettings.titleHoverStyle ?? "none"} onChange={(titleHoverStyle: string) => updateCarousel({ titleHoverStyle })} options={[{ value: "none", label: "None" }, { value: "reset", label: "Reset" }, { value: "heading", label: "Heading" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Decoration"><InspectorSelect value={carouselSettings.titleDecoration ?? "none"} onChange={(titleDecoration: string) => updateCarousel({ titleDecoration })} options={[{ value: "none", label: "None" }, { value: "line", label: "Line" }, { value: "bullet", label: "Bullet" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Font Family"><InspectorSelect value={carouselSettings.titleFontFamily ?? "none"} onChange={(titleFontFamily: string) => updateCarousel({ titleFontFamily })} options={[{ value: "none", label: "None" }, { value: "default", label: "Default" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Color"><InspectorSelect value={carouselSettings.titleColor ?? "none"} onChange={(titleColor: string) => updateCarousel({ titleColor })} options={[{ value: "none", label: "None" }, { value: "muted", label: "Muted" }, { value: "emphasis", label: "Emphasis" }, { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="HTML Element"><InspectorSelect value={carouselSettings.headingLevel ?? "h3"} onChange={(headingLevel: string) => updateCarousel({ headingLevel })} options={["h1", "h2", "h3", "h4", "h5", "h6", "div"].map((value) => ({ value, label: value }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Alignment"><InspectorSelect value={carouselSettings.titleAlign ?? "top"} onChange={(titleAlign: string) => updateCarousel({ titleAlign })} options={[{ value: "top", label: "Top" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Width"><InspectorSelect value={carouselSettings.titleGridWidth ?? "50"} onChange={(titleGridWidth: string) => updateCarousel({ titleGridWidth })} options={[{ value: "25", label: "25%" }, { value: "33", label: "33%" }, { value: "50", label: "50%" }, { value: "66", label: "66%" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Column Gap"><InspectorSelect value={carouselSettings.titleGridColumnGap ?? "default"} onChange={(titleGridColumnGap: string) => updateCarousel({ titleGridColumnGap })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Row Gap"><InspectorSelect value={carouselSettings.titleGridRowGap ?? "default"} onChange={(titleGridRowGap: string) => updateCarousel({ titleGridRowGap })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Breakpoint"><InspectorSelect value={carouselSettings.titleGridBreakpoint ?? "medium"} onChange={(titleGridBreakpoint: string) => updateCarousel({ titleGridBreakpoint })} options={[{ value: "small", label: "Small (Phone Landscape)" }, { value: "medium", label: "Medium (Tablet Landscape)" }, { value: "large", label: "Large (Desktop)" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Margin Top"><InspectorSelect value={carouselSettings.titleMarginTop ?? "default"} onChange={(titleMarginTop: string) => updateCarousel({ titleMarginTop })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+          </InspectorDivision>
+
+          <InspectorDivision title="META">
+            <InspectorFieldRow label="Style"><InspectorSelect value={carouselSettings.metaStyle ?? "h6"} onChange={(metaStyle: string) => updateCarousel({ metaStyle })} options={[{ value: "none", label: "None" }, { value: "text-meta", label: "Text Meta" }, { value: "h6", label: "Heading H6" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Color"><InspectorSelect value={carouselSettings.metaColor ?? "none"} onChange={(metaColor: string) => updateCarousel({ metaColor })} options={["none", "muted", "emphasis", "primary", "secondary"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Alignment"><InspectorSelect value={carouselSettings.metaPosition ?? "below-title"} onChange={(metaPosition: string) => updateCarousel({ metaPosition })} options={[{ value: "above-title", label: "Above Title" }, { value: "below-title", label: "Below Title" }, { value: "above-content", label: "Above Content" }, { value: "below-content", label: "Below Content" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="HTML Element"><InspectorSelect value={carouselSettings.metaHtmlElement ?? "div"} onChange={(metaHtmlElement: string) => updateCarousel({ metaHtmlElement })} options={["div", "span", "p"].map((value) => ({ value, label: value }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Margin Top"><InspectorSelect value={carouselSettings.metaMarginTop ?? "none"} onChange={(metaMarginTop: string) => updateCarousel({ metaMarginTop })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+          </InspectorDivision>
+
+          <InspectorDivision title="CONTENT">
+            <InspectorFieldRow label="Style"><InspectorSelect value={carouselSettings.contentStyle ?? "none"} onChange={(contentStyle: string) => updateCarousel({ contentStyle })} options={[{ value: "none", label: "None" }, { value: "lead", label: "Text Lead" }, { value: "meta", label: "Text Meta" }, { value: "small", label: "Text Small" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Alignment"><InspectorSwitch checked={carouselSettings.contentForceLeft === true} onChange={(contentForceLeft: boolean) => updateCarousel({ contentForceLeft })} label="Force left alignment" /></InspectorFieldRow>
+            <InspectorFieldRow label="Drop Cap"><InspectorSwitch checked={carouselSettings.contentDropCap === true} onChange={(contentDropCap: boolean) => updateCarousel({ contentDropCap })} label="Enable drop cap" /></InspectorFieldRow>
+            <InspectorFieldRow label="Columns"><InspectorSelect value={carouselSettings.contentColumns ?? "none"} onChange={(contentColumns: string) => updateCarousel({ contentColumns })} options={[{ value: "none", label: "None" }, { value: "2", label: "2 Columns" }, { value: "3", label: "3 Columns" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Divider"><InspectorSwitch checked={carouselSettings.contentColumnDivider === true} onChange={(contentColumnDivider: boolean) => updateCarousel({ contentColumnDivider })} label="Show dividers" /></InspectorFieldRow>
+            <InspectorFieldRow label="Columns Breakpoint"><InspectorSelect value={carouselSettings.contentColumnsBreakpoint ?? "medium"} onChange={(contentColumnsBreakpoint: string) => updateCarousel({ contentColumnsBreakpoint })} options={[{ value: "small", label: "Small (Phone Landscape)" }, { value: "medium", label: "Medium (Tablet Landscape)" }, { value: "large", label: "Large (Desktop)" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Margin Top"><InspectorSelect value={carouselSettings.contentMarginTop ?? "default"} onChange={(contentMarginTop: string) => updateCarousel({ contentMarginTop })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+          </InspectorDivision>
+
+          <InspectorDivision title="IMAGE">
+            <InspectorFieldRow label="Width/Height"><div className="inspector-range-value-row"><InspectorTextField value={String(carouselSettings.imageWidth ?? "")} onChange={(imageWidth) => updateCarousel({ imageWidth })} ariaLabel="Image width" /><InspectorTextField value={String(carouselSettings.imageHeight ?? "")} onChange={(imageHeight) => updateCarousel({ imageHeight })} ariaLabel="Image height" /></div></InspectorFieldRow>
+            <InspectorFieldRow label="Loading"><InspectorSwitch checked={carouselSettings.imageLoading === "eager"} onChange={(eager: boolean) => updateCarousel({ imageLoading: eager ? "eager" : "lazy" })} label="Load image eagerly" /></InspectorFieldRow>
+            <InspectorFieldRow label="Border"><InspectorSelect value={carouselSettings.imageShape ?? "none"} onChange={(imageShape: string) => updateCarousel({ imageShape })} options={[{ value: "none", label: "None" }, { value: "rounded", label: "Rounded" }, { value: "circle", label: "Circle" }, { value: "pill", label: "Pill" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.linkImage === true} onChange={(linkImage: boolean) => updateCarousel({ linkImage })} label="Link image" /></InspectorFieldRow>
+            <InspectorFieldRow label="Hover Transition"><InspectorSelect value={carouselSettings.imageHoverTransition ?? "none"} onChange={(imageHoverTransition: string) => updateCarousel({ imageHoverTransition })} options={[{ value: "none", label: "None" }, { value: "scale-up", label: "Scale Up" }, { value: "scale-down", label: "Scale Down" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Icon Width"><InspectorTextField type="number" value={String(carouselSettings.imageIconWidth ?? 80)} onChange={(value) => updateCarousel({ imageIconWidth: Number(value) || 0 })} ariaLabel="Image icon width" /></InspectorFieldRow>
+            <InspectorFieldRow label="Icon Color"><InspectorSelect value={carouselSettings.imageIconColor ?? "none"} onChange={(imageIconColor: string) => updateCarousel({ imageIconColor })} options={["none", "muted", "emphasis", "primary", "secondary"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Alignment"><InspectorSelect value={carouselSettings.imageStructuralAlignment ?? "top"} onChange={(imageStructuralAlignment: string) => updateCarousel({ imageStructuralAlignment })} options={[{ value: "top", label: "Top" }, { value: "left", label: "Left" }, { value: "right", label: "Right" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Width"><InspectorSelect value={carouselSettings.imageGridWidth ?? "50"} onChange={(imageGridWidth: string) => updateCarousel({ imageGridWidth })} options={[{ value: "25", label: "25%" }, { value: "33", label: "33%" }, { value: "50", label: "50%" }, { value: "66", label: "66%" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Column Gap"><InspectorSelect value={carouselSettings.imageGridColumnGap ?? "default"} onChange={(imageGridColumnGap: string) => updateCarousel({ imageGridColumnGap })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Row Gap"><InspectorSelect value={carouselSettings.imageGridRowGap ?? "default"} onChange={(imageGridRowGap: string) => updateCarousel({ imageGridRowGap })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Grid Breakpoint"><InspectorSelect value={carouselSettings.imageGridBreakpoint ?? "medium"} onChange={(imageGridBreakpoint: string) => updateCarousel({ imageGridBreakpoint })} options={[{ value: "small", label: "Small (Phone Landscape)" }, { value: "medium", label: "Medium (Tablet Landscape)" }, { value: "large", label: "Large (Desktop)" }]} /></InspectorFieldRow>
+            <InspectorFieldRow label="Vertical Alignment"><InspectorSwitch checked={carouselSettings.imageVerticalAlign === true} onChange={(imageVerticalAlign: boolean) => updateCarousel({ imageVerticalAlign })} label="Center" /></InspectorFieldRow>
+            <InspectorFieldRow label="Margin Top"><InspectorSelect value={carouselSettings.imageMarginTop ?? "default"} onChange={(imageMarginTop: string) => updateCarousel({ imageMarginTop })} options={["none", "small", "default", "medium", "large"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Inline SVG"><InspectorSwitch checked={carouselSettings.imageSvgInline === true} onChange={(imageSvgInline: boolean) => updateCarousel({ imageSvgInline })} label="Make SVG stylable with CSS" /></InspectorFieldRow>
+            <InspectorFieldRow label="Animate"><InspectorSwitch checked={carouselSettings.imageSvgAnimate === true} onChange={(imageSvgAnimate: boolean) => updateCarousel({ imageSvgAnimate })} label="Animate strokes" /></InspectorFieldRow>
+            <InspectorFieldRow label="SVG Color"><InspectorSelect value={carouselSettings.imageSvgColor ?? "emphasis"} onChange={(imageSvgColor: string) => updateCarousel({ imageSvgColor })} options={["muted", "emphasis", "primary", "secondary"].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></InspectorFieldRow>
+            <InspectorFieldRow label="Text Color"><InspectorSelect value={carouselSettings.imageTextColor ?? "dark"} onChange={(imageTextColor: string) => updateCarousel({ imageTextColor })} options={[{ value: "none", label: "None" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} /></InspectorFieldRow>
+          </InspectorDivision>
 
           <ActionSettingsGroup
             block={sharedSettingsBlock}
@@ -846,57 +940,6 @@ export default function SliderCapabilityPanel({
             showFullWidth
             showMargin
             keys={{ label: "buttonLabel", target: "linkTarget", aria: "linkAriaLabel", style: "buttonStyle", size: "buttonSize", width: "fullWidthButton", margin: "linkMarginTop" }}
-          />
-
-          <TitleSettingsGroup
-            block={sharedSettingsBlock}
-            update={updateCarousel}
-            showFontRole={false}
-            showMargin
-            defaultSize="inherit"
-            defaultLevel="h3"
-          />
-
-          <ContentSettingsGroup
-            block={sharedSettingsBlock}
-            update={updateCarousel}
-            showRole={false}
-            showStyle
-            showAlignment
-            showMargin
-          />
-
-          <MetaSettingsGroup
-            block={sharedSettingsBlock}
-            update={updateCarousel}
-            showAlignment={false}
-            showStyle
-            showPosition
-            showHtmlElement
-            keys={{
-              role: "metaTypographyRole",
-              align: "metaAlign",
-              level: "metaHtmlElement",
-              style: "metaStyle",
-              color: "metaColor",
-              position: "metaPosition",
-            }}
-          />
-
-          <ImageSettingsGroup
-            block={sharedSettingsBlock}
-            update={updateCarousel}
-            showFrameControls={false}
-            // Panel Slider's YOOtheme Image Alignment is structural (`top` /
-            // `left`), not the shared Image horizontal alignment. Its shared
-            // media-grid runtime is deferred, so do not expose a misleading
-            // left/center/right substitute in this composition.
-            showAlignment={false}
-            showSvgControls
-            showFocalPoint={false}
-            showShadow={false}
-            showDecoration={false}
-            svgColorLabel="SVG Color"
           />
         </div>
       );

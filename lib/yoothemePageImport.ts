@@ -25,7 +25,7 @@ import {
   normalizeYoothemeHeaderDocument,
 } from "@/lib/yoothemeImportContract";
 import { createYoothemePageImportReport, formatYoothemeImportWarnings, type YoothemeImportReport } from "@/lib/yoothemeImportReport";
-import type { UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
+import { normalizeYoothemeBackgroundPosition, type UikitYoothemeButtonVariant } from "@/lib/uikitTokens";
 import {
   UIKIT_LAYOUT_PRESETS,
   normalizeLayoutToUikitPreset,
@@ -987,6 +987,7 @@ type DynamicImportDestination =
   | "imageUrl"
   | "backgroundImageUrl"
   | "imageAlt"
+  | "hoverVideoUrl"
   | "imageLinkUrl"
   | "linkText"
   | "label"
@@ -1032,7 +1033,7 @@ const dynamicBinding = (
   allowUnregistered = false,
 ) => {
   const fallbackValueType: DynamicContentValueType =
-    destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "url"
+    destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "url"
       ? "url"
       : destination === "text" || destination === "body" || destination === "content"
         ? "richText"
@@ -1499,12 +1500,30 @@ const sourceSliderItem = (
       content: "text",
       image: "imageUrl",
       image_alt: "imageAlt",
+      video_hover: "hoverVideoUrl",
+      hover_video: "hoverVideoUrl",
       link_text: "buttonLabel",
       link: "buttonUrl",
     },
     warnings,
     path,
   );
+  const sliderBindings = dynamic.bindings
+    ? { ...dynamic.bindings } as DynamicFieldBindings<DynamicImportDestination>
+    : undefined;
+  if (dynamic.context?.provider === "woocommerce" && dynamic.context.source === "product" && sliderBindings) {
+    for (const binding of Object.values(sliderBindings)) {
+      if (!binding) continue;
+      if (binding.path === "featuredImage.url") binding.path = "image.url";
+      if (binding.path === "featuredImage.alt") binding.path = "image.alt";
+    }
+    // Product Price is YOOtheme's standard Panel Slider meta projection. Some
+    // exports express it as a provider-specific field that the old generic
+    // WordPress mapper discarded, so preserve the canonical WooCommerce field.
+    if (!sliderBindings.meta && parentProps.show_meta !== false) {
+      sliderBindings.meta = { path: "price", valueType: "string" };
+    }
+  }
   const props = { ...parentProps, ...itemProps };
   const media = normalizeYoothemeMedia(props);
   // Element-level links must not leak into each item as manufactured actions.
@@ -1533,6 +1552,7 @@ const sourceSliderItem = (
     text: sanitizeHtml(asString(props.content) ?? ""),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
+    hoverVideoUrl: resolveYoothemeAssetUrl(itemProps.video_hover ?? itemProps.hover_video),
     thumbnailUrl: resolveYoothemeAssetUrl(itemProps.thumbnail),
     thumbnailPosition: sourceFocalPoint(itemProps.thumbnail_focal_point),
     // Width and Height are Panel Slider element media defaults. Retain these
@@ -1604,7 +1624,7 @@ const sourceSliderItem = (
       ? { linkPanel: itemProps.panel_link === true || itemProps.panel_link === "true" }
       : {}),
     ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
-    ...(dynamic.bindings ? { dynamicBindings: dynamic.bindings as NonNullable<BuilderSection["slides"]>[number]["dynamicBindings"] } : {}),
+    ...(sliderBindings ? { dynamicBindings: sliderBindings as NonNullable<BuilderSection["slides"]>[number]["dynamicBindings"] } : {}),
   };
 };
 
@@ -1704,15 +1724,16 @@ const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
   "text_align_breakpoint", "text_align_fallback", "margin", "margin_remove_top", "margin_remove_bottom",
   "panel_style", "panel_padding", "panel_link", "panel_link_hover",
   "title", "meta", "content",
-  "show_title", "show_image", "show_meta", "show_content", "show_link",
+  "show_title", "show_image", "show_meta", "show_content", "show_link", "show_video", "show_hover_image", "show_hover_video",
   "text_align", "meta_align", "meta_element", "meta_style", "title_element", "title_style",
   "title_margin", "content_margin", "link_margin",
   "link", "link_text", "link_style", "link_size", "link_target",
-  "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
+  "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color", "image_link", "link_image",
   "slider_autoplay", "slider_autoplay_interval", "slider_autoplay_pause", "slider_center", "slider_finite", "slider_gap", "slider_width",
+  "slider_sets", "slider_velocity", "slider_parallax", "slider_parallax_easing", "slider_parallax_target", "slider_parallax_start", "slider_parallax_end", "slider_fill",
   "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge",
   "slider_divider", "slidenav", "slidenav_margin", "slidenav_breakpoint", "nav", "nav_position",
-  "height_expand", "panel_expand", "panel_image_no_padding", "panel_match", "slidenav_hover", "slidenav_large", "slidenav_outside_breakpoint",
+  "height_expand", "panel_expand", "panel_image_no_padding", "panel_match", "slidenav_hover", "slidenav_large",
   // Dynamic source descriptors are classified by reportUnsupportedDynamicSource.
   "source", "query", "content_source", "item_source",
 ]);
@@ -1721,13 +1742,13 @@ const PANEL_SLIDER_DEFERRED_FIELDS = new Set([
   "image_align",
   "text_color",
   "nav_breakpoint",
+  "slidenav_outside_breakpoint",
 ]);
 
 const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
   "content_column_breakpoint", "icon_width", "image_grid_breakpoint", "image_grid_width",
-  "show_hover_image", "show_hover_video", "show_video", "slider_sets",
   "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
-  "link_image", "image_transition", "animate_strokes", "image_icon_width", "image_icon_color",
+  "image_transition", "animate_strokes", "image_icon_width", "image_icon_color",
   "grid_column_gap", "grid_row_gap", "vertical_align", "margin_top",
   "lightbox_bg_close", "parallax_easing", "item_animation", "item_maxwidth",
   "meta_color", "title_link",
@@ -1737,6 +1758,7 @@ const PANEL_SLIDER_DEFERRED_MESSAGES: Record<string, string> = {
   image_align: "Panel Slider structural image alignment requires the shared media-grid layout runtime, which is not in the current supported scope.",
   text_color: "Panel Slider has no canonical shared text-context owner that applies this source value across title, meta, content, and actions.",
   nav_breakpoint: "navigation breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
+  slidenav_outside_breakpoint: "outside slidenav breakpoint responsiveness is retained for round-trip editing but deferred in the shared slider renderer.",
 };
 
 const warnPanelSliderFields = (
@@ -1760,7 +1782,7 @@ const warnPanelSliderFields = (
 };
 
 const PANEL_SLIDER_ITEM_SUPPORTED_FIELDS = new Set([
-  "title", "meta", "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
+  "title", "meta", "content", "image", "image_alt", "video_hover", "hover_video", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
   "title_element", "title_style", "meta_align", "meta_element", "meta_style",
   "link", "link_text", "link_target", "link_style", "link_size", "panel_link",
   "panel_style", "panel_padding", "panel_link_hover",
@@ -2743,6 +2765,9 @@ const mapStaticElement = (
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
+        showVideo: props.show_video !== false,
+        showHoverImage: props.show_hover_image !== false,
+        showHoverVideo: props.show_hover_video !== false,
         // YOOtheme Slideshow owns the presentation of its item actions at
         // element level. Individual item link_style/link_size remain local
         // overrides in sourceSliderItem; otherwise actions inherit these
@@ -2846,6 +2871,10 @@ const mapStaticElement = (
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
+        showVideo: props.show_video !== false,
+        showHoverImage: props.show_hover_image !== false,
+        showHoverVideo: props.show_hover_video !== false,
+        linkImage: sourceBoolean(props.image_link ?? props.link_image) ?? false,
         metaPosition: props.meta_align === "above-title" || props.meta_align === "below-content"
           ? props.meta_align
           : "below-title",
@@ -2887,6 +2916,14 @@ const mapStaticElement = (
         autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,
+        sets: props.slider_sets === true || props.slider_sets === "true",
+        velocity: Number.isFinite(Number(props.slider_velocity)) ? Number(props.slider_velocity) : undefined,
+        sliderParallax: props.slider_parallax === true || props.slider_parallax === "true",
+        sliderParallaxEasing: Number.isFinite(Number(props.slider_parallax_easing)) ? Number(props.slider_parallax_easing) : undefined,
+        sliderParallaxTarget: asString(props.slider_parallax_target) ?? undefined,
+        sliderParallaxStart: asString(props.slider_parallax_start) ?? undefined,
+        sliderParallaxEnd: asString(props.slider_parallax_end) ?? undefined,
+        fillColumnSpace: props.slider_fill === true || props.slider_fill === "true",
         centered: props.slider_center === true || props.slider_center === "true",
         loop: !(props.slider_finite === true || props.slider_finite === "true"),
         spaceBetween: sourceSliderGap(props.slider_gap),
@@ -3121,6 +3158,7 @@ const sourceColumnVerticalAlign = (
 const sourceColumnBackground = (
   props: Record<string, unknown>,
 ): BuilderColumn["background"] => {
+  const imagePosition = asString(props.image_position) ?? undefined;
   const backgroundParallax = sourceParallaxSettings({
     parallax_y: props.image_parallax_bgy,
     parallax_easing: props.image_parallax_easing,
@@ -3131,7 +3169,9 @@ const sourceColumnBackground = (
       : {}),
     ...(asString(props.image) ? { imageUrl: resolveYoothemeAssetUrl(props.image) } : {}),
     ...(asString(props.video) ? { videoUrl: resolveYoothemeAssetUrl(props.video) } : {}),
-    ...(asString(props.image_position) ? { position: asString(props.image_position)! } : {}),
+    ...(imagePosition
+      ? { position: normalizeYoothemeBackgroundPosition(imagePosition)! }
+      : {}),
     ...(asString(props.image_size) ? { size: asString(props.image_size)! } : {}),
     ...(asString(props.image_repeat) ? { repeat: asString(props.image_repeat)! } : {}),
     ...(asString(props.background_gradient) ? { gradient: asString(props.background_gradient)! } : {}),

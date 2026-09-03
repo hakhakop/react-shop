@@ -6,6 +6,7 @@ import type {
 } from "@/lib/dynamicContent";
 import { getDynamicItemContextValue } from "@/lib/dynamicContent";
 import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
+import { getCmsConnection, getWordPressAuthHeaders } from "@/lib/cmsConnection";
 import {
   getWooCommerceConnection,
   wooCommerceFetch,
@@ -118,6 +119,8 @@ export type WooCommerceProductRecord = {
   categories?: unknown;
   tags?: unknown;
   attributes?: unknown;
+  acf?: unknown;
+  meta_data?: unknown;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -267,6 +270,12 @@ const cleanWooCommercePrice = (value: unknown) => {
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;|&#160;/gi, " ")
     .replace(/&amp;/gi, "&")
+    .replace(/&euro;/gi, "€")
+    .replace(/&pound;/gi, "£")
+    .replace(/&yen;/gi, "¥")
+    .replace(/&dollar;/gi, "$")
+    .replace(/&ndash;/gi, "–")
+    .replace(/&mdash;/gi, "—")
     .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
     .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number.parseInt(code, 10)))
     .replace(/\s+/g, " ")
@@ -356,6 +365,28 @@ export function normalizeWooCommerceProductContext(product: WooCommerceProductRe
   if (imageAlt !== undefined) setField(fields, "image.alt", { type: "string", value: imageAlt });
   setField(fields, "gallery", { type: "metadata", value: { items: images.map(normalizedImage) } });
 
+  // YOOtheme Custom Products exposes ACF media subfields (for example
+  // `field.product_video.url`) even when WooCommerce delivers the value via
+  // REST `acf` or `meta_data`. Normalize both response shapes to the same
+  // canonical path used by the imported binding.
+  const productAcf = isRecord(product.acf) ? product.acf : {};
+  const productMeta = Array.isArray(product.meta_data)
+    ? product.meta_data.filter(isRecord)
+    : [];
+  const productVideoMeta = productMeta.find((entry) => entry.key === "product_video")?.value;
+  const productVideoValue = productAcf.product_video ?? productVideoMeta;
+  const rawProductVideoUrl = stringValue(productVideoValue) ?? (
+    isRecord(productVideoValue)
+      ? stringValue(productVideoValue.url) ?? stringValue(productVideoValue.src)
+      : undefined
+  );
+  const productVideoUrl = rawProductVideoUrl && !/^\d+$/.test(rawProductVideoUrl)
+    ? rawProductVideoUrl
+    : undefined;
+  if (productVideoUrl) {
+    setField(fields, "acf.product_video.url", { type: "url", value: productVideoUrl });
+  }
+
   const categories = Array.isArray(product.categories) ? product.categories.filter(isRecord).map((term) => normalizedTerm(term as WooCommerceTerm)) : [];
   const tags = Array.isArray(product.tags) ? product.tags.filter(isRecord).map((term) => normalizedTerm(term as WooCommerceTerm)) : [];
   setField(fields, "categories", { type: "metadata", value: { items: categories } });
@@ -394,7 +425,33 @@ export async function resolveWooCommerceProductContexts(input: {
   descriptor: DynamicContentContextDescriptor;
 }): Promise<DynamicItemContext[]> {
   const products = await fetchWooCommerceProductRecords(input);
-  return products.map((product) => normalizeWooCommerceProductContext(product));
+  const cms = getCmsConnection(input.website);
+  const headers = getWordPressAuthHeaders(cms);
+  const hydrated = await Promise.all(products.map(async (product) => {
+    const acf = isRecord(product.acf) ? product.acf : {};
+    const metadata = Array.isArray(product.meta_data) ? product.meta_data.filter(isRecord) : [];
+    const metaValue = metadata.find((entry) => entry.key === "product_video")?.value;
+    const videoValue = acf.product_video ?? metaValue;
+    const attachmentId = typeof videoValue === "number"
+      ? videoValue
+      : typeof videoValue === "string" && /^\d+$/.test(videoValue)
+        ? Number(videoValue)
+        : undefined;
+    if (!attachmentId || !cms.siteUrl) return product;
+    try {
+      const response = await fetch(`${cms.siteUrl}/wp-json/wp/v2/media/${attachmentId}?context=edit`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!response.ok) return product;
+      const media = await response.json() as { source_url?: unknown };
+      const url = stringValue(media.source_url);
+      return url ? { ...product, acf: { ...acf, product_video: { url } } } : product;
+    } catch {
+      return product;
+    }
+  }));
+  return hydrated.map((product) => normalizeWooCommerceProductContext(product));
 }
 
 /** Fetch through the canonical authenticated WooCommerce product provider. */

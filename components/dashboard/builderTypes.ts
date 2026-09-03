@@ -1463,6 +1463,18 @@ export type BuilderSection = {
     showDots?: boolean;
     showNavigation?: boolean;
     pauseOnHover?: boolean;
+    sets?: boolean;
+    velocity?: number;
+    fillColumnSpace?: boolean;
+    sliderParallax?: boolean;
+    sliderParallaxEasing?: number;
+    sliderParallaxTarget?: string;
+    sliderParallaxStart?: string;
+    sliderParallaxEnd?: string;
+    showVideo?: boolean;
+    showHoverImage?: boolean;
+    showHoverVideo?: boolean;
+    linkImage?: boolean;
     arrowStyle?: string;
     arrowPosition?: string;
     /** Existing shared slidenav visibility threshold. */

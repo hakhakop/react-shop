@@ -11,6 +11,7 @@ import {
   InspectorSelect,
   InspectorTextField,
   InspectorDivision,
+  InspectorRange,
 } from "@/components/dashboard/inspector/InspectorControls";
 import ParallaxEditor from "@/components/dashboard/inspector/panels/ParallaxEditor";
 
@@ -74,7 +75,7 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
   return (
     <section className="builder-general-settings-panel" data-uikit-capability="general-settings">
       <InspectorDivision
-        title="POSITION"
+        title="GENERAL"
         summary={(layout.position ?? "static").replace(/^./, (character) => character.toUpperCase())}
       >
         <div className="builder-style-section-content" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
@@ -97,13 +98,13 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
           {(["left", "right", "top", "bottom"] as const).map((side) => (
             <InspectorFieldRow key={side} label={side.charAt(0).toUpperCase() + side.slice(1)}>
               <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}>
-                <input
-                  type="range"
-                  min="-100"
-                  max="200"
+                <InspectorRange
+                  min={-100}
+                  max={200}
                   value={parseInt(layout[side] ?? "0", 10) || 0}
-                  onChange={(e) => updateLayout({ [side]: `${e.target.value}px` })}
-                  style={{ flex: 1 }}
+                  onChange={(value) => updateLayout({ [side]: `${value}px` })}
+                  ariaLabel={`${side} offset`}
+                  className="inspector-range--grow"
                 />
                 <input
                   className="inspector-control"

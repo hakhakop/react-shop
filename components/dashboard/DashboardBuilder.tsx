@@ -68,6 +68,7 @@ import {
 import Image from "next/image";
 import { GridCardsClient } from "@/components/builder/GridCardsClient";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
+import BuilderBackgroundVideo from "@/components/builder/BuilderBackgroundVideo";
 import { ResponsiveBreakpointPolicyStyle } from "@/components/builder/ResponsiveBreakpointPolicyStyle";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import { isLocale, localeLabels } from "@/lib/i18n";
@@ -2454,11 +2455,13 @@ export default function DashboardBuilder({
   const initialProjectionMatchesAuthoredState =
     initialRenderProjection?.sourceSignature === authoredRevisionSignature;
   const dynamicPreviewRequestRef = useRef(0);
-  // Initial hydration already contains the server-resolved projection. Seed
-  // the refresh guards from it so mounting the client does not immediately
-  // issue the same uncached WordPress preview request a second time.
+  // A server projection may legally contain the authored fallback when its
+  // external provider was temporarily unavailable. Always give authored
+  // Dynamic Content one client refresh on mount; otherwise that fallback is
+  // treated as final and the Panel Slider remains a single empty item until a
+  // later full navigation happens to materialize it successfully.
   const previousDynamicContentSignatureRef = useRef<string | null>(
-    initialProjectionMatchesAuthoredState ? dynamicContentSignature : null,
+    dynamicContentSignature === "[]" ? dynamicContentSignature : null,
   );
   const previousDynamicContentPageRef = useRef<BuilderLayoutKey | null>(
     initialProjectionMatchesAuthoredState ? builderState.page : null,
@@ -3009,18 +3012,40 @@ export default function DashboardBuilder({
     [builderState.sections, contentLanguage, primaryContentLanguage],
   );
   const materializedPreviewSections = useMemo(() => {
-    if (
-      !builderRenderProjection ||
-      builderRenderProjection.page !== builderState.page ||
-      builderRenderProjection.sourceSignature !== JSON.stringify(builderState)
-    ) {
-      return null;
-    }
-    return resolveContentSections(
-      builderRenderProjection.sections,
-      contentLanguage,
-      primaryContentLanguage,
-    );
+    if (!builderRenderProjection || builderRenderProjection.page !== builderState.page) return null;
+    const rebaseProjection = (authored: unknown, projected: unknown, ownerKey = ""): unknown => {
+      if (Array.isArray(authored)) {
+        // Repeatable Dynamic Content persists one authored template while the
+        // server projection contains the transient collection. Presentation
+        // edits must keep that collection visible until a source edit asks the
+        // server for a fresh projection.
+        if (
+          (ownerKey === "slides" || ownerKey === "gridItems") &&
+          authored.some((item) => item && typeof item === "object" && "dynamicContext" in item)
+        ) return Array.isArray(projected) ? projected : authored;
+        const projectedById = new Map(
+          (Array.isArray(projected) ? projected : [])
+            .filter((item) => item && typeof item === "object" && "id" in item)
+            .map((item) => [String((item as { id: unknown }).id), item]),
+        );
+        return authored.map((item) => {
+          if (!item || typeof item !== "object" || !("id" in item)) return item;
+          return rebaseProjection(item, projectedById.get(String((item as { id: unknown }).id)));
+        });
+      }
+      if (!authored || typeof authored !== "object") return authored;
+      const projectedRecord = projected && typeof projected === "object" && !Array.isArray(projected)
+        ? projected as Record<string, unknown>
+        : {};
+      return Object.fromEntries(Object.entries(authored as Record<string, unknown>).map(([key, value]) => [
+        key,
+        rebaseProjection(value, projectedRecord[key], key),
+      ]));
+    };
+    const sections = builderRenderProjection.sourceSignature === JSON.stringify(builderState)
+      ? builderRenderProjection.sections
+      : rebaseProjection(builderState.sections, builderRenderProjection.sections) as BuilderSection[];
+    return resolveContentSections(sections, contentLanguage, primaryContentLanguage);
   }, [
     builderRenderProjection,
     builderState,
@@ -15175,14 +15200,10 @@ function PreviewCanvas({
                       </>
                     )}
                     {section.visualStyle?.background?.videoUrl ? (
-                      <video
+                      <BuilderBackgroundVideo
                         className="shop-builder-section-background-video"
                         src={section.visualStyle.background.videoUrl}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        aria-hidden="true"
+                        poster={section.visualStyle.background.imageUrl}
                       />
                     ) : null}
                     <div
@@ -18824,14 +18845,10 @@ const PreviewSection = memo(function PreviewSection({
                     data-uk-sticky={structuralColumn.stickyDeclaration}
                   >
                     {structuralColumn.column.background?.videoUrl ? (
-                      <video
+                      <BuilderBackgroundVideo
                         className="shop-builder-column-background-video"
                         src={structuralColumn.column.background.videoUrl}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        aria-hidden="true"
+                        poster={structuralColumn.column.background.imageUrl}
                       />
                     ) : null}
                     {blocks.length === 0 && (

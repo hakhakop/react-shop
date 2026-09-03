@@ -203,7 +203,7 @@ test("imports extended structural ownership without repeating Row state on Colum
     responsiveWidths: { small: "1-2", medium: "1-3" },
     order: { medium: "first" },
     verticalAlign: "middle",
-    background: { imageUrl: "/media/background.jpg", position: "center-center" },
+    background: { imageUrl: "/media/background.jpg", position: "center center" },
     style: "muted",
     textColor: "light",
     padding: "small",

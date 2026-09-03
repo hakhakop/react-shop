@@ -9,6 +9,7 @@ import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import BuilderStickyRuntime from "@/components/builder/BuilderStickyRuntime";
+import BuilderBackgroundVideo from "@/components/builder/BuilderBackgroundVideo";
 import { RenderChecklist, Typog, blockLegacyGridMargin } from "@/components/builder/BuilderRenderHelpers";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitAlert from "@/components/builder/UikitAlert";
@@ -920,7 +921,11 @@ function SectionFrame({
         backgroundVideoEmbed ? (
           <iframe className="shop-builder-section-background-video" src={backgroundVideoEmbed} title="Background video" allow="autoplay; fullscreen" aria-hidden="true" />
         ) : (
-          <video className="shop-builder-section-background-video" src={backgroundVideoUrl} autoPlay muted loop playsInline aria-hidden="true" />
+          <BuilderBackgroundVideo
+            className="shop-builder-section-background-video"
+            src={backgroundVideoUrl}
+            poster={section.visualStyle?.background?.imageUrl}
+          />
         )
       ) : null}
       <div
@@ -3027,14 +3032,10 @@ function ContentLayoutSection({
                         data-uk-sticky={structuralColumn.stickyDeclaration}
                       >
                         {structuralColumn.column.background?.videoUrl ? (
-                          <video
+                          <BuilderBackgroundVideo
                             className="shop-builder-column-background-video"
                             src={structuralColumn.column.background.videoUrl}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            aria-hidden="true"
+                            poster={structuralColumn.column.background.imageUrl}
                           />
                         ) : null}
                         <ContentPositioningGroup blocks={blocks}>

@@ -333,6 +333,25 @@ export function getUikitCardClass(
 
 export type UikitPanelMediaPlacement = "top" | "bottom" | "left" | "right" | "between";
 
+/** Convert YOOtheme's directional token vocabulary to valid CSS positions. */
+export function normalizeYoothemeBackgroundPosition(value?: string): string | undefined {
+  const normalized = value?.trim().toLowerCase();
+  if (!normalized) return undefined;
+  const positions: Record<string, string> = {
+    "top-left": "left top",
+    "top-center": "center top",
+    "top-right": "right top",
+    "center-left": "left center",
+    center: "center center",
+    "center-center": "center center",
+    "center-right": "right center",
+    "bottom-left": "left bottom",
+    "bottom-center": "center bottom",
+    "bottom-right": "right bottom",
+  };
+  return positions[normalized] ?? value;
+}
+
 export function getUikitPanelMediaClass(
   placement: UikitPanelMediaPlacement = "top",
 ): string {
@@ -363,9 +382,7 @@ export function getUikitPanelMediaStyle(options: {
     "16:9": "16 / 9",
     portrait: "3 / 4",
   };
-  const focal = options.position && options.position !== "center"
-    ? options.position.replace(/-/g, " ")
-    : undefined;
+  const focal = normalizeYoothemeBackgroundPosition(options.position);
   const fit = options.fit === "cover" || options.fit === "contain" || options.fit === "fill"
     ? options.fit
     : undefined;
@@ -373,7 +390,7 @@ export function getUikitPanelMediaStyle(options: {
     aspectRatio: ratioMap[options.ratio ?? ""] || undefined,
     backgroundSize: fit,
     objectFit: fit,
-    backgroundPosition: focal ?? (options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center"),
+    backgroundPosition: focal ?? (options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center center"),
   };
 }
 

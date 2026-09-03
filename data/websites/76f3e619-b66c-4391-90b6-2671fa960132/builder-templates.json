@@ -1,5 +1,4256 @@
 [
   {
+    "id": "foote-woolberry-layout-mtl6uddj-t7ow",
+    "title": "Foote-Woolberry Layout",
+    "templateType": "footer",
+    "description": "Footer layout saved from the current Footer document",
+    "sourcePage": "footer",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "small",
+        "removeTopPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center",
+            "imageSize": "cover"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 6,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-grid-0-0-0-0",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-0-0-0-0-0",
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-truck.svg",
+                    "imageAlt": "Free Standard Delivery",
+                    "title": "Free Standard Delivery",
+                    "meta": "",
+                    "text": "Lorem ipsum dolor sit amet",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h6"
+                  },
+                  {
+                    "id": "yootheme-grid-item-0-0-0-0-1",
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-return.svg",
+                    "imageAlt": "30-Days Return Policy",
+                    "title": "30-Days Return Policy",
+                    "meta": "",
+                    "text": "Sed diam nonumy tempor",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h6"
+                  },
+                  {
+                    "id": "yootheme-grid-item-0-0-0-0-2",
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-secure-pay.svg",
+                    "imageAlt": "Secure Payments",
+                    "title": "Secure Payments",
+                    "meta": "",
+                    "text": "Invidunt ut labore dolore magna",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "div",
+                    "titleStyle": "h6"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "blank",
+                "gridCardSize": "none",
+                "gridCardHover": false,
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelExpand": "none",
+                "panelContentWidth": "auto",
+                "gridItemMaxWidth": "none",
+                "gridTitlePlacement": "top",
+                "gridTitleWidth": "1-2",
+                "gridTitleColumnGap": "default",
+                "gridTitleRowGap": "default",
+                "gridTitleBreakpoint": "m",
+                "gridMediaPlacement": "left",
+                "gridGap": "large",
+                "showDividers": false,
+                "centerColumns": true,
+                "centerRows": false,
+                "gridParallaxJustify": false,
+                "columnsPhonePortrait": "1",
+                "columnsTabletLandscape": "auto",
+                "gridMediaWidth": "auto",
+                "gridMediaColumnGap": "default",
+                "gridMediaRowGap": "default",
+                "gridMediaBreakpoint": "m",
+                "gridMediaVerticalAlign": true,
+                "imageWidth": "55px",
+                "imageAlignment": "left",
+                "imageSvgColor": "emphasis",
+                "imageMarginTop": "default",
+                "imageMaxWidth": 55,
+                "imageShape": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "enableLightbox": false,
+                "linkTitle": false,
+                "panelTitleHoverStyle": "none",
+                "panelTitleAlign": "top",
+                "panelTitleGridWidth": "1-2",
+                "panelTitleGridBreakpoint": "medium",
+                "panelTitleGridColumnGap": "default",
+                "panelTitleGridRowGap": "default",
+                "gridTitleSize": "h6",
+                "metaStyle": "text-meta",
+                "gridMetaAlign": "below-title",
+                "gridMetaHtmlElement": "div",
+                "contentStyle": "small",
+                "gridContentAlign": false,
+                "gridContentDropcap": false,
+                "gridContentColumn": "none",
+                "gridContentColumnDivider": false,
+                "gridContentColumnBreakpoint": "m",
+                "contentMarginTop": "none",
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "0",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {}
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "thirds-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-heading-0-1-0-0",
+                "kind": "heading",
+                "headingText": "Subscribe to our newsletter and get the latest information about upcoming sales and drops.",
+                "title": "Subscribe to our newsletter and get the latest information about upcoming sales and drops.",
+                "headingLevel": "div",
+                "headingSize": "h3",
+                "maxWidth": "xlarge",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "xlarge"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2-column-2",
+            "rowId": "yootheme-section-1-row-2",
+            "rowLayout": "thirds-2-1",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-3-column-1",
+            "rowId": "yootheme-section-1-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-divider-0-2-0-0",
+                "kind": "divider",
+                "dividerStyle": "default",
+                "preset": "default",
+                "spacingContract": "yootheme",
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-0-2-0-1",
+                "kind": "image",
+                "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/logo.svg",
+                "videoUrl": "",
+                "imageAlt": "Fuse",
+                "imageSvgInline": true,
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "./",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-4-column-1",
+            "rowId": "yootheme-section-1-row-4",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "yootheme-image-0-3-0-0",
+                "kind": "image",
+                "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/footer.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 320,
+                "imageWidth": "320px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "maxWidth": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "medium"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-text-0-3-0-1",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam nonumy.",
+                "textVariant": "default",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "medium"
+                  },
+                  "customCss": "@media (min-width: 960px) {\n\t.el-element.uk-width-large {max-width: 380px;}\n}",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-0-3-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-3-0-2-0",
+                    "label": "Find a Store",
+                    "url": "?page_id=245",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-4-column-2",
+            "rowId": "yootheme-section-1-row-4",
+            "rowLayout": "thirds-1-2",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-1-row-5-column-1",
+            "rowId": "yootheme-section-1-row-5",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-divider-0-4-0-0",
+                "kind": "divider",
+                "dividerStyle": "default",
+                "preset": "default",
+                "spacingContract": "yootheme"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-6-column-1",
+            "rowId": "yootheme-section-1-row-6",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-subnav-0-5-0-0",
+                "kind": "subnav",
+                "spacingContract": "yootheme",
+                "subnavItems": [
+                  {
+                    "id": "yootheme-subnav-item-0-5-0-0-0",
+                    "label": "Imprint",
+                    "url": "#",
+                    "target": "_self",
+                    "scroll": true
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-5-0-0-1",
+                    "label": "Terms &amp; Conditions",
+                    "url": "#",
+                    "target": "_self",
+                    "scroll": true
+                  },
+                  {
+                    "id": "yootheme-subnav-item-0-5-0-0-2",
+                    "label": "Privacy",
+                    "url": "#",
+                    "target": "_self",
+                    "scroll": true
+                  }
+                ],
+                "subnavStyle": "default"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-6-column-2",
+            "rowId": "yootheme-section-1-row-6",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-text-0-5-1-0",
+                "kind": "text",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> WOOLBERRY. All rights reserved.<br class=\"uk-hidden@s\"> Powered by <a class=\"uk-link-text\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "textVariant": "default",
+                "textColumnBreakpoint": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "topMargin": "large",
+            "bottomMargin": "large",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "background": {
+                  "position": "center center"
+                },
+                "style": "tile-muted",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-grid-0-0-0-0",
+                    "kind": "grid",
+                    "gridSource": "static",
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-0-0-0-0-0",
+                        "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-truck.svg",
+                        "imageAlt": "Free Standard Delivery",
+                        "title": "Free Standard Delivery",
+                        "meta": "",
+                        "text": "Lorem ipsum dolor sit amet",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h6"
+                      },
+                      {
+                        "id": "yootheme-grid-item-0-0-0-0-1",
+                        "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-return.svg",
+                        "imageAlt": "30-Days Return Policy",
+                        "title": "30-Days Return Policy",
+                        "meta": "",
+                        "text": "Sed diam nonumy tempor",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h6"
+                      },
+                      {
+                        "id": "yootheme-grid-item-0-0-0-0-2",
+                        "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/icon-secure-pay.svg",
+                        "imageAlt": "Secure Payments",
+                        "title": "Secure Payments",
+                        "meta": "",
+                        "text": "Invidunt ut labore dolore magna",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "div",
+                        "titleStyle": "h6"
+                      }
+                    ],
+                    "gridShowImage": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "enableFilter": false,
+                    "filterStyle": "tabs",
+                    "gridItemRenderer": "plain",
+                    "gridCardVariant": "blank",
+                    "gridCardSize": "none",
+                    "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelExpand": "none",
+                    "panelContentWidth": "auto",
+                    "gridItemMaxWidth": "none",
+                    "gridTitlePlacement": "top",
+                    "gridTitleWidth": "1-2",
+                    "gridTitleColumnGap": "default",
+                    "gridTitleRowGap": "default",
+                    "gridTitleBreakpoint": "m",
+                    "gridMediaPlacement": "left",
+                    "gridGap": "large",
+                    "showDividers": false,
+                    "centerColumns": true,
+                    "centerRows": false,
+                    "gridParallaxJustify": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsTabletLandscape": "auto",
+                    "gridMediaWidth": "auto",
+                    "gridMediaColumnGap": "default",
+                    "gridMediaRowGap": "default",
+                    "gridMediaBreakpoint": "m",
+                    "gridMediaVerticalAlign": true,
+                    "imageWidth": "55px",
+                    "imageAlignment": "left",
+                    "imageSvgColor": "emphasis",
+                    "imageMarginTop": "default",
+                    "imageMaxWidth": 55,
+                    "imageShape": "none",
+                    "imageBoxDecoration": "none",
+                    "imageHoverTransition": "none",
+                    "linkImage": false,
+                    "enableLightbox": false,
+                    "linkTitle": false,
+                    "panelTitleHoverStyle": "none",
+                    "panelTitleAlign": "top",
+                    "panelTitleGridWidth": "1-2",
+                    "panelTitleGridBreakpoint": "medium",
+                    "panelTitleGridColumnGap": "default",
+                    "panelTitleGridRowGap": "default",
+                    "gridTitleSize": "h6",
+                    "metaStyle": "text-meta",
+                    "gridMetaAlign": "below-title",
+                    "gridMetaHtmlElement": "div",
+                    "contentStyle": "small",
+                    "gridContentAlign": false,
+                    "gridContentDropcap": false,
+                    "gridContentColumn": "none",
+                    "gridContentColumnDivider": false,
+                    "gridContentColumnBreakpoint": "m",
+                    "contentMarginTop": "none",
+                    "buttonLabel": "Read more",
+                    "buttonStyle": "default",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "0",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {}
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-2",
+            "layout": "thirds-2-1",
+            "customLayout": {
+              "template": "2-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-2-column-1",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-2-column-2",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "maxWidth": "xlarge",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-0-1-0-0",
+                    "kind": "heading",
+                    "headingText": "Subscribe to our newsletter and get the latest information about upcoming sales and drops.",
+                    "title": "Subscribe to our newsletter and get the latest information about upcoming sales and drops.",
+                    "headingLevel": "div",
+                    "headingSize": "h3",
+                    "maxWidth": "xlarge",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "xlarge"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-2-column-2",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-3",
+            "layout": "1-col",
+            "maxWidth": "xlarge",
+            "spacingContract": "yootheme",
+            "topMargin": "large",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-3-column-1",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-divider-0-2-0-0",
+                    "kind": "divider",
+                    "dividerStyle": "default",
+                    "preset": "default",
+                    "spacingContract": "yootheme",
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-0-2-0-1",
+                    "kind": "image",
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/logo.svg",
+                    "videoUrl": "",
+                    "imageAlt": "Fuse",
+                    "imageSvgInline": true,
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "./",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-4",
+            "layout": "thirds-1-2",
+            "customLayout": {
+              "template": "1-3,2-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-4-column-1",
+                  "widths": {
+                    "medium": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-4-column-2",
+                  "widths": {
+                    "medium": "2-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "maxWidth": "xlarge",
+            "spacingContract": "yootheme",
+            "topMargin": "default",
+            "bottomMargin": "default",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-4-column-1",
+                "responsiveWidths": {
+                  "medium": "1-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-3-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/footer.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 320,
+                    "imageWidth": "320px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "maxWidth": "medium",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "medium"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-text-0-3-0-1",
+                    "kind": "text",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam nonumy.",
+                    "textVariant": "default",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "medium",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "medium"
+                      },
+                      "customCss": "@media (min-width: 960px) {\n\t.el-element.uk-width-large {max-width: 380px;}\n}",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-0-3-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-3-0-2-0",
+                        "label": "Find a Store",
+                        "url": "?page_id=245",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-4-column-2",
+                "responsiveWidths": {
+                  "medium": "2-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-5",
+            "layout": "1-col",
+            "maxWidth": "xlarge",
+            "spacingContract": "yootheme",
+            "topMargin": "large",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-5-column-1",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-divider-0-4-0-0",
+                    "kind": "divider",
+                    "dividerStyle": "default",
+                    "preset": "default",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-1-row-6",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-1-row-6-column-1",
+                  "widths": {
+                    "medium": "expand"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-1-row-6-column-2",
+                  "widths": {
+                    "medium": "auto"
+                  }
+                }
+              ]
+            },
+            "rowGap": "small",
+            "maxWidth": "xlarge",
+            "spacingContract": "yootheme",
+            "topMargin": "medium",
+            "bottomMargin": "medium",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-6-column-1",
+                "responsiveWidths": {
+                  "medium": "expand"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-subnav-0-5-0-0",
+                    "kind": "subnav",
+                    "spacingContract": "yootheme",
+                    "subnavItems": [
+                      {
+                        "id": "yootheme-subnav-item-0-5-0-0-0",
+                        "label": "Imprint",
+                        "url": "#",
+                        "target": "_self",
+                        "scroll": true
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-5-0-0-1",
+                        "label": "Terms &amp; Conditions",
+                        "url": "#",
+                        "target": "_self",
+                        "scroll": true
+                      },
+                      {
+                        "id": "yootheme-subnav-item-0-5-0-0-2",
+                        "label": "Privacy",
+                        "url": "#",
+                        "target": "_self",
+                        "scroll": true
+                      }
+                    ],
+                    "subnavStyle": "default"
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-1-row-6-column-2",
+                "responsiveWidths": {
+                  "medium": "auto"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-text-0-5-1-0",
+                    "kind": "text",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> WOOLBERRY. All rights reserved.<br class=\"uk-hidden@s\"> Powered by <a class=\"uk-link-text\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "textVariant": "default",
+                    "textColumnBreakpoint": "medium",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-03T07:13:02.263Z"
+  },
+  {
+    "id": "wooblerry-home-layout-mtl61wcr-8gfj",
+    "title": "Wooblerry-home Layout",
+    "templateType": "page",
+    "description": "Page template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionHeight": "viewport-percent",
+        "subtractHeightAbove": true,
+        "contentVerticalAlign": "center",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "video",
+            "imagePosition": "center-center",
+            "videoUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-revolutionary-muse.mp4"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-0-0-0-0",
+                "kind": "heading",
+                "headingText": "Spring Summer 2024",
+                "title": "Spring Summer 2024",
+                "headingLevel": "div",
+                "headingSize": "h4",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-0-0-0-1",
+                "kind": "heading",
+                "headingText": "Revolutionary Muse",
+                "title": "Revolutionary Muse",
+                "headingLevel": "h1",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-0-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-2-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-0-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Spring Summer 2024",
+                    "title": "Spring Summer 2024",
+                    "headingLevel": "div",
+                    "headingSize": "h4",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-0-0-0-1",
+                    "kind": "heading",
+                    "headingText": "Revolutionary Muse",
+                    "title": "Revolutionary Muse",
+                    "headingLevel": "h1",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-0-2-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-0-0-0-2-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "Categories 01",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-0-0",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-1-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-0-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=19",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-1-0",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-1-0-1-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-1-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=20",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-2-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "height": {
+              "mode": "viewport"
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-women.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-1-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-1-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-0-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=19",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-men.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-1-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-1-0-1-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-1-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=20",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Latest Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-2-0-0-0",
+                "kind": "heading",
+                "headingText": "Explore Our Latest Arrivals",
+                "title": "Explore Our Latest Arrivals",
+                "headingLevel": "h2",
+                "headingSize": "h3",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-2-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-2-0-0-1-0",
+                    "label": "Button 1",
+                    "url": "#",
+                    "target": "_self",
+                    "style": "text",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product-category",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 23,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 23
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "label": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "url": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-2-0-0-1-1",
+                    "label": "Button 2",
+                    "url": "#",
+                    "target": "_self",
+                    "style": "text",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product-category",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 43,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 43
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "label": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "url": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-panel-slider-2-0-0-2",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-2-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "itemElement": "article",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 0,
+                        "quantity": 8,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          23,
+                          43
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "image.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "image.alt",
+                        "valueType": "string"
+                      },
+                      "hoverVideoUrl": {
+                        "path": "acf.product_video.url",
+                        "valueType": "url"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      },
+                      "meta": {
+                        "path": "price",
+                        "valueType": "string"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "panel-slider",
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "imageWidth": "660",
+                  "imageHeight": "882",
+                  "imageSvgColor": "emphasis",
+                  "showTitle": true,
+                  "showImage": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "showVideo": true,
+                  "showHoverImage": true,
+                  "showHoverVideo": true,
+                  "linkImage": true,
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "h6",
+                  "headingLevel": "h3",
+                  "headingSize": "h5",
+                  "imageFit": "natural",
+                  "imageRatio": "natural",
+                  "linkPanel": false,
+                  "panelStyle": "tile-default",
+                  "panelSize": "small",
+                  "panelImageNoPadding": true,
+                  "panelHeightExpand": false,
+                  "panelExpand": "none",
+                  "panelMatch": true,
+                  "panelHover": false,
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "fullWidthButton": false,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "sets": false,
+                  "sliderParallax": false,
+                  "fillColumnSpace": false,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "itemWidthMode": "fixed",
+                  "cardsPerViewPhone": 1.25,
+                  "cardsPerViewSmall": 3,
+                  "cardsPerViewMedium": 4,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "slidenavHoverOnly": true,
+                  "slidenavLarger": false,
+                  "slidenavOutsideBreakpoint": "xlarge",
+                  "effect": "slide"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-3-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-2-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Explore Our Latest Arrivals",
+                    "title": "Explore Our Latest Arrivals",
+                    "headingLevel": "h2",
+                    "headingSize": "h3",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-2-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-2-0-0-1-0",
+                        "label": "Button 1",
+                        "url": "#",
+                        "target": "_self",
+                        "style": "text",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product-category",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 23,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 23
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "label": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "url": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-button-2-0-0-1-1",
+                        "label": "Button 2",
+                        "url": "#",
+                        "target": "_self",
+                        "style": "text",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product-category",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 43,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 43
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "label": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "url": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slider-2-0-0-2",
+                    "kind": "panelSlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-2-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "itemElement": "article",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product",
+                          "mode": "collection",
+                          "query": {
+                            "start": 0,
+                            "quantity": 8,
+                            "order": "date",
+                            "direction": "desc",
+                            "categories": [
+                              23,
+                              43
+                            ]
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "image.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "image.alt",
+                            "valueType": "string"
+                          },
+                          "hoverVideoUrl": {
+                            "path": "acf.product_video.url",
+                            "valueType": "url"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          },
+                          "meta": {
+                            "path": "price",
+                            "valueType": "string"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "panel-slider",
+                      "variant": "panel",
+                      "slideMode": "panel",
+                      "imageWidth": "660",
+                      "imageHeight": "882",
+                      "imageSvgColor": "emphasis",
+                      "showTitle": true,
+                      "showImage": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "showVideo": true,
+                      "showHoverImage": true,
+                      "showHoverVideo": true,
+                      "linkImage": true,
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "h6",
+                      "headingLevel": "h3",
+                      "headingSize": "h5",
+                      "imageFit": "natural",
+                      "imageRatio": "natural",
+                      "linkPanel": false,
+                      "panelStyle": "tile-default",
+                      "panelSize": "small",
+                      "panelImageNoPadding": true,
+                      "panelHeightExpand": false,
+                      "panelExpand": "none",
+                      "panelMatch": true,
+                      "panelHover": false,
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "fullWidthButton": false,
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "sets": false,
+                      "sliderParallax": false,
+                      "fillColumnSpace": false,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "itemWidthMode": "fixed",
+                      "cardsPerViewPhone": 1.25,
+                      "cardsPerViewSmall": 3,
+                      "cardsPerViewMedium": 4,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "slidenavHoverOnly": true,
+                      "slidenavLarger": false,
+                      "slidenavOutsideBreakpoint": "xlarge",
+                      "effect": "slide"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Collection",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionHeight": "viewport",
+        "contentVerticalAlign": "center",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "video",
+            "imagePosition": "center-center",
+            "imageSize": "cover",
+            "videoUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-color-essentials.mp4"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-3-0-0-0",
+                "kind": "heading",
+                "headingText": "Spring Summer 2024",
+                "title": "Spring Summer 2024",
+                "headingLevel": "div",
+                "headingSize": "h5",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-3-0-0-1",
+                "kind": "heading",
+                "headingText": "Color Essentials",
+                "title": "Color Essentials",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-3-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-3-0-0-2-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-3-0-0-2-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-4-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-4-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-3-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Spring Summer 2024",
+                    "title": "Spring Summer 2024",
+                    "headingLevel": "div",
+                    "headingSize": "h5",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-3-0-0-1",
+                    "kind": "heading",
+                    "headingText": "Color Essentials",
+                    "title": "Color Essentials",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-3-0-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-3-0-0-2-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-3-0-0-2-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Categories 02",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-0-0",
+                "kind": "heading",
+                "headingText": "Knitwear",
+                "title": "Knitwear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-4-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-0-1-0",
+                    "label": "Women",
+                    "url": "?product_cat=knitwear",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-4-0-0-1-1",
+                    "label": "Men",
+                    "url": "?product_cat=knitwear-2",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "medium",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-1-column-2",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-1-0",
+                "kind": "heading",
+                "headingText": "Bestsellers",
+                "title": "Bestsellers",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-4-0-1-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-1-1-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-4-0-1-1-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "medium",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-5-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "height": {
+              "mode": "viewport"
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-5-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-knitwear.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-4-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Knitwear",
+                    "title": "Knitwear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-4-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-0-0-1-0",
+                        "label": "Women",
+                        "url": "?product_cat=knitwear",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-4-0-0-1-1",
+                        "label": "Men",
+                        "url": "?product_cat=knitwear-2",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "medium",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-5-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-bestsellers.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-4-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Bestsellers",
+                    "title": "Bestsellers",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-4-0-1-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-0-1-1-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-4-0-1-1-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "medium",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-03T06:50:53.835Z"
+  },
+  {
+    "id": "wooblerry-home-layout-mtkkgxlc-7hok",
+    "title": "Wooblerry-home Layout",
+    "templateType": "page",
+    "description": "Page template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionHeight": "viewport-percent",
+        "subtractHeightAbove": true,
+        "contentVerticalAlign": "center",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "video",
+            "imagePosition": "center-center",
+            "videoUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-revolutionary-muse.mp4"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-0-0-0-0",
+                "kind": "heading",
+                "headingText": "Spring Summer 2024",
+                "title": "Spring Summer 2024",
+                "headingLevel": "div",
+                "headingSize": "h4",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-0-0-0-1",
+                "kind": "heading",
+                "headingText": "Revolutionary Muse",
+                "title": "Revolutionary Muse",
+                "headingLevel": "h1",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-0-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-2-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-0-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Spring Summer 2024",
+                    "title": "Spring Summer 2024",
+                    "headingLevel": "div",
+                    "headingSize": "h4",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-0-0-0-1",
+                    "kind": "heading",
+                    "headingText": "Revolutionary Muse",
+                    "title": "Revolutionary Muse",
+                    "headingLevel": "h1",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-0-2-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-0-0-0-2-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "Categories 01",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-0-0",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-1-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-0-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=19",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-1-0",
+                "kind": "heading",
+                "headingText": "Ready-to-Wear",
+                "title": "Ready-to-Wear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-1-0-1-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-1-0-1-1-0",
+                    "label": "Shop Now",
+                    "url": "?page_id=20",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-2-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "height": {
+              "mode": "viewport"
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-women.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-1-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-1-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-0-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=19",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-men.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-1-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Ready-to-Wear",
+                    "title": "Ready-to-Wear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-1-0-1-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-1-0-1-1-0",
+                        "label": "Shop Now",
+                        "url": "?page_id=20",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Latest Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-2-0-0-0",
+                "kind": "heading",
+                "headingText": "Explore Our Latest Arrivals",
+                "title": "Explore Our Latest Arrivals",
+                "headingLevel": "h2",
+                "headingSize": "h3",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "small",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-2-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-2-0-0-1-0",
+                    "label": "Button 1",
+                    "url": "#",
+                    "target": "_self",
+                    "style": "text",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product-category",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 23,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 23
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "label": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "url": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-2-0-0-1-1",
+                    "label": "Button 2",
+                    "url": "#",
+                    "target": "_self",
+                    "style": "text",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product-category",
+                      "mode": "single",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCat",
+                        "sourceName": "product_cat",
+                        "databaseId": 43,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCat",
+                          "arguments": {
+                            "id": 43
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "label": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "url": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-panel-slider-2-0-0-2",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-2-0-0-2-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "itemElement": "article",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "graphqlRoot": "products",
+                        "yoothemeQueryName": "products.customProducts",
+                        "sourceName": "product",
+                        "start": 0,
+                        "quantity": 8,
+                        "sourceQuery": {
+                          "name": "products.customProducts",
+                          "arguments": {
+                            "users": [],
+                            "users_operator": "IN",
+                            "offset": 0,
+                            "limit": 8,
+                            "order": "date",
+                            "order_direction": "DESC",
+                            "terms": [
+                              23,
+                              43
+                            ],
+                            "product_cat_operator": "IN",
+                            "product_tag_operator": "IN",
+                            "product_visibility_operator": "IN",
+                            "product_cat_include_children": "only"
+                          }
+                        }
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "featuredImage.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "featuredImage.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "panel-slider",
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "imageWidth": "660",
+                  "imageHeight": "882",
+                  "imageSvgColor": "emphasis",
+                  "showTitle": true,
+                  "showImage": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "h6",
+                  "headingLevel": "h3",
+                  "headingSize": "h5",
+                  "imageFit": "natural",
+                  "imageRatio": "natural",
+                  "linkPanel": false,
+                  "panelStyle": "tile-default",
+                  "panelSize": "small",
+                  "panelImageNoPadding": true,
+                  "panelHeightExpand": false,
+                  "panelExpand": "none",
+                  "panelMatch": true,
+                  "panelHover": false,
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "fullWidthButton": false,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "itemWidthMode": "fixed",
+                  "cardsPerViewPhone": 1.25,
+                  "cardsPerViewSmall": 3,
+                  "cardsPerViewMedium": 4,
+                  "showArrows": true,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "slidenavHoverOnly": true,
+                  "slidenavLarger": false,
+                  "slidenavOutsideBreakpoint": "xlarge",
+                  "effect": "slide"
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-3-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-2-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Explore Our Latest Arrivals",
+                    "title": "Explore Our Latest Arrivals",
+                    "headingLevel": "h2",
+                    "headingSize": "h3",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "small",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-2-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-2-0-0-1-0",
+                        "label": "Button 1",
+                        "url": "#",
+                        "target": "_self",
+                        "style": "text",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product-category",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 23,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 23
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "label": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "url": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-button-2-0-0-1-1",
+                        "label": "Button 2",
+                        "url": "#",
+                        "target": "_self",
+                        "style": "text",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product-category",
+                          "mode": "single",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCat",
+                            "sourceName": "product_cat",
+                            "databaseId": 43,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCat",
+                              "arguments": {
+                                "id": 43
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "label": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "url": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-panel-slider-2-0-0-2",
+                    "kind": "panelSlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-2-0-0-2-0",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "itemElement": "article",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product",
+                          "mode": "collection",
+                          "query": {
+                            "graphqlRoot": "products",
+                            "yoothemeQueryName": "products.customProducts",
+                            "sourceName": "product",
+                            "start": 0,
+                            "quantity": 8,
+                            "sourceQuery": {
+                              "name": "products.customProducts",
+                              "arguments": {
+                                "users": [],
+                                "users_operator": "IN",
+                                "offset": 0,
+                                "limit": 8,
+                                "order": "date",
+                                "order_direction": "DESC",
+                                "terms": [
+                                  23,
+                                  43
+                                ],
+                                "product_cat_operator": "IN",
+                                "product_tag_operator": "IN",
+                                "product_visibility_operator": "IN",
+                                "product_cat_include_children": "only"
+                              }
+                            }
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "title",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "featuredImage.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "featuredImage.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "panel-slider",
+                      "variant": "panel",
+                      "slideMode": "panel",
+                      "imageWidth": "660",
+                      "imageHeight": "882",
+                      "imageSvgColor": "emphasis",
+                      "showTitle": true,
+                      "showImage": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "h6",
+                      "headingLevel": "h3",
+                      "headingSize": "h5",
+                      "imageFit": "natural",
+                      "imageRatio": "natural",
+                      "linkPanel": false,
+                      "panelStyle": "tile-default",
+                      "panelSize": "small",
+                      "panelImageNoPadding": true,
+                      "panelHeightExpand": false,
+                      "panelExpand": "none",
+                      "panelMatch": true,
+                      "panelHover": false,
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "fullWidthButton": false,
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "itemWidthMode": "fixed",
+                      "cardsPerViewPhone": 1.25,
+                      "cardsPerViewSmall": 3,
+                      "cardsPerViewMedium": 4,
+                      "showArrows": true,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "slidenavHoverOnly": true,
+                      "slidenavLarger": false,
+                      "slidenavOutsideBreakpoint": "xlarge",
+                      "effect": "slide"
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Collection",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "large",
+        "maxWidth": "large",
+        "sectionHeight": "viewport",
+        "contentVerticalAlign": "center",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "textColor": "light",
+        "visualStyle": {
+          "background": {
+            "type": "video",
+            "imagePosition": "center-center",
+            "imageSize": "cover",
+            "videoUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-color-essentials.mp4"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-3-0-0-0",
+                "kind": "heading",
+                "headingText": "Spring Summer 2024",
+                "title": "Spring Summer 2024",
+                "headingLevel": "div",
+                "headingSize": "h5",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-3-0-0-1",
+                "kind": "heading",
+                "headingText": "Color Essentials",
+                "title": "Color Essentials",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-3-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-3-0-0-2-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-3-0-0-2-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-4-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-4-row-1-column-1",
+                "background": {
+                  "position": "center-center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-3-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Spring Summer 2024",
+                    "title": "Spring Summer 2024",
+                    "headingLevel": "div",
+                    "headingSize": "h5",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-3-0-0-1",
+                    "kind": "heading",
+                    "headingText": "Color Essentials",
+                    "title": "Color Essentials",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-3-0-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-3-0-0-2-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-3-0-0-2-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Categories 02",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-0-0",
+                "kind": "heading",
+                "headingText": "Knitwear",
+                "title": "Knitwear",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-4-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-0-1-0",
+                    "label": "Women",
+                    "url": "?product_cat=knitwear",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-4-0-0-1-1",
+                    "label": "Men",
+                    "url": "?product_cat=knitwear-2",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "medium",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-1-column-2",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-1-0",
+                "kind": "heading",
+                "headingText": "Bestsellers",
+                "title": "Bestsellers",
+                "headingLevel": "h2",
+                "headingSize": "small",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-4-0-1-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-1-1-0",
+                    "label": "Women",
+                    "url": "?product_cat=women",
+                    "target": "_self",
+                    "style": "text"
+                  },
+                  {
+                    "id": "yootheme-button-4-0-1-1-1",
+                    "label": "Men",
+                    "url": "?product_cat=men",
+                    "target": "_self",
+                    "style": "text"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "medium",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-5-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-1-column-1",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-1-column-2",
+                  "widths": {
+                    "medium": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "height": {
+              "mode": "viewport"
+            },
+            "spacingContract": "yootheme",
+            "topMargin": "none",
+            "bottomMargin": "none",
+            "columns": [
+              {
+                "id": "yootheme-section-5-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-knitwear.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-4-0-0-0",
+                    "kind": "heading",
+                    "headingText": "Knitwear",
+                    "title": "Knitwear",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-4-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-0-0-1-0",
+                        "label": "Women",
+                        "url": "?product_cat=knitwear",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-4-0-0-1-1",
+                        "label": "Men",
+                        "url": "?product_cat=knitwear-2",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "medium",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-5-row-1-column-2",
+                "responsiveWidths": {
+                  "medium": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-bestsellers.jpg",
+                  "position": "center-center",
+                  "size": "cover"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-4-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Bestsellers",
+                    "title": "Bestsellers",
+                    "headingLevel": "h2",
+                    "headingSize": "small",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-4-0-1-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-0-1-1-0",
+                        "label": "Women",
+                        "url": "?product_cat=women",
+                        "target": "_self",
+                        "style": "text"
+                      },
+                      {
+                        "id": "yootheme-button-4-0-1-1-1",
+                        "label": "Men",
+                        "url": "?product_cat=men",
+                        "target": "_self",
+                        "style": "text"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "medium",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-02T20:46:43.728Z"
+  },
+  {
     "id": "woolberry-women-layout-mtj2dr10-u6an",
     "title": "woolberry-women Layout",
     "templateType": "page",

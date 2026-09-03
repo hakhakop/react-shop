@@ -64,6 +64,7 @@ export type BuilderGalleryItem = {
   id: string;
   imageUrl?: string;
   imageAlt?: string;
+  hoverVideoUrl?: string;
   title?: string;
   meta?: string;
   content?: string;
@@ -420,6 +421,18 @@ export type BuilderLayoutBlock = {
     showArrows?: boolean;
     showDots?: boolean;
     pauseOnHover?: boolean;
+    sets?: boolean;
+    velocity?: number;
+    fillColumnSpace?: boolean;
+    sliderParallax?: boolean;
+    sliderParallaxEasing?: number;
+    sliderParallaxTarget?: string;
+    sliderParallaxStart?: string;
+    sliderParallaxEnd?: string;
+    showVideo?: boolean;
+    showHoverImage?: boolean;
+    showHoverVideo?: boolean;
+    linkImage?: boolean;
     arrowStyle?: string;
     arrowPosition?: string;
     paginationStyle?: string;

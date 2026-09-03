@@ -17,7 +17,7 @@ const panelSliderTypeContractCheck: {
   slide: Pick<NonNullable<BuilderSection["slides"]>[number],
     | "meta" | "imageWidth" | "imageHeight" | "imageSvgInline" | "imageSvgColor"
     | "metaHtmlElement" | "metaStyle" | "buttonTarget" | "buttonStyle" | "buttonSize"
-    | "panelStyle" | "panelSize" | "panelHover"
+    | "panelStyle" | "panelSize" | "panelHover" | "hoverVideoUrl"
   >;
 } = {
   carouselSettings: {
@@ -27,7 +27,7 @@ const panelSliderTypeContractCheck: {
   slide: {
     meta: "Meta", imageWidth: "280", imageHeight: "140", imageSvgInline: true, imageSvgColor: "emphasis",
     metaHtmlElement: "span", metaStyle: "meta", buttonTarget: "_blank", buttonStyle: "text", buttonSize: "small",
-    panelStyle: "secondary", panelSize: "small", panelHover: false,
+    panelStyle: "secondary", panelSize: "small", panelHover: false, hoverVideoUrl: "/hover.mp4",
   },
 };
 void panelSliderTypeContractCheck;
@@ -68,13 +68,13 @@ test("Panel Slider maps its element-level UIkit contract without per-item Card d
         image_width: "58", image_height: "240", image_loading: true, image_align: "top", image_border: "rounded", text_color: "light",
         image_svg_inline: true, image_svg_color: "emphasis",
         title_element: "div", meta_align: "below-title", meta_element: "div", meta_style: "text-meta",
-        panel_link: true, link_style: "default", slider_finite: true,
+        panel_link: true, image_link: true, show_hover_video: true, link_style: "default", slider_finite: true,
         panel_style: "card-primary", panel_padding: "large", panel_link_hover: true, slider_divider: true,
         slider_width: "", slider_width_default: "1-1", slider_width_medium: "1-3", slider_width_xlarge: "1-6",
         nav_breakpoint: "l", slidenav_outside_breakpoint: "xl",
         slider_gap: "default", slidenav: "outside", slidenav_breakpoint: "xl", nav: "",
       },
-      children: [{ type: "panel-slider_item", props: { title: "API", content: "Copy", image: "/icon.svg", link: "/api" } }],
+      children: [{ type: "panel-slider_item", props: { title: "API", content: "Copy", image: "/icon.svg", video_hover: "/hover.mp4", link: "/api" } }],
     }] }] }] }],
   });
 
@@ -87,9 +87,9 @@ test("Panel Slider maps its element-level UIkit contract without per-item Card d
     imageSvgColor: "emphasis", imageShape: "rounded", itemWidthMode: "auto", cardsPerViewPhone: 1,
     cardsPerViewMedium: 3, cardsPerViewXLarge: 6, showArrows: true, showDots: false,
     arrowPosition: "outer", slidenavBreakpoint: "xlarge", loop: false, divider: true,
-    panelStyle: "primary", panelSize: "large", panelHover: true,
+    panelStyle: "primary", panelSize: "large", panelHover: true, linkImage: true, showHoverVideo: true,
   });
-  expect(block.slides[0]).toMatchObject({ title: "API", text: "Copy" });
+  expect(block.slides[0]).toMatchObject({ title: "API", text: "Copy", hoverVideoUrl: "/hover.mp4" });
   expect(block.slides[0]).not.toHaveProperty("imageWidth");
   expect(block.slides[0]).not.toHaveProperty("imageHeight");
   expect(block.slides[0]).not.toHaveProperty("panelStyle");

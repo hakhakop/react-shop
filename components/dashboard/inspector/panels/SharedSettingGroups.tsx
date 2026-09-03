@@ -11,6 +11,7 @@ import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities
 import {
   InspectorFieldRow,
   InspectorSelect,
+  InspectorStyleSelect,
   InspectorPillGroup,
   InspectorTextField,
   InspectorDivision,
@@ -1058,7 +1059,7 @@ export function LinkSettingsGroup({
         inheritedValueText="Primary"
         onReset={() => update({ [keys.style]: undefined })}
       >
-        <InspectorPillGroup
+        <InspectorStyleSelect
           value={String(values[keys.style] ?? "primary")}
           options={labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values)}
           onChange={(value) => update({ [keys.style]: value })}
@@ -1309,12 +1310,11 @@ export function ActionSettingsGroup({
               ariaLabel="Button variant"
             />
           ) : (
-            <InspectorPillGroup
+            <InspectorStyleSelect
               value={String(resolvedStyle)}
               options={styleOptions}
               onChange={(value) => update({ [styleKey]: value })}
               ariaLabel="Button variant"
-              className="button-variant-control"
             />
           )}
         </InspectorFieldRow>

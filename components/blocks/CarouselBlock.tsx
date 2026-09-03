@@ -57,6 +57,7 @@ export type CarouselSlide = {
   pendingDynamicContent?: boolean;
   imageUrl?: string | null;
   imageAlt?: string | null;
+  hoverVideoUrl?: string | null;
   /** Dedicated YOOtheme Thumbnav media; falls back to imageUrl when absent. */
   thumbnailUrl?: string | null;
   thumbnailPosition?: string | null;
@@ -123,6 +124,7 @@ export type CarouselSlide = {
   panelHeightExpand?: boolean | null;
   panelExpand?: "none" | "image" | "content" | "both" | string | null;
   panelMatch?: boolean | null;
+  linkImage?: boolean | null;
 };
 
 export type CarouselSettings = {
@@ -261,6 +263,7 @@ export type CarouselSettings = {
   panelHeightExpand?: boolean | null;
   panelExpand?: "none" | "image" | "content" | "both" | string | null;
   panelMatch?: boolean | null;
+  linkImage?: boolean | null;
 };
 
 function resolveImageLoading(
@@ -587,6 +590,7 @@ export default function CarouselBlock({
   const showMeta = booleanSetting(settings?.showMeta, true);
   const showContent = booleanSetting(settings?.showContent, true);
   const showLink = booleanSetting(settings?.showLink, true);
+  const showHoverVideo = booleanSetting(settings?.showHoverVideo, true);
   const slideshowElementLinkUrl = isSlideshow && settings?.elementLinkUrl?.trim()
     ? settings.elementLinkUrl.trim()
     : undefined;
@@ -1030,6 +1034,8 @@ export default function CarouselBlock({
             const panelLinkProps = builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget);
             const panelLinkUrl = slide.buttonUrl || "#";
             const hasPanelLink = (slide.linkPanel ?? settings?.linkPanel) === true && Boolean(slide.buttonUrl);
+            const hasImageLink = settings?.linkImage === true && Boolean(slide.buttonUrl);
+            const hasHoverVideo = showHoverVideo && Boolean(slide.hoverVideoUrl?.trim());
             const itemButtonLabel = slide.buttonLabel ?? settings?.buttonLabel;
             const hasAction = slide.showAction !== false && Boolean(itemButtonLabel && slide.buttonUrl);
             const panelImageNoPadding = slide.panelImageNoPadding ?? slide.alignImageWithoutPadding ?? false;
@@ -1037,16 +1043,23 @@ export default function CarouselBlock({
               ? `shop-builder-panel-slider--expand-${slide.panelExpand ?? "none"}`
               : "";
             const panelMatchClass = slide.panelMatch === true ? "shop-builder-panel-slider--match" : "";
+            const authoredImageWidth = Number.parseFloat(String(slide.imageWidth ?? ""));
+            const authoredImageHeight = Number.parseFloat(String(slide.imageHeight ?? ""));
+            const authoredImageAspectRatio = isPanelSlider &&
+              Number.isFinite(authoredImageWidth) && authoredImageWidth > 0 &&
+              Number.isFinite(authoredImageHeight) && authoredImageHeight > 0
+                ? `${authoredImageWidth} / ${authoredImageHeight}`
+                : undefined;
             const mediaStyle: React.CSSProperties = {
-              aspectRatio: itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
+              aspectRatio: authoredImageAspectRatio ?? itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
               // UIkit's width-only inline icon presentation uses the same
               // square composition box as its declared icon width. This is
               // distinct from framed raster media, which continues to use an
               // authored height/ratio or its natural dimensions.
-              height: toCssDimension(slide.imageHeight) ??
+              height: authoredImageAspectRatio ? undefined : toCssDimension(slide.imageHeight) ??
                 (isStylableSvg && itemImageStyle.width ? itemImageStyle.width : undefined),
-              maxWidth: itemImageStyle.maxWidth,
-              width: itemImageStyle.width ?? "100%",
+              maxWidth: authoredImageAspectRatio ? "100%" : itemImageStyle.maxWidth,
+              width: authoredImageAspectRatio ? "100%" : itemImageStyle.width ?? "100%",
             };
             const MetaElement = (slide.metaHtmlElement ?? "div") as React.ElementType;
             const imageLoading = resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy");
@@ -1060,7 +1073,12 @@ export default function CarouselBlock({
                   inset: itemImageStyle.inset,
                   width: "100%",
                   height: "100%",
-                  objectFit: itemImageStyle.objectFit,
+                  // Imported width/height describe YOOtheme's cropped media
+                  // box. They must never rescale the source independently on
+                  // each axis; preserve the subject and crop to that box.
+                  objectFit: authoredImageAspectRatio
+                    ? (itemImageStyle.objectFit === "contain" ? "contain" : "cover")
+                    : itemImageStyle.objectFit,
                   objectPosition: itemMediaStyle.backgroundPosition,
                 }}
                 loading={imageLoading}
@@ -1123,12 +1141,30 @@ export default function CarouselBlock({
                     />
                   )}
                   {hasRealImage ? (
-                    <div
-                      className={`shop-builder-panel-slider-media ${getUikitImageWrapperClass(itemImage)}`.trim()}
-                      style={mediaStyle}
-                    >
-                      {panelImage}
-                    </div>
+                    React.createElement(
+                      hasImageLink ? "a" : "div",
+                      {
+                        className: `shop-builder-panel-slider-media ${getUikitImageWrapperClass(itemImage)}`.trim(),
+                        style: mediaStyle,
+                        ...(hasImageLink ? {
+                          href: panelLinkUrl,
+                          ...panelLinkProps,
+                          "aria-label": slide.imageAlt || slide.title || "Open image",
+                        } : {}),
+                      },
+                      panelImage,
+                      hasHoverVideo ? (
+                        <video
+                          className="shop-builder-panel-slider-hover-video"
+                          src={slide.hoverVideoUrl!}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          aria-hidden="true"
+                        />
+                      ) : null,
+                    )
                   ) : (
                     <button
                       type="button"

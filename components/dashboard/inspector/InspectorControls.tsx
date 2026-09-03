@@ -1,7 +1,16 @@
 "use client";
 
-import type { ChangeEvent, ReactNode } from "react";
-import { RotateCcw, AlignLeft, AlignCenter, AlignRight, AlignJustify, PanelTop, PanelLeft, PanelRight } from "lucide-react";
+import type { ChangeEvent, CSSProperties, ReactNode } from "react";
+import {
+  RotateCcw,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  PanelTop,
+  PanelLeft,
+  PanelRight,
+} from "lucide-react";
 import type { DynamicContentContextDescriptor, DynamicFieldBinding, DynamicFieldBindings } from "@/lib/dynamicContent";
 import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
@@ -193,6 +202,24 @@ export function InspectorSelect<T extends string = string>({ value, options, onC
   return <select className="inspector-control inspector-select" data-testid={testId} aria-label={ariaLabel} value={value} disabled={disabled} onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value as T)}>{options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}</select>;
 }
 
+export function InspectorStyleSelect<T extends string = string>({ value, options, onChange, ariaLabel }: {
+  value: T | undefined;
+  options: readonly InspectorOption<T>[];
+  onChange: (value: T) => void;
+  ariaLabel?: string;
+}) {
+  const selected = options.find((option) => option.value === value) ?? options[0];
+  const styleClass = String(value ?? "").replace(/[^a-z0-9_-]/gi, "-");
+  return <div className={`inspector-style-select inspector-style-select--${styleClass}`}>
+    <span className="inspector-style-select-preview" aria-hidden="true">{selected?.label ?? "Select style"}</span>
+    <div className="inspector-style-select-picker">
+    <select className="inspector-control inspector-select inspector-style-select-native" aria-label={ariaLabel} value={value} onChange={(event) => onChange(event.target.value as T)}>
+      {options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}
+    </select>
+    </div>
+  </div>;
+}
+
 export function InspectorSegmentedControl<T extends string = string>({ value, options, onChange, ariaLabel }: {
   value: T | undefined;
   options: readonly InspectorOption<T>[];
@@ -351,6 +378,31 @@ export function InspectorTextField({ value, onChange, placeholder, ariaLabel, di
 
 export function InspectorTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
   return <textarea className="inspector-control inspector-textarea" aria-label={ariaLabel} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />;
+}
+
+export function InspectorRange({ value, min, max, step, onChange, ariaLabel, className = "" }: {
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  onChange: (value: number) => void;
+  ariaLabel?: string;
+  className?: string;
+}) {
+  const progress = max === min ? 0 : Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+  return (
+    <input
+      type="range"
+      className={`inspector-range ${className}`.trim()}
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      aria-label={ariaLabel}
+      style={{ "--inspector-range-progress": `${progress}%` } as CSSProperties}
+      onChange={(event) => onChange(Number(event.target.value))}
+    />
+  );
 }
 
 export function InspectorNumberUnit({ value, unit, units = ["px", "%", "rem"], onValueChange, onUnitChange, ariaLabel }: { value: number | string; unit: string; units?: readonly string[]; onValueChange: (value: string) => void; onUnitChange: (unit: string) => void; ariaLabel?: string }) {

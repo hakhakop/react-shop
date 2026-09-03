@@ -115,11 +115,19 @@ async function renderCanonicalPost(
 
 export default async function WPPage({
   params,
+  searchParams,
 }: {
   params: Promise<WPPageParams>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   // Next 16: params is a Promise → we must await it
   const resolved = await params;
+  const query = (await searchParams) ?? {};
+  const queryValue = (key: string) => {
+    const value = query[key];
+    return Array.isArray(value) ? value[0] : value;
+  };
+  const productCategoryQuery = queryValue("product_cat")?.trim();
   const slugSegments = resolved.slug;
   const domainWebsite = await getWebsiteByDomainHost((await headers()).get("host"));
 
@@ -139,7 +147,9 @@ export default async function WPPage({
     return (
       <WebsiteFrontend
         website={domainWebsite}
-        requestedPage={slugSegments?.join("/") || "home"}
+        requestedPage={productCategoryQuery && (!slugSegments || slugSegments.length === 0)
+          ? `/product-category/${encodeURIComponent(productCategoryQuery)}`
+          : slugSegments?.join("/") || "home"}
         mode="domain"
       />
     );
@@ -165,7 +175,9 @@ export default async function WPPage({
       return (
         <WebsiteFrontend
           website={tenantWebsite}
-          requestedPage={tenantPath.join("/") || "home"}
+          requestedPage={productCategoryQuery && tenantPath.length === 0
+            ? `/product-category/${encodeURIComponent(productCategoryQuery)}`
+            : tenantPath.join("/") || "home"}
           mode="tenant-path"
         />
       );

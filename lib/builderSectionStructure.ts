@@ -20,6 +20,7 @@ import {
   getUikitCardClass,
   getUikitColumnClass,
   getUikitGridClass,
+  normalizeYoothemeBackgroundPosition,
 } from "@/lib/uikitTokens";
 import { getUikitColumnWidthClass } from "@/lib/uikitLayoutEngine";
 
@@ -203,7 +204,7 @@ function columnStyle(column: BuilderColumn): CSSProperties {
           backgroundImage: column.background.gradient
             ? `${column.background.gradient}, url(${JSON.stringify(column.background.imageUrl)})`
             : `url(${JSON.stringify(column.background.imageUrl)})`,
-          backgroundPosition: column.background.position,
+          backgroundPosition: normalizeYoothemeBackgroundPosition(column.background.position),
           backgroundSize: column.background.size,
           backgroundRepeat: column.background.repeat,
         }

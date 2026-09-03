@@ -71,6 +71,30 @@ const withRequestedBindingFields = (
   };
 };
 
+const canonicalPanelSliderBindings = (
+  descriptor: DynamicContentContextDescriptor,
+  bindings: DynamicFieldBindings | undefined,
+  showMeta: boolean,
+): DynamicFieldBindings | undefined => {
+  const importedProduct = descriptor.provider === "woocommerce" ||
+    descriptor.query?.sourceName === "product" ||
+    descriptor.query?.yoothemeQueryName === "products.customProducts";
+  if (!importedProduct) return bindings;
+  const projected = Object.fromEntries(Object.entries(bindings ?? {}).map(([destination, binding]) => {
+    if (!binding) return [destination, binding];
+    const path = binding.path === "featuredImage.url" ? "image.url"
+      : binding.path === "featuredImage.alt" ? "image.alt"
+      : binding.path;
+    return [destination, { ...binding, path }];
+  })) as DynamicFieldBindings;
+  // YOOtheme's WooCommerce Panel Slider uses Product Price as its Meta field.
+  // Older imports dropped that field because it was interpreted as a generic
+  // WordPress custom field. Recover the canonical product binding at render
+  // time without mutating the authored document.
+  if (showMeta && !projected.meta) projected.meta = { path: "price", valueType: "string" };
+  return projected;
+};
+
 const asDataRecord = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -633,9 +657,14 @@ async function materializeCarouselCollectionBlock(
     }
 
     try {
+      const bindings = canonicalPanelSliderBindings(
+        descriptor,
+        slide.dynamicBindings,
+        block.carouselSettings?.showMeta !== false,
+      );
       const contexts = await resolveContexts({
         website,
-        descriptor: withRequestedBindingFields(descriptor, slide.dynamicBindings),
+        descriptor: withRequestedBindingFields(descriptor, bindings),
       });
       const identifiedContexts = contexts.filter(
         (context): context is DynamicItemContext & { id: string | number } =>
@@ -657,12 +686,12 @@ async function materializeCarouselCollectionBlock(
       }
 
       const template = staticPanelSliderTemplate(slide);
-      const unavailableAcfPaths = Object.values(slide.dynamicBindings ?? {})
+      const unavailableAcfPaths = Object.values(bindings ?? {})
         .map((binding) => binding?.path)
         .filter((path): path is string => typeof path === "string" && path.startsWith("acf.") && !identifiedContexts.some((context) => context.fields[path]));
       renderSlides.push(
         ...identifiedContexts.map((context) => ({
-          ...resolveDynamicItem(template, context, slide.dynamicBindings),
+          ...resolveDynamicItem(template, context, bindings),
           id: descriptor.mode === "single"
             ? templateItemId
             : dynamicPanelSliderRenderItemId(templateItemId, context.id),
