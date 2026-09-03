@@ -17,6 +17,7 @@ import DatePickerCapabilityPanel from "@/components/dashboard/inspector/panels/D
 import DividerCapabilityPanel from "@/components/dashboard/inspector/panels/DividerCapabilityPanel";
 import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
 import IconCapabilityPanel from "@/components/dashboard/inspector/panels/IconCapabilityPanel";
+import SocialCapabilityPanel from "@/components/dashboard/inspector/panels/SocialCapabilityPanel";
 import GridCapabilityPanel from "@/components/dashboard/inspector/panels/GridCapabilityPanel";
 import { HeroCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
 import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
@@ -34,7 +35,7 @@ import CartCapabilityPanel from "@/components/dashboard/inspector/panels/CartCap
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
   "button", "panel", "heading", "text", "list", "accordion", "image",
-  "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker", "overlay",
+  "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "social", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker", "overlay",
 ] as const satisfies readonly LayoutBlockKind[];
 
 /**
@@ -275,6 +276,20 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsSources: ["style"],
     panel: IconCapabilityPanel,
     settingsLabel: "Settings",
+  },
+  social: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "repeatable-items", "component-presentation", "media", "link", "layout", "general", "animation"],
+    settingsSources: ["style"],
+    panel: SocialCapabilityPanel,
+    settingsLabel: "Settings",
+    dynamicFields: {
+      link: { label: "Link", destination: "link" },
+      aria: { label: "Link ARIA Label", destination: "linkAriaLabel" },
+      icon: { label: "Icon", destination: "iconName" },
+      image: { label: "Image", destination: "imageUrl" },
+    },
+    dynamicSourceSurface: "item",
   },
   badgeGrid: {
     capabilities: ["content", "style", "advanced"],

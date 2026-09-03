@@ -147,6 +147,7 @@ import UikitDatePicker from "@/components/builder/UikitDatePicker";
 import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
+import UikitSocial from "@/components/builder/UikitSocial";
 import UikitImage from "@/components/builder/UikitImage";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
 import {
@@ -2825,6 +2826,7 @@ export default function DashboardBuilder({
   const workspaceWidthRef = useRef(0);
   const inspectorDesktopLayoutRef = useRef(false);
   const sidebarTransitionUntilRef = useRef(0);
+  const sidebarTransitionCleanupTimerRef = useRef<number | null>(null);
   const sidebarViewportTimerRef = useRef<number | null>(null);
   const [spacingOverlayEnabled, setSpacingOverlayEnabled] = useState(false);
   const [spacingFocusRequest, setSpacingFocusRequest] = useState<{
@@ -2860,6 +2862,18 @@ export default function DashboardBuilder({
       setSidebarTransitioning(true);
       setSidebarCollapsed(next);
       window.localStorage.setItem(storageKeys.sidebarCollapsed, String(next));
+      if (sidebarTransitionCleanupTimerRef.current !== null) {
+        window.clearTimeout(sidebarTransitionCleanupTimerRef.current);
+      }
+      // Docked Inspector mode intentionally disables the dashboard grid
+      // transition, so transitionend is not guaranteed. Always release the
+      // temporary clipping/pointer lock after the visual transition window.
+      sidebarTransitionCleanupTimerRef.current = window.setTimeout(() => {
+        sidebarTransitionCleanupTimerRef.current = null;
+        sidebarTransitionUntilRef.current = 0;
+        window.dispatchEvent(new Event("builder:sidebar-transition-end"));
+        setSidebarTransitioning(false);
+      }, 300);
     },
     [storageKeys.sidebarCollapsed],
   );
@@ -2867,12 +2881,22 @@ export default function DashboardBuilder({
     (event: ReactTransitionEvent<HTMLDivElement>) => {
       if (event.target !== event.currentTarget) return;
       if (event.propertyName !== "grid-template-columns") return;
+      if (sidebarTransitionCleanupTimerRef.current !== null) {
+        window.clearTimeout(sidebarTransitionCleanupTimerRef.current);
+        sidebarTransitionCleanupTimerRef.current = null;
+      }
       sidebarTransitionUntilRef.current = 0;
       window.dispatchEvent(new Event("builder:sidebar-transition-end"));
       setSidebarTransitioning(false);
     },
     [],
   );
+
+  useEffect(() => () => {
+    if (sidebarTransitionCleanupTimerRef.current !== null) {
+      window.clearTimeout(sidebarTransitionCleanupTimerRef.current);
+    }
+  }, []);
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
   const themeAutoSaveTimer = useRef<number | null>(null);
@@ -19175,6 +19199,8 @@ const PreviewSection = memo(function PreviewSection({
                           <UikitBreadcrumbs block={block} />
                         ) : block.kind === "icon" ? (
                           <UikitIcon block={block} />
+                        ) : block.kind === "social" ? (
+                          <UikitSocial block={block} />
                         ) : block.kind === "list" ? (
                           <UikitList block={block} />
                         ) : block.kind === "subnav" ? (

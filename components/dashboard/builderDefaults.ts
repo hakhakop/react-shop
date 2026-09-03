@@ -1170,6 +1170,27 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "social") {
+    return {
+      id,
+      kind,
+      socialItems: [
+        { id: `${id}-social-1`, link: "https://facebook.com" },
+        { id: `${id}-social-2`, link: "https://instagram.com" },
+        { id: `${id}-social-3`, link: "https://x.com" },
+      ],
+      socialStyle: "icon",
+      socialGrid: "horizontal",
+      socialGridBreakpoint: "always",
+      socialColumnGap: "small",
+      socialRowGap: "small",
+      socialIconWidth: 20,
+      socialImageLoading: "lazy",
+      socialImageSvgInline: true,
+      socialLinkTarget: "_self",
+    };
+  }
+
   if (kind === "list") {
     return {
       id,

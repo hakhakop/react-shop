@@ -21,6 +21,7 @@ import UikitDatePicker from "@/components/builder/UikitDatePicker";
 import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
+import UikitSocial from "@/components/builder/UikitSocial";
 import UikitImage from "@/components/builder/UikitImage";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
@@ -1929,6 +1930,10 @@ export function ContentLayoutBlock({
 
   if (block.kind === "icon") {
     return <UikitIcon block={block} />;
+  }
+
+  if (block.kind === "social") {
+    return <UikitSocial block={block as any} />;
   }
 
   if (block.kind === "list") {

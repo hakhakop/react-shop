@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Database, X } from "lucide-react";
+import { Database, Pencil, X } from "lucide-react";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBinding,
@@ -20,6 +20,7 @@ type Props = {
   descriptor?: DynamicContentContextDescriptor;
   binding?: DynamicFieldBinding;
   onChange: (binding: DynamicFieldBinding | undefined) => void;
+  presentation?: "compact" | "header" | "surface";
 };
 
 export default function DynamicFieldBindingControl({
@@ -28,6 +29,7 @@ export default function DynamicFieldBindingControl({
   descriptor,
   binding,
   onChange,
+  presentation = "compact",
 }: Props) {
   const capabilities = useDynamicContentCapabilities();
   const destinationCapability = dynamicBindingDestinationCapability(destination);
@@ -145,7 +147,7 @@ export default function DynamicFieldBindingControl({
 
   return (
     <span
-      className={`builder-dynamic-binding-control${selectedField ? " has-binding" : ""}`}
+      className={`builder-dynamic-binding-control has-${presentation}-presentation${selectedField ? " has-binding" : ""}`}
     >
       <button
         ref={triggerRef}
@@ -163,7 +165,15 @@ export default function DynamicFieldBindingControl({
         title={selectedField ? `${selectedField.label} — ${sourceLabel}` : `Choose a dynamic field for ${fieldLabel}`}
       >
         <Database size={11} aria-hidden="true" />
-        {selectedField ? <span className="builder-dynamic-binding-trigger-label">{selectedField.label}</span> : null}
+        {presentation === "header" && !selectedField ? (
+          <span className="builder-dynamic-binding-trigger-label">Dynamic</span>
+        ) : selectedField ? (
+          <span className="builder-dynamic-binding-copy">
+            <span className="builder-dynamic-binding-trigger-label">{selectedField.label}</span>
+            {presentation === "surface" ? <span className="builder-dynamic-binding-source">{sourceLabel}</span> : null}
+          </span>
+        ) : null}
+        {presentation === "surface" && selectedField ? <Pencil className="builder-dynamic-binding-edit-icon" size={13} aria-hidden="true" /> : null}
       </button>
 
       {selectedField && (

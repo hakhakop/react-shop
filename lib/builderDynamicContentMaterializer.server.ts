@@ -303,7 +303,7 @@ type RepeatableItem = {
 
 async function materializeRepeatableItems<Item extends RepeatableItem>(
   items: Item[],
-  kind: "list" | "button" | "gallery",
+  kind: "list" | "button" | "gallery" | "social",
   location: BlockLocation,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
@@ -394,6 +394,10 @@ async function materializeRepeatableElement(
   if (block.kind === "gallery" && block.galleryItems?.length) {
     const galleryItems = await materializeRepeatableItems(block.galleryItems, "gallery", location, website, resolveContexts, diagnostics, inheritedContext);
     return galleryItems === block.galleryItems ? block : { ...block, galleryItems };
+  }
+  if (block.kind === "social" && block.socialItems?.length) {
+    const socialItems = await materializeRepeatableItems(block.socialItems, "social", location, website, resolveContexts, diagnostics, inheritedContext);
+    return socialItems === block.socialItems ? block : { ...block, socialItems };
   }
   return block;
 }
@@ -758,7 +762,8 @@ async function materializeBlocks(
           )
         : ((block.kind === "list" && Boolean(block.listItems?.length)) ||
           (block.kind === "button" && Boolean(block.buttons?.length)) ||
-          (block.kind === "gallery" && Boolean(block.galleryItems?.length)))
+          (block.kind === "gallery" && Boolean(block.galleryItems?.length)) ||
+          (block.kind === "social" && Boolean(block.socialItems?.length)))
           ? await materializeRepeatableElement(
               block,
               location,

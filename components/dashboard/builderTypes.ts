@@ -87,6 +87,16 @@ export type BuilderListItem = {
   dynamicBindings?: DynamicFieldBindings<"text" | "url">;
 };
 
+export type BuilderSocialItem = {
+  id: string;
+  link: string;
+  linkAriaLabel?: string;
+  iconName?: string;
+  imageUrl?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings<"link" | "linkAriaLabel" | "iconName" | "imageUrl">;
+};
+
 export type BuilderGalleryItem = {
   id: string;
   imageUrl?: string;
@@ -237,6 +247,7 @@ export type LayoutBlockKind =
   | "fluentForm"
   | "badgeGrid"
   | "icon"
+  | "social"
   | "list"
   | "subnav"
   | "menu"
@@ -727,6 +738,19 @@ export type BuilderLayoutBlock = {
   heroMediaLoading?: "lazy" | "eager";
   iconName?: string;
   iconSize?: number;
+  socialItems?: BuilderSocialItem[];
+  socialStyle?: "icon" | "button" | "link" | "muted" | "text" | "reset" | "iconnav" | "thumbnav";
+  socialGrid?: "horizontal" | "vertical";
+  socialGridBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  socialColumnGap?: "none" | "small" | "medium" | "default" | "large";
+  socialRowGap?: "none" | "small" | "medium" | "default" | "large";
+  socialIconWidth?: number;
+  socialImageWidth?: number;
+  socialImageHeight?: number;
+  socialImageLoading?: "lazy" | "eager";
+  socialImageSvgInline?: boolean;
+  socialLinkTarget?: "_self" | "_blank";
+  socialLinkAriaLabel?: string;
   items?: string[];
   menuSource?: "main" | string;
   menuItemGap?: string;

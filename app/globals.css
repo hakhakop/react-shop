@@ -27,6 +27,7 @@
 @import "./styles/archive.css";
 @import "./styles/builder-animations.css";
 @import "./styles/launch-experience.css";
+@import "./styles/inspector-calm.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

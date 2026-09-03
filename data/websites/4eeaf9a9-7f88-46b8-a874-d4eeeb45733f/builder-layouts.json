@@ -581,6 +581,33 @@
                       "effects": {},
                       "card": {}
                     }
+                  },
+                  {
+                    "id": "social-block-mtlza8ej-vwd05",
+                    "kind": "social",
+                    "socialItems": [
+                      {
+                        "id": "social-block-mtlza8ej-vwd05-social-1",
+                        "link": "https://facebook.com"
+                      },
+                      {
+                        "id": "social-block-mtlza8ej-vwd05-social-2",
+                        "link": "https://instagram.com"
+                      },
+                      {
+                        "id": "social-block-mtlza8ej-vwd05-social-3",
+                        "link": "https://x.com"
+                      }
+                    ],
+                    "socialStyle": "button",
+                    "socialGrid": "horizontal",
+                    "socialGridBreakpoint": "always",
+                    "socialColumnGap": "small",
+                    "socialRowGap": "small",
+                    "socialIconWidth": 20,
+                    "socialImageLoading": "lazy",
+                    "socialImageSvgInline": true,
+                    "socialLinkTarget": "_self"
                   }
                 ]
               }
@@ -3039,7 +3066,7 @@
                       "metaPosition": "above-title",
                       "metaHtmlElement": "div",
                       "buttonLabel": "Read Story",
-                      "buttonStyle": "default",
+                      "buttonStyle": "primary",
                       "linkTarget": "_self",
                       "linkMarginTop": "xlarge",
                       "effect": "slide",
@@ -4048,7 +4075,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-28T19:10:04.658Z"
+    "updatedAt": "2026-09-03T20:29:56.723Z"
   },
   "header": {
     "version": 1,

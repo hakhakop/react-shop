@@ -65,6 +65,7 @@ export type YoothemeImportElementKind =
   | "panel"
   | "alert"
   | "icon"
+  | "social"
   | "list"
   | "subnav"
   | "accordion"
@@ -149,6 +150,8 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   panel: "panel",
   alert: "alert",
   icon: "icon",
+  social: "social",
+  social_item: "social",
   list: "list",
   list_item: "list",
   subnav: "subnav",
@@ -997,6 +1000,9 @@ type DynamicImportDestination =
   | "content"
   | "linkUrl"
   | "linkLabel"
+  | "link"
+  | "linkAriaLabel"
+  | "iconName"
   | "url";
 
 type DynamicImportResult = {
@@ -1033,7 +1039,7 @@ const dynamicBinding = (
   allowUnregistered = false,
 ) => {
   const fallbackValueType: DynamicContentValueType =
-    destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "url"
+    destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
       ? "url"
       : destination === "text" || destination === "body" || destination === "content"
         ? "richText"
@@ -2387,6 +2393,71 @@ const mapStaticElement = (
       iconLinkTarget: props.link_target === "blank" ? "_blank" : "_self",
       iconLinkAriaLabel: asString(props.link_aria_label) ?? undefined,
       iconLinkStyle: ["button", "link", "muted", "text", "reset"].includes(linkStyle ?? "") ? linkStyle : "icon",
+    }, props);
+  }
+
+  if (type === "social") {
+    const socialItems = sourceChildren(node)
+      .filter((child) => child.type === "social_item")
+      .map((child, index) => {
+        const item = sourceProps(child);
+        const itemPath = `${path}.${index}`;
+        const dynamic = mapDynamicSource(
+          child,
+          { link: "link", link_aria_label: "linkAriaLabel", icon: "iconName", image: "imageUrl" },
+          warnings,
+          itemPath,
+        );
+        const sourceIcon = asString(item.icon);
+        const iconName = resolveUikitIconName(sourceIcon);
+        if (sourceIcon && !iconName) {
+          warnings.push(`${itemPath}.icon: '${sourceIcon}' is unavailable in the canonical WebPages UIkit icon registry and was not substituted.`);
+        }
+        warnUnsupported(itemPath, item, ["link", "link_aria_label", "icon", "image"], warnings);
+        return {
+          id: sourcePathId(itemPath, "social-item"),
+          link: asString(item.link) ?? "",
+          linkAriaLabel: asString(item.link_aria_label) ?? undefined,
+          iconName: iconName ?? undefined,
+          imageUrl: resolveYoothemeAssetUrl(item.image),
+          ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
+          ...(dynamic.bindings ? { dynamicBindings: dynamic.bindings } : {}),
+        };
+      });
+    const style = asString(props.link_style) ?? asString(props.style);
+    const grid = asString(props.grid) ?? asString(props.grid_mode) ?? asString(props.social_grid);
+    const breakpoint = sourceBreakpoint(props.grid_breakpoint ?? props.social_grid_breakpoint);
+    const normalizeGap = (value: unknown): BuilderLayoutBlock["socialColumnGap"] => {
+      const gap = String(value ?? "").toLowerCase();
+      return (["none", "small", "medium", "default", "large"] as const).includes(gap as "none")
+        ? gap as BuilderLayoutBlock["socialColumnGap"]
+        : undefined;
+    };
+    warnUnsupported(path, props, [
+      "style", "link_style", "grid", "grid_mode", "social_grid", "grid_breakpoint", "social_grid_breakpoint",
+      "column_gap", "row_gap", "grid_column_gap", "grid_row_gap", "social_column_gap", "social_row_gap", "icon_width",
+      "image_width", "image_height", "image_loading", "image_svg_inline", "link_target", "link_aria_label",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "social"),
+      kind: "social",
+      socialItems,
+      socialStyle: style === "default" ? "link"
+        : (["button", "link", "muted", "text", "reset", "iconnav", "thumbnav"] as const).includes(style as "button")
+          ? style as NonNullable<BuilderLayoutBlock["socialStyle"]>
+          : "icon",
+      socialGrid: grid === "vertical" ? "vertical" : "horizontal",
+      socialGridBreakpoint: breakpoint ?? "always",
+      socialColumnGap: normalizeGap(props.column_gap ?? props.grid_column_gap ?? props.social_column_gap) ?? "small",
+      socialRowGap: normalizeGap(props.row_gap ?? props.grid_row_gap ?? props.social_row_gap) ?? "small",
+      socialIconWidth: Number.isFinite(Number(props.icon_width)) ? Number(props.icon_width) : undefined,
+      socialImageWidth: Number.isFinite(Number(props.image_width)) ? Number(props.image_width) : undefined,
+      socialImageHeight: Number.isFinite(Number(props.image_height)) ? Number(props.image_height) : undefined,
+      socialImageLoading: props.image_loading === "eager" ? "eager" : "lazy",
+      socialImageSvgInline: sourceBoolean(props.image_svg_inline) ?? false,
+      socialLinkTarget: props.link_target === "blank" ? "_blank" : "_self",
+      socialLinkAriaLabel: asString(props.link_aria_label) ?? undefined,
     }, props);
   }
 

@@ -7,7 +7,7 @@
     "design": {},
     "sections": [
       {
-        "id": "contentLayout-mtl61ymw-y2vs3",
+        "id": "contentLayout-mtl82zkk-6qdvm",
         "kind": "contentLayout",
         "title": "Hero",
         "background": "transparent",
@@ -45,12 +45,12 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mtl61ymw-0-i9gv",
-            "rowId": "layout-row-mtl61ymw-0",
+            "id": "layout-item-mtl82zkj-0-dgun",
+            "rowId": "layout-row-mtl82zkj-0",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymw-d15oh",
+                "id": "heading-block-mtl82zkj-2rvev",
                 "kind": "heading",
                 "headingText": "Spring Summer 2024",
                 "title": "Spring Summer 2024",
@@ -69,7 +69,7 @@
                 }
               },
               {
-                "id": "heading-block-mtl61ymw-0b5mw",
+                "id": "heading-block-mtl82zkk-as397",
                 "kind": "heading",
                 "headingText": "Revolutionary Muse",
                 "title": "Revolutionary Muse",
@@ -89,7 +89,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymw-zbi3f",
+                "id": "button-block-mtl82zkk-o4304",
                 "kind": "button",
                 "buttons": [
                   {
@@ -129,21 +129,21 @@
         ],
         "rows": [
           {
-            "id": "layout-row-mtl61ymw-ps7c-section-0",
+            "id": "layout-row-mtl82zkk-u577-section-0",
             "layout": "1-col",
             "spacingContract": "yootheme",
             "columns": [
               {
-                "id": "layout-column-mtl61ymw-ps7c-section-0-0",
+                "id": "layout-column-mtl82zkk-u577-section-0-0",
                 "background": {
-                  "position": "center-center"
+                  "position": "center center"
                 },
                 "sticky": {
                   "breakpoint": "m"
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymw-la4vc",
+                    "id": "heading-block-mtl82zkk-7hrin",
                     "kind": "heading",
                     "headingText": "Spring Summer 2024",
                     "title": "Spring Summer 2024",
@@ -162,7 +162,7 @@
                     }
                   },
                   {
-                    "id": "heading-block-mtl61ymw-xr36b",
+                    "id": "heading-block-mtl82zkk-raidl",
                     "kind": "heading",
                     "headingText": "Revolutionary Muse",
                     "title": "Revolutionary Muse",
@@ -182,7 +182,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymw-ylyao",
+                    "id": "button-block-mtl82zkk-h359c",
                     "kind": "button",
                     "buttons": [
                       {
@@ -224,7 +224,7 @@
         ]
       },
       {
-        "id": "contentLayout-mtl61ymw-d0xek",
+        "id": "contentLayout-mtl82zkk-5ud1g",
         "kind": "contentLayout",
         "title": "Categories 01",
         "background": "transparent",
@@ -260,12 +260,12 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mtl61ymw-0-z4wg",
-            "rowId": "layout-row-mtl61ymw-0",
+            "id": "layout-item-mtl82zkk-0-y66k",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymw-tsmha",
+                "id": "heading-block-mtl82zkk-akjjx",
                 "kind": "heading",
                 "headingText": "Ready-to-Wear",
                 "title": "Ready-to-Wear",
@@ -284,7 +284,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymw-3gbru",
+                "id": "button-block-mtl82zkk-6a9wk",
                 "kind": "button",
                 "buttons": [
                   {
@@ -315,12 +315,12 @@
             ]
           },
           {
-            "id": "layout-item-mtl61ymw-1-ddyr",
-            "rowId": "layout-row-mtl61ymw-0",
+            "id": "layout-item-mtl82zkk-1-avls",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymw-ouv5z",
+                "id": "heading-block-mtl82zkk-06uy3",
                 "kind": "heading",
                 "headingText": "Ready-to-Wear",
                 "title": "Ready-to-Wear",
@@ -339,7 +339,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymw-q7tqe",
+                "id": "button-block-mtl82zkk-b3d4j",
                 "kind": "button",
                 "buttons": [
                   {
@@ -372,7 +372,7 @@
         ],
         "rows": [
           {
-            "id": "layout-row-mtl61ymw-09gj-section-0",
+            "id": "layout-row-mtl82zkk-gj49-section-0",
             "layout": "2-col-equal",
             "customLayout": {
               "template": "1-2,1-2",
@@ -401,14 +401,14 @@
             "bottomMargin": "none",
             "columns": [
               {
-                "id": "layout-column-mtl61ymw-09gj-section-0-0",
+                "id": "layout-column-mtl82zkk-gj49-section-0-0",
                 "responsiveWidths": {
                   "medium": "1-2"
                 },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-women.jpg",
-                  "position": "center-center",
+                  "position": "center center",
                   "size": "cover"
                 },
                 "textColor": "light",
@@ -417,7 +417,7 @@
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymw-3493e",
+                    "id": "heading-block-mtl82zkk-hme0u",
                     "kind": "heading",
                     "headingText": "Ready-to-Wear",
                     "title": "Ready-to-Wear",
@@ -436,7 +436,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymw-uxfjc",
+                    "id": "button-block-mtl82zkk-clag1",
                     "kind": "button",
                     "buttons": [
                       {
@@ -467,14 +467,14 @@
                 ]
               },
               {
-                "id": "layout-column-mtl61ymw-09gj-section-0-1",
+                "id": "layout-column-mtl82zkk-gj49-section-0-1",
                 "responsiveWidths": {
                   "medium": "1-2"
                 },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-men.jpg",
-                  "position": "center-center",
+                  "position": "center center",
                   "size": "cover"
                 },
                 "textColor": "light",
@@ -483,7 +483,7 @@
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymw-nh4ff",
+                    "id": "heading-block-mtl82zkk-m87g5",
                     "kind": "heading",
                     "headingText": "Ready-to-Wear",
                     "title": "Ready-to-Wear",
@@ -502,7 +502,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymw-sohvj",
+                    "id": "button-block-mtl82zkk-zlzp6",
                     "kind": "button",
                     "buttons": [
                       {
@@ -537,7 +537,7 @@
         ]
       },
       {
-        "id": "contentLayout-mtl61ymx-vl8uz",
+        "id": "contentLayout-mtl82zkk-wrmgk",
         "kind": "contentLayout",
         "title": "Latest Products",
         "background": "transparent",
@@ -573,12 +573,12 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mtl61ymw-0-mpo5",
-            "rowId": "layout-row-mtl61ymw-0",
+            "id": "layout-item-mtl82zkk-0-2vok",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymw-mmxx1",
+                "id": "heading-block-mtl82zkk-e89ox",
                 "kind": "heading",
                 "headingText": "Explore Our Latest Arrivals",
                 "title": "Explore Our Latest Arrivals",
@@ -598,7 +598,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymw-dtxal",
+                "id": "button-block-mtl82zkk-xltw8",
                 "kind": "button",
                 "buttons": [
                   {
@@ -686,7 +686,7 @@
                 }
               },
               {
-                "id": "panelSlider-block-mtl61ymx-lgm3p",
+                "id": "panelSlider-block-mtl82zkk-tcf77",
                 "kind": "panelSlider",
                 "slides": [
                   {
@@ -815,21 +815,21 @@
         ],
         "rows": [
           {
-            "id": "layout-row-mtl61ymx-i3ct-section-0",
+            "id": "layout-row-mtl82zkk-6ujy-section-0",
             "layout": "1-col",
             "spacingContract": "yootheme",
             "columns": [
               {
-                "id": "layout-column-mtl61ymx-i3ct-section-0-0",
+                "id": "layout-column-mtl82zkk-6ujy-section-0-0",
                 "background": {
-                  "position": "center-center"
+                  "position": "center center"
                 },
                 "sticky": {
                   "breakpoint": "m"
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymx-ddmwh",
+                    "id": "heading-block-mtl82zkk-tinta",
                     "kind": "heading",
                     "headingText": "Explore Our Latest Arrivals",
                     "title": "Explore Our Latest Arrivals",
@@ -849,7 +849,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymx-kk2sv",
+                    "id": "button-block-mtl82zkk-n0vw7",
                     "kind": "button",
                     "buttons": [
                       {
@@ -937,7 +937,7 @@
                     }
                   },
                   {
-                    "id": "panelSlider-block-mtl61ymx-ydmzp",
+                    "id": "panelSlider-block-mtl82zkk-hr4ga",
                     "kind": "panelSlider",
                     "slides": [
                       {
@@ -1068,7 +1068,7 @@
         ]
       },
       {
-        "id": "contentLayout-mtl61ymx-hzdny",
+        "id": "contentLayout-mtl82zkk-26f55",
         "kind": "contentLayout",
         "title": "Collection",
         "background": "transparent",
@@ -1106,12 +1106,12 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mtl61ymx-0-u4nc",
-            "rowId": "layout-row-mtl61ymx-0",
+            "id": "layout-item-mtl82zkk-0-uik3",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymx-wysfr",
+                "id": "heading-block-mtl82zkk-s0bl7",
                 "kind": "heading",
                 "headingText": "Spring Summer 2024",
                 "title": "Spring Summer 2024",
@@ -1130,7 +1130,7 @@
                 }
               },
               {
-                "id": "heading-block-mtl61ymx-wk7a5",
+                "id": "heading-block-mtl82zkk-wuo80",
                 "kind": "heading",
                 "headingText": "Color Essentials",
                 "title": "Color Essentials",
@@ -1150,7 +1150,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymx-s9ry6",
+                "id": "button-block-mtl82zkk-nibv2",
                 "kind": "button",
                 "buttons": [
                   {
@@ -1190,21 +1190,21 @@
         ],
         "rows": [
           {
-            "id": "layout-row-mtl61ymx-f3ky-section-0",
+            "id": "layout-row-mtl82zkk-m7zv-section-0",
             "layout": "1-col",
             "spacingContract": "yootheme",
             "columns": [
               {
-                "id": "layout-column-mtl61ymx-f3ky-section-0-0",
+                "id": "layout-column-mtl82zkk-m7zv-section-0-0",
                 "background": {
-                  "position": "center-center"
+                  "position": "center center"
                 },
                 "sticky": {
                   "breakpoint": "m"
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymx-3gxc3",
+                    "id": "heading-block-mtl82zkk-0k5un",
                     "kind": "heading",
                     "headingText": "Spring Summer 2024",
                     "title": "Spring Summer 2024",
@@ -1223,7 +1223,7 @@
                     }
                   },
                   {
-                    "id": "heading-block-mtl61ymx-4nz0l",
+                    "id": "heading-block-mtl82zkk-ycb7j",
                     "kind": "heading",
                     "headingText": "Color Essentials",
                     "title": "Color Essentials",
@@ -1243,7 +1243,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymx-uupwu",
+                    "id": "button-block-mtl82zkk-yk5n4",
                     "kind": "button",
                     "buttons": [
                       {
@@ -1285,7 +1285,7 @@
         ]
       },
       {
-        "id": "contentLayout-mtl61ymx-83tso",
+        "id": "contentLayout-mtl82zkk-shfpb",
         "kind": "contentLayout",
         "title": "Categories 02",
         "background": "transparent",
@@ -1321,12 +1321,12 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mtl61ymx-0-zfz2",
-            "rowId": "layout-row-mtl61ymx-0",
+            "id": "layout-item-mtl82zkk-0-0i4c",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymx-tveqx",
+                "id": "heading-block-mtl82zkk-ioumt",
                 "kind": "heading",
                 "headingText": "Knitwear",
                 "title": "Knitwear",
@@ -1345,7 +1345,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymx-docqn",
+                "id": "button-block-mtl82zkk-2djhv",
                 "kind": "button",
                 "buttons": [
                   {
@@ -1383,12 +1383,12 @@
             ]
           },
           {
-            "id": "layout-item-mtl61ymx-1-h5iy",
-            "rowId": "layout-row-mtl61ymx-0",
+            "id": "layout-item-mtl82zkk-1-zd1g",
+            "rowId": "layout-row-mtl82zkk-0",
             "rowLayout": "2-col-equal",
             "blocks": [
               {
-                "id": "heading-block-mtl61ymx-83aue",
+                "id": "heading-block-mtl82zkk-s80ah",
                 "kind": "heading",
                 "headingText": "Bestsellers",
                 "title": "Bestsellers",
@@ -1407,7 +1407,7 @@
                 }
               },
               {
-                "id": "button-block-mtl61ymx-hw601",
+                "id": "button-block-mtl82zkk-ta9je",
                 "kind": "button",
                 "buttons": [
                   {
@@ -1447,7 +1447,7 @@
         ],
         "rows": [
           {
-            "id": "layout-row-mtl61ymx-vzo7-section-0",
+            "id": "layout-row-mtl82zkk-sl6n-section-0",
             "layout": "2-col-equal",
             "customLayout": {
               "template": "1-2,1-2",
@@ -1476,14 +1476,14 @@
             "bottomMargin": "none",
             "columns": [
               {
-                "id": "layout-column-mtl61ymx-vzo7-section-0-0",
+                "id": "layout-column-mtl82zkk-sl6n-section-0-0",
                 "responsiveWidths": {
                   "medium": "1-2"
                 },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-knitwear.jpg",
-                  "position": "center-center",
+                  "position": "center center",
                   "size": "cover"
                 },
                 "textColor": "light",
@@ -1492,7 +1492,7 @@
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymx-uxc99",
+                    "id": "heading-block-mtl82zkk-3cpje",
                     "kind": "heading",
                     "headingText": "Knitwear",
                     "title": "Knitwear",
@@ -1511,7 +1511,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymx-38ge6",
+                    "id": "button-block-mtl82zkk-8jb5w",
                     "kind": "button",
                     "buttons": [
                       {
@@ -1549,14 +1549,14 @@
                 ]
               },
               {
-                "id": "layout-column-mtl61ymx-vzo7-section-0-1",
+                "id": "layout-column-mtl82zkk-sl6n-section-0-1",
                 "responsiveWidths": {
                   "medium": "1-2"
                 },
                 "verticalAlign": "middle",
                 "background": {
                   "imageUrl": "https://woolberry.webpages.am/wp-content/uploads/yootheme/home-categories-bestsellers.jpg",
-                  "position": "center-center",
+                  "position": "center center",
                   "size": "cover"
                 },
                 "textColor": "light",
@@ -1565,7 +1565,7 @@
                 },
                 "elements": [
                   {
-                    "id": "heading-block-mtl61ymx-mrsc5",
+                    "id": "heading-block-mtl82zkk-d8o70",
                     "kind": "heading",
                     "headingText": "Bestsellers",
                     "title": "Bestsellers",
@@ -1584,7 +1584,7 @@
                     }
                   },
                   {
-                    "id": "button-block-mtl61ymx-g6v8t",
+                    "id": "button-block-mtl82zkk-uir2a",
                     "kind": "button",
                     "buttons": [
                       {
@@ -1626,7 +1626,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-03T06:50:59.042Z"
+    "updatedAt": "2026-09-03T07:47:56.663Z"
   },
   "header": {
     "version": 1,

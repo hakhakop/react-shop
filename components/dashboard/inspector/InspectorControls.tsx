@@ -79,18 +79,20 @@ export function InspectorFieldRow({
   className = "",
   dynamicBinding,
 }: FieldProps) {
-  const dynamicAccessory = label && dynamicBinding ? (
+  const activeDynamicBinding = dynamicBinding?.bindings?.[dynamicBinding.destination];
+  const dynamicAccessory = label && dynamicBinding && !activeDynamicBinding ? (
     <DynamicFieldBindingControl
       destination={dynamicBinding.destination}
       label={label}
       descriptor={dynamicBinding.descriptor}
       binding={dynamicBinding.bindings?.[dynamicBinding.destination]}
       onChange={(binding) => dynamicBinding.onChange(dynamicBinding.destination, binding)}
+      presentation="header"
     />
-  ) : null;
+  ) : activeDynamicBinding ? <span className="builder-dynamic-field-status">Dynamic</span> : null;
   return (
     <div
-      className={`builder-field inspector-field-row ${isOverridden ? "has-override" : ""} ${className}`.trim()}
+      className={`builder-field inspector-field-row ${dynamicBinding ? "has-dynamic-field" : ""} ${activeDynamicBinding ? "is-dynamic-bound" : ""} ${isOverridden ? "has-override" : ""} ${className}`.trim()}
       title={description || undefined}
     >
       {label && (
@@ -122,7 +124,16 @@ export function InspectorFieldRow({
         </div>
       )}
       <div className="inspector-field-row-control">
-        {children}
+        {activeDynamicBinding && dynamicBinding && label ? (
+          <DynamicFieldBindingControl
+            destination={dynamicBinding.destination}
+            label={label}
+            descriptor={dynamicBinding.descriptor}
+            binding={activeDynamicBinding}
+            onChange={(binding) => dynamicBinding.onChange(dynamicBinding.destination, binding)}
+            presentation="surface"
+          />
+        ) : children}
       </div>
       {(help || description) && (
         <div className="inspector-field-row-help">

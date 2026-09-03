@@ -199,6 +199,62 @@ export default function SliderCapabilityPanel({
     update({ slides: [...slides, ...newSlides] } as any);
   };
 
+  const handleAddItem = () => {
+    update({
+      slides: [
+        ...slides,
+        {
+          id: String(Date.now()),
+          ...panelSliderItemDefaults,
+          title: `${itemLabel} ${slides.length + 1}`,
+          ...(isPanelSlider
+            ? { text: "Panel item content.", showAction: true, buttonLabel: "Learn more" }
+            : { subtitle: "Subtitle", text: "Slide description copy...", buttonLabel: "Learn More" }),
+          buttonUrl: "#",
+        },
+      ],
+    } as any);
+  };
+
+  const handleAddMedia = () => {
+    if (openWordPressMediaPicker) {
+      openWordPressMediaPicker({
+        title: `Select ${elementLabel} Media (Select Multiple)`,
+        multiple: true,
+        onSelect: (media: any) => {
+          update({
+            slides: [
+              ...slides,
+              {
+                id: String(Date.now()),
+                ...panelSliderItemDefaults,
+                imageUrl: media.sourceUrl,
+                title: media.title || media.altText || `${itemLabel} image`,
+                ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
+                text: "",
+                buttonUrl: "#",
+              },
+            ],
+          } as any);
+        },
+        onSelectMany: (mediaItems: any[]) => {
+          const newSlides = mediaItems.map((media, idx) => ({
+            id: String(Date.now() + idx),
+            ...panelSliderItemDefaults,
+            imageUrl: media.sourceUrl,
+            title: media.title || media.altText || `${itemLabel} ${slides.length + idx + 1}`,
+            ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
+            text: "",
+            buttonUrl: "#",
+          }));
+          update({ slides: [...slides, ...newSlides] } as any);
+        },
+      });
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
   // --------------------------------------------------------------------------
   // TAB 1: CONTENT
   // --------------------------------------------------------------------------
@@ -241,136 +297,11 @@ export default function SliderCapabilityPanel({
         )}
 
         <InspectorDivision title={isPanelSlider ? "PANEL SLIDES" : isSlideshow ? "ITEMS" : "SLIDES"}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
-            <button
-              type="button"
-              className="builder-btn builder-btn-secondary"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                padding: "8px 12px",
-                background: "var(--builder-surface-subtle, #f5f5f7)",
-                border: "1px solid var(--builder-border-color, #e0e0e0)",
-                borderRadius: "6px",
-                fontWeight: 600,
-                fontSize: "12px",
-                color: "var(--builder-text-primary, #111)",
-                cursor: "pointer",
-              }}
-              onClick={() =>
-                update({
-                  slides: [
-                    ...slides,
-                    {
-                      id: String(Date.now()),
-                      ...panelSliderItemDefaults,
-                      title: `${itemLabel} ${slides.length + 1}`,
-                      ...(isPanelSlider
-                        ? { text: "Panel item content.", showAction: true, buttonLabel: "Learn more" }
-                        : { subtitle: "Subtitle", text: "Slide description copy...", buttonLabel: "Learn More" }),
-                      buttonUrl: "#",
-                      imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
-                    },
-                  ],
-                } as any)
-              }
-            >
-              <Plus size={14} />
-              <span>ADD ITEM</span>
-            </button>
-
-            <button
-              type="button"
-              className="builder-btn builder-btn-primary"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                padding: "8px 12px",
-                background: "#1e87f0",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                fontWeight: 600,
-                fontSize: "12px",
-                cursor: "pointer",
-                boxShadow: "0 2px 6px rgba(30,135,240,0.3)",
-              }}
-              onClick={() => {
-                if (openWordPressMediaPicker) {
-                  openWordPressMediaPicker({
-                    title: `Select ${elementLabel} Media (Select Multiple)`,
-                    multiple: true,
-                    onSelect: (media: any) => {
-                      update({
-                        slides: [
-                          ...slides,
-                          {
-                            id: String(Date.now()),
-                            ...panelSliderItemDefaults,
-                            imageUrl: media.sourceUrl,
-                            title: media.title || media.altText || `${itemLabel} image`,
-                            ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
-                            text: "",
-                          },
-                        ],
-                      } as any);
-                    },
-                    onSelectMany: (mediaItems: any[]) => {
-                      const newSlides = mediaItems.map((media, idx) => ({
-                        id: String(Date.now() + idx),
-                        ...panelSliderItemDefaults,
-                        imageUrl: media.sourceUrl,
-                        title: media.title || media.altText || `${itemLabel} ${slides.length + idx + 1}`,
-                        ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
-                        text: "",
-                      }));
-                      update({ slides: [...slides, ...newSlides] } as any);
-                    },
-                  });
-                } else if (fileInputRef.current) {
-                  fileInputRef.current.click();
-                }
-              }}
-            >
-              <ImagePlus size={14} />
-              <span>ADD MEDIA</span>
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              style={{ display: "none" }}
-              onChange={(e) => handleAddMediaFiles(e.target.files)}
-            />
-          </div>
-
           <RepeatableItemShell
             items={slides}
             getItemKey={(slide: any, index: number) => slide.id || `slide-${index}`}
             getItemSummary={(slide: any, index: number) => slide.title || `${itemLabel} ${index + 1}`}
             itemLabel={itemLabel}
-            addLabel={`Add ${itemLabel.toLowerCase()}`}
-            onAdd={() =>
-              update({
-                slides: [
-                  ...slides,
-                  {
-                    id: String(Date.now()),
-                    ...panelSliderItemDefaults,
-                    title: `${itemLabel} ${slides.length + 1}`,
-                    ...(isPanelSlider
-                      ? { text: "Panel item content.", showAction: true, buttonLabel: "Learn more" }
-                      : { subtitle: "Subtitle", text: "Slide description copy...", buttonLabel: "Learn More" }),
-                    buttonUrl: "#",
-                  },
-                ],
-              } as any)
-            }
             onCopy={(index: number) => {
               const target = slides[index];
               if (!target) return;
@@ -701,6 +632,24 @@ export default function SliderCapabilityPanel({
                 </div>
               );
             }}
+          />
+          <div className="builder-repeatable-add-actions">
+            <button type="button" className="builder-inline-add" onClick={handleAddItem}>
+              <Plus size={16} />
+              <span>Add {itemLabel.toLowerCase()}</span>
+            </button>
+            <button type="button" className="builder-inline-add" onClick={handleAddMedia}>
+              <ImagePlus size={16} />
+              <span>Add media</span>
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(event) => handleAddMediaFiles(event.target.files)}
           />
         </InspectorDivision>
 

@@ -7805,3 +7805,27 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-grid-card--yootheme.uk-card-primary.shop-builder-grid-card--hover-disabled:active {
   box-shadow: var(--uk-card-primary-shadow, none) !important;
 }
+.shop-builder-social--horizontal,
+.shop-builder-social--vertical {
+  flex-direction: row;
+}
+
+.shop-builder-social--vertical,
+.shop-builder-social--vertical-s,
+.shop-builder-social--vertical-m,
+.shop-builder-social--vertical-l,
+.shop-builder-social--vertical-xl {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (min-width: 640px) { .shop-builder-social--vertical-s { flex-direction: row; } }
+@media (min-width: 960px) { .shop-builder-social--vertical-m { flex-direction: row; } }
+@media (min-width: 1200px) { .shop-builder-social--vertical-l { flex-direction: row; } }
+@media (min-width: 1600px) { .shop-builder-social--vertical-xl { flex-direction: row; } }
+
+.shop-builder-social a,
+.shop-builder-social img,
+.shop-builder-social svg {
+  flex: 0 0 auto;
+}

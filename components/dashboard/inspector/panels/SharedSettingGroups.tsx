@@ -22,7 +22,6 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import { UIKIT_HEADING_CAPABILITY, UIKIT_IMAGE_CAPABILITY, UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
-import DynamicFieldBindingControl from "@/components/dashboard/inspector/panels/DynamicFieldBindingControl";
 
 const labels = <T extends string>(values: readonly T[]) =>
   values.map((value) => ({
@@ -1234,15 +1233,16 @@ export function ActionSettingsGroup({
       {showLabel && labelKey && (
         <InspectorFieldRow
           label={labelLabel}
-          labelAccessory={dynamicContext && onDynamicBindingChange ? (
-            <DynamicFieldBindingControl
-              destination={dynamicLabelDestination ?? "buttonLabel"}
-              label={labelLabel}
-              descriptor={dynamicContext}
-              binding={dynamicBindings?.[labelKey]}
-              onChange={(binding) => onDynamicBindingChange(labelKey, binding)}
-            />
-          ) : undefined}
+          dynamicBinding={dynamicContext && onDynamicBindingChange ? (() => {
+            const destination = dynamicLabelDestination ?? "buttonLabel";
+            const binding = dynamicBindings?.[labelKey];
+            return {
+              destination,
+              descriptor: dynamicContext,
+              bindings: binding ? { [destination]: binding } : undefined,
+              onChange: (_destination: string, nextBinding: DynamicFieldBinding | undefined) => onDynamicBindingChange(labelKey, nextBinding),
+            };
+          })() : undefined}
           isOverridden={values[labelKey] !== undefined}
           inheritedValueText="Action"
           onReset={() => update({ [labelKey]: undefined })}
@@ -1260,15 +1260,16 @@ export function ActionSettingsGroup({
       {showUrl && urlKey && (
         <InspectorFieldRow
           label={urlLabel}
-          labelAccessory={dynamicContext && onDynamicBindingChange ? (
-            <DynamicFieldBindingControl
-              destination={dynamicUrlDestination ?? "buttonUrl"}
-              label={urlLabel}
-              descriptor={dynamicContext}
-              binding={dynamicBindings?.[urlKey]}
-              onChange={(binding) => onDynamicBindingChange(urlKey, binding)}
-            />
-          ) : undefined}
+          dynamicBinding={dynamicContext && onDynamicBindingChange ? (() => {
+            const destination = dynamicUrlDestination ?? "buttonUrl";
+            const binding = dynamicBindings?.[urlKey];
+            return {
+              destination,
+              descriptor: dynamicContext,
+              bindings: binding ? { [destination]: binding } : undefined,
+              onChange: (_destination: string, nextBinding: DynamicFieldBinding | undefined) => onDynamicBindingChange(urlKey, nextBinding),
+            };
+          })() : undefined}
           isOverridden={values[urlKey] !== undefined}
           inheritedValueText="#"
           onReset={() => update({ [urlKey]: undefined })}

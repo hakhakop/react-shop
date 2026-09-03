@@ -44,6 +44,9 @@ export type DynamicBindingDestination =
   | "url"
   | "linkUrl"
   | "linkLabel"
+  | "link"
+  | "linkAriaLabel"
+  | "iconName"
   | "imageUrl"
   | "imageAlt"
   | "hoverVideoUrl"
@@ -70,6 +73,9 @@ export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   url: { label: "Link URL", acceptedTypes: ["url"] },
   linkUrl: { label: "Link URL", acceptedTypes: ["url"] },
   linkLabel: { label: "Link Text", acceptedTypes: ["string", "richText"] },
+  link: { label: "Link", acceptedTypes: ["url"] },
+  linkAriaLabel: { label: "Link ARIA Label", acceptedTypes: ["string", "richText"] },
+  iconName: { label: "Icon", acceptedTypes: ["string"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
   hoverVideoUrl: { label: "Hover Video", acceptedTypes: ["url"] },

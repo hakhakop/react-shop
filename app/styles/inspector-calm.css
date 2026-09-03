@@ -1,0 +1,35 @@
+/* Final shared Inspector typography authority.
+   Loaded after legacy dashboard compatibility styles. */
+.builder-floating-inspector {
+  --inspector-label-size: 15px;
+  --inspector-help-size: 13px;
+  --inspector-group-gap: 24px;
+}
+
+.builder-floating-inspector .builder-inspector-header-title-wrap strong {
+  font-size: 18px;
+}
+
+.builder-floating-inspector .builder-inspector-breadcrumb-row,
+.builder-floating-inspector .builder-inspector-breadcrumb-row button,
+.builder-floating-inspector .builder-inspector-breadcrumb-row span,
+.builder-floating-inspector .builder-inspector-breadcrumb-row strong {
+  font-size: 13px !important;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-tabs button,
+.builder-floating-inspector .builder-inspector .inspector-field-row-label,
+.builder-floating-inspector .builder-inspector .inspector-field-title-text,
+.builder-floating-inspector .builder-inspector .builder-inspector-row-label,
+.builder-floating-inspector .builder-inspector .inspector-switch-label,
+.builder-floating-inspector .builder-inspector .builder-inspector-division-title,
+.builder-floating-inspector .builder-inspector .builder-inspector-section > h3 {
+  font-size: 15px;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-control,
+.builder-floating-inspector .builder-inspector .inspector-segmented button,
+.builder-floating-inspector .builder-inspector .builder-nested-card-header,
+.builder-floating-inspector .builder-inspector .builder-inline-add {
+  font-size: 14px;
+}

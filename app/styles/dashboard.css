@@ -19415,6 +19415,95 @@ body:has(.builder-dashboard.is-inspector-docked)
   flex: 1 1 auto;
 }
 
+.builder-inspector .inspector-field-row.has-dynamic-field {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
+  padding: 7px 0;
+}
+
+.builder-inspector .inspector-field-row.has-dynamic-field .inspector-field-row-label,
+.builder-inspector .inspector-field-row.has-dynamic-field .inspector-field-row-control {
+  width: 100%;
+  min-width: 0;
+}
+
+.builder-inspector .builder-dynamic-field-status {
+  margin-left: auto;
+  color: var(--builder-ui-muted, #a1a1aa);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-header-presentation {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-header-presentation .builder-dynamic-binding-trigger {
+  width: auto;
+  gap: 4px;
+  padding: 0 2px;
+  color: var(--builder-ui-muted, #a1a1aa);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-surface-presentation {
+  width: 100%;
+  max-width: none;
+  gap: 4px;
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-surface-presentation .builder-dynamic-binding-trigger {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  min-height: 38px;
+  height: 38px;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.1));
+  border-radius: 7px;
+  background: var(--builder-ui-surface, #1b1b20);
+  color: var(--builder-ui-text, #e4e4e7);
+}
+
+.builder-inspector .builder-dynamic-binding-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.builder-inspector .builder-dynamic-binding-source {
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: var(--builder-ui-muted, #a1a1aa);
+  font-size: 10.5px;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-inspector .builder-dynamic-binding-edit-icon {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--builder-ui-muted, #a1a1aa);
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-surface-presentation .builder-dynamic-binding-remove {
+  width: 32px;
+  min-width: 32px;
+  height: 38px;
+  min-height: 38px;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.1));
+  border-radius: 7px;
+  background: var(--builder-ui-surface, #1b1b20);
+}
+
 .builder-inspector .builder-dynamic-binding-control.has-binding .builder-dynamic-binding-trigger {
   flex: 1 1 auto;
   justify-content: flex-start;
@@ -19448,6 +19537,12 @@ body:has(.builder-dashboard.is-inspector-docked)
   outline: 0;
   background: var(--builder-ui-surface-hover, rgba(255, 255, 255, 0.07));
   color: var(--builder-ui-text-strong, #fafafa);
+}
+
+.builder-inspector .builder-dynamic-binding-control.has-surface-presentation.has-binding .builder-dynamic-binding-trigger {
+  padding: 0 10px;
+  background: var(--builder-ui-surface, #1b1b20);
+  color: var(--builder-ui-text, #e4e4e7);
 }
 .builder-inspector .inspector-field-title-text {
   color: var(--builder-ui-text, #d2d6df);
@@ -20962,6 +21057,41 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   margin: 0 auto;
 }
 
+/* Final Inspector type authority. Keep this after legacy Inspector rules. */
+.builder-floating-inspector {
+  --inspector-label-size: 15px;
+  --inspector-help-size: 13px;
+  --inspector-group-gap: 24px;
+}
+
+.builder-floating-inspector .builder-inspector-header-title-wrap strong {
+  font-size: 18px;
+}
+
+.builder-floating-inspector .builder-inspector-breadcrumb-row,
+.builder-floating-inspector .builder-inspector-breadcrumb-row button,
+.builder-floating-inspector .builder-inspector-breadcrumb-row span,
+.builder-floating-inspector .builder-inspector-breadcrumb-row strong {
+  font-size: 13px !important;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-tabs button,
+.builder-floating-inspector .builder-inspector .inspector-field-row-label,
+.builder-floating-inspector .builder-inspector .inspector-field-title-text,
+.builder-floating-inspector .builder-inspector .builder-inspector-row-label,
+.builder-floating-inspector .builder-inspector .inspector-switch-label,
+.builder-floating-inspector .builder-inspector .builder-inspector-division-title,
+.builder-floating-inspector .builder-inspector .builder-inspector-section > h3 {
+  font-size: 15px;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-control,
+.builder-floating-inspector .builder-inspector .inspector-segmented button,
+.builder-floating-inspector .builder-inspector .builder-nested-card-header,
+.builder-floating-inspector .builder-inspector .builder-inline-add {
+  font-size: 14px;
+}
+
 /* Last-cascade guard for the focused Structure UX. */
 
 /* Last-cascade guard for the focused Structure UX. */
@@ -21055,6 +21185,174 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
   border-radius: 4px;
   background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+/* Final Inspector type authority. Keep this after legacy compatibility rules. */
+.builder-floating-inspector {
+  --inspector-label-size: 15px;
+  --inspector-help-size: 13px;
+  --inspector-group-gap: 24px;
+}
+
+.builder-floating-inspector .builder-inspector-header-title-wrap strong {
+  font-size: 18px;
+}
+
+.builder-floating-inspector .builder-inspector-breadcrumb-row,
+.builder-floating-inspector .builder-inspector-breadcrumb-row button,
+.builder-floating-inspector .builder-inspector-breadcrumb-row span,
+.builder-floating-inspector .builder-inspector-breadcrumb-row strong {
+  font-size: 13px !important;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-tabs button,
+.builder-floating-inspector .builder-inspector .inspector-field-row-label,
+.builder-floating-inspector .builder-inspector .inspector-field-title-text,
+.builder-floating-inspector .builder-inspector .builder-inspector-row-label,
+.builder-floating-inspector .builder-inspector .inspector-switch-label {
+  font-size: 15px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-division-title,
+.builder-floating-inspector .builder-inspector .builder-inspector-section > h3 {
+  font-size: 15px;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-control,
+.builder-floating-inspector .builder-inspector .inspector-segmented button,
+.builder-floating-inspector .builder-inspector .builder-nested-card-header,
+.builder-floating-inspector .builder-inspector .builder-inline-add {
+  font-size: 14px;
+}
+
+/* Calm Inspector type and repeatable-item rhythm ----------------------------
+   Keep the hierarchy on shared primitives so individual panels do not need
+   presentation overrides. */
+.builder-floating-inspector {
+  --inspector-label-size: 15px;
+  --inspector-help-size: 13px;
+  --inspector-group-gap: 24px;
+}
+
+.builder-floating-inspector .builder-inspector-header-title-wrap strong {
+  font-size: 18px;
+  line-height: 1.35;
+  letter-spacing: -0.018em;
+}
+
+.builder-floating-inspector .builder-inspector-breadcrumb-row,
+.builder-floating-inspector .builder-inspector-breadcrumb-row button,
+.builder-floating-inspector .builder-inspector-breadcrumb-row span,
+.builder-floating-inspector .builder-inspector-breadcrumb-row strong {
+  font-size: 13px !important;
+  line-height: 1.4;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-tabs button {
+  min-height: 38px;
+  height: 38px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-division {
+  margin-bottom: 20px;
+  padding-bottom: 24px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-division-header {
+  min-height: 44px;
+  margin-bottom: 12px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-division-title,
+.builder-floating-inspector .builder-inspector .builder-inspector-section > h3 {
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.025em;
+}
+
+.builder-floating-inspector .builder-inspector .builder-inspector-division-desc,
+.builder-floating-inspector .builder-inspector .builder-inspector-division-meta,
+.builder-floating-inspector .builder-inspector .inspector-help-text,
+.builder-floating-inspector .builder-inspector .builder-inspector-row-desc {
+  font-size: var(--inspector-help-size);
+  line-height: 1.5;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-field-row,
+.builder-floating-inspector .builder-inspector .builder-inspector-row {
+  min-height: 54px;
+  gap: 16px;
+  padding-block: 8px;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-field-row-label,
+.builder-floating-inspector .builder-inspector .inspector-field-title-text,
+.builder-floating-inspector .builder-inspector .builder-inspector-row-label,
+.builder-floating-inspector .builder-inspector .inspector-switch-label {
+  font-size: var(--inspector-label-size);
+  line-height: 1.45;
+}
+
+.builder-floating-inspector .builder-inspector .inspector-control,
+.builder-floating-inspector .builder-inspector .inspector-segmented button,
+.builder-floating-inspector .builder-inspector .builder-nested-card-header,
+.builder-floating-inspector .builder-inspector .builder-inline-add {
+  font-size: 14px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-slide-toggle small {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.builder-floating-inspector .builder-inspector .builder-nested-card {
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-nested-card-header {
+  min-height: 42px;
+  margin-bottom: 12px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-repeatable-add-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.builder-floating-inspector .builder-inspector .builder-repeatable-add-actions .builder-inline-add {
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.1));
+  border-radius: 9px;
+  background: var(--builder-ui-surface, rgba(255, 255, 255, 0.035));
+  font-weight: 550;
+  box-shadow: none;
+}
+
+.builder-floating-inspector .builder-inspector .builder-repeatable-add-actions .builder-inline-add:hover {
+  border-color: var(--builder-ui-border-strong, rgba(255, 255, 255, 0.2));
+  background: var(--builder-ui-surface-hover, rgba(255, 255, 255, 0.07));
+}
+
+.builder-dynamic-binding-picker {
+  font-size: 14px;
+}
+
+.builder-dynamic-binding-picker .builder-inspector-row-desc {
+  font-size: 13px;
+}
+
+@container (max-width: 370px) {
+  .builder-floating-inspector .builder-inspector .builder-repeatable-add-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Keep document-owned Header fields on the shared Inspector rhythm. */
