@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Pencil, X } from "lucide-react";
+import { Database, X } from "lucide-react";
 import type {
   DynamicContentContextDescriptor,
   DynamicFieldBinding,
@@ -38,6 +38,7 @@ export default function DynamicFieldBindingControl({
   );
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [pickerTheme, setPickerTheme] = useState<"dark" | "light">("dark");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, width: 280 });
@@ -85,7 +86,7 @@ export default function DynamicFieldBindingControl({
       window.innerWidth - viewportPadding,
       inspectorRect?.right ?? window.innerWidth - viewportPadding,
     );
-    const width = Math.max(190, Math.min(280, boundaryRight - boundaryLeft - 16));
+    const width = Math.min(320, Math.max(0, boundaryRight - boundaryLeft - 16));
     const pickerHeight = Math.min(320, window.innerHeight - viewportPadding * 2);
     const belowTop = triggerRect.bottom + 6;
     const aboveTop = triggerRect.top - pickerHeight - 6;
@@ -144,42 +145,31 @@ export default function DynamicFieldBindingControl({
 
   return (
     <span
-      className="builder-dynamic-binding-control"
-      style={{
-        position: "relative",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "2px",
-        marginLeft: "auto",
-      }}
+      className={`builder-dynamic-binding-control${selectedField ? " has-binding" : ""}`}
     >
       <button
         ref={triggerRef}
         type="button"
-        className="builder-inspector-secondary-button"
+        className="builder-dynamic-binding-trigger"
         aria-expanded={open}
         aria-label={`${fieldLabel} dynamic binding`}
         onClick={() => {
-          if (fields.length > 0) setOpen((current) => !current);
+          if (fields.length > 0) {
+            const dashboard = triggerRef.current?.closest(".builder-dashboard") as HTMLElement | null;
+            setPickerTheme(dashboard?.dataset.theme === "light" ? "light" : "dark");
+            setOpen((current) => !current);
+          }
         }}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "3px",
-          padding: "2px 5px",
-          minHeight: "22px",
-          fontSize: "11px",
-          whiteSpace: "nowrap",
-        }}
+        title={selectedField ? `${selectedField.label} — ${sourceLabel}` : `Choose a dynamic field for ${fieldLabel}`}
       >
-        <span>{selectedField ? `${selectedField.label} — ${sourceLabel}` : "Dynamic"}</span>
-        {selectedField ? <Pencil size={11} aria-hidden="true" /> : <ChevronDown size={11} aria-hidden="true" />}
+        <Database size={11} aria-hidden="true" />
+        {selectedField ? <span className="builder-dynamic-binding-trigger-label">{selectedField.label}</span> : null}
       </button>
 
       {selectedField && (
         <button
           type="button"
-          className="builder-inspector-secondary-button"
+          className="builder-dynamic-binding-remove"
           aria-label={`Remove ${fieldLabel} dynamic binding`}
           onClick={() => {
             onChange(undefined);
@@ -187,14 +177,6 @@ export default function DynamicFieldBindingControl({
             setSearch("");
           }}
           title={`Remove ${fieldLabel} dynamic binding`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "2px",
-            minHeight: "22px",
-            minWidth: "22px",
-          }}
         >
           <X size={12} aria-hidden="true" />
         </button>
@@ -203,7 +185,7 @@ export default function DynamicFieldBindingControl({
       {open && typeof document !== "undefined" && createPortal(
         <div
           ref={pickerRef}
-          className="builder-dynamic-binding-picker"
+          className={`builder-dynamic-binding-picker is-${pickerTheme}`}
           data-inspector-owned-portal
           role="dialog"
           aria-label={`${fieldLabel} dynamic field picker`}
