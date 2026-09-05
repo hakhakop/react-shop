@@ -131,7 +131,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         subtitle: slide.meta ?? slide.subtitle ?? "",
         text: slide.text || "",
         badge: slide.badge || "",
-        imageUrl: authoredImageUrl || (pendingDynamicContent ? "" : DEFAULT_SLIDES[index % 2].imageUrl),
+        imageUrl: authoredImageUrl || (isImportedYoothemeSlider ? "" : DEFAULT_SLIDES[index % 2].imageUrl),
         imageAlt: slide.imageAlt || slide.title || (pendingDynamicContent ? "" : "Slide Image"),
         pendingDynamicContent,
         imagePadding: slide.imagePadding,

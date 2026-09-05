@@ -11,6 +11,7 @@ import { resolveWordPressGenericContentContexts } from "@/lib/wordpressGenericCo
 import { projectImportedDynamicContentProvider } from "@/lib/importedDynamicContentProvider";
 import { resolveWooCommerceTermContexts } from "@/lib/woocommerceTermContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
+import { resolveWordPressMenuContexts } from "@/lib/wordpressMenuContentProvider.server";
 
 export type DynamicContentProviderInput = {
   website?: SaaSWebsite | null;
@@ -22,6 +23,7 @@ export type DynamicContentProvider = (
 ) => Promise<DynamicItemContext[]>;
 
 const providers: Readonly<Record<string, DynamicContentProvider>> = {
+  "wordpress/menu-item": resolveWordPressMenuContexts,
   "wordpress/post": resolveWordPressPostContexts,
   "wordpress/content": resolveWordPressGenericContentContexts,
   "woocommerce/product": resolveWooCommerceProductContexts,

@@ -58,7 +58,7 @@ const withRequestedBindingFields = (
   descriptor: DynamicContentContextDescriptor,
   bindings: DynamicFieldBindings | undefined,
 ): DynamicContentContextDescriptor => {
-  if (descriptor.provider !== "wordpress" || descriptor.source !== "content") return descriptor;
+  if (!((descriptor.provider === "wordpress" && descriptor.source === "content") || (descriptor.provider === "woocommerce" && ["product-tag", "product-category"].includes(descriptor.source)))) return descriptor;
   const requestedFields = Array.from(new Set(
     Object.values(bindings ?? {})
       .map((binding) => binding?.path)
@@ -166,6 +166,8 @@ async function resolveInheritedContext(
 }
 
 const DYNAMIC_SINGLE_ELEMENT_KINDS = new Set([
+  "backToTop",
+  "sublayout",
   "heading", "image", "overlay", "text", "button", "panel", "alert",
 ]);
 
@@ -303,7 +305,7 @@ type RepeatableItem = {
 
 async function materializeRepeatableItems<Item extends RepeatableItem>(
   items: Item[],
-  kind: "list" | "button" | "gallery" | "social",
+  kind: "list" | "button" | "gallery" | "social" | "nav",
   location: BlockLocation,
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
@@ -383,6 +385,10 @@ async function materializeRepeatableElement(
   diagnostics: DynamicContentMaterializationDiagnostic[],
   inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
+  if (block.kind === "nav" && block.navItems?.length) {
+    const navItems = await materializeRepeatableItems(block.navItems, "nav", location, website, resolveContexts, diagnostics, inheritedContext);
+    return navItems === block.navItems ? block : { ...block, navItems };
+  }
   if (block.kind === "list" && block.listItems?.length) {
     const listItems = await materializeRepeatableItems(block.listItems, "list", location, website, resolveContexts, diagnostics, inheritedContext);
     return listItems === block.listItems ? block : { ...block, listItems };
@@ -736,11 +742,22 @@ async function materializeBlocks(
   diagnostics: DynamicContentMaterializationDiagnostic[],
   materializedGridBlocks: MaterializedGridBlock[],
   inheritedContext?: DynamicItemContext,
-) {
+): Promise<BuilderLayoutBlock[]> {
   let changed = false;
   const renderBlocks = await Promise.all(blocks.map(async (block, index) => {
     const blockKey = block.id ?? `${columnKey}-block-${index}`;
     const location = { sectionId, columnKey, blockKey };
+    if (block.kind === "sublayout" && block.sublayout) {
+      const projections = await expandStructuralNode({ id: blockKey, dynamicContext: block.dynamicContext }, inheritedContext, website, request => resolveContexts({ ...request, descriptor: withRequestedBindingFields(request.descriptor, block.dynamicBindings) }));
+      const fragments = await Promise.all(projections.map(async ({ node, context }) => {
+        const template = { ...staticElementTemplate(block), id: node.id };
+        const resolved = context && block.dynamicBindings ? resolveDynamicItem(template, context, block.dynamicBindings) : template;
+        const nested = await materializeSectionInstance({ id: node.id, kind: "contentLayout", rows: block.sublayout!.rows } as BuilderSection, context, website, resolveContexts, diagnostics, materializedGridBlocks);
+        return { ...resolved, sublayout: { ...block.sublayout!, rows: nested.rows! } };
+      }));
+      changed = true;
+      return fragments;
+    }
     const renderBlock = block.kind === "grid"
       ? await materializeGridBlock(
           block,
@@ -760,7 +777,7 @@ async function materializeBlocks(
             diagnostics,
             inheritedContext,
           )
-        : ((block.kind === "list" && Boolean(block.listItems?.length)) ||
+        : ((block.kind === "nav" && Boolean(block.navItems?.length)) || (block.kind === "list" && Boolean(block.listItems?.length)) ||
           (block.kind === "button" && Boolean(block.buttons?.length)) ||
           (block.kind === "gallery" && Boolean(block.galleryItems?.length)) ||
           (block.kind === "social" && Boolean(block.socialItems?.length)))
@@ -783,7 +800,7 @@ async function materializeBlocks(
     if (renderBlock !== block) changed = true;
     return renderBlock;
   }));
-  return changed ? renderBlocks : blocks;
+  return changed ? renderBlocks.flat() : blocks;
 }
 
 async function materializeSectionInstance(

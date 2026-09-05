@@ -32,6 +32,15 @@ export type DynamicContentQueryControl = {
 };
 
 export type DynamicBindingDestination =
+  | "type"
+  | "active"
+  | "backToTopLinkTitle"
+  | "backToTopHtmlId"
+  | "sublayoutHtmlId"
+  | "sublayoutClasses"
+  | "sublayoutAttributes"
+  | "backToTopClasses"
+  | "backToTopAttributes"
   | "headingText"
   | "body"
   | "eyebrow"
@@ -61,6 +70,15 @@ export type DynamicBindingDestinationCapability = {
 export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   Record<DynamicBindingDestination, DynamicBindingDestinationCapability>
 > = {
+  type: { label: "Item Type", acceptedTypes: ["string"] },
+  active: { label: "Active", acceptedTypes: ["string"] },
+  backToTopLinkTitle: { label: "Link Title", acceptedTypes: ["string"] },
+  backToTopHtmlId: { label: "ID", acceptedTypes: ["string", "identifier"] },
+  sublayoutHtmlId: { label: "ID", acceptedTypes: ["string", "identifier"] },
+  sublayoutClasses: { label: "Classes", acceptedTypes: ["string"] },
+  sublayoutAttributes: { label: "Attributes", acceptedTypes: ["string"] },
+  backToTopClasses: { label: "Classes", acceptedTypes: ["string"] },
+  backToTopAttributes: { label: "Attributes", acceptedTypes: ["string"] },
   headingText: { label: "Content", acceptedTypes: ["string", "richText"] },
   body: { label: "Content", acceptedTypes: ["string", "richText"] },
   eyebrow: { label: "Meta", acceptedTypes: ["string"] },
@@ -221,6 +239,11 @@ const WOOCOMMERCE_PRODUCT_SINGLE_QUERY_CONTROLS: readonly DynamicContentQueryCon
  */
 export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceCapability[] = [
   { key: "static", label: "None / Static" },
+  ...(["single", "collection"] as const).map(mode => ({
+    key: `wordpress-menu-${mode}`, label: mode === "single" ? "Menu Item" : "Custom Menu Items", provider: "wordpress", source: "menu-item", mode,
+    fields: [{ path: "title", label: "Title", valueType: "string" }, { path: "url", label: "URL", valueType: "url" }, { path: "type", label: "Type", valueType: "string" }, { path: "active", label: "Active", valueType: "string" }],
+    queryControls: [{ key: "menuId", label: "WordPress Menu ID", control: "text" }, { key: mode === "single" ? "itemId" : "parentId", label: mode === "single" ? "Menu Item ID" : "Parent Item ID", control: "text" }],
+  } satisfies DynamicContentSourceCapability)),
   {
     key: "wordpress-post-collection",
     label: "Posts",

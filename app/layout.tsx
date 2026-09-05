@@ -13,7 +13,6 @@ import HeaderShell from "../components/HeaderShell";
 import FooterShell from "../components/FooterShell";
 import SearchProvider from "../components/SearchProvider";
 import RecentlyViewedProvider from "../components/RecentlyViewedProvider";
-import ScrollToTopButton from "../components/ScrollToTopButton";
 import FrontendAdminBar from "../components/FrontendAdminBar";
 import ProductCategoryFilterProvider from "../components/ProductCategoryFilterProvider";
 import RootHeaderVisibility from "../components/RootHeaderVisibility";
@@ -403,7 +402,6 @@ ${explicitWordPressProductVars}
                             : undefined
                         }
                       />
-                      <ScrollToTopButton />
                       <MiniCart />
                     </>
                   )}

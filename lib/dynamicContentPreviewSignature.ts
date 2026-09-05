@@ -51,6 +51,14 @@ export function dynamicContentPreviewSignature(sections: BuilderSection[]) {
           metadata.push({ owner, kind: "gallery-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
         }
       });
+      const sublayout = block.sublayout as { rows?: Array<{ id?: string; dynamicContext?: unknown; columns: Array<{ id?: string; dynamicContext?: unknown; elements: unknown[] }> }> } | undefined;
+      sublayout?.rows?.forEach(row => {
+        metadata.push({ owner, id: row.id, dynamicContext: row.dynamicContext });
+        row.columns.forEach(column => {
+          metadata.push({ owner, id: column.id, dynamicContext: column.dynamicContext });
+          visitBlocks(column.elements, column.id ?? owner);
+        });
+      });
       const nestedLayout = block.nestedLayout as { rows?: Array<{ columns?: Array<{ blocks?: unknown[]; id?: string }> }> } | undefined;
       nestedLayout?.rows?.forEach((row) => row.columns?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? owner)));
     });

@@ -86,6 +86,7 @@ export function resolveContentSections(
       const localizedBlock = resolveContentEntity(block, language, primaryLanguage);
       return {
         ...localizedBlock,
+        sublayout: localizedBlock.sublayout ? { ...localizedBlock.sublayout, rows: localizedBlock.sublayout.rows.map(row => ({ ...row, columns: row.columns.map(column => ({ ...column, elements: column.elements.map(resolveBlock) })) })) } : undefined,
         slides: localizedBlock.slides?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
         badges: localizedBlock.badges?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
         gridItems: localizedBlock.gridItems?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),

@@ -1170,6 +1170,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "nav") return { id, kind, navItems: [{ id: `${id}-nav-1`, label: "Link", url: "#" }], navStyle: "default", navColumns: 1, navShowImage: true, navShowMeta: true };
+
   if (kind === "social") {
     return {
       id,
@@ -1189,6 +1191,13 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       socialImageSvgInline: true,
       socialLinkTarget: "_self",
     };
+  }
+
+  if (kind === "backToTop") {
+    return { id, kind, spacingContract: "yootheme", elementPadding: "none", backToTop: { title: "", columnGap: "small", rowGap: "small", floatingButton: false }, visualStyle: { layout: { marginMode: "default" } } };
+  }
+  if (kind === "sublayout") {
+    return { id, kind, spacingContract: "yootheme", elementPadding: "none", sublayout: { rows: [] }, visualStyle: { layout: { marginMode: "default" } } };
   }
 
   if (kind === "list") {

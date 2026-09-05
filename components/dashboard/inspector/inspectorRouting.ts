@@ -18,6 +18,9 @@ import DividerCapabilityPanel from "@/components/dashboard/inspector/panels/Divi
 import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
 import IconCapabilityPanel from "@/components/dashboard/inspector/panels/IconCapabilityPanel";
 import SocialCapabilityPanel from "@/components/dashboard/inspector/panels/SocialCapabilityPanel";
+import NavCapabilityPanel from "@/components/dashboard/inspector/panels/NavCapabilityPanel";
+import BackToTopCapabilityPanel from "@/components/dashboard/inspector/panels/BackToTopCapabilityPanel";
+import SublayoutCapabilityPanel from "@/components/dashboard/inspector/panels/SublayoutCapabilityPanel";
 import GridCapabilityPanel from "@/components/dashboard/inspector/panels/GridCapabilityPanel";
 import { HeroCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
 import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
@@ -34,6 +37,9 @@ import CartCapabilityPanel from "@/components/dashboard/inspector/panels/CartCap
 
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
+  "backToTop",
+  "sublayout",
+  "nav",
   "button", "panel", "heading", "text", "list", "accordion", "image",
   "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "social", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker", "overlay",
 ] as const satisfies readonly LayoutBlockKind[];
@@ -290,6 +296,23 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
       image: { label: "Image", destination: "imageUrl" },
     },
     dynamicSourceSurface: "item",
+  },
+  nav: { capabilities: ["content", "style", "advanced"], composes: ["content", "repeatable-items", "general", "animation"], settingsSources: ["style"], panel: NavCapabilityPanel, dynamicSourceSurface: "item" },
+  sublayout: {
+    dynamicSourceSurface: "element",
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: SublayoutCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  backToTop: {
+    dynamicSourceSurface: "element",
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: BackToTopCapabilityPanel,
+    settingsLabel: "Settings",
   },
   badgeGrid: {
     capabilities: ["content", "style", "advanced"],

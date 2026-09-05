@@ -1,3 +1,6 @@
+import { BACK_TO_TOP_SOURCE_FIELDS } from "@/lib/backToTopContract";
+import { normalizeMenuDropdown } from "@/lib/menuDropdownLayout";
+import { duplicateSublayoutNode } from "@/lib/builderSublayout";
 import type {
   BuilderColumn,
   BuilderLayoutBlock,
@@ -66,8 +69,11 @@ export type YoothemeImportElementKind =
   | "alert"
   | "icon"
   | "social"
+  | "backToTop"
+  | "sublayout"
   | "list"
   | "subnav"
+  | "nav"
   | "accordion"
   | "table"
   | "gallery"
@@ -152,9 +158,13 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   icon: "icon",
   social: "social",
   social_item: "social",
+  totop: "backToTop",
+  fragment: "sublayout",
   list: "list",
   list_item: "list",
   subnav: "subnav",
+  nav: "nav",
+  nav_item: "nav",
   subnav_item: "subnav",
   accordion: "accordion",
   accordion_item: "accordion",
@@ -233,6 +243,7 @@ const asText = (value: unknown): string | null => {
 
 /** YOOtheme treats unitless General position values as pixels. */
 const sourcePositionValue = (value: unknown): string | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) return `${value}px`;
   const normalized = asString(value);
   if (!normalized) return undefined;
   return /^-?\d+(?:\.\d+)?$/.test(normalized)
@@ -982,6 +993,17 @@ const sourceGridFilterControls = (
 };
 
 type DynamicImportDestination =
+  | "videoUrl"
+  | "headingText"
+  | "type"
+  | "active"
+  | "backToTopHtmlId"
+  | "sublayoutHtmlId"
+  | "sublayoutClasses"
+  | "sublayoutAttributes"
+  | "backToTopClasses"
+  | "backToTopAttributes"
+  | "backToTopLinkTitle"
   | "title"
   | "meta"
   | "text"
@@ -1039,7 +1061,7 @@ const dynamicBinding = (
   allowUnregistered = false,
 ) => {
   const fallbackValueType: DynamicContentValueType =
-    destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
+    destination === "videoUrl" || destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
       ? "url"
       : destination === "text" || destination === "body" || destination === "content"
         ? "richText"
@@ -1254,6 +1276,7 @@ const mapDynamicSource = (
     : undefined;
   const supportsWordPressPostQuery = ["posts.customPosts", "posts.archivePost", "posts.archivePostSingle"]
     .includes(String(queryName ?? ""));
+  const menuQuery = queryName === "customMenuItem" || queryName === "customMenuItems";
   const discoverableWordPressRoot = typeof queryName === "string" &&
     /^[_A-Za-z][_0-9A-Za-z]*\.[_A-Za-z][_0-9A-Za-z]*$/.test(queryName) &&
     !queryName.startsWith("posts.");
@@ -1266,7 +1289,7 @@ const mapDynamicSource = (
     : null;
   const inheritedRelationRoot = inheritedFieldRecord ? asString(inheritedFieldRecord.name) : null;
   const discoverableParentRelation = Boolean(inheritedRelationRoot && /^[_A-Za-z][_0-9A-Za-z]*$/.test(inheritedRelationRoot));
-  if (!supportsWordPressPostQuery && !discoverableWordPressRoot && !inheritedParent) {
+  if (!supportsWordPressPostQuery && !discoverableWordPressRoot && !inheritedParent && !menuQuery) {
     warnings.push(`${sourcePath}: DYNAMIC CONTENT PROVIDER UNRESOLVED (source/query). Canonical template and source bindings were retained; provider data was not materialized.`);
   }
   const queryData = supportsWordPressPostQuery
@@ -1321,8 +1344,14 @@ const mapDynamicSource = (
   }
   return {
     hasSource: true,
-    supported: supportsWordPressPostQuery || discoverableWordPressRoot || inheritedParent,
-    context: projectImportedDynamicContentProvider(supportsWordPressPostQuery
+    supported: supportsWordPressPostQuery || discoverableWordPressRoot || inheritedParent || menuQuery,
+    context: projectImportedDynamicContentProvider(menuQuery
+      ? { provider: "wordpress", source: "menu-item", mode: queryName === "customMenuItem" ? "single" : "collection", query: {
+          sourceQuery: query as DynamicContentData,
+          menuId: String(((query as Record<string, unknown>).arguments as Record<string, unknown>)?.[queryName === "customMenuItem" ? "menu" : "id"] ?? ""),
+          [queryName === "customMenuItem" ? "itemId" : "parentId"]: String(((query as Record<string, unknown>).arguments as Record<string, unknown>)?.[queryName === "customMenuItem" ? "id" : "parent"] ?? ""),
+        } }
+      : supportsWordPressPostQuery
       ? {
           provider: "wordpress",
           source: "post",
@@ -1452,6 +1481,7 @@ const sourceGridItem = (
     id: sourcePathId(path, "grid-item"),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
+    videoUrl: resolveYoothemeAssetUrl(itemProps.video),
     // Both source fields are authored as rich HTML in the DevStack fixtures.
     // Normalize them at the same safe boundary used by the WebPages rich editor.
     title: sanitizeHtml(asString(props.title) ?? ""),
@@ -1507,6 +1537,7 @@ const sourceSliderItem = (
       image: "imageUrl",
       image_alt: "imageAlt",
       video_hover: "hoverVideoUrl",
+      video: "videoUrl",
       hover_video: "hoverVideoUrl",
       link_text: "buttonLabel",
       link: "buttonUrl",
@@ -1827,7 +1858,33 @@ const mapStaticElement = (
   const type = asString(node.type);
   if (!type) return null;
 
+  if (type === "fragment") {
+    const dynamic = mapDynamicSource(node, { id: "sublayoutHtmlId", class: "sublayoutClasses", attributes: "sublayoutAttributes" }, warnings, path);
+    // YOOtheme BuilderFragment appends rows directly to the fragment node.
+    // Also tolerate older adapters carrying a decoded/serialized content tree.
+    let content: unknown = props.content;
+    if (typeof content === "string" && content.trim()) {
+      try { content = JSON.parse(content); } catch { warnings.push(`${path}.content: Invalid Sublayout JSON; nested content could not be imported.`); }
+    }
+    const directChildren = sourceChildren(node);
+    const children = directChildren.length ? directChildren : Array.isArray(content) ? content : content && typeof content === "object" ? sourceChildren(content as YoothemeSourceNode) : [];
+    const rows = (children as YoothemeSourceNode[]).filter(child => child.type === "row").map((row, ri) => {
+      const rowId = sourcePathId(`${path}.fragment.${ri}`, "row");
+      const columns = sourceChildren(row).filter(child => child.type === "column").map((column, ci) => sourceBuilderColumn(column, `${rowId}-column-${ci}`, sourceChildren(column).map((child, ei) => mapStaticElement(child, `${path}.fragment.${ri}.${ci}.${ei}`, warnings)).filter((child): child is BuilderLayoutBlock => Boolean(child))));
+      return sourceBuilderRow(row, rowId, ri, columns);
+    });
+    const allowedTags = ["div", "address", "article", "aside", "footer", "header", "hgroup", "nav", "section"];
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "fragment"), kind: "sublayout", spacingContract: "yootheme", elementPadding: "none",
+      title: asString(props.name) ?? undefined, dynamicContext: dynamic.context, dynamicBindings: dynamic.bindings,
+      sublayoutHtmlId: asString(props.id) ?? "", sublayoutClasses: asString(props.class) ?? "", sublayoutAttributes: asString(props.attributes) ?? "",
+      sublayout: { rows, htmlElement: (allowedTags.includes(String(props.html_element)) ? props.html_element : "div") as NonNullable<BuilderLayoutBlock["sublayout"]>["htmlElement"], disabled: props.status === "disabled" },
+      ...(props.animation === "none" ? { animation: { preset: "none" as const } } : {}),
+    }, { margin: "default", ...props }, { preserveLegacyAlignmentAliases: false, preserveLegacyBlockAlignmentAlias: false });
+  }
+
   if (type === "headline") {
+    const dynamic = mapDynamicSource(node, { content: "headingText", link: "buttonUrl" }, warnings, path);
     const level = sourceHeadingLevel(props.title_element);
     if (props.title_element && !level) {
       warnings.push(`${path}.title_element: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — semantic level '${String(props.title_element)}' has no canonical WebPages heading control.`);
@@ -1835,6 +1892,8 @@ const mapStaticElement = (
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "heading"),
       kind: "heading",
+      dynamicContext: dynamic.context,
+      dynamicBindings: dynamic.bindings,
       headingText: asString(props.content) ?? "",
       title: asString(props.content) ?? "",
       headingLevel: level ?? "h2",
@@ -2396,6 +2455,37 @@ const mapStaticElement = (
     }, props);
   }
 
+  if (type === "totop") {
+    const dynamic = mapDynamicSource(node, { link_title: "backToTopLinkTitle", id: "backToTopHtmlId", class: "backToTopClasses", attributes: "backToTopAttributes" }, warnings, path);
+    type Settings = NonNullable<BuilderLayoutBlock["backToTop"]>;
+    const gap = (value: unknown): Settings["columnGap"] => value === "" || value === "medium" || value === "large" || value === "collapse" ? value : "small";
+    warnUnsupported(path, props, [...BACK_TO_TOP_SOURCE_FIELDS], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "totop"),
+      kind: "backToTop",
+      ...(props.animation === "none" ? { animation: { preset: "none" as const } } : {}),
+      dynamicContext: dynamic.context,
+      dynamicBindings: dynamic.bindings,
+      backToTopLinkTitle: asString(props.link_title) ?? "",
+      backToTopHtmlId: asString(props.id) ?? "",
+      backToTopClasses: asString(props.class) ?? "",
+      backToTopAttributes: asString(props.attributes) ?? "",
+      title: asString(props.name) ?? undefined,
+      backToTop: {
+        name: asString(props.name) ?? "",
+        disabled: props.status === "disabled",
+        htmlId: asString(props.id) ?? "",
+        title: asString(props.title) ?? "",
+        linkTitle: asString(props.link_title) ?? "",
+        titleStyle: props.title_style === "small" || props.title_style === "meta" ? props.title_style : "",
+        columnGap: gap(props.title_grid_column_gap),
+        rowGap: gap(props.title_grid_row_gap),
+        breakpoint: ["s", "m", "l", "xl"].includes(String(props.title_grid_breakpoint)) ? props.title_grid_breakpoint as Settings["breakpoint"] : "",
+        floatingButton: false,
+      },
+    }, { margin: "default", ...props }, { preserveLegacyAlignmentAliases: false, preserveLegacyBlockAlignmentAlias: false });
+  }
+
   if (type === "social") {
     const socialItems = sourceChildren(node)
       .filter((child) => child.type === "social_item")
@@ -2529,6 +2619,24 @@ const mapStaticElement = (
       listIconSize: Number.isFinite(Number(props.icon_width)) ? Number(props.icon_width) : undefined,
       listLinkStyle: asString(props.link_style) ?? "default",
     }, props);
+  }
+
+  if (type === "nav") {
+    const items = sourceChildren(node).filter(child => child.type === "nav_item").map((child, index) => {
+      const item = sourceProps(child);
+      const dynamic = mapDynamicSource(child, { content: "label", link: "url", type: "type", active: "active", meta: "meta", image: "imageUrl" }, warnings, `${path}.${index}`);
+      return { id: sourcePathId(`${path}.${index}`, "nav-item"), label: sanitizeHtml(asString(item.content) ?? ""), url: asString(item.link) ?? undefined,
+        type: item.type === "header" || item.type === "divider" ? item.type : "link", target: item.link_target === "blank" ? "_blank" : "_self",
+        meta: asString(item.meta) ?? undefined, imageUrl: asString(item.image) ?? undefined,
+        dynamicContext: dynamic.context, dynamicBindings: dynamic.bindings };
+    });
+    warnUnsupported(path, props, ["grid", "image_vertical_align", "nav_style", "show_image", "show_meta", "margin", "margin_remove_top", "margin_remove_bottom", ...GENERAL_POSITION_KEYS], warnings);
+    return withSourceGeneralVisualStyle({ id: sourcePathId(path, "nav"), kind: "nav", spacingContract: "yootheme", navItems: items,
+      navStyle: props.nav_style === "primary" || props.nav_style === "secondary" ? props.nav_style : "default",
+      navColumns: Math.max(1, Number(props.grid) || 1), navShowImage: props.show_image !== false, navShowMeta: props.show_meta !== false,
+      navImageVerticalAlign: props.image_vertical_align === true,
+      ...(sourceMargin(props.margin) ? { margin: sourceMargin(props.margin) } : {}),
+    } as BuilderLayoutBlock, props);
   }
 
   if (type === "subnav") {
@@ -2805,6 +2913,10 @@ const mapStaticElement = (
       reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings);
     }
     warnUnsupported(path, props, [
+      "image_width", "image_height", "text_align",
+      ...(props.nav === "" || props.nav === false ? ["nav_align", "thumbnav_svg_color"] : []),
+      ...(props.slidenav !== "outside" ? ["slidenav_outside_breakpoint"] : []),
+      ...(props.title_hover_style === "reset" ? ["title_hover_style"] : []),
       "show_title", "show_meta", "show_content", "show_link", "link", "link_target", "link_text", "link_style", "link_size", "link_fullwidth", "link_margin", "margin",
       "slideshow_height", "slideshow_height_viewport", "slideshow_ratio", "slideshow_min_height", "slideshow_max_height", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
       "nav", "nav_below", "nav_hover", "nav_vertical", "nav_position", "nav_position_margin", "nav_breakpoint", "show_thumbnail", "thumbnav_width", "thumbnav_height", "thumbnav_wrap", "thumbnav_nowrap", "slidenav", "slidenav_hover", "slidenav_large", "slidenav_margin", "slidenav_breakpoint", "text_color",
@@ -2819,9 +2931,13 @@ const mapStaticElement = (
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "slideshow"),
       kind: "slideshow",
+      spacingContract: "yootheme",
       slides,
       carouselSettings: {
         presentation: "slideshow",
+        imageWidth: asString(props.image_width) ?? undefined,
+        imageHeight: asString(props.image_height) ?? undefined,
+        contentAlign: sourceAlignment(props.text_align),
         // Presentation remains a hero-style slideshow without inheriting the
         // generic WebPages Hero carousel's synthetic min-height defaults.
         variant: "slideshow",
@@ -3426,6 +3542,18 @@ const sourceBuilderRow = (
 export const mapYoothemeStaticContent = (
   source: unknown,
 ): YoothemeStaticImportMapping => {
+  if (source && typeof source === "object" && "format" in source && source.format === "webpages.menu-dropdown") {
+    const packet = source as { version?: unknown; content?: unknown };
+    const content = packet.version === 1 ? normalizeMenuDropdown(packet.content) : undefined;
+    if (!content) throw new Error("Invalid dropdown JSON.");
+    const report = createYoothemePageImportReport({ type: "layout" });
+    return { sections: [{ id: crypto.randomUUID(), kind: "contentLayout", title: "Dropdown", visible: true, background: "default", rows: [{ id: crypto.randomUUID(), layout: "1-col", columns: [{ id: crypto.randomUUID(), elements: [duplicateSublayoutNode(content)] }] }] } as BuilderSection], warnings: [], reportWarnings: [], report, globalStylePatch: {}, headerDocumentPatch: {} };
+  }
+  // A menu/Sublayout export is a fragment, not a separate import format.
+  // Adapt its root once, then use the page importer's normal row/element path.
+  if (source && typeof source === "object" && "type" in source && source.type === "fragment") {
+    return mapYoothemeStaticContent({ type: "layout", children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [source] }] }] }] });
+  }
   const root =
     typeof source === "object" && source !== null
       ? (source as YoothemeSourceNode)

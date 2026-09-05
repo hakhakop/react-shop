@@ -1,4 +1,7 @@
 
+import { BACK_TO_TOP_SOURCE_FIELDS } from "@/lib/backToTopContract";
+import { SUBLAYOUT_SOURCE_FIELDS } from "@/lib/sublayoutContract";
+
 /**
  * Durable Phase 12 source of truth for synchronized YOOtheme fixtures and
  * field-level compatibility semantics. It deliberately does not participate
@@ -154,6 +157,15 @@ function strictBaselineForFixture(id: string): YoothemeFixtureStrictBaseline | n
 }
 
 export const YOOTHEME_FIXTURE_REGISTRY: readonly YoothemeFixtureRecord[] = [
+  {
+    ...fixture("back-to-top", "Audited YOOtheme To Top", "4cbcfdcb469c6218e9c3d10349c28a08544dff5368eddb676a1dd42cc1115fc5", ["Back To Top", "General", "Dynamic Content"], [
+      { path: "tests/yootheme-back-to-top.spec.ts", capabilityKeys: BACK_TO_TOP_SOURCE_FIELDS.map(field => `totop.${field}`) },
+      { path: "tests/yootheme-back-to-top-browser.spec.ts", capabilityKeys: ["totop.title", "totop.link_title", "totop.title_grid_breakpoint"] },
+    ], "PARTIAL", "Synthetic fixture using the authenticated original schema. Not a full exported-page fidelity certification.", undefined, null),
+    lastVerifiedAt: "2026-09-05",
+    lastVerifiedVersion: "To Top import and component acceptance",
+    referenceViewports: [{ width: 1280, height: 800 }, { width: 600, height: 800 }],
+  },
   fixture(
     "devstack-import",
     "DevStack _import.less",
@@ -254,6 +266,32 @@ const YoothemeLessCapabilityRecords: readonly YoothemeSemanticCapabilityRecord[]
 );
 
 export const YOOTHEME_SEMANTIC_CAPABILITY_REGISTRY: readonly YoothemeSemanticCapabilityRecord[] = [
+  ...["nav", "nav_item"].flatMap(sourceType => (sourceType === "nav" ? ["grid", "nav_style", "show_image", "show_meta", "image_vertical_align", "margin", "margin_remove_top", "margin_remove_bottom"] : ["content", "link", "type", "active", "meta", "image", "link_target"]).map(sourceField => supported({
+    key: `${sourceType}.${sourceField}`, sourceType, sourceField,
+    semanticMeaning: `Navigation ${sourceField}`, capabilityFamily: "Nav",
+    canonicalOwner: "BuilderLayoutBlock.navItems / navStyle / navColumns", normalizer: "mapYoothemeStaticContent",
+    persistedDestination: "BuilderLayoutBlock Nav properties", inspectorLocation: "Nav › Content / Settings",
+    runtimeConsumer: "UikitNav and shared repeatable dynamic materializer",
+    statusReason: "Mapped and tested with the Women menu fragment; not a certification of all YOOtheme Nav variants.", fixtureIds: [],
+  }))),
+  ...SUBLAYOUT_SOURCE_FIELDS.map(sourceField => supported({
+    key: `fragment.${sourceField}`, sourceType: "fragment", sourceField,
+    semanticMeaning: `YOOtheme Sublayout ${sourceField}`, capabilityFamily: "Sublayout",
+    canonicalOwner: "BuilderLayoutBlock.sublayout and canonical rows/columns",
+    normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.sublayout / visualStyle / dynamicBindings",
+    inspectorLocation: "Sublayout › Content / Settings / Advanced",
+    runtimeConsumer: "ContentLayoutSection nested renderer and dynamic materializer",
+    statusReason: "Source schema and nested builder implementation audited; representative import and browser tests, not exhaustive full-site parity certification.", fixtureIds: [],
+  })),
+  ...BACK_TO_TOP_SOURCE_FIELDS.map(sourceField => supported({
+    key: `totop.${sourceField}`, sourceType: "totop", sourceField,
+    semanticMeaning: `YOOtheme To Top ${sourceField}`,
+    capabilityFamily: "Back To Top", canonicalOwner: "BackToTop contract and canonical visual style",
+    normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.backToTop / visualStyle / dynamicBindings",
+    inspectorLocation: "Back To Top › Content / Settings / Advanced",
+    runtimeConsumer: "UikitBackToTop + shared element shell + dynamic materializer",
+    statusReason: "Mapped from the authenticated source schema; targeted tests do not certify every exported-page combination.", fixtureIds: ["back-to-top"],
+  })),
   ...YoothemeLessCapabilityRecords,
   {
     key: "element.animation",

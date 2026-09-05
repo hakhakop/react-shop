@@ -1212,12 +1212,6 @@ a {
   pointer-events: none;
 }
 
-.scroll-to-top-button {
-  position: fixed;
-  right: 22px;
-  z-index: 1080;
-}
-
 .cart-element-floating {
   position: fixed;
   bottom: 22px;
@@ -1267,10 +1261,6 @@ a {
 .cart-element-summary-total {
   color: #e2e8f0;
   font-weight: 600;
-}
-
-.scroll-to-top-button {
-  bottom: 84px;
 }
 
 .frontend-admin-bar {
@@ -1379,10 +1369,6 @@ a {
     border-radius: 18px;
   }
 
-  .scroll-to-top-button {
-    right: 10px;
-  }
-
   .cart-element-floating--bottom-right {
     right: 10px;
   }
@@ -1393,10 +1379,6 @@ a {
 
   .cart-element-floating {
     bottom: 16px;
-  }
-
-  .scroll-to-top-button {
-    bottom: 76px;
   }
 
   .frontend-admin-bar {

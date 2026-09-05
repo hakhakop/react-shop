@@ -1525,6 +1525,18 @@ html.dark .site-header {
   transform: scaleX(1);
 }
 
+.site-header-nav-submenu.site-header-nav-submenu--builder,
+.site-header .header-builder-element--navigation
+  .site-header-nav-submenu.site-header-nav-submenu--builder:not(.site-header-nav-submenu--grid):not(.site-header-nav-submenu--mega) {
+  width: min(960px, calc(100vw - 32px));
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - var(--header-height, 96px) - 24px);
+  overflow: auto;
+}
+
+.site-header-nav-submenu--builder .shop-builder-sublayout { min-width: 0; text-align: start; }
+
 .site-header-nav-submenu {
   position: absolute;
   top: 100%;

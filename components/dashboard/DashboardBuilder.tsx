@@ -1,4 +1,5 @@
 "use client";
+import { duplicateSublayoutNode } from "@/lib/builderSublayout";
 
 import {
   ArrowLeft,
@@ -148,6 +149,7 @@ import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitSocial from "@/components/builder/UikitSocial";
+import UikitBackToTop from "@/components/builder/UikitBackToTop";
 import UikitImage from "@/components/builder/UikitImage";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
 import {
@@ -403,6 +405,7 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import { normalizeMenuDropdown, type MenuDropdownContent } from "@/lib/menuDropdownLayout";
 import {
   defaultBuilderThemeSettings,
   type BuilderThemeSettings,
@@ -2780,6 +2783,17 @@ export default function DashboardBuilder({
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [inspectorRendered, setInspectorRendered] = useState(false);
   const [elementLibraryOpen, setElementLibraryOpen] = useState(false);
+  const [embeddedInspectorActive, setEmbeddedInspectorActive] = useState(false);
+  const [embeddedInspectorTarget, setEmbeddedInspectorTarget] = useState<HTMLDivElement | null>(null);
+  const embeddedInsertRef = useRef<((kind: NonNullable<BuilderLayoutBlock["kind"]>) => void) | null>(null);
+  const embeddedImportRef = useRef<((content: MenuDropdownContent) => void) | null>(null);
+  const releaseEmbeddedInspector = useCallback(() => {
+    setEmbeddedInspectorActive(false);
+    setInspectorOpen(false);
+    setElementLibraryOpen(false);
+    embeddedInsertRef.current = null;
+    embeddedImportRef.current = null;
+  }, []);
   const [elementLibraryTarget, setElementLibraryTarget] =
     useState<BuilderElementInsertionTarget | null>(null);
   const previousInspectorOpenRef = useRef(false);
@@ -2955,6 +2969,8 @@ export default function DashboardBuilder({
   );
   const [yoothemeImportWarnings, setYoothemeImportWarnings] = useState<string[]>([]);
   const [yoothemeImportPreview, setYoothemeImportPreview] = useState<{
+    applyBlocked?: boolean;
+    targetDropdown?: boolean;
     fileName: string;
     targetPage: BuilderLayoutKey;
     documentName?: string;
@@ -5551,6 +5567,7 @@ export default function DashboardBuilder({
   };
 
   const closeElementLibrary = (restoreInspector = true) => {
+    embeddedInsertRef.current = null;
     setElementLibraryOpen(false);
     if (restoreInspector && (previousInspectorOpenRef.current || elementLibraryTarget)) {
       setInspectorOpen(true);
@@ -6895,7 +6912,7 @@ export default function DashboardBuilder({
         if (blockIndex < 0 || !block) return section;
 
         blocks.splice(blockIndex + 1, 0, {
-          ...block,
+          ...(block.kind === "sublayout" ? duplicateSublayoutNode(block) : block),
           id: createBlockId(block.kind ?? "text"),
         });
         return updateLayoutColumn(section, columnKey, (column) => ({
@@ -9292,6 +9309,7 @@ export default function DashboardBuilder({
   const cloneTemplateBlock = (
     block: BuilderLayoutBlock,
   ): BuilderLayoutBlock => {
+    if (block.kind === "sublayout") return duplicateSublayoutNode(block);
     const nextBlock = JSON.parse(JSON.stringify(block)) as BuilderLayoutBlock;
     return {
       ...nextBlock,
@@ -10383,7 +10401,10 @@ export default function DashboardBuilder({
   const importYoothemePage = async (
     file: File,
     targetType?: LayoutLibraryType,
+    _title?: string,
+    applyDropdown?: (content: MenuDropdownContent) => void,
   ) => {
+    embeddedImportRef.current = applyDropdown ?? null;
     const targetPage: BuilderLayoutKey =
       targetType === "header" || targetType === "footer"
         ? targetType
@@ -10402,6 +10423,8 @@ export default function DashboardBuilder({
         mapping.sections,
         wordpressMediaOrigin,
       );
+      const dropdown = applyDropdown ? normalizeMenuDropdown(tenantMappedSections[0]?.rows?.[0]?.columns[0]?.elements[0]) : undefined;
+      const dropdownIssues = applyDropdown ? dropdown ? mapping.warnings : ["Choose the JSON exported from the dropdown builder, not a full page."] : [];
 
       if (!mapping.sections.length && !Object.keys(mapping.globalStylePatch).length && !Object.keys(mapping.headerDocumentPatch).length) {
         setTemplateStatus("YOOtheme import failed: no supported sections");
@@ -10409,6 +10432,8 @@ export default function DashboardBuilder({
       }
 
       setYoothemeImportPreview({
+        applyBlocked: Boolean(applyDropdown && dropdownIssues.length),
+        targetDropdown: Boolean(applyDropdown),
         fileName: file.name,
         targetPage,
         documentName: targetPage === "footer" || targetPage === "header"
@@ -10417,7 +10442,7 @@ export default function DashboardBuilder({
         sections: tenantMappedSections,
         // Keep the existing string[] preview contract, but derive it from the
         // canonical Phase 12 report rather than raw importer warning strings.
-        warnings: mapping.reportWarnings,
+        warnings: [...new Set([...mapping.reportWarnings, ...dropdownIssues])],
         globalStylePatch: mapping.globalStylePatch,
         headerDocumentPatch: mapping.headerDocumentPatch,
       });
@@ -10428,6 +10453,7 @@ export default function DashboardBuilder({
   };
 
   const cancelYoothemeImport = () => {
+    embeddedImportRef.current = null;
     setYoothemeImportPreview(null);
     setTemplateStatus("YOOtheme import cancelled");
   };
@@ -10519,6 +10545,22 @@ export default function DashboardBuilder({
 
   const applyYoothemeImport = () => {
     if (!yoothemeImportPreview) return;
+    if (yoothemeImportPreview.applyBlocked) return;
+    if (yoothemeImportPreview.targetDropdown) {
+      if (!embeddedImportRef.current) {
+        setTemplateStatus("The dropdown editor was closed. Reopen its Import JSON action; nothing was changed.");
+        return;
+      }
+      const content = normalizeMenuDropdown(yoothemeImportPreview.sections[0]?.rows?.[0]?.columns[0]?.elements[0]);
+      if (!content) { setTemplateStatus("Choose a dropdown fragment export. The menu and page were not changed."); return; }
+      const apply = embeddedImportRef.current;
+      embeddedImportRef.current = null;
+      apply(content);
+      setYoothemeImportWarnings(yoothemeImportPreview.warnings);
+      setYoothemeImportPreview(null);
+      setTemplateStatus("Dropdown imported; menu changes autosave");
+      return;
+    }
 
     // A full YOOtheme site export can contain canonical Header/Navbar settings
     // without a page `layout` root. Apply Global Styles and the Header document
@@ -11053,7 +11095,7 @@ export default function DashboardBuilder({
     </DynamicContentCapabilitiesProvider>
   );
 
-  const canvasElementLibraryOpen = elementLibraryOpen && Boolean(elementLibraryTarget);
+  const canvasElementLibraryOpen = elementLibraryOpen && (Boolean(elementLibraryTarget) || Boolean(embeddedInsertRef.current));
 
   const activeDocumentKindLabel = builderState.page === "footer"
     ? "Footer"
@@ -12862,6 +12904,14 @@ export default function DashboardBuilder({
       <style data-builder-dashboard-tenant-tokens>{dashboardTenantTokensCss}</style>
       <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
+        embeddedBuilderHost={{
+          inspectorTarget: embeddedInspectorTarget,
+          showInspector: () => { setEmbeddedInspectorActive(true); setInspectorOpen(true); },
+          releaseInspector: releaseEmbeddedInspector,
+          openElements: insert => { embeddedInsertRef.current = insert; setElementLibraryTarget(null); setInspectorOpen(false); setElementLibraryOpen(true); },
+          importJson: (file, apply) => { void importYoothemePage(file, undefined, undefined, apply); },
+        }}
+        openWordPressMediaPicker={openWordPressMediaPicker}
         websiteId={websiteId}
         templateCreationContext={templateCreationContext}
         builderEditorContext={builderEditorContext}
@@ -13702,7 +13752,7 @@ export default function DashboardBuilder({
         ) : null}
       </main>
 
-      {(elementLibraryOpen && !canvasElementLibraryOpen || inspectorOpen || inspectorRendered) && selectedSection ? (
+      {(elementLibraryOpen && !canvasElementLibraryOpen || inspectorOpen || inspectorRendered) && (selectedSection || embeddedInspectorActive) ? (
         <div
           ref={inspectorPanelRef}
           className={`builder-floating-inspector is-${effectiveInspectorMode}${
@@ -13808,7 +13858,7 @@ export default function DashboardBuilder({
               onLostPointerCapture={stopInspectorResize}
             />
           ) : null}
-          {!elementLibraryOpen ? inspectorPanel : null}
+          {!elementLibraryOpen ? embeddedInspectorActive ? <div ref={setEmbeddedInspectorTarget} className="builder-inspector builder-panel is-open" /> : inspectorPanel : null}
           {elementLibraryOpen && !canvasElementLibraryOpen ? (
             <div className="builder-inspector builder-panel is-open">
               <ElementLibrary
@@ -13870,8 +13920,16 @@ export default function DashboardBuilder({
                 </div>
                 <div className="builder-element-library-modal-body">
                   <ElementLibrary
-                    availableLayoutBlockKinds={availableLayoutBlockKinds}
+                    availableLayoutBlockKinds={embeddedInsertRef.current ? getLayoutBlockKindsForState() : availableLayoutBlockKinds}
                     onAddElement={(kind) => {
+                      if (embeddedInsertRef.current) {
+                        const insert = embeddedInsertRef.current;
+                        closeElementLibrary(false);
+                        insert(kind);
+                        setEmbeddedInspectorActive(true);
+                        setInspectorOpen(true);
+                        return;
+                      }
                       const target = elementLibraryTarget;
                       addElementFromLibrary(
                         kind,
@@ -13884,7 +13942,7 @@ export default function DashboardBuilder({
                       setInspectorOpen(true);
                     }}
                     onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
-                    headerMode={builderState.page === "header"}
+                    headerMode={builderState.page === "header" && !embeddedInsertRef.current}
                   />
                 </div>
               </div>
@@ -18959,6 +19017,7 @@ const PreviewSection = memo(function PreviewSection({
                         />
                       <div
                         id={blockKey}
+                        hidden={(block.kind === "backToTop" && block.backToTop?.disabled) || (block.kind === "sublayout" && block.sublayout?.disabled)}
                         data-builder-object-type="block"
                         data-builder-section-id={section.id}
                         data-builder-column-key={columnKey}
@@ -19027,6 +19086,7 @@ const PreviewSection = memo(function PreviewSection({
                             ...getGeneralElementShellStyle(block),
                             ...getContentPositioningGroupChildStyle(block, blocks),
                             ...blockAnimationAttrs.style,
+                            ...((block.kind === "backToTop" && block.backToTop?.disabled) || (block.kind === "sublayout" && block.sublayout?.disabled) ? { display: "none" } : {}),
                           } as CSSProperties
                         }
                         {...blockAnimationAttrs.data}
@@ -19201,6 +19261,10 @@ const PreviewSection = memo(function PreviewSection({
                           <UikitIcon block={block} />
                         ) : block.kind === "social" ? (
                           <UikitSocial block={block} />
+                        ) : block.kind === "backToTop" ? (
+                          <UikitBackToTop block={block} />
+                        ) : block.kind === "sublayout" ? (
+                          <ContentLayoutBlock block={block} breadcrumbItems={[]} shellSettings={shellSettings} />
                         ) : block.kind === "list" ? (
                           <UikitList block={block} />
                         ) : block.kind === "subnav" ? (

@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { normalizeMenuDropdown, type MenuDropdownContent } from "@/lib/menuDropdownLayout";
 import { resolveHeaderBehavior, type HeaderBehavior } from "@/lib/headerBehavior";
 import {
   normalizeHeaderCustomHeight,
@@ -51,6 +52,7 @@ export type BuilderMenuPresentation = {
 export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>;
 
 export type ReactMenuItem = {
+  dropdownContent?: MenuDropdownContent;
   id: string;
   label: string;
   url: string;
@@ -1673,6 +1675,7 @@ function normalizeMenuItems(
         target: raw.target === "_blank" ? "_blank" : "_self",
         visibility,
         portableKey: typeof raw.portableKey === "string" ? raw.portableKey.trim() || undefined : undefined,
+        dropdownContent: normalizeMenuDropdown(raw.dropdownContent),
         navigationTarget:
           raw.navigationTarget && typeof raw.navigationTarget === "object" && !Array.isArray(raw.navigationTarget)
             ? raw.navigationTarget as ReactMenuItem["navigationTarget"]

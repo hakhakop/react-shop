@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useState, useMemo } from "react";
+import MenuDropdownBuilder from "./MenuDropdownBuilder";
+import type { InspectorPanelContext } from "./inspector/inspectorRouting";
 import {
   ArrowUp,
   ArrowDown,
@@ -33,6 +35,9 @@ import {
 } from "@/lib/navigationPackage";
 
 type ReactMenuEditorPanelProps = {
+  embeddedBuilderHost: import("./EmbeddedBuilderHost").EmbeddedBuilderHost;
+  shellSettings: InspectorPanelContext["shellSettings"];
+  openWordPressMediaPicker: InspectorPanelContext["openWordPressMediaPicker"];
   menuItems: ReactMenuItem[];
   onChangeMenuItems: (newItems: ReactMenuItem[]) => void;
   namedMenus: BuilderNamedMenu[];
@@ -149,7 +154,11 @@ export default function ReactMenuEditorPanel({
   websiteId,
   wordpressOrigin,
   wordpressSiteUrl,
+  shellSettings,
+  embeddedBuilderHost,
+  openWordPressMediaPicker,
 }: ReactMenuEditorPanelProps) {
+  const [builderItemId, setBuilderItemId] = useState<string | null>(null);
   const [selectedMenuSource, setSelectedMenuSource] = useState("main");
   const [newMenuName, setNewMenuName] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -743,6 +752,8 @@ export default function ReactMenuEditorPanel({
     }
   };
 
+  const builderItem = menuItems.find(item => item.id === builderItemId && !item.parentId);
+  if (builderItem) return <MenuDropdownBuilder key={`${selectedMenuSource}:${builderItem.id}`} host={embeddedBuilderHost} item={builderItem} shellSettings={shellSettings} openWordPressMediaPicker={openWordPressMediaPicker} onClose={() => setBuilderItemId(null)} onApply={dropdownContent => handleUpdateItem(builderItem.id, { dropdownContent })} />;
   return (
     <div className="builder-sidebar-panel" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       <div className="builder-card" style={{ display: "grid", gap: "8px", padding: "10px" }}>
@@ -927,6 +938,7 @@ export default function ReactMenuEditorPanel({
                       flexShrink: 0,
                     }}
                   />
+                  {node.depth === 0 && <button type="button" className="builder-btn" aria-label={`Open ${node.label} dropdown builder`} onClick={() => setBuilderItemId(node.id)}>Builder</button>}
                   <button
                     type="button"
                     className={`builder-menu-row-button ${isSelected ? "is-active" : ""}`}

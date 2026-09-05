@@ -20,6 +20,8 @@ import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition"
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import type { BuilderThemeSettings } from "@/lib/builderThemeSettings";
+import { menuDropdownRenderLayout } from "@/lib/menuDropdownLayout";
+import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 
 type HeaderShellProps = {
   layoutOverride?: BuilderHeaderLayout;
@@ -66,6 +68,12 @@ export default async function HeaderShell({
   // data, but never fetch the obsolete root GraphQL theme-settings field here.
   const settings = (themeSettingsOverride || {}) as Record<string, unknown>;
   const shellSettings = shellSettingsRaw;
+  const dropdowns = [...shellSettings.menuItems, ...(shellSettings.namedMenus ?? []).flatMap(menu => menu.items)]
+    .flatMap(item => !item.parentId && item.dropdownContent && !item.dropdownContent.sublayout.disabled ? [item.dropdownContent] : []);
+  const dropdownProjections = Object.fromEntries(await Promise.all(dropdowns.map(async content => {
+    const result = await materializeBuilderDynamicContent(menuDropdownRenderLayout([content]), { website });
+    return [content.id, { signature: JSON.stringify(content), sections: result.renderLayout.sections, warnings: result.diagnostics.flatMap(item => item.message ? [item.message] : []) }];
+  })));
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
     : {
@@ -123,6 +131,7 @@ export default async function HeaderShell({
     <HeaderShellView
       layoutOverride={layoutOverride}
       shellSettings={shellSettings}
+      dropdownProjections={dropdownProjections}
       settings={settings}
       headerSettings={headerSettings}
       serviceHomepageMode={serviceHomepageMode}

@@ -36,7 +36,7 @@ export function useUikitGridRuntime(
   const parallax = options?.parallax;
 
   useEffect(() => {
-    if (!enabled || (!masonry && parallax === undefined) || !rootRef.current) return;
+    if (!enabled || !rootRef.current) return;
 
     let cancelled = false;
     let instance: UikitGridInstance | undefined;

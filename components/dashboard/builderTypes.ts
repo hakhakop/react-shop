@@ -123,6 +123,14 @@ export type BuilderSubnavItem = {
   /** Preserve YOOtheme's authored uk-scroll behavior for anchor links. */
   scroll?: boolean;
 };
+export type BuilderNavItem = BuilderSubnavItem & {
+  type?: "link" | "header" | "divider";
+  active?: string;
+  meta?: string;
+  imageUrl?: string;
+  dynamicContext?: DynamicContentContextDescriptor;
+  dynamicBindings?: DynamicFieldBindings;
+};
 export type InspectorTab =
   | "content"
   | "settings"
@@ -248,8 +256,11 @@ export type LayoutBlockKind =
   | "badgeGrid"
   | "icon"
   | "social"
+  | "backToTop"
+  | "sublayout"
   | "list"
   | "subnav"
+  | "nav"
   | "menu"
   | "headerUtility"
   | "headerSearch"
@@ -739,6 +750,26 @@ export type BuilderLayoutBlock = {
   iconName?: string;
   iconSize?: number;
   socialItems?: BuilderSocialItem[];
+  backToTopLinkTitle?: string;
+  sublayout?: { rows: BuilderRow[]; htmlElement?: BuilderLayoutHtmlElement; disabled?: boolean };
+  sublayoutHtmlId?: string;
+  sublayoutClasses?: string;
+  sublayoutAttributes?: string;
+  backToTopHtmlId?: string;
+  backToTopClasses?: string;
+  backToTopAttributes?: string;
+  backToTop?: {
+    name?: string;
+    disabled?: boolean;
+    htmlId?: string;
+    title?: string;
+    linkTitle?: string;
+    titleStyle?: "" | "small" | "meta";
+    columnGap?: "small" | "medium" | "" | "large" | "collapse";
+    rowGap?: "small" | "medium" | "" | "large" | "collapse";
+    breakpoint?: "" | "s" | "m" | "l" | "xl";
+    floatingButton?: boolean;
+  };
   socialStyle?: "icon" | "button" | "link" | "muted" | "text" | "reset" | "iconnav" | "thumbnav";
   socialGrid?: "horizontal" | "vertical";
   socialGridBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
@@ -795,6 +826,12 @@ export type BuilderLayoutBlock = {
   listItems?: BuilderListItem[];
   /** Canonical UIkit Subnav links, including authored scroll targets. */
   subnavItems?: BuilderSubnavItem[];
+  navItems?: BuilderNavItem[];
+  navStyle?: "default" | "primary" | "secondary";
+  navColumns?: number;
+  navShowImage?: boolean;
+  navImageVerticalAlign?: boolean;
+  navShowMeta?: boolean;
   subnavStyle?: "default" | "divider" | "pill";
   subnavAlign?: "left" | "center" | "right";
   listPresentation?: "default" | "bullet" | "divider" | "striped" | "large";
@@ -1353,6 +1390,7 @@ export type BuilderSection = {
     text?: string;
     badge?: string;
     imageUrl?: string;
+    videoUrl?: string;
     imageAlt?: string;
     thumbnailUrl?: string;
     thumbnailPosition?: BuilderCarouselImagePosition;

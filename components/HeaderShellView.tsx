@@ -7,6 +7,8 @@ import HeaderActions from "./HeaderActions";
 import HeaderCategoriesDropdown from "./HeaderCategoriesDropdown";
 import HeaderFrame from "./HeaderFrame";
 import HeaderNav from "./HeaderNav";
+import MenuDropdownContent from "./MenuDropdownContent";
+import type { BuilderLayout } from "@/lib/builderLayouts";
 import HeaderSearchControl from "./HeaderSearchControl";
 import HeaderSocialLinks from "./HeaderSocialLinks";
 import type { MenuItem } from "../lib/navigation";
@@ -134,6 +136,7 @@ function filterSaaSItems(items: MenuItem[]): MenuItem[] {
 }
 
 type HeaderShellViewProps = {
+  dropdownProjections?: Record<string, { signature: string; sections: BuilderLayout["sections"]; warnings?: string[] }>;
   layoutOverride?: BuilderHeaderLayout;
   shellSettings: Partial<BuilderShellSettings>;
   settings?: Record<string, unknown>;
@@ -171,6 +174,7 @@ type HeaderShellViewProps = {
 };
 
 export default function HeaderShellView({
+  dropdownProjections,
   layoutOverride,
   shellSettings,
   settings = {},
@@ -573,6 +577,13 @@ export default function HeaderShellView({
 
     return (
       <HeaderNav
+        dropdownContentById={Object.fromEntries(sourceItems.filter(item => !item.parentId && item.dropdownContent?.sublayout.rows.length && !item.dropdownContent.sublayout.disabled).map(item => [item.id,
+          <MenuDropdownContent key={item.id} content={item.dropdownContent!}
+            initialSections={dropdownProjections?.[item.dropdownContent!.id]?.sections}
+            initialSignature={dropdownProjections?.[item.dropdownContent!.id]?.signature}
+            initialWarnings={dropdownProjections?.[item.dropdownContent!.id]?.warnings}
+            draft={builderDraftPreview} websiteId={scopedPreviewWebsiteId} page={scopedPreviewPage} shellSettings={effectiveShellSettings}
+            linkProjection={scopedPreviewWebsiteId ? { mode: scopedLinkMode ?? "preview", context: { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages, systemRouteAliases: getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings) } } : undefined} />]))}
         items={filterSaaSItems(menuItems)}
         presentationById={menuPresentation}
         categories={

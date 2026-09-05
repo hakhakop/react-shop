@@ -1,0 +1,25 @@
+{
+  "type": "layout",
+  "children": [{
+    "type": "section",
+    "children": [{
+      "type": "row",
+      "children": [{
+        "type": "column",
+        "children": [{
+          "type": "totop",
+          "props": {
+            "title": "Back to Top",
+            "link_title": "Return to beginning",
+            "title_style": "meta",
+            "title_grid_column_gap": "small",
+            "title_grid_row_gap": "small",
+            "title_grid_breakpoint": "m",
+            "margin": "default",
+            "text_align": "right"
+          }
+        }]
+      }]
+    }]
+  }]
+}

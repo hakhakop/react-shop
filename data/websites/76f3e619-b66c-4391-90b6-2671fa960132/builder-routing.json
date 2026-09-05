@@ -64,6 +64,22 @@
         }
       ],
       "layoutId": "layout:builder:post-category"
+    },
+    {
+      "id": "routing:template:caee2da8-29e5-4ca0-ad7a-e3bf336a4fb6",
+      "name": "Product index",
+      "enabled": true,
+      "order": 40,
+      "pageType": "archive:product",
+      "view": "archive",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product-archive"
+        }
+      ],
+      "layoutId": "layout:builder:dynamic:aab84021-5f30-43ea-bb8c-5b68db076662"
     }
   ],
   "individualOverrides": []

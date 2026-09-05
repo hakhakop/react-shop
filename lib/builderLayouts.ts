@@ -157,6 +157,12 @@ export type BuilderLayoutBlock = {
   menuItems?: unknown[];
   /** Canonical UIkit Subnav links, including authored scroll targets. */
   subnavItems?: BuilderSubnavItem[];
+  navItems?: import("@/components/dashboard/builderTypes").BuilderNavItem[];
+  navStyle?: "default" | "primary" | "secondary";
+  navColumns?: number;
+  navShowImage?: boolean;
+  navImageVerticalAlign?: boolean;
+  navShowMeta?: boolean;
   subnavStyle?: "default" | "divider" | "pill";
   subnavAlign?: "left" | "center" | "right";
   imageInverseUrl?: string | null;
@@ -374,6 +380,7 @@ export type BuilderLayoutBlock = {
     text?: string;
     badge?: string;
     imageUrl?: string;
+    videoUrl?: string;
     imageAlt?: string;
     thumbnailUrl?: string;
     thumbnailPosition?: string;
@@ -508,6 +515,15 @@ export type BuilderLayoutBlock = {
   heroMediaLoading?: "lazy" | "eager";
   iconName?: string;
   socialItems?: BuilderSocialItem[];
+  backToTop?: import("@/components/dashboard/builderTypes").BuilderLayoutBlock["backToTop"];
+  backToTopLinkTitle?: string;
+  sublayout?: import("@/components/dashboard/builderTypes").BuilderLayoutBlock["sublayout"];
+  sublayoutHtmlId?: string;
+  sublayoutClasses?: string;
+  sublayoutAttributes?: string;
+  backToTopHtmlId?: string;
+  backToTopClasses?: string;
+  backToTopAttributes?: string;
   socialStyle?: "icon" | "button" | "link" | "muted" | "text" | "reset" | "iconnav" | "thumbnav";
   socialGrid?: "horizontal" | "vertical";
   socialGridBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";

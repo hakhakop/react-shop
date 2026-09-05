@@ -1,0 +1,9 @@
+.builder-menu-dropdown-editor.builder-inspector { display: block; position: relative; inset: auto; z-index: auto; height: auto; overflow: visible; min-width: 0; width: 100%; max-width: none; padding: 16px; box-sizing: border-box; }
+.builder-menu-dropdown-editor h3 { color: var(--builder-ui-text); font-size: 18px; line-height: 1.4; margin: 20px 0 8px; overflow-wrap: anywhere; }
+.builder-menu-dropdown-editor h4 { color: var(--builder-ui-text); }
+.builder-menu-dropdown-help { color: var(--builder-ui-muted); font-size: 13px; line-height: 1.6; }
+.builder-menu-dropdown-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.builder-menu-dropdown-actions button { appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border: 1px solid var(--builder-ui-border); border-radius: 8px; background: var(--builder-ui-surface); color: var(--builder-ui-text); font: inherit; font-size: 13px; cursor: pointer; }
+.builder-menu-dropdown-actions button:disabled { opacity: .5; cursor: not-allowed; }
+.builder-menu-dropdown-import { padding: 14px; border: 1px solid var(--builder-ui-border); border-radius: 10px; font-size: 13px; overflow-wrap: anywhere; }
+.builder-menu-dropdown-import ul { max-height: 260px; overflow-y: auto; padding-left: 18px; }

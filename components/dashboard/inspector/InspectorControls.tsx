@@ -391,11 +391,12 @@ export function InspectorTextarea({ value, onChange, placeholder, ariaLabel }: {
   return <textarea className="inspector-control inspector-textarea" aria-label={ariaLabel} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />;
 }
 
-export function InspectorRange({ value, min, max, step, onChange, ariaLabel, className = "" }: {
+export function InspectorRange({ value, min, max, step, onChange, ariaLabel, disabled = false, className = "" }: {
   value: number;
   min: number;
   max: number;
   step?: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
   ariaLabel?: string;
   className?: string;
@@ -404,6 +405,7 @@ export function InspectorRange({ value, min, max, step, onChange, ariaLabel, cla
   return (
     <input
       type="range"
+      disabled={disabled}
       className={`inspector-range ${className}`.trim()}
       min={min}
       max={max}

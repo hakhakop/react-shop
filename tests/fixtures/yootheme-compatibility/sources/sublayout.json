@@ -1,0 +1,10 @@
+{
+  "type": "layout",
+  "children": [{ "type": "section", "children": [{ "type": "row", "children": [{ "type": "column", "children": [{
+    "type": "fragment", "props": { "name": "Footer links", "html_element": "nav", "id": "nested-links", "margin": "default" },
+    "children": [{ "type": "row", "props": { "layout": "1-1", "width": "expand", "column_gap": "collapse" }, "children": [
+      { "type": "column", "props": { "width": "1-1", "width_medium": "1-2" }, "children": [{ "type": "headline", "props": { "content": "Shop", "title_element": "h3" } }] },
+      { "type": "column", "props": { "width": "1-1", "width_medium": "1-2" }, "children": [{ "type": "headline", "props": { "content": "Help", "title_element": "h3" } }] }
+    ] }, { "type": "row", "children": [{ "type": "column", "children": [{ "type": "text", "props": { "content": "Nested footer content" } }] }] }]
+  }] }] }] }]
+}

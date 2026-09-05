@@ -1,0 +1,2 @@
+/** Audited against the authenticated YOOtheme 4.5.18 fragment schema. */
+export const SUBLAYOUT_SOURCE_FIELDS = ["content", "html_element", "position", "position_left", "position_right", "position_top", "position_bottom", "position_z_index", "blend", "margin", "margin_remove_top", "margin_remove_bottom", "animation", "visibility", "name", "status", "source", "id", "class", "attributes", "css"] as const;

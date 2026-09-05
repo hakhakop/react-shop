@@ -22,6 +22,7 @@ import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitSocial from "@/components/builder/UikitSocial";
+import UikitBackToTop from "@/components/builder/UikitBackToTop";
 import UikitImage from "@/components/builder/UikitImage";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
@@ -31,6 +32,7 @@ import {
 } from "@/components/builder/ContentPositioningGroup";
 import UikitList from "@/components/builder/UikitList";
 import UikitSubnav from "@/components/builder/UikitSubnav";
+import UikitNav from "@/components/builder/UikitNav";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
 import UikitFluentForm from "@/components/builder/UikitFluentForm";
@@ -1935,10 +1937,20 @@ export function ContentLayoutBlock({
   if (block.kind === "social") {
     return <UikitSocial block={block as any} />;
   }
+  if (block.kind === "backToTop") return <UikitBackToTop block={block} />;
+  if (block.kind === "sublayout") {
+    if (block.sublayout?.disabled) return null;
+    const Tag = block.sublayout?.htmlElement ?? "div";
+    return <Tag id={block.sublayoutHtmlId || undefined} className="el-element shop-builder-sublayout" style={{ minWidth: 0 }}>
+      <ContentLayoutSection nested section={{ id: `${block.id}-sublayout`, kind: "contentLayout", rows: block.sublayout?.rows ?? [] } as BuilderSection} product={product} breadcrumbItems={breadcrumbItems} page={page ?? "home"} pageContent={pageContent} categoryTree={categoryTree} activeCategorySlug={activeCategorySlug} website={website} shellSettings={shellSettings} layoutScheme={parentScheme} />
+    </Tag>;
+  }
 
   if (block.kind === "list") {
     return <UikitList block={block} />;
   }
+
+  if (block.kind === "nav") return <UikitNav block={block} />;
 
   if (block.kind === "subnav") {
     return <UikitSubnav block={block as any} />;
@@ -2738,6 +2750,7 @@ function rowContextStyle(
 }
 
 function ContentLayoutSection({
+  nested = false,
   section,
   product,
   breadcrumbItems,
@@ -2750,6 +2763,7 @@ function ContentLayoutSection({
   layoutScheme = "light",
   builderInteractionIdentity = false,
 }: {
+  nested?: boolean;
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
@@ -2780,13 +2794,7 @@ function ContentLayoutSection({
 
   const sectionColorScheme = resolveSectionColorScheme(section, layoutScheme);
 
-  return (
-    <SectionFrame
-      section={section}
-      layoutScheme={layoutScheme}
-      extra="shop-builder-content-layout"
-      builderInteractionIdentity={builderInteractionIdentity}
-    >
+  const content = (
       <div
         className="shop-builder-content-layout-rows-wrapper"
         style={{
@@ -2941,6 +2949,7 @@ function ContentLayoutSection({
                       <Fragment key={block.id ?? blockIndex}>
                         <div
                         data-builder-block-id={block.id}
+                        hidden={(block.kind === "backToTop" && block.backToTop?.disabled) || (block.kind === "sublayout" && block.sublayout?.disabled)}
                         data-builder-object-type={builderInteractionIdentity ? "block" : undefined}
                         data-builder-section-id={builderInteractionIdentity ? section.id : undefined}
                         data-builder-column-key={builderInteractionIdentity ? columnKey : undefined}
@@ -2951,6 +2960,7 @@ function ContentLayoutSection({
                           ...blockSurfaceStyle(block, rowColorScheme),
                           ...getContentPositioningGroupChildStyle(block, columnBlocks),
                           ...blockAnimationAttrs.style,
+                          ...((block.kind === "backToTop" && block.backToTop?.disabled) || (block.kind === "sublayout" && block.sublayout?.disabled) ? { display: "none" } : {}),
                         }}
                         {...blockAnimationAttrs.data}
                         {...parseSafeElementAttributes(resolveElementAdvanced(block).customAttributes)}
@@ -3056,8 +3066,8 @@ function ContentLayoutSection({
           );
         })}
       </div>
-    </SectionFrame>
   );
+  return nested ? content : <SectionFrame section={section} layoutScheme={layoutScheme} extra="shop-builder-content-layout" builderInteractionIdentity={builderInteractionIdentity}>{content}</SectionFrame>;
 }
 
 function SliderSection({

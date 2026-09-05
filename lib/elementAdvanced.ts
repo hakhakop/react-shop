@@ -21,6 +21,10 @@ export type ElementAdvancedValues = {
 
 /** Minimal shared contract so Builder and storefront use the same owner. */
 export type ElementAdvancedBlock = {
+  backToTopClasses?: string;
+  sublayoutClasses?: string;
+  sublayoutAttributes?: string;
+  backToTopAttributes?: string;
   id?: string;
   kind?: string;
   customId?: string;
@@ -43,8 +47,8 @@ export function normalizeElementCompatibilityCss(source: string | undefined, blo
 export function resolveElementAdvanced(block: ElementAdvancedBlock): ElementAdvancedValues {
   const visual = block.visualStyle;
   return {
-    customClass: visual?.customClass ?? block.customClass,
-    customAttributes: visual?.customAttributes ?? block.customAttributes,
+    customClass: (block.kind === "sublayout" ? block.sublayoutClasses : block.kind === "backToTop" ? block.backToTopClasses : undefined) ?? visual?.customClass ?? block.customClass,
+    customAttributes: (block.kind === "sublayout" ? block.sublayoutAttributes : block.kind === "backToTop" ? block.backToTopAttributes : undefined) ?? visual?.customAttributes ?? block.customAttributes,
     customCss: visual?.customCss ?? block.customCss,
   };
 }

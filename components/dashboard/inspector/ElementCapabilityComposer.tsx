@@ -3,6 +3,7 @@
 import { createElement, Fragment } from "react";
 import type { InspectorPanelContext, InspectorElementCapabilityDeclaration } from "@/components/dashboard/inspector/inspectorRouting";
 import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import YoothemeGeneralSettingsPanel from "@/components/dashboard/inspector/panels/YoothemeGeneralSettingsPanel";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
@@ -28,7 +29,7 @@ export default function ElementCapabilityComposer({ declaration, ...context }: P
             {createElement(panel, { ...context, tab: source })}
           </Fragment>
         ))}
-        {declaration.composes.includes("general") && (
+        {context.block.kind === "backToTop" || context.block.kind === "sublayout" ? <YoothemeGeneralSettingsPanel {...context} includeAlignmentAndWidth={context.block.kind !== "sublayout"} /> : declaration.composes.includes("general") && (
           <GeneralSettingsPanel
             {...context}
             tab="layout"
@@ -67,6 +68,7 @@ export default function ElementCapabilityComposer({ declaration, ...context }: P
   }
 
   if (context.tab === "advanced") {
+    if (context.block.kind === "backToTop" || context.block.kind === "sublayout") return createElement(panel, context);
     return (
       <div className="builder-inspector-stack" data-inspector-composition="advanced">
         {declaration.dynamicSourceSurface === "element" && (

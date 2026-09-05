@@ -1,0 +1,5 @@
+/* Only host sizing is local; visuals belong to the shared Structure builder. */
+.builder-sublayout-structure.builder-structure-panel { height: auto; min-height: 0; min-width: 0; }
+.builder-sublayout-structure > .builder-structure-tree { padding: 0; overflow: visible; }
+.builder-sublayout-library { min-width: 0; }
+.builder-sublayout-library > .builder-sidebar-panel { min-height: 0; height: auto; }

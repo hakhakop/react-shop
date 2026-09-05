@@ -7829,3 +7829,24 @@ body.is-visual-builder-active .uk-lightbox {
 .shop-builder-social svg {
   flex: 0 0 auto;
 }
+
+.shop-builder-totop-floating {
+  position: fixed;
+  right: max(22px, env(safe-area-inset-right));
+  bottom: max(84px, env(safe-area-inset-bottom));
+  z-index: 1080;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: var(--uk-global-background, #fff);
+  box-shadow: 0 3px 14px rgb(0 0 0 / 14%);
+}
+
+.shop-builder-totop .uk-totop:focus-visible,
+.shop-builder-totop-floating:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}

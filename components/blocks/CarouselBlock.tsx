@@ -56,6 +56,7 @@ export type CarouselSlide = {
   /** Runtime-only unresolved state; never persisted as Library content. */
   pendingDynamicContent?: boolean;
   imageUrl?: string | null;
+  videoUrl?: string | null;
   imageAlt?: string | null;
   hoverVideoUrl?: string | null;
   /** Dedicated YOOtheme Thumbnav media; falls back to imageUrl when absent. */
@@ -391,7 +392,7 @@ export default function CarouselBlock({
   const panelContentAlignment = isPanelSlider
     ? resolveCarouselContentAlignment(settings?.contentAlign)
     : null;
-  const overlayContentAlignment = settings?.presentation === "overlay-slider"
+  const overlayContentAlignment = settings?.presentation === "overlay-slider" || settings?.presentation === "slideshow"
     ? resolveCarouselContentAlignment(settings?.contentAlign)
     : null;
 
@@ -1560,7 +1561,9 @@ export default function CarouselBlock({
             return (
               <SwiperSlide key={slide.id || idx}>
                 <SlideshowItemElement className={`shop-builder-hero-slide-card ${slideshowItemTextContext}`.trim()}>
-                  {hasRealImage ? (
+                  {isSlideshow && slide.videoUrl ? (
+                    <div className="shop-builder-swiper-media"><video src={slide.videoUrl} poster={slide.imageUrl || undefined} autoPlay muted loop playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                  ) : hasRealImage ? (
                     <div className="shop-builder-swiper-media">
                       <Image
                         src={slide.imageUrl!}

@@ -6,6 +6,7 @@ import type {
 } from "@/lib/dynamicContent";
 import { getWooCommerceConnection, wooCommerceFetch } from "@/lib/woocommerce";
 import type { SaaSWebsite } from "@/lib/websites";
+import { resolveWordPressGenericContentContexts } from "@/lib/wordpressGenericContentProvider.server";
 
 type WooCommerceTermRecord = {
   id?: unknown;
@@ -109,5 +110,15 @@ export async function resolveWooCommerceTermContexts(input: {
     if (slug) params.set("slug", slug);
     terms = await wooCommerceFetch<WooCommerceTermRecord[]>(connection, `${owner.endpoint}?${params}`);
   }
-  return terms.map((term) => normalizeTerm(term, owner));
+  const contexts = terms.map((term) => normalizeTerm(term, owner));
+  if (Array.isArray(query.requestedFields) && query.requestedFields.some(field => typeof field === "string" && field.startsWith("acf."))) {
+    const enriched = await resolveWordPressGenericContentContexts({ website: input.website, descriptor: {
+      ...input.descriptor, provider: "wordpress", source: "content", query: { ...query, sourceName: owner.taxonomy },
+    } }).catch(() => []);
+    return contexts.map(context => {
+      const extra = enriched.find(candidate => String(candidate.fields.databaseId?.value) === String(context.id));
+      return extra ? { ...context, fields: { ...context.fields, ...Object.fromEntries(Object.entries(extra.fields).filter(([key]) => key.startsWith("acf."))) } } : context;
+    });
+  }
+  return contexts;
 }

@@ -70,6 +70,8 @@ const corePages = [
 ] as const;
 
 type DashboardSidebarProps = {
+  embeddedBuilderHost: import("./EmbeddedBuilderHost").EmbeddedBuilderHost;
+  openWordPressMediaPicker: import("./inspector/inspectorRouting").InspectorPanelContext["openWordPressMediaPicker"];
   websiteId?: string;
   templateCreationContext?: BuilderTemplateCreationContext;
   builderEditorContext?: BuilderEditorContext | null;
@@ -96,6 +98,8 @@ type DashboardSidebarProps = {
   templateStatus: string;
   yoothemeImportWarnings?: string[];
   yoothemeImportPreview?: {
+    applyBlocked?: boolean;
+    targetDropdown?: boolean;
     fileName: string;
     targetPage?: BuilderLayoutKey;
     documentName?: string;
@@ -143,6 +147,8 @@ type DashboardSidebarProps = {
 };
 
 export default function DashboardSidebar({
+  embeddedBuilderHost,
+  openWordPressMediaPicker,
   websiteId,
   templateCreationContext,
   builderEditorContext,
@@ -467,7 +473,7 @@ export default function DashboardSidebar({
           <div>
             <strong id="yootheme-import-preview-title">Preview YOOtheme import</strong>
             <span>
-              Review the mapped content before replacing the {yoothemeImportPreview.targetPage === "footer" ? "Footer document" : yoothemeImportPreview.targetPage === "header" ? "Header document" : "current page"}.
+              Review the mapped content before replacing the {yoothemeImportPreview.targetDropdown ? "selected menu dropdown" : yoothemeImportPreview.targetPage === "footer" ? "Footer document" : yoothemeImportPreview.targetPage === "header" ? "Header document" : "current page"}.
             </span>
           </div>
           <button
@@ -488,7 +494,7 @@ export default function DashboardSidebar({
               : " with no compatibility warnings"}.
           </span>
         </div>
-        {(yoothemeImportPreview.targetPage === "footer" || yoothemeImportPreview.targetPage === "header") ? (
+        {!yoothemeImportPreview.targetDropdown && (yoothemeImportPreview.targetPage === "footer" || yoothemeImportPreview.targetPage === "header") ? (
           <label className="builder-field">
             <span>{yoothemeImportPreview.targetPage === "footer" ? "Footer document name" : "Header document name"}</span>
             <input
@@ -575,12 +581,15 @@ export default function DashboardSidebar({
             </ul>
           </details>
         )}
+        {yoothemeImportPreview.applyBlocked && <p role="alert" className="builder-template-note">
+          This dropdown cannot be applied without losing source content. The compatibility warnings above describe the missing mappings. Your existing dropdown has not been changed.
+        </p>}
         <div className="builder-layout-actions">
           <button type="button" className="builder-secondary-button" onClick={onCancelYoothemeImport}>
             Cancel
           </button>
-          <button type="button" className="builder-primary-button" onClick={onApplyYoothemeImport}>
-            Apply to {yoothemeImportPreview.targetPage === "footer" ? "Footer" : yoothemeImportPreview.targetPage === "header" ? "Header" : "page"}
+          <button type="button" className="builder-primary-button" disabled={yoothemeImportPreview.applyBlocked} onClick={onApplyYoothemeImport}>
+            Apply to {yoothemeImportPreview.targetDropdown ? "dropdown" : yoothemeImportPreview.targetPage === "footer" ? "Footer" : yoothemeImportPreview.targetPage === "header" ? "Header" : "page"}
           </button>
         </div>
       </div>
@@ -696,6 +705,9 @@ export default function DashboardSidebar({
                 transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 <ReactMenuEditorPanel
+                  embeddedBuilderHost={embeddedBuilderHost}
+                  shellSettings={shellSettings}
+                  openWordPressMediaPicker={openWordPressMediaPicker}
                   menuItems={shellSettings.menuItems ?? []}
                   onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
                   namedMenus={shellSettings.namedMenus ?? []}

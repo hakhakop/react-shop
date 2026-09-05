@@ -28,6 +28,7 @@ import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 
 interface HeaderNavProps {
+  dropdownContentById?: Record<string, ReactNode>;
   items: MenuItem[];
   presentationById?: Record<string, MenuPresentationSettings>;
   categories?: ReactNode;
@@ -209,6 +210,7 @@ function renderMenuItems(
   expandedIds = new Set<string>(),
   onToggleMobileItem?: (id: string) => void,
   pushAfter?: number,
+  dropdownContentById?: Record<string, ReactNode>,
 ): ReactNode {
   const visibleItems = items.filter((item) =>
     mobileMode ? item.visibility !== "desktop" : item.visibility !== "mobile",
@@ -231,7 +233,8 @@ function renderMenuItems(
     const children = (item.children ?? []).filter((child) =>
       mobileMode ? child.visibility !== "desktop" : child.visibility !== "mobile",
     );
-    const hasChildren = children.length > 0;
+    const dropdownContent = !mobileMode && level === 0 ? dropdownContentById?.[item.id] : undefined;
+    const hasChildren = children.length > 0 || Boolean(dropdownContent);
     const isBranchActive = itemHasActiveDescendant(item, currentPath);
     const presentation = normalizeMenuPresentation(presentationById?.[item.id]);
     const headingVisible = presentation.showHeading !== false;
@@ -302,8 +305,9 @@ function renderMenuItems(
 
         {hasChildren && submenuOpen && (
           <div
-            className={`site-header-nav-submenu site-header-nav-submenu--${submenuLayout}`}
-            role="menu"
+            className={`site-header-nav-submenu site-header-nav-submenu--${submenuLayout}${dropdownContent ? " site-header-nav-submenu--builder" : ""}`}
+            role={dropdownContent ? "region" : "menu"}
+            aria-label={dropdownContent ? `${item.label} dropdown` : undefined}
             style={
               {
                 "--submenu-columns": submenuColumns,
@@ -326,7 +330,7 @@ function renderMenuItems(
                 {item.label}
               </Link>
             )}
-            {headingVisible && (
+            {!dropdownContent && headingVisible && (
               <div className="site-header-nav-submenu-heading">
                 {icon && <span className="site-header-nav-icon">{icon}</span>}
                 {headingVisible && <span>{item.label}</span>}
@@ -335,7 +339,7 @@ function renderMenuItems(
                 )}
               </div>
             )}
-            <div className="site-header-nav-submenu-items">
+            {dropdownContent || <div className="site-header-nav-submenu-items">
               {renderMenuItems(
                 children,
                 currentPath,
@@ -351,7 +355,7 @@ function renderMenuItems(
                 onToggleMobileItem,
                 pushAfter,
               )}
-            </div>
+            </div>}
           </div>
         )}
       </div>
@@ -360,6 +364,7 @@ function renderMenuItems(
 }
 
 export default function HeaderNav({
+  dropdownContentById,
   items,
   presentationById,
   categories,
@@ -525,6 +530,7 @@ export default function HeaderNav({
           expandedMobileIds,
           toggleDesktopMenuItem,
           dialogPushAfter,
+          dropdownContentById,
         )}
       </nav>
 

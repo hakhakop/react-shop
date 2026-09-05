@@ -1,0 +1,551 @@
+{
+  "type": "fragment",
+  "children": [
+    {
+      "type": "row",
+      "props": {
+        "layout": "1-5,1-5,1-5,2-5|1-3,1-3,1-3,1-1"
+      },
+      "children": [
+        {
+          "type": "column",
+          "props": {
+            "image_position": "center-center",
+            "position_sticky_breakpoint": "m",
+            "width_medium": "1-5",
+            "width_small": "1-3"
+          },
+          "children": [
+            {
+              "type": "headline",
+              "props": {
+                "margin": "small",
+                "title_element": "div",
+                "title_style": "h5"
+              },
+              "source": {
+                "query": {
+                  "name": "customMenuItem",
+                  "arguments": {
+                    "menu": 78,
+                    "id": "1437"
+                  }
+                },
+                "props": {
+                  "content": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "title"
+                  }
+                }
+              }
+            },
+            {
+              "type": "nav",
+              "props": {
+                "grid": "1",
+                "image_vertical_align": true,
+                "margin": "medium",
+                "margin_remove_top": true,
+                "nav_style": "default",
+                "show_image": true,
+                "show_meta": true
+              },
+              "children": [
+                {
+                  "type": "nav_item",
+                  "source": {
+                    "query": {
+                      "name": "customMenuItems",
+                      "arguments": {
+                        "id": 78,
+                        "parent": "1437",
+                        "heading": "",
+                        "include_heading": true
+                      }
+                    },
+                    "props": {
+                      "content": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "title"
+                      },
+                      "link": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "url"
+                      },
+                      "type": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "type"
+                      },
+                      "active": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "active"
+                      }
+                    }
+                  },
+                  "props": []
+                }
+              ]
+            },
+            {
+              "type": "headline",
+              "props": {
+                "link": "?product_cat=women",
+                "margin": "small",
+                "title_element": "div",
+                "title_style": "h5"
+              },
+              "source": {
+                "query": {
+                  "name": "customMenuItem",
+                  "arguments": {
+                    "menu": 78,
+                    "id": "1442"
+                  }
+                },
+                "props": {
+                  "content": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "title"
+                  }
+                }
+              }
+            },
+            {
+              "type": "nav",
+              "props": {
+                "grid": "1",
+                "image_vertical_align": true,
+                "nav_style": "default",
+                "show_image": true,
+                "show_meta": true
+              },
+              "children": [
+                {
+                  "type": "nav_item",
+                  "source": {
+                    "query": {
+                      "name": "customMenuItems",
+                      "arguments": {
+                        "id": 78,
+                        "parent": "1442",
+                        "heading": "",
+                        "include_heading": true
+                      }
+                    },
+                    "props": {
+                      "content": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "title"
+                      },
+                      "link": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "url"
+                      },
+                      "active": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "active"
+                      }
+                    }
+                  },
+                  "props": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "column",
+          "props": {
+            "image_position": "center-center",
+            "position_sticky_breakpoint": "m",
+            "width_medium": "1-5",
+            "width_small": "1-3"
+          },
+          "children": [
+            {
+              "type": "headline",
+              "props": {
+                "margin": "small",
+                "title_element": "div",
+                "title_style": "h5"
+              },
+              "source": {
+                "query": {
+                  "name": "customMenuItem",
+                  "arguments": {
+                    "menu": 78,
+                    "id": "1419"
+                  }
+                },
+                "props": {
+                  "content": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "title"
+                  },
+                  "link": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "url"
+                  }
+                }
+              }
+            },
+            {
+              "type": "nav",
+              "props": {
+                "grid": "1",
+                "image_vertical_align": true,
+                "nav_style": "default",
+                "show_image": true,
+                "show_meta": true
+              },
+              "children": [
+                {
+                  "type": "nav_item",
+                  "source": {
+                    "query": {
+                      "name": "customMenuItems",
+                      "arguments": {
+                        "id": 78,
+                        "parent": "1419",
+                        "heading": ""
+                      }
+                    },
+                    "props": {
+                      "content": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "title"
+                      },
+                      "link": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "url"
+                      },
+                      "active": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "active"
+                      }
+                    }
+                  },
+                  "props": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "column",
+          "props": {
+            "image_position": "center-center",
+            "position_sticky_breakpoint": "m",
+            "width_medium": "1-5",
+            "width_small": "1-3"
+          },
+          "children": [
+            {
+              "type": "headline",
+              "props": {
+                "margin": "medium",
+                "margin_remove_bottom": true,
+                "title_element": "div",
+                "title_style": "h5"
+              },
+              "source": {
+                "query": {
+                  "name": "customMenuItem",
+                  "arguments": {
+                    "menu": 78,
+                    "id": "1445"
+                  }
+                },
+                "props": {
+                  "content": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "title"
+                  },
+                  "link": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "url"
+                  }
+                }
+              }
+            },
+            {
+              "type": "nav",
+              "props": {
+                "grid": "1",
+                "image_vertical_align": true,
+                "margin": "small",
+                "nav_style": "default",
+                "show_image": true,
+                "show_meta": true
+              },
+              "children": [
+                {
+                  "type": "nav_item",
+                  "source": {
+                    "query": {
+                      "name": "customMenuItems",
+                      "arguments": {
+                        "id": 78,
+                        "parent": "1445",
+                        "heading": "",
+                        "include_heading": true
+                      }
+                    },
+                    "props": {
+                      "content": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "title"
+                      },
+                      "link": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "url"
+                      },
+                      "active": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "active"
+                      }
+                    }
+                  },
+                  "props": []
+                }
+              ]
+            },
+            {
+              "type": "headline",
+              "props": {
+                "margin": "medium",
+                "margin_remove_bottom": true,
+                "title_element": "div",
+                "title_style": "h5"
+              },
+              "source": {
+                "query": {
+                  "name": "customMenuItem",
+                  "arguments": {
+                    "menu": 78,
+                    "id": "1430"
+                  }
+                },
+                "props": {
+                  "content": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "title"
+                  },
+                  "link": {
+                    "filters": {
+                      "search": ""
+                    },
+                    "name": "url"
+                  }
+                }
+              }
+            },
+            {
+              "type": "nav",
+              "props": {
+                "grid": "1",
+                "image_vertical_align": true,
+                "margin": "small",
+                "nav_style": "default",
+                "show_image": true,
+                "show_meta": true
+              },
+              "children": [
+                {
+                  "type": "nav_item",
+                  "source": {
+                    "query": {
+                      "name": "customMenuItems",
+                      "arguments": {
+                        "id": 78,
+                        "parent": "1430",
+                        "heading": ""
+                      }
+                    },
+                    "props": {
+                      "content": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "title"
+                      },
+                      "link": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "url"
+                      },
+                      "active": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "active"
+                      }
+                    }
+                  },
+                  "props": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "column",
+          "props": {
+            "image_position": "center-center",
+            "position_sticky_breakpoint": "m",
+            "width_medium": "2-5",
+            "width_small": "1-1"
+          },
+          "children": [
+            {
+              "type": "slideshow",
+              "props": {
+                "image_height": "420",
+                "image_width": "600",
+                "link_margin": "small",
+                "link_style": "text",
+                "link_text": "Shop Collection",
+                "margin": "default",
+                "meta_align": "below-title",
+                "meta_element": "div",
+                "meta_style": "text-meta",
+                "nav": "",
+                "nav_align": "center",
+                "nav_breakpoint": "s",
+                "nav_position": "bottom-center",
+                "nav_position_margin": "medium",
+                "overlay_animation": "parallax",
+                "overlay_position": "bottom-left",
+                "show_content": true,
+                "show_link": true,
+                "show_meta": true,
+                "show_thumbnail": true,
+                "show_title": true,
+                "slidenav": "default",
+                "slidenav_breakpoint": "s",
+                "slidenav_hover": true,
+                "slidenav_margin": "medium",
+                "slidenav_outside_breakpoint": "xl",
+                "slideshow_autoplay": true,
+                "slideshow_autoplay_interval": "5",
+                "slideshow_autoplay_pause": true,
+                "slideshow_min_height": "360",
+                "text_align": "left",
+                "text_color": "light",
+                "thumbnav_height": "75",
+                "thumbnav_svg_color": "emphasis",
+                "thumbnav_width": "100",
+                "title_element": "div",
+                "title_hover_style": "reset",
+                "title_style": "h3"
+              },
+              "children": [
+                {
+                  "type": "slideshow_item",
+                  "source": {
+                    "query": {
+                      "name": "productTags.customProductTag",
+                      "arguments": {
+                        "id": 71
+                      }
+                    },
+                    "props": {
+                      "title": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "name"
+                      },
+                      "video": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "field.image_featured.url"
+                      }
+                    }
+                  },
+                  "props": {
+                    "link": "?product_cat=women"
+                  }
+                },
+                {
+                  "type": "slideshow_item",
+                  "source": {
+                    "query": {
+                      "name": "productTags.customProductTag",
+                      "arguments": {
+                        "id": 73
+                      }
+                    },
+                    "props": {
+                      "title": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "name"
+                      },
+                      "video": {
+                        "filters": {
+                          "search": ""
+                        },
+                        "name": "field.image_featured.url"
+                      }
+                    }
+                  },
+                  "props": {
+                    "link": "?product_cat=women"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "4.5.18",
+  "props": {
+    "margin": "default"
+  }
+}

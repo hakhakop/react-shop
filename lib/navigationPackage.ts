@@ -4,6 +4,7 @@ import type {
   ReactMenuItem,
 } from "@/lib/builderShell";
 import { getNavigationTargetHref } from "@/lib/navigationTargets";
+import { normalizeMenuDropdown, type MenuDropdownContent } from "@/lib/menuDropdownLayout";
 
 export const PORTABLE_NAVIGATION_FORMAT = "webpages.navigation" as const;
 export const PORTABLE_NAVIGATION_VERSION = 1 as const;
@@ -31,6 +32,7 @@ export type PortableNavigationTarget = {
 };
 
 export type PortableNavigationItem = {
+  dropdownContent?: MenuDropdownContent;
   key: string;
   /** Diagnostic/current-site identity only; portableKey remains authoritative. */
   sourceMenuItemDatabaseId?: number;
@@ -191,6 +193,7 @@ export function createPortableNavigationPackage(input: {
       label: item.label,
       target,
       linkTarget: item.target === "_blank" ? "_blank" : "_self",
+      ...(item.dropdownContent ? { dropdownContent: structuredClone(item.dropdownContent) } : {}),
       ...(input.presentation?.[item.id] ? { presentation: input.presentation[item.id] } : {}),
       ...(Object.keys(metadata).length ? { metadata } : {}),
     } satisfies PortableNavigationItem;
@@ -263,6 +266,8 @@ export function parsePortableNavigationPackage(value: unknown): PortableNavigati
       ? item.presentation as BuilderMenuPresentation
       : undefined;
     const metadataRaw = record(item.metadata);
+    const dropdownContent = normalizeMenuDropdown(item.dropdownContent);
+    if (item.dropdownContent && !dropdownContent) throw new Error(`Navigation item ${key} has an invalid dropdown layout.`);
     return {
       key,
       ...(optionalNumber(item.sourceMenuItemDatabaseId)
@@ -273,6 +278,7 @@ export function parsePortableNavigationPackage(value: unknown): PortableNavigati
       label,
       target: parseTarget(item.target),
       linkTarget: item.linkTarget === "_blank" ? "_blank" : "_self",
+      ...(dropdownContent ? { dropdownContent } : {}),
       ...(presentation ? { presentation } : {}),
       ...(Object.keys(metadataRaw).length ? { metadata: metadataRaw as PortableNavigationItem["metadata"] } : {}),
     } satisfies PortableNavigationItem;
@@ -325,6 +331,7 @@ export function materializePortableNavigation(
       url: portableTargetHref(item.target),
       parentId: item.parentKey ? idByKey.get(item.parentKey) ?? null : null,
       target: item.linkTarget,
+      ...(item.dropdownContent ? { dropdownContent: structuredClone(item.dropdownContent) } : {}),
       ...(item.metadata ?? {}),
       portableKey: item.key,
       navigationTarget: item.target,
