@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Plus, ImagePlus } from "lucide-react";
 import type { BuilderLayoutBlock, BuilderParallaxSettings, BuilderParallaxStop, InspectorTab } from "@/components/dashboard/builderTypes";
-import type { DynamicFieldBinding } from "@/lib/dynamicContent";
+import type { DynamicContentContextDescriptor, DynamicFieldBinding } from "@/lib/dynamicContent";
 import type { DynamicBindingDestination } from "@/lib/dynamicContentCapabilities";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { sanitizeHtml } from "@/lib/safeHtml";
@@ -21,7 +21,7 @@ import {
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import DynamicContentInspectorGroup, { DynamicContentSourceNotice, effectiveDynamicContentSource } from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 import { ParallaxStopsEditor } from "@/components/dashboard/inspector/panels/ParallaxEditor";
 import {
   InspectorDivision,
@@ -38,6 +38,7 @@ type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
   shellSettings: BuilderShellSettings;
+  inheritedDynamicContext?: DynamicContentContextDescriptor;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
   openWordPressMediaPicker?: (options: {
     title: string;
@@ -70,6 +71,7 @@ export default function SliderCapabilityPanel({
   block,
   tab,
   shellSettings,
+  inheritedDynamicContext,
   update,
   openWordPressMediaPicker,
 }: Props) {
@@ -339,7 +341,7 @@ export default function SliderCapabilityPanel({
               };
               const dynamicBinding = (destination: DynamicBindingDestination) => ({
                 destination,
-                descriptor: slide.dynamicContext,
+                descriptor: effectiveDynamicContentSource(slide.dynamicContext, inheritedDynamicContext),
                 bindings: slide.dynamicBindings,
                 onChange: updateDynamicBinding,
               });
@@ -368,6 +370,13 @@ export default function SliderCapabilityPanel({
                   {activeTab === "content" ? (
                     <>
                       {isSlideshow && <>
+                        <InspectorFieldRow label="Video" dynamicBinding={dynamicBinding("videoUrl")}>
+                          <InspectorTextField
+                            value={slide.videoUrl ?? ""}
+                            onChange={(value: string) => updateSlide({ videoUrl: value || undefined })}
+                            placeholder="https://…"
+                          />
+                        </InspectorFieldRow>
                         <InspectorFieldRow label="Image" dynamicBinding={dynamicBinding("imageUrl")}>
                           <BuilderImageUrlControl
                             value={slide.imageUrl ?? ""}
@@ -510,10 +519,17 @@ export default function SliderCapabilityPanel({
                       </>}
                     </>
                   ) : activeTab === "advanced" ? (
-                    <DynamicContentInspectorGroup
-                      item={slide}
-                      update={updateSlide}
-                    />
+                    <>
+                      {slide.dynamicContext?.provider === "webpages" && slide.dynamicContext?.source === "context-relation" ? (
+                        <DynamicContentSourceNotice descriptor={slide.dynamicContext} />
+                      ) : (
+                        <DynamicContentInspectorGroup
+                          item={slide}
+                          update={updateSlide}
+                          inheritedSource={inheritedDynamicContext}
+                        />
+                      )}
+                    </>
                   ) : isSlideshow ? (
                     <>
                       <InspectorDivision title="ITEM">

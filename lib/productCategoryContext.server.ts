@@ -1,6 +1,7 @@
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { DynamicContentData, DynamicItemContext, DynamicItemContextValue } from "@/lib/dynamicContent";
 import type { ProductNode } from "@/lib/products";
+import type { ArchiveRouteContext, RouteTaxonomyTerm } from "@/lib/layoutRouting";
 import { normalizeWooCommerceProductRecord } from "@/lib/shopProducts.server";
 import { getWooCommerceConnection, wooCommerceFetch } from "@/lib/woocommerce";
 import { fetchWooCommerceProductRecords } from "@/lib/woocommerceDynamicContentProvider.server";
@@ -51,6 +52,87 @@ export type CanonicalProductCategory = {
   dynamicContext: DynamicItemContext;
 };
 
+export type CanonicalProductCategoryDescriptor = CanonicalProductCategory["category"];
+
+function productCategoryDescriptor(
+  source: WooCategoryRecord,
+  allCategories: readonly WooCategoryRecord[],
+): CanonicalProductCategoryDescriptor | null {
+  const id = positiveId(source.id);
+  const name = text(source.name);
+  const slug = text(source.slug);
+  if (!id || !name || !slug) return null;
+  const byId = new Map(allCategories.flatMap((category) => {
+    const categoryId = positiveId(category.id);
+    return categoryId ? [[categoryId, category] as const] : [];
+  }));
+  const ancestry: CanonicalProductCategoryDescriptor["ancestry"] = [];
+  let parentId = positiveId(source.parent);
+  const visited = new Set<number>();
+  while (parentId && !visited.has(parentId)) {
+    visited.add(parentId);
+    const parent = byId.get(parentId);
+    const parentName = text(parent?.name);
+    const parentSlug = text(parent?.slug);
+    if (!parent || !parentName || !parentSlug) break;
+    ancestry.unshift({ id: parentId, name: parentName, slug: parentSlug });
+    parentId = positiveId(parent.parent);
+  }
+  return {
+    id,
+    name,
+    slug,
+    description: text(source.description) ?? "",
+    parentId: positiveId(source.parent) ?? null,
+    ancestry,
+  };
+}
+
+/** Lightweight taxonomy inventory used to choose a valid Template preview. */
+export async function listCanonicalProductCategoryDescriptors(
+  website?: SaaSWebsite | null,
+): Promise<CanonicalProductCategoryDescriptor[]> {
+  const connection = getWooCommerceConnection(website);
+  const categories = await wooCommerceFetch<WooCategoryRecord[]>(
+    connection,
+    "products/categories?per_page=100&hide_empty=false",
+  );
+  return categories.flatMap((category) => {
+    const descriptor = productCategoryDescriptor(category, categories);
+    return descriptor ? [descriptor] : [];
+  });
+}
+
+/** One category-route projection shared by storefront rendering and editor discovery. */
+export function projectProductCategoryRouteContext(
+  category: CanonicalProductCategory["category"],
+  uri: string,
+  options: { pageNumber?: number; requestTaxonomyTerms?: readonly RouteTaxonomyTerm[] } = {},
+): ArchiveRouteContext {
+  return {
+    view: "archive",
+    pageType: "taxonomy:product_cat",
+    provider: "woocommerce",
+    contentType: "product-category",
+    contentId: String(category.id),
+    databaseId: category.id,
+    slug: category.slug,
+    uri,
+    taxonomyTerms: [
+      { taxonomy: "product_cat", id: String(category.id), slug: category.slug },
+      ...category.ancestry.map((ancestor) => ({
+        taxonomy: "product_cat",
+        id: String(ancestor.id),
+        slug: ancestor.slug,
+      })),
+    ],
+    ...(options.requestTaxonomyTerms?.length
+      ? { requestTaxonomyTerms: options.requestTaxonomyTerms }
+      : {}),
+    pageNumber: options.pageNumber ?? 1,
+  };
+}
+
 /** Resolve a WooCommerce category and its archive context without creating a WebPages page. */
 export async function getCanonicalProductCategoryBySlug(
   slug: string,
@@ -78,23 +160,9 @@ export async function getCanonicalProductCategoryBySlug(
     const normalized = normalizeWooCommerceProductRecord(product);
     return normalized ? [normalized] : [];
   });
-  const byId = new Map(allCategories.flatMap((category) => {
-    const categoryId = positiveId(category.id);
-    return categoryId ? [[categoryId, category] as const] : [];
-  }));
-  const ancestry: Array<{ id: number; name: string; slug: string }> = [];
-  let parentId = positiveId(source.parent);
-  const visited = new Set<number>();
-  while (parentId && !visited.has(parentId)) {
-    visited.add(parentId);
-    const parent = byId.get(parentId);
-    const parentName = text(parent?.name);
-    const parentSlug = text(parent?.slug);
-    if (!parent || !parentName || !parentSlug) break;
-    ancestry.unshift({ id: parentId, name: parentName, slug: parentSlug });
-    parentId = positiveId(parent.parent);
-  }
-  const description = text(source.description) ?? "";
+  const descriptor = productCategoryDescriptor(source, allCategories);
+  if (!descriptor) return null;
+  const { ancestry, description } = descriptor;
   const fields: Record<string, DynamicItemContextValue> = {};
   setField(fields, "id", { type: "identifier", value: id });
   setField(fields, "databaseId", { type: "identifier", value: id });
@@ -109,7 +177,7 @@ export async function getCanonicalProductCategoryBySlug(
   setField(fields, "termPath", { type: "metadata", value: { items: [...ancestry.map((item) => item.slug), slug] } });
   setField(fields, "ancestry", { type: "metadata", value: { items: ancestry.map((item) => metadata(item)) } });
   return {
-    category: { id, name, slug, description, parentId: positiveId(source.parent) ?? null, ancestry },
+    category: descriptor,
     products,
     categoryTree: categoryTree(allCategories),
     dynamicContext: { id, fields },

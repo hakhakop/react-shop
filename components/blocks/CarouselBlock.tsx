@@ -207,6 +207,7 @@ export type CarouselSettings = {
   /** Visibility belongs to the YOOtheme carousel element, not individual slides. */
   showTitle?: boolean | "true" | "false" | 1 | 0 | null;
   showImage?: boolean | "true" | "false" | 1 | 0 | null;
+  showHoverVideo?: boolean | "true" | "false" | 1 | 0 | null;
   showMeta?: boolean | "true" | "false" | 1 | 0 | null;
   showContent?: boolean | "true" | "false" | 1 | 0 | null;
   showLink?: boolean | "true" | "false" | 1 | 0 | null;
@@ -1037,6 +1038,24 @@ export default function CarouselBlock({
             const hasPanelLink = (slide.linkPanel ?? settings?.linkPanel) === true && Boolean(slide.buttonUrl);
             const hasImageLink = settings?.linkImage === true && Boolean(slide.buttonUrl);
             const hasHoverVideo = showHoverVideo && Boolean(slide.hoverVideoUrl?.trim());
+            const playHoverVideo = (event: React.SyntheticEvent<HTMLElement>) => {
+              const video = event.currentTarget.querySelector<HTMLVideoElement>(
+                ".shop-builder-panel-slider-hover-video",
+              );
+              if (!video) return;
+              void video.play().catch(() => {
+                // Browser media policy can reject playback; the image remains
+                // the stable fallback without affecting the slider layout.
+              });
+            };
+            const stopHoverVideo = (event: React.SyntheticEvent<HTMLElement>) => {
+              const video = event.currentTarget.querySelector<HTMLVideoElement>(
+                ".shop-builder-panel-slider-hover-video",
+              );
+              if (!video) return;
+              video.pause();
+              video.currentTime = 0;
+            };
             const itemButtonLabel = slide.buttonLabel ?? settings?.buttonLabel;
             const hasAction = slide.showAction !== false && Boolean(itemButtonLabel && slide.buttonUrl);
             const panelImageNoPadding = slide.panelImageNoPadding ?? slide.alignImageWithoutPadding ?? false;
@@ -1152,16 +1171,22 @@ export default function CarouselBlock({
                           ...panelLinkProps,
                           "aria-label": slide.imageAlt || slide.title || "Open image",
                         } : {}),
+                        ...(hasHoverVideo ? {
+                          onMouseEnter: playHoverVideo,
+                          onMouseLeave: stopHoverVideo,
+                          onFocus: playHoverVideo,
+                          onBlur: stopHoverVideo,
+                        } : {}),
                       },
                       panelImage,
                       hasHoverVideo ? (
                         <video
                           className="shop-builder-panel-slider-hover-video"
                           src={slide.hoverVideoUrl!}
-                          autoPlay
                           muted
                           loop
                           playsInline
+                          preload="none"
                           aria-hidden="true"
                         />
                       ) : null,

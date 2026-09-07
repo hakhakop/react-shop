@@ -95,10 +95,73 @@ const canonicalPanelSliderBindings = (
   return projected;
 };
 
+const canonicalInheritedBindings = (
+  bindings: DynamicFieldBindings | undefined,
+  inheritedContext: DynamicItemContext | undefined,
+): DynamicFieldBindings | undefined => {
+  if (!bindings || !inheritedContext) return bindings;
+  return Object.fromEntries(Object.entries(bindings).map(([destination, binding]) => {
+    if (!binding || inheritedContext.fields[binding.path]) return [destination, binding];
+    const path = binding.path === "featuredImage.url" && inheritedContext.fields["image.url"]
+      ? "image.url"
+      : binding.path === "featuredImage.alt" && inheritedContext.fields["image.alt"]
+        ? "image.alt"
+        : binding.path === "woocommerce.price" && inheritedContext.fields.price
+          ? "price"
+          : binding.path;
+    return [destination, { ...binding, path }];
+  })) as DynamicFieldBindings;
+};
+
 const asDataRecord = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
     : {};
+
+const inferredContextValue = (key: string, value: unknown): DynamicItemContext["fields"][string] | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return { type: key === "id" ? "identifier" : "number", value };
+  }
+  if (typeof value !== "string" || !value) return undefined;
+  if (key === "id") return { type: "identifier", value };
+  if (key === "url" || key.endsWith("Url")) return { type: "url", value };
+  return { type: "string", value };
+};
+
+/** Resolve a repeatable relation already normalized on the inherited item. */
+const resolveLocalContextRelation = (
+  descriptor: DynamicContentContextDescriptor,
+  inheritedContext: DynamicItemContext | undefined,
+): DynamicItemContext[] | undefined => {
+  if (descriptor.provider !== "webpages" || descriptor.source !== "context-relation") return undefined;
+  const path = typeof descriptor.query?.path === "string" ? descriptor.query.path : "";
+  const [root, ...segments] = path.split(".").filter(Boolean);
+  if (!root || !inheritedContext) return [];
+  const rootValue = inheritedContext.fields[root]?.value;
+  let relation: unknown = rootValue;
+  for (const segment of segments) relation = asDataRecord(relation)[segment];
+  if (!Array.isArray(relation)) return [];
+
+  const start = Number.isInteger(descriptor.query?.start)
+    ? Math.max(0, Number(descriptor.query?.start))
+    : 0;
+  const quantity = Number.isInteger(descriptor.query?.quantity) && Number(descriptor.query?.quantity) > 0
+    ? Number(descriptor.query?.quantity)
+    : undefined;
+  return relation.slice(start, quantity ? start + quantity : undefined).flatMap((entry, index) => {
+    const record = asDataRecord(entry);
+    const id = typeof record.id === "string" || typeof record.id === "number"
+      ? record.id
+      : `${String(inheritedContext.id ?? "context")}-${root}-${start + index}`;
+    const fields = Object.fromEntries(
+      Object.entries(record).flatMap(([key, value]) => {
+        const normalized = inferredContextValue(key, value);
+        return normalized ? [[key, normalized]] : [];
+      }),
+    );
+    return [{ id, fields } satisfies DynamicItemContext];
+  });
+};
 
 const resolveInheritedDescriptor = (
   descriptor: DynamicContentContextDescriptor | undefined,
@@ -152,6 +215,10 @@ const resolveInheritedDescriptor = (
   }, inheritedContext);
 };
 
+const isStaticDynamicDescriptor = (
+  descriptor: DynamicContentContextDescriptor | null | undefined,
+) => descriptor?.provider === "webpages" && descriptor.source === "static";
+
 async function resolveInheritedContext(
   descriptor: DynamicContentContextDescriptor | undefined,
   inheritedContext: DynamicItemContext | undefined,
@@ -159,6 +226,7 @@ async function resolveInheritedContext(
   resolveContexts: DynamicContentContextResolver,
 ) {
   if (!descriptor) return inheritedContext;
+  if (isStaticDynamicDescriptor(descriptor)) return undefined;
   const resolvedDescriptor = resolveInheritedDescriptor(descriptor, inheritedContext);
   if (!resolvedDescriptor) return inheritedContext;
   const contexts = await resolveContexts({ website, descriptor: resolvedDescriptor });
@@ -214,7 +282,7 @@ export function dynamicStructureRenderId(
 type StructuralNode = {
   id: string;
   dynamicContext?: DynamicContentContextDescriptor;
-  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl">;
+  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl" | "backgroundVideoUrl">;
   visualStyle?: Record<string, unknown>;
 };
 
@@ -223,20 +291,28 @@ const projectStructuralNode = <Node extends StructuralNode>(
   context: DynamicItemContext | undefined,
   renderId?: string,
 ): Node => {
-  const binding = node.dynamicBindings?.backgroundImageUrl;
-  const backgroundImageUrl = binding
-    ? getDynamicItemContextValue(context, binding.path, "url")
+  const imageBinding = node.dynamicBindings?.backgroundImageUrl;
+  const videoBinding = node.dynamicBindings?.backgroundVideoUrl;
+  const backgroundImageUrl = imageBinding
+    ? getDynamicItemContextValue(context, imageBinding.path, "url")
+    : undefined;
+  const backgroundVideoUrl = videoBinding
+    ? getDynamicItemContextValue(context, videoBinding.path, "url")
     : undefined;
   const projected = { ...node, ...(renderId ? { id: renderId } : {}) } as Node & Record<string, unknown>;
   delete projected.dynamicContext;
   delete projected.dynamicBindings;
-  const resolvedUrl = backgroundImageUrl;
-  if (resolvedUrl) {
+  if (backgroundImageUrl || backgroundVideoUrl) {
     const visualStyle = asDataRecord(node.visualStyle);
     const background = asDataRecord(visualStyle.background);
     projected.visualStyle = {
       ...visualStyle,
-      background: { ...background, type: "image", imageUrl: resolvedUrl },
+      background: {
+        ...background,
+        ...(backgroundImageUrl ? { imageUrl: backgroundImageUrl } : {}),
+        ...(backgroundVideoUrl ? { videoUrl: backgroundVideoUrl } : {}),
+        type: backgroundVideoUrl ? "video" : "image",
+      },
     };
   }
   return projected as Node;
@@ -248,6 +324,9 @@ async function expandStructuralNode<Node extends StructuralNode>(
   website: SaaSWebsite | null | undefined,
   resolveContexts: DynamicContentContextResolver,
 ): Promise<Array<{ node: Node; context?: DynamicItemContext }>> {
+  if (isStaticDynamicDescriptor(node.dynamicContext)) {
+    return [{ node: projectStructuralNode(node, undefined), context: undefined }];
+  }
   const descriptor = resolveInheritedDescriptor(node.dynamicContext, inheritedContext);
   if (!descriptor) return [{ node, context: inheritedContext }];
   const contexts = await resolveContexts({
@@ -261,7 +340,12 @@ async function expandStructuralNode<Node extends StructuralNode>(
     (typeof context.id === "string" && context.id.length > 0) ||
     (typeof context.id === "number" && Number.isFinite(context.id)),
   );
-  if (identified.length === 0) return [{ node, context: inheritedContext }];
+  // A structural collection is multiplication, not an element-level static
+  // fallback. An empty archive therefore produces no repeated row/column;
+  // independently authored empty-state content remains visible.
+  if (identified.length === 0) {
+    return contexts.length === 0 ? [] : [{ node, context: inheritedContext }];
+  }
   return identified.map((context) => {
     const projected = projectStructuralNode(node, context, dynamicStructureRenderId(node.id, context.id));
     return { node: projected, context };
@@ -315,13 +399,18 @@ async function materializeRepeatableItems<Item extends RepeatableItem>(
   const output: Item[] = [];
   let expanded = false;
   for (const item of items) {
+    if (isStaticDynamicDescriptor(item.dynamicContext)) {
+      output.push(staticRepeatableItemTemplate(item));
+      expanded = true;
+      continue;
+    }
     const descriptor = resolveInheritedDescriptor(
       item.dynamicContext as DynamicContentContextDescriptor | undefined,
       inheritedContext,
     );
     if (!descriptor) {
       output.push(inheritedContext && item.dynamicBindings
-        ? resolveDynamicItem(item, inheritedContext, item.dynamicBindings) as Item
+        ? resolveDynamicItem(item, inheritedContext, canonicalInheritedBindings(item.dynamicBindings, inheritedContext)) as Item
         : item);
       if (inheritedContext && item.dynamicBindings) expanded = true;
       continue;
@@ -416,6 +505,7 @@ async function materializeElementBlock(
   diagnostics: DynamicContentMaterializationDiagnostic[],
   inheritedContext?: DynamicItemContext,
 ): Promise<BuilderLayoutBlock> {
+  if (isStaticDynamicDescriptor(block.dynamicContext)) return staticElementTemplate(block);
   if (block.kind === "products") {
     const productDescriptor = resolveInheritedDescriptor(block.dynamicContext ?? {
       provider: "woocommerce",
@@ -441,7 +531,7 @@ async function materializeElementBlock(
   const blockDescriptor = resolveInheritedDescriptor(block.dynamicContext, inheritedContext);
   if (!blockDescriptor) {
     if (!inheritedContext || !block.dynamicBindings) return block;
-    return resolveDynamicItem(staticElementTemplate(block), inheritedContext, block.dynamicBindings);
+    return resolveDynamicItem(staticElementTemplate(block), inheritedContext, canonicalInheritedBindings(block.dynamicBindings, inheritedContext));
   }
 
   try {
@@ -519,6 +609,11 @@ async function materializeGridBlock(
   const renderItems: GridItem[] = [];
 
   for (const item of block.gridItems) {
+    if (isStaticDynamicDescriptor(item.dynamicContext)) {
+      renderItems.push(staticGridTemplate(item));
+      changed = true;
+      continue;
+    }
     const descriptor = resolveInheritedDescriptor(item.dynamicContext, inheritedContext);
     if (!descriptor) {
       if (inheritedContext && item.dynamicBindings) {
@@ -632,14 +727,28 @@ async function materializeCarouselCollectionBlock(
 ): Promise<BuilderLayoutBlock> {
   if (!(block.kind === "panelSlider" || block.kind === "slideshow" || block.kind === "overlaySlider" || block.kind === "slider") || !block.slides?.length) return block;
 
+  // YOOtheme carousel sources establish the context inherited by their item
+  // templates. A plain `#parent` intentionally resolves to the containing
+  // column context; it is not a provider request and never names a product ID.
+  const carouselContext = await resolveInheritedContext(
+    block.dynamicContext,
+    inheritedContext,
+    website,
+    resolveContexts,
+  );
   let changed = false;
   const renderSlides: PanelSliderSlide[] = [];
 
   for (const slide of block.slides) {
-    const descriptor = resolveInheritedDescriptor(slide.dynamicContext, inheritedContext);
+    if (isStaticDynamicDescriptor(slide.dynamicContext)) {
+      renderSlides.push(staticPanelSliderTemplate(slide));
+      changed = true;
+      continue;
+    }
+    const descriptor = resolveInheritedDescriptor(slide.dynamicContext, carouselContext);
     if (!descriptor) {
-      if (inheritedContext && slide.dynamicBindings) {
-        renderSlides.push(resolveDynamicItem(staticPanelSliderTemplate(slide), inheritedContext, slide.dynamicBindings));
+      if (carouselContext && slide.dynamicBindings) {
+        renderSlides.push(resolveDynamicItem(staticPanelSliderTemplate(slide), carouselContext, canonicalInheritedBindings(slide.dynamicBindings, carouselContext)));
         changed = true;
       } else renderSlides.push(slide);
       continue;
@@ -672,9 +781,10 @@ async function materializeCarouselCollectionBlock(
         slide.dynamicBindings,
         block.carouselSettings?.showMeta !== false,
       );
-      const contexts = await resolveContexts({
+      const requestedDescriptor = withRequestedBindingFields(descriptor, bindings);
+      const contexts = resolveLocalContextRelation(requestedDescriptor, carouselContext) ?? await resolveContexts({
         website,
-        descriptor: withRequestedBindingFields(descriptor, bindings),
+        descriptor: requestedDescriptor,
       });
       const identifiedContexts = contexts.filter(
         (context): context is DynamicItemContext & { id: string | number } =>
@@ -747,6 +857,26 @@ async function materializeBlocks(
   const renderBlocks = await Promise.all(blocks.map(async (block, index) => {
     const blockKey = block.id ?? `${columnKey}-block-${index}`;
     const location = { sectionId, columnKey, blockKey };
+    if (block.dynamicCondition?.source === "archive-products") {
+      try {
+        const descriptor = resolveInheritedDescriptor({
+          provider: "woocommerce",
+          source: "product",
+          mode: "collection",
+          query: { quantity: 1 },
+        }, inheritedContext)!;
+        const contexts = await resolveContexts({ website, descriptor });
+        const matches = block.dynamicCondition.operator === "empty"
+          ? contexts.length === 0
+          : contexts.length > 0;
+        if (!matches) {
+          changed = true;
+          return [];
+        }
+      } catch (error) {
+        diagnostics.push({ status: "fallback", ...location, message: safeErrorMessage(error) });
+      }
+    }
     if (block.kind === "sublayout" && block.sublayout) {
       const projections = await expandStructuralNode({ id: blockKey, dynamicContext: block.dynamicContext }, inheritedContext, website, request => resolveContexts({ ...request, descriptor: withRequestedBindingFields(request.descriptor, block.dynamicBindings) }));
       const fragments = await Promise.all(projections.map(async ({ node, context }) => {

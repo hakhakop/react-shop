@@ -30,6 +30,7 @@ import {
   getWebsiteRouteSegment,
 } from "../lib/websites";
 import { builderGlobalVisibilityClassName } from "../lib/builderVisualStyle";
+import StorefrontNavigationLoading from "../components/StorefrontNavigationLoading";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -389,6 +390,7 @@ ${explicitWordPressProductVars}
                   )}
 
                   <main className="site-main" suppressHydrationWarning>{children}</main>
+                  <StorefrontNavigationLoading />
 
                   {(!isDashboardWorkspaceRequest || isTenantPreviewRequest) && (
                     <>

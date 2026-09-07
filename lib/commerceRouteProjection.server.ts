@@ -1,16 +1,17 @@
 import type { StorefrontBuilderRendererProps } from "@/components/builder/StorefrontBuilderRenderer";
 import type { BuilderDataScope, BuilderLayout } from "@/lib/builderLayouts";
 import type { DynamicItemContext } from "@/lib/dynamicContent";
-import { resolveLayout, type ArchiveRouteContext, type SingularRouteContext } from "@/lib/layoutRouting";
+import { resolveLayout, type RouteTaxonomyTerm, type SingularRouteContext } from "@/lib/layoutRouting";
 import {
   ensureProductCategoryRoutingCompatibility,
   ensureProductSingleRoutingCompatibility,
   getBuilderLayoutByDocumentId,
 } from "@/lib/layoutRoutingStore.server";
 import type { CommerceRouteAlias } from "@/lib/navigationTargets";
-import { getCanonicalProductCategoryBySlug } from "@/lib/productCategoryContext.server";
+import { getCanonicalProductCategoryBySlug, projectProductCategoryRouteContext } from "@/lib/productCategoryContext.server";
 import { getCanonicalProductSingularBySlug } from "@/lib/productSingularContext.server";
 import type { SaaSWebsite } from "@/lib/websites";
+import { resolveWooCommerceTermContexts } from "@/lib/woocommerceTermContentProvider.server";
 
 export type CommerceRouteProjection = {
   page: "product-category" | "product-single";
@@ -24,24 +25,28 @@ export async function resolveCommerceRouteProjection(input: {
   alias: CommerceRouteAlias;
   website: SaaSWebsite;
   scope: BuilderDataScope;
+  pageNumber?: number;
+  requestProductTagSlugs?: string[];
 }): Promise<CommerceRouteProjection | null> {
   if (input.alias.pageKey === "product-category") {
-    const resolved = await getCanonicalProductCategoryBySlug(input.alias.target.slug, input.website);
+    const [resolved, requestTagContexts] = await Promise.all([
+      getCanonicalProductCategoryBySlug(input.alias.target.slug, input.website),
+      Promise.all((input.requestProductTagSlugs ?? []).map((slug) => resolveWooCommerceTermContexts({
+        website: input.website,
+        descriptor: { provider: "woocommerce", source: "product-tag", mode: "single", query: { slug } },
+      }).catch(() => []))).then((groups) => groups.flat()),
+    ]);
     if (!resolved) return null;
-    const routeContext: ArchiveRouteContext = {
-      view: "archive",
-      pageType: "taxonomy:product_cat",
-      provider: "woocommerce",
-      contentType: "product-category",
-      contentId: String(resolved.category.id),
-      databaseId: resolved.category.id,
-      slug: resolved.category.slug,
-      uri: input.alias.path,
-      taxonomyTerms: [
-        { taxonomy: "product_cat", id: String(resolved.category.id), slug: resolved.category.slug },
-        ...resolved.category.ancestry.map((category) => ({ taxonomy: "product_cat", id: String(category.id), slug: category.slug })),
-      ],
-    };
+    const requestTaxonomyTerms: RouteTaxonomyTerm[] = requestTagContexts.flatMap((context) => {
+      const value = context.fields.slug?.value;
+      return context.id !== undefined && typeof value === "string"
+        ? [{ taxonomy: "product_tag", id: String(context.id), slug: value }]
+        : [];
+    });
+    const routeContext = projectProductCategoryRouteContext(resolved.category, input.alias.path, {
+      pageNumber: input.pageNumber,
+      requestTaxonomyTerms,
+    });
     const registry = await ensureProductCategoryRoutingCompatibility(input.scope);
     const resolution = resolveLayout({
       context: routeContext,
@@ -52,6 +57,11 @@ export async function resolveCommerceRouteProjection(input: {
     const layout = resolution.outcome === "individual" || resolution.outcome === "routing-template"
       ? await getBuilderLayoutByDocumentId(resolution.layoutId, input.scope)
       : null;
+    const templatePageSize = resolution.outcome === "routing-template"
+      ? resolution.template.postsPerPage
+      : undefined;
+    const pageSize = templatePageSize ?? resolved.products.length;
+    const pageOffset = Math.max(0, (input.pageNumber ?? 1) - 1) * pageSize;
     return {
       page: "product-category",
       pageLabel: resolved.category.name,
@@ -64,7 +74,7 @@ export async function resolveCommerceRouteProjection(input: {
           ...resolved.category.ancestry.map((category) => ({ label: category.name })),
           { label: resolved.category.name },
         ],
-        products: resolved.products,
+        products: templatePageSize ? resolved.products.slice(pageOffset, pageOffset + templatePageSize) : resolved.products,
         categoryTree: resolved.categoryTree,
         activeCategorySlug: resolved.category.slug,
       },

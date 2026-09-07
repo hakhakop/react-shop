@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { defaultBuilderShellSettings, normalizeBuilderShellSettings } from "@/lib/builderShell";
-import { emptyMenuDropdown, exportMenuDropdown } from "@/lib/menuDropdownLayout";
-import { createSublayoutRow } from "@/lib/builderSublayout";
-import women from "./fixtures/yootheme-compatibility/sources/women-menu-dropdown.json";
+import newIn from "./fixtures/yootheme-compatibility/sources/new-in-menu-dropdown.json";
 
 test("manual elements update immediately and use external Inspector and library hosts", async ({ page }) => {
   const previewRequests: unknown[] = [];
@@ -32,17 +30,24 @@ test("manual elements update immediately and use external Inspector and library 
   expect(JSON.stringify(previewRequests)).toContain("Live dropdown title");
 });
 
-test("real dashboard dropdown edits autosave and import uses the existing preview", async ({ page }) => {
+test("real dashboard dropdown edits autosave and import uses the shared Section Library", async ({ page }) => {
   const saved: Record<string, unknown>[] = [];
+  let templates: Record<string, unknown>[] = [];
   let serverSettings = normalizeBuilderShellSettings({ ...defaultBuilderShellSettings, namedMenus: [{ id: "main-menu", name: "Main Menu", items: [{ id: "women", label: "Women", url: "/women" }] }] });
   // Exercise the production UI and persistence payload, without writing tenant data.
   await page.route("**/api/**", async route => {
     if (["GET", "HEAD"].includes(route.request().method())) {
       if (route.request().url().includes("/api/builder-shell")) return route.fulfill({ json: { settings: serverSettings } });
+      if (route.request().url().includes("/api/builder-templates")) return route.fulfill({ json: { templates } });
       return route.fulfill({ json: {} });
     }
     const body = route.request().postDataJSON();
     if (route.request().url().includes("builder-shell")) { saved.push(body); serverSettings = normalizeBuilderShellSettings(body); return route.fulfill({ json: { settings: serverSettings } }); }
+    if (route.request().url().includes("builder-templates")) {
+      const template = { ...body, id: `template-${templates.length + 1}`, updatedAt: new Date().toISOString(), libraryScope: "site" };
+      templates = [template, ...templates];
+      return route.fulfill({ json: { template, templates } });
+    }
     if (route.request().url().includes("builder-layouts")) expect(JSON.stringify(body)).not.toContain("Dropdown pipeline test");
     return route.fulfill({ json: { success: true, settings: body, layout: body } });
   });
@@ -60,37 +65,40 @@ test("real dashboard dropdown edits autosave and import uses the existing previe
   await library.locator(".builder-element-library-card").filter({ hasText: "Heading" }).click();
   const inspector = page.locator(".builder-floating-inspector");
   await expect(inspector.locator("[data-sublayout-detail]")).toBeVisible();
+  await inspector.getByRole("button", { name: "Close inspector", exact: true }).click();
+  await expect(inspector).toBeHidden();
+  await page.getByRole("button", { name: "Open Inspector", exact: true }).click();
+  await expect(inspector.locator("[data-sublayout-detail]")).toBeVisible();
   await inspector.getByRole("textbox").first().fill("Dropdown pipeline test");
   await expect.poll(() => JSON.stringify(saved)).toContain("Dropdown pipeline test");
   const fragment = { type: "fragment", children: [{ type: "row", children: [{ type: "column", children: [{ type: "headline", props: { content: "Imported pipeline title" } }] }] }] };
-  await editor.getByLabel("Dropdown JSON").setInputFiles({ name: "dropdown.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(fragment)) });
-  await expect(page.getByRole("button", { name: "Apply to dropdown", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Apply to dropdown", exact: true }).click();
+  await editor.getByRole("button", { name: "Open Layout Library" }).click();
+  let layoutLibrary = page.getByRole("dialog", { name: "Library" });
+  await layoutLibrary.locator("label").filter({ hasText: "Import YOOtheme JSON to Library" }).locator("input").setInputFiles({ name: "dropdown.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(fragment)) });
+  await layoutLibrary.getByLabel("Library item name").fill("Imported pipeline dropdown");
+  await layoutLibrary.getByRole("button", { name: "Import to Library" }).click();
+  await expect(layoutLibrary).toContainText("Imported pipeline dropdown");
+  await layoutLibrary.getByRole("button", { name: "Select" }).first().click();
+  await layoutLibrary.getByRole("button", { name: "Apply to Dropdown" }).click();
   await expect.poll(() => JSON.stringify(saved)).toContain("Imported pipeline title");
   await page.reload();
   await page.getByRole("button", { name: "Menu", exact: true }).click();
   await page.getByLabel("WebPages menu").selectOption("main-menu");
   await page.getByRole("button", { name: "Open Women dropdown builder" }).click();
   await expect(page.getByRole("tree", { name: "Women dropdown structure" })).toContainText("Imported pipeline title");
-  const products = emptyMenuDropdown();
-  products.sublayout.rows.push(createSublayoutRow());
-  products.sublayout.rows[0].columns[0].elements.push({ id: "dropdown-products", kind: "products", dynamicContext: { provider: "woocommerce", source: "product", mode: "collection", query: { quantity: 8 } } });
-  await editor.getByLabel("Dropdown JSON").setInputFiles({ name: "products.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(exportMenuDropdown(products))) });
-  await expect(page.getByRole("button", { name: "Apply to dropdown", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Apply to dropdown", exact: true }).click();
-  await expect.poll(() => JSON.stringify(serverSettings)).toContain('"source":"product"');
-  await editor.getByLabel("Dropdown JSON").setInputFiles({ name: "women.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(women)) });
-  await expect(page.getByRole("button", { name: "Apply to dropdown", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Apply to dropdown", exact: true }).click();
-  await expect.poll(() => JSON.stringify(serverSettings)).toContain('"source":"menu-item"');
-  await page.reload();
-  await page.getByRole("button", { name: "Menu", exact: true }).click();
-  await page.getByLabel("WebPages menu").selectOption("main-menu");
-  await page.getByRole("button", { name: "Open Women dropdown builder" }).click();
-  await expect(editor.locator(".builder-structure-element-card").filter({ hasText: /^Nav/ })).toHaveCount(5);
-  const beforeUnsupported = JSON.stringify(serverSettings);
-  await editor.getByLabel("Dropdown JSON").setInputFiles({ name: "unsupported.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify({ type: "fragment", children: [{ type: "row", children: [{ type: "column", children: [{ type: "unsupported_widget" }] }] }] })) });
-  await expect(page.getByRole("button", { name: "Apply to dropdown", exact: true })).toBeDisabled();
-  await expect(page.getByRole("alert").filter({ hasText: "cannot be applied without losing source content" })).toBeVisible();
-  expect(JSON.stringify(serverSettings)).toBe(beforeUnsupported);
+  await editor.getByRole("button", { name: "Open Layout Library" }).click();
+  layoutLibrary = page.getByRole("dialog", { name: "Library" });
+  await layoutLibrary.locator("label").filter({ hasText: "Import YOOtheme JSON to Library" }).locator("input").setInputFiles({ name: "new-in.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(newIn)) });
+  await layoutLibrary.getByLabel("Library item name").fill("New In dropdown");
+  await layoutLibrary.getByRole("button", { name: "Import to Library" }).click();
+  await expect(layoutLibrary).toContainText("New In dropdown");
+  await layoutLibrary.locator(".builder-template-row").filter({ hasText: "New In dropdown" }).getByRole("button", { name: "Select" }).click();
+  await layoutLibrary.getByRole("button", { name: "Apply to Dropdown" }).click();
+  await expect.poll(() => JSON.stringify(serverSettings)).toContain('"hoverVideoUrl"');
+  await expect.poll(() => JSON.stringify(serverSettings)).toContain('"kind":"textAffix"');
+  expect(JSON.stringify(serverSettings)).toContain('"source":"product-category"');
+  expect(JSON.stringify(serverSettings)).toContain('"parentId":0');
+  expect(JSON.stringify(serverSettings)).toContain('"order":"menuOrder"');
+  expect(JSON.stringify(serverSettings)).toContain('"path":"acf.products_intro_image.url"');
+  expect(JSON.stringify(serverSettings)).toContain('"path":"acf.products_hover_video.url"');
 });

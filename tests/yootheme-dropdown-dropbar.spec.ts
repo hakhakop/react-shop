@@ -104,4 +104,6 @@ test("shared Header CSS consumes canonical alignment, boundary, click and dropba
   expect(css).toContain(".site-header--dropdown-hover .site-header-nav-item:hover");
   expect(css).toContain("var(--uk-dropbar-background");
   expect(css).toContain("var(--uk-navbar-dropdown-nav-item-hover-color");
+  expect(css).toContain(".site-header-nav-submenu--builder");
+  expect(css).toMatch(/site-header-nav-submenu--builder\s*\{[\s\S]*?gap:\s*0;[\s\S]*?padding:\s*0;/);
 });

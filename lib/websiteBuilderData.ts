@@ -21,6 +21,10 @@ type BuilderFileName = (typeof BUILDER_FILES)[number];
 type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE | typeof BUILDER_ROUTING_FILE | typeof BUILDER_THEME_SETTINGS_FILE;
 type BuilderFileState = "missing" | "empty" | "non-empty" | "invalid";
 let rootBuilderDataEnsurePromise: Promise<void> | null = null;
+// Builder files are initialized once per process. Re-checking the filesystem
+// for all three files on every storefront navigation adds avoidable latency
+// (especially on the first request after a cold dev/server start).
+const websiteBuilderDataEnsurePromises = new Map<string, Promise<void>>();
 
 function assertSafeWebsiteId(websiteId: string) {
   if (!/^[a-zA-Z0-9_-]+$/.test(websiteId)) {
@@ -221,11 +225,25 @@ async function seedBuilderFile(websiteId: string, fileName: BuilderFileName) {
 }
 
 export async function ensureWebsiteBuilderData(websiteId: string) {
+  const existing = websiteBuilderDataEnsurePromises.get(websiteId);
+  if (existing) {
+    await existing;
+    return;
+  }
   const dir = getWebsiteBuilderDir(websiteId);
-  await mkdir(dir, { recursive: true });
-  await Promise.all(
+  const pending = (async () => {
+    await mkdir(dir, { recursive: true });
+    await Promise.all(
     BUILDER_FILES.map((fileName) => seedBuilderFile(websiteId, fileName)),
-  );
+    );
+  })();
+  websiteBuilderDataEnsurePromises.set(websiteId, pending);
+  try {
+    await pending;
+  } catch (error) {
+    websiteBuilderDataEnsurePromises.delete(websiteId);
+    throw error;
+  }
 }
 
 export async function initializeWebsiteBuilderData(input: {

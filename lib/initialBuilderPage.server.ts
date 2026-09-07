@@ -17,6 +17,7 @@ export async function resolveInitialBuilderPage(input: {
   contentLanguage: string;
   primaryContentLanguage: string;
   wordpressMediaOrigin?: string | null;
+  deferDynamicContent?: boolean;
 }) {
   const authoredLayout = await getPublishedBuilderLayout(input.page, input.scope);
   const editorContext = await resolveOrdinaryBuilderEditorContext({
@@ -43,16 +44,18 @@ export async function resolveInitialBuilderPage(input: {
   const resolvedMediaLayout = input.wordpressMediaOrigin
     ? resolveBuilderMediaUrls(localizedLayout, input.wordpressMediaOrigin)
     : localizedLayout;
-  const materialization = await materializeBuilderDynamicContent(
-    resolvedMediaLayout,
-    input.website
-      ? { website: input.website }
-      : undefined,
-  );
+  const renderLayout = input.deferDynamicContent
+    ? resolvedMediaLayout
+    : (await materializeBuilderDynamicContent(
+        resolvedMediaLayout,
+        input.website
+          ? { website: input.website }
+          : undefined,
+      )).renderLayout;
 
   return {
     authoredLayout,
-    renderLayout: materialization.renderLayout,
+    renderLayout,
     editorContext,
   } satisfies {
     authoredLayout: BuilderLayout;

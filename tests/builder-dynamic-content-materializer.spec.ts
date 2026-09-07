@@ -344,3 +344,92 @@ test("WordPress provider orchestration feeds the transient Grid projection", asy
     globalThis.fetch = originalFetch;
   }
 });
+
+test("a Product Category column expands products and each nested slideshow expands its gallery", async () => {
+  const authored: BuilderLayout = {
+    version: 1,
+    key: "product-category",
+    page: "product-category",
+    updatedAt: "2026-09-06T00:00:00.000Z",
+    sections: [{
+      id: "products",
+      kind: "content",
+      title: "Products",
+      background: "default",
+      visible: true,
+      rows: [{ id: "products-row", layout: "4-col-equal", columns: [{
+        id: "product-template",
+        dynamicContext: { provider: "woocommerce", source: "product", mode: "collection", query: { start: 0 } },
+        elements: [{
+          id: "slideshow",
+          kind: "slideshow",
+          slides: [
+            { id: "primary", imageUrl: "", dynamicBindings: { imageUrl: { path: "featuredImage.url", valueType: "url" } } },
+            { id: "gallery", imageUrl: "", dynamicContext: { provider: "webpages", source: "context-relation", mode: "collection", query: { path: "gallery.items", start: 0, quantity: 2 } }, dynamicBindings: { imageUrl: { path: "url", valueType: "url" } } },
+          ],
+        }, {
+          id: "details",
+          kind: "panel",
+          title: "",
+          eyebrow: "",
+          dynamicBindings: { title: { path: "title", valueType: "string" }, eyebrow: { path: "woocommerce.price", valueType: "string" } },
+        }],
+      }] }],
+    }],
+  };
+  const product = (id: number): DynamicItemContext => ({ id, fields: {
+    id: { type: "identifier", value: id },
+    title: { type: "string", value: `Product ${id}` },
+    price: { type: "string", value: `$${id}` },
+    "image.url": { type: "url", value: `https://shop.test/${id}-primary.jpg` },
+    gallery: { type: "metadata", value: { items: [
+      { id: id * 10 + 1, url: `https://shop.test/${id}-gallery-1.jpg`, alt: "Gallery one" },
+      { id: id * 10 + 2, url: `https://shop.test/${id}-gallery-2.jpg`, alt: "Gallery two" },
+      { id: id * 10 + 3, url: `https://shop.test/${id}-gallery-3.jpg`, alt: "Gallery three" },
+    ] } },
+  } });
+  const requests: Array<Record<string, unknown> | undefined> = [];
+  const result = await materializeBuilderDynamicContent(authored, {
+    rootContext: { id: 45, fields: {
+      kind: { type: "string", value: "product-category" },
+      taxonomy: { type: "string", value: "product_cat" },
+      termId: { type: "identifier", value: 45 },
+    } },
+    resolveContexts: async ({ descriptor }) => {
+      requests.push(descriptor.query);
+      return [product(101), product(102)];
+    },
+  });
+
+  expect(requests).toEqual([expect.objectContaining({ routeCategory: 45 })]);
+  const columns = result.renderLayout.sections[0]!.rows![0]!.columns;
+  expect(columns).toHaveLength(2);
+  expect(columns.map((column) => column.elements[1]?.title)).toEqual(["Product 101", "Product 102"]);
+  expect(columns.map((column) => column.elements[1]?.eyebrow)).toEqual(["$101", "$102"]);
+  expect(columns[0]!.elements[0]!.slides?.map((slide) => slide.imageUrl)).toEqual([
+    "https://shop.test/101-primary.jpg",
+    "https://shop.test/101-gallery-1.jpg",
+    "https://shop.test/101-gallery-2.jpg",
+  ]);
+  expect(JSON.stringify(authored)).not.toContain("Product 101");
+});
+
+test("archive empty-state blocks disappear when the active category has products", async () => {
+  const authored = proofLayout();
+  const column = authored.sections[0]!.rows![0]!.columns[0]!;
+  column.elements = [{
+    id: "empty-state",
+    kind: "heading",
+    headingText: "No products were found.",
+    dynamicCondition: { source: "archive-products", operator: "empty" },
+  }];
+  const result = await materializeBuilderDynamicContent(authored, {
+    rootContext: { id: 45, fields: {
+      kind: { type: "string", value: "product-category" },
+      taxonomy: { type: "string", value: "product_cat" },
+      termId: { type: "identifier", value: 45 },
+    } },
+    resolveContexts: async () => [postContext(1)],
+  });
+  expect(result.renderLayout.sections[0]!.rows![0]!.columns[0]!.elements).toEqual([]);
+});

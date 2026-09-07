@@ -1,4 +1,3 @@
-import { cache } from "react";
 import { getCmsConnection, getWordPressAuthHeaders } from "@/lib/cmsConnection";
 import { getWebsiteGraphQLEndpoint, graphqlFetch } from "@/lib/graphql";
 import { makeNavigationUrlPortable } from "@/lib/navigationPackage";
@@ -8,12 +7,36 @@ import type { SaaSWebsite } from "@/lib/websites";
 
 type MenuNode = { databaseId: number; parentDatabaseId?: number; label: string; url?: string; path?: string; target?: string; cssClasses?: string[] };
 type Menu = { databaseId: number; menuItems?: { nodes?: MenuNode[] } };
-const loadMenus = cache(async (website?: SaaSWebsite | null) => {
+type MenuResponse = { menus?: { nodes?: Menu[] } };
+
+const MENU_CACHE_TTL_MS = 30_000;
+const MENU_CACHE_MAX_ENTRIES = 50;
+const menuCache = new Map<string, { expiresAt: number; value: Promise<MenuResponse> }>();
+
+const trimMenuCache = () => {
+  while (menuCache.size > MENU_CACHE_MAX_ENTRIES) {
+    const oldest = menuCache.keys().next().value;
+    if (typeof oldest !== "string") break;
+    menuCache.delete(oldest);
+  }
+};
+
+const loadMenus = (website?: SaaSWebsite | null) => {
   const cms = getCmsConnection(website);
-  return graphqlFetch<{ menus?: { nodes?: Menu[] } }>(`query WebPagesDynamicMenus {
+  const endpoint = getWebsiteGraphQLEndpoint(website);
+  const cacheKey = `${website?.id ?? "default"}:${endpoint ?? "missing"}`;
+  const cached = menuCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+  const value = graphqlFetch<MenuResponse>(`query WebPagesDynamicMenus {
     menus(first: 100) { nodes { databaseId menuItems(first: 500) { nodes { databaseId parentDatabaseId label url path target cssClasses } } } }
-  }`, undefined, { endpoint: getWebsiteGraphQLEndpoint(website), headers: getWordPressAuthHeaders(cms) ?? undefined });
-});
+  }`, undefined, { endpoint, headers: getWordPressAuthHeaders(cms) ?? undefined });
+  menuCache.set(cacheKey, { expiresAt: Date.now() + MENU_CACHE_TTL_MS, value });
+  trimMenuCache();
+  value.catch(() => {
+    if (menuCache.get(cacheKey)?.value === value) menuCache.delete(cacheKey);
+  });
+  return value;
+};
 
 export function projectWordPressMenuContexts(menus: Menu[], input: DynamicContentProviderInput): DynamicItemContext[] {
   const source = input.descriptor.query?.sourceQuery as { arguments?: Record<string, unknown> } | undefined;

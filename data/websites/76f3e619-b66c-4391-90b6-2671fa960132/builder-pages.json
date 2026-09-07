@@ -14,5 +14,26 @@
     "title": "women",
     "slug": "women",
     "updatedAt": "2026-09-01T19:30:03.981Z"
+  },
+  {
+    "id": "c70b5064-44ee-409a-a68a-bb5d1f2f2b41",
+    "key": "page:kids",
+    "title": "Kids",
+    "slug": "kids",
+    "updatedAt": "2026-09-06T12:03:59.839Z"
+  },
+  {
+    "id": "edacb14c-a0c6-4a05-980f-853430832d0a",
+    "key": "page:men",
+    "title": "Men",
+    "slug": "men",
+    "updatedAt": "2026-09-06T12:08:28.510Z"
+  },
+  {
+    "id": "58b90d77-5e83-408b-945e-317d27c15583",
+    "key": "page:gifts",
+    "title": "Gifts",
+    "slug": "gifts",
+    "updatedAt": "2026-09-06T12:11:40.583Z"
   }
 ]

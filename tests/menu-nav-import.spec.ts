@@ -5,6 +5,96 @@ import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMat
 import { getWebsiteByIdOrSlug } from "@/lib/websites";
 import { projectWordPressMenuContexts } from "@/lib/wordpressMenuContentProvider.server";
 import { duplicateSublayoutNode } from "@/lib/builderSublayout";
+import { DYNAMIC_CONTENT_SOURCE_CAPABILITIES, dynamicBindingDestinationCapability, dynamicContentCapabilityMatchesDescriptor } from "@/lib/dynamicContentCapabilities";
+
+test("imported slideshow video and product tag selection have shared Inspector capabilities", () => {
+  const mapped = mapYoothemeStaticContent(women);
+  const fragment = mapped.sections[0].rows![0].columns[0].elements[0];
+  const slideshow = fragment.sublayout!.rows[0].columns.flatMap(column => column.elements).find(block => block.kind === "slideshow")!;
+  expect(slideshow.slides).toHaveLength(2);
+  slideshow.slides!.forEach((slide, index) => {
+    expect(slide.dynamicContext?.query?.databaseId).toBe([71, 73][index]);
+    expect(slide.dynamicBindings?.videoUrl).toEqual({ path: "acf.image_featured.url", valueType: "url" });
+    const capability = DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find(candidate => dynamicContentCapabilityMatchesDescriptor(candidate, slide.dynamicContext!));
+    expect(capability?.label).toBe("Product Tag");
+    expect(capability?.queryControls?.some(control => control.key === "databaseId")).toBe(true);
+  });
+  expect(dynamicBindingDestinationCapability("videoUrl")?.acceptedTypes).toEqual(["url"]);
+});
+
+test("Kids Overlay preserves the authored Product Tag video binding", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "fragment",
+    children: [{
+      type: "row",
+      children: [{
+        type: "column",
+        children: [{
+          type: "overlay",
+          props: {
+            image_height: 540,
+            image_min_height: "360",
+            image_width: 960,
+            overlay_mode: "cover",
+          },
+          source: {
+            query: { name: "productTags.customProductTag", arguments: { id: 75 } },
+            props: {
+              image_alt: { name: "field.image_intro.alt" },
+              title: { name: "name" },
+              video: { name: "field.image_featured.url" },
+            },
+          },
+        }],
+      }],
+    }],
+  });
+  const fragment = mapped.sections[0].rows![0].columns[0].elements[0];
+  const overlay = fragment.sublayout!.rows[0].columns[0].elements[0];
+
+  expect(overlay.kind).toBe("overlay");
+  expect(overlay.dynamicContext).toMatchObject({
+    provider: "woocommerce",
+    source: "product-tag",
+    mode: "single",
+    query: { databaseId: 75 },
+  });
+  expect(overlay.dynamicBindings).toMatchObject({
+    imageAlt: { path: "acf.image_intro.alt", valueType: "string" },
+    title: { path: "name", valueType: "string" },
+    videoUrl: { path: "acf.image_featured.url", valueType: "url" },
+  });
+});
+
+test("connected Kids Overlay resolves its Product Tag video", async () => {
+  test.skip(!process.env.VERIFY_WOOLBERRY_NAV, "Opt-in read-only connected CMS verification");
+  const mapped = mapYoothemeStaticContent({
+    type: "fragment",
+    children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "overlay",
+      props: { image_height: 540, image_min_height: "360", image_width: 960, overlay_mode: "cover" },
+      source: {
+        query: { name: "productTags.customProductTag", arguments: { id: 75 } },
+        props: {
+          image_alt: { name: "field.image_intro.alt" },
+          title: { name: "name" },
+          video: { name: "field.image_featured.url" },
+        },
+      },
+    }] }] }],
+  });
+  const website = await getWebsiteByIdOrSlug("woolberry");
+  const result = await materializeBuilderDynamicContent(
+    { version: 1, page: "header", updatedAt: "", sections: mapped.sections },
+    { website },
+  );
+  const fragment = result.renderLayout.sections[0].rows![0].columns[0].elements[0];
+  const overlay = fragment.sublayout!.rows[0].columns[0].elements[0];
+
+  expect(overlay.title).toBeTruthy();
+  expect(overlay.videoUrl).toMatch(/^https:\/\/.+\.(?:mp4|webm)(?:\?.*)?$/i);
+  expect(result.diagnostics.filter(item => item.message?.includes("acf.image_featured.url"))).toHaveLength(0);
+});
 
 test("Women fragment retains Nav collections in the shared mapper", () => {
   const result = mapYoothemeStaticContent(women);
@@ -14,6 +104,23 @@ test("Women fragment retains Nav collections in the shared mapper", () => {
   const copied = duplicateSublayoutNode(fragment);
   expect(copied.id).not.toBe(fragment.id);
   expect(copied.sublayout!.rows[0].columns[0].elements[0].dynamicContext).toEqual(fragment.sublayout!.rows[0].columns[0].elements[0].dynamicContext);
+});
+
+test("connected slideshow resolves both ACF videos independently of menu contents", async () => {
+  test.skip(!process.env.VERIFY_WOOLBERRY_NAV, "Opt-in read-only connected CMS verification");
+  const mapped = mapYoothemeStaticContent(women);
+  const fragment = mapped.sections[0].rows![0].columns[0].elements[0];
+  const slideshow = fragment.sublayout!.rows[0].columns.flatMap(column => column.elements).find(block => block.kind === "slideshow")!;
+  fragment.sublayout!.rows[0].columns = [{ ...fragment.sublayout!.rows[0].columns[0], elements: [slideshow] }];
+  const website = await getWebsiteByIdOrSlug("woolberry");
+  const result = await materializeBuilderDynamicContent({ version: 1, page: "header", updatedAt: "", sections: mapped.sections }, { website });
+  const slides = result.renderLayout.sections[0].rows![0].columns[0].elements[0].sublayout!.rows[0].columns[0].elements[0].slides!;
+  expect(slides.map(slide => slide.title)).toEqual(["Revolutionary Muse Women", "Color Essentials Women"]);
+  expect(slides.map(slide => slide.videoUrl)).toEqual([
+    "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-revolutionary-muse-women.mp4",
+    "https://woolberry.webpages.am/wp-content/uploads/yootheme/products-tag-color-essentials-women.mp4",
+  ]);
+  expect(result.diagnostics.filter(item => item.message?.includes("acf.image_featured.url"))).toHaveLength(0);
 });
 
 test("connected Women dropdown resolves live CMS contexts read-only", async () => {
@@ -27,9 +134,7 @@ test("connected Women dropdown resolves live CMS contexts read-only", async () =
   expect(blocks.flatMap(block => block.navItems ?? [])).toHaveLength(25);
   expect(blocks.find(block => block.kind === "slideshow")?.slides?.map(slide => slide.title)).toEqual(["Revolutionary Muse Women", "Color Essentials Women"]);
   expect(result.diagnostics.filter(item => item.status === "fallback")).toEqual([]);
-  // This tenant does not expose its featured term media via GraphQL or REST.
-  // Keep the missing-field diagnostic; never certify these videos as resolved.
-  expect(result.diagnostics.filter(item => item.message?.includes("acf.image_featured.url"))).toHaveLength(2);
+  expect(result.diagnostics.filter(item => item.message?.includes("acf.image_featured.url"))).toHaveLength(0);
 });
 
 test("menu context scopes by menu and parent and preserves header/divider semantics", () => {

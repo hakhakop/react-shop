@@ -45,6 +45,11 @@ export type BuilderMenuPresentation = {
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
   submenuWidth: string | null;
+  /** YOOtheme menu-item dropdown geometry. Null keeps the WebPages default. */
+  submenuStretch: "navbar" | "navbar-container" | null;
+  submenuLarge: boolean;
+  submenuRemoveHorizontalPadding: boolean;
+  submenuRemoveVerticalPadding: boolean;
   mobileAccordion: boolean;
   badgeText: string | null;
 };
@@ -137,6 +142,10 @@ export type BuilderShellSettings = {
   headerSearchDropdownStretch?: string;
   headerSearchDropdownLarge?: boolean;
   headerSearchIconPosition?: "" | "left" | "right";
+  headerSearchExpand?: boolean;
+  headerSearchPreventSubmit?: boolean;
+  headerSearchDropbarAnimation?: string;
+  headerSearchDropbarRemoveHorizontalPadding?: boolean;
   headerSocialPosition?: string;
   headerSocialStyle?: boolean;
   headerSocialGap?: string;
@@ -146,6 +155,10 @@ export type BuilderShellSettings = {
   headerMobileSearchDropdownStretch?: string;
   headerMobileSearchDropdownLarge?: boolean;
   headerMobileSearchIconPosition?: "" | "left" | "right";
+  headerMobileSearchExpand?: boolean;
+  headerMobileSearchPreventSubmit?: boolean;
+  headerMobileSearchDropbarAnimation?: string;
+  headerMobileSearchDropbarRemoveHorizontalPadding?: boolean;
   headerMobileSocialPosition?: string;
   headerMobileSocialStyle?: boolean;
   headerMobileSocialGap?: string;
@@ -1310,6 +1323,13 @@ function normalizeMenuPresentation(value: unknown): BuilderMenuPresentation {
       typeof raw.submenuWidth === "string" && raw.submenuWidth.trim().length > 0
         ? raw.submenuWidth.trim()
         : null,
+    submenuStretch:
+      raw.submenuStretch === "navbar" || raw.submenuStretch === "navbar-container"
+        ? raw.submenuStretch
+        : null,
+    submenuLarge: raw.submenuLarge === true,
+    submenuRemoveHorizontalPadding: raw.submenuRemoveHorizontalPadding === true,
+    submenuRemoveVerticalPadding: raw.submenuRemoveVerticalPadding === true,
     mobileAccordion: raw.mobileAccordion !== false,
     badgeText:
       typeof raw.badgeText === "string" && raw.badgeText.trim().length > 0

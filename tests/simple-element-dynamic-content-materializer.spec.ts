@@ -63,6 +63,8 @@ test("destination type compatibility remains narrow", () => {
   expect(dynamicBindingDestinationCapability("body")?.acceptedTypes).toEqual(["string", "richText"]);
   expect(dynamicBindingDestinationCapability("buttonUrl")?.acceptedTypes).toEqual(["url"]);
   expect(dynamicBindingDestinationCapability("imageUrl")?.acceptedTypes).toEqual(["url"]);
+  expect(dynamicBindingDestinationCapability("backgroundImageUrl")?.acceptedTypes).toEqual(["url"]);
+  expect(dynamicBindingDestinationCapability("backgroundVideoUrl")?.acceptedTypes).toEqual(["url"]);
   expect(dynamicBindingDestinationCapability("alertLinkUrl")?.acceptedTypes).toEqual(["url"]);
 });
 
@@ -236,7 +238,10 @@ test("single taxonomy items materialize section backgrounds, overlays, and Galle
       background: "transparent",
       visible: true,
       dynamicContext: descriptor(56),
-      dynamicBindings: { backgroundImageUrl: { path: "acf.image_featured.url", valueType: "url" } },
+      dynamicBindings: {
+        backgroundImageUrl: { path: "acf.image_intro.url", valueType: "url" },
+        backgroundVideoUrl: { path: "acf.image_featured.url", valueType: "url" },
+      },
       rows: [{ id: "row", layout: "1-col", columns: [{ id: "column", elements: [
         { id: "overlay", kind: "overlay", dynamicContext: descriptor(44), dynamicBindings: { title: { path: "name", valueType: "string" } } },
         { id: "gallery", kind: "gallery", galleryItems: [{ id: "gallery-item", title: "Fallback", dynamicContext: descriptor(45), dynamicBindings: { title: { path: "name", valueType: "string" }, imageUrl: { path: "acf.image_intro.url", valueType: "url" } } }] },
@@ -248,13 +253,17 @@ test("single taxonomy items materialize section backgrounds, overlays, and Galle
       const databaseId = Number(source.query?.databaseId);
       return [{ id: databaseId, fields: {
         name: { type: "string", value: databaseId === 44 ? "Exclusive Architecture" : "Family Vacation" },
-        "acf.image_featured.url": { type: "url", value: "/cozy-featured.jpg" },
-        "acf.image_intro.url": { type: "url", value: "/family-intro.jpg" },
+        "acf.image_intro.url": { type: "url", value: databaseId === 56 ? "/cozy-poster.jpg" : "/family-intro.jpg" },
+        "acf.image_featured.url": { type: "url", value: "/cozy-featured.mp4" },
       } }];
     },
   });
   const section = result.renderLayout.sections[0];
-  expect(section.visualStyle?.background).toMatchObject({ type: "image", imageUrl: "/cozy-featured.jpg" });
+  expect(section.visualStyle?.background).toMatchObject({
+    type: "video",
+    imageUrl: "/cozy-poster.jpg",
+    videoUrl: "/cozy-featured.mp4",
+  });
   expect(section.rows?.[0].columns[0].elements[0].title).toBe("Exclusive Architecture");
   expect(section.rows?.[0].columns[0].elements[1].galleryItems?.[0]).toMatchObject({
     id: "gallery-item",

@@ -467,16 +467,53 @@ export function applyBuilderThemeSettings(
     "headerDialogLayout", "headerDialogMenuStyle", "headerDialogCenter", "headerDialogPushAfter",
     "headerOffcanvasMode", "headerOffcanvasFlip", "headerOffcanvasOverlay", "headerDialogDropbarAnimation",
     "headerSearchPosition", "headerSearchLayout", "headerSearchDropdownStretch", "headerSearchDropdownLarge", "headerSearchIconPosition",
+    "headerSearchExpand", "headerSearchPreventSubmit", "headerSearchDropbarAnimation", "headerSearchDropbarRemoveHorizontalPadding",
     "headerSocialPosition", "headerSocialStyle", "headerSocialGap", "headerSocialItems", "headerLogoPaddingRemove",
     "headerMobileSearchLayout", "headerMobileSearchDropdownStretch", "headerMobileSearchDropdownLarge", "headerMobileSearchIconPosition",
+    "headerMobileSearchExpand", "headerMobileSearchPreventSubmit", "headerMobileSearchDropbarAnimation", "headerMobileSearchDropbarRemoveHorizontalPadding",
     "headerMobileSocialPosition", "headerMobileSocialStyle", "headerMobileSocialGap", "headerMobileSocialItems", "headerMobileLogoPaddingRemove",
     "headerMobileDialogClose", "headerMobileDialogMenuStyle", "headerMobileDialogDropbarAnimation",
     "headerMobileLayout", "headerMobileBehavior", "headerMobileSearchPosition", "headerMobileDialogTogglePosition", "headerMobileDialogLayout",
     "headerMobileDialogCenter", "headerMobileDialogPushAfter", "headerMobileOffcanvasMode", "headerMobileOffcanvasFlip", "headerMobileOffcanvasOverlay",
     "headerMobileLogoUrl", "headerInverseLogoUrl", "headerMobileComposition",
   ].forEach((key) => delete providerGlobalStyles[key]);
+  const sourceMenuItems = record(themeSettings.sourceConfig.menuItems);
+  const menuPresentation = { ...shellSettings.menuPresentation };
+  for (const [sourceId, rawItem] of Object.entries(sourceMenuItems)) {
+    const dropdown = record(record(rawItem).dropdown);
+    if (!Object.keys(dropdown).length) continue;
+    const matchingItems = shellSettings.menuItems.filter((item) =>
+      item.id === sourceId || item.id === `wp-${sourceId}` || item.portableKey === sourceId || item.portableKey === `wp-${sourceId}`,
+    );
+    for (const item of matchingItems) {
+      const previous = menuPresentation[item.id];
+      menuPresentation[item.id] = {
+        showHeading: previous?.showHeading ?? false,
+        icon: previous?.icon ?? null,
+        submenuLayout: previous?.submenuLayout ?? "list",
+        submenuColumns: previous?.submenuColumns ?? 3,
+        submenuWidth: previous?.submenuWidth ?? null,
+        mobileAccordion: previous?.mobileAccordion ?? true,
+        badgeText: previous?.badgeText ?? null,
+        submenuStretch:
+          dropdown.stretch === "navbar" || dropdown.stretch === "navbar-container"
+            ? dropdown.stretch
+            : previous?.submenuStretch ?? null,
+        submenuLarge: typeof dropdown.size === "boolean" ? dropdown.size : previous?.submenuLarge ?? false,
+        submenuRemoveHorizontalPadding:
+          typeof dropdown.padding_remove_horizontal === "boolean"
+            ? dropdown.padding_remove_horizontal
+            : previous?.submenuRemoveHorizontalPadding ?? false,
+        submenuRemoveVerticalPadding:
+          typeof dropdown.padding_remove_vertical === "boolean"
+            ? dropdown.padding_remove_vertical
+            : previous?.submenuRemoveVerticalPadding ?? false,
+      };
+    }
+  }
   return {
     ...shellSettings,
     ...providerGlobalStyles,
+    ...(Object.keys(menuPresentation).length ? { menuPresentation } : {}),
   };
 }

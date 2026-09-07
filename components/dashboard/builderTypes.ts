@@ -58,6 +58,10 @@ export type MenuPresentationSettings = {
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
   submenuWidth: string | null;
+  submenuStretch: "navbar" | "navbar-container" | null;
+  submenuLarge: boolean;
+  submenuRemoveHorizontalPadding: boolean;
+  submenuRemoveVerticalPadding: boolean;
   mobileAccordion: boolean;
   badgeText: string | null;
 };
@@ -101,6 +105,7 @@ export type BuilderGalleryItem = {
   id: string;
   imageUrl?: string;
   imageAlt?: string;
+  hoverVideoUrl?: string;
   title?: string;
   meta?: string;
   content?: string;
@@ -111,7 +116,7 @@ export type BuilderGalleryItem = {
   linkAriaLabel?: string;
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
-    "imageUrl" | "imageAlt" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+    "imageUrl" | "imageAlt" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
   >;
 };
 
@@ -410,6 +415,11 @@ export type BuilderColumnStickySettings = {
 
 export type BuilderColumn = {
   id: string;
+  /** Stable semantic ownership used by Header recipes without creating a second builder model. */
+  headerSlot?:
+    | "toolbar-start" | "toolbar-end"
+    | "header-start" | "logo" | "navbar-start" | "navigation" | "navbar-end" | "header-end"
+    | "mobile-start" | "mobile-logo" | "mobile-navigation" | "mobile-end";
   dynamicContext?: DynamicContentContextDescriptor;
   responsiveWidths?: BuilderResponsiveColumnWidths;
   order?: BuilderResponsiveColumnOrder;
@@ -508,6 +518,11 @@ export type BuilderLayoutBlock = {
   cartPresentation?: "inline" | "floating";
   cartFloatingPosition?: "bottom-right" | "bottom-left";
   dynamicContext?: DynamicContentContextDescriptor;
+  /** Provider-neutral visibility condition imported from upstream content. */
+  dynamicCondition?: {
+    source: "archive-products";
+    operator: "empty" | "notEmpty";
+  };
   dynamicBindings?: DynamicFieldBindings<
     | "headingText" | "body" | "eyebrow" | "title"
     | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
@@ -1142,6 +1157,10 @@ export type BuilderSection = {
   headerMobileSearchDropdownStretch?: string;
   headerMobileSearchDropdownLarge?: boolean;
   headerMobileSearchIconPosition?: "" | "left" | "right";
+  headerMobileSearchExpand?: boolean;
+  headerMobileSearchPreventSubmit?: boolean;
+  headerMobileSearchDropbarAnimation?: string;
+  headerMobileSearchDropbarRemoveHorizontalPadding?: boolean;
   headerMobileSocialPosition?: string;
   headerMobileSocialStyle?: boolean;
   headerMobileSocialGap?: string;
@@ -1178,6 +1197,10 @@ export type BuilderSection = {
   headerSearchDropdownStretch?: string;
   headerSearchDropdownLarge?: boolean;
   headerSearchIconPosition?: "" | "left" | "right";
+  headerSearchExpand?: boolean;
+  headerSearchPreventSubmit?: boolean;
+  headerSearchDropbarAnimation?: string;
+  headerSearchDropbarRemoveHorizontalPadding?: boolean;
   headerSocialPosition?: string;
   headerSocialStyle?: boolean;
   headerSocialGap?: string;
@@ -1194,7 +1217,7 @@ export type BuilderSection = {
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
   dynamicContext?: DynamicContentContextDescriptor;
-  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl">;
+  dynamicBindings?: DynamicFieldBindings<"backgroundImageUrl" | "backgroundVideoUrl">;
   /** User-facing label in Builder navigation. */
   name?: string;
   /** Optional public HTML anchor; internal Builder identity remains `id`. */
@@ -1391,6 +1414,7 @@ export type BuilderSection = {
     badge?: string;
     imageUrl?: string;
     videoUrl?: string;
+    hoverVideoUrl?: string;
     imageAlt?: string;
     thumbnailUrl?: string;
     thumbnailPosition?: BuilderCarouselImagePosition;
@@ -1456,6 +1480,8 @@ export type BuilderSection = {
       | "imageUrl"
       | "imageAlt"
       | "thumbnailUrl"
+      | "videoUrl"
+      | "hoverVideoUrl"
       | "navigationLabel"
       | "buttonAriaLabel"
       | "buttonLabel"

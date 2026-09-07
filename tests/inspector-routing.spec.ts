@@ -29,3 +29,10 @@ test("button presentation is declared wherever actions are rendered", () => {
     expect(INSPECTOR_ELEMENT_CAPABILITIES[kind]?.composes).toContain("component-presentation");
   }
 });
+
+test("Header Menu uses the canonical Inspector composition", () => {
+  expect(classifyInspectorKind("menu")).toBe("canonical");
+  expect(LEGACY_INSPECTOR_ALLOWLIST).not.toContain("menu");
+  expect(INSPECTOR_ELEMENT_CAPABILITIES.menu?.settingsLabel).toBe("Settings");
+  expect(INSPECTOR_ELEMENT_CAPABILITIES.menu?.composes).toContain("general");
+});

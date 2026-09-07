@@ -6,10 +6,14 @@ import {
   createYoothemeThemeSettings,
   type BuilderThemeSettings,
 } from "@/lib/builderThemeSettings";
+import {
+  createYoothemeHeaderRecipe,
+  type YoothemeHeaderImportMode,
+} from "@/lib/yoothemeHeaderRecipe";
 
 type Props = {
   themeSettings: BuilderThemeSettings;
-  onImport: (settings: BuilderThemeSettings) => void | Promise<void>;
+  onImport: (settings: BuilderThemeSettings, headerMode: YoothemeHeaderImportMode) => void | Promise<void>;
   onExport: () => void;
   disabled?: boolean;
   embedded?: boolean;
@@ -19,6 +23,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
   const [reading, setReading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [headerMode, setHeaderMode] = useState<YoothemeHeaderImportMode>("settings-only");
 
   const handleFile = async (file?: File) => {
     if (!file) return;
@@ -31,8 +36,13 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
       if (!imported.themeId && !imported.sourceConfig.style) {
         throw new Error("This JSON does not look like a YOOtheme theme export.");
       }
-      await onImport(imported);
-      setMessage(`${imported.displayName} theme settings imported.`);
+      await onImport(imported, headerMode);
+      const recipe = createYoothemeHeaderRecipe(imported);
+      setMessage(
+        headerMode === "settings-only"
+          ? `${imported.displayName} settings imported; Header rows were preserved.`
+          : `${imported.displayName} settings imported; ${recipe.report.createdRows} Header rows created.${recipe.report.omitted.length ? ` ${recipe.report.omitted.length} external menu resource${recipe.report.omitted.length === 1 ? "" : "s"} still need linking.` : ""}`,
+      );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Theme settings import failed.");
     } finally {
@@ -74,6 +84,28 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
 
           <label className="builder-field">
             <span>Import YOOtheme theme settings JSON</span>
+            <span className="builder-theme-import-modes" role="radiogroup" aria-label="Header import behavior">
+              <label>
+                <input
+                  type="radio"
+                  name="header-import-mode"
+                  value="settings-only"
+                  checked={headerMode === "settings-only"}
+                  onChange={() => setHeaderMode("settings-only")}
+                />
+                <span><strong>Apply settings only</strong><small>Recommended. Keeps every existing Header row, column, and element.</small></span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="header-import-mode"
+                  value="replace-from-recipe"
+                  checked={headerMode === "replace-from-recipe"}
+                  onChange={() => setHeaderMode("replace-from-recipe")}
+                />
+                <span><strong>Create Header from recipe</strong><small>Explicitly replaces Header rows with ordinary Builder rows compiled from YOOtheme positions.</small></span>
+              </label>
+            </span>
             <span className="builder-file-button">
               <Upload size={14} /> Choose JSON file
               <input
@@ -83,7 +115,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
                 onChange={(event) => void handleFile(event.target.files?.[0])}
               />
             </span>
-            <small>Use the original YOOtheme Theme Settings export, such as yootheme-jack.webpages.am.json. External WordPress widget content is intentionally outside this import.</small>
+            <small>Use the original YOOtheme Theme Settings export. LESS remains visual-token input; it never owns Header construction.</small>
           </label>
 
           <button type="button" className="builder-secondary-button" disabled={disabled || !themeSettings.active} onClick={onExport}>

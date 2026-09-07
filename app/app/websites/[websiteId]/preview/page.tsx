@@ -27,6 +27,9 @@ type WebsitePreviewPageProps = {
     path?: string;
     builderFrame?: string;
     builderBridge?: string;
+    builderContext?: string;
+    product_tag?: string;
+    paged?: string;
   }>;
 };
 
@@ -53,6 +56,12 @@ export default async function WebsitePreviewPage({
   const requestedPage = query?.path ?? query?.page ?? "home";
   const productSlug = query?.product;
   const categorySlug = query?.category;
+  const builderEditingContext =
+    query?.builderContext === "header" || query?.builderContext === "footer"
+      ? query.builderContext
+      : null;
+  const deferPageDocumentToBuilder =
+    query?.builderFrame === "selection" && builderEditingContext === null;
   const requestedPath = previewPathWithSearch(
     websiteId,
     requestedPage,
@@ -72,6 +81,7 @@ export default async function WebsitePreviewPage({
 
   const commerceSlug = requestedPage === "product-category" ? categorySlug : productSlug;
   const commerceProjection =
+    !deferPageDocumentToBuilder &&
     (requestedPage === "product-category" || requestedPage === "product-single") && commerceSlug
       ? await resolveCommerceRouteProjection({
           alias: {
@@ -95,6 +105,8 @@ export default async function WebsitePreviewPage({
           },
           website,
           scope: { websiteId: website.id },
+          pageNumber: Math.max(1, Number.parseInt(query?.paged ?? "1", 10) || 1),
+          requestProductTagSlugs: query?.product_tag?.split(",").map((item) => item.trim()).filter(Boolean),
         }).catch(() => null)
       : null;
   const connection = getWooCommerceConnection(website);
@@ -134,6 +146,7 @@ export default async function WebsitePreviewPage({
       dynamicItemContextOverride={commerceProjection?.dynamicContext}
       fallbackContent={corePageFallback}
       builderIframeSelection={query?.builderFrame === "selection"}
+      builderEditingContext={builderEditingContext}
       builderIframeDiagnostics={
         query?.builderBridge === "full"
           ? "full"
@@ -145,6 +158,8 @@ export default async function WebsitePreviewPage({
             ? "rect"
             : "minimal"
       }
+      pageNumber={Math.max(1, Number.parseInt(query?.paged ?? "1", 10) || 1)}
+      requestProductTagSlugs={query?.product_tag?.split(",").map((item) => item.trim()).filter(Boolean)}
     />
   );
 }

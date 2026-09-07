@@ -7,6 +7,7 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { ComponentType } from "react";
 import type { CategoryTreeItem } from "@/lib/categories";
+import type { DynamicContentContextDescriptor } from "@/lib/dynamicContent";
 import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
 import AlertCapabilityPanel from "@/components/dashboard/inspector/panels/AlertCapabilityPanel";
 import BadgeGridCapabilityPanel from "@/components/dashboard/inspector/panels/BadgeGridCapabilityPanel";
@@ -19,6 +20,7 @@ import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/Head
 import IconCapabilityPanel from "@/components/dashboard/inspector/panels/IconCapabilityPanel";
 import SocialCapabilityPanel from "@/components/dashboard/inspector/panels/SocialCapabilityPanel";
 import NavCapabilityPanel from "@/components/dashboard/inspector/panels/NavCapabilityPanel";
+import HeaderMenuCapabilityPanel from "@/components/dashboard/inspector/panels/HeaderMenuCapabilityPanel";
 import BackToTopCapabilityPanel from "@/components/dashboard/inspector/panels/BackToTopCapabilityPanel";
 import SublayoutCapabilityPanel from "@/components/dashboard/inspector/panels/SublayoutCapabilityPanel";
 import GridCapabilityPanel from "@/components/dashboard/inspector/panels/GridCapabilityPanel";
@@ -39,7 +41,7 @@ import CartCapabilityPanel from "@/components/dashboard/inspector/panels/CartCap
 export const CANONICAL_INSPECTOR_KINDS = [
   "backToTop",
   "sublayout",
-  "nav",
+  "nav", "menu",
   "button", "panel", "heading", "text", "list", "accordion", "image",
   "hero", "grid", "gallery", "slider", "slideshow", "overlaySlider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "social", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker", "overlay",
 ] as const satisfies readonly LayoutBlockKind[];
@@ -50,7 +52,7 @@ export const CANONICAL_INSPECTOR_KINDS = [
  */
 export const LEGACY_INSPECTOR_ALLOWLIST = [
   "scrollPinnedDemo",
-  "embed", "menu",
+  "embed",
   "cartContent", "checkoutContent", "accountContent",
 ] as const satisfies readonly LayoutBlockKind[];
 
@@ -66,6 +68,8 @@ export type InspectorPanelContext = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
   shellSettings: BuilderShellSettings;
+  /** Structural source inherited from the selected element's owning column. */
+  inheritedDynamicContext?: DynamicContentContextDescriptor;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
   previewCategoryTree?: CategoryTreeItem[];
   openWordPressMediaPicker: (options: {
@@ -298,6 +302,13 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     dynamicSourceSurface: "item",
   },
   nav: { capabilities: ["content", "style", "advanced"], composes: ["content", "repeatable-items", "general", "animation"], settingsSources: ["style"], panel: NavCapabilityPanel, dynamicSourceSurface: "item" },
+  menu: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: HeaderMenuCapabilityPanel,
+    settingsLabel: "Settings",
+  },
   sublayout: {
     dynamicSourceSurface: "element",
     capabilities: ["content", "style", "advanced"],

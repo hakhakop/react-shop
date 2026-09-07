@@ -20,6 +20,8 @@ export type TemplatePageTypeDefinition = {
   filters: readonly TemplateAssignmentFilterKind[];
   previewDescriptor?: DynamicContentContextDescriptor;
   taxonomy?: string;
+  /** Taxonomy exposed by YOOtheme's request-side "Limit by Terms" control. */
+  requestTaxonomy?: string;
   defaultStorefrontHref?: string;
 };
 
@@ -75,6 +77,7 @@ export const BUILTIN_TEMPLATE_PAGE_TYPES: readonly TemplatePageTypeDefinition[] 
   definition({
     id: "taxonomy:product_cat", label: "Product Category Archive", view: "archive", provider: "woocommerce",
     contentType: "product-category", source: "product-category", sourceKind: "taxonomy", taxonomy: "product_cat",
+    requestTaxonomy: "product_tag",
     filters: ["taxonomy-term", "request-taxonomy-term", "page-number", "language"],
   }),
   definition({

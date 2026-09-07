@@ -15,6 +15,104 @@ import type { SaaSWebsite } from "@/lib/websites";
 
 const DEFAULT_QUANTITY = 10;
 const MAX_QUERY_WINDOW = 100;
+const MEDIA_ATTACHMENT_CACHE_TTL_MS = 5 * 60 * 1000;
+const MEDIA_ATTACHMENT_FAILURE_TTL_MS = 15 * 1000;
+const MEDIA_ATTACHMENT_CACHE_LIMIT = 256;
+const WOOCOMMERCE_READ_CACHE_TTL_MS = 15 * 1000;
+const WOOCOMMERCE_READ_CACHE_LIMIT = 128;
+
+type MediaAttachmentCacheEntry = {
+  expiresAt: number;
+  value?: string;
+  pending?: Promise<string | undefined>;
+};
+
+const mediaAttachmentUrlCache = new Map<string, MediaAttachmentCacheEntry>();
+const wooCommerceReadCache = new Map<string, {
+  expiresAt: number;
+  value?: unknown;
+  pending?: Promise<unknown>;
+}>();
+
+async function cachedWooCommerceRead<T>(
+  connection: ReturnType<typeof getWooCommerceConnection>,
+  path: string,
+): Promise<T> {
+  const key = `${connection.apiUrl ?? "unconfigured"}|${path}`;
+  const cached = wooCommerceReadCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) {
+    return (cached.pending ?? cached.value) as T | Promise<T>;
+  }
+  const pending = wooCommerceFetch<T>(connection, path);
+  wooCommerceReadCache.set(key, {
+    expiresAt: Date.now() + WOOCOMMERCE_READ_CACHE_TTL_MS,
+    pending,
+  });
+  while (wooCommerceReadCache.size > WOOCOMMERCE_READ_CACHE_LIMIT) {
+    const oldestKey = wooCommerceReadCache.keys().next().value as string | undefined;
+    if (!oldestKey) break;
+    wooCommerceReadCache.delete(oldestKey);
+  }
+  try {
+    const value = await pending;
+    wooCommerceReadCache.set(key, {
+      expiresAt: Date.now() + WOOCOMMERCE_READ_CACHE_TTL_MS,
+      value,
+    });
+    return value;
+  } catch (error) {
+    wooCommerceReadCache.delete(key);
+    throw error;
+  }
+}
+
+function trimMediaAttachmentCache() {
+  while (mediaAttachmentUrlCache.size > MEDIA_ATTACHMENT_CACHE_LIMIT) {
+    const oldestKey = mediaAttachmentUrlCache.keys().next().value as string | undefined;
+    if (!oldestKey) return;
+    mediaAttachmentUrlCache.delete(oldestKey);
+  }
+}
+
+async function resolveMediaAttachmentUrl(input: {
+  siteUrl: string;
+  attachmentId: number;
+  headers?: HeadersInit | null;
+}) {
+  const key = `${input.siteUrl}|${input.attachmentId}`;
+  const now = Date.now();
+  const cached = mediaAttachmentUrlCache.get(key);
+  if (cached && cached.expiresAt > now) {
+    if (cached.pending) return cached.pending;
+    return cached.value;
+  }
+
+  const pending = (async () => {
+    try {
+      const response = await fetch(
+        `${input.siteUrl}/wp-json/wp/v2/media/${input.attachmentId}?context=edit`,
+        { headers: input.headers ?? undefined, cache: "no-store" },
+      );
+      if (!response.ok) return undefined;
+      const media = await response.json() as { source_url?: unknown };
+      return stringValue(media.source_url);
+    } catch {
+      return undefined;
+    }
+  })();
+
+  mediaAttachmentUrlCache.set(key, {
+    expiresAt: now + MEDIA_ATTACHMENT_CACHE_TTL_MS,
+    pending,
+  });
+  trimMediaAttachmentCache();
+  const value = await pending;
+  mediaAttachmentUrlCache.set(key, {
+    expiresAt: Date.now() + (value ? MEDIA_ATTACHMENT_CACHE_TTL_MS : MEDIA_ATTACHMENT_FAILURE_TTL_MS),
+    ...(value ? { value } : {}),
+  });
+  return value;
+}
 
 export type WooCommerceProductCollectionOrder =
   | "date"
@@ -363,7 +461,11 @@ export function normalizeWooCommerceProductContext(product: WooCommerceProductRe
     setField(fields, "image", { type: "media", value: { url: imageUrl, ...(identifierValue(primaryImage?.id) !== undefined ? { id: identifierValue(primaryImage?.id) } : {}), ...(imageAlt !== undefined ? { alt: imageAlt } : {}) } });
   }
   if (imageAlt !== undefined) setField(fields, "image.alt", { type: "string", value: imageAlt });
-  setField(fields, "gallery", { type: "metadata", value: { items: images.map(normalizedImage) } });
+  // Woo REST puts the featured image first in `images`, while YOOtheme's
+  // `woocommerce.gallery_image_ids` relation contains only the additional
+  // gallery attachments. Keep those concepts separate so an imported
+  // featured-image slide is not duplicated as gallery slide one.
+  setField(fields, "gallery", { type: "metadata", value: { items: images.slice(1).map(normalizedImage) } });
 
   // YOOtheme Custom Products exposes ACF media subfields (for example
   // `field.product_video.url`) even when WooCommerce delivers the value via
@@ -438,18 +540,12 @@ export async function resolveWooCommerceProductContexts(input: {
         ? Number(videoValue)
         : undefined;
     if (!attachmentId || !cms.siteUrl) return product;
-    try {
-      const response = await fetch(`${cms.siteUrl}/wp-json/wp/v2/media/${attachmentId}?context=edit`, {
-        headers,
-        cache: "no-store",
-      });
-      if (!response.ok) return product;
-      const media = await response.json() as { source_url?: unknown };
-      const url = stringValue(media.source_url);
-      return url ? { ...product, acf: { ...acf, product_video: { url } } } : product;
-    } catch {
-      return product;
-    }
+    const url = await resolveMediaAttachmentUrl({
+      siteUrl: cms.siteUrl,
+      attachmentId,
+      headers,
+    });
+    return url ? { ...product, acf: { ...acf, product_video: { url } } } : product;
   }));
   return hydrated.map((product) => normalizeWooCommerceProductContext(product));
 }
@@ -462,7 +558,7 @@ export async function fetchWooCommerceProductRecords(input: {
   const connection = getWooCommerceConnection(input.website);
   const descriptor = await normalizeImportedProductDescriptor(input.descriptor, connection);
   const compiled = compileWooCommerceProductRequest(descriptor);
-  const payload = await wooCommerceFetch<WooCommerceProductRecord | WooCommerceProductRecord[]>(connection, compiled.path);
+  const payload = await cachedWooCommerceRead<WooCommerceProductRecord | WooCommerceProductRecord[]>(connection, compiled.path);
   const products = Array.isArray(payload) ? payload : [payload];
   const records = products.filter(isRecord);
   if (!compiled.postFilterCategoryIds?.length) return records;
@@ -508,7 +604,7 @@ async function normalizeImportedProductDescriptor(
   const lookup = async (path: string) => {
     if (!include) return [] as number[];
     try {
-      const values = await wooCommerceFetch<Array<{ id?: unknown }>>(connection, `${path}?include=${include}&per_page=100&hide_empty=false`);
+      const values = await cachedWooCommerceRead<Array<{ id?: unknown }>>(connection, `${path}?include=${include}&per_page=100&hide_empty=false`);
       return values.flatMap((value) => {
         const id = Number(value.id);
         return Number.isInteger(id) && id > 0 ? [id] : [];

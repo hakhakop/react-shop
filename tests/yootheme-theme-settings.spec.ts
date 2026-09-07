@@ -76,62 +76,9 @@ test("maps a full YOOtheme export into one page and Header theme document", () =
   expect(settings.resolved.shellSettings).not.toHaveProperty("headerSearchPosition");
   expect(settings.resolved.shellSettings).not.toHaveProperty("headerDialogLayout");
 
-  const rows = settings.header.document.rows ?? [];
-  expect(rows).toHaveLength(3);
-  expect(rows[0]).toMatchObject({
-    id: "header-toolbar-row",
-    role: "toolbar",
-    headerVariant: "desktop",
-    layout: "whole",
-    maxWidth: "default",
-    horizontalDistribution: "center",
-    columns: [{ id: "header-toolbar-column", elements: [] }],
-  });
-  expect(rows[1]).toMatchObject({ id: "header-main-row", headerVariant: "desktop" });
-  const columns = rows[1]?.columns ?? [];
-  expect(columns).toHaveLength(3);
-  expect(columns[0]?.elements).toEqual([
-    expect.objectContaining({
-      id: "header-logo",
-      kind: "image",
-      imageUrl: "wp-content/uploads/yootheme/logo.svg",
-      imageMobileUrl: "wp-content/uploads/yootheme/logo-mobile.svg",
-      imageSvgInline: true,
-      headerBrandText: "Jack Baker",
-    }),
-  ]);
-  expect(columns[1]?.elements).toEqual([
-    expect.objectContaining({
-      id: "header-navigation",
-      kind: "menu",
-      menuSource: "main",
-    }),
-  ]);
-  expect(columns[2]?.elements).toEqual([]);
-  expect(columns.flatMap((column) => column.elements ?? []).map((block) => block.kind)).not.toContain("headerSearch");
-  expect(columns.flatMap((column) => column.elements ?? []).map((block) => block.kind)).not.toContain("headerCart");
-  expect(rows[2]).toMatchObject({
-    id: "header-mobile-row",
-    headerVariant: "mobile",
-    layout: "halves",
-    columns: [
-      {
-        id: "header-mobile-start",
-        elements: [expect.objectContaining({
-          id: "header-mobile-logo",
-          kind: "image",
-          imageUrl: "wp-content/uploads/yootheme/logo-mobile.svg",
-        })],
-      },
-      {
-        id: "header-mobile-end",
-        elements: [
-          expect.objectContaining({ id: "header-mobile-search", kind: "headerSearch" }),
-          expect.objectContaining({ id: "header-mobile-navigation", kind: "menu", menuSource: "main" }),
-        ],
-      },
-    ],
-  });
+  // Theme Settings are not a Header builder export. They must change the
+  // existing Header document's settings without replacing its authored rows.
+  expect(settings.header.document).not.toHaveProperty("rows");
 
   expect(settings.sourceConfig.dialog).toMatchObject({ layout: "offcanvas-top", toggle: "header:end" });
   expect(settings.sourceConfig.mobileHeader).toMatchObject({ layout: "horizontal-right" });
@@ -164,11 +111,66 @@ test("normalizes standard YOOtheme Header position vocabulary", () => {
     headerDialogTogglePosition: "header-start",
     headerMobileSearchPosition: "mobile-start",
   });
-  const mobileRow = settings.header.document.rows?.find((row) => row.headerVariant === "mobile");
-  expect(mobileRow?.columns.flatMap((column) => column.elements ?? [])).toContainEqual(
-    expect.objectContaining({ id: "header-mobile-search", kind: "headerSearch", elementAlign: "left" }),
-  );
+  expect(settings.header.document).not.toHaveProperty("rows");
   expect(settings.sourceConfig.dialog).toMatchObject({ toggle: "header:start" });
+});
+
+test("preserves YOOtheme Search expansion and dropbar semantics on the Header document", () => {
+  const source = JSON.parse(
+    readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
+  );
+  source.header.search_expand = true;
+  source.header.search_prevent_submit = true;
+  source.header.search_dropbar = { animation: "reveal-top", padding_remove_horizontal: true };
+  source.mobile.header.search_expand = false;
+  source.mobile.header.search_prevent_submit = true;
+  source.mobile.header.search_dropbar = { animation: "slide-left", padding_remove_horizontal: true };
+
+  expect(createYoothemeThemeSettings(source).header.document).toMatchObject({
+    headerSearchExpand: true,
+    headerSearchPreventSubmit: true,
+    headerSearchDropbarAnimation: "reveal-top",
+    headerSearchDropbarRemoveHorizontalPadding: true,
+    headerMobileSearchExpand: false,
+    headerMobileSearchPreventSubmit: true,
+    headerMobileSearchDropbarAnimation: "slide-left",
+    headerMobileSearchDropbarRemoveHorizontalPadding: true,
+  });
+});
+
+test("applies a YOOtheme root-menu dropdown only to its stable WordPress menu item", () => {
+  const source = JSON.parse(
+    readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
+  );
+  source.menu.items = {
+    1418: {
+      dropdown: {
+        stretch: "navbar-container",
+        size: true,
+        padding_remove_horizontal: false,
+        padding_remove_vertical: true,
+      },
+    },
+  };
+  const settings = createYoothemeThemeSettings(source);
+  const result = applyBuilderThemeSettings(
+    {
+      ...defaultBuilderShellSettings,
+      menuItems: [
+        { id: "wp-1418", label: "Women", url: "/women" },
+        { id: "wp-999", label: "Men", url: "/men" },
+      ],
+    },
+    settings,
+  );
+
+  expect(result.menuPresentation["wp-1418"]).toMatchObject({
+    submenuStretch: "navbar-container",
+    submenuLarge: true,
+    submenuRemoveHorizontalPadding: false,
+    submenuRemoveVerticalPadding: true,
+  });
+  expect(result.menuPresentation["wp-999"]).toBeUndefined();
 });
 
 test("maps standard mobile Header alignment without using a preset", () => {
@@ -176,26 +178,14 @@ test("maps standard mobile Header alignment without using a preset", () => {
     readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
   );
   source.mobile.header.layout = "horizontal-center";
-  const center = createYoothemeThemeSettings(source).header.document.rows?.find(
-    (row) => row.headerVariant === "mobile",
-  );
-  expect(center).toMatchObject({
-    layout: "quarters-1-2-1",
-    columns: [
-      { id: "header-mobile-start", elements: [expect.objectContaining({ id: "header-mobile-logo" })] },
-      { id: "header-mobile-center", elements: [expect.objectContaining({ id: "header-mobile-navigation", elementAlign: "center" })] },
-      { id: "header-mobile-end", elements: [expect.objectContaining({ id: "header-mobile-search" })] },
-    ],
+  expect(createYoothemeThemeSettings(source).header.document).toMatchObject({
+    headerMobileLayout: "horizontal-center",
   });
 
   source.mobile.header.layout = "horizontal-left";
-  const left = createYoothemeThemeSettings(source).header.document.rows?.find(
-    (row) => row.headerVariant === "mobile",
-  );
-  expect(left?.columns[0]?.elements?.map((element) => element.id)).toEqual([
-    "header-mobile-logo",
-    "header-mobile-navigation",
-  ]);
+  expect(createYoothemeThemeSettings(source).header.document).toMatchObject({
+    headerMobileLayout: "horizontal-left",
+  });
 });
 
 test("provider runtime projection cannot override a normal canonical Header edit", () => {

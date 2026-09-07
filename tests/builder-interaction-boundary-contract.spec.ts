@@ -11,6 +11,14 @@ const builderSource = fs.readFileSync(
   path.join(root, "components/dashboard/DashboardBuilder.tsx"),
   "utf8",
 );
+const iframeBridgeSource = fs.readFileSync(
+  path.join(root, "components/builder/BuilderIframeSelectionBridge.tsx"),
+  "utf8",
+);
+const scopedRouterSource = fs.readFileSync(
+  path.join(root, "components/builder/ScopedPreviewLinkRouter.tsx"),
+  "utf8",
+);
 
 test("Builder scopes capture-phase interaction suppression to the editable canvas", () => {
   expect(boundarySource).toContain("BUILDER_PREVIEW_INTERACTIVE_SELECTOR");
@@ -41,4 +49,14 @@ test("preview whitelist is explicit and destination resolution is deferred", () 
   expect(boundarySource).toContain(".shop-builder-products button");
   expect(boundarySource).toContain(".shop-builder-grid-wrapper button");
   expect(boundarySource).toContain('future explicit "Open link" action');
+});
+
+test("multi-item links retain the clicked action instead of using the first child link", () => {
+  expect(builderSource).toContain("selectedLinkIntent");
+  expect(builderSource).toContain("blockLinks.length === 1");
+  expect(builderSource).toContain("never silently");
+  expect(builderSource).toContain("builderTargetsEqual(selectedLinkIntent.owner, target)");
+  expect(iframeBridgeSource).toContain("selectedLinkHref !== href");
+  expect(iframeBridgeSource).toContain("linkLabel");
+  expect(scopedRouterSource).toContain('if (mode === "builder") return');
 });

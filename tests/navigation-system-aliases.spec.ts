@@ -118,6 +118,10 @@ test("canonical commerce paths remain direct hard-reload candidates outside menu
     target: { postType: "product", slug: "black-oversized-blouse" },
   });
   expect(resolveCommerceRouteCandidate("/about/")).toBeNull();
+  expect(resolveScopedBuilderHref("/product-category/kids/babies-0-24-months/", { websiteId: "woolberry" }))
+    .toBe("/app/websites/woolberry/builder?page=product-category&category=babies-0-24-months");
+  expect(resolveScopedPreviewHref("/product-category/kids/youth-7-years/", { websiteId: "woolberry" }))
+    .toBe("/app/websites/woolberry/preview?page=product-category&category=youth-7-years");
 });
 
 test("every website-authored root path projects without route-shape guessing", () => {

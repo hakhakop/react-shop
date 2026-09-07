@@ -2716,37 +2716,6 @@
         "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-top-left",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "header-language",
-                "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
-              }
-            ]
-          },
-          {
-            "id": "header-top-right",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "header-utility-account",
-                "kind": "headerAccount",
-                "headerUtilityAction": "account",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "muted"
-              }
-            ]
-          },
-          {
             "id": "header-main-left",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
@@ -2754,11 +2723,10 @@
               {
                 "id": "header-logo",
                 "kind": "image",
-                "headerBrandMode": "logo",
-                "headerBrandText": "Header Parity Site",
-                "imageMaxWidth": 180,
-                "imageAlt": "Header Parity Site logo",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png"
+                "headerBrandMode": "both",
+                "headerBrandText": "WebPages",
+                "imageMaxWidth": 140,
+                "imageAlignment": "left"
               }
             ]
           },
@@ -2773,7 +2741,7 @@
                 "title": "Navigation",
                 "menuSource": "main",
                 "menuActiveIndicator": "underline",
-                "elementAlign": "right"
+                "elementAlign": "center"
               }
             ]
           },
@@ -2783,24 +2751,18 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Contact Us",
-                "buttonUrl": "/contact",
-                "buttonStyle": "default",
-                "size": "default"
-              },
-              {
-                "id": "header-utility-theme",
-                "kind": "headerTheme",
-                "headerUtilityAction": "theme",
-                "headerUtilityVariant": "muted"
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "ghost",
+                "elementAlign": "right"
               },
               {
                 "id": "header-utility-cart",
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted"
+                "headerUtilityVariant": "ghost",
+                "elementAlign": "right"
               }
             ]
           }

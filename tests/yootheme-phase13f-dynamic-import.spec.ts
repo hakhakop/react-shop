@@ -89,6 +89,147 @@ test("preserves authored static fallbacks beside supported bindings", () => {
   });
 });
 
+test("imports the New In dropdown gallery collection with title affix and hover video", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "fragment",
+    children: [{
+      type: "row",
+      children: [{
+        type: "column",
+        children: [{
+          type: "gallery",
+          props: {
+            grid_column_gap: "collapse",
+            grid_row_gap: "collapse",
+            show_hover_image: true,
+            show_hover_video: true,
+          },
+          children: [{
+            type: "gallery_item",
+            source: {
+              query: {
+                name: "productCats.customProductCats",
+                arguments: { offset: 0, limit: 10, order: "term_order", order_direction: "ASC", id: 0 },
+              },
+              props: {
+                image: { filters: { search: "" }, name: "field.products_intro_image.url" },
+                title: { filters: { search: "", before: "New in " }, name: "name" },
+                link: { filters: { search: "" }, name: "link" },
+                hover_video: { filters: { search: "" }, name: "field.products_hover_video.url" },
+              },
+            },
+          }],
+        }],
+      }],
+    }],
+  });
+  const gallery = collectBlocks(mapped.sections).find((block) => block.kind === "gallery");
+
+  expect(gallery).toBeTruthy();
+  expect(gallery).toMatchObject({
+    gridGap: "none",
+    gridRowGap: "none",
+    gridShowHoverImage: true,
+    gridShowHoverVideo: true,
+  });
+  expect(gallery.galleryItems[0]).toMatchObject({
+    dynamicContext: {
+      provider: "woocommerce",
+      source: "product-category",
+      mode: "collection",
+      query: {
+        start: 0,
+        quantity: 10,
+        parentId: 0,
+        order: "menuOrder",
+        direction: "asc",
+        hideEmpty: true,
+        sourceQuery: {
+          name: "productCats.customProductCats",
+          arguments: { offset: 0, limit: 10, order: "term_order", order_direction: "ASC", id: 0 },
+        },
+      },
+    },
+    dynamicBindings: {
+      imageUrl: { path: "acf.products_intro_image.url", valueType: "url" },
+      title: {
+        path: "name",
+        valueType: "string",
+        transform: { kind: "textAffix", before: "New in " },
+      },
+      linkUrl: { path: "link", valueType: "url" },
+      hoverVideoUrl: { path: "acf.products_hover_video.url", valueType: "url" },
+    },
+  });
+  expect(mapped.warnings.some((warning) => warning.includes("binding was not imported"))).toBeFalsy();
+});
+
+test("imports a selected Product Category children relation as a Gallery collection", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [{
+            type: "gallery",
+            props: { grid_column_gap: "collapse" },
+            children: [{
+              type: "gallery_item",
+              source: {
+                query: {
+                  name: "productCats.customProductCat",
+                  arguments: { id: 61 },
+                  field: {
+                    name: "children",
+                    directives: [{ name: "slice", arguments: { offset: 0 } }],
+                  },
+                },
+                props: {
+                  image: { filters: { search: "" }, name: "field.products_intro_image.url" },
+                  title: { filters: { search: "" }, name: "name" },
+                  link: { filters: { search: "" }, name: "link" },
+                },
+              },
+            }],
+          }],
+        }],
+      }],
+    }],
+  });
+  const gallery = collectBlocks(mapped.sections).find((block) => block.kind === "gallery");
+
+  expect(gallery.galleryItems[0]).toMatchObject({
+    dynamicContext: {
+      provider: "woocommerce",
+      source: "product-category",
+      mode: "collection",
+      query: {
+        parentId: 61,
+        parentRelation: true,
+        start: 0,
+        hideEmpty: true,
+        sourceQuery: {
+          name: "productCats.customProductCat",
+          arguments: { id: 61 },
+          field: {
+            name: "children",
+            directives: [{ name: "slice", arguments: { offset: 0 } }],
+          },
+        },
+      },
+    },
+    dynamicBindings: {
+      imageUrl: { path: "acf.products_intro_image.url", valueType: "url" },
+      title: { path: "name", valueType: "string" },
+      linkUrl: { path: "link", valueType: "url" },
+    },
+  });
+  expect(gallery.galleryItems[0].dynamicContext.query.databaseId).toBeUndefined();
+});
+
 test("custom WordPress source retains static fallback and becomes a discoverable provider", () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout",
@@ -162,7 +303,11 @@ test("Design Escapes custom providers retain every known canonical element templ
     query: { graphqlRoot: "accommodations", start: 0, quantity: 4 },
   });
   expect(panelSlider.slides[0].dynamicBindings.imageUrl).toEqual({ path: "acf.intro_image.url", valueType: "url" });
-  expect(grid.gridItems[0].dynamicContext).toBeUndefined();
+  expect(grid.gridItems[0].dynamicContext).toMatchObject({
+    provider: "yootheme",
+    source: "#parent",
+    mode: "single",
+  });
   expect(gallery.galleryItems[0].dynamicBindings).toMatchObject({
     title: { path: "name", valueType: "string" },
     imageUrl: { path: "acf.image_intro.url", valueType: "url" },
@@ -209,6 +354,55 @@ test("Design Cozy Places imports a single tag context and its related Accommodat
       imageUrl: { path: "acf.intro_image.url", valueType: "url" },
       imageAlt: { path: "acf.intro_image.alt", valueType: "string" },
       buttonUrl: { path: "link", valueType: "url" },
+    },
+  });
+});
+
+test("imports YOOtheme Product Tag section video as a canonical background video binding", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      props: {
+        name: "Hero",
+        height: "viewport",
+        image_position: "center-center",
+        image_size: "cover",
+      },
+      source: {
+        query: {
+          name: "productTags.customProductTag",
+          arguments: { id: 71 },
+        },
+        props: {
+          video: {
+            filters: { search: "" },
+            name: "field.image_featured.url",
+          },
+        },
+      },
+      children: [{ type: "row", children: [{ type: "column", children: [] }] }],
+    }],
+  });
+
+  expect(mapped.sections[0]).toMatchObject({
+    dynamicContext: {
+      provider: "woocommerce",
+      source: "product-tag",
+      mode: "single",
+      query: { databaseId: 71 },
+    },
+    dynamicBindings: {
+      backgroundVideoUrl: {
+        path: "acf.image_featured.url",
+        valueType: "url",
+      },
+    },
+    visualStyle: {
+      background: {
+        imagePosition: "center-center",
+        imageSize: "cover",
+      },
     },
   });
 });
@@ -426,4 +620,77 @@ test("imports Circle Blog archive Panel and responsive Grids into canonical post
     });
   }
   expect(mapped.warnings.some((warning) => /dynamic content unsupported/i.test(warning))).toBeFalsy();
+});
+
+test("imports YOOtheme product-subcategory multiplication and nested gallery semantics", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [
+      { type: "row", children: [{ type: "column", children: [{
+        type: "headline",
+        source: { query: { name: "productCats.taxonomyProductCat" }, props: { content: { name: "name" } } },
+      }] }] },
+      { type: "row", children: [{
+        type: "column",
+        source: { query: { name: "productCats.productCatProduct", arguments: { offset: 0 } } },
+        children: [{
+          type: "slideshow",
+          children: [
+            { type: "slideshow_item", source: { query: { name: "#parent" }, props: { image: { name: "featuredImage.url" } } } },
+            { type: "slideshow_item", source: {
+              query: { name: "#parent", field: { name: "woocommerce.gallery_image_ids", directives: [{ name: "slice", arguments: { offset: 0, limit: 2 } }] } },
+              props: { image: { name: "url" } },
+            } },
+          ],
+        }, {
+          type: "panel",
+          source: { query: { name: "#parent" }, props: { title: { name: "title" }, meta: { name: "woocommerce.price" }, link: { name: "link" } } },
+        }],
+      }] },
+    ] }],
+  });
+
+  const heading = mapped.sections[0]!.rows![0]!.columns[0]!.elements[0]!;
+  const productColumn = mapped.sections[0]!.rows![1]!.columns[0]!;
+  const slideshow = productColumn.elements[0]!;
+  expect(heading.dynamicContext).toBeUndefined();
+  expect(heading.dynamicBindings).toMatchObject({ headingText: { path: "name" } });
+  expect(productColumn.dynamicContext).toMatchObject({
+    provider: "woocommerce",
+    source: "product",
+    mode: "collection",
+    query: { start: 0 },
+  });
+  // YOOtheme owns product multiplication on the structural column. This
+  // fixture has no element source, so the Slideshow inherits it implicitly;
+  // preserve the first item's explicit `#parent` marker for Inspector parity.
+  expect(slideshow.dynamicContext).toBeUndefined();
+  expect(slideshow.slides?.[0]?.dynamicContext).toMatchObject({ provider: "yootheme", source: "#parent", mode: "single" });
+  expect(slideshow.slides?.[1]).toMatchObject({
+    dynamicContext: {
+      provider: "webpages",
+      source: "context-relation",
+      mode: "collection",
+      query: { path: "gallery.items", start: 0, quantity: 2 },
+    },
+    dynamicBindings: { imageUrl: { path: "url", valueType: "url" } },
+  });
+});
+
+test("imports YOOtheme archive item-count empty state as a visibility condition", () => {
+  const mapped = mapYoothemeStaticContent({ type: "layout", children: [{
+    type: "section",
+    children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "headline",
+      props: { content: "No products were found." },
+      source: {
+        query: { name: "site" },
+        props: { _condition: { name: "item_count", filters: { condition: "!" } } },
+      },
+    }] }] }],
+  }] });
+  expect(mapped.sections[0]!.rows![0]!.columns[0]!.elements[0]).toMatchObject({
+    dynamicCondition: { source: "archive-products", operator: "empty" },
+    headingText: "No products were found.",
+  });
 });

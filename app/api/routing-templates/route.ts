@@ -7,6 +7,7 @@ import {
   createRoutingTemplatesService,
 } from "@/lib/routingTemplatesService.server";
 import { getTemplatePageTypeCatalog } from "@/lib/templatePageTypes.server";
+import { getTemplateAssignmentOptions } from "@/lib/templateAssignmentOptions.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,6 +31,11 @@ export async function GET(request: NextRequest) {
   const pageTypes = await getTemplatePageTypeCatalog("website" in access ? access.website : null);
   const service = createRoutingTemplatesService(access.scope, {}, { pageTypes });
   try {
+    if (request.nextUrl.searchParams.get("assignmentOptions") === "1") {
+      return NextResponse.json({
+        assignmentOptions: await getTemplateAssignmentOptions("website" in access ? access.website : null),
+      });
+    }
     const id = request.nextUrl.searchParams.get("id");
     if (id) return NextResponse.json({ template: await service.get(id) });
     const layoutId = request.nextUrl.searchParams.get("referencesForLayout");

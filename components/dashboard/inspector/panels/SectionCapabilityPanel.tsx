@@ -16,8 +16,10 @@ import {
   InspectorSwitch,
   InspectorTextField,
   InspectorTextarea,
+  inspectorDynamicBinding,
 } from "@/components/dashboard/inspector/InspectorControls";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import { resolveSectionBackground } from "@/lib/semanticBackgrounds";
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
@@ -78,14 +80,23 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="section-content">
-        <Group title="Background" summary={imageUrl ? "Image" : resolvedBackground.role}>
-          <InspectorFieldRow label="Image" description="Section background image source.">
+        <Group
+          title="Background"
+          summary={
+            background?.videoUrl || section.dynamicBindings?.backgroundVideoUrl
+              ? "Video"
+              : imageUrl || section.dynamicBindings?.backgroundImageUrl
+                ? "Image"
+                : resolvedBackground.role
+          }
+        >
+          <InspectorFieldRow label="Image" description="Section background image source." dynamicBinding={inspectorDynamicBinding(section, update, "backgroundImageUrl")}>
             <BuilderImageUrlControl value={imageUrl} placeholder="http://" onChange={(event) => updateBackgroundImage({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Section Background Image", currentUrl: imageUrl || undefined, onSelect: (media) => updateBackgroundImage({ imageUrl: media.sourceUrl }) })} />
           </InspectorFieldRow>
           <InspectorFieldRow label="Image Size"><InspectorSelect value={background?.imageSize ?? "auto"} options={[{ value: "auto", label: "Auto" }, { value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} onChange={(imageSize) => updateBackgroundImage({ imageSize })} ariaLabel="Section image size" /></InspectorFieldRow>
           <InspectorFieldRow label="Image Position"><InspectorSelect value={background?.imagePosition ?? "center-center"} options={["top-left", "top-center", "top-right", "center-left", "center-center", "center-right", "bottom-left", "bottom-center", "bottom-right"].map((value) => ({ value, label: value.replace(/-/g, " ").replace(/(^| )([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`) }))} onChange={(imagePosition) => updateBackgroundImage({ imagePosition })} ariaLabel="Section image position" /></InspectorFieldRow>
           <InspectorFieldRow label="Image Repeat"><InspectorSelect value={background?.imageRepeat ?? "no-repeat"} options={[{ value: "no-repeat", label: "No Repeat" }, { value: "repeat", label: "Repeat" }, { value: "repeat-x", label: "Repeat X" }, { value: "repeat-y", label: "Repeat Y" }]} onChange={(imageRepeat) => updateBackgroundImage({ imageRepeat })} ariaLabel="Section image repeat" /></InspectorFieldRow>
-          <InspectorFieldRow label="Video" description="Select a video file or enter a YouTube or Vimeo link.">
+          <InspectorFieldRow label="Video" description="Select a video file or enter a YouTube or Vimeo link." dynamicBinding={inspectorDynamicBinding(section, update, "backgroundVideoUrl")}>
             <BuilderImageUrlControl value={background?.videoUrl ?? ""} placeholder="http://" chooseLabel="Select Video" onChange={(event) => { const videoUrl = normalizeVideoUrl(event.target.value); updateBackgroundImage({ videoUrl: videoUrl || undefined, type: videoUrl ? "video" : "image" }); }} onChoose={() => openWordPressMediaPicker?.({ title: "Section Background Video", currentUrl: background?.videoUrl, onSelect: (media) => updateBackgroundImage({ videoUrl: media.sourceUrl, type: "video" }) })} />
           </InspectorFieldRow>
           <InspectorFieldRow label="Title" description="Decorative Section title source field.">
@@ -104,10 +115,8 @@ export default function SectionCapabilityPanel({ section, tab, isFirstVisible, u
           <InspectorFieldRow label="Status / Disable Section" description="Section status is not yet a canonical persisted capability.">
             <InspectorSelect value="enabled" options={[{ value: "enabled", label: "Enabled" }, { value: "disabled", label: "Deferred" }]} disabled onChange={() => undefined} ariaLabel="Section status (deferred)" />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Dynamic Content" description="Dynamic Section content is not yet supported by the canonical owner.">
-            <InspectorTextField value="" placeholder="Deferred" disabled onChange={() => undefined} ariaLabel="Section dynamic content (deferred)" />
-          </InspectorFieldRow>
         </Group>
+        <DynamicContentInspectorGroup item={section} update={update} />
         <Group title="Advanced">
           <InspectorFieldRow label="ID"><InspectorTextField value={section.anchorId ?? ""} onChange={(anchorId) => update({ anchorId: anchorId || undefined })} ariaLabel="Section ID" /></InspectorFieldRow>
           <InspectorFieldRow label="Classes"><InspectorTextField value={section.visualStyle?.customClass ?? ""} onChange={(className) => updateAdvanced({ className: className || undefined })} ariaLabel="Section classes" /></InspectorFieldRow>

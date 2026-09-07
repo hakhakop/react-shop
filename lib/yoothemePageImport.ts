@@ -219,7 +219,11 @@ const sourceRowLayout = (
 ): string | undefined => {
   const sourceLayout = asString(sourceProps(rowNode).layout)?.replace(/\s+/g, "");
   if (sourceLayout) {
-    const normalized = normalizeLayoutToUikitPreset(sourceLayout);
+    // YOOtheme stores responsive layouts as `desktop|small`. The shared Row
+    // primitive owns the desktop preset while columns retain every authored
+    // breakpoint width below. Normalizing the entire string made a valid
+    // `1-5,1-5,1-5,2-5|...` layout fall back to four equal columns.
+    const normalized = normalizeLayoutToUikitPreset(sourceLayout.split("|", 1)[0]);
     if (
       normalized in UIKIT_LAYOUT_PRESETS &&
       UIKIT_LAYOUT_PRESETS[normalized].columnCount === columns.length
@@ -1011,6 +1015,7 @@ type DynamicImportDestination =
   | "eyebrow"
   | "imageUrl"
   | "backgroundImageUrl"
+  | "backgroundVideoUrl"
   | "imageAlt"
   | "hoverVideoUrl"
   | "imageLinkUrl"
@@ -1030,6 +1035,7 @@ type DynamicImportDestination =
 type DynamicImportResult = {
   context?: DynamicContentContextDescriptor;
   bindings?: DynamicFieldBindings<DynamicImportDestination>;
+  condition?: NonNullable<BuilderLayoutBlock["dynamicCondition"]>;
   hasSource: boolean;
   supported: boolean;
 };
@@ -1061,7 +1067,7 @@ const dynamicBinding = (
   allowUnregistered = false,
 ) => {
   const fallbackValueType: DynamicContentValueType =
-    destination === "videoUrl" || destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
+    destination === "videoUrl" || destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "backgroundVideoUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
       ? "url"
       : destination === "text" || destination === "body" || destination === "content"
         ? "richText"
@@ -1120,6 +1126,10 @@ const sourceTextTransform = (
   if (entries.length === 1 && entries[0][0] === "limit" && Number.isInteger(entries[0][1]) && Number(entries[0][1]) > 0) {
     return { kind: "textLimit", limit: Number(entries[0][1]) };
   }
+  if (entries.every(([key, value]) => (key === "before" || key === "after") && typeof value === "string")) {
+    const affix = Object.fromEntries(entries) as { before?: string; after?: string };
+    return { kind: "textAffix", ...affix };
+  }
   warnings.push(`${sourcePath}: dynamic filters/transforms are unsupported and the binding was not imported.`);
   return undefined;
 };
@@ -1127,6 +1137,7 @@ const sourceTextTransform = (
 const sourceDynamicFieldPath = (
   value: unknown,
   genericAcf = false,
+  queryName?: string,
 ): { path: string; filters?: unknown; arguments?: unknown } | undefined => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const descriptor = value as Record<string, unknown>;
@@ -1150,6 +1161,17 @@ const sourceDynamicFieldPath = (
     return { path: args.show_excerpt === false ? "content" : "excerpt", filters: descriptor.filters, arguments: descriptor.arguments };
   }
   if (name === "modified" || name === "modifiedDate") return { path: "modifiedDate", filters: descriptor.filters };
+  if (queryName === "productCats.customProductCats") {
+    if (name === "field.products_intro_image.url") {
+      return { path: "acf.products_intro_image.url", filters: descriptor.filters, arguments: descriptor.arguments };
+    }
+    if (name === "field.products_intro_image.alt") {
+      return { path: "acf.products_intro_image.alt", filters: descriptor.filters, arguments: descriptor.arguments };
+    }
+    if (name === "field.products_hover_video.url") {
+      return { path: "acf.products_hover_video.url", filters: descriptor.filters, arguments: descriptor.arguments };
+    }
+  }
   if (genericAcf && name.startsWith("field.") && name.length > "field.".length) {
     return { path: `acf.${name.slice("field.".length)}`, filters: descriptor.filters, arguments: descriptor.arguments };
   }
@@ -1289,6 +1311,9 @@ const mapDynamicSource = (
     : null;
   const inheritedRelationRoot = inheritedFieldRecord ? asString(inheritedFieldRecord.name) : null;
   const discoverableParentRelation = Boolean(inheritedRelationRoot && /^[_A-Za-z][_0-9A-Za-z]*$/.test(inheritedRelationRoot));
+  const inheritedWooCommerceGallery = inheritedRelationRoot === "woocommerce.gallery_image_ids";
+  const currentArchiveContext = queryName === "productCats.taxonomyProductCat" &&
+    (!query || typeof query !== "object" || Array.isArray(query) || !(query as Record<string, unknown>).arguments);
   if (!supportsWordPressPostQuery && !discoverableWordPressRoot && !inheritedParent && !menuQuery) {
     warnings.push(`${sourcePath}: DYNAMIC CONTENT PROVIDER UNRESOLVED (source/query). Canonical template and source bindings were retained; provider data was not materialized.`);
   }
@@ -1301,8 +1326,33 @@ const mapDynamicSource = (
   const genericArgumentRecord = genericArguments && typeof genericArguments === "object" && !Array.isArray(genericArguments)
     ? genericArguments as Record<string, unknown>
     : {};
+  const genericField = query && typeof query === "object" && !Array.isArray(query)
+    ? (query as Record<string, unknown>).field
+    : null;
+  const genericFieldRecord = genericField && typeof genericField === "object" && !Array.isArray(genericField)
+    ? genericField as Record<string, unknown>
+    : null;
+  const genericRelationName = genericFieldRecord ? asString(genericFieldRecord.name) : null;
+  const genericRelationDirectives = Array.isArray(genericFieldRecord?.directives)
+    ? genericFieldRecord.directives as unknown[]
+    : [];
+  const genericSliceDirective = genericRelationDirectives.find((directive) => {
+    const record = directive && typeof directive === "object" && !Array.isArray(directive)
+      ? directive as Record<string, unknown>
+      : null;
+    return record?.name === "slice";
+  });
+  const genericSliceArguments = genericSliceDirective && typeof genericSliceDirective === "object" && !Array.isArray(genericSliceDirective)
+    ? (genericSliceDirective as Record<string, unknown>).arguments
+    : null;
+  const genericSliceArgumentRecord = genericSliceArguments && typeof genericSliceArguments === "object" && !Array.isArray(genericSliceArguments)
+    ? genericSliceArguments as Record<string, unknown>
+    : {};
+  const genericChildCollection = genericRelationName === "children";
   const genericStart = Number(genericArgumentRecord.offset);
   const genericQuantity = Number(genericArgumentRecord.limit);
+  const genericRelationStart = Number(genericSliceArgumentRecord.offset);
+  const genericRelationQuantity = Number(genericSliceArgumentRecord.limit);
   if (supportsWordPressPostQuery && !queryData) return { hasSource: true, supported: false };
   const bindings: DynamicFieldBindings<DynamicImportDestination> = {};
   const sourceProps = sourceRecord.props;
@@ -1316,11 +1366,27 @@ const mapDynamicSource = (
     ? metaSourceRecord.arguments as Record<string, unknown>
     : {};
   const metaTaxonomy = asString(metaArguments.show_taxonomy);
+  const conditionSource = sourceProps && typeof sourceProps === "object" && !Array.isArray(sourceProps)
+    ? (sourceProps as Record<string, unknown>)._condition
+    : undefined;
+  const conditionRecord = conditionSource && typeof conditionSource === "object" && !Array.isArray(conditionSource)
+    ? conditionSource as Record<string, unknown>
+    : undefined;
+  const conditionFilters = conditionRecord?.filters && typeof conditionRecord.filters === "object" && !Array.isArray(conditionRecord.filters)
+    ? conditionRecord.filters as Record<string, unknown>
+    : undefined;
+  const archiveProductsCondition = queryName === "site" && conditionRecord?.name === "item_count"
+    ? {
+        source: "archive-products" as const,
+        operator: conditionFilters?.condition === "!" ? "empty" as const : "notEmpty" as const,
+      }
+    : undefined;
   if (sourceProps && typeof sourceProps === "object" && !Array.isArray(sourceProps)) {
     for (const [sourceKey, destination] of Object.entries(destinationMap)) {
       const descriptor = sourceDynamicFieldPath(
         (sourceProps as Record<string, unknown>)[sourceKey],
         discoverableWordPressRoot || discoverableParentRelation,
+        typeof queryName === "string" ? queryName : undefined,
       );
       if (!descriptor) continue;
       const bindingPath = `${sourcePath}.source.props.${sourceKey}`;
@@ -1360,6 +1426,19 @@ const mapDynamicSource = (
             ? { query: queryData as DynamicContentContextDescriptor["query"] }
             : {}),
         }
+      : inheritedWooCommerceGallery
+        ? {
+            provider: "webpages",
+            source: "context-relation",
+            mode: "collection",
+            query: {
+              path: "gallery.items",
+              start: Number.isInteger(genericRelationStart) && genericRelationStart >= 0 ? genericRelationStart : 0,
+              ...(Number.isInteger(genericRelationQuantity) && genericRelationQuantity > 0
+                ? { quantity: genericRelationQuantity }
+                : {}),
+            },
+          }
       : discoverableParentRelation
         ? {
             provider: "wordpress",
@@ -1386,12 +1465,23 @@ const mapDynamicSource = (
             },
           }
         : inheritedParent
+          ? {
+              provider: "yootheme",
+              source: "#parent",
+              mode: "single",
+              query: {
+                sourceQuery: query as DynamicContentData,
+              },
+            }
+        : currentArchiveContext
           ? undefined
           : discoverableWordPressRoot
         ? {
             provider: "wordpress",
             source: "content",
-            mode: Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
+            mode: genericChildCollection
+              ? "collection"
+              : Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
               ? "single"
               : "collection",
             query: {
@@ -1400,11 +1490,17 @@ const mapDynamicSource = (
               ...(yoothemeWordPressSourceName(String(queryName))
                 ? { sourceName: yoothemeWordPressSourceName(String(queryName))! }
                 : {}),
-              ...(Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
+              ...(genericChildCollection && Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
+                ? { parentId: Number(genericArgumentRecord.id), parentRelation: true }
+                : Number.isInteger(Number(genericArgumentRecord.id)) && Number(genericArgumentRecord.id) > 0
                 ? { databaseId: Number(genericArgumentRecord.id) }
                 : {}),
-              ...(Number.isInteger(genericStart) && genericStart >= 0 ? { start: genericStart } : {}),
-              ...(Number.isInteger(genericQuantity) && genericQuantity > 0 ? { quantity: genericQuantity } : {}),
+              ...(Number.isInteger(genericChildCollection ? genericRelationStart : genericStart) && (genericChildCollection ? genericRelationStart : genericStart) >= 0
+                ? { start: genericChildCollection ? genericRelationStart : genericStart }
+                : {}),
+              ...(Number.isInteger(genericChildCollection ? genericRelationQuantity : genericQuantity) && (genericChildCollection ? genericRelationQuantity : genericQuantity) > 0
+                ? { quantity: genericChildCollection ? genericRelationQuantity : genericQuantity }
+                : {}),
               ...(metaTaxonomy ? { metaTaxonomy } : {}),
               ...(query && typeof query === "object" && !Array.isArray(query)
                 ? { sourceQuery: query as DynamicContentData }
@@ -1423,6 +1519,7 @@ const mapDynamicSource = (
             : {}),
         }),
     ...(Object.keys(bindings).length > 0 ? { bindings } : {}),
+    ...(archiveProductsCondition ? { condition: archiveProductsCondition } : {}),
   };
 };
 
@@ -1481,7 +1578,6 @@ const sourceGridItem = (
     id: sourcePathId(path, "grid-item"),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
-    videoUrl: resolveYoothemeAssetUrl(itemProps.video),
     // Both source fields are authored as rich HTML in the DevStack fixtures.
     // Normalize them at the same safe boundary used by the WebPages rich editor.
     title: sanitizeHtml(asString(props.title) ?? ""),
@@ -1870,7 +1966,7 @@ const mapStaticElement = (
     const children = directChildren.length ? directChildren : Array.isArray(content) ? content : content && typeof content === "object" ? sourceChildren(content as YoothemeSourceNode) : [];
     const rows = (children as YoothemeSourceNode[]).filter(child => child.type === "row").map((row, ri) => {
       const rowId = sourcePathId(`${path}.fragment.${ri}`, "row");
-      const columns = sourceChildren(row).filter(child => child.type === "column").map((column, ci) => sourceBuilderColumn(column, `${rowId}-column-${ci}`, sourceChildren(column).map((child, ei) => mapStaticElement(child, `${path}.fragment.${ri}.${ci}.${ei}`, warnings)).filter((child): child is BuilderLayoutBlock => Boolean(child))));
+      const columns = sourceChildren(row).filter(child => child.type === "column").map((column, ci) => sourceBuilderColumn(column, `${rowId}-column-${ci}`, sourceChildren(column).map((child, ei) => mapStaticElement(child, `${path}.fragment.${ri}.${ci}.${ei}`, warnings)).filter((child): child is BuilderLayoutBlock => Boolean(child)), warnings, `${path}.fragment.${ri}.${ci}`));
       return sourceBuilderRow(row, rowId, ri, columns);
     });
     const allowedTags = ["div", "address", "article", "aside", "footer", "header", "hgroup", "nav", "section"];
@@ -1894,6 +1990,7 @@ const mapStaticElement = (
       kind: "heading",
       dynamicContext: dynamic.context,
       dynamicBindings: dynamic.bindings,
+      ...(dynamic.condition ? { dynamicCondition: dynamic.condition } : {}),
       headingText: asString(props.content) ?? "",
       title: asString(props.content) ?? "",
       headingLevel: level ?? "h2",
@@ -1960,6 +2057,7 @@ const mapStaticElement = (
   if (type === "image" || type === "overlay") {
     const dynamic = mapDynamicSource(node, {
       image: "imageUrl",
+      video: "videoUrl",
       image_alt: "imageAlt",
       title: "title",
       meta: "meta",
@@ -2820,6 +2918,7 @@ const mapStaticElement = (
           {
             image: "imageUrl",
             image_alt: "imageAlt",
+            hover_video: "hoverVideoUrl",
             title: "title",
             meta: "meta",
             content: "content",
@@ -2830,13 +2929,14 @@ const mapStaticElement = (
           itemPath,
         );
         const sourceLink = asString(item.link);
-        ["video", "video_title", "hover_image", "hover_video", "text_color", "text_color_hover", "lightbox_image_focal_point", "lightbox_text_color", "image_focal_point", "hover_image_focal_point"].forEach((key) => {
+        ["video", "video_title", "hover_image", "text_color", "text_color_hover", "lightbox_image_focal_point", "lightbox_text_color", "image_focal_point", "hover_image_focal_point"].forEach((key) => {
           if (item[key] !== undefined && item[key] !== "" && item[key] !== false) warnings.push(path + "." + index + "." + key + ": DEFERRED — Gallery item runtime has no exact canonical consumer yet.");
         });
         return {
           id: sourcePathId(path + "." + index, "gallery-item"),
           imageUrl: asString(item.image) ?? undefined,
           imageAlt: asString(item.image_alt) ?? undefined,
+          hoverVideoUrl: resolveYoothemeAssetUrl(item.hover_video),
           title: asString(item.title) ?? "",
           meta: asString(item.meta) ?? "",
           content: sanitizeHtml(asString(item.content) ?? ""),
@@ -2865,7 +2965,8 @@ const mapStaticElement = (
       id: sourcePathId(path, "gallery"), kind: "gallery", galleryItems: items,
       gridShowTitle: props.show_title !== false, gridShowMeta: props.show_meta !== false,
       gridShowText: props.show_content !== false, gridShowButton: props.show_link !== false,
-      gridShowHoverImage: false, gridShowHoverVideo: false,
+      gridShowHoverImage: sourceBoolean(props.show_hover_image) ?? false,
+      gridShowHoverVideo: sourceBoolean(props.show_hover_video) ?? false,
       gridGap: props.grid_column_gap === "collapse" ? "none" : sourceMargin(props.grid_column_gap) ?? "medium",
       gridRowGap: props.grid_row_gap === "collapse" ? "none" : sourceMargin(props.grid_row_gap) ?? "medium",
       showDividers: props.grid_divider === true || props.grid_divider === "true",
@@ -2908,6 +3009,7 @@ const mapStaticElement = (
   }
 
   if (type === "slideshow") {
+    const dynamic = mapDynamicSource(node, {}, warnings, path);
     const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
     if (hasUnsupportedDynamicSource) {
       reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings);
@@ -2933,6 +3035,7 @@ const mapStaticElement = (
       kind: "slideshow",
       spacingContract: "yootheme",
       slides,
+      ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
       carouselSettings: {
         presentation: "slideshow",
         imageWidth: asString(props.image_width) ?? undefined,
@@ -3025,6 +3128,7 @@ const mapStaticElement = (
   }
 
   if (type === "panel-slider") {
+    const dynamic = mapDynamicSource(node, {}, warnings, path);
     const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props, warnings);
     if (hasUnsupportedDynamicSource) {
       reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings);
@@ -3040,6 +3144,7 @@ const mapStaticElement = (
       id: sourcePathId(path, "panel-slider"),
       kind: "panelSlider",
       slides: slides.map(({ imageAlignment: _deferredItemImageAlignment, ...slide }) => slide),
+      ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
       carouselSettings: {
         presentation: "panel-slider",
         variant: "panel",
@@ -3407,6 +3512,8 @@ const sourceBuilderColumn = (
   columnNode: YoothemeSourceNode,
   id: string,
   elements: BuilderLayoutBlock[],
+  warnings: string[] = [],
+  sourcePath = id,
 ): BuilderColumn => {
   const props = sourceProps(columnNode);
   const responsiveWidths = sourceResponsiveColumnWidths(props);
@@ -3419,8 +3526,10 @@ const sourceBuilderColumn = (
     : undefined;
   const keepEmpty = sourceBoolean(props.keep_empty ?? props.empty_content);
   const advanced = sourceAdvancedSettings(columnNode, props);
+  const dynamic = mapDynamicSource(columnNode, {}, warnings, sourcePath);
   return {
     id,
+    ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
     ...(responsiveWidths ? { responsiveWidths } : {}),
     ...(order ? { order } : {}),
     ...(verticalAlign ? { verticalAlign } : {}),
@@ -3465,6 +3574,7 @@ const sourceBuilderRow = (
   columns: BuilderColumn[],
 ): BuilderRow => {
   const props = sourceProps(rowNode);
+  const dynamic = mapDynamicSource(rowNode, {}, [], id);
   const layout = sourceRowLayout(rowNode, sourceChildren(rowNode).filter((node) => node.type === "column")) ?? "1-col";
   const sourceLayout = asString(props.layout) ?? undefined;
   const horizontalDistribution = props.alignment === "justify" || props.align === "justify"
@@ -3515,6 +3625,7 @@ const sourceBuilderRow = (
     : undefined;
   return {
     id,
+    ...(dynamic.context ? { dynamicContext: dynamic.context } : {}),
     layout,
     ...(customLayout ? { customLayout } : {}),
     ...(sourceStructuralSpacing(props.column_gap) ? { columnGap: sourceStructuralSpacing(props.column_gap) } : {}),
@@ -3603,6 +3714,8 @@ export const mapYoothemeStaticContent = (
             columnNode,
             `${rowId}-column-${columnIndex + 1}`,
             blocks,
+            warnings,
+            `${sectionIndex}.${rowIndex}.${columnIndex}`,
           );
         });
         rows.push(sourceBuilderRow(rowNode, rowId, rowIndex, builderColumns));
@@ -3615,7 +3728,7 @@ export const mapYoothemeStaticContent = (
     const sectionProps = sourceProps(sectionNode);
     const sectionDynamic = mapDynamicSource(
       sectionNode,
-      { image: "backgroundImageUrl" },
+      { image: "backgroundImageUrl", video: "backgroundVideoUrl" },
       warnings,
       `${sectionIndex}`,
     );

@@ -38,6 +38,7 @@ import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition"
 import { resolveHeaderMenuSourceItems } from "@/lib/headerMenuSources";
 import { getNavigationRouteAliases } from "@/lib/navigationTargets";
 import {
+  BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
 } from "@/components/builder/BuilderIframeDraftBridge";
@@ -234,7 +235,16 @@ export default function HeaderShellView({
       }
       if (event.data.documentKey !== "header") return;
       const state = event.data.state as BuilderState | undefined;
-      if (!Number.isFinite(revision) || revision <= liveHeaderRevisionRef.current) return;
+      if (!Number.isFinite(revision)) return;
+      if (revision <= liveHeaderRevisionRef.current) {
+        window.parent.postMessage({
+          source: BUILDER_IFRAME_DRAFT_SOURCE,
+          type: BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
+          documentKey: "header",
+          revision,
+        }, window.location.origin);
+        return;
+      }
       if (!state || state.page !== "header" || !Array.isArray(state.sections)) return;
 
       // Header draft messages can race a page/shell URL transition. Only
@@ -245,6 +255,12 @@ export default function HeaderShellView({
         if (!candidate.elements.length || !candidate.columns?.length) return;
         liveHeaderRevisionRef.current = revision;
         setLiveHeaderComposition(candidate);
+        window.parent.postMessage({
+          source: BUILDER_IFRAME_DRAFT_SOURCE,
+          type: BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
+          documentKey: "header",
+          revision,
+        }, window.location.origin);
       } catch {
         // Keep the canonical server composition on malformed/stale drafts.
       }
@@ -579,9 +595,9 @@ export default function HeaderShellView({
       <HeaderNav
         dropdownContentById={Object.fromEntries(sourceItems.filter(item => !item.parentId && item.dropdownContent?.sublayout.rows.length && !item.dropdownContent.sublayout.disabled).map(item => [item.id,
           <MenuDropdownContent key={item.id} content={item.dropdownContent!}
-            initialSections={dropdownProjections?.[item.dropdownContent!.id]?.sections}
-            initialSignature={dropdownProjections?.[item.dropdownContent!.id]?.signature}
-            initialWarnings={dropdownProjections?.[item.dropdownContent!.id]?.warnings}
+            initialSections={dropdownProjections?.[item.id]?.sections}
+            initialSignature={dropdownProjections?.[item.id]?.signature}
+            initialWarnings={dropdownProjections?.[item.id]?.warnings}
             draft={builderDraftPreview} websiteId={scopedPreviewWebsiteId} page={scopedPreviewPage} shellSettings={effectiveShellSettings}
             linkProjection={scopedPreviewWebsiteId ? { mode: scopedLinkMode ?? "preview", context: { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages, systemRouteAliases: getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings) } } : undefined} />]))}
         items={filterSaaSItems(menuItems)}
@@ -886,6 +902,10 @@ export default function HeaderShellView({
           stretch={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownStretch : documentSettings.searchDropdownStretch}
           large={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownLarge : documentSettings.searchDropdownLarge}
           iconPosition={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchIconPosition : documentSettings.searchIconPosition}
+          expandInput={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchExpand : documentSettings.searchExpand}
+          preventSubmit={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchPreventSubmit : documentSettings.searchPreventSubmit}
+          dropbarAnimation={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropbarAnimation : documentSettings.searchDropbarAnimation}
+          removeHorizontalPadding={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropbarRemoveHorizontalPadding : documentSettings.searchDropbarRemoveHorizontalPadding}
         />
       ) : (
         <HeaderActions

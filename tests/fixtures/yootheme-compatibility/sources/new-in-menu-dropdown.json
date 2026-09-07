@@ -1,0 +1,78 @@
+{
+  "type": "fragment",
+  "children": [{
+    "type": "row",
+    "children": [{
+      "type": "column",
+      "children": [{
+        "type": "gallery",
+        "props": {
+          "filter_align": "left",
+          "filter_all": true,
+          "filter_grid_breakpoint": "m",
+          "filter_grid_width": "auto",
+          "filter_position": "top",
+          "filter_style": "tab",
+          "grid_column_gap": "collapse",
+          "grid_default": "1",
+          "grid_medium": "3",
+          "grid_row_gap": "collapse",
+          "image_height": 580,
+          "image_transition": "scale-up",
+          "image_width": 855,
+          "item_animation": true,
+          "lightbox_bg_close": true,
+          "link_style": "default",
+          "link_text": "",
+          "margin": "default",
+          "meta_align": "below-title",
+          "meta_element": "div",
+          "meta_style": "text-meta",
+          "overlay_hover": false,
+          "overlay_link": true,
+          "overlay_mode": "cover",
+          "overlay_position": "center",
+          "overlay_style": "",
+          "overlay_transition": "fade",
+          "parallax_easing": "1",
+          "show_content": true,
+          "show_hover_image": true,
+          "show_hover_video": true,
+          "show_link": true,
+          "show_meta": true,
+          "show_title": true,
+          "text_align": "center",
+          "text_color": "light",
+          "title_element": "div",
+          "title_hover_style": "reset",
+          "title_style": "h2"
+        },
+        "children": [{
+          "type": "gallery_item",
+          "source": {
+            "query": {
+              "name": "productCats.customProductCats",
+              "arguments": {
+                "offset": 0,
+                "limit": 10,
+                "order": "term_order",
+                "order_direction": "ASC",
+                "id": 0
+              }
+            },
+            "props": {
+              "image": { "filters": { "search": "" }, "name": "field.products_intro_image.url" },
+              "title": { "filters": { "search": "", "before": "New in " }, "name": "name" },
+              "link": { "filters": { "search": "" }, "name": "link" },
+              "hover_video": { "filters": { "search": "" }, "name": "field.products_hover_video.url" }
+            }
+          }
+        }]
+      }]
+    }]
+  }],
+  "version": "4.5.18",
+  "props": { "margin": "default" },
+  "modified": "2026-09-06T10:01:18.636Z",
+  "name": "woolberry-new-in-menu-dropdown"
+}

@@ -17,8 +17,15 @@ export function dynamicContentPreviewSignature(sections: BuilderSection[]) {
       const listItems = records(block.listItems);
       const buttons = records(block.buttons);
       const galleryItems = records(block.galleryItems);
-      if (block.dynamicContext || block.dynamicBindings) {
-        metadata.push({ owner, kind: block.kind, id: block.id, dynamicContext: block.dynamicContext, dynamicBindings: block.dynamicBindings });
+      if (block.dynamicContext || block.dynamicBindings || block.dynamicCondition) {
+        metadata.push({
+          owner,
+          kind: block.kind,
+          id: block.id,
+          dynamicContext: block.dynamicContext,
+          dynamicBindings: block.dynamicBindings,
+          dynamicCondition: block.dynamicCondition,
+        });
       }
       // Products render from a transient materialized collection. Any authored
       // Products setting invalidates the render projection, even when the
@@ -65,7 +72,26 @@ export function dynamicContentPreviewSignature(sections: BuilderSection[]) {
   };
 
   sections.forEach((section) => {
-    section.rows?.forEach((row) => row.columns.forEach((column) => visitBlocks(column.elements, column.id)));
+    if (section.dynamicContext || section.dynamicBindings) {
+      metadata.push({
+        owner: section.id,
+        kind: "section",
+        id: section.id,
+        dynamicContext: section.dynamicContext,
+        dynamicBindings: section.dynamicBindings,
+      });
+    }
+    section.rows?.forEach((row) => {
+      if (row.dynamicContext) {
+        metadata.push({ owner: section.id, kind: "row", id: row.id, dynamicContext: row.dynamicContext });
+      }
+      row.columns.forEach((column) => {
+        if (column.dynamicContext) {
+          metadata.push({ owner: row.id, kind: "column", id: column.id, dynamicContext: column.dynamicContext });
+        }
+        visitBlocks(column.elements, column.id);
+      });
+    });
     section.layoutItems?.forEach((column) => visitBlocks(column.blocks ?? [], column.id ?? section.id));
   });
   return JSON.stringify(metadata);

@@ -18,12 +18,13 @@ import { GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
 import { YoothemeColorPaletteProvider, YoothemeColorPicker, YoothemeFontPicker, YoothemeLessImportModal } from "@/components/dashboard/global-styles/YoothemeStyleControls";
 import ThemeSettingsPanel from "@/components/dashboard/global-styles/ThemeSettingsPanel";
 import type { BuilderThemeSettings } from "@/lib/builderThemeSettings";
+import type { YoothemeHeaderImportMode } from "@/lib/yoothemeHeaderRecipe";
 
 type Props = {
   shellSettings: BuilderShellSettings;
   updateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
   themeSettings: BuilderThemeSettings;
-  onImportThemeSettings: (settings: BuilderThemeSettings) => void | Promise<void>;
+  onImportThemeSettings: (settings: BuilderThemeSettings, headerMode: YoothemeHeaderImportMode) => void | Promise<void>;
   onExportThemeSettings: () => void;
 };
 type Screen = "root" | "theme" | "global" | "button" | "card" | "heading" | "accordion" | "background" | "base" | "visibility" | "section" | "container" | "grid" | "nav" | "navbar" | "search" | "offcanvas" | "logo";

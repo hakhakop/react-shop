@@ -51,6 +51,8 @@ test("registered page types include WordPress, system, and WooCommerce views in 
     "taxonomy:product_cat", "taxonomy:product_tag", "system:search", "system:error-404",
   ]));
   expect(new Set(BUILTIN_TEMPLATE_PAGE_TYPES.map((item) => item.id)).size).toBe(BUILTIN_TEMPLATE_PAGE_TYPES.length);
+  expect(BUILTIN_TEMPLATE_PAGE_TYPES.find((item) => item.id === "taxonomy:product_cat"))
+    .toMatchObject({ taxonomy: "product_cat", requestTaxonomy: "product_tag" });
 });
 
 test("legacy templates acquire canonical page types without a broad data migration", () => {
@@ -79,6 +81,34 @@ test("assignment values are OR within a filter and filter groups compose with AN
   expect(routingTemplateMatches({ ...categoryContext, language: "hy" }, template)).toBe(false);
   expect(routingTemplateMatches({ ...categoryContext, pageNumber: 1 }, template)).toBe(false);
   expect(routingTemplateMatches({ ...categoryContext, requestTaxonomyTerms: [] }, template)).toBe(false);
+});
+
+test("category assignments distinguish the selected term from its children", () => {
+  const selectedParent = assignedTemplate([
+    { subject: "content-type", operator: "include", contentType: "product-category" },
+    { subject: "taxonomy-term", operator: "include", taxonomy: "product_cat", termId: "10", children: "exclude" },
+  ]);
+  const parentAndChildren = assignedTemplate([
+    { subject: "content-type", operator: "include", contentType: "product-category" },
+    { subject: "taxonomy-term", operator: "include", taxonomy: "product_cat", termId: "10", children: "include" },
+  ]);
+  const childrenOnly = assignedTemplate([
+    { subject: "content-type", operator: "include", contentType: "product-category" },
+    { subject: "taxonomy-term", operator: "include", taxonomy: "product_cat", termId: "10", children: "only" },
+  ]);
+  const parentContext = {
+    ...categoryContext,
+    contentId: "10",
+    slug: "women",
+    taxonomyTerms: [{ taxonomy: "product_cat", id: "10", slug: "women" }],
+  };
+
+  expect(routingTemplateMatches(parentContext, selectedParent)).toBe(true);
+  expect(routingTemplateMatches(categoryContext, selectedParent)).toBe(false);
+  expect(routingTemplateMatches(parentContext, parentAndChildren)).toBe(true);
+  expect(routingTemplateMatches(categoryContext, parentAndChildren)).toBe(true);
+  expect(routingTemplateMatches(parentContext, childrenOnly)).toBe(false);
+  expect(routingTemplateMatches(categoryContext, childrenOnly)).toBe(true);
 });
 
 test("first matching list item wins and a disabled item can only be forced by editor preview", () => {
@@ -120,8 +150,8 @@ test("CRUD, copy, status, assignment change, and order use the same generic serv
   const reassigned = await service.update(copy.template.id, { pageType: genre.id, conditions: [
     { subject: "content-type", operator: "include", contentType: "movie_genre" },
     { subject: "taxonomy-term", operator: "include", taxonomy: "movie_genre", termId: "12" },
-  ] });
-  expect(reassigned).toMatchObject({ pageType: genre.id, view: "archive" });
+  ], postsPerPage: 18 });
+  expect(reassigned).toMatchObject({ pageType: genre.id, view: "archive", postsPerPage: 18 });
   const reordered = await service.reorder((await service.list()).map((item) => item.id).reverse());
   expect(reordered.map((item) => item.order)).toEqual(reordered.map((_, index) => index * 10));
   expect((await service.delete(copy.template.id)).template.id).toBe(copy.template.id);

@@ -57,7 +57,10 @@ export type DynamicBindingDestination =
   | "linkAriaLabel"
   | "iconName"
   | "imageUrl"
+  | "backgroundImageUrl"
   | "imageAlt"
+  | "videoUrl"
+  | "backgroundVideoUrl"
   | "hoverVideoUrl"
   | "buttonLabel"
   | "buttonUrl";
@@ -95,7 +98,10 @@ export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   linkAriaLabel: { label: "Link ARIA Label", acceptedTypes: ["string", "richText"] },
   iconName: { label: "Icon", acceptedTypes: ["string"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
+  backgroundImageUrl: { label: "Background Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
+  videoUrl: { label: "Video", acceptedTypes: ["url"] },
+  backgroundVideoUrl: { label: "Background Video", acceptedTypes: ["url"] },
   hoverVideoUrl: { label: "Hover Video", acceptedTypes: ["url"] },
   buttonLabel: { label: "Button Label", acceptedTypes: ["string", "richText"] },
   buttonUrl: { label: "Button URL", acceptedTypes: ["url"] },
@@ -232,6 +238,22 @@ const WOOCOMMERCE_PRODUCT_SINGLE_QUERY_CONTROLS: readonly DynamicContentQueryCon
   { key: "id", label: "Numeric ID", control: "integer", minimum: 1, placeholder: "41" },
 ] as const;
 
+const WOOCOMMERCE_PRODUCT_TAG_ACF_FIELDS: readonly DynamicContentSourceField[] = [
+  { path: "acf.image_intro", label: "Intro Image", valueType: "media" },
+  { path: "acf.image_intro.url", label: "Intro Image URL", valueType: "url" },
+  { path: "acf.image_intro.alt", label: "Intro Image Alt", valueType: "string" },
+  { path: "acf.image_featured", label: "Video", valueType: "media" },
+  { path: "acf.image_featured.url", label: "Video URL", valueType: "url" },
+] as const;
+
+const WOOCOMMERCE_PRODUCT_CATEGORY_ACF_FIELDS: readonly DynamicContentSourceField[] = [
+  { path: "acf.products_intro_image", label: "Intro Image", valueType: "media" },
+  { path: "acf.products_intro_image.url", label: "Intro Image URL", valueType: "url" },
+  { path: "acf.products_intro_image.alt", label: "Intro Image Alt", valueType: "string" },
+  { path: "acf.products_hover_video", label: "Hover Video", valueType: "media" },
+  { path: "acf.products_hover_video.url", label: "Hover Video URL", valueType: "url" },
+] as const;
+
 /**
  * The single source/query capability registry shared by the inspector and
  * server orchestration. Query controls are declared alongside each source so
@@ -239,6 +261,43 @@ const WOOCOMMERCE_PRODUCT_SINGLE_QUERY_CONTROLS: readonly DynamicContentQueryCon
  */
 export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceCapability[] = [
   { key: "static", label: "None / Static" },
+  ...(["product-tag", "product-category"] as const).flatMap(source =>
+    (["single", "collection"] as const).map(mode => ({
+      key: `woocommerce-${source}-${mode}`,
+      label: mode === "single"
+        ? `Product ${source === "product-tag" ? "Tag" : "Category"}`
+        : `Custom Product ${source === "product-tag" ? "Tags" : "Categories"}`,
+      provider: "woocommerce", source, mode,
+      fields: [
+        { path: "name", label: "Name", valueType: "string" },
+        { path: "description", label: "Description", valueType: "richText" },
+        { path: "slug", label: "Slug", valueType: "string" },
+        { path: "link", label: "Link", valueType: "url" },
+        { path: "id", label: "ID", valueType: "identifier" },
+        ...(source === "product-tag" ? WOOCOMMERCE_PRODUCT_TAG_ACF_FIELDS : WOOCOMMERCE_PRODUCT_CATEGORY_ACF_FIELDS),
+      ],
+      queryControls: mode === "single"
+        ? [{ key: "databaseId", label: "Term ID", control: "integer", minimum: 1 }]
+        : [
+            ...(source === "product-category" ? [{ key: "parentId", label: "Parent Category", control: "integer", minimum: 0, placeholder: "0" } as const] : []),
+            { key: "start", label: "Start", control: "integer", minimum: 0 },
+            { key: "quantity", label: "Quantity", control: "integer", minimum: 1 },
+            { key: "order", label: "Order", control: "select", options: [
+              { value: "menuOrder", label: "Term Order" },
+              { value: "name", label: "Alphabetical" },
+              { value: "id", label: "ID" },
+              { value: "count", label: "Item Count" },
+            ] },
+            { key: "direction", label: "Direction", control: "select", options: [
+              { value: "asc", label: "Ascending" },
+              { value: "desc", label: "Descending" },
+            ] },
+            { key: "hideEmpty", label: "Hide Empty", control: "select", options: [
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ] },
+          ],
+    } satisfies DynamicContentSourceCapability))),
   ...(["single", "collection"] as const).map(mode => ({
     key: `wordpress-menu-${mode}`, label: mode === "single" ? "Menu Item" : "Custom Menu Items", provider: "wordpress", source: "menu-item", mode,
     fields: [{ path: "title", label: "Title", valueType: "string" }, { path: "url", label: "URL", valueType: "url" }, { path: "type", label: "Type", valueType: "string" }, { path: "active", label: "Active", valueType: "string" }],
@@ -298,6 +357,57 @@ export const WOOCOMMERCE_PRODUCT_COLLECTION_SOURCE =
 
 export const WOOCOMMERCE_PRODUCT_SINGLE_SOURCE =
   DYNAMIC_CONTENT_SOURCE_CAPABILITIES.find((source) => source.key === "woocommerce-product-single")!;
+
+const WOOCOMMERCE_TAXONOMY_SOURCE_NAMES: Readonly<Record<string, string>> = {
+  "product-tag": "product_tag",
+  "product-category": "product_cat",
+};
+
+const mergeSourceFields = (
+  base: readonly DynamicContentSourceField[] | undefined,
+  discovered: readonly DynamicContentSourceField[],
+) => {
+  const fields = new Map((base ?? []).map((field) => [field.path, field]));
+  // Prefer the connected WordPress schema for labels and field types when it
+  // describes the same canonical path. Static fields remain the offline
+  // fallback, so imported bindings never depend on discovery being available.
+  discovered.forEach((field) => fields.set(field.path, field));
+  return Array.from(fields.values());
+};
+
+/**
+ * Project WordPress taxonomy discovery into the equivalent WooCommerce term
+ * sources used by imported YOOtheme product-tag/category queries. The runtime
+ * provider remains WooCommerce; this only enriches its Inspector field list.
+ */
+export function mergeDiscoveredDynamicContentCapabilities(
+  base: readonly DynamicContentSourceCapability[],
+  discovered: readonly DynamicContentSourceCapability[],
+): DynamicContentSourceCapability[] {
+  const mergedBase = base.map((capability) => {
+    const taxonomy = capability.provider === "woocommerce"
+      ? WOOCOMMERCE_TAXONOMY_SOURCE_NAMES[capability.source ?? ""]
+      : undefined;
+    if (!taxonomy) return capability;
+
+    const taxonomyFields = discovered.flatMap((candidate) => {
+      const query = candidate.defaultQuery ?? {};
+      return candidate.provider === "wordpress" &&
+        candidate.source === "content" &&
+        query.sourceKind === "taxonomy" &&
+        sourceIdentity(query.sourceName) === sourceIdentity(taxonomy)
+        ? [...(candidate.fields ?? [])]
+        : [];
+    });
+    return taxonomyFields.length > 0
+      ? { ...capability, fields: mergeSourceFields(capability.fields, taxonomyFields) }
+      : capability;
+  });
+
+  const byKey = new Map<string, DynamicContentSourceCapability>();
+  [...mergedBase, ...discovered].forEach((capability) => byKey.set(capability.key, capability));
+  return Array.from(byKey.values());
+}
 
 export function dynamicContentSourceKey(
   descriptor: DynamicContentContextDescriptor | null | undefined,

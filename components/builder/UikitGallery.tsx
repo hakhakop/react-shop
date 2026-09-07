@@ -83,6 +83,7 @@ export default function UikitGallery({ block }: Props) {
       id: item.id || String(idx),
       imageUrl: sourceImageUrl || (isYoothemeGallery ? "" : DEFAULT_GALLERY_ITEMS[idx % 3].imageUrl),
       imageAlt: item.imageAlt || item.alt || item.title || "",
+      hoverVideoUrl: item.hoverVideoUrl || "",
       title: item.title || "",
       meta: item.meta || "",
       content: item.content || item.description || "",
@@ -107,6 +108,7 @@ export default function UikitGallery({ block }: Props) {
   const showMeta = rawBlock.gridShowMeta !== false;
   const showContent = rawBlock.gridShowText !== false;
   const showLink = rawBlock.gridShowButton !== false;
+  const showHoverVideo = rawBlock.gridShowHoverVideo === true;
 
   // React Lightbox Modal state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -303,31 +305,46 @@ export default function UikitGallery({ block }: Props) {
                       }}
                     />
                   ) : (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.imageAlt}
-                      className={`${isYoothemeGallery ? "el-image" : imageClass} uk-transition-scale-up uk-transition-opaque`}
-                      loading={rawBlock.imageLoading ?? "lazy"}
-                      width={isYoothemeGallery ? importedIntrinsicDimensions?.width : undefined}
-                      height={isYoothemeGallery ? importedIntrinsicDimensions?.height : undefined}
-                      {...imageAttributes}
-                      style={{
-                        width: isYoothemeGallery ? "auto" : "100%",
-                        maxWidth: isYoothemeGallery ? "100%" : undefined,
-                        height: isYoothemeGallery ? "auto" : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
-                        objectFit: isYoothemeGallery ? undefined : imageStyle.objectFit,
-                        display: "block",
-                        ...(!isYoothemeGallery && imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
-                      }}
-                      onError={(e) => {
-                        if (isYoothemeGallery) {
-                          e.currentTarget.style.visibility = "hidden";
-                          return;
-                        }
-                        // Native Galleries retain their authored default fallback.
-                        e.currentTarget.src = DEFAULT_GALLERY_ITEMS[index % 3].imageUrl;
-                      }}
-                    />
+                    <>
+                      <img
+                        src={item.imageUrl}
+                        alt={item.imageAlt}
+                        className={`${isYoothemeGallery ? "el-image" : imageClass} uk-transition-scale-up uk-transition-opaque`}
+                        loading={rawBlock.imageLoading ?? "lazy"}
+                        width={isYoothemeGallery ? importedIntrinsicDimensions?.width : undefined}
+                        height={isYoothemeGallery ? importedIntrinsicDimensions?.height : undefined}
+                        {...imageAttributes}
+                        style={{
+                          width: isYoothemeGallery ? "auto" : "100%",
+                          maxWidth: isYoothemeGallery ? "100%" : undefined,
+                          height: isYoothemeGallery ? "auto" : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
+                          objectFit: isYoothemeGallery ? undefined : imageStyle.objectFit,
+                          display: "block",
+                          ...(!isYoothemeGallery && imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
+                        }}
+                        onError={(e) => {
+                          if (isYoothemeGallery) {
+                            e.currentTarget.style.visibility = "hidden";
+                            return;
+                          }
+                          // Native Galleries retain their authored default fallback.
+                          e.currentTarget.src = DEFAULT_GALLERY_ITEMS[index % 3].imageUrl;
+                        }}
+                      />
+                      {showHoverVideo && item.hoverVideoUrl ? (
+                        <video
+                          className="shop-builder-gallery-hover-video uk-position-cover uk-transition-fade"
+                          src={item.hoverVideoUrl}
+                          preload="metadata"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          aria-hidden="true"
+                          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+                        />
+                      ) : null}
+                    </>
                   )}
 
                   {hasOverlayLink && (
@@ -346,7 +363,8 @@ export default function UikitGallery({ block }: Props) {
                     />
                   )}
 
-                  {/* YOOtheme overlay: Cover fills the media; Caption is a positioned content box. */}
+                  {/* YOOtheme overlay: Cover owns the full-media paint layer, while
+                      overlayPosition independently positions its content panel. */}
                   {(showMeta || showTitle || showContent || showLink) && (
                     <div
                       style={isYoothemeGallery ? { ...overlayThemeStyle, ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" as const } : {}) } : {
@@ -356,10 +374,12 @@ export default function UikitGallery({ block }: Props) {
                         ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" } : {}),
                       }}
                       className={isYoothemeGallery
-                        ? `${overlayMode === "cover" ? "uk-position-cover" : overlayPositionClass} ${overlayMarginClass} ${overlayStyleClass} ${overlayTransitionClass}`.trim()
+                        ? `${overlayMode === "cover" ? "uk-position-cover" : `${overlayPositionClass} ${overlayMarginClass}`} ${overlayStyleClass} ${overlayTransitionClass}`.trim()
                         : "uk-transition-fade"}
                     >
-                    <div className={isYoothemeGallery ? `uk-overlay ${overlayPaddingClass} uk-margin-remove-first-child`.trim() : ""}>
+                    <div className={isYoothemeGallery
+                      ? `${overlayMode === "cover" ? `${overlayPositionClass} ${overlayMarginClass}` : ""} uk-overlay ${overlayPaddingClass} uk-margin-remove-first-child`.trim()
+                      : ""}>
                       {showMeta && item.meta && rawBlock.panelMetaPosition !== "below-title" && (
                         <div
                           className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}

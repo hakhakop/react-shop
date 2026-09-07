@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "routingTemplates": [
+    {
+      "id": "routing:legacy-post-single",
+      "name": "Single Post",
+      "enabled": true,
+      "order": 0,
+      "pageType": "singular:post",
+      "view": "singular",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "post"
+        }
+      ],
+      "layoutId": "layout:builder:post-single"
+    }
+  ],
+  "individualOverrides": []
+}

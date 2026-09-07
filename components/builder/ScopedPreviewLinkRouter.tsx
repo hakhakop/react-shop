@@ -63,6 +63,11 @@ export default function ScopedPreviewLinkRouter({
 
       const href = anchor.getAttribute("href");
       if (!href) return;
+      // Builder canvas links are selection-first. The shared interaction
+      // owner records the exact clicked item/action and exposes navigation
+      // through its Follow Link action (or a repeated click). Do not let this
+      // document-level projection router race that interaction.
+      if (mode === "builder") return;
       const resolvedHref = websiteId
         ? projectWebsiteHref(href, {
             mode,

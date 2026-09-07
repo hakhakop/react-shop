@@ -1,5 +1,6 @@
 import type { BuilderCustomPage, BuilderLayoutKey } from "@/lib/builderLayouts";
 import {
+  resolveCommerceRouteCandidate,
   resolveNavigationRouteAlias,
   resolveSystemRouteAlias,
   type NavigationRouteAlias,
@@ -181,12 +182,30 @@ export function getStorefrontHrefFromScopedPreviewHref(
   try {
     const url = new URL(href, "https://webpages.local");
     const match = url.pathname.match(/^\/app\/websites\/([^/]+)\/(?:preview|builder)\/?$/);
-    if (!match || decodeURIComponent(match[1]) !== websiteId) return href;
+    if (!match || decodeURIComponent(match[1]) !== websiteId) {
+      // Authored WooCommerce buttons commonly use a query-only target. Give
+      // the builder router an absolute storefront path so following the exact
+      // clicked item does not accidentally replace the builder's own query.
+      const legacyProductCategory = url.searchParams.get("product_cat")?.trim();
+      if (legacyProductCategory && (href.startsWith("?") || href.startsWith("/?"))) {
+        return `/?product_cat=${encodeURIComponent(legacyProductCategory)}${url.hash}`;
+      }
+      return href;
+    }
     const requestedPage = url.searchParams.get("page");
-    if (!requestedPage) return href;
+    if (!requestedPage) {
+      const legacyProductCategory = url.searchParams.get("product_cat")?.trim();
+      return legacyProductCategory
+        ? `/?product_cat=${encodeURIComponent(legacyProductCategory)}${url.hash}`
+        : href;
+    }
     if (requestedPage === "product-single") {
       const product = url.searchParams.get("product");
       return `${product ? `/product/${encodeURIComponent(product)}` : "/product"}${url.hash}`;
+    }
+    if (requestedPage === "product-category" || requestedPage === "product-category-specific") {
+      const category = url.searchParams.get("category")?.trim();
+      return `${category ? `/product-category/${encodeURIComponent(category)}` : "/categories"}${url.hash}`;
     }
     const pageKey = requestedPage.startsWith("page:")
       ? requestedPage as BuilderLayoutKey
@@ -356,13 +375,14 @@ function resolveScopedWebsiteHref(
   const params = new URLSearchParams({ page: previewPage });
   const { path } = normalizeHrefPath(trimmed);
   const routeAlias = resolveNavigationRouteAlias(path, systemRouteAliases);
+  const commerceRoute = routeAlias ?? resolveCommerceRouteCandidate(path);
 
-  if (routeAlias?.pageKey === "product-category" && routeAlias.target.slug) {
-    params.set("category", routeAlias.target.slug);
+  if (commerceRoute?.pageKey === "product-category" && commerceRoute.target.slug) {
+    params.set("category", commerceRoute.target.slug);
   }
 
-  if (routeAlias?.pageKey === "product-single" && routeAlias.target.slug) {
-    params.set("product", routeAlias.target.slug);
+  if (commerceRoute?.pageKey === "product-single" && commerceRoute.target.slug) {
+    params.set("product", commerceRoute.target.slug);
   } else if (path.startsWith("/product/")) {
     const productSlug = path.replace(/^\/product\/+/, "").split("/")[0];
     if (productSlug) params.set("product", productSlug);

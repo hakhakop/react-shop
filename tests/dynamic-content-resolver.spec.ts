@@ -130,6 +130,22 @@ test("YOOtheme archive date and teaser-limit transforms resolve safely", () => {
   expect(resolved.text).toBe(`${"A".repeat(100)}…`);
 });
 
+test("YOOtheme text affixes resolve without discarding the dynamic value", () => {
+  const resolved = resolveDynamicItem(
+    { title: "Fallback" },
+    { fields: { name: { type: "string", value: "Women" } } },
+    {
+      title: {
+        path: "name",
+        valueType: "string",
+        transform: { kind: "textAffix", before: "New in " },
+      },
+    },
+  );
+
+  expect(resolved.title).toBe("New in Women");
+});
+
 test("invalid date transform input retains the authored fallback", () => {
   const bindings: DynamicFieldBindings<keyof TestItem> = {
     text: {

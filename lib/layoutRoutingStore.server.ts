@@ -179,6 +179,9 @@ function parseTemplate(value: unknown): RoutingTemplate {
       : legacyTemplatePageType(value.view, legacyContentType?.subject === "content-type" ? legacyContentType.contentType : "unknown"),
     view: value.view,
     conditions,
+    ...(Number.isInteger(Number(value.postsPerPage)) && Number(value.postsPerPage) > 0 && Number(value.postsPerPage) <= 100
+      ? { postsPerPage: Number(value.postsPerPage) }
+      : {}),
     layoutId: parseLayoutDocumentId(value.layoutId),
   };
 }

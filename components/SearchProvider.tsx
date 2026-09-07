@@ -12,7 +12,7 @@ import SearchModal from "./SearchModal";
 import { getStorefrontContentHref } from "@/lib/storefrontContentHref";
 
 type SearchContextType = {
-  openSearch: () => void;
+  openSearch: (options?: { preventSubmit?: boolean }) => void;
 };
 
 type SearchResult = {
@@ -34,14 +34,19 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [preventSubmit, setPreventSubmit] = useState(false);
   const router = useRouter();
 
-  const openSearch = () => setOpen(true);
+  const openSearch = (options?: { preventSubmit?: boolean }) => {
+    setPreventSubmit(options?.preventSubmit === true);
+    setOpen(true);
+  };
   const closeSearch = () => {
     setOpen(false);
     setQuery("");
     setResults([]);
     setLoading(false);
+    setPreventSubmit(false);
   };
 
   // Cmd+K / Ctrl+K global shortcut
@@ -109,6 +114,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   }, [query]);
 
   const handleSubmit = () => {
+    if (preventSubmit) return;
     if (!query.trim()) return;
     const q = query.trim();
     closeSearch();

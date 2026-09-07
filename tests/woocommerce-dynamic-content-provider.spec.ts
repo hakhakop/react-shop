@@ -5,8 +5,19 @@ import { resolveDynamicContentContexts } from "@/lib/dynamicContentProviders.ser
 import {
   compileWooCommerceProductRequest,
   normalizeWooCommerceProductContext,
+  resolveWooCommerceProductContexts,
 } from "@/lib/woocommerceDynamicContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
+import { projectImportedDynamicContentProvider } from "@/lib/importedDynamicContentProvider";
+
+test("YOOtheme popular products ordering compiles through the shared import boundary", () => {
+  const descriptor = projectImportedDynamicContentProvider({
+    provider: "wordpress", source: "content", mode: "collection",
+    query: { sourceName: "product", sourceQuery: { name: "products.customProducts", arguments: { order: "views", order_direction: "all", limit: 8, terms: [23] } } },
+  });
+  expect(descriptor.query).toMatchObject({ order: "popularity", direction: "desc", categories: [23] });
+  expect(compileWooCommerceProductRequest(descriptor).path).toContain("orderby=popularity");
+});
 
 const websiteWithWooCommerce = () => ({
   cmsConnection: {
@@ -119,6 +130,16 @@ test("normalizes Product records without leaking raw REST objects or inventing v
   });
   expect(JSON.stringify(context)).not.toContain("rawProviderObject");
   expect(JSON.stringify(context)).not.toContain("secret");
+  expect(context.fields.gallery).toEqual({
+    type: "metadata",
+    value: {
+      items: [{
+        id: 10,
+        url: "https://tenant.example/denim-back.jpg",
+        alt: "Back",
+      }],
+    },
+  });
 
   const unresolvedAttachment = normalizeWooCommerceProductContext({
     ...product,
@@ -163,6 +184,53 @@ test("resolves collection and single Products through provider/source dispatch",
       "https://tenant.example/wp-json/wc/v3/products?offset=0&per_page=1&order=desc&orderby=date",
       "https://tenant.example/wp-json/wc/v3/products?slug=denim-overall&per_page=1",
     ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("deduplicates short-lived Product reads and media attachment hydration", async () => {
+  const originalFetch = globalThis.fetch;
+  let productRequests = 0;
+  let mediaRequests = 0;
+  const attachmentProduct = {
+    ...product,
+    id: 9041,
+    acf: { product_video: "99041" },
+  };
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    if (url.includes("/wp-json/wp/v2/media/99041")) {
+      mediaRequests += 1;
+      return Response.json({ source_url: "https://tenant.example/cached-video.mp4" });
+    }
+    productRequests += 1;
+    return Response.json([attachmentProduct]);
+  };
+  try {
+    const descriptor = {
+      provider: "woocommerce" as const,
+      source: "product" as const,
+      mode: "collection" as const,
+      query: { quantity: 73, order: "rating" },
+    };
+    const first = await resolveWooCommerceProductContexts({
+      website: websiteWithWooCommerce(),
+      descriptor,
+    });
+    const second = await resolveWooCommerceProductContexts({
+      website: websiteWithWooCommerce(),
+      descriptor,
+    });
+    expect(productRequests).toBe(1);
+    expect(mediaRequests).toBe(1);
+    expect(first[0].fields["acf.product_video.url"]).toEqual({
+      type: "url",
+      value: "https://tenant.example/cached-video.mp4",
+    });
+    expect(second[0].fields["acf.product_video.url"]).toEqual(
+      first[0].fields["acf.product_video.url"],
+    );
   } finally {
     globalThis.fetch = originalFetch;
   }

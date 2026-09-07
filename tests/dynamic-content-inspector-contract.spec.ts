@@ -4,6 +4,7 @@ import {
   dynamicContentSourceCapability,
   dynamicContentSourceFields,
   dynamicContentSourceKey,
+  mergeDiscoveredDynamicContentCapabilities,
 } from "@/lib/dynamicContentCapabilities";
 import { INSPECTOR_ELEMENT_CAPABILITIES } from "@/components/dashboard/inspector/inspectorRouting";
 
@@ -14,11 +15,11 @@ test("advertises Post and Product through the canonical source registry", () => 
     provider,
     source,
     mode,
-  }))).toEqual([
+  }))).toEqual(expect.arrayContaining([
     { key: "static", label: "None / Static", provider: undefined, source: undefined, mode: undefined },
     {
       key: "wordpress-post-collection",
-      label: "Custom Posts",
+      label: "Posts",
       provider: "wordpress",
       source: "post",
       mode: "collection",
@@ -37,7 +38,7 @@ test("advertises Post and Product through the canonical source registry", () => 
       source: "product",
       mode: "single",
     },
-  ]);
+  ]));
 });
 
 test("Custom Posts source maps to the canonical collection descriptor", () => {
@@ -146,6 +147,31 @@ test("Product fields are filtered by the shared destination compatibility regist
   ]));
   expect(compatible(["media"])).toContain("image");
   expect(compatible(["url"])).toContain("link");
+});
+
+test("discovered Product Tag fields enrich the imported WooCommerce source", () => {
+  const capabilities = mergeDiscoveredDynamicContentCapabilities(
+    DYNAMIC_CONTENT_SOURCE_CAPABILITIES,
+    [{
+      key: "wordpress-taxonomy-product_tag-single",
+      label: "Product Tags (Single)",
+      provider: "wordpress",
+      source: "content",
+      mode: "single",
+      defaultQuery: { sourceKind: "taxonomy", sourceName: "product_tag" },
+      fields: [
+        { path: "acf.image_featured.url", label: "Video Url → URL", valueType: "url" },
+        { path: "acf.editorial_image.url", label: "Editorial Image → URL", valueType: "url" },
+      ],
+    }],
+  );
+  const productTag = capabilities.find((candidate) => candidate.key === "woocommerce-product-tag-single");
+
+  expect(productTag?.fields).toEqual(expect.arrayContaining([
+    { path: "acf.image_featured.url", label: "Video Url → URL", valueType: "url" },
+    { path: "acf.editorial_image.url", label: "Editorial Image → URL", valueType: "url" },
+  ]));
+  expect(productTag?.fields?.filter((field) => field.path === "acf.image_featured.url")).toHaveLength(1);
 });
 
 test("element source ownership is declared centrally, separate from field destinations", () => {

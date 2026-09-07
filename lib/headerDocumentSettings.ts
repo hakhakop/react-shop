@@ -21,6 +21,10 @@ export type ResolvedHeaderDocumentSettings = {
   mobileSearchDropdownStretch: string | undefined;
   mobileSearchDropdownLarge: boolean;
   mobileSearchIconPosition: "" | "left" | "right" | undefined;
+  mobileSearchExpand: boolean;
+  mobileSearchPreventSubmit: boolean;
+  mobileSearchDropbarAnimation: string | undefined;
+  mobileSearchDropbarRemoveHorizontalPadding: boolean;
   mobileSocialPosition: string | undefined;
   mobileSocialStyle: boolean;
   mobileSocialGap: string | undefined;
@@ -57,6 +61,10 @@ export type ResolvedHeaderDocumentSettings = {
   searchDropdownStretch: string | undefined;
   searchDropdownLarge: boolean;
   searchIconPosition: "" | "left" | "right" | undefined;
+  searchExpand: boolean;
+  searchPreventSubmit: boolean;
+  searchDropbarAnimation: string | undefined;
+  searchDropbarRemoveHorizontalPadding: boolean;
   socialPosition: string | undefined;
   socialStyle: boolean;
   socialGap: string | undefined;
@@ -107,12 +115,20 @@ type HeaderSettingsFallback = Partial<Pick<
   | "headerSearchDropdownStretch"
   | "headerSearchDropdownLarge"
   | "headerSearchIconPosition"
+  | "headerSearchExpand"
+  | "headerSearchPreventSubmit"
+  | "headerSearchDropbarAnimation"
+  | "headerSearchDropbarRemoveHorizontalPadding"
   | "headerSocialPosition"
   | "headerSocialStyle"
   | "headerSocialGap"
   | "headerSocialItems"
   | "headerLogoPaddingRemove"
   | "headerMobileLogoUrl"
+  | "headerMobileSearchExpand"
+  | "headerMobileSearchPreventSubmit"
+  | "headerMobileSearchDropbarAnimation"
+  | "headerMobileSearchDropbarRemoveHorizontalPadding"
   | "headerInverseLogoUrl"
   | "headerMobileComposition"
   | "headerZIndex"
@@ -149,6 +165,10 @@ export function resolveHeaderDocumentSettings(
     | "documentMobileSearchDropdownStretch"
     | "documentMobileSearchDropdownLarge"
     | "documentMobileSearchIconPosition"
+    | "documentMobileSearchExpand"
+    | "documentMobileSearchPreventSubmit"
+    | "documentMobileSearchDropbarAnimation"
+    | "documentMobileSearchDropbarRemoveHorizontalPadding"
     | "documentMobileSocialPosition"
     | "documentMobileSocialStyle"
     | "documentMobileSocialGap"
@@ -185,6 +205,10 @@ export function resolveHeaderDocumentSettings(
     | "documentSearchDropdownStretch"
     | "documentSearchDropdownLarge"
     | "documentSearchIconPosition"
+    | "documentSearchExpand"
+    | "documentSearchPreventSubmit"
+    | "documentSearchDropbarAnimation"
+    | "documentSearchDropbarRemoveHorizontalPadding"
     | "documentSocialPosition"
     | "documentSocialStyle"
     | "documentSocialGap"
@@ -222,6 +246,10 @@ export function resolveHeaderDocumentSettings(
     mobileSearchDropdownStretch: composition.documentMobileSearchDropdownStretch,
     mobileSearchDropdownLarge: composition.documentMobileSearchDropdownLarge ?? false,
     mobileSearchIconPosition: composition.documentMobileSearchIconPosition,
+    mobileSearchExpand: composition.documentMobileSearchExpand ?? fallback.headerMobileSearchExpand ?? false,
+    mobileSearchPreventSubmit: composition.documentMobileSearchPreventSubmit ?? fallback.headerMobileSearchPreventSubmit ?? false,
+    mobileSearchDropbarAnimation: composition.documentMobileSearchDropbarAnimation ?? fallback.headerMobileSearchDropbarAnimation,
+    mobileSearchDropbarRemoveHorizontalPadding: composition.documentMobileSearchDropbarRemoveHorizontalPadding ?? fallback.headerMobileSearchDropbarRemoveHorizontalPadding ?? false,
     mobileSocialPosition: composition.documentMobileSocialPosition,
     mobileSocialStyle: composition.documentMobileSocialStyle ?? false,
     mobileSocialGap: composition.documentMobileSocialGap,
@@ -261,6 +289,10 @@ export function resolveHeaderDocumentSettings(
     searchDropdownStretch: composition.documentSearchDropdownStretch ?? fallback.headerSearchDropdownStretch,
     searchDropdownLarge: composition.documentSearchDropdownLarge ?? fallback.headerSearchDropdownLarge ?? false,
     searchIconPosition: composition.documentSearchIconPosition ?? fallback.headerSearchIconPosition,
+    searchExpand: composition.documentSearchExpand ?? fallback.headerSearchExpand ?? false,
+    searchPreventSubmit: composition.documentSearchPreventSubmit ?? fallback.headerSearchPreventSubmit ?? false,
+    searchDropbarAnimation: composition.documentSearchDropbarAnimation ?? fallback.headerSearchDropbarAnimation,
+    searchDropbarRemoveHorizontalPadding: composition.documentSearchDropbarRemoveHorizontalPadding ?? fallback.headerSearchDropbarRemoveHorizontalPadding ?? false,
     socialPosition: composition.documentSocialPosition ?? fallback.headerSocialPosition,
     socialStyle: composition.documentSocialStyle ?? fallback.headerSocialStyle ?? false,
     socialGap: composition.documentSocialGap ?? fallback.headerSocialGap,

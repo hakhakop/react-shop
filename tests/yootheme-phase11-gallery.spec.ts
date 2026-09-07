@@ -17,6 +17,23 @@ test("Phase 11.3 maps the verified static Gallery item and shared media subset",
   expect(mapped.warnings).toEqual([]);
 });
 
+test("Gallery hover-video controls map to the canonical item media contract", () => {
+  const mapped = mapYoothemeStaticContent({
+    ...fixture,
+    children: [{ ...fixture.children[0], children: [{ ...fixture.children[0].children[0], children: [{ ...fixture.children[0].children[0].children[0], children: [{
+      type: "gallery",
+      props: { show_hover_video: true },
+      children: [{ type: "gallery_item", props: { image: "/gallery.jpg", hover_video: "/gallery-hover.mp4" } }],
+    }] }] }] }],
+  });
+  const gallery = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+  expect(gallery).toMatchObject({
+    gridShowHoverVideo: true,
+    galleryItems: [expect.objectContaining({ hoverVideoUrl: "/gallery-hover.mp4" })],
+  });
+  expect(mapped.warnings.join("\n")).not.toContain("hover_video");
+});
+
 test("Phase 11.3 reports Gallery-only runtime gaps instead of fabricating support", () => {
   const mapped = mapYoothemeStaticContent({
     ...fixture,

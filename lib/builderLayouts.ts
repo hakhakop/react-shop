@@ -85,7 +85,7 @@ export type BuilderGalleryItem = {
   linkAriaLabel?: string;
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
-    "imageUrl" | "imageAlt" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+    "imageUrl" | "imageAlt" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
   >;
 };
 
@@ -128,6 +128,11 @@ export type BuilderLayoutBlock = {
   cartPresentation?: "inline" | "floating";
   cartFloatingPosition?: "bottom-right" | "bottom-left";
   dynamicContext?: DynamicContentContextDescriptor;
+  /** Provider-neutral visibility condition imported from upstream content. */
+  dynamicCondition?: {
+    source: "archive-products";
+    operator: "empty" | "notEmpty";
+  };
   dynamicBindings?: DynamicFieldBindings<
     | "headingText" | "body" | "eyebrow" | "title"
     | "imageUrl" | "imageAlt" | "imageLinkUrl" | "linkText"
@@ -381,6 +386,7 @@ export type BuilderLayoutBlock = {
     badge?: string;
     imageUrl?: string;
     videoUrl?: string;
+    hoverVideoUrl?: string;
     imageAlt?: string;
     thumbnailUrl?: string;
     thumbnailPosition?: string;
@@ -404,6 +410,8 @@ export type BuilderLayoutBlock = {
       | "imageUrl"
       | "imageAlt"
       | "thumbnailUrl"
+      | "videoUrl"
+      | "hoverVideoUrl"
       | "navigationLabel"
       | "buttonAriaLabel"
       | "buttonLabel"
@@ -447,6 +455,7 @@ export type BuilderLayoutBlock = {
     sliderParallaxStart?: string;
     sliderParallaxEnd?: string;
     showVideo?: boolean;
+    showMeta?: boolean;
     showHoverImage?: boolean;
     showHoverVideo?: boolean;
     linkImage?: boolean;

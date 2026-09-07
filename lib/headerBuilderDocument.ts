@@ -176,6 +176,10 @@ export type HeaderBuilderComposition = {
   documentMobileSearchDropdownStretch?: string;
   documentMobileSearchDropdownLarge?: boolean;
   documentMobileSearchIconPosition?: "" | "left" | "right";
+  documentMobileSearchExpand?: boolean;
+  documentMobileSearchPreventSubmit?: boolean;
+  documentMobileSearchDropbarAnimation?: string;
+  documentMobileSearchDropbarRemoveHorizontalPadding?: boolean;
   documentMobileSocialPosition?: string;
   documentMobileSocialStyle?: boolean;
   documentMobileSocialGap?: string;
@@ -212,6 +216,10 @@ export type HeaderBuilderComposition = {
   documentSearchDropdownStretch?: string;
   documentSearchDropdownLarge?: boolean;
   documentSearchIconPosition?: "" | "left" | "right";
+  documentSearchExpand?: boolean;
+  documentSearchPreventSubmit?: boolean;
+  documentSearchDropbarAnimation?: string;
+  documentSearchDropbarRemoveHorizontalPadding?: boolean;
   documentSocialPosition?: string;
   documentSocialStyle?: boolean;
   documentSocialGap?: string;

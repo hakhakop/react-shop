@@ -395,15 +395,6 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
   const sourceLogo = root.logo && typeof root.logo === "object"
     ? root.logo as Record<string, unknown>
     : {};
-  const sourceMenu = root.menu && typeof root.menu === "object"
-    ? root.menu as Record<string, unknown>
-    : {};
-  const sourceMenuPositions = sourceMenu.positions && typeof sourceMenu.positions === "object"
-    ? sourceMenu.positions as Record<string, unknown>
-    : {};
-  const navbarMenuPosition = sourceMenuPositions.navbar && typeof sourceMenuPositions.navbar === "object"
-    ? sourceMenuPositions.navbar as Record<string, unknown>
-    : {};
   const sourceSite = root.site && typeof root.site === "object"
     ? root.site as Record<string, unknown>
     : {};
@@ -472,6 +463,13 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
   if (mobileSearchIcon === "" || mobileSearchIcon === "left" || mobileSearchIcon === "right") {
     patch.headerMobileSearchIconPosition = mobileSearchIcon;
   }
+  if (typeof sourceMobileHeader.search_expand === "boolean") patch.headerMobileSearchExpand = sourceMobileHeader.search_expand;
+  if (typeof sourceMobileHeader.search_prevent_submit === "boolean") patch.headerMobileSearchPreventSubmit = sourceMobileHeader.search_prevent_submit;
+  const mobileSearchDropbar = sourceMobileHeader.search_dropbar && typeof sourceMobileHeader.search_dropbar === "object"
+    ? sourceMobileHeader.search_dropbar as Record<string, unknown> : {};
+  const mobileSearchDropbarAnimation = string(mobileSearchDropbar.animation);
+  if (mobileSearchDropbarAnimation !== undefined) patch.headerMobileSearchDropbarAnimation = mobileSearchDropbarAnimation;
+  if (typeof mobileSearchDropbar.padding_remove_horizontal === "boolean") patch.headerMobileSearchDropbarRemoveHorizontalPadding = mobileSearchDropbar.padding_remove_horizontal;
   const mobileSocial = typeof sourceMobileHeader.social === "string"
     ? normalizeYoothemeHeaderPosition(sourceMobileHeader.social.trim() || "hide")
     : undefined;
@@ -536,6 +534,13 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
   }
   const searchIcon = string(sourceHeader.search_icon);
   if (searchIcon === "" || searchIcon === "left" || searchIcon === "right") patch.headerSearchIconPosition = searchIcon;
+  if (typeof sourceHeader.search_expand === "boolean") patch.headerSearchExpand = sourceHeader.search_expand;
+  if (typeof sourceHeader.search_prevent_submit === "boolean") patch.headerSearchPreventSubmit = sourceHeader.search_prevent_submit;
+  const searchDropbar = sourceHeader.search_dropbar && typeof sourceHeader.search_dropbar === "object"
+    ? sourceHeader.search_dropbar as Record<string, unknown> : {};
+  const searchDropbarAnimation = string(searchDropbar.animation);
+  if (searchDropbarAnimation !== undefined) patch.headerSearchDropbarAnimation = searchDropbarAnimation;
+  if (typeof searchDropbar.padding_remove_horizontal === "boolean") patch.headerSearchDropbarRemoveHorizontalPadding = searchDropbar.padding_remove_horizontal;
   const socialPosition = typeof sourceHeader.social === "string"
     ? normalizeYoothemeHeaderPosition(sourceHeader.social.trim() || "hide")
     : undefined;
@@ -569,190 +574,11 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
   const dialogDropbarAnimation = string(sourceDialogDropbar.animation ?? sourceDialog["dropbar.animation"]);
   if (dialogDropbarAnimation !== undefined) patch.headerDialogDropbarAnimation = dialogDropbarAnimation;
 
-  const logoText = typeof sourceLogo.text === "string" ? sourceLogo.text.trim() : "";
-  const logoImage = string(sourceLogo.image);
   const logoInverse = string(sourceLogo.image_inverse);
   const logoMobile = string(sourceLogo.image_mobile);
-  const logoSvgInline = typeof sourceLogo.image_svg_inline === "boolean"
-    ? sourceLogo.image_svg_inline
-    : undefined;
-  const hasNavbarMenu = navbarMenuPosition.menu !== undefined &&
-    navbarMenuPosition.menu !== null &&
-    navbarMenuPosition.menu !== "";
 
   if (logoMobile) patch.headerMobileLogoUrl = logoMobile;
   if (logoInverse) patch.headerInverseLogoUrl = logoInverse;
-
-  // YOOtheme's horizontal layouts are compositions, not WebPages preset
-  // names. Materialize the supported structure directly into the existing
-  // canonical Header row/column/element model. Unrepresented Header-position
-  // modules are deliberately not invented here.
-  if (sourceLayout?.startsWith("horizontal-")) {
-    const logoBlock: BuilderLayoutBlock | null = logoImage || logoText
-      ? {
-          id: "header-logo",
-          kind: "image",
-          ...(logoImage ? { imageUrl: logoImage } : {}),
-          ...(logoInverse ? { imageInverseUrl: logoInverse } : {}),
-          ...(logoMobile ? { imageMobileUrl: logoMobile } : {}),
-          ...(logoSvgInline !== undefined ? { imageSvgInline: logoSvgInline } : {}),
-          imageAlt: logoText || "Site logo",
-          headerBrandMode: logoImage ? "logo" : "brand",
-          ...(logoText ? { headerBrandText: logoText } : {}),
-          imageAlignment: "left",
-          elementAlign: "left",
-        }
-      : null;
-    const navigationBlock: BuilderLayoutBlock | null = hasNavbarMenu
-      ? {
-          id: "header-navigation",
-          kind: "menu",
-          title: "Navigation",
-          menuSource: "main",
-          elementAlign: "center",
-          ...(patch.headerDropbarEnabled !== undefined ? { menuDropbar: patch.headerDropbarEnabled } : {}),
-          ...(patch.headerClickModeEnabled !== undefined ? { menuClickMode: patch.headerClickModeEnabled } : {}),
-        }
-      : null;
-    const desktopSearchBlock: BuilderLayoutBlock | null = searchPosition && searchPosition !== "hide"
-      ? {
-          id: "header-search",
-          kind: "headerSearch",
-          headerUtilityAction: "search",
-          elementAlign: searchPosition.endsWith("start") ? "left" : "right",
-        }
-      : null;
-    const desktopSocialBlock: BuilderLayoutBlock | null = socialPosition && socialPosition !== "hide" && patch.headerSocialItems?.length
-      ? {
-          id: "header-social",
-          kind: "headerSocial",
-          headerSocialItems: patch.headerSocialItems,
-          headerSocialStyle: patch.headerSocialStyle,
-          headerSocialGap: patch.headerSocialGap,
-          elementAlign: socialPosition.endsWith("start") ? "left" : "right",
-        }
-      : null;
-
-    patch.layout = "header-row";
-    patch.layoutColumns = 3;
-    patch.headerUtilityMigrationVersion = 3;
-    patch.background = "transparent";
-    patch.backgroundMode = "full";
-    patch.contentMode = width === "expand" || width === "full" ? "expand" : "boxed";
-    patch.colorScheme = "inherit";
-    patch.layoutItems = undefined;
-    const mobileLogoBlock: BuilderLayoutBlock | null = logoMobile || logoImage || logoText
-      ? {
-          id: "header-mobile-logo",
-          kind: "image",
-          imageUrl: logoMobile || logoImage,
-          ...(logoInverse ? { imageInverseUrl: logoInverse } : {}),
-          ...(logoSvgInline !== undefined ? { imageSvgInline: logoSvgInline } : {}),
-          imageAlt: logoText || "Site logo",
-          headerBrandMode: logoMobile || logoImage ? "logo" : "brand",
-          ...(logoText ? { headerBrandText: logoText } : {}),
-          imageAlignment: "left",
-          elementAlign: "left",
-        }
-      : null;
-    const mobileNavigationBlock: BuilderLayoutBlock | null = navigationBlock
-      ? {
-          ...navigationBlock,
-          id: "header-mobile-navigation",
-          title: "Mobile navigation",
-          elementAlign: sourceMobileLayout === "horizontal-center"
-            ? "center"
-            : sourceMobileLayout === "horizontal-left"
-              ? "left"
-              : "right",
-        }
-      : null;
-    const mobileSearchBlock: BuilderLayoutBlock | null = mobileSearch && mobileSearch !== "hide"
-      ? {
-          id: "header-mobile-search",
-          kind: "headerSearch",
-          headerUtilityAction: "search",
-          elementAlign: mobileSearch.endsWith("start") ? "left" : "right",
-        }
-      : null;
-    const mobileSocialBlock: BuilderLayoutBlock | null = mobileSocial && mobileSocial !== "hide" && patch.headerMobileSocialItems?.length
-      ? {
-          id: "header-mobile-social",
-          kind: "headerSocial",
-          headerSocialItems: patch.headerMobileSocialItems,
-          headerSocialStyle: patch.headerMobileSocialStyle,
-          headerSocialGap: patch.headerMobileSocialGap,
-          elementAlign: mobileSocial.endsWith("start") ? "left" : "right",
-        }
-      : null;
-    const mobileStartElements = [
-      ...(mobileLogoBlock ? [mobileLogoBlock] : []),
-      ...(sourceMobileLayout === "horizontal-left" && mobileNavigationBlock ? [mobileNavigationBlock] : []),
-      ...(mobileSearchBlock && mobileSearch?.endsWith("start") ? [mobileSearchBlock] : []),
-      ...(mobileSocialBlock && mobileSocial?.endsWith("start") ? [mobileSocialBlock] : []),
-    ];
-    const mobileEndElements = [
-      ...(mobileSearchBlock && !mobileSearch?.endsWith("start") ? [mobileSearchBlock] : []),
-      ...(mobileSocialBlock && !mobileSocial?.endsWith("start") ? [mobileSocialBlock] : []),
-      ...(sourceMobileLayout === "horizontal-right" && mobileNavigationBlock ? [mobileNavigationBlock] : []),
-    ];
-    const mobileColumns = sourceMobileLayout === "horizontal-center"
-      ? [
-          { id: "header-mobile-start", elements: mobileStartElements },
-          { id: "header-mobile-center", elements: mobileNavigationBlock ? [mobileNavigationBlock] : [] },
-          { id: "header-mobile-end", elements: mobileEndElements },
-        ]
-      : [
-          { id: "header-mobile-start", elements: mobileStartElements },
-          { id: "header-mobile-end", elements: mobileEndElements },
-        ];
-
-    patch.rows = [
-      ...(hasToolbarConfiguration ? [{
-        id: "header-toolbar-row",
-        role: "toolbar" as const,
-        ...(sourceMobileLayout ? { headerVariant: "desktop" as const } : {}),
-        layout: "whole",
-        ...(toolbarWidth ? { maxWidth: toolbarWidth } : {}),
-        ...(hasToolbarCenter
-          ? { horizontalDistribution: sourceSite.toolbar_center ? "center" as const : "justify" as const }
-          : {}),
-        columns: [{ id: "header-toolbar-column", elements: [] }],
-      }] : []),
-      {
-        id: "header-main-row",
-        ...(sourceMobileLayout ? { headerVariant: "desktop" as const } : {}),
-        layout: "quarters-1-2-1",
-        columns: [
-          {
-            id: "header-main-left",
-            elements: [
-              ...(desktopSearchBlock && searchPosition?.endsWith("start") ? [desktopSearchBlock] : []),
-              ...(desktopSocialBlock && socialPosition?.endsWith("start") ? [desktopSocialBlock] : []),
-              ...(logoBlock ? [logoBlock] : []),
-            ],
-          },
-          {
-            id: "header-main-center",
-            elements: navigationBlock ? [navigationBlock] : [],
-          },
-          {
-            id: "header-main-right",
-            elements: [
-              ...(desktopSearchBlock && !searchPosition?.endsWith("start") ? [desktopSearchBlock] : []),
-              ...(desktopSocialBlock && !socialPosition?.endsWith("start") ? [desktopSocialBlock] : []),
-            ],
-          },
-        ],
-      },
-      ...(sourceMobileLayout ? [{
-        id: "header-mobile-row",
-        headerVariant: "mobile" as const,
-        layout: sourceMobileLayout === "horizontal-center" ? "quarters-1-2-1" : "halves",
-        columns: mobileColumns,
-      }] : []),
-    ];
-  }
 
   // These keys are accepted by YOOtheme exports when present (they are absent
   // from some theme exports). Preserve them as document values instead of

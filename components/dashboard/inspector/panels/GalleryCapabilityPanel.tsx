@@ -31,11 +31,13 @@ import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/Elemen
 import UikitGridStructureSettingsGroup from "@/components/dashboard/inspector/panels/UikitGridStructureSettingsGroup";
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import type { CategoryTreeItem } from "@/lib/categories";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
   shellSettings: BuilderShellSettings;
+  previewCategoryTree?: CategoryTreeItem[];
   update: (patch: Partial<BuilderLayoutBlock>) => void;
   openWordPressMediaPicker?: (options: {
     title: string;
@@ -50,6 +52,7 @@ export default function GalleryCapabilityPanel({
   block,
   tab,
   shellSettings,
+  previewCategoryTree,
   update,
   openWordPressMediaPicker,
 }: Props) {
@@ -288,6 +291,9 @@ export default function GalleryCapabilityPanel({
                     />
                   </InspectorFieldRow>
                   <InspectorFieldRow label="Image alt" dynamicBinding={dynamicBinding("imageAlt")}><InspectorTextField value={item.imageAlt ?? ""} onChange={(imageAlt) => updateItem({ imageAlt })} placeholder="Image description" /></InspectorFieldRow>
+                  <InspectorFieldRow label="Hover video" dynamicBinding={dynamicBinding("hoverVideoUrl")}>
+                    <InspectorTextField value={item.hoverVideoUrl ?? ""} onChange={(hoverVideoUrl) => updateItem({ hoverVideoUrl })} placeholder="https://…" />
+                  </InspectorFieldRow>
                   <InspectorFieldRow label="Title" dynamicBinding={dynamicBinding("title")}>
                     <InspectorTextField
                       value={item.title ?? ""}
@@ -320,7 +326,7 @@ export default function GalleryCapabilityPanel({
                   <InspectorFieldRow label="Link target"><InspectorSelect value={item.linkTarget ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(linkTarget) => updateItem({ linkTarget })} /></InspectorFieldRow>
                   <InspectorFieldRow label="ARIA label"><InspectorTextField value={item.linkAriaLabel ?? ""} onChange={(linkAriaLabel) => updateItem({ linkAriaLabel })} /></InspectorFieldRow>
                   </> : (
-                    <DynamicContentInspectorGroup item={item} update={updateItem} />
+                    <DynamicContentInspectorGroup item={item} update={updateItem} categoryTree={previewCategoryTree} />
                   )}
                 </div>
               );

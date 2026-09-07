@@ -160,14 +160,14 @@ export function resolveBuilderRowStyle(
           "--builder-authored-row-min-height": authoredMinHeight,
         } as CSSProperties)
       : {}),
-    ...(row?.maxWidth && row.maxWidth !== "inherit"
+    ...(row?.maxWidth && row.maxWidth !== "inherit" && row.maxWidth !== "none"
       ? {
           maxWidth:
             row.maxWidth === "small" ? "var(--uk-container-small-max-width, 900px)"
             : row.maxWidth === "xsmall" || row.maxWidth === "xs" ? "750px"
             : row.maxWidth === "default" || row.maxWidth === "medium" ? "1200px"
             : row.maxWidth === "large" || row.maxWidth === "xlarge" ? "1600px"
-            : row.maxWidth === "expand" || row.maxWidth === "full" || row.maxWidth === "none" ? "100%"
+            : row.maxWidth === "expand" || row.maxWidth === "full" ? "none"
             : undefined,
           width: "100%",
           marginInline: "auto",

@@ -2,11 +2,12 @@ import { getPublishedBuilderLayout, type BuilderDataScope, type BuilderLayout, t
 import { readDynamicBuilderDocument } from "@/lib/builderLayoutDocuments.server";
 import { materializeBuilderDynamicContent, type DynamicContentContextResolver } from "@/lib/builderDynamicContentMaterializer.server";
 import { getDynamicItemContextValue } from "@/lib/dynamicContent";
-import { builderLayoutDocumentId, parseLayoutDocumentId, resolveLayout, type StableContentIdentity } from "@/lib/layoutRouting";
+import { builderLayoutDocumentId, parseLayoutDocumentId, resolveLayout, routingTemplateMatches, type StableContentIdentity } from "@/lib/layoutRouting";
 import { getBuilderLayoutByDocumentId, readLayoutRoutingRegistry } from "@/lib/layoutRoutingStore.server";
 import { createRoutingTemplatesService } from "@/lib/routingTemplatesService.server";
 import { legacyTemplatePageType } from "@/lib/templatePageTypes";
 import type { SaaSWebsite } from "@/lib/websites";
+import { listCanonicalProductCategoryDescriptors, projectProductCategoryRouteContext } from "@/lib/productCategoryContext.server";
 import {
   getTemplatePageTypeCatalog,
   resolveTemplatePagePreviewEntries,
@@ -127,7 +128,28 @@ export async function resolveTemplateBuilderContext(input: {
     })[0];
   // YOOtheme opens a template against a context that satisfies its assignment.
   // An explicit preview selection wins; otherwise use the first assigned entity/term.
-  const requestedPreviewIdentity = input.previewIdentity ?? assignedIdentity;
+  let requestedPreviewIdentity: StableContentIdentity | undefined = input.previewIdentity ?? assignedIdentity;
+  if (!input.previewIdentity && definition.id === "taxonomy:product_cat") {
+    const assignedCategoryIsChildrenOnly = template.conditions.some((condition) =>
+      condition.subject === "taxonomy-term" &&
+      condition.operator === "include" &&
+      condition.taxonomy === "product_cat" &&
+      condition.children === "only",
+    );
+    if (assignedCategoryIsChildrenOnly) {
+      const descriptors = await listCanonicalProductCategoryDescriptors(input.website);
+      const matchingCategory = descriptors.find((category) => routingTemplateMatches(
+        projectProductCategoryRouteContext(category, `/product-category/${category.slug}`),
+        template,
+        { includeDisabled: true },
+      ));
+      requestedPreviewIdentity = matchingCategory ? {
+        provider: definition.provider,
+        contentType: definition.contentType,
+        contentId: String(matchingCategory.id),
+      } : undefined;
+    }
+  }
   const persistedLayout = await readLayout(input.documentId, scope);
   const layout = input.authoredLayout ?? persistedLayout;
   const resolveContexts = input.resolveContexts;

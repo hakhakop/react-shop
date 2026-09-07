@@ -71,6 +71,10 @@ type MenuPresentationSettings = {
   submenuLayout: "list" | "grid" | "mega";
   submenuColumns: number;
   submenuWidth: string | null;
+  submenuStretch: "navbar" | "navbar-container" | null;
+  submenuLarge: boolean;
+  submenuRemoveHorizontalPadding: boolean;
+  submenuRemoveVerticalPadding: boolean;
   mobileAccordion: boolean;
   badgeText: string | null;
 };
@@ -168,6 +172,13 @@ function normalizeMenuPresentation(
       typeof value?.submenuWidth === "string" && value.submenuWidth.trim().length > 0
         ? value.submenuWidth.trim()
         : null,
+    submenuStretch:
+      value?.submenuStretch === "navbar" || value?.submenuStretch === "navbar-container"
+        ? value.submenuStretch
+        : null,
+    submenuLarge: value?.submenuLarge === true,
+    submenuRemoveHorizontalPadding: value?.submenuRemoveHorizontalPadding === true,
+    submenuRemoveVerticalPadding: value?.submenuRemoveVerticalPadding === true,
     mobileAccordion: value?.mobileAccordion !== false,
     badgeText:
       typeof value?.badgeText === "string" && value.badgeText.trim().length > 0
@@ -305,12 +316,13 @@ function renderMenuItems(
 
         {hasChildren && submenuOpen && (
           <div
-            className={`site-header-nav-submenu site-header-nav-submenu--${submenuLayout}${dropdownContent ? " site-header-nav-submenu--builder" : ""}`}
+            className={`site-header-nav-submenu site-header-nav-submenu--${submenuLayout}${dropdownContent ? " site-header-nav-submenu--builder" : ""}${presentation.submenuStretch ? ` is-stretch-${presentation.submenuStretch}` : ""}${presentation.submenuLarge ? " is-large" : ""}${presentation.submenuRemoveHorizontalPadding ? " is-flush-horizontal" : ""}${presentation.submenuRemoveVerticalPadding ? " is-flush-vertical" : ""}`}
             role={dropdownContent ? "region" : "menu"}
             aria-label={dropdownContent ? `${item.label} dropdown` : undefined}
             style={
               {
                 "--submenu-columns": submenuColumns,
+                "--submenu-stretch": presentation.submenuStretch ?? "none",
                 ...(presentation.submenuWidth
                   ? { width: presentation.submenuWidth, maxWidth: "min(100vw - 30px, 1424px)" }
                   : {}),

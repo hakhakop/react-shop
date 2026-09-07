@@ -24,6 +24,7 @@ import type {
   ReactMenuItem,
 } from "@/lib/builderShell";
 import type { BuilderCustomPage } from "@/components/dashboard/builderTypes";
+import type { CategoryTreeItem } from "@/lib/categories";
 import {
   createPortableNavigationPackage,
   materializePortableNavigation,
@@ -37,6 +38,7 @@ import {
 type ReactMenuEditorPanelProps = {
   embeddedBuilderHost: import("./EmbeddedBuilderHost").EmbeddedBuilderHost;
   shellSettings: InspectorPanelContext["shellSettings"];
+  previewCategoryTree?: CategoryTreeItem[];
   openWordPressMediaPicker: InspectorPanelContext["openWordPressMediaPicker"];
   menuItems: ReactMenuItem[];
   onChangeMenuItems: (newItems: ReactMenuItem[]) => void;
@@ -155,6 +157,7 @@ export default function ReactMenuEditorPanel({
   wordpressOrigin,
   wordpressSiteUrl,
   shellSettings,
+  previewCategoryTree,
   embeddedBuilderHost,
   openWordPressMediaPicker,
 }: ReactMenuEditorPanelProps) {
@@ -753,7 +756,7 @@ export default function ReactMenuEditorPanel({
   };
 
   const builderItem = menuItems.find(item => item.id === builderItemId && !item.parentId);
-  if (builderItem) return <MenuDropdownBuilder key={`${selectedMenuSource}:${builderItem.id}`} host={embeddedBuilderHost} item={builderItem} shellSettings={shellSettings} openWordPressMediaPicker={openWordPressMediaPicker} onClose={() => setBuilderItemId(null)} onApply={dropdownContent => handleUpdateItem(builderItem.id, { dropdownContent })} />;
+  if (builderItem) return <MenuDropdownBuilder key={`${selectedMenuSource}:${builderItem.id}`} host={embeddedBuilderHost} item={builderItem} menuId={selectedMenuSource} shellSettings={shellSettings} previewCategoryTree={previewCategoryTree} openWordPressMediaPicker={openWordPressMediaPicker} onClose={() => setBuilderItemId(null)} onApply={dropdownContent => handleUpdateItem(builderItem.id, { dropdownContent })} />;
   return (
     <div className="builder-sidebar-panel" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       <div className="builder-card" style={{ display: "grid", gap: "8px", padding: "10px" }}>

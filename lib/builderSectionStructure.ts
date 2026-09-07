@@ -122,10 +122,19 @@ function rowGridClass(
     );
   });
   const boundaryClass = hasStickyColumn ? "builder-sticky-boundary-row" : undefined;
-  if (usesCombinedGap) return compactClasses(base, boundaryClass);
+  // The inspector and imported YOOtheme contract both treat an absent row
+  // width as None. Emit that semantic default as a class too, otherwise the
+  // UI says None while the renderer has no width state to distinguish from
+  // Expand.
+  const rawMaxWidth = (row.maxWidth ?? "none").trim().toLowerCase();
+  const maxWidthClass = rawMaxWidth !== "inherit"
+    ? `shop-builder-content-row--max-width-${rawMaxWidth === "full" ? "expand" : rawMaxWidth}`
+    : undefined;
+  if (usesCombinedGap) return compactClasses(base, boundaryClass, maxWidthClass);
   return compactClasses(
     base,
     boundaryClass,
+    maxWidthClass,
     columnGap ? `uk-grid-column-${columnGap}` : undefined,
     rowGap ? `uk-grid-row-${rowGap}` : undefined,
   );

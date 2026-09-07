@@ -14,6 +14,8 @@ test("imported Gallery composes only truthful Image controls and preserves sourc
   expect(panel).toContain("showDecoration={!isImportedYoothemeGallery}");
   expect(panel).toContain("DynamicContentInspectorGroup");
   expect(panel).toContain('dynamicBinding("imageUrl")');
+  expect(panel).toContain('label="Hover video" dynamicBinding={dynamicBinding("hoverVideoUrl")}');
+  expect(panel).toContain('onChange={(hoverVideoUrl) => updateItem({ hoverVideoUrl })}');
   expect(panel).toContain('dynamicBinding("content")');
   expect(panel).toContain('dynamicBinding("linkUrl")');
   expect(gallery).toContain("resolveGalleryImageAspectRatio(rawBlock.imageWidth, rawBlock.imageHeight)");
@@ -30,6 +32,7 @@ test("imported Gallery composes only truthful Image controls and preserves sourc
   expect(gallery).toContain('replace("shop-builder-uikit-grid--column-center", "")');
   expect(gallery).toContain("uk-margin-remove-first-child");
   expect(gallery).toContain("overlayPositionClass");
+  expect(gallery).toContain('overlayMode === "cover" ? `${overlayPositionClass} ${overlayMarginClass}` : ""');
   expect(gallery).toContain("overlayPaddingClass");
 });
 

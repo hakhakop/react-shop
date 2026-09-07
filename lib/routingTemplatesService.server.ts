@@ -102,6 +102,15 @@ function cleanName(value: unknown) {
   return value.trim();
 }
 
+function postsPerPage(value: unknown, current?: number) {
+  if (value === undefined) return current;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 100) {
+    throw new InvalidRoutingTemplateRequestError("Posts per page must be between 1 and 100.");
+  }
+  return parsed;
+}
+
 function validateConditions(
   contentType: RoutingTemplateContentType,
   input?: readonly SingularTemplateCondition[],
@@ -289,6 +298,7 @@ export function createRoutingTemplatesService(
       enabled?: boolean;
       layout?: DynamicBuilderDocumentCreateInput;
       starter?: RoutingTemplateStarter;
+      postsPerPage?: number;
     }) {
       const legacyPageType = input.contentType
         ? legacyTemplatePageType(input.contentType.endsWith("-category") ? "archive" : "singular", input.contentType)
@@ -310,6 +320,7 @@ export function createRoutingTemplatesService(
         pageType: definition.id,
         view: definition.view,
         conditions,
+        ...(postsPerPage(input.postsPerPage) ? { postsPerPage: postsPerPage(input.postsPerPage) } : {}),
         layoutId: document.documentId,
       };
       try {
@@ -325,6 +336,7 @@ export function createRoutingTemplatesService(
       enabled?: boolean;
       pageType?: string;
       conditions?: readonly SingularTemplateCondition[];
+      postsPerPage?: number;
     }) {
       const id = parseServiceTemplateId(value);
       const registry = await readRegistry();
@@ -351,6 +363,9 @@ export function createRoutingTemplatesService(
             ? validateConditions(contentType)
             : current.conditions
           : validateConditions(contentType, input.conditions),
+        ...(postsPerPage(input.postsPerPage, current.postsPerPage)
+          ? { postsPerPage: postsPerPage(input.postsPerPage, current.postsPerPage) }
+          : {}),
       };
       const templates = [...registry.routingTemplates];
       templates[index] = template;

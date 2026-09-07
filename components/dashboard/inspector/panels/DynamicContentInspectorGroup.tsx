@@ -19,7 +19,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import { flattenCategoryTree } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import type { CategoryTreeItem } from "@/lib/categories";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 
 type DynamicItem = {
   dynamicContext?: DynamicContentContextDescriptor;
@@ -30,7 +30,86 @@ type Props<Item extends DynamicItem = DynamicItem> = {
   update: (patch: Partial<Item>) => void;
   fixedSourceKey?: DynamicContentSourceCapability["key"];
   categoryTree?: CategoryTreeItem[];
+  /** The nearest authored ancestor source, exposed as YOOtheme's `#parent`. */
+  inheritedSource?: DynamicContentContextDescriptor;
 };
+
+const PARENT_SOURCE_KEY = "yootheme-parent";
+const STATIC_SOURCE_DESCRIPTOR: DynamicContentContextDescriptor = {
+  provider: "webpages",
+  source: "static",
+  mode: "single",
+};
+
+export const isParentDynamicContentSource = (
+  descriptor: DynamicContentContextDescriptor | null | undefined,
+) => descriptor?.provider === "yootheme" && descriptor.source === "#parent";
+
+export const effectiveDynamicContentSource = (
+  descriptor: DynamicContentContextDescriptor | null | undefined,
+  inheritedSource: DynamicContentContextDescriptor | null | undefined,
+) => isParentDynamicContentSource(descriptor) || (!descriptor && inheritedSource)
+  ? inheritedSource ?? undefined
+  : descriptor ?? undefined;
+
+const parentSourceEntityLabel = (descriptor: DynamicContentContextDescriptor) => {
+  if (descriptor.provider === "woocommerce") {
+    if (descriptor.source === "product") return "Products";
+    if (descriptor.source === "product-category") return "Product Categories";
+    if (descriptor.source === "product-tag") return "Product Tags";
+  }
+  if (descriptor.provider === "wordpress" && descriptor.source === "post") return "Posts";
+  return descriptor.source
+    .split(/[-_.]/g)
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
+};
+
+const dynamicSourceLabel = (descriptor: DynamicContentContextDescriptor) => {
+  if (descriptor.provider === "woocommerce" && descriptor.source === "product" && descriptor.mode === "collection") {
+    return "Current Product Category → Products";
+  }
+  if (descriptor.provider === "woocommerce" && descriptor.source === "product" && descriptor.mode === "single") {
+    return "Current Product";
+  }
+  if (
+    descriptor.provider === "webpages" &&
+    descriptor.source === "context-relation" &&
+    descriptor.query?.path === "gallery.items"
+  ) {
+    return "Current Product → Gallery Images";
+  }
+  return `${descriptor.provider} → ${descriptor.source}`;
+};
+
+export function DynamicContentSourceNotice({
+  descriptor,
+  inherited = false,
+}: {
+  descriptor: DynamicContentContextDescriptor;
+  inherited?: boolean;
+}) {
+  const query = descriptor.query ?? {};
+  const galleryRelation =
+    descriptor.provider === "webpages" &&
+    descriptor.source === "context-relation" &&
+    query.path === "gallery.items";
+  const relationLimit = galleryRelation && typeof query.quantity === "number"
+    ? ` Up to ${query.quantity} additional images are used.`
+    : "";
+  return (
+    <div className="builder-element-inspector-note" data-dynamic-source-ownership={inherited ? "inherited" : "related"}>
+      <strong>{inherited ? "Inherited dynamic source" : "Related dynamic source"}</strong>
+      <span>{dynamicSourceLabel(descriptor)}</span>
+      <span>
+        {inherited
+          ? "The parent column repeats this element once for every product in the active category. Content fields map values from that current product."
+          : `This item repeats a relation from the current product.${relationLimit}`}
+      </span>
+    </div>
+  );
+}
 
 const orderOptions = [
   { value: "date", label: "Date" },
@@ -137,20 +216,30 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
   update,
   fixedSourceKey,
   categoryTree = [],
+  inheritedSource,
 }: Props<Item>) {
   const capabilities = useDynamicContentCapabilities();
-  const sourceOptions = useMemo(() => capabilities.map((source) => ({
-    value: source.key,
-    label: source.label,
-  })), [capabilities]);
+  const sourceOptions = useMemo(() => [
+    ...capabilities.slice(0, 1).map((source) => ({ value: source.key, label: source.label })),
+    ...(inheritedSource ? [{
+      value: PARENT_SOURCE_KEY,
+      label: `Parent (${parentSourceEntityLabel(inheritedSource)})`,
+    }] : []),
+    ...capabilities.slice(1).map((source) => ({ value: source.key, label: source.label })),
+  ], [capabilities, inheritedSource]);
   const descriptor = item.dynamicContext;
   const fixedCapability = fixedSourceKey
     ? capabilities.find((candidate) => candidate.key === fixedSourceKey)
     : undefined;
+  const effectiveAuthoredDescriptor = effectiveDynamicContentSource(descriptor, inheritedSource);
   const descriptorCapability = capabilities.find((candidate) =>
-    dynamicContentCapabilityMatchesDescriptor(candidate, descriptor),
+    dynamicContentCapabilityMatchesDescriptor(candidate, effectiveAuthoredDescriptor),
   );
-  const source = fixedSourceKey ?? descriptorCapability?.key ?? dynamicContentSourceKey(descriptor);
+  const source = fixedSourceKey ?? (
+    inheritedSource && (isParentDynamicContentSource(descriptor) || !descriptor)
+      ? PARENT_SOURCE_KEY
+      : descriptorCapability?.key ?? dynamicContentSourceKey(descriptor)
+  );
   const effectiveDescriptor = fixedCapability?.provider && fixedCapability.source && fixedCapability.mode
     ? {
         provider: fixedCapability.provider,
@@ -158,9 +247,10 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
         mode: fixedCapability.mode,
         ...(descriptor?.query ? { query: descriptor.query } : {}),
       } satisfies DynamicContentContextDescriptor
-    : descriptor;
+    : effectiveAuthoredDescriptor;
   const capability = fixedCapability ?? descriptorCapability;
-  const isWordPressPostCollection = capability?.provider === "wordpress" && capability.source === "post" && capability.mode === "collection";
+  const usesParentSource = source === PARENT_SOURCE_KEY;
+  const isWordPressPostCollection = !usesParentSource && capability?.provider === "wordpress" && capability.source === "post" && capability.mode === "collection";
   const query = asRecord(effectiveDescriptor?.query);
   const filters = asRecord(query.filters);
 
@@ -191,7 +281,22 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
 
   const selectSource = (value: string) => {
     if (value === "static") {
-      update({ dynamicContext: undefined } as Partial<Item>);
+      update({ dynamicContext: inheritedSource ? STATIC_SOURCE_DESCRIPTOR : undefined } as Partial<Item>);
+      return;
+    }
+    if (value === PARENT_SOURCE_KEY && inheritedSource) {
+      update({
+        dynamicContext: {
+          provider: "yootheme",
+          source: "#parent",
+          mode: "single",
+          query: {
+            parentProvider: inheritedSource.provider,
+            parentSource: inheritedSource.source,
+            parentMode: inheritedSource.mode,
+          },
+        },
+      } as unknown as Partial<Item>);
       return;
     }
     const capability = capabilities.find(
@@ -218,6 +323,51 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
         <InspectorFieldRow key={control.key} label={control.label} description="Select one or more product categories.">
           <ProductCategoryPicker value={value} categoryTree={categoryTree} onChange={(nextValue) => setQuery({ categories: nextValue })} />
         </InspectorFieldRow>
+      );
+    }
+    if (
+      capability?.provider === "woocommerce" &&
+      capability.source === "product-category" &&
+      control.key === "parentId" &&
+      categoryTree.length > 0
+    ) {
+      const categoryOptions = flattenCategoryTree(categoryTree).map((category) => ({
+        value: String((category as { dbId?: number }).dbId ?? category.slug),
+        label: category.label,
+      }));
+      return (
+        <Fragment key={control.key}>
+          <InspectorFieldRow
+            label={query.parentRelation === true ? "Category" : control.label}
+            description="Select the category whose direct children should populate this item template."
+          >
+            <InspectorSelect
+              value={value == null ? "0" : String(value)}
+              options={[{ value: "0", label: "Root" }, ...categoryOptions]}
+              onChange={(nextValue) => setQuery({
+                parentId: Math.max(0, Number.parseInt(nextValue, 10) || 0),
+                parentRelation: true,
+              })}
+              ariaLabel="Dynamic Content Parent Category"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow
+            label="Multiple Items Source"
+            description="Fetch all product categories or only direct children of the selected category."
+          >
+            <InspectorSelect
+              value={query.parentRelation === true ? "children" : "all"}
+              options={[
+                { value: "children", label: "Child Product Categories" },
+                { value: "all", label: "All Product Categories" },
+              ]}
+              onChange={(nextValue) => setQuery(nextValue === "children"
+                ? { parentRelation: true, parentId: Math.max(0, Number(query.parentId) || 0) }
+                : { parentRelation: undefined, parentId: undefined })}
+              ariaLabel="Dynamic Content multiple items source"
+            />
+          </InspectorFieldRow>
+        </Fragment>
       );
     }
     if (control.control === "select") {
@@ -354,7 +504,7 @@ export default function DynamicContentInspectorGroup<Item extends DynamicItem>({
         </>
       )}
 
-      {!isWordPressPostCollection && capability?.queryControls?.length ? (
+      {!usesParentSource && !isWordPressPostCollection && capability?.queryControls?.length ? (
         <>{capability.queryControls.map(renderCapabilityQueryControl)}</>
       ) : null}
     </InspectorDivision>

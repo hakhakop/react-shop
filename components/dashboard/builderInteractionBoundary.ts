@@ -63,10 +63,15 @@ export function resolveBuilderOpenLinkIntent(target: EventTarget | null) {
   const element = closestElement(target, "a[href]");
   if (!element) return null;
   const anchor = element as HTMLAnchorElement;
+  const label = anchor.getAttribute("aria-label")?.trim() ||
+    anchor.getAttribute("title")?.trim() ||
+    anchor.textContent?.replace(/\s+/g, " ").trim() ||
+    null;
   return {
     href: anchor.getAttribute("href") ?? "",
     target: anchor.getAttribute("target"),
     rel: anchor.getAttribute("rel"),
+    label,
   };
 }
 

@@ -86,6 +86,15 @@ export type BuilderWireframeActions = {
     blockKey: string;
     direction: -1 | 1;
   }) => void;
+  moveBlockTo?: (payload: {
+    sectionId: string;
+    sourceColumnKey: string;
+    sourceBlockKey: string;
+    targetSectionId: string;
+    targetColumnKey: string;
+    targetBlockKey?: string;
+    placement?: "above" | "below";
+  }) => void;
   duplicateBlock?: (payload: {
     sectionId: string;
     columnKey: string;
@@ -154,7 +163,7 @@ function findColumnKeyForBlock(
       const column =
         item as NonNullable<BuilderSection["layoutItems"]>[number];
       if (column.blocks?.some((b) => b.id === blockKey)) {
-        return column.id;
+        return column.id ?? null;
       }
       if (column.nestedLayout?.rows) {
         for (const nRow of column.nestedLayout.rows) {
@@ -456,6 +465,7 @@ const WireframeBlock = memo(function WireframeBlock({
   hovered: boolean;
   actions: BuilderWireframeActions;
 }) {
+  const [dragOver, setDragOver] = useState<"above" | "below" | null>(null);
   const blockKey = block.id ?? `${columnKey}-block-${index}`;
   const blockLabel =
     layoutBlockLabels[(block.kind ?? "text") as LayoutBlockKind] ??
@@ -466,8 +476,50 @@ const WireframeBlock = memo(function WireframeBlock({
 
   return (
     <div
-      className={`builder-structure-element-card builder-structure-item builder-structure-item--element builder-wireframe-item builder-wireframe-item--block${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+      className={`builder-structure-element-card builder-structure-item builder-structure-item--element builder-wireframe-item builder-wireframe-item--block${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}${dragOver ? ` is-drop-${dragOver}` : ""}`}
       data-structure-key={`block:${sectionId}:${columnKey}:${blockKey}`}
+      draggable={Boolean(actions.moveBlockTo)}
+      onDragStart={(event) => {
+        if (!actions.moveBlockTo) return;
+        event.dataTransfer.setData("application/x-builder-structure-block", JSON.stringify({
+          sectionId,
+          sourceColumnKey: columnKey,
+          sourceBlockKey: blockKey,
+        }));
+        event.dataTransfer.effectAllowed = "move";
+      }}
+      onDragOver={(event) => {
+        if (!actions.moveBlockTo || !event.dataTransfer.types.includes("application/x-builder-structure-block")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const rect = event.currentTarget.getBoundingClientRect();
+        setDragOver(event.clientY < rect.top + rect.height / 2 ? "above" : "below");
+        event.dataTransfer.dropEffect = "move";
+      }}
+      onDragLeave={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragOver(null);
+      }}
+      onDrop={(event) => {
+        const raw = event.dataTransfer.getData("application/x-builder-structure-block");
+        if (!raw || !actions.moveBlockTo) return;
+        event.preventDefault();
+        event.stopPropagation();
+        setDragOver(null);
+        try {
+          const source = JSON.parse(raw) as { sectionId: string; sourceColumnKey: string; sourceBlockKey: string };
+          if (source.sectionId === sectionId && source.sourceColumnKey === columnKey && source.sourceBlockKey === blockKey) return;
+          actions.moveBlockTo({
+            ...source,
+            targetSectionId: sectionId,
+            targetColumnKey: columnKey,
+            targetBlockKey: blockKey,
+            placement: dragOver ?? "above",
+          });
+        } catch {
+          // Ignore external or malformed drag payloads.
+        }
+      }}
+      onDragEnd={() => setDragOver(null)}
       onMouseEnter={() =>
         actions.hover?.({ type: "block", sectionId, columnKey, blockKey })
       }
@@ -674,6 +726,7 @@ export const WireframeColumn = memo(
     onToggle: (key: string) => void;
     actions: BuilderWireframeActions;
   }) {
+    const [dragOver, setDragOver] = useState(false);
     const columnKey = item.id ?? `layout-item-${flatIndex}`;
     const selected = selectedColumnKey === columnKey && !selectedBlockKey;
     const hovered = hoveredColumnKey === columnKey && !hoveredBlockKey;
@@ -682,7 +735,7 @@ export const WireframeColumn = memo(
 
     return (
       <div
-        className={`builder-structure-column-box builder-structure-branch builder-structure-branch--column builder-wireframe-column${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}`}
+        className={`builder-structure-column-box builder-structure-branch builder-structure-branch--column builder-wireframe-column${selected ? " is-selected" : ""}${hovered ? " is-hovered" : ""}${dragOver ? " is-drop-column" : ""}`}
         data-structure-key={`column:${sectionId}:${columnKey}`}
         onClick={(e) => {
           e.stopPropagation();
@@ -692,6 +745,33 @@ export const WireframeColumn = memo(
           actions.hover?.({ type: "column", sectionId, columnKey })
         }
         onMouseLeave={() => actions.hover?.(null)}
+        onDragOver={(event) => {
+          if (!actions.moveBlockTo || !event.dataTransfer.types.includes("application/x-builder-structure-block")) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+          setDragOver(true);
+        }}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragOver(false);
+        }}
+        onDrop={(event) => {
+          const raw = event.dataTransfer.getData("application/x-builder-structure-block");
+          if (!raw || !actions.moveBlockTo) return;
+          event.preventDefault();
+          event.stopPropagation();
+          setDragOver(false);
+          try {
+            const source = JSON.parse(raw) as { sectionId: string; sourceColumnKey: string; sourceBlockKey: string };
+            actions.moveBlockTo({
+              ...source,
+              targetSectionId: sectionId,
+              targetColumnKey: columnKey,
+              placement: "below",
+            });
+          } catch {
+            // Ignore external or malformed drag payloads.
+          }
+        }}
       >
         <div className="builder-structure-column-elements builder-structure-children--elements builder-wireframe-children--blocks">
           {nested ? (
@@ -752,6 +832,42 @@ export const WireframeColumn = memo(
                   />
                 );
               })}
+              {blocks.length === 0 && actions.moveBlockTo ? (
+                <div
+                  className={`builder-structure-empty-column-drop-target${dragOver ? " is-drop-column" : ""}`}
+                  onDragOver={(event) => {
+                    if (!event.dataTransfer.types.includes("application/x-builder-structure-block")) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.dataTransfer.dropEffect = "move";
+                    setDragOver(true);
+                  }}
+                  onDragLeave={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragOver(false);
+                  }}
+                  onDrop={(event) => {
+                    const raw = event.dataTransfer.getData("application/x-builder-structure-block");
+                    if (!raw) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setDragOver(false);
+                    try {
+                      const source = JSON.parse(raw) as { sectionId: string; sourceColumnKey: string; sourceBlockKey: string };
+                      actions.moveBlockTo?.({
+                        ...source,
+                        targetSectionId: sectionId,
+                        targetColumnKey: columnKey,
+                        placement: "below",
+                      });
+                    } catch {
+                      // Ignore external or malformed drag payloads.
+                    }
+                  }}
+                  aria-label={`Move element to ${item.title || `Column ${index + 1}`}`}
+                >
+                  Drop element here
+                </div>
+              ) : null}
               {actions.openElements ? (
                 <button
                   type="button"
@@ -1072,6 +1188,7 @@ function targetRowIndex(
   if (!target || target.sectionId !== section.id) return null;
   if (target.type === "row") return target.rowIndex;
   if (target.type === "section") return null;
+  const targetBlockKey = target.type === "block" ? target.blockKey : undefined;
   const idx = getWireframeRows(section).findIndex((row) =>
     row.items.some((item) => {
       const column =
@@ -1079,16 +1196,16 @@ function targetRowIndex(
       return (
         (target.columnKey && column.id === target.columnKey) ||
         Boolean(
-          (target.blockKey &&
-            column.blocks?.some((b) => b.id === target.blockKey)) ||
+          (targetBlockKey &&
+            column.blocks?.some((b) => b.id === targetBlockKey)) ||
             column.nestedLayout?.rows.some((nested) =>
               nested.columns.some(
                 (nestedColumn) =>
                   (target.columnKey &&
                     nestedColumn.id === target.columnKey) ||
-                  (target.blockKey &&
+                  (targetBlockKey &&
                     nestedColumn.blocks?.some(
-                      (b) => b.id === target.blockKey,
+                      (b) => b.id === targetBlockKey,
                     )),
               ),
             ),

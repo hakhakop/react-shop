@@ -173,6 +173,26 @@ export function getUikitContainerClass(preset?: string): string {
 }
 
 /**
+ * Resolve the section container from one canonical semantic value.
+ *
+ * `maxWidth` is the current Inspector/import contract. `contentMode` remains
+ * as a compatibility fallback for older WebPages documents. Keeping this
+ * resolution in the UIkit adapter prevents the outer section modifier and
+ * its actual container from drifting onto different width tokens.
+ */
+export function resolveUikitSectionContainerPreset(
+  maxWidth?: string | null,
+  contentMode?: string | null,
+): string | undefined {
+  const current = maxWidth?.trim().toLowerCase();
+  if (current) return current === "boxed" ? "default" : current;
+
+  const legacy = contentMode?.trim().toLowerCase();
+  if (!legacy) return undefined;
+  return legacy === "boxed" ? "default" : legacy;
+}
+
+/**
  * Maps WebPages row grid parameters to UIkit grid layout classes.
  */
 export function getUikitGridClass(options?: {

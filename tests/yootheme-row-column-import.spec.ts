@@ -96,6 +96,52 @@ test("keeps YOOtheme small row width on the canonical container token", () => {
   expect(structure.rows[0]?.style.maxWidth).toBe("var(--uk-container-small-max-width, 900px)");
 });
 
+test("keeps YOOtheme row Width None distinct from Expand", () => {
+  const noneStyle = resolveBuilderRowStyle({
+    spacingContract: "yootheme",
+    maxWidth: "none",
+  });
+  const expandStyle = resolveBuilderRowStyle({
+    spacingContract: "yootheme",
+    maxWidth: "expand",
+  });
+
+  expect(noneStyle.maxWidth).toBeUndefined();
+  expect(noneStyle.width).toBeUndefined();
+  expect(expandStyle.maxWidth).toBe("none");
+  expect(expandStyle.width).toBe("100%");
+});
+
+test("projects the YOOtheme row width token into semantic classes", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [
+        { type: "row", props: { width: "none" }, children: [{ type: "column", children: [] }] },
+        { type: "row", props: { width: "expand" }, children: [{ type: "column", children: [] }] },
+      ],
+    }],
+  });
+  const rows = resolveBuilderSectionStructure(imported.sections[0]).rows;
+
+  expect(rows[0]?.className).toContain("shop-builder-content-row--max-width-none");
+  expect(rows[1]?.className).toContain("shop-builder-content-row--max-width-expand");
+});
+
+test("projects an absent row width as the inspector's None default", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{ type: "row", children: [{ type: "column", children: [] }] }],
+    }],
+  });
+
+  expect(resolveBuilderSectionStructure(imported.sections[0]).rows[0]?.className)
+    .toContain("shop-builder-content-row--max-width-none");
+});
+
 test("does not suppress the visible UIkit row gutter for a source none margin", () => {
   expect(resolveBuilderRowGap(
     { spacingContract: "yootheme" },

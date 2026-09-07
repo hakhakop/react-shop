@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { emptyMenuDropdown, exportMenuDropdown, normalizeMenuDropdown, menuDropdownRenderLayout } from "@/lib/menuDropdownLayout";
+import { emptyMenuDropdown, exportMenuDropdown, normalizeMenuDropdown, menuDropdownFromSection, menuDropdownRenderLayout } from "@/lib/menuDropdownLayout";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
 import { createSublayoutRow } from "@/lib/builderSublayout";
@@ -18,6 +18,24 @@ test("dropdown content survives shell normalization without becoming a page", ()
   const shell = normalizeBuilderShellSettings({ menuItems: [{ id: "women", label: "Women", url: "/women", dropdownContent: content }] });
   expect(shell.menuItems[0].dropdownContent).toEqual(content);
   expect(normalizeMenuDropdown({ kind: "sublayout", id: "bad", sublayout: { rows: [{}] } })).toBeUndefined();
+});
+
+test("ordinary site sections can be applied as dropdown layouts", () => {
+  const content = menuDropdownFromSection({
+    id: "shared-section",
+    rows: [{
+      id: "shared-row",
+      columns: [{
+        id: "shared-column",
+        width: 1,
+        elements: [{ id: "shared-heading", kind: "heading", headingText: "Shared section" }],
+      }],
+    }],
+  } as any);
+  expect(content?.sublayout?.rows[0]?.columns[0]?.elements[0]).toMatchObject({
+    kind: "heading",
+    headingText: "Shared section",
+  });
 });
 
 test("portable navigation attaches each dropdown to its own stable item", () => {
@@ -68,6 +86,7 @@ test("dropdown Products uses the page resolver without mutating saved content", 
 test("actual Woolberry Women export retains all five Nav groups", () => {
   const result = previewMenuDropdownImport(women);
   expect(result.content?.sublayout.rows[0].columns).toHaveLength(4);
+  expect(result.content?.sublayout.rows[0].layout).toBe("fifths-1-1-1-2");
   expect(result.content?.sublayout.rows[0].columns.flatMap(column => column.elements).filter(block => block.kind === "nav")).toHaveLength(5);
   expect(JSON.stringify(women)).toContain("customMenuItems");
 });

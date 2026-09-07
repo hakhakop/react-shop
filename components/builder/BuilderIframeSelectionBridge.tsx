@@ -7,16 +7,41 @@ export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selectio
 
 type SelectionMessage = {
   source: typeof BUILDER_IFRAME_SELECTION_SOURCE;
-  type: "ready" | "context" | "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell" | "insert";
+  type: "ready" | "context" | "select" | "focus" | "rect" | "scroll-start" | "navigate" | "exit-shell" | "insert" | "move";
   target?: BuilderInteractionTarget;
+  sourceTarget?: BuilderInteractionTarget;
+  placement?: "above" | "below";
   scrollIntoView?: boolean;
   rect?: { x: number; y: number; width: number; height: number } | null;
   href?: string;
+  linkLabel?: string;
   shell?: "header" | "footer" | null;
   insertionIndex?: number;
 };
 
-function targetFromClick(event: MouseEvent): BuilderInteractionTarget | null {
+type SelectionRect = { x: number; y: number; width: number; height: number };
+
+/**
+ * UIkit rows legitimately use a negative inline grid margin to cancel the
+ * first column gutter. That layout geometry must not make the editor's
+ * selection wireframe escape the visible iframe canvas.
+ */
+export function visibleBuilderSelectionRect(
+  rect: SelectionRect,
+  target: BuilderInteractionTarget | null,
+  viewportWidth: number,
+): SelectionRect {
+  if (target?.type !== "row" || viewportWidth <= 0) return rect;
+  const left = Math.max(0, rect.x);
+  const right = Math.min(viewportWidth, rect.x + rect.width);
+  return {
+    ...rect,
+    x: left,
+    width: Math.max(0, right - left),
+  };
+}
+
+function targetFromClick(event: MouseEvent | DragEvent): BuilderInteractionTarget | null {
   const element = event.target instanceof Element ? event.target : null;
   const row = element?.closest<HTMLElement>('[data-builder-object-type="row"]');
   if (row) {
@@ -109,6 +134,7 @@ export default function BuilderIframeSelectionBridge({
 }) {
   useEffect(() => {
     let selectedTarget: BuilderInteractionTarget | null = null;
+    let selectedLinkHref: string | null = null;
     const builderContext = new URLSearchParams(window.location.search).get("builderContext");
     let editingShell: "header" | "footer" | null =
       builderContext === "header" || builderContext === "footer"
@@ -118,17 +144,45 @@ export default function BuilderIframeSelectionBridge({
     let scrollSettleTimer = 0;
     let scrolling = false;
     let selectedResizeObserver: ResizeObserver | null = null;
+    const draggableElements = new Set<HTMLElement>();
+    let draggableObserver: MutationObserver | null = null;
+    const enableDraggableElement = (element: HTMLElement) => {
+      element.draggable = true;
+      draggableElements.add(element);
+    };
+    const enableDraggableWithin = (root: ParentNode) => {
+      if (root instanceof HTMLElement && root.matches('[data-builder-object-type="block"]')) {
+        enableDraggableElement(root);
+      }
+      root.querySelectorAll<HTMLElement>('[data-builder-object-type="block"]')
+        .forEach(enableDraggableElement);
+    };
+    const refreshDraggableTarget = () => {
+      // Drag must be discoverable in the live canvas. Requiring a successful
+      // preliminary selection made header blocks impossible to move whenever
+      // an authored interactive child (such as Search) intercepted that click.
+      // Every Builder block is a valid source; the drop target determines its
+      // new position, so enable native dragging for the full authored surface.
+      enableDraggableWithin(document);
+    };
     const reportRect = () => {
       frame = 0;
       const element = selectedTarget
         ? document.querySelector<HTMLElement>(targetSelector(selectedTarget, editingShell))
         : null;
       const rect = element?.getBoundingClientRect();
+      const visibleRect = rect
+        ? visibleBuilderSelectionRect(
+            { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+            selectedTarget,
+            document.documentElement.clientWidth || window.innerWidth,
+          )
+        : null;
       const message: SelectionMessage = {
         source: BUILDER_IFRAME_SELECTION_SOURCE,
         type: "rect",
         target: selectedTarget ?? undefined,
-        rect: rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height } : null,
+        rect: visibleRect,
       };
       window.parent.postMessage(message, window.location.origin);
     };
@@ -169,13 +223,19 @@ export default function BuilderIframeSelectionBridge({
         reportRect();
       }, 140);
     };
-    const selectTarget = (target: BuilderInteractionTarget) => {
+    const selectTarget = (
+      target: BuilderInteractionTarget,
+      link?: { href: string; label?: string | null } | null,
+    ) => {
       selectedTarget = target;
+      selectedLinkHref = link?.href || null;
       observeSelectedElement();
       window.parent.postMessage({
         source: BUILDER_IFRAME_SELECTION_SOURCE,
         type: "select",
         target,
+        ...(link?.href ? { href: link.href } : {}),
+        ...(link?.label ? { linkLabel: link.label } : {}),
         shell: target.sectionId === "header-document"
           ? "header"
           : target.sectionId === "footer-document"
@@ -218,7 +278,10 @@ export default function BuilderIframeSelectionBridge({
             type: "section",
             sectionId: "header-document",
           } satisfies BuilderInteractionTarget;
-          selectTarget(target);
+          selectTarget(target, {
+            href: anchor.getAttribute("href") ?? "",
+            label: anchor.getAttribute("aria-label") ?? anchor.getAttribute("title") ?? anchor.textContent?.trim(),
+          });
           return;
         }
         const href = anchor.getAttribute("href") ?? "";
@@ -246,6 +309,10 @@ export default function BuilderIframeSelectionBridge({
       const element = event.target instanceof Element ? event.target : null;
       const header = element?.closest(".site-header");
       const footer = element?.closest('footer[data-builder-page-root="true"]');
+      const explicitlyOpened = Boolean(
+        anchor && (anchor.target === "_blank" || event.metaKey || event.ctrlKey || event.shiftKey),
+      );
+      if (explicitlyOpened) return;
       const headerInteractive = element?.closest(
         "button, input, select, textarea, form, [role='button']",
       );
@@ -280,14 +347,22 @@ export default function BuilderIframeSelectionBridge({
       }
       const target = targetFromClick(event);
       const navigationEnabled = diagnostics === "settled" || diagnostics === "full";
-      if (anchor && navigationEnabled && targetsMatch(selectedTarget, target)) {
-        const explicitlyOpened = anchor.target === "_blank" || event.metaKey || event.ctrlKey || event.shiftKey;
+      if (anchor && target && navigationEnabled && targetsMatch(selectedTarget, target)) {
         const href = anchor.getAttribute("href") ?? "";
         const external = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href) &&
           !href.startsWith(window.location.origin);
-        if (external && explicitlyOpened) return;
+        // Preserve the browser's familiar open-link gesture inside the
+        // Builder. A normal click remains selection-first; Cmd/Ctrl/Shift
+        // click follows the real link without changing the authored element.
         event.preventDefault();
         if (external || !href || href === "#" || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+        if (selectedLinkHref !== href) {
+          selectTarget(target, {
+            href,
+            label: anchor.getAttribute("aria-label") ?? anchor.getAttribute("title") ?? anchor.textContent?.trim(),
+          });
+          return;
+        }
         const navigation: SelectionMessage = {
           source: BUILDER_IFRAME_SELECTION_SOURCE,
           type: "navigate",
@@ -300,7 +375,10 @@ export default function BuilderIframeSelectionBridge({
       if (event.target instanceof Element && event.target.closest("a[href], button, input, select, textarea, form")) {
         event.preventDefault();
       }
-      selectTarget(target);
+      selectTarget(target, anchor ? {
+        href: anchor.getAttribute("href") ?? "",
+        label: anchor.getAttribute("aria-label") ?? anchor.getAttribute("title") ?? anchor.textContent?.trim(),
+      } : null);
     };
     const handleMessage = (event: MessageEvent<SelectionMessage>) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
@@ -313,6 +391,7 @@ export default function BuilderIframeSelectionBridge({
       }
       if (event.data.type !== "focus" || !event.data.target) return;
       selectedTarget = event.data.target;
+      selectedLinkHref = null;
       observeSelectedElement();
       const element = document.querySelector<HTMLElement>(targetSelector(event.data.target, editingShell));
       if (event.data.scrollIntoView && element) {
@@ -320,8 +399,82 @@ export default function BuilderIframeSelectionBridge({
       }
       if (diagnostics !== "minimal") scheduleRect();
     };
+    const clearDropTarget = () => {
+      document.querySelectorAll<HTMLElement>(
+        ".builder-iframe-drag-over-above, .builder-iframe-drag-over-below, .builder-iframe-drag-over-column",
+      ).forEach((element) => element.classList.remove(
+        "builder-iframe-drag-over-above",
+        "builder-iframe-drag-over-below",
+        "builder-iframe-drag-over-column",
+      ));
+    };
+    const handleDragStart = (event: DragEvent) => {
+      const sourceTarget = targetFromClick(event);
+      if (!sourceTarget || sourceTarget.type !== "block" || !event.dataTransfer) return;
+      event.dataTransfer.setData("application/x-webpages-builder-block", JSON.stringify(sourceTarget));
+      event.dataTransfer.effectAllowed = "move";
+    };
+    const handleDragOver = (event: DragEvent) => {
+      if (!event.dataTransfer?.types.includes("application/x-webpages-builder-block")) return;
+      const target = targetFromClick(event);
+      if (!target || (target.type !== "block" && target.type !== "column")) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      clearDropTarget();
+      const owner = event.target instanceof Element
+        ? event.target.closest<HTMLElement>(`[data-builder-object-type="${target.type}"]`)
+        : null;
+      if (!owner) return;
+      if (target.type === "column") {
+        owner.classList.add("builder-iframe-drag-over-column");
+      } else {
+        const rect = owner.getBoundingClientRect();
+        owner.classList.add(event.clientY < rect.top + rect.height / 2 ? "builder-iframe-drag-over-above" : "builder-iframe-drag-over-below");
+      }
+    };
+    const handleDrop = (event: DragEvent) => {
+      const rawSource = event.dataTransfer?.getData("application/x-webpages-builder-block");
+      const target = targetFromClick(event);
+      clearDropTarget();
+      if (!rawSource || !target || (target.type !== "block" && target.type !== "column")) return;
+      try {
+        const sourceTarget = JSON.parse(rawSource) as BuilderInteractionTarget;
+        if (sourceTarget.type !== "block" || (target.type === "block" && sourceTarget.blockKey === target.blockKey && sourceTarget.columnKey === target.columnKey && sourceTarget.sectionId === target.sectionId)) return;
+        event.preventDefault();
+        const owner = event.target instanceof Element
+          ? event.target.closest<HTMLElement>(`[data-builder-object-type="${target.type}"]`)
+          : null;
+        const rect = owner?.getBoundingClientRect();
+        const placement = target.type === "block" && rect && event.clientY >= rect.top + rect.height / 2 ? "below" : "above";
+        window.parent.postMessage({
+          source: BUILDER_IFRAME_SELECTION_SOURCE,
+          type: "move",
+          sourceTarget,
+          target,
+          placement,
+        } satisfies SelectionMessage, window.location.origin);
+      } catch {
+        // Ignore malformed external drag data.
+      }
+    };
     document.addEventListener("click", handleClick, true);
+    document.addEventListener("dragstart", handleDragStart, true);
+    document.addEventListener("dragover", handleDragOver, true);
+    document.addEventListener("drop", handleDrop, true);
+    document.addEventListener("dragend", clearDropTarget, true);
     window.addEventListener("message", handleMessage);
+    refreshDraggableTarget();
+    // Dynamic projections can replace or append blocks after the bridge is
+    // ready. Register only those added nodes instead of rescanning every block
+    // whenever selection changes.
+    draggableObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLElement) enableDraggableWithin(node);
+        });
+      }
+    });
+    draggableObserver.observe(document.documentElement, { childList: true, subtree: true });
     window.parent.postMessage({
       source: BUILDER_IFRAME_SELECTION_SOURCE,
       type: "ready",
@@ -334,7 +487,14 @@ export default function BuilderIframeSelectionBridge({
       if (frame) window.cancelAnimationFrame(frame);
       window.clearTimeout(scrollSettleTimer);
       selectedResizeObserver?.disconnect();
+      draggableObserver?.disconnect();
       document.removeEventListener("click", handleClick, true);
+      document.removeEventListener("dragstart", handleDragStart, true);
+      document.removeEventListener("dragover", handleDragOver, true);
+      document.removeEventListener("drop", handleDrop, true);
+      document.removeEventListener("dragend", clearDropTarget, true);
+      draggableElements.forEach((element) => { element.draggable = false; });
+      draggableElements.clear();
       window.removeEventListener("message", handleMessage);
       if (diagnostics !== "minimal") {
         window.removeEventListener("scroll", diagnostics === "settled" ? handleSettledScroll : scheduleRect);
@@ -343,5 +503,14 @@ export default function BuilderIframeSelectionBridge({
     };
   }, [diagnostics]);
 
-  return null;
+  return <style>{`
+    .builder-iframe-drag-over-above, .builder-iframe-drag-over-below { position: relative; }
+    .builder-iframe-drag-over-above::before, .builder-iframe-drag-over-below::before {
+      content: ""; position: absolute; z-index: 2147483647; left: 0; right: 0;
+      height: 3px; background: #8b5cf6; box-shadow: 0 0 7px rgba(139,92,246,.8); pointer-events: none;
+    }
+    .builder-iframe-drag-over-above::before { top: -2px; }
+    .builder-iframe-drag-over-below::before { bottom: -2px; }
+    .builder-iframe-drag-over-column { outline: 2px solid rgba(139,92,246,.8); outline-offset: -2px; }
+  `}</style>;
 }

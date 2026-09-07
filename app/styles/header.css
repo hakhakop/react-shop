@@ -1537,6 +1537,24 @@ html.dark .site-header {
 
 .site-header-nav-submenu--builder .shop-builder-sublayout { min-width: 0; text-align: start; }
 
+/* YOOtheme's per-item `dropdown.stretch` is intentionally opt-in. A normal
+ * builder dropdown retains its compact width; imported navbar dropdowns can
+ * use the same container-wide geometry as their source. */
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar {
+  width: min(var(--uk-container-default-max-width, 1424px), calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.site-header-nav-submenu--builder.is-large { padding: calc(var(--uk-navbar-dropdown-padding, var(--uk-dropdown-padding, .95rem)) * 1.5); }
+.site-header-nav-submenu--builder.is-flush-horizontal { padding-inline: 0; }
+.site-header-nav-submenu--builder.is-flush-vertical { padding-block: 0; }
+
+.site-header-search.is-expanded { flex: 1 1 auto; min-width: min(18rem, 100%); }
+.site-header-search.is-expanded .site-header-search-input { width: 100%; }
+.site-header-search.is-dropbar-flush { margin-inline: 0; }
+
 .site-header-nav-submenu {
   position: absolute;
   top: 100%;
@@ -1606,13 +1624,18 @@ html.dark .site-header {
 }
 
 /* Dropbar uses the same canonical submenu content but promotes its first
-   level surface to the navbar boundary. No parallel dropdown renderer. */
-.site-header--dropdown-dropbar
+   level surface to the Header row boundary. The static ancestor chain above
+   makes `.site-header-main-inner` the containing block, so this follows the
+   Header's full/boxed width contract without a viewport-width workaround. */
+.site-header.site-header--dropdown-dropbar
+  .header-builder-element--navigation
   .site-header-nav > .site-header-nav-item > .site-header-nav-submenu {
   right: 0;
   left: 0;
-  width: 100%;
-  min-width: 100%;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  margin-left: 0;
   margin-top: var(--uk-dropdown-dropbar-margin, 0);
   padding-top: var(--uk-dropbar-padding-top, var(--uk-dropdown-dropbar-padding-top, var(--uk-navbar-dropdown-dropbar-padding-top, 20px)));
   padding-bottom: var(--uk-navbar-dropdown-dropbar-padding-bottom, var(--uk-dropdown-padding, 25px));
@@ -1625,13 +1648,44 @@ html.dark .site-header {
   transform: translateY(8px);
 }
 
-.site-header--dropdown-dropbar.site-header--dropdown-hover
+/* Builder-backed dropbars render an authored Builder fragment rather than a
+   dropdown list. The fragment owns all of its spacing, and imported collapsed
+   grids must be able to meet the dropbar edges just as they do in YOOtheme. */
+.site-header.site-header--dropdown-dropbar
+  .header-builder-element--navigation
+  .site-header-nav > .site-header-nav-item > .site-header-nav-submenu--builder {
+  gap: 0;
+  padding: 0;
+}
+
+.site-header.site-header--dropdown-dropbar.site-header--dropdown-hover
+  .header-builder-element--navigation
   .site-header-nav > .site-header-nav-item:hover > .site-header-nav-submenu,
-.site-header--dropdown-dropbar.site-header--dropdown-hover
+.site-header.site-header--dropdown-dropbar.site-header--dropdown-hover
+  .header-builder-element--navigation
   .site-header-nav > .site-header-nav-item:focus-within > .site-header-nav-submenu,
-.site-header--dropdown-dropbar
+.site-header.site-header--dropdown-dropbar
+  .header-builder-element--navigation
   .site-header-nav > .site-header-nav-item.is-open > .site-header-nav-submenu {
   transform: translateY(0);
+}
+
+/* Imported YOOtheme item-level stretching takes precedence over the compact
+   builder-dropdown fallback and the header-level dropbar width. */
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar {
+  right: auto;
+  left: 50%;
+  min-width: min(var(--uk-container-default-max-width, 1424px), calc(100vw - 32px));
+  transform: translate(-50%, 8px);
+}
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:hover > .site-header-nav-submenu--builder.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:hover > .site-header-nav-submenu--builder.is-stretch-navbar,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:focus-within > .site-header-nav-submenu--builder.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:focus-within > .site-header-nav-submenu--builder.is-stretch-navbar,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-open > .site-header-nav-submenu--builder.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-open > .site-header-nav-submenu--builder.is-stretch-navbar {
+  transform: translate(-50%, 0);
 }
 
 .site-header-nav-submenu .site-header-nav-link,

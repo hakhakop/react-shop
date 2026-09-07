@@ -301,10 +301,10 @@ export default function RowCapabilityPanel({
 
         <InspectorDivision title="GUTTERS & ALIGNMENT" summary={row.columnGap ?? "Default"}>
         <InspectorFieldRow label="Column Gap">
-          <InspectorSelect value={row.columnGap ?? "inherit"} options={gapOptions} onChange={(columnGap) => update({ columnGap })} ariaLabel="Row Column Gap" />
+          <InspectorSelect value={row.columnGap ?? "default"} options={gapOptions} onChange={(columnGap) => update({ columnGap })} ariaLabel="Row Column Gap" />
         </InspectorFieldRow>
         <InspectorFieldRow label="Row Gap">
-          <InspectorSelect value={row.rowGap ?? "inherit"} options={gapOptions} onChange={(rowGap) => update({ rowGap })} ariaLabel="Row Gap" />
+          <InspectorSelect value={row.rowGap ?? "default"} options={gapOptions} onChange={(rowGap) => update({ rowGap })} ariaLabel="Row Gap" />
         </InspectorFieldRow>
         <InspectorFieldRow label="Divider">
           <RowCheck checked={row.divider === true} onChange={(divider) => update({ divider })} label="Show dividers" />

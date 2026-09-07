@@ -84,6 +84,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             : "hy",
           primaryContentLanguage: "hy",
           wordpressMediaOrigin: getWordPressBaseUrl(),
+          deferDynamicContent: true,
         })
       : undefined;
 

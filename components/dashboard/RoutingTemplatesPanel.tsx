@@ -20,6 +20,7 @@ type RoutingTemplate = {
   pageType: string;
   view: "singular" | "archive";
   conditions: TemplateCondition[];
+  postsPerPage?: number;
   layoutId: string;
 };
 type TemplatePageType = {
@@ -31,8 +32,17 @@ type TemplatePageType = {
   contentType: string;
   sourceKind: "content" | "taxonomy" | "system";
   taxonomy?: string;
+  requestTaxonomy?: string;
   filters: Array<"content-identity" | "taxonomy-term" | "request-taxonomy-term" | "page-number" | "language">;
 };
+type AssignmentTermOption = {
+  id: string;
+  label: string;
+  slug: string;
+  parentId?: string;
+  depth: number;
+};
+type AssignmentOptions = Record<string, AssignmentTermOption[]>;
 
 type Props = {
   websiteId?: string;
@@ -59,9 +69,72 @@ function displayName(template: RoutingTemplate) {
   return template.name;
 }
 
+function taxonomyLabel(taxonomy: string) {
+  return ({
+    product_cat: "Product Categories",
+    product_tag: "Product Tags",
+    category: "Categories",
+    post_tag: "Tags",
+  } as Record<string, string>)[taxonomy] ?? taxonomy.replaceAll("_", " ");
+}
+
+function TemplateTermPicker({
+  label,
+  options,
+  value,
+  loading,
+  onChange,
+}: {
+  label: string;
+  options: AssignmentTermOption[];
+  value: string[];
+  loading: boolean;
+  onChange: (value: string[]) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const selected = useMemo(() => new Set(value), [value]);
+  const visible = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return options.filter((option) => !query || option.label.toLowerCase().includes(query) || option.slug.toLowerCase().includes(query));
+  }, [options, search]);
+  return (
+    <fieldset className="template-assignment-picker">
+      <legend><span>{label}</span><small>{value.length ? `${value.length} selected` : "All"}</small></legend>
+      <input
+        type="search"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder={`Search ${label.toLowerCase()}…`}
+        aria-label={`Search ${label}`}
+      />
+      <div className="template-assignment-picker-list" role="group" aria-label={label}>
+        {loading ? <span className="template-assignment-picker-empty">Loading…</span> : visible.map((option) => {
+          const checked = selected.has(option.id);
+          return <label key={option.id} className={checked ? "is-selected" : undefined} style={{ "--term-depth": option.depth } as React.CSSProperties}>
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(event) => {
+                const next = new Set(selected);
+                if (event.target.checked) next.add(option.id); else next.delete(option.id);
+                onChange(Array.from(next));
+              }}
+            />
+            <span>{option.label}</span>
+          </label>;
+        })}
+        {!loading && visible.length === 0 && <span className="template-assignment-picker-empty">No matching terms.</span>}
+      </div>
+      <small>Leave everything unselected to match all.</small>
+    </fieldset>
+  );
+}
+
 export default function RoutingTemplatesPanel({ websiteId, creationContext, editorContext, onTemplatesChanged }: Props) {
   const [templates, setTemplates] = useState<RoutingTemplate[]>([]);
   const [pageTypes, setPageTypes] = useState<TemplatePageType[]>([]);
+  const [assignmentOptions, setAssignmentOptions] = useState<AssignmentOptions>({});
+  const [assignmentOptionsLoading, setAssignmentOptionsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -74,11 +147,12 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
   const [editEnabled, setEditEnabled] = useState(true);
   const [includeIds, setIncludeIds] = useState("");
   const [excludeIds, setExcludeIds] = useState("");
-  const [termIds, setTermIds] = useState("");
-  const [requestTermIds, setRequestTermIds] = useState("");
+  const [termIds, setTermIds] = useState<string[]>([]);
+  const [requestTermIds, setRequestTermIds] = useState<string[]>([]);
   const [childMode, setChildMode] = useState<"exclude" | "include" | "only">("exclude");
   const [pageNumber, setPageNumber] = useState<"all" | "first" | "except-first">("all");
   const [language, setLanguage] = useState("");
+  const [postsPerPage, setPostsPerPage] = useState(12);
   const activeTemplateId = editorContext?.ownership.activeTemplate?.templateId ?? "";
   const previewedTemplateId = editorContext?.document.kind === "routing-template"
     ? editorContext.ownership.assignedTemplate?.templateId ?? ""
@@ -110,6 +184,21 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
   }, [apiUrl]);
 
   useEffect(() => { void load(); }, [load]);
+
+  const loadAssignmentOptions = useCallback(async () => {
+    if (Object.keys(assignmentOptions).length || assignmentOptionsLoading) return;
+    setAssignmentOptionsLoading(true);
+    try {
+      const response = await fetch(`${apiUrl}${apiUrl.includes("?") ? "&" : "?"}assignmentOptions=1`, { cache: "no-store" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Unable to load assignment options.");
+      setAssignmentOptions(payload.assignmentOptions ?? {});
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to load assignment options.");
+    } finally {
+      setAssignmentOptionsLoading(false);
+    }
+  }, [apiUrl, assignmentOptions, assignmentOptionsLoading]);
 
   async function mutate(body: Record<string, unknown>) {
     const response = await fetch(apiUrl, {
@@ -175,6 +264,12 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
       const response = await fetch(`${apiUrl}${apiUrl.includes("?") ? "&" : "?"}id=${encodeURIComponent(template.id)}`, { method: "DELETE" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to delete template.");
+      if (template.id === previewedTemplateId || template.id === activeTemplateId) {
+        // The deleted document must not remain mounted as a writable canvas.
+        // A hard transition also clears any queued iframe save for that owner.
+        window.location.assign(editorContext?.navigation.returnHref ?? `${window.location.pathname}?page=home`);
+        return;
+      }
       await load();
       await onTemplatesChanged?.();
       if (payload.layoutDeleted === false) setError("Template deleted; its shared layout was preserved.");
@@ -189,11 +284,13 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
     setEditing(template); setEditName(displayName(template)); setEditPageType(template.pageType); setEditEnabled(template.enabled);
     setIncludeIds(identities.filter((item) => item.operator === "include").map((item) => item.identity.contentId).join(", "));
     setExcludeIds(identities.filter((item) => item.operator === "exclude").map((item) => item.identity.contentId).join(", "));
-    setTermIds(terms.filter((item) => item.operator === "include").map((item) => item.termId).join(", "));
-    setRequestTermIds(requestTerms.filter((item) => item.operator === "include").map((item) => item.termId).join(", "));
+    setTermIds(terms.filter((item) => item.operator === "include").map((item) => item.termId));
+    setRequestTermIds(requestTerms.filter((item) => item.operator === "include").map((item) => item.termId));
     setChildMode(terms[0]?.children ?? "exclude");
     setPageNumber((template.conditions.find((item) => item.subject === "page-number") as Extract<TemplateCondition, { subject: "page-number" }> | undefined)?.page ?? "all");
     setLanguage((template.conditions.find((item) => item.subject === "language" && item.operator === "include") as Extract<TemplateCondition, { subject: "language" }> | undefined)?.language ?? "");
+    setPostsPerPage(template.postsPerPage ?? 12);
+    void loadAssignmentOptions();
     if (!definition) setError("This template Page type is no longer registered by the connected providers.");
   }
 
@@ -207,13 +304,13 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
     ids(includeIds).forEach((contentId) => conditions.push({ subject: "content-identity", operator: "include", identity: { provider: definition.provider, contentType: definition.contentType, contentId } }));
     ids(excludeIds).forEach((contentId) => conditions.push({ subject: "content-identity", operator: "exclude", identity: { provider: definition.provider, contentType: definition.contentType, contentId } }));
     if (definition.taxonomy) {
-      ids(termIds).forEach((termId) => conditions.push({ subject: "taxonomy-term", operator: "include", taxonomy: definition.taxonomy!, termId, children: childMode }));
-      ids(requestTermIds).forEach((termId) => conditions.push({ subject: "request-taxonomy-term", operator: "include", taxonomy: definition.taxonomy!, termId }));
+      termIds.forEach((termId) => conditions.push({ subject: "taxonomy-term", operator: "include", taxonomy: definition.taxonomy!, termId, children: childMode }));
+      requestTermIds.forEach((termId) => conditions.push({ subject: "request-taxonomy-term", operator: "include", taxonomy: definition.requestTaxonomy ?? definition.taxonomy!, termId }));
     }
     if (pageNumber !== "all") conditions.push({ subject: "page-number", operator: "include", page: pageNumber });
     if (language.trim()) conditions.push({ subject: "language", operator: "include", language: language.trim() });
     try {
-      const payload = await mutate({ action: "update", id: editing.id, name: editName.trim(), enabled: editEnabled, pageType: editPageType, conditions });
+      const payload = await mutate({ action: "update", id: editing.id, name: editName.trim(), enabled: editEnabled, pageType: editPageType, conditions, postsPerPage });
       setEditing(null);
       // Assignment edits can invalidate the old concrete preview. Re-open the
       // edited document through its registered Page type so the server chooses
@@ -289,9 +386,13 @@ export default function RoutingTemplatesPanel({ websiteId, creationContext, edit
           <label className="builder-field"><span>Status</span><select aria-label="Template Status" value={editEnabled ? "enabled" : "disabled"} onChange={(event) => setEditEnabled(event.target.value === "enabled")}><option value="enabled">Enabled</option><option value="disabled">Disabled</option></select></label>
           <label className="builder-field"><span>Page</span><select aria-label="Template Page" value={editPageType} onChange={(event) => setEditPageType(event.target.value)}>{pageTypes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
           {definition?.filters.includes("content-identity") && <><label className="builder-field"><span>Only content IDs</span><input aria-label="Include Content IDs" value={includeIds} onChange={(event) => setIncludeIds(event.target.value)} placeholder="1416, 1420" /></label><label className="builder-field"><span>Exclude content IDs</span><input aria-label="Exclude Content IDs" value={excludeIds} onChange={(event) => setExcludeIds(event.target.value)} /></label></>}
-          {definition?.filters.includes("taxonomy-term") && <><label className="builder-field"><span>Limit by {definition.taxonomy} term IDs</span><input aria-label="Primary Term IDs" value={termIds} onChange={(event) => setTermIds(event.target.value)} /></label><label className="builder-field"><span>Child terms</span><select aria-label="Child Terms" value={childMode} onChange={(event) => setChildMode(event.target.value as typeof childMode)}><option value="exclude">Exclude child terms</option><option value="include">Include child terms</option><option value="only">Only include child terms</option></select></label></>}
-          {definition?.filters.includes("request-taxonomy-term") && <label className="builder-field"><span>Limit by request term IDs</span><input aria-label="Request Term IDs" value={requestTermIds} onChange={(event) => setRequestTermIds(event.target.value)} /></label>}
+          {definition?.filters.includes("taxonomy-term") && definition.taxonomy && <>
+            <TemplateTermPicker label={`Limit by ${taxonomyLabel(definition.taxonomy)}`} options={assignmentOptions[definition.taxonomy] ?? []} value={termIds} loading={assignmentOptionsLoading} onChange={setTermIds} />
+            <label className="builder-field"><span>Child categories</span><select aria-label="Child Terms" value={childMode} onChange={(event) => setChildMode(event.target.value as typeof childMode)}><option value="exclude">Exclude child categories</option><option value="include">Include child categories</option><option value="only">Only include child categories</option></select></label>
+          </>}
+          {definition?.filters.includes("request-taxonomy-term") && <TemplateTermPicker label="Limit by Terms" options={assignmentOptions[definition.requestTaxonomy ?? definition.taxonomy ?? ""] ?? []} value={requestTermIds} loading={assignmentOptionsLoading} onChange={setRequestTermIds} />}
           {definition?.filters.includes("page-number") && <label className="builder-field"><span>Page number</span><select aria-label="Page Number" value={pageNumber} onChange={(event) => setPageNumber(event.target.value as typeof pageNumber)}><option value="all">All pages</option><option value="first">First page</option><option value="except-first">All except first page</option></select></label>}
+          {definition?.view === "archive" && <label className="builder-field"><span>Posts per page</span><input type="number" min={1} max={100} aria-label="Posts per Page" value={postsPerPage} onChange={(event) => setPostsPerPage(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>}
           {definition?.filters.includes("language") && <label className="builder-field"><span>Language</span><input aria-label="Assignment Language" value={language} onChange={(event) => setLanguage(event.target.value)} placeholder="All languages" /></label>}
           <div style={{display:"flex",gap:8}}><button className="builder-primary-button" type="button" onClick={() => void saveSettings()}>Save</button><button className="builder-secondary-button" type="button" onClick={() => setEditing(null)}>Cancel</button></div>
         </div>;

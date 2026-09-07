@@ -242,8 +242,8 @@
     "status": "creating",
     "creationRequestId": "1d8112e4-0755-403a-bb40-c16340360cc8",
     "createdAt": "2026-08-30T08:05:49.930Z",
-    "updatedAt": "2026-09-05T19:54:31.147Z",
-    "lastPublishedAt": "2026-09-05T19:54:31.147Z",
+    "updatedAt": "2026-09-06T17:05:33.623Z",
+    "lastPublishedAt": "2026-09-06T17:05:33.623Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://woolberry.webpages.am",
@@ -315,5 +315,48 @@
     "creationRequestId": "28e726fb-a2d2-4f25-9c54-816d19e60604",
     "createdAt": "2026-08-30T09:11:03.589Z",
     "updatedAt": "2026-08-30T09:11:03.589Z"
+  },
+  {
+    "id": "aa74e534-2e8d-4648-a2ed-d6ead3ed9dd2",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "Balou",
+    "slug": "balou",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "89440334-f297-4ba3-8f17-672e7d8c9734",
+    "createdAt": "2026-09-06T15:29:27.058Z",
+    "updatedAt": "2026-09-06T15:40:56.639Z",
+    "lastPublishedAt": "2026-09-06T15:33:30.476Z",
+    "cmsConnection": {
+      "provider": "wordpress",
+      "siteUrl": "https://balou.webpages.am",
+      "adminUrl": "https://balou.webpages.am/wp-admin",
+      "graphqlUrl": "https://balou.webpages.am/graphql",
+      "wooCommerceApiUrl": "https://balou.webpages.am/wp-json/wc/v3",
+      "wooCommerceConsumerKey": "ck_526be11e94124863925561e8465d7a546c49004d",
+      "wooCommerceConsumerSecret": "cs_1a77077d00efce90f3d65cf16f86740c4bd9a537",
+      "wordpressUsername": "hakhakop",
+      "wordpressApplicationPassword": "lCbh 5vGr 1cqy cEAe 5Fq8 pdql",
+      "storeStatusNotes": "",
+      "technicalNotes": "",
+      "updatedAt": "2026-09-06T15:40:56.639Z"
+    }
   }
 ]

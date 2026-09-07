@@ -154,6 +154,8 @@ export type RoutingTemplate = {
   pageType?: string;
   view: "singular" | "archive";
   conditions: readonly SingularTemplateCondition[];
+  /** Archive query size. Undefined preserves legacy layout-owned pagination. */
+  postsPerPage?: number;
   layoutId: LayoutDocumentId;
 };
 
@@ -204,7 +206,10 @@ function conditionMatches(
     if (condition.children === "only") {
       return current?.id !== condition.termId && matches.some((term) => term.id === condition.termId);
     }
-    return current?.id === condition.termId || matches.some((term) => term.id === condition.termId);
+    // YOOtheme's "Exclude child categories" means the selected term itself,
+    // not the selected term plus every ancestor match. `taxonomyTerms` is
+    // canonicalized as [current, ...ancestors].
+    return current?.id === condition.termId;
   }
   if (condition.subject === "request-taxonomy-term") {
     return (context.requestTaxonomyTerms ?? []).some(

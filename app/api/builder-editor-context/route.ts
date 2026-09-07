@@ -9,7 +9,7 @@ import { createContentDiscoveryService } from "@/lib/contentDiscovery.server";
 import { getBuilderPageBySystemRole, readBuilderCustomPages } from "@/lib/builderLayouts";
 import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getNavigationRouteAliases, resolveCommerceRouteCandidate, resolveNavigationRouteAlias } from "@/lib/navigationTargets";
-import { getCanonicalProductCategoryBySlug } from "@/lib/productCategoryContext.server";
+import { getCanonicalProductCategoryBySlug, projectProductCategoryRouteContext } from "@/lib/productCategoryContext.server";
 import { getCanonicalProductSingularBySlug } from "@/lib/productSingularContext.server";
 import { getWebsiteRouteSegment } from "@/lib/websites";
 import { IndividualBuilderContextMismatchError } from "@/lib/individualBuilderContext.server";
@@ -47,7 +47,9 @@ export async function GET(request: NextRequest) {
   try {
     const href = request.nextUrl.searchParams.get("href");
     if (href) {
-      const path = new URL(href, request.nextUrl.origin).pathname.replace(/\/+$/, "") || "/";
+      const hrefUrl = new URL(href, request.nextUrl.origin);
+      const path = hrefUrl.pathname.replace(/\/+$/, "") || "/";
+      const legacyProductCategory = hrefUrl.searchParams.get("product_cat")?.trim();
       const website = "website" in access ? access.website : null;
       const routeSegment = website ? getWebsiteRouteSegment(website) : null;
       const relativePath = routeSegment && (path === `/${routeSegment}` || path.startsWith(`/${routeSegment}/`))
@@ -59,7 +61,9 @@ export async function GET(request: NextRequest) {
           getBuilderShellSettings(access.scope),
         ]);
         const aliases = getNavigationRouteAliases(shell);
-        const alias = resolveNavigationRouteAlias(relativePath, aliases) ?? resolveCommerceRouteCandidate(relativePath);
+        const alias = legacyProductCategory
+          ? resolveCommerceRouteCandidate(`/product-category/${encodeURIComponent(legacyProductCategory)}`)
+          : resolveNavigationRouteAlias(relativePath, aliases) ?? resolveCommerceRouteCandidate(relativePath);
         const assignedShop = getBuilderPageBySystemRole(pages, "shop");
         if ((alias?.pageKey === "shop" || relativePath === "/shop") && assignedShop) {
           const target = await getEditableLayoutTargetForCurrentRequest({
@@ -74,17 +78,7 @@ export async function GET(request: NextRequest) {
           const target = await getEditableLayoutTargetForCurrentRequest({
             request: {
               kind: "dynamic",
-              context: {
-                view: "archive",
-                pageType: "taxonomy:product_cat",
-                provider: "woocommerce",
-                contentType: "product-category",
-                contentId: String(category.category.id),
-                databaseId: category.category.id,
-                slug: category.category.slug,
-                uri: relativePath,
-                taxonomyTerms: [{ taxonomy: "product_cat", id: String(category.category.id), slug: category.category.slug }],
-              },
+              context: projectProductCategoryRouteContext(category.category, relativePath),
               storefrontHref: path,
               label: category.category.name,
             },

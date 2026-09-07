@@ -32,6 +32,12 @@ test("Templates surface is a thin scoped consumer of the routing API", async () 
   expect(panel).not.toContain("router.push");
   expect(panel).toContain("pageTypes.map");
   expect(panel).toContain("definition.label");
+  expect(panel).toContain("TemplateTermPicker");
+  expect(panel).toContain("assignmentOptions=1");
+  expect(panel).toContain("definition.requestTaxonomy ?? definition.taxonomy");
+  expect(panel).toContain('aria-label="Posts per Page"');
+  expect(panel).not.toContain('aria-label="Primary Term IDs"');
+  expect(panel).not.toContain('aria-label="Request Term IDs"');
   expect(panel).not.toContain("builder-templates");
   expect(panel).not.toContain("search-results");
 });

@@ -105,6 +105,7 @@ import {
   getUikitSectionPaddingClass,
   getUikitSectionMarginClass,
   getUikitContainerClass,
+  resolveUikitSectionContainerPreset,
   getUikitWidthClass,
   getUikitCardClass,
   getUikitButtonClass,
@@ -152,7 +153,9 @@ import {
   isYoothemeCenteredPositionedPanel,
 } from "@/lib/builderElementShell";
 import {
+  BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
   BUILDER_IFRAME_DRAFT_MESSAGE,
+  BUILDER_IFRAME_DRAFT_READY_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
 } from "@/components/builder/BuilderIframeDraftBridge";
 import type { BuilderState } from "@/components/dashboard/builderTypes";
@@ -696,7 +699,10 @@ export function getBuilderSectionClassName(
   extra?: string,
 ) {
   const mode = section.backgroundMode === "boxed" ? "boxed" : undefined;
-  const maxWidth = section.maxWidth ?? section.contentMode;
+  const maxWidth = resolveUikitSectionContainerPreset(
+    section.maxWidth,
+    section.contentMode,
+  );
   const scheme = resolveSectionColorScheme(section, layoutScheme);
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
@@ -932,7 +938,9 @@ function SectionFrame({
         )
       ) : null}
       <div
-        className={`shop-builder-section-content ${getUikitContainerClass(section.contentMode)}`}
+        className={`shop-builder-section-content ${getUikitContainerClass(
+          resolveUikitSectionContainerPreset(section.maxWidth, section.contentMode),
+        )}`}
         data-gsap-stagger={
           section.kind === "hero" || section.kind === "embed" ? undefined : true
         }
@@ -3301,6 +3309,14 @@ function StorefrontBuilderRendererBase({
   useEffect(() => {
     liveRevisionRef.current = 0;
     setLiveDraft(null);
+    const acknowledgeDraft = (revision: number) => {
+      window.parent.postMessage({
+        source: BUILDER_IFRAME_DRAFT_SOURCE,
+        type: BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
+        documentKey: page,
+        revision,
+      }, window.location.origin);
+    };
     const handleDraftMessage = (event: MessageEvent) => {
       if (
         event.origin !== window.location.origin ||
@@ -3312,19 +3328,42 @@ function StorefrontBuilderRendererBase({
         return;
       }
       const revision = Number(event.data.revision);
-      const state = event.data.state as BuilderState | undefined;
-      if (!Number.isFinite(revision) || revision <= liveRevisionRef.current) return;
-      if (!state || state.page !== page || !Array.isArray(state.sections)) return;
+      const authoredState = event.data.state as BuilderState | undefined;
+      const contextState = event.data.contextState as BuilderState | undefined;
+      const rendersCurrentRoute =
+        documentRuntimeOwnedExternally && event.data.renderPage === page;
+      const state = authoredState?.page === page || rendersCurrentRoute
+        ? authoredState
+        : contextState;
+      if (!Number.isFinite(revision)) return;
+      if (revision <= liveRevisionRef.current) {
+        acknowledgeDraft(revision);
+        return;
+      }
+      if (
+        !state ||
+        (!rendersCurrentRoute && state.page !== page) ||
+        !Array.isArray(state.sections)
+      ) return;
       liveRevisionRef.current = revision;
       setLiveDraft(state);
+      acknowledgeDraft(revision);
     };
     window.addEventListener("message", handleDraftMessage);
+    // The renderer announces readiness only after its snapshot listener is
+    // installed. Selection readiness alone is too early and can lose the
+    // materialized Dynamic Content projection during iframe hydration.
+    window.parent.postMessage({
+      source: BUILDER_IFRAME_DRAFT_SOURCE,
+      type: BUILDER_IFRAME_DRAFT_READY_MESSAGE,
+      documentKey: page,
+    }, window.location.origin);
     return () => window.removeEventListener("message", handleDraftMessage);
-  }, [page]);
+  }, [documentRuntimeOwnedExternally, page]);
 
   // Keep the canonical renderer and its DOM/runtime instances mounted. A
   // draft snapshot only replaces the data prop that drives this render tree.
-  const authoredLayout = liveDraft?.page === page
+  const authoredLayout = liveDraft
     ? {
         ...initialLayout,
         ...liveDraft,

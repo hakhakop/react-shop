@@ -2430,6 +2430,58 @@ body:has(.builder-dashboard) .site-header--service {
   color: var(--builder-ui-text-strong, #ffffff);
 }
 
+/* Structure tree: blocks can be relocated across columns and sections. */
+.builder-structure-element-card[draggable="true"] {
+  cursor: grab;
+}
+
+.builder-structure-element-card[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.builder-structure-element-card.is-drop-above::before,
+.builder-structure-element-card.is-drop-below::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 3px;
+  right: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: #8b5cf6;
+  box-shadow: 0 0 7px rgba(139, 92, 246, 0.75);
+}
+
+.builder-structure-element-card.is-drop-above::before { top: -1px; }
+.builder-structure-element-card.is-drop-below::after { bottom: -1px; }
+
+.builder-structure-column-box.is-drop-column {
+  background: rgba(139, 92, 246, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.7);
+}
+
+/* An empty Structure column needs a visible, direct relocation target. */
+.builder-structure-empty-column-drop-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  margin: 3px;
+  border: 1px dashed rgba(148, 163, 184, 0.48);
+  border-radius: 5px;
+  color: var(--builder-ui-muted, #94a3b8);
+  font-size: 10px;
+  line-height: 1;
+  user-select: none;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.builder-structure-empty-column-drop-target.is-drop-column {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.13);
+  color: #ddd6fe;
+}
+
 /* Universal Tree Row / Item Base */
 .builder-structure-item,
 .builder-wireframe-item {
@@ -6953,6 +7005,7 @@ body:has(.builder-dashboard) .site-header--service {
    authenticated tenant preview route, so none of the Builder interaction DOM
    participates in its scroll/render tree. */
 .builder-iframe-comparison-shell {
+  position: relative;
   flex: 1;
   width: 100%;
   height: 100vh;
@@ -6961,6 +7014,153 @@ body:has(.builder-dashboard) .site-header--service {
   justify-content: center;
   overflow: hidden;
   background: #f7f7f4;
+}
+
+.builder-canvas-loading-state {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(247, 247, 244, 0.92);
+  color: #52525b;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(3px);
+}
+
+.builder-canvas-loading-skeleton {
+  width: min(720px, 72%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0.72;
+}
+
+.builder-canvas-loading-skeleton > span,
+.builder-canvas-loading-skeleton .is-cards i {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(100deg, #e4e4df 25%, #f2f2ee 42%, #e4e4df 60%);
+  background-size: 300% 100%;
+  animation: builder-loading-shimmer 1.25s ease-in-out infinite;
+}
+
+.builder-canvas-loading-skeleton .is-title { width: 42%; height: 30px; }
+.builder-canvas-loading-skeleton .is-copy { width: 72%; height: 14px; }
+.builder-canvas-loading-skeleton .is-copy.is-short { width: 51%; }
+.builder-canvas-loading-skeleton .is-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.builder-canvas-loading-skeleton .is-cards i { height: 210px; }
+
+.builder-canvas-loading-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.builder-canvas-loading-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 999px;
+  animation: builder-loading-spin 700ms linear infinite;
+}
+
+.builder-route-loading {
+  --builder-loading-sidebar: min(390px, 34vw);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--builder-loading-sidebar) minmax(0, 1fr);
+  overflow: hidden;
+  background: #f7f7f4;
+}
+
+.builder-route-loading-sidebar {
+  min-height: 100vh;
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #101014;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.builder-route-loading-brand,
+.builder-route-loading-line,
+.builder-route-loading-card {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.06) 25%, rgba(255, 255, 255, 0.12) 42%, rgba(255, 255, 255, 0.06) 60%);
+  background-size: 300% 100%;
+  animation: builder-loading-shimmer 1.25s ease-in-out infinite;
+}
+
+.builder-route-loading-brand { width: 44%; height: 18px; margin-bottom: 20px; }
+.builder-route-loading-line { width: 72%; height: 13px; }
+.builder-route-loading-line.is-wide { width: 92%; height: 26px; }
+.builder-route-loading-line.is-short { width: 48%; }
+.builder-route-loading-card { width: 100%; height: 128px; margin-top: 8px; }
+
+.builder-route-loading-canvas {
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #52525b;
+  font-size: 14px;
+}
+
+@keyframes builder-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes builder-loading-shimmer {
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .builder-canvas-loading-spinner,
+  .builder-route-loading-brand,
+  .builder-route-loading-line,
+  .builder-route-loading-card {
+    animation: none;
+  }
+}
+
+/* The iframe canvas uses the same page-shaped skeleton as the storefront
+   route. Keep the loading copy floating above it instead of shrinking the
+   skeleton into a generic centered card. */
+.builder-canvas-loading-state {
+  display: block;
+  overflow: auto;
+  padding: 0;
+  background: #f7f7f4;
+}
+
+.builder-canvas-loading-state > .storefront-loading-skeleton {
+  width: 100%;
+  min-height: 100%;
+}
+
+.builder-canvas-loading-state .builder-canvas-loading-label {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  z-index: 3;
+  padding: 8px 12px;
+  border: 1px solid rgba(82, 82, 91, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .builder-iframe-comparison-viewport {
@@ -8719,12 +8919,12 @@ body[data-storefront-preset="princity"]
   gap: 16px;
 }
 
-/* UIkit content-layout rows extend through the container's horizontal
-   gutters. Mirror that negative gutter in the Builder interaction surface so
-   editor frames do not shrink the canonical row track. */
+/* The section container owns the outer gutter. Individual rows project their
+   own UIkit negative grid margin below, because each row can have a different
+   Column Gap token. */
 .builder-preview-canvas .builder-preview-content-layout-grid {
-  width: calc(100% + var(--uk-container-padding-horizontal-m, 40px));
-  margin-left: calc(var(--uk-container-padding-horizontal-m, 40px) * -1);
+  width: 100%;
+  margin-left: 0;
 }
 
 .builder-preview-canvas
@@ -15286,6 +15486,32 @@ body:has(.builder-dashboard[data-theme="light"]) .builder-row-layout-modal {
   bottom: 0;
 }
 
+/* Storefront-rendered shell documents (currently Footer) use the same
+   Builder target attributes as the editable canvas. Keep their native drop
+   feedback identical when a selected element is dragged across columns. */
+[data-builder-object-type="block"].is-drag-over-above,
+[data-builder-object-type="block"].is-drag-over-below {
+  position: relative;
+}
+[data-builder-object-type="block"].is-drag-over-above::before,
+[data-builder-object-type="block"].is-drag-over-below::before {
+  content: "";
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #8b5cf6;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.6);
+  pointer-events: none;
+}
+[data-builder-object-type="block"].is-drag-over-above::before { top: -1.25px; }
+[data-builder-object-type="block"].is-drag-over-below::before { bottom: -1.25px; }
+[data-builder-object-type="column"].is-drag-over {
+  outline: 2px solid rgba(139, 92, 246, 0.7);
+  outline-offset: -2px;
+}
+
 .builder-preview-content-layout-grid
   article.is-drag-over
   .builder-preview-drop-zone,
@@ -16934,16 +17160,23 @@ body:has([data-scoped-builder-root])
    classes against the imported site tokens instead of baking editor-only
    pixel values into the row. */
 .builder-preview-canvas .builder-preview-content-row {
+  --shop-builder-row-column-gutter: var(--uk-global-gutter, 30px);
   position: static !important;
   display: grid !important;
   grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
   column-gap: 0 !important;
   row-gap: var(--uk-global-gutter, 30px) !important;
-  margin-left: 0 !important;
+  margin-left: calc(var(--shop-builder-row-column-gutter) * -1) !important;
   margin-right: 0 !important;
-  width: 100% !important;
+  width: calc(100% + var(--shop-builder-row-column-gutter)) !important;
   align-items: stretch !important;
   box-sizing: border-box !important;
+}
+
+@media (min-width: 1200px) {
+  .builder-preview-canvas .builder-preview-content-row {
+    --shop-builder-row-column-gutter: var(--uk-global-medium-gutter, 40px);
+  }
 }
 
 /* Authored UIkit rows use a definite height plus a minimum. The editor's
@@ -16982,8 +17215,14 @@ body:has([data-scoped-builder-root])
   row-gap: 0 !important;
 }
 
+.builder-preview-canvas .builder-preview-content-row.uk-grid-collapse,
+.builder-preview-canvas .builder-preview-content-row.uk-grid-column-collapse {
+  --shop-builder-row-column-gutter: 0px;
+}
+
 .builder-preview-canvas .builder-preview-content-row.uk-grid-small,
 .builder-preview-canvas .builder-preview-content-row.uk-grid-column-small {
+  --shop-builder-row-column-gutter: var(--uk-grid-gutter-small, 15px);
   column-gap: 0 !important;
 }
 
@@ -16994,6 +17233,7 @@ body:has([data-scoped-builder-root])
 
 .builder-preview-canvas .builder-preview-content-row.uk-grid-medium,
 .builder-preview-canvas .builder-preview-content-row.uk-grid-column-medium {
+  --shop-builder-row-column-gutter: var(--uk-global-gutter, 30px);
   column-gap: 0 !important;
 }
 
@@ -17004,6 +17244,7 @@ body:has([data-scoped-builder-root])
 
 .builder-preview-canvas .builder-preview-content-row.uk-grid-large,
 .builder-preview-canvas .builder-preview-content-row.uk-grid-column-large {
+  --shop-builder-row-column-gutter: var(--uk-global-medium-gutter, 40px);
   column-gap: 0 !important;
 }
 
@@ -17015,6 +17256,7 @@ body:has([data-scoped-builder-root])
 @media (min-width: 1200px) {
   .builder-preview-canvas .builder-preview-content-row.uk-grid-large,
   .builder-preview-canvas .builder-preview-content-row.uk-grid-column-large {
+    --shop-builder-row-column-gutter: var(--uk-global-large-gutter, 70px);
     column-gap: 0 !important;
   }
 
@@ -17030,7 +17272,7 @@ body:has([data-scoped-builder-root])
 .builder-preview-canvas
   .builder-preview-content-row
   > .builder-interaction-column {
-  padding-left: var(--uk-global-gutter, 30px) !important;
+  padding-left: var(--shop-builder-row-column-gutter) !important;
 }
 
 .builder-preview-canvas
@@ -17077,6 +17319,40 @@ body:has([data-scoped-builder-root])
     .builder-preview-content-row.uk-grid-column-large
     > .builder-interaction-column {
     padding-left: var(--uk-global-large-gutter, 70px) !important;
+  }
+}
+
+/* The interactive grid normally mirrors UIkit's negative row gutter. Width:
+   Expand is the exception: it represents the padded uk-container-expand
+   wrapper, while Width: None continues to use the unwrapped grid geometry. */
+.builder-preview-canvas
+  .builder-preview-content-row--max-width-expand {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: var(--uk-container-padding-horizontal, 15px) !important;
+  padding-right: var(--uk-container-padding-horizontal, 15px) !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row--max-width-expand
+  > .builder-interaction-column:first-child {
+  padding-left: 0 !important;
+}
+
+@media (min-width: 640px) {
+  .builder-preview-canvas .builder-preview-content-row--max-width-expand {
+    padding-left: var(--uk-container-padding-horizontal-s, 30px) !important;
+    padding-right: var(--uk-container-padding-horizontal-s, 30px) !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .builder-preview-canvas .builder-preview-content-row--max-width-expand {
+    padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
+    padding-right: var(--uk-container-padding-horizontal-m, 40px) !important;
   }
 }
 
@@ -18793,6 +19069,31 @@ body:has(.builder-dashboard.is-inspector-docked)
 .builder-theme-settings-intro strong,
 .builder-theme-settings-intro p { display: block; margin: 0; }
 .builder-theme-settings-intro p { margin-top: 4px; color: var(--builder-ui-muted, #64748b); font-size: 11px; line-height: 1.45; }
+.builder-theme-import-modes {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 2px;
+}
+.builder-theme-import-modes > label {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 11px 12px;
+  border: 1px solid var(--builder-ui-border, #d9dde4);
+  border-radius: 10px;
+  background: var(--builder-ui-surface, #fff);
+  cursor: pointer;
+}
+.builder-theme-import-modes > label:has(input:checked) {
+  border-color: var(--builder-ui-accent, #2563eb);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--builder-ui-accent, #2563eb) 24%, transparent);
+}
+.builder-theme-import-modes input { margin: 3px 0 0; }
+.builder-theme-import-modes span,
+.builder-theme-import-modes strong,
+.builder-theme-import-modes small { display: block; min-width: 0; }
+.builder-theme-import-modes small { margin-top: 3px; color: var(--builder-ui-muted, #64748b); line-height: 1.4; }
 .builder-file-button {
   position: relative;
   display: inline-flex;
@@ -20963,6 +21264,17 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
 .routing-template-row-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 25px; border: 0; border-radius: 4px; padding: 4px 5px; background: transparent; color: var(--builder-ui-muted); cursor: pointer; font: inherit; font-size: 10px; }
 .routing-template-row-actions button:hover:not(:disabled) { background: var(--builder-ui-hover); color: var(--builder-ui-text); }
 .routing-template-row-actions button:disabled { opacity: .35; cursor: not-allowed; }
+.template-assignment-picker { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; gap: 7px; }
+.template-assignment-picker legend { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--builder-ui-text); font-size: 12px; font-weight: 650; }
+.template-assignment-picker legend small, .template-assignment-picker > small { color: var(--builder-ui-muted); font-size: 10px; font-weight: 400; }
+.template-assignment-picker > input { width: 100%; min-width: 0; border: 1px solid var(--builder-ui-border); border-radius: 7px; padding: 8px 10px; background: var(--builder-ui-surface); color: var(--builder-ui-text); font: inherit; font-size: 12px; }
+.template-assignment-picker-list { max-height: 230px; overflow: auto; display: grid; border: 1px solid var(--builder-ui-border); border-radius: 8px; background: var(--builder-ui-surface); }
+.template-assignment-picker-list label { min-width: 0; min-height: 34px; padding: 7px 9px 7px calc(9px + var(--term-depth, 0) * 14px); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--builder-ui-border); color: var(--builder-ui-text); cursor: pointer; font-size: 12px; }
+.template-assignment-picker-list label:last-of-type { border-bottom: 0; }
+.template-assignment-picker-list label:hover, .template-assignment-picker-list label.is-selected { background: var(--builder-ui-hover); }
+.template-assignment-picker-list label input { width: 15px; height: 15px; flex: 0 0 15px; margin: 0; accent-color: var(--builder-ui-accent); }
+.template-assignment-picker-list label span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.template-assignment-picker-empty { padding: 12px; color: var(--builder-ui-muted); font-size: 11px; }
 .builder-template-preview-select { display: flex; flex-direction: column; gap: 3px; min-width: 170px; color: var(--builder-ui-muted); font-size: 10px; }
 .builder-template-preview-select select { max-width: 220px; border: 1px solid var(--builder-ui-border); border-radius: 5px; padding: 5px 7px; background: var(--builder-ui-surface); color: var(--builder-ui-text); font: inherit; font-size: 11px; }
 .builder-template-preview-select small { max-width: 190px; color: var(--builder-ui-muted); font-size: 10px; }

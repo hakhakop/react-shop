@@ -128,6 +128,8 @@ export default async function WPPage({
     return Array.isArray(value) ? value[0] : value;
   };
   const productCategoryQuery = queryValue("product_cat")?.trim();
+  const requestProductTagSlugs = queryValue("product_tag")?.split(",").map((item) => item.trim()).filter(Boolean) ?? [];
+  const requestedPageNumber = Math.max(1, Number.parseInt(queryValue("paged") ?? "1", 10) || 1);
   const slugSegments = resolved.slug;
   const domainWebsite = await getWebsiteByDomainHost((await headers()).get("host"));
 
@@ -151,6 +153,8 @@ export default async function WPPage({
           ? `/product-category/${encodeURIComponent(productCategoryQuery)}`
           : slugSegments?.join("/") || "home"}
         mode="domain"
+        pageNumber={requestedPageNumber}
+        requestProductTagSlugs={requestProductTagSlugs}
       />
     );
   }
@@ -179,6 +183,8 @@ export default async function WPPage({
             ? `/product-category/${encodeURIComponent(productCategoryQuery)}`
             : tenantPath.join("/") || "home"}
           mode="tenant-path"
+          pageNumber={requestedPageNumber}
+          requestProductTagSlugs={requestProductTagSlugs}
         />
       );
     }

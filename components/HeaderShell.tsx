@@ -7,6 +7,7 @@ import {
 } from "../lib/builderShell";
 import {
   type BuilderCustomPage,
+  type BuilderLayout,
   type BuilderLayoutKey,
 } from "../lib/builderLayouts";
 import { projectWebsiteHref } from "../lib/scopedPreviewLinks";
@@ -37,7 +38,110 @@ type HeaderShellProps = {
   builderPreviewMode?: boolean;
   builderDraftPreview?: boolean;
   tenantPathMode?: boolean;
+  dropdownProjectionsOverride?: HeaderDropdownProjections;
 };
+
+export type HeaderDropdownProjections = Record<
+  string,
+  { signature: string; sections: BuilderLayout["sections"]; warnings?: string[] }
+>;
+
+type HeaderDropdownProjection = HeaderDropdownProjections[string];
+type HeaderDropdownProjectionCacheEntry = {
+  signature: string;
+  expiresAt: number;
+  value?: HeaderDropdownProjection;
+  pending?: Promise<HeaderDropdownProjection>;
+};
+const HEADER_DROPDOWN_CACHE_TTL_MS = 30_000;
+const HEADER_DROPDOWN_CACHE_MAX_ENTRIES = 200;
+const headerDropdownProjectionCache = new Map<string, HeaderDropdownProjectionCacheEntry>();
+
+const trimHeaderDropdownProjectionCache = () => {
+  while (headerDropdownProjectionCache.size > HEADER_DROPDOWN_CACHE_MAX_ENTRIES) {
+    const oldest = headerDropdownProjectionCache.keys().next().value;
+    if (typeof oldest !== "string") break;
+    headerDropdownProjectionCache.delete(oldest);
+  }
+};
+
+const materializeHeaderDropdown = async (
+  content: NonNullable<BuilderShellSettings["menuItems"][number]["dropdownContent"]>,
+  website?: SaaSWebsite | null,
+): Promise<HeaderDropdownProjection> => {
+  const signature = JSON.stringify(content);
+  const result = await materializeBuilderDynamicContent(menuDropdownRenderLayout([content]), { website });
+  return {
+    signature,
+    sections: result.renderLayout.sections,
+    warnings: result.diagnostics.flatMap(item => item.message ? [item.message] : []),
+  };
+};
+
+const resolveCachedHeaderDropdown = async (
+  itemId: string,
+  content: NonNullable<BuilderShellSettings["menuItems"][number]["dropdownContent"]>,
+  website?: SaaSWebsite | null,
+) => {
+  const signature = JSON.stringify(content);
+  const cacheKey = `${website?.id ?? "default"}:${itemId}`;
+  const cached = headerDropdownProjectionCache.get(cacheKey);
+  if (cached?.signature === signature) {
+    if (cached.value) {
+      if (cached.expiresAt <= Date.now() && !cached.pending) {
+        const pending = materializeHeaderDropdown(content, website);
+        cached.pending = pending;
+        pending.then(value => {
+          const current = headerDropdownProjectionCache.get(cacheKey);
+          if (current?.pending !== pending || current.signature !== signature) return;
+          headerDropdownProjectionCache.set(cacheKey, {
+            signature,
+            value,
+            expiresAt: Date.now() + HEADER_DROPDOWN_CACHE_TTL_MS,
+          });
+        }).catch(() => {
+          if (headerDropdownProjectionCache.get(cacheKey)?.pending === pending) cached.pending = undefined;
+        });
+      }
+      return cached.value;
+    }
+    if (cached.pending) return cached.pending;
+  }
+  const pending = materializeHeaderDropdown(content, website);
+  headerDropdownProjectionCache.set(cacheKey, {
+    signature,
+    pending,
+    expiresAt: Date.now() + HEADER_DROPDOWN_CACHE_TTL_MS,
+  });
+  trimHeaderDropdownProjectionCache();
+  try {
+    const value = await pending;
+    const current = headerDropdownProjectionCache.get(cacheKey);
+    if (current?.pending === pending && current.signature === signature) {
+      headerDropdownProjectionCache.set(cacheKey, {
+        signature,
+        value,
+        expiresAt: Date.now() + HEADER_DROPDOWN_CACHE_TTL_MS,
+      });
+    }
+    return value;
+  } catch (error) {
+    if (headerDropdownProjectionCache.get(cacheKey)?.pending === pending) headerDropdownProjectionCache.delete(cacheKey);
+    throw error;
+  }
+};
+
+export async function resolveHeaderDropdownProjections(
+  shellSettings: BuilderShellSettings,
+  website?: SaaSWebsite | null,
+): Promise<HeaderDropdownProjections> {
+  const dropdowns = [...shellSettings.menuItems, ...(shellSettings.namedMenus ?? []).flatMap(menu => menu.items)]
+    .filter(item => !item.parentId && item.dropdownContent && !item.dropdownContent.sublayout.disabled);
+  return Object.fromEntries(await Promise.all(dropdowns.map(async item => [
+    item.id,
+    await resolveCachedHeaderDropdown(item.id, item.dropdownContent!, website),
+  ])));
+}
 
 export default async function HeaderShell({
   layoutOverride,
@@ -53,6 +157,7 @@ export default async function HeaderShell({
   builderPreviewMode = false,
   builderDraftPreview = false,
   tenantPathMode = false,
+  dropdownProjectionsOverride,
 }: HeaderShellProps) {
   const scope = website?.id
     ? { websiteId: website.id }
@@ -68,12 +173,8 @@ export default async function HeaderShell({
   // data, but never fetch the obsolete root GraphQL theme-settings field here.
   const settings = (themeSettingsOverride || {}) as Record<string, unknown>;
   const shellSettings = shellSettingsRaw;
-  const dropdowns = [...shellSettings.menuItems, ...(shellSettings.namedMenus ?? []).flatMap(menu => menu.items)]
-    .flatMap(item => !item.parentId && item.dropdownContent && !item.dropdownContent.sublayout.disabled ? [item.dropdownContent] : []);
-  const dropdownProjections = Object.fromEntries(await Promise.all(dropdowns.map(async content => {
-    const result = await materializeBuilderDynamicContent(menuDropdownRenderLayout([content]), { website });
-    return [content.id, { signature: JSON.stringify(content), sections: result.renderLayout.sections, warnings: result.diagnostics.flatMap(item => item.message ? [item.message] : []) }];
-  })));
+  const dropdownProjections = dropdownProjectionsOverride ??
+    await resolveHeaderDropdownProjections(shellSettings, website);
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
     : {

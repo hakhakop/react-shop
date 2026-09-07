@@ -45,15 +45,75 @@
           "subject": "content-type",
           "operator": "include",
           "contentType": "product-category"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "61",
+          "children": "exclude"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "43",
+          "children": "exclude"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "23",
+          "children": "exclude"
         }
       ],
+      "postsPerPage": 12,
       "layoutId": "layout:builder:product-category"
+    },
+    {
+      "id": "routing:template:5d916934-4165-4eb9-8f86-cb4003e7ec7f",
+      "name": "Child  Product Category",
+      "enabled": true,
+      "order": 30,
+      "pageType": "taxonomy:product_cat",
+      "view": "archive",
+      "conditions": [
+        {
+          "subject": "content-type",
+          "operator": "include",
+          "contentType": "product-category"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "61",
+          "children": "only"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "43",
+          "children": "only"
+        },
+        {
+          "subject": "taxonomy-term",
+          "operator": "include",
+          "taxonomy": "product_cat",
+          "termId": "23",
+          "children": "only"
+        }
+      ],
+      "postsPerPage": 12,
+      "layoutId": "layout:builder:dynamic:95b5ac0f-50d5-47b8-a4ab-61b8d0ac8ee6"
     },
     {
       "id": "routing:legacy-post-category",
       "name": "Global Post Category",
       "enabled": true,
-      "order": 30,
+      "order": 40,
       "pageType": "taxonomy:category",
       "view": "archive",
       "conditions": [
@@ -69,7 +129,7 @@
       "id": "routing:template:caee2da8-29e5-4ca0-ad7a-e3bf336a4fb6",
       "name": "Product index",
       "enabled": true,
-      "order": 40,
+      "order": 50,
       "pageType": "archive:product",
       "view": "archive",
       "conditions": [

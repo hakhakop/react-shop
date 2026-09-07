@@ -11,7 +11,10 @@ test("Templates carry strict identity and Builder preview stays transient", asyn
   expect(panel).toContain("creationContext.previewIdentity");
   expect(builder).toContain('searchParams.get("routingTemplate")');
   expect(builder).toContain('"/api/builder-template-context"');
-  expect(builder).toContain("setTemplatePreviewIdentity(candidate.identity)");
+  expect(builder).toContain("Resolve the destination owner every time");
+  expect(builder).toContain("builderNavigationRequestRef.current");
+  expect(builder).toContain('builderEditorContext.content.pageType === "taxonomy:product_cat"');
+  expect(builder).toContain('params.set("category", categorySlug || candidateCategorySlug!)');
   expect(builder).toContain("product.databaseId ?? product.id");
   expect(builder).toContain('return `Used for: ${context.ownership.assignmentSummary ?? "Matching content"}`');
   expect(builder).not.toContain("templatePreviewIdentityStorage");

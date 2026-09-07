@@ -71,7 +71,8 @@ export type DynamicFieldBinding = {
 /** Explicit, non-executable transforms supported by the shared resolver. */
 export type DynamicFieldTransform =
   | { kind: "dateFormat"; format: string }
-  | { kind: "textLimit"; limit: number };
+  | { kind: "textLimit"; limit: number }
+  | { kind: "textAffix"; before?: string; after?: string };
 
 export const SUPPORTED_DYNAMIC_DATE_FORMATS = ["d F, Y", "j F, Y"] as const;
 
@@ -163,6 +164,10 @@ const applyDynamicTransform = (
     return plainText.length <= transform.limit
       ? plainText
       : `${plainText.slice(0, transform.limit).trimEnd()}…`;
+  }
+  if (transform.kind === "textAffix") {
+    if (typeof value !== "string") return undefined;
+    return `${transform.before ?? ""}${value}${transform.after ?? ""}`;
   }
   return undefined;
 };

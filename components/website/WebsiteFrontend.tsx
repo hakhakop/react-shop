@@ -1,4 +1,6 @@
-import HeaderShell from "@/components/HeaderShell";
+import HeaderShell, {
+  resolveHeaderDropdownProjections,
+} from "@/components/HeaderShell";
 import FooterShell from "@/components/FooterShell";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import WebPagesFontLoader from "@/components/builder/WebPagesFontLoader";
@@ -73,8 +75,58 @@ type WebsiteFrontendProps = {
   layoutOverride?: BuilderLayout;
   dynamicItemContextOverride?: DynamicItemContext;
   builderIframeSelection?: boolean;
+  builderEditingContext?: "header" | "footer" | null;
   builderIframeDiagnostics?: "minimal" | "settled" | "rect" | "toolbar" | "full";
+  pageNumber?: number;
+  requestProductTagSlugs?: string[];
 };
+
+type FrontendMaterializationCacheEntry = {
+  expiresAt: number;
+  value?: Awaited<ReturnType<typeof materializeBuilderDynamicContent>>;
+  pending?: Promise<Awaited<ReturnType<typeof materializeBuilderDynamicContent>>>;
+};
+
+// Storefront navigations repeatedly render the same published layout while a
+// visitor moves between nearby pages. Share the in-flight projection and keep
+// the short-lived render projection so a second navigation does not repeat all
+// WooCommerce/WordPress provider reads. The layout timestamp is part of the
+// key, so publishing a new layout naturally bypasses this cache.
+const FRONTEND_MATERIALIZATION_TTL_MS = 30_000;
+const frontendMaterializationCache = new Map<string, FrontendMaterializationCacheEntry>();
+
+function frontendMaterializationKey(
+  website: SaaSWebsite,
+  layout: BuilderLayout,
+  rootContext: DynamicItemContext | undefined,
+) {
+  return `${website.id}:${layout.key}:${layout.updatedAt}:${rootContext ? JSON.stringify(rootContext) : "root"}`;
+}
+
+async function materializeFrontendLayout(
+  website: SaaSWebsite,
+  layout: BuilderLayout,
+  rootContext: DynamicItemContext | undefined,
+) {
+  const key = frontendMaterializationKey(website, layout, rootContext);
+  const cached = frontendMaterializationCache.get(key);
+  if (cached?.value && cached.expiresAt > Date.now()) return cached.value;
+  if (cached?.pending) return cached.pending;
+
+  const pending = materializeBuilderDynamicContent(layout, {
+    website,
+    rootContext,
+  });
+  frontendMaterializationCache.set(key, { pending, expiresAt: Date.now() + FRONTEND_MATERIALIZATION_TTL_MS });
+  try {
+    const value = await pending;
+    frontendMaterializationCache.set(key, { value, expiresAt: Date.now() + FRONTEND_MATERIALIZATION_TTL_MS });
+    return value;
+  } catch (error) {
+    if (frontendMaterializationCache.get(key)?.pending === pending) frontendMaterializationCache.delete(key);
+    throw error;
+  }
+}
 
 function spacing(value: string | undefined, context: BuilderSpacingContext) {
   return resolveBuilderSpacing(value, context).css;
@@ -256,7 +308,10 @@ export default async function WebsiteFrontend({
   layoutOverride,
   dynamicItemContextOverride,
   builderIframeSelection = false,
+  builderEditingContext = null,
   builderIframeDiagnostics = "minimal",
+  pageNumber,
+  requestProductTagSlugs,
 }: WebsiteFrontendProps) {
   await ensureWebsiteBuilderData(website.id);
 
@@ -291,15 +346,20 @@ export default async function WebsiteFrontend({
   const assignedShopPage = getBuilderPageBySystemRole(customPages, "shop");
   const page = resolvedPage === "shop" && assignedShopPage ? assignedShopPage.key : resolvedPage;
   const isShopPage = resolvedPage === "shop" || assignedShopPage?.key === page;
+  const deferPageDocumentToBuilder = builderIframeSelection && builderEditingContext === null;
 
-  const commerceProjection = routeAlias && (
+  const commerceProjection = !deferPageDocumentToBuilder && routeAlias && (
     routeAlias.pageKey === "product-category" || routeAlias.pageKey === "product-single"
   ) ? await resolveCommerceRouteProjection({
       alias: routeAlias as CommerceRouteAlias,
       website,
       scope,
+      pageNumber,
+      requestProductTagSlugs,
     }) : null;
-  const layout = layoutOverride ?? commerceProjection?.layout ?? await getPublishedBuilderLayout(page, scope);
+  const layout = deferPageDocumentToBuilder
+    ? null
+    : layoutOverride ?? commerceProjection?.layout ?? await getPublishedBuilderLayout(page, scope);
   const shopProducts = isShopPage && layout && !rendererProps?.products
     ? await getShopProducts(website)
     : undefined;
@@ -328,12 +388,19 @@ export default async function WebsiteFrontend({
   // its isolated iframe through the draft bridge. Materializing the published
   // layout again here delays iframe readiness and duplicates every provider
   // request before that bridge can deliver the authoritative projection.
-  const materialization = resolvedMediaLayout && !builderIframeSelection
-      ? await materializeBuilderDynamicContent(resolvedMediaLayout, {
-        website,
-        rootContext: dynamicItemContextOverride ?? commerceProjection?.dynamicContext,
-      })
-    : null;
+  // Page Dynamic Content and menu-dropdown Dynamic Content are independent.
+  // Start both provider graphs together so frontend requests pay the slower
+  // path once rather than waiting for the page and then the Header serially.
+  const [materialization, headerDropdownProjections] = await Promise.all([
+    resolvedMediaLayout && (!builderIframeSelection || builderEditingContext !== null)
+      ? materializeFrontendLayout(
+          website,
+          resolvedMediaLayout,
+          dynamicItemContextOverride ?? commerceProjection?.dynamicContext,
+        )
+      : Promise.resolve(null),
+    resolveHeaderDropdownProjections(shellSettings, website),
+  ]);
   const renderLayout = materialization?.renderLayout ?? resolvedMediaLayout;
   const effectiveFallbackContent = fallbackContent ?? (
     isShopPage ? <DefaultShopSurface website={website} /> : undefined
@@ -422,6 +489,7 @@ export default async function WebsiteFrontend({
               builderDraftPreview={builderIframeSelection}
               tenantPathMode={isTenantPath}
               themeSettingsOverride={themeSettings as BuilderThemeSettings}
+              dropdownProjectionsOverride={headerDropdownProjections}
             />
             {renderLayout && hasVisibleLayout || mountDraftPreview ? (
               <StorefrontBuilderRenderer

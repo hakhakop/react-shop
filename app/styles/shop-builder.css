@@ -413,8 +413,9 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
      imported YOOtheme grids overflow by the full gutter width. */
   width: auto;
   max-width: var(--uk-container-default-max-width, 1200px);
-  padding-left: var(--uk-container-padding-horizontal, 15px);
-  padding-right: var(--uk-container-padding-horizontal, 15px);
+  --shop-builder-container-padding-horizontal: var(--uk-container-padding-horizontal, 15px);
+  padding-left: var(--shop-builder-container-padding-horizontal);
+  padding-right: var(--shop-builder-container-padding-horizontal);
 }
 
 .shop-builder-section-content.uk-container-xsmall { max-width: var(--uk-container-xsmall-max-width, 750px); }
@@ -425,15 +426,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 @media (min-width: 640px) {
   .shop-builder-section-content.uk-container {
-    padding-left: var(--uk-container-padding-horizontal-s, 30px);
-    padding-right: var(--uk-container-padding-horizontal-s, 30px);
+    --shop-builder-container-padding-horizontal: var(--uk-container-padding-horizontal-s, 30px);
   }
 }
 
 @media (min-width: 960px) {
   .shop-builder-section-content.uk-container {
-    padding-left: var(--uk-container-padding-horizontal-m, 40px);
-    padding-right: var(--uk-container-padding-horizontal-m, 40px);
+    --shop-builder-container-padding-horizontal: var(--uk-container-padding-horizontal-m, 40px);
   }
 }
 
@@ -4340,16 +4339,124 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   }
 }
 
+/* Grid column-gap modifiers are authoritative after the responsive baseline.
+   Keep them after the media rules so restoring the section container gutter
+   cannot accidentally turn Collapse/Small/Medium rows into the default gap. */
+.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card {
+  padding-left: 0 !important;
+}
+
+.shop-builder-content-row.uk-grid-small > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-small > .shop-builder-content-layout-card {
+  padding-left: var(--uk-grid-gutter-small, 15px) !important;
+}
+
+.shop-builder-content-row.uk-grid-medium > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-medium > .shop-builder-content-layout-card {
+  padding-left: var(--uk-global-gutter, 30px) !important;
+}
+
+.shop-builder-content-row.uk-grid-large > .shop-builder-content-layout-card,
+.shop-builder-content-row.uk-grid-column-large > .shop-builder-content-layout-card {
+  padding-left: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+@media (min-width: 1200px) {
+  .shop-builder-content-row.uk-grid-large > .shop-builder-content-layout-card,
+  .shop-builder-content-row.uk-grid-column-large > .shop-builder-content-layout-card {
+    padding-left: var(--uk-global-large-gutter, 70px) !important;
+  }
+}
+
+/* UIkit grids cancel the first column's leading gutter with an equal negative
+   margin on the row. Without that half of the contract, a Max Width: None row
+   still looks container-padded even though no container exists. Keep the
+   shared storefront/legacy-canvas projection aligned with the same gutter
+   tokens used by the columns above. */
+.shop-builder-content-row--yootheme {
+  --shop-builder-row-column-gutter: var(--uk-container-padding-horizontal, 15px);
+  margin-left: calc(var(--shop-builder-row-column-gutter) * -1) !important;
+  margin-right: 0 !important;
+  width: calc(100% + var(--shop-builder-row-column-gutter)) !important;
+}
+
+@media (min-width: 640px) {
+  .shop-builder-content-row--yootheme {
+    --shop-builder-row-column-gutter: var(--uk-container-padding-horizontal-s, 30px);
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-content-row--yootheme {
+    --shop-builder-row-column-gutter: var(--uk-container-padding-horizontal-m, 40px);
+  }
+}
+
+.shop-builder-content-row--yootheme.uk-grid-collapse,
+.shop-builder-content-row--yootheme.uk-grid-column-collapse {
+  --shop-builder-row-column-gutter: 0px;
+}
+
+.shop-builder-content-row--yootheme.uk-grid-small,
+.shop-builder-content-row--yootheme.uk-grid-column-small {
+  --shop-builder-row-column-gutter: var(--uk-grid-gutter-small, 15px);
+}
+
+.shop-builder-content-row--yootheme.uk-grid-medium,
+.shop-builder-content-row--yootheme.uk-grid-column-medium {
+  --shop-builder-row-column-gutter: var(--uk-global-gutter, 30px);
+}
+
+.shop-builder-content-row--yootheme.uk-grid-large,
+.shop-builder-content-row--yootheme.uk-grid-column-large {
+  --shop-builder-row-column-gutter: var(--uk-global-medium-gutter, 40px);
+}
+
+@media (min-width: 1200px) {
+  .shop-builder-content-row--yootheme.uk-grid-large,
+  .shop-builder-content-row--yootheme.uk-grid-column-large {
+    --shop-builder-row-column-gutter: var(--uk-global-large-gutter, 70px);
+  }
+}
+
+/* YOOtheme's row Width values describe two genuinely different structures:
+   Expand uses a full-width UIkit container (and therefore its responsive
+   horizontal padding), while None omits the container. Our row is a single
+   node rather than YOOtheme's wrapper + grid pair, so project that distinction
+   explicitly without changing the internal column-gap contract. */
+.shop-builder-content-row--yootheme.shop-builder-content-row--max-width-expand {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: var(--shop-builder-container-padding-horizontal, var(--uk-container-padding-horizontal, 15px)) !important;
+  padding-right: var(--shop-builder-container-padding-horizontal, var(--uk-container-padding-horizontal, 15px)) !important;
+}
+
+.shop-builder-content-row--yootheme.shop-builder-content-row--max-width-expand
+  > .shop-builder-content-layout-card:first-child {
+  padding-left: 0 !important;
+}
+
+@media (min-width: 640px) {
+  .shop-builder-content-row--yootheme.shop-builder-content-row--max-width-expand {
+    padding-left: var(--uk-container-padding-horizontal-s, 30px) !important;
+    padding-right: var(--uk-container-padding-horizontal-s, 30px) !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-content-row--yootheme.shop-builder-content-row--max-width-expand {
+    padding-left: var(--uk-container-padding-horizontal-m, 40px) !important;
+    padding-right: var(--uk-container-padding-horizontal-m, 40px) !important;
+  }
+}
+
 .shop-builder-content-layout-card.is-drag-over {
   box-shadow: inset 0 0 0 2px rgba(13, 115, 255, 0.5);
   background: rgba(13, 115, 255, 0.04);
-}
-
-/* A contained imported row already owns its horizontal gutter through the
-   outer UIkit container contract. Do not add the column gutter a second time
-   or centered card tracks become narrower than the source row. */
-.shop-builder-content-row--contained > .shop-builder-content-layout-card {
-  padding-left: 0 !important;
 }
 
 .shop-builder-column-block + .shop-builder-column-block {

@@ -5,7 +5,7 @@ import type { InspectorPanelContext, InspectorElementCapabilityDeclaration } fro
 import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
 import YoothemeGeneralSettingsPanel from "@/components/dashboard/inspector/panels/YoothemeGeneralSettingsPanel";
 import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
-import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
+import DynamicContentInspectorGroup, { DynamicContentSourceNotice } from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = InspectorPanelContext & {
   declaration: InspectorElementCapabilityDeclaration;
@@ -69,10 +69,27 @@ export default function ElementCapabilityComposer({ declaration, ...context }: P
 
   if (context.tab === "advanced") {
     if (context.block.kind === "backToTop" || context.block.kind === "sublayout") return createElement(panel, context);
+    const isCarousel = ["panelSlider", "slideshow", "overlaySlider", "slider"].includes(String(context.block.kind));
     return (
       <div className="builder-inspector-stack" data-inspector-composition="advanced">
+        {context.inheritedDynamicContext && !isCarousel && (
+          <DynamicContentSourceNotice descriptor={context.inheritedDynamicContext} inherited />
+        )}
+        {context.inheritedDynamicContext && isCarousel && (
+          <DynamicContentInspectorGroup
+            item={context.block}
+            update={context.update}
+            inheritedSource={context.inheritedDynamicContext}
+            categoryTree={context.previewCategoryTree}
+          />
+        )}
         {declaration.dynamicSourceSurface === "element" && (
-          <DynamicContentInspectorGroup item={context.block} update={context.update} categoryTree={context.previewCategoryTree} />
+          <DynamicContentInspectorGroup
+            item={context.block}
+            update={context.update}
+            inheritedSource={context.inheritedDynamicContext}
+            categoryTree={context.previewCategoryTree}
+          />
         )}
         <ElementAdvancedPanel block={context.block} update={context.update} />
       </div>

@@ -75,7 +75,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
             />
           </InspectorFieldRow>
           {isOverlay && (
-            <InspectorFieldRow label="Video">
+            <InspectorFieldRow label="Video" dynamicBinding={inspectorDynamicBinding(block, update, "videoUrl")}>
               <BuilderImageUrlControl
                 value={image.videoUrl ?? ""}
                 placeholder="https://... or /uploads/video.mp4"

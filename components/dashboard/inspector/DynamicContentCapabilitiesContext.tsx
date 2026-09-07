@@ -3,6 +3,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import {
   DYNAMIC_CONTENT_SOURCE_CAPABILITIES,
+  mergeDiscoveredDynamicContentCapabilities,
   type DynamicContentSourceCapability,
 } from "@/lib/dynamicContentCapabilities";
 
@@ -17,11 +18,10 @@ export function DynamicContentCapabilitiesProvider({
   discovered: readonly DynamicContentSourceCapability[];
   children: ReactNode;
 }) {
-  const capabilities = useMemo(() => {
-    const byKey = new Map<string, DynamicContentSourceCapability>();
-    [...DYNAMIC_CONTENT_SOURCE_CAPABILITIES, ...discovered].forEach((capability) => byKey.set(capability.key, capability));
-    return Array.from(byKey.values());
-  }, [discovered]);
+  const capabilities = useMemo(
+    () => mergeDiscoveredDynamicContentCapabilities(DYNAMIC_CONTENT_SOURCE_CAPABILITIES, discovered),
+    [discovered],
+  );
   return (
     <DynamicContentCapabilitiesContext.Provider value={capabilities}>
       {children}

@@ -17,6 +17,7 @@ import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
 import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
 import { resolveLegacyTemplateBuilderEntry } from "@/lib/templateBuilderContext.server";
+import { resolveBuilderEditorSession } from "@/lib/builderEditorContext.server";
 
 export const metadata = {
   title: "Website Builder",
@@ -131,17 +132,58 @@ export default async function WebsiteBuilderPage({
   const contentLanguage = website.enabledLanguages.includes(languageCookie as never)
     ? languageCookie!
     : website.primaryLanguage;
-  const initialPageHydration =
-    !hasStrictDocumentTarget
-      ? await resolveInitialBuilderPage({
+  const scalar = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
+  const strictDocument = scalar(resolvedSearchParams?.document);
+  const strictRoutingTemplate = scalar(resolvedSearchParams?.routingTemplate);
+  const strictIndividual = scalar(resolvedSearchParams?.individual);
+  const strictPreviewProvider = scalar(resolvedSearchParams?.previewProvider);
+  const strictPreviewContentType = scalar(resolvedSearchParams?.previewContentType);
+  const strictPreviewContentId = scalar(resolvedSearchParams?.previewContentId);
+  const [initialPageHydration, initialContextPageHydration] =
+    hasStrictDocumentTarget && strictDocument && (strictRoutingTemplate || strictIndividual)
+      ? await resolveBuilderEditorSession({
+          documentId: strictDocument,
+          routingTemplateId: strictRoutingTemplate,
+          individual: strictIndividual,
+          ...(strictPreviewProvider && strictPreviewContentType && strictPreviewContentId
+            ? { previewIdentity: { provider: strictPreviewProvider, contentType: strictPreviewContentType, contentId: strictPreviewContentId } }
+            : {}),
+          scope: { websiteId: website.id },
+          website,
+        }).then((session) => session.resolution ? [{
+          authoredLayout: session.resolution.layout,
+          renderLayout: session.resolution.renderLayout,
+          editorContext: session.editorContext,
+          context: session.resolution.context,
+          candidates: "candidates" in session.resolution ? session.resolution.candidates : [],
+          previewIdentity: "previewIdentity" in session.resolution ? session.resolution.previewIdentity : undefined,
+        }, undefined] as const : [undefined, undefined] as const)
+      : !hasStrictDocumentTarget
+      ? await Promise.all([
+        resolveInitialBuilderPage({
           page: initialHydrationPage,
           scope: { websiteId: website.id },
           website,
           contentLanguage,
           primaryContentLanguage: website.primaryLanguage,
           wordpressMediaOrigin: getWordPressMediaOrigin(website),
-        })
-      : undefined;
+          // DashboardBuilder refreshes this transient projection after mount.
+          // Keep remote providers off the blocking Builder shell path.
+          deferDynamicContent: true,
+        }),
+        initialPage === "header" || initialPage === "footer"
+          ? resolveInitialBuilderPage({
+              page: requestedContextPage,
+              scope: { websiteId: website.id },
+              website,
+              contentLanguage,
+              primaryContentLanguage: website.primaryLanguage,
+              wordpressMediaOrigin: getWordPressMediaOrigin(website),
+              deferDynamicContent: true,
+            })
+          : Promise.resolve(undefined),
+      ])
+      : [undefined, undefined];
 
   return (
     <SaaSI18nProvider userLocale={user.language} persistForUser><div data-scoped-builder-root>
@@ -156,6 +198,7 @@ export default async function WebsiteBuilderPage({
           wordpressMediaOrigin={getWordPressMediaOrigin(website)}
           wordpressSiteUrl={getWordPressBaseUrl(website)}
           initialPageHydration={initialPageHydration}
+          initialContextPageHydration={initialContextPageHydration}
         />
       </Suspense>
     </div></SaaSI18nProvider>

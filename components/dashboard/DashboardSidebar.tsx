@@ -57,6 +57,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 import type { BuilderEditorContext, BuilderTemplateCreationContext } from "@/lib/builderEditorContext";
+import type { CategoryTreeItem } from "@/lib/categories";
 
 type TemplateLibraryTab = LayoutLibraryType;
 
@@ -73,6 +74,7 @@ type DashboardSidebarProps = {
   embeddedBuilderHost: import("./EmbeddedBuilderHost").EmbeddedBuilderHost;
   openWordPressMediaPicker: import("./inspector/inspectorRouting").InspectorPanelContext["openWordPressMediaPicker"];
   websiteId?: string;
+  previewCategoryTree?: CategoryTreeItem[];
   templateCreationContext?: BuilderTemplateCreationContext;
   builderEditorContext?: BuilderEditorContext | null;
   onRoutingTemplatesChanged?: () => void | Promise<void>;
@@ -99,6 +101,7 @@ type DashboardSidebarProps = {
   yoothemeImportWarnings?: string[];
   yoothemeImportPreview?: {
     applyBlocked?: boolean;
+    blockingIssues?: string[];
     targetDropdown?: boolean;
     fileName: string;
     targetPage?: BuilderLayoutKey;
@@ -150,6 +153,7 @@ export default function DashboardSidebar({
   embeddedBuilderHost,
   openWordPressMediaPicker,
   websiteId,
+  previewCategoryTree,
   templateCreationContext,
   builderEditorContext,
   onRoutingTemplatesChanged,
@@ -581,14 +585,15 @@ export default function DashboardSidebar({
             </ul>
           </details>
         )}
-        {yoothemeImportPreview.applyBlocked && <p role="alert" className="builder-template-note">
-          This dropdown cannot be applied without losing source content. The compatibility warnings above describe the missing mappings. Your existing dropdown has not been changed.
+        {yoothemeImportPreview.applyBlocked && <p id="yootheme-import-blocked-reason" role="alert" className="builder-template-note">
+          <strong>This import needs attention before it can be applied.</strong>
+          <span>{yoothemeImportPreview.blockingIssues?.[0] ?? "The source contains content that cannot be mapped safely. Your existing dropdown has not been changed."}</span>
         </p>}
         <div className="builder-layout-actions">
           <button type="button" className="builder-secondary-button" onClick={onCancelYoothemeImport}>
             Cancel
           </button>
-          <button type="button" className="builder-primary-button" disabled={yoothemeImportPreview.applyBlocked} onClick={onApplyYoothemeImport}>
+          <button type="button" className="builder-primary-button" disabled={yoothemeImportPreview.applyBlocked} aria-describedby={yoothemeImportPreview.applyBlocked ? "yootheme-import-blocked-reason" : undefined} title={yoothemeImportPreview.applyBlocked ? yoothemeImportPreview.blockingIssues?.[0] : undefined} onClick={onApplyYoothemeImport}>
             Apply to {yoothemeImportPreview.targetDropdown ? "dropdown" : yoothemeImportPreview.targetPage === "footer" ? "Footer" : yoothemeImportPreview.targetPage === "header" ? "Header" : "page"}
           </button>
         </div>
@@ -707,6 +712,7 @@ export default function DashboardSidebar({
                 <ReactMenuEditorPanel
                   embeddedBuilderHost={embeddedBuilderHost}
                   shellSettings={shellSettings}
+                  previewCategoryTree={previewCategoryTree}
                   openWordPressMediaPicker={openWordPressMediaPicker}
                   menuItems={shellSettings.menuItems ?? []}
                   onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}

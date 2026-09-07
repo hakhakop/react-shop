@@ -86,3 +86,44 @@ export type EditableLayoutTarget = {
   routingTemplateId?: string;
   individualIdentity?: StableContentIdentity;
 };
+
+export type BuilderPersistenceTarget =
+  | { kind: "document"; documentId: string }
+  | { kind: "page" };
+
+/**
+ * Resolves the only document the current URL/context pair is allowed to save.
+ * A strict Template/Individual URL deliberately fails closed until its server-
+ * validated editor context has loaded. This prevents the temporary Home state
+ * rendered during a client transition from being persisted as that page.
+ */
+export function resolveBuilderPersistenceTarget(input: {
+  requestedDocumentId?: string | null;
+  editorContext?: BuilderEditorContext | null;
+  page: string;
+}): BuilderPersistenceTarget | null {
+  const requestedDocumentId = input.requestedDocumentId?.trim() || null;
+  const context = input.editorContext;
+  if (requestedDocumentId) {
+    if (
+      !context ||
+      context.document.id !== requestedDocumentId ||
+      (context.document.kind !== "routing-template" && context.document.kind !== "individual")
+    ) return null;
+    // Built-in templates can be opened through the same strict routing URL as
+    // dynamic templates, but their storage owner remains the canonical
+    // Builder layout store. Sending these IDs to the dynamic-document writer
+    // makes Publish fail validation after an assignment is edited.
+    if (!requestedDocumentId.startsWith("layout:builder:dynamic:")) {
+      return requestedDocumentId === `layout:builder:${input.page}`
+        ? { kind: "page" }
+        : null;
+    }
+    return { kind: "document", documentId: requestedDocumentId };
+  }
+  if (!context || context.document.kind === "routing-template" || context.document.kind === "individual") {
+    return null;
+  }
+  if (context.document.id !== `layout:builder:${input.page}`) return null;
+  return { kind: "page" };
+}
