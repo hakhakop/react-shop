@@ -252,7 +252,7 @@
     }
   ],
   "namedMenus": [],
-  "updatedAt": "2026-09-06T15:34:52.979Z",
+  "updatedAt": "2026-09-07T14:34:29.713Z",
   "buttonTextTransform": "none",
   "navbarDropdownIndicator": "chevron",
   "emphasisColor": "#26244c",
@@ -1010,5 +1010,7 @@
       "source": "yootheme-less",
       "createdAt": "2026-09-06T15:34:44.857Z"
     }
-  ]
+  ],
+  "themePageLayout": "boxed",
+  "themePageContainerAlignment": "center"
 }

@@ -4,6 +4,9 @@ import type {
   StorefrontLoadingData,
   StorefrontLoadingSectionShape,
 } from "@/lib/storefrontLoading";
+import type { BuilderSection } from "@/components/dashboard/builderTypes";
+
+type StorefrontLoadingSectionInput = StorefrontLoadingSectionShape | BuilderSection;
 
 function LoadingBlock({ className = "" }: { className?: string }) {
   return <span className={`storefront-loading-skeleton__block ${className}`.trim()} />;
@@ -27,6 +30,59 @@ function blockItemCount(section: StorefrontLoadingSectionShape, kinds: string[])
       .map((block) => block.itemCount),
     0,
   );
+}
+
+function normalizeSection(section: StorefrontLoadingSectionInput): StorefrontLoadingSectionShape {
+  if (
+    "blocks" in section &&
+    "itemCount" in section &&
+    Array.isArray(section.blocks) &&
+    Array.isArray(section.blockKinds)
+  ) {
+    return section;
+  }
+
+  const builderSection = section as BuilderSection;
+  const blocks = builderSection.rows?.length
+    ? builderSection.rows.flatMap((row) =>
+        row.columns.flatMap((column) => column.elements ?? []),
+      )
+    : (builderSection.layoutItems ?? []).flatMap((item) => item.blocks ?? []);
+  const blockShapes = blocks.map((block) => {
+    const candidate = block as typeof block & {
+      items?: unknown[];
+      slides?: unknown[];
+      galleryItems?: unknown[];
+    };
+    return {
+      kind: block.kind ?? "text",
+      itemCount: Math.max(
+        candidate.items?.length ?? 0,
+        candidate.slides?.length ?? 0,
+        candidate.galleryItems?.length ?? 0,
+        1,
+      ),
+    };
+  });
+  const itemCount = Math.max(
+    builderSection.layoutItems?.length ?? 0,
+    builderSection.rows?.reduce(
+      (count, row) => Math.max(count, row.columns.length),
+      0,
+    ) ?? 0,
+    1,
+  );
+
+  return {
+    kind: builderSection.kind,
+    sectionHeight: builderSection.sectionHeight ?? null,
+    heroHeight: blocks.find((block) => block.heroHeight)?.heroHeight ?? null,
+    layout: builderSection.layout ?? null,
+    columns: Math.max(1, builderSection.layoutColumns ?? builderSection.columns ?? itemCount),
+    itemCount,
+    blockKinds: Array.from(new Set(blockShapes.map((block) => block.kind))),
+    blocks: blockShapes,
+  };
 }
 
 function ProductLoadingCard() {
@@ -171,7 +227,14 @@ function LoadingSection({ section }: { section: StorefrontLoadingSectionShape })
     "slideshow",
     "slider",
   ].some((kind) => kinds.has(kind));
-  const hasMultipleItems = section.itemCount > 1 || section.columns > 1;
+  const mediaItemCount = blockItemCount(section, [
+    "gallery",
+    "overlaySlider",
+    "slideshow",
+    "slider",
+  ]);
+  const hasMultipleItems =
+    section.itemCount > 1 || section.columns > 1 || mediaItemCount > 1;
 
   if (hasProductDetailBlock) return <ProductDetailLoadingSection />;
   if (hasProductBlock) {
@@ -193,7 +256,7 @@ function LoadingSection({ section }: { section: StorefrontLoadingSectionShape })
       <CategoryLoadingGrid
         count={Math.max(
           section.itemCount,
-          blockItemCount(section, ["gallery", "overlaySlider", "slideshow", "slider"]),
+          mediaItemCount,
         )}
         columns={section.columns}
       />
@@ -214,13 +277,10 @@ const defaultChrome: StorefrontLoadingChromeShape = {
 
 function LoadingHeader({ chrome }: { chrome: StorefrontLoadingChromeShape }) {
   const navItemCount = clampCount(chrome.navItemCount, 4, 10);
-  const style = {
-    "--storefront-loading-header-height": chrome.headerHeight || "84px",
-  } as CSSProperties;
   if (!chrome.headerVisible) return null;
 
   return (
-    <header className="storefront-loading-skeleton__header" style={style}>
+    <header className="storefront-loading-skeleton__header">
       <LoadingBlock className="storefront-loading-skeleton__logo" />
       <nav className="storefront-loading-skeleton__nav">
         {Array.from({ length: navItemCount }, (_, index) => (
@@ -272,14 +332,23 @@ export default function StorefrontLoadingSkeleton({
   chrome,
 }: {
   data?: StorefrontLoadingData | null;
-  sections?: readonly StorefrontLoadingSectionShape[];
+  sections?: readonly StorefrontLoadingSectionInput[];
   chrome?: StorefrontLoadingChromeShape;
 }) {
-  const resolvedSections = data?.sections ?? sections ?? [];
+  const resolvedSections = (data?.sections ?? sections ?? [])
+    .filter((section) => !("visible" in section) || section.visible !== false)
+    .map(normalizeSection);
   const resolvedChrome = data?.chrome ?? chrome ?? defaultChrome;
+  const headerHeight = resolvedChrome.headerHeight?.trim() ?? "";
+  const loadingStyle = /^(?:\d+(?:\.\d+)?(?:px|rem|em|%|vw|vh|svh|dvh)|clamp\([^)]*\)|calc\([^)]*\))$/.test(headerHeight)
+    ? ({ "--storefront-loading-header-height": headerHeight } as CSSProperties)
+    : undefined;
 
   return (
-    <div className="storefront-loading-skeleton">
+    <div
+      className={`storefront-loading-skeleton${resolvedChrome.headerVisible ? "" : " is-header-hidden"}`}
+      style={loadingStyle}
+    >
       <LoadingHeader chrome={resolvedChrome} />
       <div className="storefront-loading-skeleton__content">
         {resolvedSections.length > 0 ? (

@@ -1,0 +1,1846 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "balou",
+  "displayName": "balou",
+  "sourceConfig": {
+    "style": "balou",
+    "site": {
+      "layout": "boxed",
+      "boxed": {
+        "alignment": 1,
+        "header_transparent": "",
+        "media": ""
+      },
+      "image_size": "cover",
+      "image_position": "center-center",
+      "image_effect": "fixed",
+      "toolbar_width": "default",
+      "breadcrumbs_show_home": true,
+      "breadcrumbs_show_current": true,
+      "breadcrumbs_home_text": "",
+      "main_section": {
+        "height": true
+      },
+      "breadcrumbs": false,
+      "padding": "small",
+      "padding_remove_top": false,
+      "padding_remove_bottom": false
+    },
+    "header": {
+      "layout": "stacked-center-split-b",
+      "width": "xlarge",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "right",
+      "social_gap": "small",
+      "search": "navbar:end",
+      "social_style": false,
+      "social": "",
+      "social_items": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "search_dropdown": {
+        "stretch": "",
+        "align": "right",
+        "size": true,
+        "width": "750"
+      }
+    },
+    "navbar": {
+      "sticky": 2,
+      "dropdown_align": "left",
+      "offcanvas": [],
+      "dropbar": false,
+      "dropdown_boundary": false,
+      "style": "",
+      "dropdown_click": false,
+      "dropdown_target": false
+    },
+    "mobile": {
+      "breakpoint": "l",
+      "header": {
+        "layout": "horizontal-center-logo",
+        "search_layout": "dropbar",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social": "dialog-mobile:end",
+        "social_gap": "small",
+        "social_width": "18",
+        "social_items": [
+          {
+            "link": "https://www.etsy.com/"
+          },
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://twitter.com/yootheme"
+          },
+          {
+            "link": "https://www.instagram.com/"
+          }
+        ],
+        "search": "header-mobile:start",
+        "search_dropdown": {
+          "width": "750"
+        }
+      },
+      "navbar": {
+        "sticky": 2
+      },
+      "dialog": {
+        "layout": "offcanvas-top",
+        "toggle": "navbar-mobile:start",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "slide-left"
+        },
+        "text_center": false,
+        "push_index": 2,
+        "dropdown": [],
+        "toggle_text": false
+      },
+      "search": "right",
+      "offcanvas": {
+        "overlay": true
+      }
+    },
+    "dialog": {
+      "layout": "offcanvas-top",
+      "toggle": "header:end",
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": true,
+        "overlay": true
+      }
+    },
+    "mobileHeader": {
+      "layout": "horizontal-center-logo",
+      "search_layout": "dropbar",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_style": false,
+      "social": "dialog-mobile:end",
+      "social_gap": "small",
+      "social_width": "18",
+      "social_items": [
+        {
+          "link": "https://www.etsy.com/"
+        },
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://twitter.com/yootheme"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        }
+      ],
+      "search": "header-mobile:start",
+      "search_dropdown": {
+        "width": "750"
+      }
+    },
+    "mobileNavbar": {
+      "sticky": 2
+    },
+    "mobileDialog": {
+      "layout": "offcanvas-top",
+      "toggle": "navbar-mobile:start",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": false
+      },
+      "dropbar": {
+        "animation": "slide-left"
+      },
+      "text_center": false,
+      "push_index": 2,
+      "dropdown": [],
+      "toggle_text": false
+    },
+    "mobileBreakpoint": "l",
+    "logo": {
+      "text": "Balou",
+      "image": "wp-content/uploads/yootheme/logo.svg",
+      "image_inverse": "",
+      "image_mobile": "wp-content/uploads/yootheme/logo-mobile.svg",
+      "image_svg_inline": true,
+      "image_dialog": ""
+    },
+    "menuPositions": {
+      "navbar": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 22
+      },
+      "header": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-left": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-right": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "navbar-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "header-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 21,
+        "divider": false,
+        "type": ""
+      }
+    },
+    "menuItems": {
+      "281": {
+        "content": {
+          "name": "fgh",
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "column_gap": "small",
+                "divider": false,
+                "layout": "1-2,1-2",
+                "row_gap": "small"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-2"
+                  },
+                  "children": [
+                    {
+                      "type": "grid",
+                      "props": {
+                        "content_column_breakpoint": "m",
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_gap": "small",
+                        "grid_default": "1",
+                        "grid_divider": false,
+                        "grid_medium": "",
+                        "grid_row_gap": "small",
+                        "icon_width": 80,
+                        "image_align": "left",
+                        "image_border": "rounded",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_column_gap": "medium",
+                        "image_grid_row_gap": "medium",
+                        "image_grid_width": "auto",
+                        "image_height": "65",
+                        "image_svg_color": "emphasis",
+                        "image_vertical_align": true,
+                        "image_width": "85",
+                        "item_animation": true,
+                        "lightbox_bg_close": true,
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin": "default",
+                        "meta_align": "below-title",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "panel_link": true,
+                        "parallax_easing": "1",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_image": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "show_video": true,
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "heading",
+                        "title_link": false,
+                        "title_style": "h6"
+                      },
+                      "children": [
+                        {
+                          "type": "grid_item",
+                          "source": {
+                            "query": {
+                              "name": "productCats.customProductCats",
+                              "arguments": {
+                                "offset": 0,
+                                "limit": 5,
+                                "order": "term_order",
+                                "order_direction": "ASC",
+                                "id": 0
+                              }
+                            },
+                            "props": {
+                              "title": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "name"
+                              },
+                              "image": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "thumbnail.url"
+                              },
+                              "image_alt": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "thumbnail.alt"
+                              },
+                              "link": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "link"
+                              }
+                            }
+                          },
+                          "props": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-2"
+                  },
+                  "children": [
+                    {
+                      "type": "image",
+                      "props": {
+                        "image": "wp-content/uploads/yootheme/illustration-flower.svg",
+                        "image_height": "100",
+                        "image_svg_color": "emphasis",
+                        "image_width": "100",
+                        "margin": "default",
+                        "position": "absolute",
+                        "position_left": "280",
+                        "position_top": "-40",
+                        "position_z_index": "1"
+                      }
+                    },
+                    {
+                      "type": "panel",
+                      "props": {
+                        "content_column_breakpoint": "m",
+                        "icon_width": 80,
+                        "image": "wp-content/uploads/yootheme/home-slider-06.jpg",
+                        "image_align": "top",
+                        "image_border": "rounded",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_height": "400",
+                        "image_link": true,
+                        "image_svg_color": "emphasis",
+                        "image_transition": "scale-up",
+                        "image_width": "600",
+                        "link": "?page_id=5",
+                        "link_style": "text",
+                        "link_text": "More Info",
+                        "margin": "default",
+                        "margin_remove_top": true,
+                        "meta": "",
+                        "meta_align": "above-title",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "title": "Customize Your Individual Knitwear",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_link": true,
+                        "title_style": "h5"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "version": "4.5.18",
+          "props": []
+        },
+        "dropdown": {
+          "columns": 1,
+          "width": "750",
+          "align": "",
+          "stretch": "",
+          "padding_remove_horizontal": false
+        }
+      },
+      "288": {
+        "content": null,
+        "dropdown": {
+          "columns": 1,
+          "width": "750"
+        }
+      },
+      "289": {
+        "content": null,
+        "dropdown": {
+          "columns": 1,
+          "width": "1000"
+        }
+      },
+      "291": {
+        "content": {
+          "name": "journal-dropbar",
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "margin": "default"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m"
+                  },
+                  "children": [
+                    {
+                      "type": "grid",
+                      "props": {
+                        "block_align": "center",
+                        "content_column_breakpoint": "m",
+                        "content_margin": "remove",
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_gap": "medium",
+                        "grid_default": "4",
+                        "grid_medium": "",
+                        "grid_row_gap": "small",
+                        "icon_width": 80,
+                        "image_align": "top",
+                        "image_border": "rounded",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_height": "255",
+                        "image_svg_color": "emphasis",
+                        "image_transition": "scale-up",
+                        "image_width": "385",
+                        "item_animation": true,
+                        "lightbox_bg_close": true,
+                        "link_fullwidth": false,
+                        "link_style": "text",
+                        "link_text": "",
+                        "margin": "default",
+                        "meta_align": "below-title",
+                        "meta_color": "muted",
+                        "meta_element": "div",
+                        "meta_style": "h6",
+                        "panel_image_no_padding": true,
+                        "panel_link": true,
+                        "parallax_easing": "1",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_image": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "show_video": true,
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_style": "h5"
+                      },
+                      "children": [
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "item_element": "article"
+                          },
+                          "source": {
+                            "query": {
+                              "name": "posts.customPosts",
+                              "arguments": {
+                                "users": [],
+                                "users_operator": "IN",
+                                "offset": 0,
+                                "limit": 4,
+                                "order": "date",
+                                "order_direction": "DESC",
+                                "terms": [],
+                                "category_operator": "IN",
+                                "post_tag_operator": "IN"
+                              }
+                            },
+                            "props": {
+                              "title": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "title"
+                              },
+                              "image": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "field.intro_image.url"
+                              },
+                              "link": {
+                                "filters": {
+                                  "search": ""
+                                },
+                                "name": "link"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "button",
+                      "props": {
+                        "fullwidth": false,
+                        "grid_column_gap": "small",
+                        "grid_row_gap": "small",
+                        "margin": "medium",
+                        "text_align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "button_item",
+                          "props": {
+                            "button_style": "text",
+                            "content": "See All Articles",
+                            "dialog_layout": "modal",
+                            "dialog_offcanvas_flip": true,
+                            "icon_align": "left",
+                            "link": "?post_type=post"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "version": "4.5.18",
+          "props": []
+        },
+        "dropdown": {
+          "columns": 1,
+          "width": "",
+          "stretch": "navbar"
+        }
+      }
+    },
+    "menu": {
+      "items": {
+        "281": {
+          "content": {
+            "name": "fgh",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "small",
+                  "divider": false,
+                  "layout": "1-2,1-2",
+                  "row_gap": "small"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-2"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "1",
+                          "grid_divider": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "icon_width": 80,
+                          "image_align": "left",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_column_gap": "medium",
+                          "image_grid_row_gap": "medium",
+                          "image_grid_width": "auto",
+                          "image_height": "65",
+                          "image_svg_color": "emphasis",
+                          "image_vertical_align": true,
+                          "image_width": "85",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": false,
+                          "title_style": "h6"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "source": {
+                              "query": {
+                                "name": "productCats.customProductCats",
+                                "arguments": {
+                                  "offset": 0,
+                                  "limit": 5,
+                                  "order": "term_order",
+                                  "order_direction": "ASC",
+                                  "id": 0
+                                }
+                              },
+                              "props": {
+                                "title": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "name"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "thumbnail.url"
+                                },
+                                "image_alt": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "thumbnail.alt"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "link"
+                                }
+                              }
+                            },
+                            "props": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-2"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/illustration-flower.svg",
+                          "image_height": "100",
+                          "image_svg_color": "emphasis",
+                          "image_width": "100",
+                          "margin": "default",
+                          "position": "absolute",
+                          "position_left": "280",
+                          "position_top": "-40",
+                          "position_z_index": "1"
+                        }
+                      },
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "icon_width": 80,
+                          "image": "wp-content/uploads/yootheme/home-slider-06.jpg",
+                          "image_align": "top",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "400",
+                          "image_link": true,
+                          "image_svg_color": "emphasis",
+                          "image_transition": "scale-up",
+                          "image_width": "600",
+                          "link": "?page_id=5",
+                          "link_style": "text",
+                          "link_text": "More Info",
+                          "margin": "default",
+                          "margin_remove_top": true,
+                          "meta": "",
+                          "meta_align": "above-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "title": "Customize Your Individual Knitwear",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h5"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "750",
+            "align": "",
+            "stretch": "",
+            "padding_remove_horizontal": false
+          }
+        },
+        "288": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "750"
+          }
+        },
+        "289": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "1000"
+          }
+        },
+        "291": {
+          "content": {
+            "name": "journal-dropbar",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "margin": "default"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "block_align": "center",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "remove",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "medium",
+                          "grid_default": "4",
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "255",
+                          "image_svg_color": "emphasis",
+                          "image_transition": "scale-up",
+                          "image_width": "385",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_fullwidth": false,
+                          "link_style": "text",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "below-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_style": "h6",
+                          "panel_image_no_padding": true,
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "item_element": "article"
+                            },
+                            "source": {
+                              "query": {
+                                "name": "posts.customPosts",
+                                "arguments": {
+                                  "users": [],
+                                  "users_operator": "IN",
+                                  "offset": 0,
+                                  "limit": 4,
+                                  "order": "date",
+                                  "order_direction": "DESC",
+                                  "terms": [],
+                                  "category_operator": "IN",
+                                  "post_tag_operator": "IN"
+                                }
+                              },
+                              "props": {
+                                "title": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "title"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "field.intro_image.url"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "link"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "button",
+                        "props": {
+                          "fullwidth": false,
+                          "grid_column_gap": "small",
+                          "grid_row_gap": "small",
+                          "margin": "medium",
+                          "text_align": "center"
+                        },
+                        "children": [
+                          {
+                            "type": "button_item",
+                            "props": {
+                              "button_style": "text",
+                              "content": "See All Articles",
+                              "dialog_layout": "modal",
+                              "dialog_offcanvas_flip": true,
+                              "icon_align": "left",
+                              "link": "?post_type=post"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "stretch": "navbar"
+          }
+        }
+      },
+      "positions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 22
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 21,
+          "divider": false,
+          "type": ""
+        }
+      }
+    }
+  },
+  "page": {
+    "layout": "boxed",
+    "alignment": "center",
+    "colorMode": "light"
+  },
+  "header": {
+    "source": {
+      "header": {
+        "layout": "stacked-center-split-b",
+        "width": "xlarge",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "right",
+        "social_gap": "small",
+        "search": "navbar:end",
+        "social_style": false,
+        "social": "",
+        "social_items": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "search_dropdown": {
+          "stretch": "",
+          "align": "right",
+          "size": true,
+          "width": "750"
+        }
+      },
+      "navbar": {
+        "sticky": 2,
+        "dropdown_align": "left",
+        "offcanvas": [],
+        "dropbar": false,
+        "dropdown_boundary": false,
+        "style": "",
+        "dropdown_click": false,
+        "dropdown_target": false
+      },
+      "mobile": {
+        "breakpoint": "l",
+        "header": {
+          "layout": "horizontal-center-logo",
+          "search_layout": "dropbar",
+          "search_dropdown.stretch": "navbar",
+          "search_dropdown.size": true,
+          "search_icon": "left",
+          "social_style": false,
+          "social": "dialog-mobile:end",
+          "social_gap": "small",
+          "social_width": "18",
+          "social_items": [
+            {
+              "link": "https://www.etsy.com/"
+            },
+            {
+              "link": "https://facebook.com/yootheme"
+            },
+            {
+              "link": "https://twitter.com/yootheme"
+            },
+            {
+              "link": "https://www.instagram.com/"
+            }
+          ],
+          "search": "header-mobile:start",
+          "search_dropdown": {
+            "width": "750"
+          }
+        },
+        "navbar": {
+          "sticky": 2
+        },
+        "dialog": {
+          "layout": "offcanvas-top",
+          "toggle": "navbar-mobile:start",
+          "close": true,
+          "menu_style": "default",
+          "offcanvas": {
+            "mode": "slide",
+            "flip": false
+          },
+          "dropbar": {
+            "animation": "slide-left"
+          },
+          "text_center": false,
+          "push_index": 2,
+          "dropdown": [],
+          "toggle_text": false
+        },
+        "search": "right",
+        "offcanvas": {
+          "overlay": true
+        }
+      },
+      "dialog": {
+        "layout": "offcanvas-top",
+        "toggle": "header:end",
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true,
+          "overlay": true
+        }
+      },
+      "mobileHeader": {
+        "layout": "horizontal-center-logo",
+        "search_layout": "dropbar",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_style": false,
+        "social": "dialog-mobile:end",
+        "social_gap": "small",
+        "social_width": "18",
+        "social_items": [
+          {
+            "link": "https://www.etsy.com/"
+          },
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://twitter.com/yootheme"
+          },
+          {
+            "link": "https://www.instagram.com/"
+          }
+        ],
+        "search": "header-mobile:start",
+        "search_dropdown": {
+          "width": "750"
+        }
+      },
+      "mobileNavbar": {
+        "sticky": 2
+      },
+      "mobileDialog": {
+        "layout": "offcanvas-top",
+        "toggle": "navbar-mobile:start",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": false
+        },
+        "dropbar": {
+          "animation": "slide-left"
+        },
+        "text_center": false,
+        "push_index": 2,
+        "dropdown": [],
+        "toggle_text": false
+      },
+      "mobileBreakpoint": "l",
+      "logo": {
+        "text": "Balou",
+        "image": "wp-content/uploads/yootheme/logo.svg",
+        "image_inverse": "",
+        "image_mobile": "wp-content/uploads/yootheme/logo-mobile.svg",
+        "image_svg_inline": true,
+        "image_dialog": ""
+      },
+      "menuPositions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 22
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 21,
+          "divider": false,
+          "type": ""
+        }
+      },
+      "menuItems": {
+        "281": {
+          "content": {
+            "name": "fgh",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "small",
+                  "divider": false,
+                  "layout": "1-2,1-2",
+                  "row_gap": "small"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-2"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "1",
+                          "grid_divider": false,
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "icon_width": 80,
+                          "image_align": "left",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_column_gap": "medium",
+                          "image_grid_row_gap": "medium",
+                          "image_grid_width": "auto",
+                          "image_height": "65",
+                          "image_svg_color": "emphasis",
+                          "image_vertical_align": true,
+                          "image_width": "85",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "heading",
+                          "title_link": false,
+                          "title_style": "h6"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "source": {
+                              "query": {
+                                "name": "productCats.customProductCats",
+                                "arguments": {
+                                  "offset": 0,
+                                  "limit": 5,
+                                  "order": "term_order",
+                                  "order_direction": "ASC",
+                                  "id": 0
+                                }
+                              },
+                              "props": {
+                                "title": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "name"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "thumbnail.url"
+                                },
+                                "image_alt": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "thumbnail.alt"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "link"
+                                }
+                              }
+                            },
+                            "props": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-2"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/illustration-flower.svg",
+                          "image_height": "100",
+                          "image_svg_color": "emphasis",
+                          "image_width": "100",
+                          "margin": "default",
+                          "position": "absolute",
+                          "position_left": "280",
+                          "position_top": "-40",
+                          "position_z_index": "1"
+                        }
+                      },
+                      {
+                        "type": "panel",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "icon_width": 80,
+                          "image": "wp-content/uploads/yootheme/home-slider-06.jpg",
+                          "image_align": "top",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "400",
+                          "image_link": true,
+                          "image_svg_color": "emphasis",
+                          "image_transition": "scale-up",
+                          "image_width": "600",
+                          "link": "?page_id=5",
+                          "link_style": "text",
+                          "link_text": "More Info",
+                          "margin": "default",
+                          "margin_remove_top": true,
+                          "meta": "",
+                          "meta_align": "above-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "title": "Customize Your Individual Knitwear",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h5"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "750",
+            "align": "",
+            "stretch": "",
+            "padding_remove_horizontal": false
+          }
+        },
+        "288": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "750"
+          }
+        },
+        "289": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "width": "1000"
+          }
+        },
+        "291": {
+          "content": {
+            "name": "journal-dropbar",
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "margin": "default"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "block_align": "center",
+                          "content_column_breakpoint": "m",
+                          "content_margin": "remove",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "medium",
+                          "grid_default": "4",
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "icon_width": 80,
+                          "image_align": "top",
+                          "image_border": "rounded",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "255",
+                          "image_svg_color": "emphasis",
+                          "image_transition": "scale-up",
+                          "image_width": "385",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_fullwidth": false,
+                          "link_style": "text",
+                          "link_text": "",
+                          "margin": "default",
+                          "meta_align": "below-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_style": "h6",
+                          "panel_image_no_padding": true,
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "item_element": "article"
+                            },
+                            "source": {
+                              "query": {
+                                "name": "posts.customPosts",
+                                "arguments": {
+                                  "users": [],
+                                  "users_operator": "IN",
+                                  "offset": 0,
+                                  "limit": 4,
+                                  "order": "date",
+                                  "order_direction": "DESC",
+                                  "terms": [],
+                                  "category_operator": "IN",
+                                  "post_tag_operator": "IN"
+                                }
+                              },
+                              "props": {
+                                "title": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "title"
+                                },
+                                "image": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "field.intro_image.url"
+                                },
+                                "link": {
+                                  "filters": {
+                                    "search": ""
+                                  },
+                                  "name": "link"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "button",
+                        "props": {
+                          "fullwidth": false,
+                          "grid_column_gap": "small",
+                          "grid_row_gap": "small",
+                          "margin": "medium",
+                          "text_align": "center"
+                        },
+                        "children": [
+                          {
+                            "type": "button_item",
+                            "props": {
+                              "button_style": "text",
+                              "content": "See All Articles",
+                              "dialog_layout": "modal",
+                              "dialog_offcanvas_flip": true,
+                              "icon_align": "left",
+                              "link": "?post_type=post"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "4.5.18",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "width": "",
+            "stretch": "navbar"
+          }
+        }
+      }
+    },
+    "document": {
+      "headerArchitectureVersion": 2,
+      "headerBehavior": "sticky-on-scroll-up",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileBehavior": "sticky-on-scroll-up",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "dropbar",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "dialog-mobile:end",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://www.etsy.com/"
+        },
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://twitter.com/yootheme"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "offcanvas-top",
+      "headerMobileDialogTogglePosition": "navbar-mobile:start",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": false,
+      "headerMobileDialogPushAfter": 2,
+      "headerMobileOffcanvasMode": "slide",
+      "headerMobileOffcanvasFlip": false,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "slide-left",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": false,
+      "headerClickModeEnabled": false,
+      "headerSearchPosition": "navbar-end",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "right",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg"
+    },
+    "breakpoint": "1200px",
+    "mobileLayout": "horizontal-center-logo",
+    "dialogLayout": "offcanvas-top",
+    "dialogToggle": "header:end"
+  },
+  "resolved": {
+    "shellSettings": {
+      "themePageLayout": "boxed",
+      "themePageContainerAlignment": "center"
+    },
+    "headerDocument": {
+      "headerArchitectureVersion": 2,
+      "headerBehavior": "sticky-on-scroll-up",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileBehavior": "sticky-on-scroll-up",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "dropbar",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "dialog-mobile:end",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://www.etsy.com/"
+        },
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://twitter.com/yootheme"
+        },
+        {
+          "link": "https://www.instagram.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "offcanvas-top",
+      "headerMobileDialogTogglePosition": "navbar-mobile:start",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": false,
+      "headerMobileDialogPushAfter": 2,
+      "headerMobileOffcanvasMode": "slide",
+      "headerMobileOffcanvasFlip": false,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "slide-left",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerDropbarEnabled": false,
+      "headerClickModeEnabled": false,
+      "headerSearchPosition": "navbar-end",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "right",
+      "headerSocialPosition": "hide",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://twitter.com/"
+        },
+        {
+          "link": "https://dribbble.com/"
+        },
+        {
+          "link": "https://github.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/logo-mobile.svg"
+    }
+  },
+  "capabilities": {
+    "global": [],
+    "page": [
+      "site.layout",
+      "site.boxed.alignment",
+      "theme.layout",
+      "theme.alignment",
+      "theme.colorMode"
+    ],
+    "header": [
+      "site.toolbar_width",
+      "header.layout",
+      "header.width",
+      "header.search_layout",
+      "header.search_dropdown.stretch",
+      "header.search_dropdown.size",
+      "header.search_icon",
+      "header.social_gap",
+      "header.search",
+      "header.social_style",
+      "header.social",
+      "header.social_items",
+      "header.search_dropdown",
+      "navbar.sticky",
+      "navbar.dropdown_align",
+      "navbar.offcanvas",
+      "navbar.dropbar",
+      "navbar.dropdown_boundary",
+      "navbar.style",
+      "navbar.dropdown_click",
+      "navbar.dropdown_target",
+      "mobile.breakpoint",
+      "mobile.header",
+      "mobile.navbar",
+      "mobile.dialog",
+      "mobile.search",
+      "mobile.offcanvas",
+      "dialog.layout",
+      "dialog.toggle",
+      "dialog.menu_style",
+      "dialog.offcanvas",
+      "headerDocument.headerArchitectureVersion",
+      "headerDocument.headerPresetKey",
+      "headerDocument.headerBehavior",
+      "headerDocument.headerMobileBreakpoint",
+      "headerDocument.headerMobileBehavior",
+      "headerDocument.headerMobileSearchPosition",
+      "headerDocument.headerMobileSearchLayout",
+      "headerDocument.headerMobileSearchDropdownStretch",
+      "headerDocument.headerMobileSearchDropdownLarge",
+      "headerDocument.headerMobileSearchIconPosition",
+      "headerDocument.headerMobileSocialPosition",
+      "headerDocument.headerMobileSocialStyle",
+      "headerDocument.headerMobileSocialGap",
+      "headerDocument.headerMobileSocialItems",
+      "headerDocument.headerMobileDialogLayout",
+      "headerDocument.headerMobileDialogTogglePosition",
+      "headerDocument.headerMobileDialogClose",
+      "headerDocument.headerMobileDialogMenuStyle",
+      "headerDocument.headerMobileDialogCenter",
+      "headerDocument.headerMobileDialogPushAfter",
+      "headerDocument.headerMobileOffcanvasMode",
+      "headerDocument.headerMobileOffcanvasFlip",
+      "headerDocument.headerMobileOffcanvasOverlay",
+      "headerDocument.headerMobileDialogDropbarAnimation",
+      "headerDocument.headerDropdownAlign",
+      "headerDocument.headerDropdownAlignToNavbar",
+      "headerDocument.headerDropbarEnabled",
+      "headerDocument.headerClickModeEnabled",
+      "headerDocument.headerSearchPosition",
+      "headerDocument.headerSearchLayout",
+      "headerDocument.headerSearchDropdownStretch",
+      "headerDocument.headerSearchDropdownLarge",
+      "headerDocument.headerSearchIconPosition",
+      "headerDocument.headerSocialPosition",
+      "headerDocument.headerSocialStyle",
+      "headerDocument.headerSocialGap",
+      "headerDocument.headerSocialItems",
+      "headerDocument.headerDialogLayout",
+      "headerDocument.headerDialogTogglePosition",
+      "headerDocument.headerDialogMenuStyle",
+      "headerDocument.headerOffcanvasMode",
+      "headerDocument.headerOffcanvasFlip",
+      "headerDocument.headerOffcanvasOverlay",
+      "headerDocument.headerMobileLogoUrl"
+    ]
+  },
+  "unsupported": [],
+  "updatedAt": "2026-09-07T14:34:10.787Z"
+}

@@ -722,6 +722,11 @@
   min-height: calc(100svh - var(--storefront-loading-header-height));
 }
 
+.storefront-loading-skeleton.is-header-hidden .storefront-loading-skeleton__feature.is-full-height,
+.storefront-loading-skeleton.is-header-hidden .storefront-loading-skeleton__text-section.is-full-height {
+  min-height: 100svh;
+}
+
 .storefront-loading-skeleton__feature-media,
 .storefront-loading-skeleton__category-media {
   position: absolute;

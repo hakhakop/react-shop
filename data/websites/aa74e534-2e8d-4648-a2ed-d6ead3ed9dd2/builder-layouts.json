@@ -4873,8 +4873,31 @@
     "key": "header",
     "page": "header",
     "targetType": "header",
-    "updatedAt": "2026-09-06T15:29:27.060Z",
-    "design": {},
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
     "sections": [
       {
         "id": "header-document",
@@ -4928,7 +4951,8 @@
                 "kind": "button",
                 "buttonLabel": "Contact Us",
                 "buttonUrl": "#contact",
-                "buttonStyle": "primary"
+                "buttonStyle": "primary",
+                "size": "default"
               }
             ]
           }
@@ -4941,7 +4965,7 @@
         "headerOverlay": false,
         "headerHeight": "auto",
         "headerLayout": "simple",
-        "headerBehavior": "sticky",
+        "headerBehavior": "sticky-on-scroll-up",
         "headerWidthMode": "boxed",
         "headerBackgroundMode": "default",
         "headerTextMode": "auto",
@@ -4949,9 +4973,74 @@
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "",
         "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerTopToolbarMeta": "",
+        "headerMobileBreakpoint": "1200px",
+        "headerMobileBehavior": "sticky-on-scroll-up",
+        "headerMobileSearchPosition": "right",
+        "headerMobileSearchLayout": "dropbar",
+        "headerMobileSearchDropdownStretch": "navbar",
+        "headerMobileSearchDropdownLarge": true,
+        "headerMobileSearchIconPosition": "left",
+        "headerMobileSocialPosition": "dialog-mobile:end",
+        "headerMobileSocialStyle": false,
+        "headerMobileSocialGap": "small",
+        "headerMobileSocialItems": [
+          {
+            "link": "https://www.etsy.com/"
+          },
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://twitter.com/yootheme"
+          },
+          {
+            "link": "https://www.instagram.com/"
+          }
+        ],
+        "headerMobileDialogLayout": "offcanvas-top",
+        "headerMobileDialogTogglePosition": "navbar-mobile:start",
+        "headerMobileDialogClose": true,
+        "headerMobileDialogMenuStyle": "default",
+        "headerMobileDialogCenter": false,
+        "headerMobileDialogPushAfter": 2,
+        "headerMobileOffcanvasMode": "slide",
+        "headerMobileOffcanvasFlip": false,
+        "headerMobileOffcanvasOverlay": true,
+        "headerMobileDialogDropbarAnimation": "slide-left",
+        "headerDropdownAlign": "left",
+        "headerDropdownAlignToNavbar": false,
+        "headerDropbarEnabled": false,
+        "headerClickModeEnabled": false,
+        "headerSearchPosition": "navbar-end",
+        "headerSearchLayout": "input-dropdown",
+        "headerSearchDropdownStretch": "navbar",
+        "headerSearchDropdownLarge": true,
+        "headerSearchIconPosition": "right",
+        "headerSocialPosition": "hide",
+        "headerSocialStyle": false,
+        "headerSocialGap": "small",
+        "headerSocialItems": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "headerDialogLayout": "offcanvas-top",
+        "headerDialogTogglePosition": "header-end",
+        "headerDialogMenuStyle": "default",
+        "headerOffcanvasMode": "slide",
+        "headerOffcanvasFlip": true,
+        "headerOffcanvasOverlay": true,
+        "headerMobileLogoUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg"
       }
-    ]
+    ],
+    "updatedAt": "2026-09-07T14:34:10.825Z"
   },
   "footer": {
     "version": 1,

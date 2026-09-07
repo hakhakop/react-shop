@@ -13,6 +13,7 @@ import {
   getNavigationRouteAliases,
   resolveCommerceRouteCandidate,
   resolveNavigationRouteAlias,
+  resolveSystemRouteAlias,
 } from "@/lib/navigationTargets";
 import {
   ensureWebsiteBuilderData,
@@ -44,11 +45,13 @@ function getBlockItemCount(block: BuilderLayoutBlock) {
     items?: unknown[];
     slides?: unknown[];
     galleryItems?: unknown[];
+    menuItems?: unknown[];
   };
   return Math.max(
     candidate.items?.length ?? 0,
     candidate.slides?.length ?? 0,
     candidate.galleryItems?.length ?? 0,
+    candidate.menuItems?.length ?? 0,
     1,
   );
 }
@@ -71,7 +74,7 @@ function summarizeSection(section: BuilderSection): StorefrontLoadingSectionShap
   return {
     kind: section.kind,
     sectionHeight: section.sectionHeight ?? null,
-    heroHeight: section.heroHeight ?? null,
+    heroHeight: blocks.find((block) => block.heroHeight)?.heroHeight ?? null,
     layout: section.layout ?? null,
     columns: Math.max(1, section.layoutColumns ?? section.columns ?? itemCount),
     itemCount,
@@ -117,14 +120,24 @@ async function resolvePublicLayout(pathname: string, request: NextRequest) {
   const routeAlias =
     resolveNavigationRouteAlias(routePath, aliases) ??
     resolveCommerceRouteCandidate(routePath);
-  const resolvedPage = routeAlias
-    ? routeAlias.pageKey
-    : getBuilderPageKeyForTenantPath(
-        normalizedPath,
-        customPages,
-        website ? getWebsiteRouteSegment(website) : undefined,
-        aliases,
-      ) ?? "home";
+  const resolvedPage =
+    routeAlias?.pageKey === "product-category" || routeAlias?.pageKey === "product-single"
+      ? routeAlias.pageKey
+      : resolveSystemRouteAlias(
+          routePath,
+          aliases.filter(
+            (alias) =>
+              alias.pageKey !== "product-category" &&
+              alias.pageKey !== "product-single",
+          ),
+        ) ??
+        getBuilderPageKeyForTenantPath(
+          normalizedPath,
+          customPages,
+          website ? getWebsiteRouteSegment(website) : undefined,
+          aliases,
+        ) ??
+        "home";
   const assignedShopPage = getBuilderPageBySystemRole(customPages, "shop");
   const page = resolvedPage === "shop" && assignedShopPage
     ? assignedShopPage.key
