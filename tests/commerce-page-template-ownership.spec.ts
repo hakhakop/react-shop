@@ -5,7 +5,7 @@ import { getBuilderPageBySystemRole, readBuilderCustomPages } from "@/lib/builde
 
 const woolberryId = "76f3e619-b66c-4391-90b6-2671fa960132";
 const websiteDataPath = (...segments: string[]) =>
-  path.join(process.cwd(), "data", "websites", woolberryId, ...segments);
+  path.join(process.cwd(), "data", "fixtures", "dev", "websites", woolberryId, ...segments);
 
 test("Woolberry Shop is a stable assigned Page and commerce archives are routing templates", async () => {
   const pages = await readBuilderCustomPages({ websiteId: woolberryId });

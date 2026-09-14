@@ -1,6 +1,8 @@
 import path from "node:path";
 
 const REPO_DATA_DIR = path.join(process.cwd(), "data");
+const DEV_FIXTURE_DATA_DIR = path.join(REPO_DATA_DIR, "fixtures", "dev");
+const DEFAULT_RUNTIME_DATA_DIR = path.join(REPO_DATA_DIR, "runtime");
 let loggedRuntimeDataDir = false;
 
 function resolveDataDir(value: string | undefined) {
@@ -16,19 +18,22 @@ export function getRepoDataDir() {
 }
 
 export function getSeedDataDir() {
-  return REPO_DATA_DIR;
+  return DEV_FIXTURE_DATA_DIR;
 }
 
 export function getRuntimeDataDir() {
-  const dir = resolveDataDir(process.env.WEBPAGES_DATA_DIR);
+  const configuredDir = process.env.WEBPAGES_DATA_DIR?.trim();
+  const dir = configuredDir
+    ? resolveDataDir(configuredDir)
+    : DEFAULT_RUNTIME_DATA_DIR;
 
   if (!loggedRuntimeDataDir) {
     console.info("[webpages-data] directories", {
       runtimeDir: dir,
-      source: process.env.WEBPAGES_DATA_DIR
+      source: configuredDir
         ? "WEBPAGES_DATA_DIR"
-        : "repo data fallback",
-      seedDir: REPO_DATA_DIR,
+        : "local runtime default",
+      seedDir: DEV_FIXTURE_DATA_DIR,
     });
     loggedRuntimeDataDir = true;
   }

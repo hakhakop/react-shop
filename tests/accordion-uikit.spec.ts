@@ -7,9 +7,9 @@ const password = "HeaderParity!2026";
 const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
 const fixtureId = "accordion-direct-fixture";
-const layoutsPath = path.resolve("data/builder-layouts.json");
+const layoutsPath = path.resolve("data/fixtures/dev/builder-layouts.json");
 const originalLayouts = readFileSync(layoutsPath, "utf8");
-const websiteLayoutsPath = path.resolve("data/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json");
+const websiteLayoutsPath = path.resolve("data/fixtures/dev/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json");
 const originalWebsiteLayouts = readFileSync(websiteLayoutsPath, "utf8");
 
 async function publish(page: Page) {

@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import en from "@/data/i18n/en.json";
+import en from "@/data/fixtures/dev/i18n/en.json";
 import { getRuntimeDataDir, getSeedDataDir } from "@/lib/runtimeDataDir";
 import {
   supportedLocales,

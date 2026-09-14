@@ -8,7 +8,7 @@ const password = "HeaderParity!2026";
 const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
 const websiteId = "eb65bd05-1299-4071-b432-f3c04e9eda2e";
-const layoutsPath = path.resolve("data/websites", websiteId, "builder-layouts.json");
+const layoutsPath = path.resolve("data/fixtures/dev/websites", websiteId, "builder-layouts.json");
 const originalLayouts = readFileSync(layoutsPath, "utf8");
 
 async function signIn(page: Page) {

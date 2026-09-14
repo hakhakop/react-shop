@@ -1,4 +1,4 @@
-import en from "@/data/i18n/en.json";
+import en from "@/data/fixtures/dev/i18n/en.json";
 
 export const supportedLocales = ["en", "hy", "ru"] as const;
 export type Locale = (typeof supportedLocales)[number];

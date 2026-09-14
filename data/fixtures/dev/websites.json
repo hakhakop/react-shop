@@ -1,0 +1,294 @@
+[
+  {
+    "id": "27079c03-3661-4c23-bf79-790cc8d73320",
+    "ownerId": "dev-admin-user",
+    "name": "Circle",
+    "slug": "circle",
+    "type": "business",
+    "domain": "circle.example.test",
+    "primaryDomain": "circle.example.test",
+    "domains": [
+      "circle.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "active",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "4eeaf9a9-7f88-46b8-a874-d4eeeb45733f",
+    "ownerId": "dev-admin-user",
+    "name": "Devstack",
+    "slug": "devstack",
+    "type": "business",
+    "domain": "devstack.example.test",
+    "primaryDomain": "devstack.example.test",
+    "domains": [
+      "devstack.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "fd4072d5-18cf-472c-99d3-ea369504ea91",
+    "ownerId": "dev-admin-user",
+    "name": "Jack",
+    "slug": "jack",
+    "type": "business",
+    "domain": "jack.example.test",
+    "primaryDomain": "jack.example.test",
+    "domains": [
+      "jack.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "27ed19c1-e8e8-4112-abda-17f7a2abc3b9",
+    "ownerId": "dev-admin-user",
+    "name": "Yard",
+    "slug": "yard",
+    "type": "business",
+    "domain": "yard.example.test",
+    "primaryDomain": "yard.example.test",
+    "domains": [
+      "yard.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "b1fe403f-b57b-4f93-a33e-5c061e4ebea2",
+    "ownerId": "dev-admin-user",
+    "name": "Design",
+    "slug": "design",
+    "type": "business",
+    "domain": "design.example.test",
+    "primaryDomain": "design.example.test",
+    "domains": [
+      "design.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "76f3e619-b66c-4391-90b6-2671fa960132",
+    "ownerId": "demo-owner-user",
+    "name": "Woolberry",
+    "slug": "woolberry",
+    "type": "business",
+    "domain": "woolberry.example.test",
+    "primaryDomain": "woolberry.example.test",
+    "domains": [
+      "woolberry.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "a80e0a66-3376-4583-ade4-e6da6951266d",
+    "ownerId": "dev-admin-user",
+    "name": "Navigation Lab A",
+    "slug": "navigation-lab-a",
+    "type": "business",
+    "domain": "navigation-lab-a.example.test",
+    "primaryDomain": "navigation-lab-a.example.test",
+    "domains": [
+      "navigation-lab-a.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Blank",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "a7aef437-0e33-44bb-ab17-458301fbf7f8",
+    "ownerId": "dev-admin-user",
+    "name": "Navigation Lab B",
+    "slug": "navigation-lab-b",
+    "type": "business",
+    "domain": "navigation-lab-b.example.test",
+    "primaryDomain": "navigation-lab-b.example.test",
+    "domains": [
+      "navigation-lab-b.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Blank",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "aa74e534-2e8d-4648-a2ed-d6ead3ed9dd2",
+    "ownerId": "dev-admin-user",
+    "name": "Balou",
+    "slug": "balou",
+    "type": "business",
+    "domain": "balou.example.test",
+    "primaryDomain": "balou.example.test",
+    "domains": [
+      "balou.example.test"
+    ],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "header-parity-site",
+    "ownerId": "header-parity-user",
+    "name": "Header Parity Demo",
+    "slug": "header-parity-demo",
+    "type": "business",
+    "domain": "header-parity.example.test",
+    "primaryDomain": "header-parity.example.test",
+    "domains": [
+      "header-parity.example.test"
+    ],
+    "description": "A deterministic browser-test website fixture.",
+    "timeZone": "Asia/Yerevan",
+    "language": "en",
+    "primaryLanguage": "en",
+    "enabledLanguages": [
+      "en",
+      "hy",
+      "ru"
+    ],
+    "status": "active",
+    "websiteCategory": "Testing",
+    "companyName": "Header Parity Demo",
+    "personName": "Header Parity Tester",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "header-parity@example.test",
+    "socialLinks": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  }
+]

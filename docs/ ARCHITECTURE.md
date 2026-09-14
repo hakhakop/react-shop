@@ -143,7 +143,7 @@ Every website has independent builder data.
 Storage:
 
 ```
-data/websites/<websiteId>/
+data/runtime/websites/<websiteId>/
 ```
 
 Files:

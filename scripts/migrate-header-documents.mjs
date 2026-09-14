@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { migrateLegacyHeaderDocument } from "../lib/headerDocumentMigration.ts";
 
-const dataRoot = path.resolve(process.env.WEBPAGES_DATA_DIR || "data");
+const dataRoot = path.resolve(process.env.WEBPAGES_DATA_DIR || "data/runtime");
 const fallbackShell = {
   headerVisible: true,
   headerTransparent: false,

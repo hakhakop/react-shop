@@ -7,7 +7,7 @@ const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
 const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
-const layoutsPath = resolve(process.cwd(), "data/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json");
+const layoutsPath = resolve(process.cwd(), "data/fixtures/dev/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json");
 const originalLayouts = readFileSync(layoutsPath, "utf8");
 
 test.afterAll(() => writeFileSync(layoutsPath, originalLayouts));
