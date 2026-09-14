@@ -9,7 +9,7 @@ const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
 const layoutsPath = resolve(
   process.cwd(),
-  "data/fixtures/dev/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json",
+  "data/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json",
 );
 
 async function publish(page: Page) {

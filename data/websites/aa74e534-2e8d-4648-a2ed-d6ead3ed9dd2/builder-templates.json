@@ -1,0 +1,4847 @@
+[
+  {
+    "id": "balou-webpages-am-layout-mtpz186p-dvb5",
+    "title": "balou.webpages.am Layout",
+    "templateType": "page",
+    "description": "Page template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "transparent",
+        "backgroundRole": "primary",
+        "sectionVariant": "primary",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "headerTransparent": true,
+        "pullUnderHeader": true,
+        "headerTextColor": "dark",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-slideshow-0-0-0-0",
+                "kind": "slideshow",
+                "spacingContract": "yootheme",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-0",
+                    "title": "Knit &amp; More",
+                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-01.png",
+                    "imageAlt": "Knit & More",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-1",
+                    "title": "Knit &amp; More",
+                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-02.png",
+                    "imageAlt": "Knit & More",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false
+                  },
+                  {
+                    "id": "yootheme-panel-slide-0-0-0-0-2",
+                    "title": "Knit &amp; More",
+                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-03.png",
+                    "imageAlt": "Knit & More",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "imageLoading": "eager",
+                    "showAction": false
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "slideshow",
+                  "imageWidth": "1840",
+                  "contentAlign": "center",
+                  "variant": "slideshow",
+                  "slideMode": "hero",
+                  "slideshowHeight": "viewport",
+                  "slideshowMinHeight": 600,
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "showVideo": true,
+                  "showHoverImage": true,
+                  "showHoverVideo": true,
+                  "buttonStyle": "secondary",
+                  "buttonSize": "large",
+                  "buttonLabel": "Read more",
+                  "fullWidthButton": false,
+                  "linkMarginTop": "xlarge",
+                  "showNavigationThumbnail": true,
+                  "elementLinkTarget": "_self",
+                  "headingLevel": "h2",
+                  "headingSize": "2xlarge",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "autoplay": true,
+                  "autoplayDelayMs": 5000,
+                  "pauseOnHover": true,
+                  "showArrows": false,
+                  "navigationType": "none",
+                  "showDots": false,
+                  "arrowPosition": "overlay",
+                  "paginationPosition": "bottom-center",
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "navigationBelow": false,
+                  "navigationHoverOnly": false,
+                  "navigationVertical": false,
+                  "thumbnavWidth": 100,
+                  "thumbnavHeight": 75,
+                  "thumbnavNoWrap": false,
+                  "slidenavMargin": "medium",
+                  "slidenavBreakpoint": "small",
+                  "slidenavHoverOnly": false,
+                  "slidenavLarger": false,
+                  "effect": "fade",
+                  "overlayContainer": "none",
+                  "overlayContainerPadding": "default",
+                  "overlayMargin": "default",
+                  "overlayPosition": "center",
+                  "overlayStyle": "none",
+                  "overlayAnimation": "parallax",
+                  "overlayPadding": "default",
+                  "overlayWidth": "none",
+                  "contentExpand": false,
+                  "overlayTextColor": "light"
+                },
+                "textAlign": "center",
+                "headingAlign": "center",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "none",
+                    "textAlign": "center"
+                  },
+                  "customCss": "@media (max-width: 640px) {\n    .el-meta {\n        display: none;\n    }\n}\n\n.el-item { --uk-inverse: dark !important; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-0-0-0-1",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-1-0",
+                    "label": "Products",
+                    "url": "?post_type=product",
+                    "target": "_self",
+                    "style": "secondary"
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-1-1",
+                    "label": "Etsy Shop",
+                    "url": "https://www.etsy.com/",
+                    "target": "_blank",
+                    "style": "primary"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "m",
+                "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "5vh",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "visibilityMode": "m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-0-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-2-0",
+                    "label": "Products",
+                    "url": "?post_type=product",
+                    "target": "_self",
+                    "style": "secondary"
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2-1",
+                    "label": "Etsy Shop",
+                    "url": "https://www.etsy.com/",
+                    "target": "_blank",
+                    "style": "primary"
+                  }
+                ],
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "hidden-m",
+                "visibilityMode": "hidden-m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "5vh",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "visibilityMode": "hidden-m"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "textColor": "light",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-slideshow-0-0-0-0",
+                    "kind": "slideshow",
+                    "spacingContract": "yootheme",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-0",
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-01.png",
+                        "imageAlt": "Knit & More",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-1",
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-02.png",
+                        "imageAlt": "Knit & More",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false
+                      },
+                      {
+                        "id": "yootheme-panel-slide-0-0-0-0-2",
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-03.png",
+                        "imageAlt": "Knit & More",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "imageLoading": "eager",
+                        "showAction": false
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "slideshow",
+                      "imageWidth": "1840",
+                      "contentAlign": "center",
+                      "variant": "slideshow",
+                      "slideMode": "hero",
+                      "slideshowHeight": "viewport",
+                      "slideshowMinHeight": 600,
+                      "showTitle": true,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "showVideo": true,
+                      "showHoverImage": true,
+                      "showHoverVideo": true,
+                      "buttonStyle": "secondary",
+                      "buttonSize": "large",
+                      "buttonLabel": "Read more",
+                      "fullWidthButton": false,
+                      "linkMarginTop": "xlarge",
+                      "showNavigationThumbnail": true,
+                      "elementLinkTarget": "_self",
+                      "headingLevel": "h2",
+                      "headingSize": "2xlarge",
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "autoplay": true,
+                      "autoplayDelayMs": 5000,
+                      "pauseOnHover": true,
+                      "showArrows": false,
+                      "navigationType": "none",
+                      "showDots": false,
+                      "arrowPosition": "overlay",
+                      "paginationPosition": "bottom-center",
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "navigationBelow": false,
+                      "navigationHoverOnly": false,
+                      "navigationVertical": false,
+                      "thumbnavWidth": 100,
+                      "thumbnavHeight": 75,
+                      "thumbnavNoWrap": false,
+                      "slidenavMargin": "medium",
+                      "slidenavBreakpoint": "small",
+                      "slidenavHoverOnly": false,
+                      "slidenavLarger": false,
+                      "effect": "fade",
+                      "overlayContainer": "none",
+                      "overlayContainerPadding": "default",
+                      "overlayMargin": "default",
+                      "overlayPosition": "center",
+                      "overlayStyle": "none",
+                      "overlayAnimation": "parallax",
+                      "overlayPadding": "default",
+                      "overlayWidth": "none",
+                      "contentExpand": false,
+                      "overlayTextColor": "light"
+                    },
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "none",
+                        "textAlign": "center"
+                      },
+                      "customCss": "@media (max-width: 640px) {\n    .el-meta {\n        display: none;\n    }\n}\n\n.el-item { --uk-inverse: dark !important; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-1",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-0-1-0",
+                        "label": "Products",
+                        "url": "?post_type=product",
+                        "target": "_self",
+                        "style": "secondary"
+                      },
+                      {
+                        "id": "yootheme-button-0-0-0-1-1",
+                        "label": "Etsy Shop",
+                        "url": "https://www.etsy.com/",
+                        "target": "_blank",
+                        "style": "primary"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "bottom": "5vh",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "visibilityMode": "m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-0-0-0-2-0",
+                        "label": "Products",
+                        "url": "?post_type=product",
+                        "target": "_self",
+                        "style": "secondary"
+                      },
+                      {
+                        "id": "yootheme-button-0-0-0-2-1",
+                        "label": "Etsy Shop",
+                        "url": "https://www.etsy.com/",
+                        "target": "_blank",
+                        "style": "primary"
+                      }
+                    ],
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "hidden-m",
+                    "visibilityMode": "hidden-m",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "bottom": "5vh",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "visibilityMode": "hidden-m"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "Featured Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "sectionPadding": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "3-col-equal",
+        "layoutColumns": 3,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-1-0-0-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "woocommerce",
+                  "source": "product",
+                  "mode": "collection",
+                  "query": {
+                    "start": 0,
+                    "order": "date",
+                    "direction": "desc",
+                    "categories": [
+                      8
+                    ]
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.product_teaser_image_bg_square.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.product_teaser_image_bg_square.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "metaString",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 640,
+                "imageWidth": "640px",
+                "imageIntrinsicWidth": 640,
+                "imageMinHeight": "360px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "htmlElement": "article",
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "h5",
+                "titleHoverStyle": "reset",
+                "titleLink": true,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "metaMarginTop": "small",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-2",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-1-0-1-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "woocommerce",
+                  "source": "product",
+                  "mode": "collection",
+                  "query": {
+                    "start": 2,
+                    "order": "date",
+                    "direction": "desc",
+                    "categories": [
+                      8
+                    ]
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.product_teaser_image_bg_square.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.product_teaser_image_bg_square.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "metaString",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 640,
+                "imageWidth": "640px",
+                "imageIntrinsicWidth": 640,
+                "imageMinHeight": "360px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "htmlElement": "article",
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "h5",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "metaMarginTop": "small",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-1-column-3",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-1-0-2-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "woocommerce",
+                  "source": "product",
+                  "mode": "collection",
+                  "query": {
+                    "start": 1,
+                    "order": "date",
+                    "direction": "desc",
+                    "categories": [
+                      8
+                    ]
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.product_teaser_image_bg_square.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.product_teaser_image_bg_square.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "metaString",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 640,
+                "imageWidth": "640px",
+                "imageIntrinsicWidth": 640,
+                "imageMinHeight": "360px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "htmlElement": "article",
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "h5",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "metaMarginTop": "small",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-2-column-1",
+            "rowId": "yootheme-section-2-row-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-1-1-0-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "woocommerce",
+                  "source": "product",
+                  "mode": "collection",
+                  "query": {
+                    "start": 3,
+                    "order": "date",
+                    "direction": "desc",
+                    "categories": [
+                      8
+                    ]
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.product_teaser_image_bg_landscape.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.product_teaser_image_bg_landscape.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "metaString",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 920,
+                "imageWidth": "920px",
+                "imageIntrinsicWidth": 920,
+                "imageIntrinsicHeight": 615,
+                "imageMinHeight": "360px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "htmlElement": "article",
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "h5",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "metaMarginTop": "small",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-2-column-2",
+            "rowId": "yootheme-section-2-row-2",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-1-1-1-0",
+                "kind": "overlay",
+                "dynamicContext": {
+                  "provider": "woocommerce",
+                  "source": "product",
+                  "mode": "collection",
+                  "query": {
+                    "start": 4,
+                    "order": "date",
+                    "direction": "desc",
+                    "categories": [
+                      8
+                    ]
+                  }
+                },
+                "dynamicBindings": {
+                  "imageUrl": {
+                    "path": "acf.product_teaser_image_bg_landscape.url",
+                    "valueType": "url"
+                  },
+                  "imageAlt": {
+                    "path": "acf.product_teaser_image_bg_landscape.alt",
+                    "valueType": "string"
+                  },
+                  "title": {
+                    "path": "title",
+                    "valueType": "string"
+                  },
+                  "meta": {
+                    "path": "metaString",
+                    "valueType": "string"
+                  },
+                  "imageLinkUrl": {
+                    "path": "link",
+                    "valueType": "url"
+                  }
+                },
+                "imageUrl": "",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 920,
+                "imageWidth": "920px",
+                "imageIntrinsicWidth": 920,
+                "imageIntrinsicHeight": 615,
+                "imageMinHeight": "360px",
+                "imageFit": "cover",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": true,
+                "htmlElement": "article",
+                "overlayMode": "cover",
+                "overlayPosition": "bottom-center",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "overlayTransition": "fade",
+                "overlayTextColor": "light",
+                "titleStyle": "h5",
+                "titleHoverStyle": "reset",
+                "titleLink": false,
+                "titleElement": "h3",
+                "metaStyle": "text-meta",
+                "metaAlignment": "below-title",
+                "metaElement": "div",
+                "metaMarginTop": "small",
+                "linkStyle": "default",
+                "linkFullWidth": false,
+                "imageTextColor": "light",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-2-row-1",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "1-3,1-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-1-column-1",
+                  "widths": {
+                    "small": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-2",
+                  "widths": {
+                    "small": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-1-column-3",
+                  "widths": {
+                    "small": "1-3"
+                  },
+                  "order": {
+                    "small": "first"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-0-0-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 0,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          8
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.product_teaser_image_bg_square.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.product_teaser_image_bg_square.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "metaString",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 640,
+                    "imageWidth": "640px",
+                    "imageIntrinsicWidth": 640,
+                    "imageMinHeight": "360px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "htmlElement": "article",
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "h5",
+                    "titleHoverStyle": "reset",
+                    "titleLink": true,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "metaMarginTop": "small",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "1-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-0-1-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 2,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          8
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.product_teaser_image_bg_square.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.product_teaser_image_bg_square.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "metaString",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 640,
+                    "imageWidth": "640px",
+                    "imageIntrinsicWidth": 640,
+                    "imageMinHeight": "360px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "htmlElement": "article",
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "h5",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "metaMarginTop": "small",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-1-column-3",
+                "responsiveWidths": {
+                  "small": "1-3"
+                },
+                "order": {
+                  "small": "first"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "padding": "none",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-0-2-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 1,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          8
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.product_teaser_image_bg_square.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.product_teaser_image_bg_square.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "metaString",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 640,
+                    "imageWidth": "640px",
+                    "imageIntrinsicWidth": 640,
+                    "imageMinHeight": "360px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "htmlElement": "article",
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "h5",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "metaMarginTop": "small",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-2-row-2",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-2-row-2-column-1",
+                  "widths": {
+                    "small": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-2-row-2-column-2",
+                  "widths": {
+                    "small": "1-2"
+                  },
+                  "order": {
+                    "small": "first"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-2-row-2-column-1",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "padding": "none",
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-1-0-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 3,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          8
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.product_teaser_image_bg_landscape.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.product_teaser_image_bg_landscape.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "metaString",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 920,
+                    "imageWidth": "920px",
+                    "imageIntrinsicWidth": 920,
+                    "imageIntrinsicHeight": 615,
+                    "imageMinHeight": "360px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "htmlElement": "article",
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "h5",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "metaMarginTop": "small",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-2-row-2-column-2",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "order": {
+                  "small": "first"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-1-1-1-0",
+                    "kind": "overlay",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product",
+                      "mode": "collection",
+                      "query": {
+                        "start": 4,
+                        "order": "date",
+                        "direction": "desc",
+                        "categories": [
+                          8
+                        ]
+                      }
+                    },
+                    "dynamicBindings": {
+                      "imageUrl": {
+                        "path": "acf.product_teaser_image_bg_landscape.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "acf.product_teaser_image_bg_landscape.alt",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "metaString",
+                        "valueType": "string"
+                      },
+                      "imageLinkUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    },
+                    "imageUrl": "",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 920,
+                    "imageWidth": "920px",
+                    "imageIntrinsicWidth": 920,
+                    "imageIntrinsicHeight": 615,
+                    "imageMinHeight": "360px",
+                    "imageFit": "cover",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": true,
+                    "htmlElement": "article",
+                    "overlayMode": "cover",
+                    "overlayPosition": "bottom-center",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "overlayTransition": "fade",
+                    "overlayTextColor": "light",
+                    "titleStyle": "h5",
+                    "titleHoverStyle": "reset",
+                    "titleLink": false,
+                    "titleElement": "h3",
+                    "metaStyle": "text-meta",
+                    "metaAlignment": "below-title",
+                    "metaElement": "div",
+                    "metaMarginTop": "small",
+                    "linkStyle": "default",
+                    "linkFullWidth": false,
+                    "imageTextColor": "light",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "Products",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "xlarge",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "3-col-equal",
+        "layoutColumns": 3,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-planet.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "8vh"
+                      },
+                      {
+                        "value": "3vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-7vh",
+                    "left": "-2vw",
+                    "marginMode": "default"
+                  },
+                  "customCss": ".el-image { max-width: 45vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-1-column-2",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-0-1-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-rocket.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-8vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "right": "-10vw",
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "customCss": ".el-image { max-width: 25vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-2-0-1-1",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cloud.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "right",
+                "headingAlign": "right",
+                "visibility": "hidden-l",
+                "visibilityMode": "hidden-l",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "8vh",
+                    "right": "-2vw",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "visibilityMode": "hidden-l"
+                  },
+                  "customCss": ".el-image { max-width: 25vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-2-0-1-2",
+                "kind": "heading",
+                "headingText": "Products",
+                "title": "Products",
+                "headingLevel": "h2",
+                "headingSize": "h1",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "left": "0px",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-divider-2-0-1-3",
+                "kind": "divider",
+                "dividerStyle": "default",
+                "preset": "default",
+                "spacingContract": "yootheme",
+                "margin": "medium",
+                "elementPadding": "none",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-text-2-0-1-4",
+                "kind": "text",
+                "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor.",
+                "textVariant": "default",
+                "elementAlign": "center",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "large",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "large",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-2-0-1-5",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-falling-star.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "5vh"
+                      },
+                      {
+                        "value": "-2vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "left": "-15vw",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "customCss": ".el-image { max-width: 30vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-1-column-3",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-0-2-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cloud.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "l",
+                "visibilityMode": "l",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "10vh",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "visibilityMode": "l"
+                  },
+                  "customCss": ".el-image { max-width: 25vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-2-0-2-1",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-balloon.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "left",
+                "headingAlign": "left",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "8vh"
+                      },
+                      {
+                        "value": "-10vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-12vh",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "large",
+                    "textAlignFallback": "right"
+                  },
+                  "customCss": ".el-image { max-width: 12vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-1",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-grid-2-1-0-0",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-2-1-0-0-0",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3",
+                    "titleStyle": "h6",
+                    "dynamicContext": {
+                      "provider": "woocommerce",
+                      "source": "product-category",
+                      "mode": "collection",
+                      "query": {
+                        "graphqlRoot": "productCats",
+                        "yoothemeQueryName": "productCats.customProductCats",
+                        "sourceName": "product_cat",
+                        "start": 0,
+                        "quantity": 10,
+                        "sourceQuery": {
+                          "name": "productCats.customProductCats",
+                          "arguments": {
+                            "offset": 0,
+                            "limit": 10,
+                            "order": "term_order",
+                            "order_direction": "ASC",
+                            "id": 0
+                          }
+                        },
+                        "parentId": 0,
+                        "order": "menuOrder",
+                        "direction": "asc",
+                        "hideEmpty": true
+                      }
+                    },
+                    "dynamicBindings": {
+                      "title": {
+                        "path": "name",
+                        "valueType": "string"
+                      },
+                      "imageUrl": {
+                        "path": "thumbnail.url",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "thumbnail.alt",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "link",
+                        "valueType": "url"
+                      }
+                    }
+                  },
+                  {
+                    "id": "yootheme-grid-item-2-1-0-0-1",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/products-category-custom-order.jpg",
+                    "imageAlt": "Custom Order",
+                    "title": "Custom Order",
+                    "meta": "",
+                    "text": "",
+                    "buttonUrl": "?page_id=5",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3",
+                    "titleStyle": "h6"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "blank",
+                "gridCardSize": "none",
+                "gridCardHover": false,
+                "panelImageNoPadding": false,
+                "linkPanel": true,
+                "panelHover": false,
+                "panelExpand": "none",
+                "panelContentWidth": "auto",
+                "gridItemMaxWidth": "none",
+                "gridTitlePlacement": "top",
+                "gridTitleWidth": "1-2",
+                "gridTitleColumnGap": "default",
+                "gridTitleRowGap": "default",
+                "gridTitleBreakpoint": "m",
+                "gridMediaPlacement": "top",
+                "showDividers": false,
+                "centerColumns": false,
+                "centerRows": false,
+                "gridParallaxJustify": false,
+                "columnsPhonePortrait": "2",
+                "columnsTabletLandscape": "3",
+                "gridMediaWidth": "1-2",
+                "gridMediaColumnGap": "default",
+                "gridMediaRowGap": "default",
+                "gridMediaBreakpoint": "m",
+                "gridMediaVerticalAlign": false,
+                "imageWidth": "510px",
+                "imageSvgColor": "emphasis",
+                "imageMarginTop": "default",
+                "imageMaxWidth": 510,
+                "imageShape": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "scale-up",
+                "linkImage": false,
+                "enableLightbox": false,
+                "linkTitle": false,
+                "panelTitleHoverStyle": "heading-link",
+                "panelTitleAlign": "top",
+                "panelTitleGridWidth": "1-2",
+                "panelTitleGridBreakpoint": "medium",
+                "panelTitleGridColumnGap": "default",
+                "panelTitleGridRowGap": "default",
+                "gridTitleSize": "h6",
+                "metaStyle": "text-meta",
+                "gridMetaAlign": "below-title",
+                "gridMetaHtmlElement": "div",
+                "gridContentAlign": false,
+                "gridContentDropcap": false,
+                "gridContentColumn": "none",
+                "gridContentColumnDivider": false,
+                "gridContentColumnBreakpoint": "m",
+                "contentMarginTop": "small",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin)"
+                  },
+                  "card": {
+                    "titleMargin": "0",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-3-row-1",
+            "layout": "3-col-equal",
+            "customLayout": {
+              "template": "1-3,1-3,1-3",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-3-row-1-column-1",
+                  "widths": {
+                    "large": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-1-column-2",
+                  "widths": {
+                    "large": "1-3"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-3-row-1-column-3",
+                  "widths": {
+                    "large": "1-3"
+                  }
+                }
+              ]
+            },
+            "columnGap": "none",
+            "rowGap": "none",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-1-column-1",
+                "responsiveWidths": {
+                  "large": "1-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-planet.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "8vh"
+                          },
+                          {
+                            "value": "3vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "-7vh",
+                        "left": "-2vw",
+                        "marginMode": "default"
+                      },
+                      "customCss": ".el-image { max-width: 45vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-1-column-2",
+                "responsiveWidths": {
+                  "large": "1-3"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-0-1-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-rocket.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-8vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "right": "-10vw",
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "customCss": ".el-image { max-width: 25vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-2-0-1-1",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cloud.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "visibility": "hidden-l",
+                    "visibilityMode": "hidden-l",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "8vh",
+                        "right": "-2vw",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "visibilityMode": "hidden-l"
+                      },
+                      "customCss": ".el-image { max-width: 25vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-2-0-1-2",
+                    "kind": "heading",
+                    "headingText": "Products",
+                    "title": "Products",
+                    "headingLevel": "h2",
+                    "headingSize": "h1",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "left": "0px",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-divider-2-0-1-3",
+                    "kind": "divider",
+                    "dividerStyle": "default",
+                    "preset": "default",
+                    "spacingContract": "yootheme",
+                    "margin": "medium",
+                    "elementPadding": "none",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-text-2-0-1-4",
+                    "kind": "text",
+                    "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor.",
+                    "textVariant": "default",
+                    "elementAlign": "center",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "large",
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "maxWidth": "large",
+                        "blockAlign": "center",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-2-0-1-5",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-falling-star.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "5vh"
+                          },
+                          {
+                            "value": "-2vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "left": "-15vw",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "customCss": ".el-image { max-width: 30vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-3-row-1-column-3",
+                "responsiveWidths": {
+                  "large": "1-3"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-2-0-2-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cloud.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "l",
+                    "visibilityMode": "l",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "10vh",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "visibilityMode": "l"
+                      },
+                      "customCss": ".el-image { max-width: 25vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-2-0-2-1",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-balloon.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "8vh"
+                          },
+                          {
+                            "value": "-10vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "bottom": "-12vh",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "large",
+                        "textAlignFallback": "right"
+                      },
+                      "customCss": ".el-image { max-width: 12vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-3-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-grid-2-1-0-0",
+                    "kind": "grid",
+                    "gridSource": "static",
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-2-1-0-0-0",
+                        "imageUrl": "",
+                        "imageAlt": "",
+                        "title": "",
+                        "meta": "",
+                        "text": "",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3",
+                        "titleStyle": "h6",
+                        "dynamicContext": {
+                          "provider": "woocommerce",
+                          "source": "product-category",
+                          "mode": "collection",
+                          "query": {
+                            "graphqlRoot": "productCats",
+                            "yoothemeQueryName": "productCats.customProductCats",
+                            "sourceName": "product_cat",
+                            "start": 0,
+                            "quantity": 10,
+                            "sourceQuery": {
+                              "name": "productCats.customProductCats",
+                              "arguments": {
+                                "offset": 0,
+                                "limit": 10,
+                                "order": "term_order",
+                                "order_direction": "ASC",
+                                "id": 0
+                              }
+                            },
+                            "parentId": 0,
+                            "order": "menuOrder",
+                            "direction": "asc",
+                            "hideEmpty": true
+                          }
+                        },
+                        "dynamicBindings": {
+                          "title": {
+                            "path": "name",
+                            "valueType": "string"
+                          },
+                          "imageUrl": {
+                            "path": "thumbnail.url",
+                            "valueType": "url"
+                          },
+                          "imageAlt": {
+                            "path": "thumbnail.alt",
+                            "valueType": "string"
+                          },
+                          "buttonUrl": {
+                            "path": "link",
+                            "valueType": "url"
+                          }
+                        }
+                      },
+                      {
+                        "id": "yootheme-grid-item-2-1-0-0-1",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/products-category-custom-order.jpg",
+                        "imageAlt": "Custom Order",
+                        "title": "Custom Order",
+                        "meta": "",
+                        "text": "",
+                        "buttonUrl": "?page_id=5",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3",
+                        "titleStyle": "h6"
+                      }
+                    ],
+                    "gridShowImage": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "enableFilter": false,
+                    "filterStyle": "tabs",
+                    "gridItemRenderer": "plain",
+                    "gridCardVariant": "blank",
+                    "gridCardSize": "none",
+                    "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": true,
+                    "panelHover": false,
+                    "panelExpand": "none",
+                    "panelContentWidth": "auto",
+                    "gridItemMaxWidth": "none",
+                    "gridTitlePlacement": "top",
+                    "gridTitleWidth": "1-2",
+                    "gridTitleColumnGap": "default",
+                    "gridTitleRowGap": "default",
+                    "gridTitleBreakpoint": "m",
+                    "gridMediaPlacement": "top",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "centerRows": false,
+                    "gridParallaxJustify": false,
+                    "columnsPhonePortrait": "2",
+                    "columnsTabletLandscape": "3",
+                    "gridMediaWidth": "1-2",
+                    "gridMediaColumnGap": "default",
+                    "gridMediaRowGap": "default",
+                    "gridMediaBreakpoint": "m",
+                    "gridMediaVerticalAlign": false,
+                    "imageWidth": "510px",
+                    "imageSvgColor": "emphasis",
+                    "imageMarginTop": "default",
+                    "imageMaxWidth": 510,
+                    "imageShape": "none",
+                    "imageBoxDecoration": "none",
+                    "imageHoverTransition": "scale-up",
+                    "linkImage": false,
+                    "enableLightbox": false,
+                    "linkTitle": false,
+                    "panelTitleHoverStyle": "heading-link",
+                    "panelTitleAlign": "top",
+                    "panelTitleGridWidth": "1-2",
+                    "panelTitleGridBreakpoint": "medium",
+                    "panelTitleGridColumnGap": "default",
+                    "panelTitleGridRowGap": "default",
+                    "gridTitleSize": "h6",
+                    "metaStyle": "text-meta",
+                    "gridMetaAlign": "below-title",
+                    "gridMetaHtmlElement": "div",
+                    "gridContentAlign": false,
+                    "gridContentDropcap": false,
+                    "gridContentColumn": "none",
+                    "gridContentColumnDivider": false,
+                    "gridContentColumnBreakpoint": "m",
+                    "contentMarginTop": "small",
+                    "buttonStyle": "default",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin)"
+                      },
+                      "card": {
+                        "titleMargin": "0",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {}
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "About",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "large",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-3-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-about.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 780,
+                "imageWidth": "780px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageLinkUrl": "?page_id=6",
+                "imageLinkTarget": "_self",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-3-0-0-1",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-rainbow.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "left",
+                "headingAlign": "left",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-20vh"
+                      }
+                    ],
+                    "easing": 1,
+                    "target": "!.uk-section"
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "5vh",
+                    "left": "-8vw",
+                    "marginMode": "default",
+                    "textAlign": "left"
+                  },
+                  "customCss": ".el-image {\n    min-width: 180px;\n    max-width: 25vw; \n}",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-4-row-1-column-2",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-3-0-1-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bird.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 250,
+                "imageWidth": "250px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "hidden-m",
+                "visibilityMode": "hidden-m",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "visibilityMode": "hidden-m"
+                  },
+                  "customCss": ".el-image { max-width: 25vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-3-0-1-1",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bird.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 250,
+                "imageWidth": "250px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "m",
+                "visibilityMode": "m",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "5vh"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-18vh",
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "visibilityMode": "m"
+                  },
+                  "customCss": ".el-image { max-width: 25vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-heading-3-0-1-2",
+                "kind": "heading",
+                "headingText": "Inspired by Our Children & The Passion for Crafts",
+                "title": "Inspired by Our Children & The Passion for Crafts",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "elementAlign": "center",
+                "maxWidth": "large",
+                "textAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "large",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-text-3-0-1-3",
+                "kind": "text",
+                "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum.",
+                "textVariant": "default",
+                "elementAlign": "center",
+                "textColumnBreakpoint": "medium",
+                "maxWidth": "large",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium",
+                    "maxWidth": "large",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-button-3-0-1-4",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-3-0-1-4-0",
+                    "label": "Our Story",
+                    "url": "?page_id=6",
+                    "target": "_self",
+                    "style": "secondary"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementAlign": "center",
+                "maxWidth": "large",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large",
+                    "maxWidth": "large",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-3-0-1-5",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cupcake.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 160,
+                "imageWidth": "160px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "visibility": "m",
+                "visibilityMode": "m",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "5vh"
+                      },
+                      {
+                        "value": "0"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-30vh",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center",
+                    "textAlignBreakpoint": "xlarge",
+                    "textAlignFallback": "left",
+                    "visibilityMode": "m"
+                  },
+                  "customCss": ".el-image { max-width: 15vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-4-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-4-row-1-column-1",
+                  "widths": {
+                    "small": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-4-row-1-column-2",
+                  "widths": {
+                    "small": "1-2"
+                  },
+                  "order": {
+                    "small": "first"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-4-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-3-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-about.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 780,
+                    "imageWidth": "780px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageLinkUrl": "?page_id=6",
+                    "imageLinkTarget": "_self",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-3-0-0-1",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-rainbow.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-20vh"
+                          }
+                        ],
+                        "easing": 1,
+                        "target": "!.uk-section"
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "bottom": "5vh",
+                        "left": "-8vw",
+                        "marginMode": "default",
+                        "textAlign": "left"
+                      },
+                      "customCss": ".el-image {\n    min-width: 180px;\n    max-width: 25vw; \n}",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-4-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "order": {
+                  "small": "first"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-3-0-1-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bird.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 250,
+                    "imageWidth": "250px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "hidden-m",
+                    "visibilityMode": "hidden-m",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "visibilityMode": "hidden-m"
+                      },
+                      "customCss": ".el-image { max-width: 25vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-3-0-1-1",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bird.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 250,
+                    "imageWidth": "250px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "5vh"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "top": "-18vh",
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "visibilityMode": "m"
+                      },
+                      "customCss": ".el-image { max-width: 25vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-heading-3-0-1-2",
+                    "kind": "heading",
+                    "headingText": "Inspired by Our Children & The Passion for Crafts",
+                    "title": "Inspired by Our Children & The Passion for Crafts",
+                    "headingLevel": "h2",
+                    "headingAlign": "left",
+                    "elementAlign": "center",
+                    "maxWidth": "large",
+                    "textAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "maxWidth": "large",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-text-3-0-1-3",
+                    "kind": "text",
+                    "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum.",
+                    "textVariant": "default",
+                    "elementAlign": "center",
+                    "textColumnBreakpoint": "medium",
+                    "maxWidth": "large",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium",
+                        "maxWidth": "large",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-button-3-0-1-4",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-3-0-1-4-0",
+                        "label": "Our Story",
+                        "url": "?page_id=6",
+                        "target": "_self",
+                        "style": "secondary"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementAlign": "center",
+                    "maxWidth": "large",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "large",
+                        "maxWidth": "large",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-3-0-1-5",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-cupcake.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 160,
+                    "imageWidth": "160px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "5vh"
+                          },
+                          {
+                            "value": "0"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "bottom": "-30vh",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "center",
+                        "textAlignBreakpoint": "xlarge",
+                        "textAlignFallback": "left",
+                        "visibilityMode": "m"
+                      },
+                      "customCss": ".el-image { max-width: 15vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Contact",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "xlarge",
+        "maxWidth": "xlarge",
+        "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-4-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-contact.jpg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 620,
+                "imageWidth": "620px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-4-0-0-1",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-sun.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageMaxWidth": 320,
+                "imageWidth": "320px",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "right",
+                "headingAlign": "right",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "5vh"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "right": "-2vw",
+                    "bottom": "5vh",
+                    "marginMode": "default",
+                    "textAlign": "right"
+                  },
+                  "customCss": ".el-image {\n    min-width: 150px;\n    max-width: 20vw; \n}",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-1-column-2",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-1-0",
+                "kind": "heading",
+                "headingText": "Visit Our Tiny Store in the Beautiful City Center",
+                "title": "Visit Our Tiny Store in the Beautiful City Center",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "textAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-grid-4-0-1-1",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-4-0-1-1-0",
+                    "imageUrl": "",
+                    "imageAlt": "Contact",
+                    "title": "Contact",
+                    "meta": "",
+                    "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3",
+                    "titleStyle": "h6"
+                  },
+                  {
+                    "id": "yootheme-grid-item-4-0-1-1-1",
+                    "imageUrl": "",
+                    "imageAlt": "Opening Hours",
+                    "title": "Opening Hours",
+                    "meta": "",
+                    "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "mediaFit": "natural",
+                    "titleElement": "h3",
+                    "titleStyle": "h6"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "enableFilter": false,
+                "filterStyle": "tabs",
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "blank",
+                "gridCardSize": "none",
+                "gridCardHover": false,
+                "panelImageNoPadding": false,
+                "linkPanel": false,
+                "panelHover": false,
+                "panelExpand": "none",
+                "panelContentWidth": "auto",
+                "gridItemMaxWidth": "none",
+                "gridTitlePlacement": "top",
+                "gridTitleWidth": "1-2",
+                "gridTitleColumnGap": "default",
+                "gridTitleRowGap": "default",
+                "gridTitleBreakpoint": "m",
+                "gridMediaPlacement": "top",
+                "gridGap": "small",
+                "gridRowGap": "small",
+                "showDividers": false,
+                "centerColumns": false,
+                "centerRows": false,
+                "gridParallaxJustify": false,
+                "columnsPhonePortrait": "1",
+                "columnsTabletLandscape": "2",
+                "gridMediaWidth": "1-2",
+                "gridMediaColumnGap": "default",
+                "gridMediaRowGap": "default",
+                "gridMediaBreakpoint": "m",
+                "gridMediaVerticalAlign": false,
+                "imageSvgColor": "emphasis",
+                "imageMarginTop": "default",
+                "imageShape": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "imageIconWidth": "80",
+                "linkImage": false,
+                "enableLightbox": false,
+                "linkTitle": false,
+                "panelTitleHoverStyle": "none",
+                "panelTitleAlign": "top",
+                "panelTitleGridWidth": "1-2",
+                "panelTitleGridBreakpoint": "medium",
+                "panelTitleGridColumnGap": "default",
+                "panelTitleGridRowGap": "default",
+                "gridTitleSize": "h6",
+                "metaStyle": "text-meta",
+                "gridMetaAlign": "below-title",
+                "gridMetaHtmlElement": "div",
+                "gridContentAlign": false,
+                "gridContentDropcap": false,
+                "gridContentColumn": "none",
+                "gridContentColumnDivider": false,
+                "gridContentColumnBreakpoint": "m",
+                "contentMarginTop": "small",
+                "buttonLabel": "Read more",
+                "buttonStyle": "default",
+                "buttonTarget": "_self",
+                "fullWidthButton": false,
+                "visualStyle": {
+                  "margin": {
+                    "top": "var(--uk-global-margin-medium)"
+                  },
+                  "card": {
+                    "titleMargin": "0",
+                    "buttonMargin": "0"
+                  },
+                  "layout": {
+                    "marginMode": "medium",
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {}
+                },
+                "maxWidth": "xlarge",
+                "elementAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
+              },
+              {
+                "id": "yootheme-button-4-0-1-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-1-2-0",
+                    "label": "Contact",
+                    "url": "?page_id=8",
+                    "target": "_self",
+                    "style": "default"
+                  }
+                ],
+                "size": "large",
+                "buttonColumnGap": "small",
+                "buttonRowGap": "small",
+                "fullWidthButton": false,
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "textAlign": "left",
+                "headingAlign": "left",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1,
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              {
+                "id": "yootheme-image-4-0-1-3",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bear.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "right",
+                "headingAlign": "right",
+                "visibility": "m",
+                "visibilityMode": "m",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-5vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "visibilityMode": "m"
+                  },
+                  "customCss": ".el-image { max-width: 20vw; }",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-5-row-1",
+            "layout": "2-col-equal",
+            "customLayout": {
+              "template": "1-2,1-2",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-5-row-1-column-1",
+                  "widths": {
+                    "small": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-5-row-1-column-2",
+                  "widths": {
+                    "small": "1-2"
+                  }
+                }
+              ]
+            },
+            "columnGap": "large",
+            "rowGap": "large",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-5-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-4-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-contact.jpg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 620,
+                    "imageWidth": "620px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-4-0-0-1",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-sun.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageMaxWidth": 320,
+                    "imageWidth": "320px",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "5vh"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "right": "-2vw",
+                        "bottom": "5vh",
+                        "marginMode": "default",
+                        "textAlign": "right"
+                      },
+                      "customCss": ".el-image {\n    min-width: 150px;\n    max-width: 20vw; \n}",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-5-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "verticalAlign": "middle",
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-4-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Visit Our Tiny Store in the Beautiful City Center",
+                    "title": "Visit Our Tiny Store in the Beautiful City Center",
+                    "headingLevel": "h2",
+                    "headingAlign": "left",
+                    "elementAlign": "center",
+                    "maxWidth": "xlarge",
+                    "textAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "maxWidth": "xlarge",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-grid-4-0-1-1",
+                    "kind": "grid",
+                    "gridSource": "static",
+                    "gridItems": [
+                      {
+                        "id": "yootheme-grid-item-4-0-1-1-0",
+                        "imageUrl": "",
+                        "imageAlt": "Contact",
+                        "title": "Contact",
+                        "meta": "",
+                        "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3",
+                        "titleStyle": "h6"
+                      },
+                      {
+                        "id": "yootheme-grid-item-4-0-1-1-1",
+                        "imageUrl": "",
+                        "imageAlt": "Opening Hours",
+                        "title": "Opening Hours",
+                        "meta": "",
+                        "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                        "buttonLabel": "Read more",
+                        "buttonTarget": "_self",
+                        "mediaFit": "natural",
+                        "titleElement": "h3",
+                        "titleStyle": "h6"
+                      }
+                    ],
+                    "gridShowImage": true,
+                    "gridShowMeta": true,
+                    "gridShowText": true,
+                    "gridShowButton": true,
+                    "enableFilter": false,
+                    "filterStyle": "tabs",
+                    "gridItemRenderer": "plain",
+                    "gridCardVariant": "blank",
+                    "gridCardSize": "none",
+                    "gridCardHover": false,
+                    "panelImageNoPadding": false,
+                    "linkPanel": false,
+                    "panelHover": false,
+                    "panelExpand": "none",
+                    "panelContentWidth": "auto",
+                    "gridItemMaxWidth": "none",
+                    "gridTitlePlacement": "top",
+                    "gridTitleWidth": "1-2",
+                    "gridTitleColumnGap": "default",
+                    "gridTitleRowGap": "default",
+                    "gridTitleBreakpoint": "m",
+                    "gridMediaPlacement": "top",
+                    "gridGap": "small",
+                    "gridRowGap": "small",
+                    "showDividers": false,
+                    "centerColumns": false,
+                    "centerRows": false,
+                    "gridParallaxJustify": false,
+                    "columnsPhonePortrait": "1",
+                    "columnsTabletLandscape": "2",
+                    "gridMediaWidth": "1-2",
+                    "gridMediaColumnGap": "default",
+                    "gridMediaRowGap": "default",
+                    "gridMediaBreakpoint": "m",
+                    "gridMediaVerticalAlign": false,
+                    "imageSvgColor": "emphasis",
+                    "imageMarginTop": "default",
+                    "imageShape": "none",
+                    "imageBoxDecoration": "none",
+                    "imageHoverTransition": "none",
+                    "imageIconWidth": "80",
+                    "linkImage": false,
+                    "enableLightbox": false,
+                    "linkTitle": false,
+                    "panelTitleHoverStyle": "none",
+                    "panelTitleAlign": "top",
+                    "panelTitleGridWidth": "1-2",
+                    "panelTitleGridBreakpoint": "medium",
+                    "panelTitleGridColumnGap": "default",
+                    "panelTitleGridRowGap": "default",
+                    "gridTitleSize": "h6",
+                    "metaStyle": "text-meta",
+                    "gridMetaAlign": "below-title",
+                    "gridMetaHtmlElement": "div",
+                    "gridContentAlign": false,
+                    "gridContentDropcap": false,
+                    "gridContentColumn": "none",
+                    "gridContentColumnDivider": false,
+                    "gridContentColumnBreakpoint": "m",
+                    "contentMarginTop": "small",
+                    "buttonLabel": "Read more",
+                    "buttonStyle": "default",
+                    "buttonTarget": "_self",
+                    "fullWidthButton": false,
+                    "visualStyle": {
+                      "margin": {
+                        "top": "var(--uk-global-margin-medium)"
+                      },
+                      "card": {
+                        "titleMargin": "0",
+                        "buttonMargin": "0"
+                      },
+                      "layout": {
+                        "marginMode": "medium",
+                        "maxWidth": "xlarge",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {}
+                    },
+                    "maxWidth": "xlarge",
+                    "elementAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme"
+                  },
+                  {
+                    "id": "yootheme-button-4-0-1-2",
+                    "kind": "button",
+                    "buttons": [
+                      {
+                        "id": "yootheme-button-4-0-1-2-0",
+                        "label": "Contact",
+                        "url": "?page_id=8",
+                        "target": "_self",
+                        "style": "default"
+                      }
+                    ],
+                    "size": "large",
+                    "buttonColumnGap": "small",
+                    "buttonRowGap": "small",
+                    "fullWidthButton": false,
+                    "elementAlign": "center",
+                    "maxWidth": "xlarge",
+                    "textAlign": "left",
+                    "headingAlign": "left",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "relative",
+                        "zIndex": 1,
+                        "maxWidth": "xlarge",
+                        "blockAlign": "center",
+                        "textAlign": "left",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  },
+                  {
+                    "id": "yootheme-image-4-0-1-3",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-bear.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "visibility": "m",
+                    "visibilityMode": "m",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-5vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "zIndex": 0,
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "visibilityMode": "m"
+                      },
+                      "customCss": ".el-image { max-width: 20vw; }",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-6",
+        "kind": "contentLayout",
+        "title": "Instagram",
+        "background": "transparent",
+        "backgroundRole": "default",
+        "sectionVariant": "default",
+        "contentMode": "none",
+        "maxWidth": "none",
+        "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "visualStyle": {
+          "background": {
+            "type": "image",
+            "imagePosition": "center-center"
+          }
+        },
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "visible": true,
+        "layout": "quarters-1-2-1",
+        "layoutColumns": 3,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-6-row-1-column-1",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-image-5-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-flower.svg",
+                "videoUrl": "",
+                "imageAlt": "",
+                "imageSvgColor": "emphasis",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false,
+                "textAlign": "right",
+                "headingAlign": "right",
+                "visibility": "s",
+                "visibilityMode": "s",
+                "animation": {
+                  "preset": "parallax",
+                  "parallax": {
+                    "y": [
+                      {
+                        "value": "0"
+                      },
+                      {
+                        "value": "-2vh"
+                      }
+                    ],
+                    "easing": 1
+                  }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "left": "1vw",
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "small",
+                    "textAlignFallback": "left",
+                    "visibilityMode": "s"
+                  },
+                  "customCss": ".el-image {\n    min-width: 60px;\n    max-width: 10vw; \n}",
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-6-row-1-column-2",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "yootheme-heading-5-0-1-0",
+                "kind": "heading",
+                "headingText": "Follow Us on Instagram",
+                "title": "Follow Us on Instagram",
+                "headingLevel": "h2",
+                "headingSize": "h5",
+                "headingAlign": "center",
+                "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "medium",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-6-row-1-column-3",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": []
+          },
+          {
+            "id": "yootheme-section-6-row-2-column-1",
+            "rowId": "yootheme-section-6-row-2",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-overlay-slider-5-1-0-0",
+                "kind": "overlaySlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-0",
+                    "title": "Slider 01",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-01.jpg",
+                    "imageAlt": "Slider 01",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-1",
+                    "title": "Slider 02",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-02.jpg",
+                    "imageAlt": "Slider 02",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-2",
+                    "title": "Slider 03",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-03.jpg",
+                    "imageAlt": "Slider 03",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-3",
+                    "title": "Slider 04",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-04.jpg",
+                    "imageAlt": "Slider 04",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-4",
+                    "title": "Slider 05",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-05.jpg",
+                    "imageAlt": "Slider 05",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  },
+                  {
+                    "id": "yootheme-panel-slide-5-1-0-0-5",
+                    "title": "Slider 06",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-06.jpg",
+                    "imageAlt": "Slider 06",
+                    "hoverVideoUrl": "",
+                    "thumbnailUrl": "",
+                    "showAction": false,
+                    "buttonUrl": "https://www.instagram.com/"
+                  }
+                ],
+                "carouselSettings": {
+                  "presentation": "overlay-slider",
+                  "variant": "overlay",
+                  "slideMode": "overlay",
+                  "showTitle": false,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "itemWidthMode": "fixed",
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "centered": false,
+                  "loop": true,
+                  "spaceBetween": 0,
+                  "divider": false,
+                  "cardsPerViewPhone": 3,
+                  "cardsPerViewSmall": 4,
+                  "cardsPerViewLarge": 5,
+                  "showArrows": false,
+                  "showDots": false,
+                  "navigationType": "none",
+                  "navigationBelow": true,
+                  "navigationMargin": "medium",
+                  "navigationBreakpoint": "small",
+                  "arrowPosition": "overlay",
+                  "slidenavMargin": "medium",
+                  "paginationPosition": "bottom-center",
+                  "slidenavBreakpoint": "small",
+                  "headingLevel": "h3",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "meta",
+                  "buttonStyle": "default",
+                  "linkTarget": "_self",
+                  "effect": "slide",
+                  "overlayMode": "cover",
+                  "overlayDisplay": "hover",
+                  "overlayPosition": "center",
+                  "overlayPadding": "default",
+                  "overlayStyle": "none",
+                  "overlayTextColor": "light",
+                  "imageWidth": "370px"
+                },
+                "textAlign": "center",
+                "headingAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-6-row-1",
+            "layout": "quarters-1-2-1",
+            "customLayout": {
+              "template": "1-4,1-2,1-4",
+              "columns": [
+                {
+                  "columnId": "yootheme-section-6-row-1-column-1",
+                  "widths": {
+                    "small": "1-4"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-6-row-1-column-2",
+                  "widths": {
+                    "small": "1-2"
+                  }
+                },
+                {
+                  "columnId": "yootheme-section-6-row-1-column-3",
+                  "widths": {
+                    "small": "1-4"
+                  }
+                }
+              ]
+            },
+            "maxWidth": "default",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-6-row-1-column-1",
+                "responsiveWidths": {
+                  "small": "1-4"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-image-5-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/illustration-flower.svg",
+                    "videoUrl": "",
+                    "imageAlt": "",
+                    "imageSvgColor": "emphasis",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false,
+                    "textAlign": "right",
+                    "headingAlign": "right",
+                    "visibility": "s",
+                    "visibilityMode": "s",
+                    "animation": {
+                      "preset": "parallax",
+                      "parallax": {
+                        "y": [
+                          {
+                            "value": "0"
+                          },
+                          {
+                            "value": "-2vh"
+                          }
+                        ],
+                        "easing": 1
+                      }
+                    },
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "position": "absolute",
+                        "left": "1vw",
+                        "zIndex": 1,
+                        "marginMode": "default",
+                        "textAlign": "right",
+                        "textAlignBreakpoint": "small",
+                        "textAlignFallback": "left",
+                        "visibilityMode": "s"
+                      },
+                      "customCss": ".el-image {\n    min-width: 60px;\n    max-width: 10vw; \n}",
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-6-row-1-column-2",
+                "responsiveWidths": {
+                  "small": "1-2"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-heading-5-0-1-0",
+                    "kind": "heading",
+                    "headingText": "Follow Us on Instagram",
+                    "title": "Follow Us on Instagram",
+                    "headingLevel": "h2",
+                    "headingSize": "h5",
+                    "headingAlign": "center",
+                    "textAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "medium",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "yootheme-section-6-row-1-column-3",
+                "responsiveWidths": {
+                  "small": "1-4"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-6-row-2",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-6-row-2-column-1",
+                "responsiveWidths": {
+                  "medium": "1-1"
+                },
+                "background": {
+                  "position": "center center"
+                },
+                "sticky": {
+                  "breakpoint": "m"
+                },
+                "elements": [
+                  {
+                    "id": "yootheme-overlay-slider-5-1-0-0",
+                    "kind": "overlaySlider",
+                    "slides": [
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-0",
+                        "title": "Slider 01",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-01.jpg",
+                        "imageAlt": "Slider 01",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-1",
+                        "title": "Slider 02",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-02.jpg",
+                        "imageAlt": "Slider 02",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-2",
+                        "title": "Slider 03",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-03.jpg",
+                        "imageAlt": "Slider 03",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-3",
+                        "title": "Slider 04",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-04.jpg",
+                        "imageAlt": "Slider 04",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-4",
+                        "title": "Slider 05",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-05.jpg",
+                        "imageAlt": "Slider 05",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      },
+                      {
+                        "id": "yootheme-panel-slide-5-1-0-0-5",
+                        "title": "Slider 06",
+                        "meta": "",
+                        "text": "",
+                        "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slider-06.jpg",
+                        "imageAlt": "Slider 06",
+                        "hoverVideoUrl": "",
+                        "thumbnailUrl": "",
+                        "showAction": false,
+                        "buttonUrl": "https://www.instagram.com/"
+                      }
+                    ],
+                    "carouselSettings": {
+                      "presentation": "overlay-slider",
+                      "variant": "overlay",
+                      "slideMode": "overlay",
+                      "showTitle": false,
+                      "showMeta": true,
+                      "showContent": true,
+                      "showLink": true,
+                      "itemWidthMode": "fixed",
+                      "autoplay": false,
+                      "pauseOnHover": true,
+                      "centered": false,
+                      "loop": true,
+                      "spaceBetween": 0,
+                      "divider": false,
+                      "cardsPerViewPhone": 3,
+                      "cardsPerViewSmall": 4,
+                      "cardsPerViewLarge": 5,
+                      "showArrows": false,
+                      "showDots": false,
+                      "navigationType": "none",
+                      "navigationBelow": true,
+                      "navigationMargin": "medium",
+                      "navigationBreakpoint": "small",
+                      "arrowPosition": "overlay",
+                      "slidenavMargin": "medium",
+                      "paginationPosition": "bottom-center",
+                      "slidenavBreakpoint": "small",
+                      "headingLevel": "h3",
+                      "metaPosition": "below-title",
+                      "metaHtmlElement": "div",
+                      "metaStyle": "meta",
+                      "buttonStyle": "default",
+                      "linkTarget": "_self",
+                      "effect": "slide",
+                      "overlayMode": "cover",
+                      "overlayDisplay": "hover",
+                      "overlayPosition": "center",
+                      "overlayPadding": "default",
+                      "overlayStyle": "none",
+                      "overlayTextColor": "light",
+                      "imageWidth": "370px"
+                    },
+                    "textAlign": "center",
+                    "headingAlign": "center",
+                    "elementPadding": "none",
+                    "spacingContract": "yootheme",
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default",
+                        "textAlign": "center"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-06T15:33:16.081Z"
+  }
+]

@@ -1,0 +1,240 @@
+[
+  {
+    "id": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "email": "hakop28ol@yahoo.com",
+    "passwordHash": "$2b$12$L2FcYCmhPMwYXX2XhrAK7O88rF3kgmVBdEdsv46PWQ2yzh0oHn9l2",
+    "name": "Hakob Jaghatspanyan",
+    "role": "super_admin",
+    "createdAt": "2026-06-29T19:14:12.875Z",
+    "updatedAt": "2026-09-02T07:00:47.526Z",
+    "language": "en",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-22T17:38:17.507Z"
+    }
+  },
+  {
+    "id": "9782eff3-23e8-4dea-934b-1c6ceae4cd04",
+    "email": "jaghatspanyan35@gmail.com",
+    "passwordHash": "$2b$12$NzC4ymdpkBJDIQiycEmeW.YeOc8Y.9wgzHTq4Uh0CtMrJ7m2BN.NO",
+    "name": "Notebookmall",
+    "role": "user",
+    "createdAt": "2026-06-30T07:05:03.122Z",
+    "updatedAt": "2026-06-30T07:05:03.122Z"
+  },
+  {
+    "id": "db003b60-c750-431a-970d-7c4da5b39fd4",
+    "email": "info@webpages.am",
+    "passwordHash": "$2b$12$tq/moezc9D5w1QDOrA8E2.ayA6cavqXqhixgzK2nPdm8hCAPoka3i",
+    "name": "Hakob Jaghatspanyan",
+    "role": "user",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-07T06:14:32.890Z"
+    },
+    "onboarding": {
+      "companyName": "WebPages",
+      "logoUrl": "/uploads/onboarding/logo-2-mra97qux.svg",
+      "businessCategory": "WebPages",
+      "phone": "+37499451167",
+      "publicEmail": "hi@mail.com",
+      "address": "hey",
+      "websiteName": "ay",
+      "preferredDomain": "oy",
+      "businessDescription": "iy",
+      "facebookUrl": "https://hoy",
+      "instagramUrl": "https://hiy",
+      "styleNotes": "yay",
+      "additionalNotes": "bay",
+      "updatedAt": "2026-07-07T06:14:32.890Z"
+    },
+    "createdAt": "2026-07-07T06:14:32.890Z",
+    "updatedAt": "2026-07-07T06:14:32.890Z"
+  },
+  {
+    "id": "91e79ce9-598e-454e-93df-c0e370dbf73a",
+    "email": "info@prada.com",
+    "passwordHash": "$2b$12$Vvo.coyOYaWT2W2hsFV8DOIV/LB6o7s/TWyRhBZLUvqdRMLjtfOMi",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T17:34:47.643Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@prada.com",
+      "address": "",
+      "websiteName": "prada.com",
+      "preferredDomain": "",
+      "businessDescription": "dsvdsfsfsdf",
+      "facebookUrl": "",
+      "instagramUrl": "",
+      "styleNotes": "",
+      "additionalNotes": "",
+      "updatedAt": "2026-07-09T17:34:47.643Z"
+    },
+    "createdAt": "2026-07-09T17:34:47.643Z",
+    "updatedAt": "2026-07-09T17:34:47.643Z"
+  },
+  {
+    "id": "034319ed-1792-45c3-b1de-99ce26fcb1ae",
+    "email": "info@notebookmall.am",
+    "passwordHash": "$2b$12$tyz70qpOqqwCUxjOSqEcvuk8d1zI4kgYUbR3Q7V9ihV6Ir9fDtwoO",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T17:37:37.221Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@prada.com",
+      "address": "3 Station Place, Finsbury Park",
+      "websiteName": "cxv",
+      "preferredDomain": "",
+      "businessDescription": "cxvxcvxc",
+      "facebookUrl": "",
+      "instagramUrl": "",
+      "styleNotes": "vcxvxc",
+      "additionalNotes": "vxcvxcvx",
+      "updatedAt": "2026-07-09T17:37:37.221Z"
+    },
+    "createdAt": "2026-07-09T17:37:37.221Z",
+    "updatedAt": "2026-07-09T17:37:37.221Z"
+  },
+  {
+    "id": "db26c829-284a-45b9-b487-6b4375df5e0e",
+    "email": "info@prafda.com",
+    "passwordHash": "$2b$12$Bywa55RhKdf3Z/cpbpsQPudZxN0YZxytDlTr9ACuSMvmZxyx3xBMW",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T18:32:54.412Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@a41studio.am",
+      "address": "sadfd",
+      "websiteName": "asfdsa",
+      "preferredDomain": "sadfds",
+      "businessDescription": "dsfasdf",
+      "facebookUrl": "https://dfsafds",
+      "instagramUrl": "https://dfa",
+      "styleNotes": "sdafsda",
+      "additionalNotes": "sadfdf",
+      "updatedAt": "2026-07-09T18:32:54.412Z"
+    },
+    "createdAt": "2026-07-09T18:32:54.413Z",
+    "updatedAt": "2026-07-09T18:32:54.413Z"
+  },
+  {
+    "id": "33d9dc8c-59ab-402f-8068-5fa8b25752cd",
+    "email": "hakop28ol@yahoo1.com",
+    "passwordHash": "$2b$12$0YpRNrR3hOlYI/MTGiAgdeIHaXqfrw7G6WhgIu8h5ssL/Es6ntWyC",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T18:43:20.325Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "hakop28ol@yahoo1.com",
+      "address": "Leningradyan 38",
+      "websiteName": "1",
+      "preferredDomain": "1",
+      "businessDescription": "1",
+      "facebookUrl": "https://1",
+      "instagramUrl": "https://1",
+      "styleNotes": "1",
+      "additionalNotes": "1",
+      "updatedAt": "2026-07-09T18:43:20.325Z"
+    },
+    "createdAt": "2026-07-09T18:43:20.325Z",
+    "updatedAt": "2026-07-09T18:43:20.325Z"
+  },
+  {
+    "id": "3d5db4fd-c1a6-41c9-870a-ab05d889cbb0",
+    "email": "hakop28ol2@yahoo.com",
+    "passwordHash": "$2b$12$HZrapxtIaTINBCYlUh3DdO0KQUElleVmqHZ2/wJg2ykjPFZt3XIa2",
+    "name": "Hakob",
+    "role": "user",
+    "createdAt": "2026-07-18T05:02:46.435Z",
+    "updatedAt": "2026-07-18T05:15:05.132Z",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-18T05:15:05.132Z"
+    }
+  },
+  {
+    "id": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
+    "email": "hakop28ol3@yahoo.com",
+    "passwordHash": "$2b$12$0BxMfewAr1pLf89dHgM6CuiL74rzuen2gnjdoZsDEjWRkMZA/ZIM2",
+    "name": "Hakob Jaghatspanyan",
+    "role": "user",
+    "createdAt": "2026-07-18T06:28:42.667Z",
+    "updatedAt": "2026-07-20T20:13:04.969Z",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-20T20:13:04.969Z"
+    },
+    "language": "en"
+  },
+  {
+    "id": "d01a2293-95d5-4a9f-b6fa-54917af92c76",
+    "email": "header-parity-20260722@example.test",
+    "passwordHash": "$2b$12$K9yXsE8r2usdMMRil1wRWOpWQDuq4DEJKSxkcJ1Lm5XQ9q9onFTyK",
+    "name": "Header Parity Tester",
+    "role": "user",
+    "createdAt": "2026-07-22T19:07:02.187Z",
+    "updatedAt": "2026-08-03T19:22:03.936Z",
+    "language": "en"
+  },
+  {
+    "id": "87aa206d-ad3e-470f-ab4f-a3cc9e21e000",
+    "email": "circle@circle.am",
+    "passwordHash": "$2b$12$2kLieej1d3sJCG4.Fc.AIeFS4lvr9GYSkyFaG5K/rWXVDY.ZXhaf6",
+    "name": "Circle",
+    "role": "user",
+    "createdAt": "2026-08-21T15:23:25.323Z",
+    "updatedAt": "2026-08-21T15:23:25.323Z"
+  }
+]

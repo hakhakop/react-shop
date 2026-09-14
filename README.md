@@ -14,7 +14,6 @@ A Next.js 16 / React 19 headless storefront connected to WordPress/WooCommerce v
 
 ```bash
 npm install
-npm run dev:seed
 npm run dev
 ```
 
@@ -40,9 +39,6 @@ Key authorities:
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start dev server |
-| `npm run dev:seed` | Copy Git-tracked development fixtures into local runtime storage |
-| `npm run dev:reset` | Reset local runtime storage to the tracked development fixtures |
-| `npm run dev:check-fixtures` | Validate fixture structure and credential safety |
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
@@ -53,10 +49,5 @@ Key authorities:
 - `app/` — Next.js App Router pages and layouts
 - `components/` — React components (builder, dashboard, blocks, UI)
 - `lib/` — Data fetching, GraphQL client, builder utilities
-- `data/fixtures/dev/` — Git-tracked, test-safe development tenants and builder data
-- `data/runtime/` — Ignored mutable local runtime data created by the seed/reset commands
+- `data/` — Persistent JSON stores for builder layouts
 - `public/` — Static assets and uploaded images
-
-See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) for the development accounts and
-runtime-data rules. Production deployments should set `WEBPAGES_DATA_DIR` to a
-persistent directory outside the repository.

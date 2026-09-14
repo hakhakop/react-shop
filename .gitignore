@@ -54,6 +54,4 @@ node_modules
 npm-debug.log*
 yarn-error.log*
 data/backups/
-/data/runtime/
 test-results/
-next-working.tar.gz

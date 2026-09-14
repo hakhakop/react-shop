@@ -8,9 +8,9 @@ const builderUrl = "/app/websites/header-parity-site/builder?page=header";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
 const layoutsPath = resolve(
   process.cwd(),
-  "data/fixtures/dev/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json",
+  "data/websites/eb65bd05-1299-4071-b432-f3c04e9eda2e/builder-layouts.json",
 );
-const websitesPath = resolve(process.cwd(), "data/fixtures/dev/websites.json");
+const websitesPath = resolve(process.cwd(), "data/websites.json");
 const websiteId = "eb65bd05-1299-4071-b432-f3c04e9eda2e";
 const ORIGINAL_WEBSITE_LANGUAGES = ["hy"];
 

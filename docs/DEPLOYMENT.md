@@ -32,35 +32,25 @@ from that directory:
 /var/lib/webpages/websites/<websiteId>/builder-shell.json
 ```
 
-When `WEBPAGES_DATA_DIR` is not set, local development uses the ignored
-`data/runtime/` directory. Populate it with the tracked development fixtures
-using `npm run dev:seed` or `npm run dev:reset`.
+When `WEBPAGES_DATA_DIR` is not set, local development keeps using the repo
+`data/` directory.
 
 When `WEBPAGES_DATA_DIR` is set, the repo `data/` directory is not used as a
-live runtime read/write location. The Git-tracked fixture source is
-`data/fixtures/dev/`.
+live runtime read/write location. It is only used as a seed/template source.
 
-The development fixture directory contains the default builder files:
+The repo `data/` directory remains the seed/template source for default builder
+files:
 
 ```text
-data/fixtures/dev/builder-layouts.json
-data/fixtures/dev/builder-pages.json
-data/fixtures/dev/builder-shell.json
-data/fixtures/dev/builder-templates.json
-data/fixtures/dev/users.json
-data/fixtures/dev/websites.json
-data/fixtures/dev/websites/<websiteId>/builder-*.json
+data/builder-layouts.json
+data/builder-pages.json
+data/builder-shell.json
+data/builder-templates.json
 ```
 
 When a new SaaS website is created, the app copies seed builder files from the
-fixture directory into the runtime website directory. Runtime writes and
-backups stay under the configured runtime directory and are never written back
-to Git-tracked fixtures.
-
-The development fixture accounts use bcrypt hashes and `@example.test` email
-addresses. CMS connection fields are intentionally absent or empty; real WordPress,
-WooCommerce, application-password, and auth-secret values belong in local
-environment variables or the external runtime directory, never in fixtures.
+repo `data/` directory into the runtime website directory. Existing runtime data
+is not moved, deleted, or migrated automatically yet.
 
 At startup and during website seeding, the app logs the active runtime data
 directory and seed data directory with the `[webpages-data]` prefix.

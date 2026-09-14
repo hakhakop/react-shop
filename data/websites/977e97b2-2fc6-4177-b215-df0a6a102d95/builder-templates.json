@@ -1,0 +1,99 @@
+[
+  {
+    "id": "domain-media-isolation-live-layout-mtfim3ac-dmgp",
+    "title": "domain-media-isolation-live Layout",
+    "templateType": "page",
+    "description": "Page template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Imported Section 1",
+        "background": "transparent",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "boxed",
+        "maxWidth": "default",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "sectionTitleRotation": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-image-0-0-0-0",
+                "kind": "image",
+                "imageUrl": "https://domain-media-isolation.webpages.am/wp-content/uploads/yootheme/domain-media-probe.svg",
+                "videoUrl": "",
+                "imageAlt": "Tenant media isolation probe",
+                "imageRatio": "natural",
+                "imageShape": "none",
+                "imageHasBorder": false,
+                "hoverImageUrl": "",
+                "containerHeightExpand": false,
+                "linkOverlay": false,
+                "overlayMode": "cover",
+                "overlayHover": false,
+                "overlayAnimateBackground": false,
+                "overlayExpandContent": false,
+                "titleLink": false,
+                "linkFullWidth": false
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "elements": [
+                  {
+                    "id": "yootheme-image-0-0-0-0",
+                    "kind": "image",
+                    "imageUrl": "https://domain-media-isolation.webpages.am/wp-content/uploads/yootheme/domain-media-probe.svg",
+                    "videoUrl": "",
+                    "imageAlt": "Tenant media isolation probe",
+                    "imageRatio": "natural",
+                    "imageShape": "none",
+                    "imageHasBorder": false,
+                    "hoverImageUrl": "",
+                    "containerHeightExpand": false,
+                    "linkOverlay": false,
+                    "overlayMode": "cover",
+                    "overlayHover": false,
+                    "overlayAnimateBackground": false,
+                    "overlayExpandContent": false,
+                    "titleLink": false,
+                    "linkFullWidth": false
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-08-30T07:55:54.276Z"
+  }
+]

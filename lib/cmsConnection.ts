@@ -1,6 +1,3 @@
-import path from "node:path";
-import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
-
 export type CmsConnection = {
   provider: string;
   siteUrl: string;
@@ -64,8 +61,12 @@ function getEnvSiteUrl(): string {
   }
 }
 
-function getRootBuilderShellPath() {
-  return path.join(getRuntimeDataDir(), "builder-shell.json");
+function getRootBuilderShellPath(path: typeof import("node:path")) {
+  const configuredDir = process.env.WEBPAGES_DATA_DIR?.trim();
+  const dataDir = configuredDir
+    ? path.resolve(process.cwd(), configuredDir)
+    : path.join(process.cwd(), "data");
+  return path.join(dataDir, "builder-shell.json");
 }
 
 export function getEnvCmsConnection(): CmsConnection {
@@ -113,8 +114,9 @@ function readPersistedRootCmsConnection(): Partial<CmsConnection> | null {
   try {
     if (typeof window !== "undefined") return null;
     const fs = process.getBuiltinModule?.("fs") as typeof import("node:fs") | undefined;
-    if (!fs) return null;
-    const raw = JSON.parse(fs.readFileSync(getRootBuilderShellPath(), "utf8")) as {
+    const path = process.getBuiltinModule?.("path") as typeof import("node:path") | undefined;
+    if (!fs || !path) return null;
+    const raw = JSON.parse(fs.readFileSync(getRootBuilderShellPath(path), "utf8")) as {
       cmsConnection?: unknown;
     };
     return raw.cmsConnection && typeof raw.cmsConnection === "object"

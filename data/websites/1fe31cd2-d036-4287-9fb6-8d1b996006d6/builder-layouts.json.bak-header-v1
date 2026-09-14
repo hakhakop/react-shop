@@ -1,0 +1,593 @@
+{
+  "home": {
+    "version": 1,
+    "key": "home",
+    "page": "home",
+    "targetType": "page",
+    "updatedAt": "2026-07-15T10:11:02.380Z",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#171717",
+      "mutedTextColor": "#686861",
+      "accentColor": "#315f53",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#171717",
+      "buttonTextColor": "#ffffff",
+      "radius": "12px",
+      "sectionMaxWidth": "1440px",
+      "sectionGutter": "clamp(20px, 4vw, 64px)",
+      "headingFontFamily": "inherit",
+      "headingWeight": "720",
+      "headingLineHeight": "0.98",
+      "cardBg": "#ffffff",
+      "cardRadius": "12px",
+      "cardBorder": "rgba(23,23,23,0.09)",
+      "cardShadow": "0 10px 30px rgba(23,23,23,0.05)",
+      "cardShadowHover": "0 16px 38px rgba(23,23,23,0.09)"
+    },
+    "sections": [
+      {
+        "id": "starter-hero",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "starter-hero-column",
+            "rowId": "starter-hero-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "starter-hero-block",
+                "kind": "hero",
+                "eyebrow": "A clear place to begin",
+                "title": "Introduce what you do and why it matters",
+                "body": "Use this opening section to communicate your main value in one confident headline, a short supporting paragraph, and one or two focused next steps.",
+                "buttonLabel": "Get Started",
+                "buttonUrl": "#contact",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "starter-hero-secondary",
+                    "label": "Explore Services",
+                    "url": "#services",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "about",
+        "kind": "contentLayout",
+        "title": "About",
+        "eyebrow": "About this section",
+        "body": "Explain the perspective, experience, or approach that helps visitors trust what comes next.",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "about-intro",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "about-heading",
+                "kind": "text",
+                "eyebrow": "About",
+                "title": "A concise story builds confidence",
+                "body": "Keep this introduction focused: one clear idea, a meaningful point of difference, and enough context to help visitors understand your approach.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "about-details",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "about-list",
+                "kind": "list",
+                "title": "What belongs here",
+                "items": [
+                  "A short explanation of your purpose",
+                  "The values that guide your work",
+                  "A practical reason visitors can trust you"
+                ],
+                "listIcon": "circleCheck",
+                "elementPadding": "md"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "services",
+        "kind": "contentLayout",
+        "title": "Services and Features",
+        "eyebrow": "Services / Features",
+        "body": "Present three focused offers or benefits. Each card works best with a short title and two or three lines of supporting copy.",
+        "background": "#efefe9",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "services-grid-column",
+            "rowId": "services-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "services-grid",
+                "kind": "grid",
+                "title": "Show visitors how you can help",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "service-1",
+                    "eyebrow": "01",
+                    "title": "Plan with clarity",
+                    "text": "Describe a service or benefit that helps customers make a confident first step.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "service-2",
+                    "eyebrow": "02",
+                    "title": "Create with purpose",
+                    "text": "Explain the practical value visitors receive and keep the language easy to scan.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "service-3",
+                    "eyebrow": "03",
+                    "title": "Grow with confidence",
+                    "text": "Show how your offer continues to support customers after the initial engagement.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "starter-cta",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "#315f53",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "cta-column",
+            "rowId": "cta-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "cta-block",
+                "kind": "promoStrip",
+                "eyebrow": "Ready for the next step?",
+                "title": "Turn interest into a clear action",
+                "body": "Use a short call to action after visitors understand your value. Keep the request simple and specific.",
+                "buttonLabel": "Contact Us",
+                "buttonUrl": "#contact",
+                "buttonStyle": "light",
+                "elementPadding": "md"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "testimonials",
+        "kind": "contentLayout",
+        "title": "Testimonials",
+        "eyebrow": "Testimonials",
+        "body": "Two or three short testimonials are usually enough. Focus on the experience, the result, and who the feedback came from.",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "testimonial-column",
+            "rowId": "testimonial-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "testimonial-grid",
+                "kind": "grid",
+                "title": "Build trust with specific, concise feedback",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "testimonial-1",
+                    "eyebrow": "“",
+                    "title": "The process felt clear from the first conversation to the final result.",
+                    "meta": "Alex Morgan · Project Lead",
+                    "text": "A useful testimonial explains what improved and why the experience felt valuable."
+                  },
+                  {
+                    "id": "testimonial-2",
+                    "eyebrow": "“",
+                    "title": "We finally have a structure that is easy to understand and build on.",
+                    "meta": "Jordan Lee · Business Owner",
+                    "text": "Keep quotes believable, focused, and short enough to scan comfortably."
+                  },
+                  {
+                    "id": "testimonial-3",
+                    "eyebrow": "“",
+                    "title": "Every step was thoughtful, practical, and easy to follow.",
+                    "meta": "Taylor Reed · Operations Manager",
+                    "text": "Replace these examples with real customer feedback when it becomes available."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "faq",
+        "kind": "contentLayout",
+        "title": "Frequently Asked Questions",
+        "eyebrow": "FAQ",
+        "body": "Answer the questions that usually appear before someone contacts you. Keep each response direct and genuinely useful.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "faq-column",
+            "rowId": "faq-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "faq-grid",
+                "kind": "grid",
+                "title": "Helpful answers remove uncertainty",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": false,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "faq-1",
+                    "title": "What should this website explain first?",
+                    "text": "Start with your main value, who it helps, and the next action you want a visitor to take."
+                  },
+                  {
+                    "id": "faq-2",
+                    "title": "How much content belongs on each page?",
+                    "text": "Use enough detail to answer the visitor’s next question, then link to deeper information when needed."
+                  },
+                  {
+                    "id": "faq-3",
+                    "title": "Can the layout change later?",
+                    "text": "Yes. Every section, row, column, and element is editable, movable, duplicable, and removable."
+                  },
+                  {
+                    "id": "faq-4",
+                    "title": "What makes a strong call to action?",
+                    "text": "Use a natural label that clearly describes what happens next, such as Contact Us or Book a Consultation."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contact",
+        "kind": "contentLayout",
+        "title": "Contact",
+        "eyebrow": "Contact",
+        "body": "End with one clear way to continue. Add a form, phone number, email address, booking link, or location details as appropriate.",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "contact-intro",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "contact-copy",
+                "kind": "text",
+                "eyebrow": "Let’s talk",
+                "title": "Make the next step feel simple",
+                "body": "Tell visitors when they can expect a reply and what information will help you respond well.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "contact-action",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "contact-panel",
+                "kind": "panel",
+                "eyebrow": "Start a conversation",
+                "title": "Tell us what you are working on",
+                "body": "Share your goal, timeline, and the best way to reach you. Replace this action with a contact form whenever you are ready.",
+                "buttonLabel": "Book a Consultation",
+                "buttonUrl": "mailto:hello@example.com",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "updatedAt": "2026-07-15T10:11:02.380Z",
+    "design": {},
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "thirds",
+        "layoutColumns": 3,
+        "headerUtilityMigrationVersion": 3,
+        "layoutItems": [
+          {
+            "id": "starter-header-brand",
+            "rowId": "starter-header-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "starter-brand",
+                "kind": "image",
+                "headerBrandMode": "brand",
+                "headerBrandText": "new",
+                "imageAlt": "new logo",
+                "imageMaxWidth": 180
+              }
+            ]
+          },
+          {
+            "id": "starter-header-menu",
+            "rowId": "starter-header-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "starter-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "underline"
+              }
+            ]
+          },
+          {
+            "id": "starter-header-action",
+            "rowId": "starter-header-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "header-button",
+                "kind": "button",
+                "buttonLabel": "Contact Us",
+                "buttonUrl": "#contact",
+                "buttonStyle": "primary"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "updatedAt": "2026-07-15T10:11:02.380Z",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "eyebrow": "Footer",
+        "body": "Use the footer for essential navigation, contact details, and a concise closing message.",
+        "background": "#171717",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "thirds",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "footer-about",
+            "rowId": "footer-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-about-copy",
+                "kind": "text",
+                "title": "new",
+                "body": "A short closing statement can reinforce what you offer and who it is for.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "footer-links",
+            "rowId": "footer-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-link-list",
+                "kind": "list",
+                "title": "Explore",
+                "items": [
+                  "About",
+                  "Services",
+                  "Testimonials",
+                  "Contact"
+                ],
+                "listIcon": "arrowRight"
+              }
+            ]
+          },
+          {
+            "id": "footer-contact",
+            "rowId": "footer-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-contact-copy",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Keep in touch",
+                "body": "hello@example.com\n+1 000 000 0000",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  }
+}
