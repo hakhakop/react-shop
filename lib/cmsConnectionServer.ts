@@ -24,7 +24,11 @@ export async function getCmsConnectionForRequest(
     normalizedHost === "localhost" ||
     normalizedHost === "127.0.0.1" ||
     normalizedHost === "[::1]";
-  if (normalizedHost && (normalizedHost === rootHost || isLocalRootHost)) {
+  const isConfiguredLiveRootHost = normalizedHost === "react.webpages.am";
+  if (
+    normalizedHost &&
+    (normalizedHost === rootHost || isLocalRootHost || isConfiguredLiveRootHost)
+  ) {
     return getCmsConnection(undefined);
   }
   const website = await getWebsiteByDomainHost(normalizedHost);
