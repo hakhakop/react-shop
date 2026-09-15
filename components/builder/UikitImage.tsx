@@ -66,6 +66,9 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
       : ["rounded", "circle", "pill"].includes(rawBlock.imageBorder)
         ? rawBlock.imageBorder
         : undefined;
+  const isHeaderLogo = rawBlock.id === "header-logo" || rawBlock.headerBrandMode !== undefined;
+  const isNativeStandaloneImage =
+    rawBlock.kind === "image" && !isImportedYoothemeImage && !isHeaderLogo;
   // Pre-Phase-5 imports wrote numeric YOOtheme image_width only to the
   // legacy max-width alias and stored `auto` here. Promote that value at the
   // canonical media boundary so the media composition box, not just its img,
@@ -73,9 +76,17 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   const canonicalImageWidth =
     rawBlock.imageWidth && rawBlock.imageWidth !== "auto"
       ? rawBlock.imageWidth
-      : typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
+      : isImportedYoothemeImage && typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
         ? String(rawBlock.imageMaxWidth)
         : rawBlock.imageWidth;
+  const positionedMediaAnchor =
+    rawBlock.visualStyle?.layout?.position === "absolute"
+      ? rawBlock.visualStyle.layout.right !== undefined
+        ? "right"
+        : rawBlock.visualStyle.layout.left !== undefined
+          ? "left"
+          : undefined
+      : undefined;
   const legacyIntrinsicWidth = Number.parseFloat(String(canonicalImageWidth ?? ""));
   const legacyIntrinsicHeight = Number.parseFloat(String(rawBlock.imageHeight ?? ""));
   const intrinsicWidth = Number(rawBlock.imageIntrinsicWidth) || (isImportedYoothemeOverlay ? legacyIntrinsicWidth : 0);
@@ -83,12 +94,25 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
   const intrinsicAspectRatio = intrinsicWidth > 0 && intrinsicHeight > 0 ? `${intrinsicWidth} / ${intrinsicHeight}` : undefined;
   const resolvedImageBlock = {
     ...rawBlock,
-    imageRatio: resolveString(rawBlock.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
-    imageFit: isImportedYoothemeImage && rawBlock.kind === "overlay" && rawBlock.imageHeight
+    // Standalone YOOtheme Image has no ratio/fit controls. Ignore legacy
+    // WebPages defaults here so an older inserted block cannot recreate a
+    // synthetic cover frame after the document is reopened.
+    imageRatio: isNativeStandaloneImage
+      ? "natural"
+      : resolveString(rawBlock.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
+    imageFit: isNativeStandaloneImage
+      ? "natural"
+      : isImportedYoothemeImage && rawBlock.kind === "overlay" && rawBlock.imageHeight
       ? resolveString(rawBlock.imageFit, undefined, "cover")
       : resolveString(rawBlock.imageFit, shellSettings?.imageDefaultFit, "natural"),
     imageShape: resolveString(localImageShape, shellSettings?.imageDefaultBorder, "none"),
     imageShadow: resolveString(rawBlock.imageShadow, shellSettings?.imageDefaultShadow, "none"),
+    // Native images inherit the global alignment token. Imported YOOtheme
+    // images keep their General text alignment; only positioned artwork needs
+    // this fallback to anchor a fixed-size image to its authored edge.
+    imageAlignment: isImportedYoothemeImage
+      ? rawBlock.imageAlignment ?? positionedMediaAnchor
+      : resolveString(rawBlock.imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
     imageWidth: canonicalImageWidth,
     imageHeight: isImportedYoothemeOverlay ? undefined : rawBlock.imageHeight,
     imageLoading: resolveString(rawBlock.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
@@ -116,7 +140,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
       : String(rawBlock.imageMinHeight)
     : undefined;
   const hasMediaFrame = Boolean(mediaAspectRatio || imageStyle.height || mediaMinHeight);
-  const imageAuthoredMaxWidth = imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined);
+  const imageAuthoredMaxWidth = imageStyle.maxWidth ?? (!isNativeStandaloneImage && rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined);
   const generalPosition = rawBlock.visualStyle?.layout?.position;
   const allowsPositionedOverflow = generalPosition === "absolute" || generalPosition === "fixed";
   const imageAttributes = getUikitImageAttributes(imageSemantics);

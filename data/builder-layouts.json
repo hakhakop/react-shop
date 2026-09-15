@@ -358,6 +358,25 @@
                 },
                 "elements": [
                   {
+                    "id": "image-block-mu2g32y4-eson1",
+                    "kind": "image",
+                    "title": "",
+                    "body": "",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/2026/08/logo-2-scaled.png",
+                    "imageAlt": "Modern editorial image placeholder",
+                    "imageAlignment": "center",
+                    "imageMaxWidth": 1200,
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "imageShape": "rounded",
+                    "imageShadow": "none",
+                    "imageWidth": "auto",
+                    "imageLoading": "lazy",
+                    "imageLinkTarget": "_self",
+                    "imageCaption": "",
+                    "elementPadding": "xs"
+                  },
+                  {
                     "id": "yootheme-heading-0-0-0-0",
                     "kind": "heading",
                     "headingText": "Build Anything on<br class=\"uk-visible@s\"> DevStack",
@@ -4097,7 +4116,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-31T14:26:14.608Z"
+    "updatedAt": "2026-09-15T09:26:31.226Z"
   },
   "shop": {
     "version": 1,

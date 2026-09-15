@@ -650,12 +650,19 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
       imageAlt: "Modern editorial image placeholder",
       imageAlignment: "center",
-      imageMaxWidth: 1200,
-      imageFit: "cover",
-      imageRatio: "16:9",
-      imageShape: "rounded",
+      // A standalone YOOtheme Image preserves the source geometry until the
+      // author opts into a width, height, ratio, or crop mode. Overlay images
+      // are the exception: their content needs a framed cover surface.
+      ...(kind === "overlay"
+        ? {
+            imageMaxWidth: 1200,
+            imageFit: "cover" as const,
+            imageRatio: "16:9" as const,
+            imageShape: "rounded" as const,
+          }
+        : {}),
       imageShadow: "none",
-      imageWidth: "auto",
+      ...(kind === "overlay" ? { imageWidth: "auto" as const } : {}),
       imageLoading: "lazy",
       imageLinkTarget: "_self",
       imageCaption: "",

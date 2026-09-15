@@ -23010,7 +23010,8 @@ body:has(.builder-dashboard[data-theme="light"]) .builder-row-layout-modal .buil
   width: 100%;
   height: 100%;
   border-radius: 5px;
-  object-fit: cover;
+  /* Keep wide YOOtheme media fully visible in the source preview. */
+  object-fit: contain;
 }
 
 .builder-inspector .builder-media-url-thumbnail-empty {
