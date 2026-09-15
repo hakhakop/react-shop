@@ -703,6 +703,10 @@ body:has(.builder-dashboard) .site-header--service {
   gap: 8px;
 }
 
+.builder-editor-chrome--compact {
+  gap: 5px;
+}
+
 .builder-document-header,
 .builder-canvas-controls {
   border: 1px solid var(--builder-ui-border);
@@ -718,6 +722,75 @@ body:has(.builder-dashboard) .site-header--service {
   padding: 10px 12px;
   container-name: builder-document-header;
   container-type: inline-size;
+}
+
+/* Keep the persistent document context visible without making it a second
+   page card above the Structure tree. */
+.builder-document-header--compact {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5px 8px;
+  padding: 6px 88px 6px 8px;
+}
+
+.builder-document-header--compact .builder-document-header-main {
+  display: contents;
+}
+
+.builder-document-header--compact .builder-document-breadcrumb {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.builder-document-header--compact .builder-document-breadcrumb > span:last-child {
+  display: none;
+}
+
+.builder-document-header--compact .builder-document-breadcrumb > span[aria-hidden="true"] {
+  display: none;
+}
+
+.builder-document-header--compact .builder-document-identity {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.builder-document-header--compact .builder-document-identity h1 {
+  font-size: 13px;
+}
+
+.builder-document-header--compact .builder-document-identity p {
+  max-width: 150px;
+}
+
+.builder-document-header--compact .builder-document-actions {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.builder-document-header--compact .builder-canvas-control {
+  min-height: 24px;
+  padding-inline: 7px;
+  font-size: 9.5px;
+}
+
+.builder-document-header--compact .builder-icon-only-control {
+  width: 24px;
+}
+
+.builder-document-header--compact .builder-content-language-select {
+  height: 24px;
+  font-size: 9px;
+}
+
+.builder-document-header--compact .builder-document-publish-control {
+  position: absolute;
+  top: 6px;
+  right: 8px;
 }
 
 .builder-document-header .builder-document-language-top {
@@ -763,6 +836,20 @@ body:has(.builder-dashboard) .site-header--service {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+}
+
+@container builder-document-header (max-width: 520px) {
+  .builder-document-header--compact .builder-document-identity {
+    min-width: 0;
+  }
+
+  .builder-document-header--compact .builder-document-identity p {
+    display: none;
+  }
+
+  .builder-document-header--compact .builder-document-actions {
+    justify-content: flex-start;
+  }
 }
 
 .builder-document-actions {
@@ -973,6 +1060,21 @@ body:has(.builder-dashboard) .site-header--service {
 
   .builder-document-actions .builder-canvas-control:not(.builder-icon-only-control) {
     flex: 1 1 180px;
+  }
+}
+
+@container builder-document-header (max-width: 520px) {
+  .builder-document-header--compact .builder-document-language-top {
+    height: 24px;
+    min-height: 24px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 4px;
+  }
+
+  .builder-document-header--compact .builder-document-actions .builder-canvas-control:not(.builder-icon-only-control) {
+    flex: 0 1 auto;
   }
 }
 
@@ -2140,8 +2242,8 @@ body:has(.builder-dashboard) .site-header--service {
 .builder-wireframe-header-consolidated {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 6px 8px;
+  gap: 0;
+  padding: 5px 8px;
   background: var(--builder-ui-panel, rgba(18, 18, 22, 0.65));
   border-bottom: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.06));
   flex-shrink: 0;

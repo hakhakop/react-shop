@@ -4100,7 +4100,7 @@ export default function DashboardBuilder({
   useEffect(() => {
     if (initializedStorageScopeRef.current === storageKeys.state) return;
     initializedStorageScopeRef.current = storageKeys.state;
-    setPublishedDocumentReady(false);
+    setPublishedDocumentReady(Boolean(initialPublishedState));
     try {
       const storedDrafts = window.localStorage.getItem(storageKeys.drafts);
       const parsedDrafts = storedDrafts
@@ -13073,10 +13073,14 @@ export default function DashboardBuilder({
 
   const activeDocumentDisplayName = builderState.displayName ||
     (builderState.page === "footer" ? "Footer" : builderState.page === "header" ? "Header" : getLayoutLabel(builderState.page, customPages));
+  const documentOwnershipLabel = builderDocumentOwnershipLabel(builderEditorContext);
+  const showDocumentOwnership = Boolean(
+    documentOwnershipLabel && documentOwnershipLabel !== activeDocumentKindLabel,
+  );
 
   const sidebarTopActions = (
-    <div className="builder-editor-chrome" aria-label="Builder document and canvas controls">
-      <header className="builder-document-header" data-testid="builder-document-header">
+    <div className="builder-editor-chrome builder-editor-chrome--compact" aria-label="Builder document and canvas controls">
+      <header className="builder-document-header builder-document-header--compact" data-testid="builder-document-header">
         <div className="builder-document-breadcrumb" aria-label="Builder breadcrumb">
           {builderEditorContext ? (
             <button
@@ -13128,7 +13132,9 @@ export default function DashboardBuilder({
                 ) : null}
               </div>
             )}
-            <p>{builderEditorContext ? builderDocumentOwnershipLabel(builderEditorContext) : sidebarTab === "globalStyles" ? shellStatus : statusText}</p>
+            {(!builderEditorContext || showDocumentOwnership) ? (
+              <p>{builderEditorContext ? documentOwnershipLabel : sidebarTab === "globalStyles" ? shellStatus : statusText}</p>
+            ) : null}
           </div>
           <div className="builder-document-actions" aria-label="Document actions">
             {builderEditorContext?.content.mode === "preview" && builderEditorContext.capabilities.canChangePreview ? (
@@ -13203,7 +13209,7 @@ export default function DashboardBuilder({
             {sidebarTab === "globalStyles" ? (
               <button
                 type="button"
-                className="builder-canvas-control is-primary"
+                className="builder-canvas-control builder-document-publish-control is-primary"
                 onClick={publishShellSettings}
                 title={`Publish ${shellSettingsLabel}`}
               >
@@ -13213,7 +13219,7 @@ export default function DashboardBuilder({
             ) : hasPendingChanges ? (
                 <button
                   type="button"
-                  className="builder-canvas-control is-primary"
+                  className="builder-canvas-control builder-document-publish-control is-primary"
                   onClick={() => void publishLayout()}
                   disabled={!publishedDocumentReady || !persistenceTarget}
                 >

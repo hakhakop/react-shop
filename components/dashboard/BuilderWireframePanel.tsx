@@ -10,7 +10,6 @@ import {
   Copy,
   Database,
   ExternalLink,
-  FileText,
   Image as ImageIcon,
   Layers3,
   LayoutGrid,
@@ -1679,19 +1678,16 @@ export default function BuilderWireframePanel({
   return (
     <div className="builder-sidebar-panel builder-structure-panel builder-wireframe-panel builder-wireframe-panel--outline">
       <div className="builder-structure-header builder-wireframe-header-consolidated">
-        <div className="builder-structure-header-row builder-wireframe-header-row">
-          <div className="builder-structure-header-title-wrap builder-wireframe-header-title-wrap">
-            <FileText
+        <div className="builder-structure-header-row builder-structure-header-row--sub builder-wireframe-header-row--sub">
+          <div
+            className="builder-structure-header-title-wrap builder-wireframe-header-title-wrap"
+            aria-label={`${pageLabel} ${documentBadgeLabel ?? documentKindLabel ?? "Page"}`}
+          >
+            <Layers3
               size={13}
               className="builder-structure-header-icon builder-wireframe-icon builder-wireframe-icon--page"
             />
-            <strong>{pageLabel}</strong>
           </div>
-          <span className="builder-structure-badge builder-structure-badge--doc builder-wireframe-badge builder-wireframe-badge--page">
-            {documentBadgeLabel}
-          </span>
-        </div>
-        <div className="builder-structure-header-row builder-structure-header-row--sub builder-wireframe-header-row--sub">
           <span>
             {structureLabel ??
               (header ? "Header structure" : `${documentKindLabel} structure`)}

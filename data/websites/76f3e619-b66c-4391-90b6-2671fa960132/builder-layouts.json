@@ -113,7 +113,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -122,7 +121,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -164,8 +164,8 @@
                   {
                     "id": "heading-block-mtl82zkk-raidl",
                     "kind": "heading",
-                    "headingText": "Revolutionary Muse",
-                    "title": "Revolutionary Muse",
+                    "headingText": "Revolutionary Muse1",
+                    "title": "Revolutionary Muse1",
                     "headingLevel": "h1",
                     "headingSize": "small",
                     "headingAlign": "center",
@@ -301,7 +301,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -310,7 +309,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -356,7 +356,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -365,7 +364,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -675,7 +675,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -683,7 +682,9 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default",
+                "size": "default"
               },
               {
                 "id": "panelSlider-block-mtl82zkk-tcf77",
@@ -1174,7 +1175,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1183,7 +1183,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -1369,7 +1370,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1378,7 +1378,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           },
@@ -1431,7 +1432,6 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -1440,7 +1440,8 @@
                   },
                   "effects": {},
                   "card": {}
-                }
+                },
+                "buttonStyle": "default"
               }
             ]
           }
@@ -1626,7 +1627,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-03T07:47:56.663Z"
+    "updatedAt": "2026-09-15T08:05:57.318Z"
   },
   "header": {
     "version": 1,
