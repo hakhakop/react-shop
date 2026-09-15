@@ -66,3 +66,8 @@ test("ordinary page ownership must match the state key", () => {
     page: "home",
   })).toBeNull();
 });
+
+test("standalone Header and Footer documents use the page-store owner", () => {
+  expect(resolveBuilderPersistenceTarget({ page: "header" })).toEqual({ kind: "page" });
+  expect(resolveBuilderPersistenceTarget({ page: "footer", editorContext: null })).toEqual({ kind: "page" });
+});

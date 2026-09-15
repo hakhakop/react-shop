@@ -121,7 +121,15 @@ export function resolveBuilderPersistenceTarget(input: {
     }
     return { kind: "document", documentId: requestedDocumentId };
   }
-  if (!context || context.document.kind === "routing-template" || context.document.kind === "individual") {
+  // Header and Footer are standalone shell documents owned by the canonical
+  // page-store endpoint. They do not receive a page-level editor context, so
+  // their absence of context is expected rather than a reason to disable save.
+  if (!context) {
+    return input.page === "header" || input.page === "footer"
+      ? { kind: "page" }
+      : null;
+  }
+  if (context.document.kind === "routing-template" || context.document.kind === "individual") {
     return null;
   }
   if (context.document.id !== `layout:builder:${input.page}`) return null;
