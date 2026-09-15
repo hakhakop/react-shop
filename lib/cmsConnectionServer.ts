@@ -20,7 +20,11 @@ export async function getCmsConnectionForRequest(
       process.env.WEBPAGES_ROOT_DOMAIN ||
       "webpages.am",
   );
-  if (normalizedHost && normalizedHost === rootHost) {
+  const isLocalRootHost =
+    normalizedHost === "localhost" ||
+    normalizedHost === "127.0.0.1" ||
+    normalizedHost === "[::1]";
+  if (normalizedHost && (normalizedHost === rootHost || isLocalRootHost)) {
     return getCmsConnection(undefined);
   }
   const website = await getWebsiteByDomainHost(normalizedHost);
