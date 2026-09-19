@@ -35,6 +35,41 @@ const gallerySection = (databaseId: number): BuilderSection => ({
   }],
 });
 
+const navSection = (parentId: number): BuilderSection => ({
+  id: "section",
+  kind: "contentLayout",
+  title: "Nav",
+  background: "transparent",
+  visible: true,
+  rows: [{
+    id: "row",
+    layout: "1-col",
+    columns: [{
+      id: "column",
+      elements: [{
+        id: "nav",
+        kind: "nav",
+        navItems: [{
+          id: "nav-template",
+          label: "Authored fallback",
+          dynamicContext: {
+            provider: "wordpress",
+            source: "menu-item",
+            mode: "collection",
+            query: { menuId: 9, parentId },
+          },
+          dynamicBindings: {
+            label: { path: "title", valueType: "string" },
+            meta: { path: "subtitle", valueType: "string" },
+            imageUrl: { path: "image", valueType: "url" },
+            url: { path: "url", valueType: "url" },
+          },
+        }],
+      }],
+    }],
+  }],
+});
+
 test("Gallery item source edits invalidate the dynamic render projection", () => {
   const first = dynamicContentPreviewSignature([gallerySection(46)]);
   const second = dynamicContentPreviewSignature([gallerySection(47)]);
@@ -48,6 +83,14 @@ test("static Gallery copy does not cause a provider refresh", () => {
   const second = gallerySection(46);
   second.rows![0].columns[0].elements[0].galleryItems![0].title = "Changed fallback";
   expect(dynamicContentPreviewSignature([first])).toBe(dynamicContentPreviewSignature([second]));
+});
+
+test("Nav item source edits invalidate the dynamic render projection", () => {
+  const first = dynamicContentPreviewSignature([navSection(40)]);
+  const second = dynamicContentPreviewSignature([navSection(41)]);
+  expect(first).not.toBe(second);
+  expect(first).toContain('"kind":"nav-item"');
+  expect(first).toContain('"parentId":40');
 });
 
 test("structural row and column sources participate in the preview signature", () => {

@@ -23,6 +23,7 @@ import {
 import DynamicContentInspectorGroup from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 
 type Props = {
+  previewCategoryTree?: import("@/components/dashboard/inspector/inspectorRouting").InspectorPanelContext["previewCategoryTree"];
   block: BuilderLayoutBlock;
   tab: InspectorTab;
   shellSettings: BuilderShellSettings;

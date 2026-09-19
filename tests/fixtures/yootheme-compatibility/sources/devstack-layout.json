@@ -1,0 +1,133 @@
+{
+  "type": "layout",
+  "children": [
+    {
+      "type": "section",
+      "children": [
+        {
+          "type": "row",
+          "props": {
+            "divider": true,
+            "layout": "1-4,3-4"
+          },
+          "children": [
+            {
+              "type": "column",
+              "props": {
+                "image_position": "center-center",
+                "position_sticky_breakpoint": "m",
+                "width_medium": "1-4"
+              },
+              "children": [
+                {
+                  "type": "panel",
+                  "props": {
+                    "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                    "content_column_breakpoint": "m",
+                    "content_style": "text-small",
+                    "icon_width": 80,
+                    "image": "",
+                    "image_align": "top",
+                    "image_grid_breakpoint": "m",
+                    "image_grid_width": "1-2",
+                    "image_svg_color": "emphasis",
+                    "link": "?page_id=19",
+                    "link_style": "text",
+                    "link_text": "Learn More",
+                    "margin": "default",
+                    "meta": "",
+                    "meta_align": "below-title",
+                    "meta_color": "muted",
+                    "meta_element": "div",
+                    "meta_style": "text-small",
+                    "title": "Product Overview",
+                    "title_align": "top",
+                    "title_element": "div",
+                    "title_grid_breakpoint": "m",
+                    "title_grid_width": "1-2",
+                    "title_hover_style": "reset",
+                    "title_link": true,
+                    "title_style": "h5"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "column",
+              "props": {
+                "image_position": "center-center",
+                "position_sticky_breakpoint": "m",
+                "width_medium": "3-4"
+              },
+              "children": [
+                {
+                  "type": "nav",
+                  "props": {
+                    "grid": "2",
+                    "grid_column_gap": "large",
+                    "grid_row_gap": "large",
+                    "image_margin": true,
+                    "image_svg_inline": false,
+                    "image_vertical_align": false,
+                    "image_width": "50",
+                    "nav_style": "secondary",
+                    "show_image": true,
+                    "show_meta": true
+                  },
+                  "children": [
+                    {
+                      "type": "nav_item",
+                      "source": {
+                        "query": {
+                          "name": "customMenuItems",
+                          "arguments": {
+                            "id": 9,
+                            "parent": "40",
+                            "heading": ""
+                          }
+                        },
+                        "props": {
+                          "content": {
+                            "filters": {
+                              "search": ""
+                            },
+                            "name": "title"
+                          },
+                          "meta": {
+                            "filters": {
+                              "search": ""
+                            },
+                            "name": "subtitle"
+                          },
+                          "image": {
+                            "filters": {
+                              "search": ""
+                            },
+                            "name": "image"
+                          },
+                          "link": {
+                            "filters": {
+                              "search": ""
+                            },
+                            "name": "url"
+                          },
+                          "active": {
+                            "filters": {
+                              "search": ""
+                            },
+                            "name": "active"
+                          }
+                        }
+                      },
+                      "props": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -9,7 +9,7 @@ test("Grid importer preserves UIkit masonry/parallax options through the canonic
       grid_parallax_start: "10vh", grid_parallax_end: "bottom",
     }, children: [] }] }] }] }],
   } as any);
-  const block = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const block = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(block).toMatchObject({ gridMasonry: "next", gridParallax: 150, gridParallaxJustify: true, gridParallaxStart: "10vh", gridParallaxEnd: "bottom" });
   expect(uikitGridAttribute(resolveUikitGridStructure(block))).toBe(
     "masonry: next; parallax: 150; parallax-justify: true; parallax-start: 10vh; parallax-end: bottom",

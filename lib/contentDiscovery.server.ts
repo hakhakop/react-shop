@@ -110,7 +110,7 @@ export function createContentDiscoveryService(
       }
       const context = contexts[0];
       if (!context) return { availability: "missing", identity };
-      const item = discoveryItem(context, identity.provider, identity.contentType);
+      const item = discoveryItem(context, identity.provider === "woocommerce" ? "woocommerce" : "wordpress", identity.contentType === "product" ? "product" : "post");
       if (!item || item.identity.contentId !== identity.contentId) {
         return { availability: "missing", identity };
       }

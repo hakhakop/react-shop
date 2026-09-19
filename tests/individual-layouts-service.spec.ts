@@ -84,7 +84,7 @@ test("Individual service creates exact Product/Post assignments and exposes cano
 });
 
 test("removal preserves referenced layouts and cleanup failure never restores routing", async () => {
-  const registry = { version: 1 as const, routingTemplates: [], individualOverrides: [] as IndividualLayoutOverride[] };
+  const registry: import("@/lib/layoutRoutingStore.server").LayoutRoutingRegistry = { version: 1 as const, routingTemplates: [], individualOverrides: [] as IndividualLayoutOverride[] };
   let current = structuredClone(registry);
   let cleanupFails = false;
   const service = createIndividualLayoutsService({}, {

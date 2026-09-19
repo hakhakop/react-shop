@@ -6,8 +6,8 @@ const descriptor = { provider: "wordpress", source: "post", mode: "collection" a
 
 const layout = (): BuilderLayout => ({
   version: 1,
-  key: "repeatable-proof",
-  page: "repeatable-proof",
+  key: "page:repeatable-proof",
+  page: "page:repeatable-proof",
   updatedAt: "2026-08-14T00:00:00.000Z",
   sections: [{
     id: "section", kind: "content", title: "Proof", background: "#fff", visible: true,
@@ -65,8 +65,8 @@ test("repeatable provider failure preserves one authored fallback item", async (
 test("Slideshow and Overlay Slider reuse the same transient slide expansion", async () => {
   const authored: BuilderLayout = {
     version: 1,
-    key: "carousel-repeatable-proof",
-    page: "carousel-repeatable-proof",
+    key: "page:carousel-repeatable-proof",
+    page: "page:carousel-repeatable-proof",
     updatedAt: "2026-08-14T00:00:00.000Z",
     sections: [{
       id: "section", kind: "content", title: "Proof", background: "#fff", visible: true,

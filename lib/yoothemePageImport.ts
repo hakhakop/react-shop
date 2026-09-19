@@ -189,6 +189,7 @@ const sourcePagination = (node: YoothemeSourceNode): BuilderLayoutBlock["paginat
   if (node.type !== "pagination") return undefined;
   const props = sourceProps(node);
   const type = asString(props.pagination_type);
+  const margin = sourcePaginationMargin(props.margin);
   return {
     enabled: true,
     // Circle's archive page reserves the first post for its featured Panel;
@@ -196,7 +197,7 @@ const sourcePagination = (node: YoothemeSourceNode): BuilderLayoutBlock["paginat
     perPage: 9,
     mode: type === "infinite" ? "infinite" : type === "load-more" ? "loadMore" : "pageNumbers",
     style: "standard",
-    margin: sourceMargin(props.margin),
+    margin,
     alignment: props.text_align === "left" || props.text_align === "right" ? props.text_align : "center",
     animation: asString(props.animation) ?? undefined,
   };
@@ -387,6 +388,16 @@ const sourceMargin = (value: unknown): string | undefined => {
   return undefined;
 };
 
+const sourcePaginationMargin = (
+  value: unknown,
+): "none" | "small" | "default" | "medium" | "large" | "xlarge" | undefined => {
+  const margin = sourceMargin(value);
+  return margin === "none" || margin === "small" || margin === "default" || margin === "medium" ||
+    margin === "large" || margin === "xlarge"
+    ? margin
+    : undefined;
+};
+
 const sourceBoolean = (value: unknown): boolean | undefined => {
   if (value === true || value === "true" || value === 1 || value === "1") return true;
   if (value === false || value === "false" || value === 0 || value === "0") return false;
@@ -517,8 +528,9 @@ const sourceParallaxEasing = (value: unknown): number | undefined => {
 };
 
 const sourceParallaxSettings = (props: Record<string, unknown>) => {
-  const origin = asString(props.parallax_transform_origin);
-  const breakpoint = asString(props.parallax_breakpoint);
+  const rawOrigin = asString(props.parallax_transform_origin);
+  const origin = (["top-left", "top-center", "top-right", "center-left", "center-center", "center-right", "bottom-left", "bottom-center", "bottom-right"] as const).find(value => value === rawOrigin);
+  const breakpoint = (["s", "m", "l", "xl", ""] as const).find(value => value === props.parallax_breakpoint);
   const easing = sourceParallaxEasing(props.parallax_easing);
   const settings = {
     ...(sourceParallaxStops(props.parallax_x) ? { x: sourceParallaxStops(props.parallax_x) } : {}),
@@ -529,9 +541,9 @@ const sourceParallaxSettings = (props: Record<string, unknown>) => {
     ...(sourceParallaxStops(props.parallax_blur) ? { blur: sourceParallaxStops(props.parallax_blur) } : {}),
     ...(origin ? { transformOrigin: origin } : {}),
     ...(easing !== undefined ? { easing } : {}),
-    ...(asString(props.parallax_target) ? { target: asString(props.parallax_target) } : {}),
-    ...(asString(props.parallax_start) ? { start: asString(props.parallax_start) } : {}),
-    ...(asString(props.parallax_end) ? { end: asString(props.parallax_end) } : {}),
+    ...(asString(props.parallax_target) ? { target: asString(props.parallax_target) ?? undefined } : {}),
+    ...(asString(props.parallax_start) ? { start: asString(props.parallax_start) ?? undefined } : {}),
+    ...(asString(props.parallax_end) ? { end: asString(props.parallax_end) ?? undefined } : {}),
     ...(props.parallax_zindex === true || props.parallax_zindex === "true" ? { zIndex: true } : {}),
     ...(breakpoint ? { breakpoint } : {}),
   };
@@ -2724,7 +2736,8 @@ const mapStaticElement = (
       const item = sourceProps(child);
       const dynamic = mapDynamicSource(child, { content: "label", link: "url", type: "type", active: "active", meta: "meta", image: "imageUrl" }, warnings, `${path}.${index}`);
       return { id: sourcePathId(`${path}.${index}`, "nav-item"), label: sanitizeHtml(asString(item.content) ?? ""), url: asString(item.link) ?? undefined,
-        type: item.type === "header" || item.type === "divider" ? item.type : "link", target: item.link_target === "blank" ? "_blank" : "_self",
+        type: item.type === "divider" ? "divider" : item.type === "heading" || item.type === "header" ? "header" : "link",
+        target: item.link_target === true || item.link_target === "true" || item.link_target === 1 || item.link_target === "1" || item.link_target === "blank" ? "_blank" : "_self",
         meta: asString(item.meta) ?? undefined, imageUrl: asString(item.image) ?? undefined,
         imageAlt: asString(item.image_alt) ?? undefined, icon: asString(item.icon) ?? undefined,
         active: item.active === true || item.active === "true" ? "true" : "", scroll: item.link_scroll === true,
@@ -2734,7 +2747,7 @@ const mapStaticElement = (
     return withSourceGeneralVisualStyle({ id: sourcePathId(path, "nav"), kind: "nav", spacingContract: "yootheme", navItems: items,
       navStyle: props.nav_style === "navbar-dropdown-nav" ? "navbar" : props.nav_style === "primary" || props.nav_style === "secondary" || props.nav_style === "navbar" ? props.nav_style : "default",
       navColumns: Math.max(1, Number(props.grid) || 1), navShowImage: props.show_image !== false, navShowMeta: props.show_meta !== false,
-      navImageVerticalAlign: props.image_vertical_align === true,
+      navImageVerticalAlign: props.image_vertical_align === true || props.image_vertical_align === "true",
       navSize: ["medium", "large", "xlarge"].includes(String(props.nav_size)) ? props.nav_size : undefined,
       navDivider: props.nav_divider === true,
       navHtmlElement: props.html_element === "nav" ? "nav" : "div",
@@ -3165,8 +3178,8 @@ const mapStaticElement = (
         variant: "panel",
         slideMode: "panel",
         ...panelSliderMedia,
-        ...(asString(props.image_width) ? { imageWidth: asString(props.image_width) } : {}),
-        ...(asString(props.image_height) ? { imageHeight: asString(props.image_height) } : {}),
+        ...(asString(props.image_width) ? { imageWidth: asString(props.image_width) ?? undefined } : {}),
+        ...(asString(props.image_height) ? { imageHeight: asString(props.image_height) ?? undefined } : {}),
         ...(Object.prototype.hasOwnProperty.call(props, "image_border")
           ? { imageShape: sourceImageBorder(props.image_border) ?? "none" }
           : {}),

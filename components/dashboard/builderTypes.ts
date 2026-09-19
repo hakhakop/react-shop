@@ -527,7 +527,7 @@ export type BuilderLayoutBlock = {
   };
   dynamicBindings?: DynamicFieldBindings<
     | "headingText" | "body" | "eyebrow" | "title"
-    | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl"
+    | "imageUrl" | "imageAlt" | "buttonLabel" | "buttonUrl" | "alertLinkUrl" | "sublayoutHtmlId" | "sublayoutHtmlClass"
   >;
   /** Transient canonical Product contexts supplied by materialization/preview. */
   dynamicProductContexts?: DynamicItemContext[];
@@ -843,6 +843,8 @@ export type BuilderLayoutBlock = {
   listItems?: BuilderListItem[];
   /** Canonical UIkit Subnav links, including authored scroll targets. */
   subnavItems?: BuilderSubnavItem[];
+  alertLinkUrl?: string;
+  alertLinkTarget?: "_self" | "_blank";
   navItems?: BuilderNavItem[];
   navStyle?: "default" | "primary" | "secondary" | "navbar";
   navSize?: "medium" | "large" | "xlarge";
@@ -1051,7 +1053,7 @@ export type BuilderLayoutBlock = {
     buttonAlign?: "left" | "center" | "right";
     buttonTarget?: "_self" | "_blank";
     renderer?: "plain" | "card";
-    cardVariant?: "default" | "primary" | "secondary" | "blank";
+    cardVariant?: BuilderLayoutBlock["gridCardVariant"];
     cardSize?: "small" | "default" | "large";
     cardHover?: boolean;
     mediaPlacement?: "top" | "bottom" | "left" | "right" | "between";
@@ -1064,7 +1066,7 @@ export type BuilderLayoutBlock = {
     titleStyle?: "inherit" | "h3" | "h4" | "h5";
     actionStyle?: BuilderButtonStyle;
     actionSize?: "small" | "default" | "large";
-    typography?: TypographySettings;
+    typography?: TypographySettings | TypographyGroup;
     items?: string[];
     iconName?: string;
     iconSize?: number;
@@ -1123,7 +1125,7 @@ export type BuilderLayoutBlock = {
     mode: "loadMore" | "pageNumbers" | "infinite";
     infiniteScroll?: boolean;
     style?: "standard" | "solid" | "minimal" | "rounded";
-    margin?: "none" | "small" | "medium" | "large" | "xlarge";
+    margin?: "none" | "small" | "default" | "medium" | "large" | "xlarge";
     alignment?: "left" | "center" | "right";
     animation?: string;
   };
@@ -1482,7 +1484,7 @@ export type BuilderSection = {
     buttonTarget?: BuilderCarouselActionTarget;
     buttonStyle?: BuilderLayoutBlock["buttonStyle"];
     buttonSize?: BuilderCarouselActionSize;
-    typography?: TypographySettings;
+    typography?: TypographySettings | TypographyGroup;
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
@@ -1576,10 +1578,24 @@ export type BuilderSection = {
     sliderParallaxTarget?: string;
     sliderParallaxStart?: string;
     sliderParallaxEnd?: string;
+    showTitle?: boolean;
+    showImage?: boolean;
+    showMeta?: boolean;
+    showContent?: boolean;
+    showLink?: boolean;
     showVideo?: boolean;
     showHoverImage?: boolean;
     showHoverVideo?: boolean;
     linkImage?: boolean;
+    linkPanel?: boolean;
+    panelImageNoPadding?: boolean;
+    panelHeightExpand?: boolean;
+    panelExpand?: "none" | "image" | "content" | "both";
+    panelMatch?: boolean;
+    buttonLabel?: string;
+    fullWidthButton?: boolean;
+    linkMarginTop?: string;
+    centered?: boolean;
     arrowStyle?: string;
     arrowPosition?: string;
     /** Existing shared slidenav visibility threshold. */

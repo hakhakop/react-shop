@@ -157,6 +157,17 @@ function strictBaselineForFixture(id: string): YoothemeFixtureStrictBaseline | n
 }
 
 export const YOOTHEME_FIXTURE_REGISTRY: readonly YoothemeFixtureRecord[] = [
+  fixture("column-sticky", "Column sticky import contract", "8f9582a781d4e2052fba0e26f9ab2adf028eb61f00efda491375e63f9c78551a", ["Column layout"], [
+    { path: "tests/yootheme-row-column-import.spec.ts", capabilityKeys: ["column.position_sticky"] },
+  ], "PARTIAL", "Synthetic fixture verifies imported sticky ownership; browser fidelity is not certified.", undefined, null, []),
+  {
+    ...fixture("sublayout", "YOOtheme nested Sublayout", "fc8c6ead156436070da5edb693df4e8a0a56e00febf89ca026e4464183422331", ["Sublayout"], [
+      { path: "tests/yootheme-sublayout.spec.ts", capabilityKeys: SUBLAYOUT_SOURCE_FIELDS.map(field => `fragment.${field}`) },
+      { path: "tests/yootheme-sublayout-browser.spec.ts", capabilityKeys: ["fragment.html_element"] },
+    ], "PARTIAL", "Focused nested import, dynamic content, and responsive layout evidence.", undefined, null, ["grid"]),
+    lastVerifiedAt: "2026-09-19",
+    lastVerifiedVersion: "Sublayout contract registration",
+  },
   {
     ...fixture("devstack-nav", "DevStack Nav and menu metadata", "08686ec9f2cf3cf6fbcba0fdc322372a0c9b39803902a2c5ef810aabe0b73b9c", ["Nav", "Dynamic Content"], [
       { path: "tests/yootheme-nav-parity.spec.tsx", capabilityKeys: ["nav.grid", "nav.nav_style", "nav.image_width", "nav.grid_column_gap", "nav.grid_row_gap", "nav_item.meta", "nav_item.image"] },
@@ -290,7 +301,7 @@ export const YOOTHEME_SEMANTIC_CAPABILITY_REGISTRY: readonly YoothemeSemanticCap
     normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.sublayout / visualStyle / dynamicBindings",
     inspectorLocation: "Sublayout › Content / Settings / Advanced",
     runtimeConsumer: "ContentLayoutSection nested renderer and dynamic materializer",
-    statusReason: "Source schema and nested builder implementation audited; representative import and browser tests, not exhaustive full-site parity certification.", fixtureIds: [],
+    statusReason: "Source schema and nested builder implementation audited; representative import and browser tests, not exhaustive full-site parity certification.", fixtureIds: ["sublayout"],
   })),
   ...BACK_TO_TOP_SOURCE_FIELDS.map(sourceField => supported({
     key: `totop.${sourceField}`, sourceType: "totop", sourceField,
@@ -342,7 +353,7 @@ export const YOOTHEME_SEMANTIC_CAPABILITY_REGISTRY: readonly YoothemeSemanticCap
   supported({ key: "alert.alert_style", sourceType: "alert", sourceField: "alert_style", semanticMeaning: "UIkit Alert style", capabilityFamily: "Alert presentation", canonicalOwner: "UikitAlert", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.alertStyle", inspectorLocation: "Alert › Settings › Presentation", runtimeConsumer: "UikitAlert", statusReason: "Enterprise7 static Alert subset and Enterprise8 default-surface contract are verified.", fixtureIds: ["enterprise7", "enterprise8"] }),
   supported({ key: "icon.icon_color", sourceType: "icon", sourceField: "icon_color", semanticMeaning: "Semantic icon color", capabilityFamily: "Icon", canonicalOwner: "UikitIcon", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.iconColorScheme", inspectorLocation: "Icon › Settings › Color", runtimeConsumer: "UikitIcon", statusReason: "Enterprise7 static Icon subset is verified.", fixtureIds: ["enterprise7"] }),
   supported({ key: "image.css", sourceType: "image", sourceField: "css", semanticMeaning: "Scoped Image Advanced CSS using YOOtheme .el-element/.el-image/.el-link selectors", capabilityFamily: "Advanced CSS", canonicalOwner: "ElementAdvancedStyle", normalizer: "sourceGeneralVisualStyle", persistedDestination: "BuilderLayoutBlock.visualStyle.customCss", inspectorLocation: "Image › Advanced › CSS", runtimeConsumer: "ElementAdvancedStyle → scoped Builder/storefront shell", statusReason: "Enterprise8 Image Advanced CSS is persisted and translated at the shared element scope boundary.", fixtureIds: ["enterprise8"] }),
-  supported({ key: "column.position_sticky", sourceType: "column", sourceField: "position_sticky", semanticMeaning: "Column sticky containment, offsets, breakpoint, and blend behavior", capabilityFamily: "Column layout", canonicalOwner: "BuilderColumn.sticky", normalizer: "sourceColumnSticky", persistedDestination: "BuilderColumn.sticky", inspectorLocation: "Column › Settings › Position Sticky", runtimeConsumer: "BuilderStickyRuntime → shared Builder/storefront column target", statusReason: "Imported YOOtheme column sticky settings are projected through the shared structural renderer.", fixtureIds: ["product-2"] }),
+  supported({ key: "column.position_sticky", sourceType: "column", sourceField: "position_sticky", semanticMeaning: "Column sticky containment, offsets, breakpoint, and blend behavior", capabilityFamily: "Column layout", canonicalOwner: "BuilderColumn.sticky", normalizer: "sourceColumnSticky", persistedDestination: "BuilderColumn.sticky", inspectorLocation: "Column › Settings › Position Sticky", runtimeConsumer: "BuilderStickyRuntime → shared Builder/storefront column target", statusReason: "Imported YOOtheme column sticky settings are projected through the shared structural renderer.", fixtureIds: ["column-sticky"] }),
   supported({ key: "list.list_type", sourceType: "list", sourceField: "list_type", semanticMeaning: "List presentation type", capabilityFamily: "List", canonicalOwner: "UikitList", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.listType", inspectorLocation: "List › Settings › Presentation", runtimeConsumer: "UikitList", statusReason: "Enterprise7 static List subset is verified.", fixtureIds: ["enterprise7"] }),
   supported({ key: "table.show_image", sourceType: "table", sourceField: "show_image", semanticMeaning: "Table image column visibility", capabilityFamily: "Table content", canonicalOwner: "UikitTable + canonical Image", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.tableShowImage", inspectorLocation: "Table › Content › Item › Image", runtimeConsumer: "UikitTable", statusReason: "Enterprise8 media/action table contract is verified.", fixtureIds: ["enterprise8"] }),
   supported({ key: "table.show_link", sourceType: "table", sourceField: "show_link", semanticMeaning: "Table action/link column visibility", capabilityFamily: "Table content", canonicalOwner: "UikitTable + shared Action", normalizer: "mapYoothemeStaticContent", persistedDestination: "BuilderLayoutBlock.tableShowLink", inspectorLocation: "Table › Content › Item › Link", runtimeConsumer: "UikitTable", statusReason: "Enterprise8 media/action table contract is verified.", fixtureIds: ["enterprise8"] }),

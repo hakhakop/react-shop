@@ -78,6 +78,7 @@ function navigationReducer(state: NavigationState, action: NavigationAction): Na
       
       const tabLabelMap: Record<SidebarTab, string> = {
         builder: "Builder",
+        content: "Content",
         elements: "Elements",
         globalStyles: "Global Styles",
         history: "History",

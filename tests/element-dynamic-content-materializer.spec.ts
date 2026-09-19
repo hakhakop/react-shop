@@ -12,8 +12,8 @@ const descriptor = {
 
 const layout = (): BuilderLayout => ({
   version: 1,
-  key: "element-dynamic-proof",
-  page: "element-dynamic-proof",
+  key: "page:element-dynamic-proof",
+  page: "page:element-dynamic-proof",
   updatedAt: "2026-08-14T00:00:00.000Z",
   sections: [{
     id: "section",

@@ -28,7 +28,7 @@ const proofLayout = (): BuilderLayout => ({
         elements: [{
           id: "proof-panel-slider",
           kind: "panelSlider",
-          panelStyle: "primary",
+          panelVariant: "primary",
           panelSize: "large",
           panelHeightExpand: true,
           imageFit: "cover",
@@ -38,7 +38,7 @@ const proofLayout = (): BuilderLayout => ({
           size: "large",
           typography: {
             title: { fontWeight: 700 },
-            text: { lineHeight: 1.5 },
+            body: { lineHeight: "1.5" },
           },
           carouselSettings: {
             presentation: "panel-slider",

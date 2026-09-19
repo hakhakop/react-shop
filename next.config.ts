@@ -14,12 +14,6 @@ const wordpressUploadsPath = `${wordpressUrl.pathname.replace(
 const nextConfig = {
  devIndicators: false,
 
-typescript: {
-
-  ignoreBuildErrors: true,
-
-},
-
 images: {
     remotePatterns: [
       {

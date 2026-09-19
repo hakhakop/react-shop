@@ -8,8 +8,8 @@ const descriptor = { provider: "wordpress", source: "post", mode: "collection" a
 
 const proofLayout = (): BuilderLayout => ({
   version: 1,
-  key: "simple-elements-proof",
-  page: "simple-elements-proof",
+  key: "page:simple-elements-proof",
+  page: "page:simple-elements-proof",
   updatedAt: "2026-08-14T00:00:00.000Z",
   sections: [{
     id: "section",
@@ -73,8 +73,8 @@ test("13K1 inherits the nearest structural item context while an explicit child 
   const childContext = { provider: "wordpress", source: "page", mode: "single" as const };
   const authored: BuilderLayout = {
     version: 1,
-    key: "parent-context-proof",
-    page: "parent-context-proof",
+    key: "page:parent-context-proof",
+    page: "page:parent-context-proof",
     updatedAt: "2026-08-14T00:00:00.000Z",
     sections: [{
       id: "section",
@@ -155,8 +155,8 @@ test("a parent taxonomy context supplies its database ID to a related collection
   const descriptors: DynamicContentContextDescriptor[] = [];
   const layout = {
     version: 1,
-    key: "parent-relation-proof",
-    page: "parent-relation-proof",
+    key: "page:parent-relation-proof",
+    page: "page:parent-relation-proof",
     updatedAt: "2026-08-28T00:00:00.000Z",
     sections: [{
       id: "tag-section",
@@ -228,8 +228,8 @@ test("single taxonomy items materialize section backgrounds, overlays, and Galle
   });
   const layout = {
     version: 1,
-    key: "taxonomy-visuals",
-    page: "taxonomy-visuals",
+    key: "page:taxonomy-visuals",
+    page: "page:taxonomy-visuals",
     updatedAt: "2026-08-28T00:00:00.000Z",
     sections: [{
       id: "section",

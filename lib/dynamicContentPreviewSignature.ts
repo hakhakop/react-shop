@@ -14,6 +14,7 @@ export function dynamicContentPreviewSignature(sections: BuilderSection[]) {
     records(blocks).forEach((block) => {
       const gridItems = records(block.gridItems);
       const slides = records(block.slides);
+      const navItems = records(block.navItems);
       const listItems = records(block.listItems);
       const buttons = records(block.buttons);
       const galleryItems = records(block.galleryItems);
@@ -41,6 +42,11 @@ export function dynamicContentPreviewSignature(sections: BuilderSection[]) {
       slides.forEach((slide) => {
         if (slide.dynamicContext || slide.dynamicBindings) {
           metadata.push({ owner, kind: "panel-slider", id: slide.id, dynamicContext: slide.dynamicContext, dynamicBindings: slide.dynamicBindings });
+        }
+      });
+      navItems.forEach((item) => {
+        if (item.dynamicContext || item.dynamicBindings) {
+          metadata.push({ owner, kind: "nav-item", id: item.id, dynamicContext: item.dynamicContext, dynamicBindings: item.dynamicBindings });
         }
       });
       listItems.forEach((item) => {

@@ -1,3 +1,4 @@
+import columnStickyFixture from "./fixtures/yootheme-compatibility/sources/column-sticky.json";
 import { expect, test } from "@playwright/test";
 
 import enterprise8 from "@/tests/fixtures/yootheme-compatibility/sources/enterprise8.json";
@@ -71,6 +72,27 @@ test("does not invent a 40px top margin for an unconfigured YOOtheme row", () =>
   });
 
   expect(imported.sections[0]?.rows?.[1]?.topMargin).toBeUndefined();
+});
+
+test("keeps YOOtheme default pagination spacing", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [
+            { type: "grid", props: {}, children: [] },
+            { type: "pagination", props: { margin: "default" } },
+          ],
+        }],
+      }],
+    }],
+  });
+  const grid = imported.sections[0]?.rows?.[0]?.columns[0]?.elements[0];
+  expect(grid?.pagination?.margin).toBe("default");
 });
 
 test("keeps YOOtheme xlarge row margins on the global token", () => {
@@ -343,5 +365,12 @@ test("registry distinguishes persisted structural fields from runtime support", 
     status: "DEFERRED",
     canonicalOwner: "BuilderRow",
     runtimeConsumer: null,
+  });
+});
+
+test("registered column-sticky fixture retains containment, offset, and breakpoint", async () => {
+  const imported = mapYoothemeStaticContent(columnStickyFixture);
+  expect(imported.sections[0].rows![0].columns[0].sticky).toEqual({
+    mode: "column-within-row", topOffset: "25px", breakpoint: "m",
   });
 });

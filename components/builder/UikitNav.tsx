@@ -29,26 +29,35 @@ export function NavMarkup({ block, pathname }: { block: BuilderLayoutBlock; path
     if (item.type === "divider") return <li key={item.id} className="el-item uk-nav-divider" role="separator" />;
     if (item.type === "header") return <li key={item.id} className="el-item uk-nav-header" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.label) }} />;
     const active = item.active === "true" || Boolean(item.url && item.url !== "#" && item.url === pathname);
+    const hasMeta = block.navShowMeta !== false && Boolean(item.meta);
     const label = <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.label) }} />;
-    const text = block.navShowMeta !== false && item.meta
-      ? <div>{label}<div className="uk-nav-subtitle" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.meta) }} /></div> : label;
+    const text = hasMeta
+      ? <div>{label}<div className="uk-nav-subtitle" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.meta ?? "") }} /></div> : label;
     const width = Number(block.imageWidth) || undefined;
     const height = Number(block.imageHeight) || undefined;
-    const imageClass = ["el-image", block.imageBorder && `uk-border-${block.imageBorder}`].filter(Boolean).join(" ");
+    const imageClass = [
+      "el-image",
+      block.imageBorder && `uk-border-${block.imageBorder}`,
+      !hasMeta && block.navImageMargin !== false && "uk-margin-small-right",
+    ].filter(Boolean).join(" ");
     const image = item.imageUrl ? <img src={item.imageUrl} alt={item.imageAlt ?? ""} width={width} height={height}
       loading={block.imageLoading ?? "lazy"} className={imageClass} style={width && height ? { objectFit: "cover", width, height } : undefined} /> : item.icon
-      ? <span className="el-image" uk-icon={`icon: ${item.icon}${block.iconSize ? `; width: ${block.iconSize}` : ""}`} /> : null;
+      ? <span className={imageClass} uk-icon={`icon: ${item.icon}${block.iconSize ? `; width: ${block.iconSize}` : ""}`} /> : null;
     const media = item.imageUrl && block.imageSvgInline && /\.svg(?:[?#]|$)/i.test(item.imageUrl)
       ? <UikitStylableSvg src={item.imageUrl} alt={item.imageAlt} className={imageClass}
           style={{ width, height }} preserveIntrinsicSize={!width && !height} loading={block.imageLoading}
           color={getUikitSvgColor(block.imageSvgColor)} fallback={image} /> : image;
+    const content = block.navShowImage !== false && media
+      ? hasMeta
+        ? <div className={`uk-grid uk-grid-${block.navImageMargin === false ? "collapse" : "small"} uk-child-width-expand uk-flex-nowrap${block.navImageVerticalAlign ? " uk-flex-middle" : ""}`} uk-grid="">
+            <div className="uk-width-auto">{media}</div><div>{text}</div>
+          </div>
+        : <>{media}{text}</>
+      : text;
     return <li key={item.id} className={`el-item${active ? " uk-active" : ""}`}>
-      <a href={item.url || undefined} {...builderLinkTargetProps(item.target)} {...(item.scroll ? { "uk-scroll": "" } : {})}
-        aria-current={active ? "page" : undefined} className="el-link">
-        {block.navShowImage !== false && media ? <div className={`uk-grid-${block.navImageMargin === false ? "collapse" : "small"} uk-child-width-expand uk-flex-nowrap${block.navImageVerticalAlign ? " uk-flex-middle" : ""}`} uk-grid="">
-          <div className="uk-width-auto">{media}</div><div>{text}</div>
-        </div> : text}
-      </a>
+      {item.url ? <a href={item.url} {...builderLinkTargetProps(item.target)} {...(item.scroll ? { "uk-scroll": "" } : {})}
+        aria-current={active ? "page" : undefined} className="el-link">{content}</a>
+        : <div className="el-content uk-disabled">{content}</div>}
     </li>;
   };
   const lists = columns.map((items, index) => <ul key={index} className={listClass}>{items.map(renderItem)}</ul>);
@@ -58,8 +67,9 @@ export function NavMarkup({ block, pathname }: { block: BuilderLayoutBlock; path
     ? block.navGridColumnGap ? [`uk-grid-${block.navGridColumnGap}`] : []
     : [block.navGridColumnGap && `uk-grid-column-${block.navGridColumnGap}`, block.navGridRowGap && `uk-grid-row-${block.navGridRowGap}`];
   return <Wrapper className="shop-builder-nav">{columns.length > 1 ? <div className={[
+    "uk-grid",
     breakpoint ? `uk-child-width-1-1 uk-child-width-expand@${breakpoint}` : "uk-child-width-expand",
-    ...gapClasses, block.navGridDivider && "uk-grid-divider",
+    ...gapClasses, block.navGridDivider && block.navGridColumnGap !== "collapse" && block.navGridRowGap !== "collapse" && "uk-grid-divider",
   ].filter(Boolean).join(" ")} uk-grid="">{lists.map((list, index) => <div key={index}>{list}</div>)}</div> : lists[0]}</Wrapper>;
 }
 

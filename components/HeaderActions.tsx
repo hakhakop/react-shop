@@ -102,7 +102,7 @@ export default function HeaderActions({
                   variant={iconVariant}
                   size="md"
                   aria-label="Search"
-                  onClick={openSearch}
+                  onClick={() => openSearch()}
                 />
               </motion.div>
             );

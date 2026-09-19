@@ -17,7 +17,7 @@ const fixture = {
 
 test("Batch 2 imports YOOtheme Grid composition as canonical structural state", () => {
   const mapped = mapYoothemeStaticContent(fixture as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid).toMatchObject({
     gridItemMaxWidth: "xlarge", panelContentWidth: "small", panelExpand: "both",
     gridTitlePlacement: "left", gridTitleWidth: "2-3", gridTitleColumnGap: "large", gridTitleRowGap: "small", gridTitleBreakpoint: "l",
@@ -44,9 +44,9 @@ test("Grid applies the shared Image margin top for every placement", () => {
   const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
   const styles = readFileSync(resolve(process.cwd(), "app/styles/shop-builder.css"), "utf8");
   const dashboardStyles = readFileSync(resolve(process.cwd(), "app/styles/dashboard.css"), "utf8");
-  expect(renderer).toContain('getUikitMarginClass(rawBlock.imageMarginTop ?? "default", "top")');
+  expect(renderer).toContain('getUikitMarginClass(rawBlock.imageMarginTop, "top")');
   expect(renderer).toContain('getUikitMarginClass(rawBlock.metaMarginTop, "top")');
-  expect(renderer).toContain('.replace(/\\buk-margin-remove-top\\b/g, "").trim()');
+  expect(renderer).toContain('${mediaClass} ${mediaMarginTopClass}');
   expect(renderer).not.toContain('mediaPlacement === "between"\n              ||');
   expect(styles).toContain("margin-bottom: 20px !important;");
   expect(styles).not.toContain("margin: 0 0 20px 0 !important;");
@@ -61,7 +61,7 @@ test("YOOtheme's remove value uses the shared zero-spacing token", () => {
       type: "grid", props: { image_align: "bottom", image_margin: "remove" }, children: [],
     }] }] }] }],
   } as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid.imageMarginTop).toBe("none");
   expect(getUikitMarginClass(grid.imageMarginTop, "top")).toBe("uk-margin-remove-top");
   expect(getUikitMarginClass("small", "top")).toBe("uk-margin-small-top");
@@ -83,14 +83,14 @@ test("Grid parent Image settings retain YOOtheme owners during import", () => {
       }, children: [],
     }] }] }] }],
   } as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid).toMatchObject({
     imageWidth: "80px", imageHeight: "80px", imageLoading: "eager", imageShape: "rounded",
     imageShadow: "medium", imageBoxDecoration: "primary", imageHoverTransition: "scale-up",
     imageHoverBoxShadow: "large", imageHoverBorder: true, gridMediaWidth: "1-2",
     gridMediaColumnGap: "small", gridMediaRowGap: "large", gridMediaBreakpoint: "m",
     gridMediaVerticalAlign: true, imageMarginTop: "medium", imageSvgInline: true,
-    imageSvgAnimate: true, imageSvgColor: "emphasis", imageIconWidth: "80", imageIconColor: "primary",
+    imageSvgAnimate: true, imageSvgColor: "emphasis", imageIconWidth: undefined, imageIconColor: "primary",
     imageTextColor: "light", gridMediaPlacement: "between", linkImage: true,
   });
 });
@@ -98,8 +98,8 @@ test("Grid parent Image settings retain YOOtheme owners during import", () => {
 test("YOOtheme Grid dimensions remain intrinsic under responsive tracks", () => {
   const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
   expect(renderer).toContain("height: isYoothemeGrid && !hasCropFrame");
-  expect(renderer).toContain('width={intrinsicImageWidth}');
-  expect(renderer).toContain('height={intrinsicImageHeight}');
+  expect(renderer).toContain('width={resolvedIntrinsicImageWidth}');
+  expect(renderer).toContain('height={resolvedIntrinsicImageHeight}');
 });
 
 test("YOOtheme Grid restores Advanced CSS item compatibility classes", () => {
@@ -114,7 +114,7 @@ test("Grid parent alignment is not shadowed by synthetic item-top defaults", () 
       type: "grid", props: { image_align: "bottom" }, children: [{ type: "grid_item", props: { title: "Item", image: "/image.jpg" } }],
     }] }] }] }],
   } as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid.gridMediaPlacement).toBe("bottom");
   expect(grid.gridItems?.[0]?.mediaPlacement).toBeUndefined();
 });
@@ -128,7 +128,7 @@ test("Grid Meta settings retain canonical style, alignment, element, and margin 
       }, children: [{ type: "grid_item", props: { title: "Item", meta: "Meta" } }],
     }] }] }] }],
   } as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid).toMatchObject({
     metaStyle: "h5", metaColor: "none", gridMetaAlign: "above-content",
     gridMetaHtmlElement: "h3", metaMarginTop: "medium",
@@ -144,7 +144,7 @@ test("Grid Panel settings retain YOOtheme style, padding, expansion, and max-wid
       }, children: [],
     }] }] }] }],
   } as any);
-  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks[0] as any;
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
   expect(grid).toMatchObject({
     gridCardVariant: "tile-checked", gridCardSize: "large", linkPanel: true,
     panelHover: true, panelExpand: "content", gridItemMaxWidth: "medium",

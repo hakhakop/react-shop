@@ -75,6 +75,7 @@ test("keeps legacy equal-column structural classes unchanged", () => {
     "uk-grid",
     "uk-grid-small",
     "uk-grid-match",
+    "shop-builder-content-row--max-width-none",
   ]);
   expect(row.columns.map(({ className }) => className)).toEqual([
     "uk-width-1-2@m",
@@ -144,7 +145,7 @@ test("does not add match-height to canonical YOOtheme rows without the source mo
 test("Panel fill projects UIkit's item-match modifier onto its owning column", () => {
   const structure = resolveBuilderSectionStructure({
     id: "panel-fill",
-    kind: "contentLayout",
+    kind: "contentLayout", title: "", background: "transparent", visible: true,
     rows: [{
       id: "panel-fill-row",
       layout: "2-col-equal",
@@ -163,7 +164,7 @@ test("Panel fill projects UIkit's item-match modifier onto its owning column", (
 test("keeps authored responsive widths without an equal-column fallback", () => {
   const structure = resolveBuilderSectionStructure({
     id: "pricing-plan",
-    kind: "contentLayout",
+    kind: "contentLayout", title: "", background: "transparent", visible: true,
     rows: [{
       id: "plan-row",
       layout: "3-col-equal",

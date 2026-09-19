@@ -13,7 +13,7 @@ const currentHeader: BuilderState = {
   design: {},
   sections: [{
     id: "header-document",
-    kind: "header",
+    kind: "header", visible: true,
     title: "Header",
     background: "transparent",
     layout: "whole",

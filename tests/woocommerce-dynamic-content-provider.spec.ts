@@ -242,7 +242,7 @@ test("projects imported YOOtheme commerce namespaces to the registered WooCommer
   globalThis.fetch = async (input) => {
     const url = String(input);
     requested.push(url);
-    if (url.includes("products/categories?include=")) return Response.json([{ id: 3 }]);
+    if (url.includes("products/categories?include=")) return Response.json([{ id: 3, name: "Clothing", slug: "clothing", description: "Seasonal clothing" }]);
     if (url.includes("products/tags?include=")) return Response.json([]);
     if (url.includes("/products?")) return Response.json([product]);
     if (url.endsWith("products/categories/3")) return Response.json({
@@ -293,8 +293,8 @@ test("projects imported YOOtheme commerce namespaces to the registered WooCommer
 test("Product uses the canonical materializer and leaves authored layout untouched", async () => {
   const authored = {
     version: 1,
-    key: "product-provider-proof",
-    page: "product-provider-proof",
+    key: "page:product-provider-proof",
+    page: "page:product-provider-proof",
     updatedAt: "2026-08-15T00:00:00.000Z",
     sections: [{
       id: "section",
@@ -327,12 +327,12 @@ test("Product uses the canonical materializer and leaves authored layout untouch
 test("Products element receives a transient canonical collection projection", async () => {
   const authored = {
     version: 1,
-    key: "products-element-proof",
-    page: "products-element-proof",
+    key: "page:products-element-proof",
+    page: "page:products-element-proof",
     updatedAt: "2026-08-15T00:00:00.000Z",
     sections: [{
       id: "section",
-      kind: "content",
+      kind: "content", title: "", background: "transparent", visible: true,
       rows: [{ id: "row", layout: "1-col", columns: [{ id: "column", elements: [{
         id: "products",
         kind: "products",

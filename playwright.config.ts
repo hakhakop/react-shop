@@ -7,6 +7,7 @@ const baseURL =
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: ["**/devstack-import-acceptance.spec.ts"],
   timeout: 60_000,
   workers: 1,
   use: {

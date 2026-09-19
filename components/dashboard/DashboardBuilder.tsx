@@ -2314,20 +2314,7 @@ export default function DashboardBuilder({
   const shellTransitionRef = useRef<{
     direction: "enter" | "exit";
     page: BuilderLayoutKey;
-  } | null>(() => initialPageHydration?.editorContext.document.kind === "routing-template"
-    ? initialPageHydration.context as {
-        documentId: string;
-        routingTemplateId: string;
-        displayName: string;
-        family: string;
-        familyLabel: string;
-        pageType: string;
-        provider: string;
-        source: string;
-        websiteId?: string;
-        assignmentSummary: string;
-      }
-    : null);
+  } | null>(null);
   const strictBuilderTargetIdentityRef = useRef("");
   const strictBuilderTargetParts = [
     searchParams.get("document") ?? "",
@@ -2359,6 +2346,33 @@ export default function DashboardBuilder({
     source: string;
     websiteId?: string;
     assignmentSummary: string;
+  } | null>(() => initialPageHydration?.editorContext.document.kind === "routing-template"
+    ? initialPageHydration.context as {
+        documentId: string;
+        routingTemplateId: string;
+        displayName: string;
+        family: string;
+        familyLabel: string;
+        pageType: string;
+        provider: string;
+        source: string;
+        websiteId?: string;
+        assignmentSummary: string;
+      }
+    : null);
+  const [individualBuilderContext, setIndividualBuilderContext] = useState<{
+    mode: "individual";
+    documentId: string;
+    identity: { provider: string; contentType: "product" | "post"; contentId: string };
+    pageType: string;
+    family: "product" | "post";
+    familyLabel: "Individual Product Layout" | "Individual Post Layout";
+    title: string | null;
+    slug: string | null;
+    availability: "published" | "unpublished" | "unknown" | "missing";
+    websiteId?: string;
+    storefrontHref?: string;
+    assignedTemplate: null | { templateId: string; name: string; layoutId: string };
   } | null>(() => initialPageHydration?.editorContext.document.kind === "individual"
     ? initialPageHydration.context as {
         mode: "individual";
@@ -2375,20 +2389,6 @@ export default function DashboardBuilder({
         assignedTemplate: null | { templateId: string; name: string; layoutId: string };
       }
     : null);
-  const [individualBuilderContext, setIndividualBuilderContext] = useState<{
-    mode: "individual";
-    documentId: string;
-    identity: { provider: string; contentType: "product" | "post"; contentId: string };
-    pageType: string;
-    family: "product" | "post";
-    familyLabel: "Individual Product Layout" | "Individual Post Layout";
-    title: string | null;
-    slug: string | null;
-    availability: "published" | "unpublished" | "unknown" | "missing";
-    websiteId?: string;
-    storefrontHref?: string;
-    assignedTemplate: null | { templateId: string; name: string; layoutId: string };
-  } | null>(null);
   const [templatePreviewCandidates, setTemplatePreviewCandidates] = useState<Array<{
     identity: { provider: string; contentType: string; contentId: string };
     label: string;
@@ -3272,7 +3272,11 @@ export default function DashboardBuilder({
   const redoHistoryRef = useRef<BuilderState[]>([]);
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
-    useState("");
+    // The server-provided document is already a committed baseline on first
+    // paint. Initializing from it avoids a race where a user imports a layout
+    // before the effect below records that baseline, causing the imported
+    // layout itself to be treated as already published.
+    useState(() => initialPublishedState ? JSON.stringify(initialPublishedState) : "");
   const [committedShellSettingsSignature, setCommittedShellSettingsSignature] =
     useState("");
   const undoRef = useRef<() => void>(() => {});

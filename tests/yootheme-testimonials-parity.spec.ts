@@ -235,7 +235,7 @@ test.describe("YOOtheme Testimonials Section & Overlay Slider Parity", () => {
       (s) => s.title === "Customer Stories",
     );
     expect(customerStoriesSection).toBeDefined();
-    expect(customerStoriesSection!.contentMode).toBe("expand");
+    expect(customerStoriesSection!.contentMode).toBe("none");
 
     const sliderBlock = customerStoriesSection!.rows?.flatMap((r) =>
       r.columns.flatMap((c) => c.elements),

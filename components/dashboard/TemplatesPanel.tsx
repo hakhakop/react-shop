@@ -74,7 +74,8 @@ export default function TemplatesPanel({
     if (!renameTemplateRequest) return;
     const template = savedTemplates.find((item) => item.id === renameTemplateRequest.id);
     if (!template) return;
-    setTemplateLibraryTab(renameTemplateRequest.templateType);
+    setTemplateLibraryTab(templateLibraryTabs.some(tab => tab.value === renameTemplateRequest.templateType)
+      ? renameTemplateRequest.templateType as TemplateLibraryTab : "page");
     setRenamingTemplateId(template.id);
     setRenamingTemplateTitle(template.title);
   }, [renameTemplateRequest, savedTemplates]);

@@ -38,8 +38,10 @@ test("DevStack Nav retains layout settings, dynamic media, and reference column 
   expect(splitNavColumns(result.navItems!, 2).map(group => group.map(item => item.label))).toEqual([labels.slice(0, 4), labels.slice(4)]);
   const html = renderToStaticMarkup(React.createElement(NavMarkup, { block: result }));
   expect(html.match(/<ul /g)).toHaveLength(2);
-  expect(html).toContain('uk-child-width-expand uk-grid-large');
+  expect(html).toContain('uk-grid uk-child-width-expand uk-grid-large');
   expect(html).toContain('width="50"');
+  expect(html.match(/class="uk-grid uk-grid-small uk-child-width-expand uk-flex-nowrap"/g)).toHaveLength(7);
+  expect(html).not.toContain('class="uk-width-expand"');
   expect(html.match(/class="uk-nav-subtitle"/g)).toHaveLength(7);
   expect(html).not.toContain("uk-text-meta");
   expect(JSON.stringify(layout)).toBe(original);
@@ -49,14 +51,17 @@ test("Nav imports responsive grids, semantic wrapper, item markup and active sta
   const mapped = mapYoothemeStaticContent(wrap({ type: "nav", props: {
     nav_style: "navbar-dropdown-nav", nav_divider: true, html_element: "nav", grid: "3", grid_breakpoint: "m", grid_column_gap: "collapse", grid_row_gap: "small", grid_divider: true, show_image: false, show_meta: false,
   }, children: [
-    { type: "nav_item", props: { content: "<strong>Home &amp; More</strong>", link: "/", active: true, link_target: "blank", link_scroll: true, image: "/image.svg", meta: "hidden subtitle" } },
-    { type: "nav_item", props: { content: "Heading", type: "header" } },
+    { type: "nav_item", props: { content: "<strong>Home &amp; More</strong>", link: "/", active: true, link_target: true, link_scroll: true, image: "/image.svg", meta: "hidden subtitle" } },
+    { type: "nav_item", props: { content: "Heading", type: "heading" } },
     { type: "nav_item", props: { type: "divider" } },
   ] }));
   expect(mapped.warnings).toEqual([]);
   const nav = mapped.sections[0].rows![0].columns[0].elements[0];
   const html = renderToStaticMarkup(React.createElement(NavMarkup, { block: nav }));
-  for (const value of ['<nav class="shop-builder-nav">', 'uk-child-width-expand@m', 'uk-grid-column-collapse', 'uk-grid-row-small', 'uk-grid-divider', 'uk-navbar-dropdown-nav', 'aria-current="page"', 'target="_blank"', 'uk-scroll=""', '<strong>Home &amp; More</strong>', 'uk-nav-header', 'role="separator"']) expect(html).toContain(value);
+  expect(nav.navItems?.[0]).toMatchObject({ target: "_blank" });
+  expect(nav.navItems?.[1]).toMatchObject({ type: "header" });
+  for (const value of ['<nav class="shop-builder-nav">', 'uk-child-width-expand@m', 'uk-grid-column-collapse', 'uk-grid-row-small', 'uk-navbar-dropdown-nav', 'aria-current="page"', 'target="_blank"', 'uk-scroll=""', '<strong>Home &amp; More</strong>', 'uk-nav-header', 'role="separator"']) expect(html).toContain(value);
+  expect(html).not.toContain('uk-grid-divider');
   expect(html).not.toContain('<img');
   expect(html).not.toContain('hidden subtitle');
 });

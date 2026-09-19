@@ -370,7 +370,7 @@
                     "imageRatio": "16:9",
                     "imageShape": "rounded",
                     "imageShadow": "none",
-                    "imageWidth": "auto",
+                    "imageWidth": "300",
                     "imageLoading": "lazy",
                     "imageLinkTarget": "_self",
                     "imageCaption": "",
@@ -4187,7 +4187,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-19T10:04:12.326Z"
+    "updatedAt": "2026-09-19T13:33:02.953Z"
   },
   "shop": {
     "version": 1,

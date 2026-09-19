@@ -60,7 +60,7 @@ export function resolveCanonicalGridAction(
   // value as the copied default rather than an item override. This keeps
   // existing documents responsive to their canonical Grid Link control while
   // preserving explicit item styles imported by the corrected path.
-  const ignoresLegacyCopiedItemStyle = block.id.startsWith("yootheme-grid-")
+  const ignoresLegacyCopiedItemStyle = block.id?.startsWith("yootheme-grid-")
     && allLegacyItemStyles.length === (block.gridItems ?? []).length
     && new Set(allLegacyItemStyles).size === 1
     && rawItem.buttonStyleSource !== "item";
