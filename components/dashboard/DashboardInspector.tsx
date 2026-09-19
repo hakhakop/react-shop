@@ -4,7 +4,10 @@ import {
   ArrowDown,
   ArrowUp,
   Copy,
+  GripVertical,
   PanelRightClose,
+  Pin,
+  PinOff,
   Plus,
   Ruler,
   Save,
@@ -19,6 +22,7 @@ import {
   useState,
   type ChangeEvent,
   type Dispatch,
+  type PointerEvent as ReactPointerEvent,
   type SetStateAction,
 } from "react";
 import { createPortal } from "react-dom";
@@ -555,6 +559,13 @@ type DashboardInspectorProps = {
   onOpenGlobalSpacingSettings?: (scope: "section" | "row" | "element") => void;
   onOpenGlobalTypographySettings?: () => void;
   onCloseInspector: () => void;
+  showHeaderCloseControl?: boolean;
+  inspectorMode?: "docked" | "floating";
+  inspectorDesktopLayout?: boolean;
+  onToggleInspectorMode?: () => void;
+  onInspectorDragStart?: (event: ReactPointerEvent<HTMLDivElement>) => void;
+  onInspectorDragMove?: (event: ReactPointerEvent<HTMLDivElement>) => void;
+  onInspectorDragStop?: (event: ReactPointerEvent<HTMLDivElement>) => void;
   setInspectorTab: Dispatch<SetStateAction<InspectorTab>>;
   setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
   setOpenSlideId: Dispatch<SetStateAction<string | null>>;
@@ -610,6 +621,58 @@ function InspectorGroupSummary({
       </span>
       {meta ? <small>{meta}</small> : null}
     </>
+  );
+}
+
+function InspectorWorkspaceActions({
+  inspectorMode,
+  inspectorDesktopLayout,
+  onCloseInspector,
+  onToggleInspectorMode,
+}: {
+  inspectorMode: "docked" | "floating";
+  inspectorDesktopLayout: boolean;
+  onCloseInspector: () => void;
+  onToggleInspectorMode: () => void;
+}) {
+  const isDocked = inspectorMode === "docked";
+  const canDock = isDocked || inspectorDesktopLayout;
+
+  return (
+    <div
+      className="builder-inspector-mode-actions"
+      aria-label="Inspector panel controls"
+    >
+      <button
+        className="builder-inspector-mode-action"
+        type="button"
+        onClick={onCloseInspector}
+        aria-label="Collapse Inspector"
+        title="Collapse Inspector"
+      >
+        <PanelRightClose size={14} aria-hidden="true" />
+      </button>
+      <button
+        className="builder-inspector-mode-action"
+        type="button"
+        onClick={onToggleInspectorMode}
+        disabled={!canDock}
+        aria-label={isDocked ? "Float Inspector" : "Dock Inspector right"}
+        title={
+          isDocked
+            ? "Float Inspector"
+            : canDock
+              ? "Dock Inspector right"
+              : "Docking is available on wider screens"
+        }
+      >
+        {isDocked ? (
+          <PinOff size={14} aria-hidden="true" />
+        ) : (
+          <Pin size={14} aria-hidden="true" />
+        )}
+      </button>
+    </div>
   );
 }
 
@@ -1199,6 +1262,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     onOpenGlobalSpacingSettings,
     onOpenGlobalTypographySettings,
     onCloseInspector,
+    showHeaderCloseControl = true,
+    inspectorMode = "docked",
+    inspectorDesktopLayout = true,
+    onToggleInspectorMode,
+    onInspectorDragStart,
+    onInspectorDragMove,
+    onInspectorDragStop,
     setInspectorTab,
     setOpenSlideId,
     setSpacingOverlayEnabled = () => undefined,
@@ -2095,21 +2165,41 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}
     >
       {!selectedSection ? (
-        <div className="builder-inspector-header-consolidated">
+        <div
+          className="builder-inspector-header-consolidated"
+          onPointerDown={onInspectorDragStart}
+          onPointerMove={onInspectorDragMove}
+          onPointerUp={onInspectorDragStop}
+          onPointerCancel={onInspectorDragStop}
+          onLostPointerCapture={onInspectorDragStop}
+        >
           <div className="builder-inspector-header-row">
             <div className="builder-inspector-header-title-wrap">
+              {inspectorMode === "floating" && onInspectorDragStart ? (
+                <GripVertical size={13} aria-hidden="true" />
+              ) : null}
               <strong>Inspector</strong>
             </div>
-            <div className="builder-inspector-header-actions">
-              <button
-                type="button"
-                className="builder-inspector-close"
-                onClick={onCloseInspector}
-                aria-label="Close inspector"
-              >
-                <PanelRightClose size={14} />
-              </button>
-            </div>
+            {showHeaderCloseControl ? (
+              <div className="builder-inspector-header-actions">
+                <button
+                  type="button"
+                  className="builder-inspector-close"
+                  onClick={onCloseInspector}
+                  aria-label="Close inspector"
+                >
+                  <PanelRightClose size={14} />
+                </button>
+              </div>
+            ) : null}
+            {onToggleInspectorMode ? (
+              <InspectorWorkspaceActions
+                inspectorMode={inspectorMode}
+                inspectorDesktopLayout={inspectorDesktopLayout}
+                onCloseInspector={onCloseInspector}
+                onToggleInspectorMode={onToggleInspectorMode}
+              />
+            ) : null}
           </div>
           <div className="builder-inspector-empty-state">
             <span>Select a section, row, or element to begin editing.</span>
@@ -2117,14 +2207,24 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         </div>
       ) : (
         <>
-          <div className="builder-inspector-header-consolidated">
+          <div
+            className="builder-inspector-header-consolidated"
+            onPointerDown={onInspectorDragStart}
+            onPointerMove={onInspectorDragMove}
+            onPointerUp={onInspectorDragStop}
+            onPointerCancel={onInspectorDragStop}
+            onLostPointerCapture={onInspectorDragStop}
+          >
             <div className="builder-inspector-header-row">
               <div className="builder-inspector-header-title-wrap">
+                {inspectorMode === "floating" && onInspectorDragStart ? (
+                  <GripVertical size={13} aria-hidden="true" />
+                ) : null}
                 <strong>
                   {selectedLayoutBlock
                     ? `${selectedElementLabel} · Element`
                     : selectedColumnIndex >= 0
-                      ? `${selectedColumnLabel} · Column`
+                        ? `${selectedColumnLabel} · Column`
                       : selectedLayoutRow
                         ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
                     : isDocumentRoot
@@ -2148,15 +2248,25 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   <Ruler size={13} />
                   <span>Spacing</span>
                 </button>
-                <button
-                  type="button"
-                  className="builder-inspector-close"
-                  onClick={onCloseInspector}
-                  aria-label="Close inspector"
-                >
-                  <PanelRightClose size={14} />
-                </button>
+                {showHeaderCloseControl ? (
+                  <button
+                    type="button"
+                    className="builder-inspector-close"
+                    onClick={onCloseInspector}
+                    aria-label="Close inspector"
+                  >
+                    <PanelRightClose size={14} />
+                  </button>
+                ) : null}
               </div>
+              {onToggleInspectorMode ? (
+                <InspectorWorkspaceActions
+                  inspectorMode={inspectorMode}
+                  inspectorDesktopLayout={inspectorDesktopLayout}
+                  onCloseInspector={onCloseInspector}
+                  onToggleInspectorMode={onToggleInspectorMode}
+                />
+              ) : null}
             </div>
 
             <div

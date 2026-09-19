@@ -21,7 +21,6 @@ import {
   ListChecks,
   Navigation,
   PanelLeft,
-  PanelRightClose,
   PanelRightOpen,
   Pencil,
   Languages,
@@ -38,7 +37,6 @@ import {
   Sparkles,
   Star,
   ShieldCheck,
-  SquareMousePointer,
   TextCursorInput,
   Truck,
   UserRound,
@@ -11646,6 +11644,17 @@ export default function DashboardBuilder({
       moveSelected={moveSelected}
       openWordPressMediaPicker={openWordPressMediaPicker}
       onCloseInspector={() => setInspectorOpen(false)}
+      showHeaderCloseControl={false}
+      inspectorMode={effectiveInspectorMode}
+      inspectorDesktopLayout={inspectorDesktopLayout}
+      onToggleInspectorMode={() =>
+        setInspectorModePreference(
+          effectiveInspectorMode === "docked" ? "floating" : "docked",
+        )
+      }
+      onInspectorDragStart={startInspectorDrag}
+      onInspectorDragMove={moveInspectorDrag}
+      onInspectorDragStop={stopInspectorDrag}
       setInspectorTab={setInspectorTab}
       setSpacingOverlayEnabled={setSpacingOverlayEnabled}
       setOpenSlideId={setOpenSlideId}
@@ -14390,30 +14399,22 @@ export default function DashboardBuilder({
               : { width: `${clampedInspectorWidth}px` }
           }
         >
-          <div
-            className="builder-inspector-mode-bar"
-            onPointerDown={startInspectorDrag}
-            onPointerMove={moveInspectorDrag}
-            onPointerUp={stopInspectorDrag}
-            onPointerCancel={stopInspectorDrag}
-            onLostPointerCapture={stopInspectorDrag}
-          >
-            <span>
-              {elementLibraryOpen ? (
-                <>
-                  <PanelRightOpen size={14} aria-hidden="true" />
-                  Element Library
-                </>
-              ) : (
-                <>
-                  <GripVertical size={14} aria-hidden="true" />
-                  Inspector
-                </>
-              )}
-            </span>
-            <div>
-              {elementLibraryOpen ? (
+          {elementLibraryOpen ? (
+            <div
+              className="builder-inspector-mode-bar is-library"
+              onPointerDown={startInspectorDrag}
+              onPointerMove={moveInspectorDrag}
+              onPointerUp={stopInspectorDrag}
+              onPointerCancel={stopInspectorDrag}
+              onLostPointerCapture={stopInspectorDrag}
+            >
+              <span className="builder-inspector-mode-title">
+                <PanelRightOpen size={14} aria-hidden="true" />
+                Element Library
+              </span>
+              <div className="builder-inspector-mode-actions">
                 <button
+                  className="builder-inspector-mode-action builder-inspector-mode-action--icon"
                   type="button"
                   onClick={() => closeElementLibrary(true)}
                   aria-label="Close Element Library"
@@ -14421,54 +14422,9 @@ export default function DashboardBuilder({
                 >
                   <X size={14} />
                 </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setInspectorModePreference(
-                        effectiveInspectorMode === "docked"
-                          ? "floating"
-                          : "docked",
-                      )
-                    }
-                    disabled={
-                      effectiveInspectorMode === "floating" &&
-                      !inspectorDesktopLayout
-                    }
-                    aria-label={
-                      effectiveInspectorMode === "docked"
-                        ? "Undock Inspector"
-                        : "Dock Inspector right"
-                    }
-                    title={
-                      effectiveInspectorMode === "docked"
-                        ? "Undock Inspector"
-                        : inspectorDesktopLayout
-                          ? "Dock Inspector right"
-                          : "Docking is available on wider screens"
-                    }
-                  >
-                    {effectiveInspectorMode === "docked" ? (
-                      <SquareMousePointer size={14} />
-                    ) : (
-                      <PanelRightOpen size={14} />
-                    )}
-                  </button>
-                  {embeddedInspectorActive ? (
-                    <button
-                      type="button"
-                      onClick={() => setInspectorOpen(false)}
-                      aria-label="Close inspector"
-                      title="Close inspector"
-                    >
-                      <PanelRightClose size={14} />
-                    </button>
-                  ) : null}
-                </>
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
           {!elementLibraryOpen && inspectorResizeEnabled ? (
             <div
               className="builder-inspector-resize-handle"
@@ -14589,7 +14545,6 @@ export default function DashboardBuilder({
           title="Open Inspector"
         >
           <PanelRightOpen size={15} />
-          <span>Inspector</span>
         </button>
       ) : null}
 
