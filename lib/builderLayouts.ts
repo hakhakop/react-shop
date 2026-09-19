@@ -163,7 +163,15 @@ export type BuilderLayoutBlock = {
   /** Canonical UIkit Subnav links, including authored scroll targets. */
   subnavItems?: BuilderSubnavItem[];
   navItems?: import("@/components/dashboard/builderTypes").BuilderNavItem[];
-  navStyle?: "default" | "primary" | "secondary";
+  navStyle?: "default" | "primary" | "secondary" | "navbar";
+  navSize?: "medium" | "large" | "xlarge";
+  navDivider?: boolean;
+  navHtmlElement?: "div" | "nav";
+  navGridBreakpoint?: "s" | "m" | "l" | "xl";
+  navGridDivider?: boolean;
+  navGridColumnGap?: "small" | "medium" | "large" | "collapse";
+  navGridRowGap?: "small" | "medium" | "large" | "collapse";
+  navImageMargin?: boolean;
   navColumns?: number;
   navShowImage?: boolean;
   navImageVerticalAlign?: boolean;

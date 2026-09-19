@@ -1,5 +1,496 @@
 [
   {
+    "id": "decstack-why-devstack-dropdown-section-mu87zxbi-ru67",
+    "title": "DecStack-Why-Devstack-Dropdown Section",
+    "templateType": "section",
+    "description": "Section template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "yootheme-section-1",
+        "kind": "contentLayout",
+        "title": "Imported Section 1",
+        "background": "transparent",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "boxed",
+        "maxWidth": "default",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "contentVerticalAlign": "top",
+        "sectionPadding": "default",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "sectionTitleRotation": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-fragment-0-0-0-0",
+                "kind": "sublayout",
+                "spacingContract": "yootheme",
+                "elementPadding": "none",
+                "sublayoutHtmlId": "",
+                "sublayoutClasses": "",
+                "sublayoutAttributes": "",
+                "sublayout": {
+                  "rows": [
+                    {
+                      "id": "yootheme-row-0-0-0-0-fragment-0",
+                      "layout": "quarters-1-3",
+                      "customLayout": {
+                        "template": "1-4,3-4",
+                        "columns": [
+                          {
+                            "columnId": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                            "widths": {
+                              "medium": "1-4"
+                            }
+                          },
+                          {
+                            "columnId": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                            "widths": {
+                              "medium": "3-4"
+                            }
+                          }
+                        ]
+                      },
+                      "divider": true,
+                      "spacingContract": "yootheme",
+                      "columns": [
+                        {
+                          "id": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                          "responsiveWidths": {
+                            "medium": "1-4"
+                          },
+                          "background": {
+                            "position": "center center"
+                          },
+                          "sticky": {
+                            "breakpoint": "m"
+                          },
+                          "elements": [
+                            {
+                              "id": "yootheme-panel-0-0-0-0-fragment-0-0-0",
+                              "kind": "panel",
+                              "yoothemeSource": {
+                                "type": "panel",
+                                "props": {
+                                  "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                                  "content_column_breakpoint": "m",
+                                  "content_style": "text-small",
+                                  "icon_width": 80,
+                                  "image": "",
+                                  "image_align": "top",
+                                  "image_grid_breakpoint": "m",
+                                  "image_grid_width": "1-2",
+                                  "image_svg_color": "emphasis",
+                                  "link": "?page_id=19",
+                                  "link_style": "text",
+                                  "link_text": "Learn More",
+                                  "margin": "default",
+                                  "meta": "",
+                                  "meta_align": "below-title",
+                                  "meta_color": "muted",
+                                  "meta_element": "div",
+                                  "meta_style": "text-small",
+                                  "title": "Product Overview",
+                                  "title_align": "top",
+                                  "title_element": "div",
+                                  "title_grid_breakpoint": "m",
+                                  "title_grid_width": "1-2",
+                                  "title_hover_style": "reset",
+                                  "title_link": true,
+                                  "title_style": "h5"
+                                }
+                              },
+                              "title": "Product Overview",
+                              "eyebrow": "",
+                              "body": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                              "imageUrl": "",
+                              "imageAlt": "",
+                              "imageSvgColor": "emphasis",
+                              "buttonLabel": "Learn More",
+                              "buttonUrl": "?page_id=19",
+                              "buttonStyle": "text",
+                              "panelActionStyle": "text",
+                              "buttonTarget": "_self",
+                              "fullWidthButton": false,
+                              "panelVariant": "blank",
+                              "panelSize": "none",
+                              "panelImageNoPadding": false,
+                              "linkPanel": false,
+                              "panelHover": false,
+                              "panelHeightExpand": false,
+                              "panelExpand": "none",
+                              "panelMetaPosition": "below-title",
+                              "panelShowMedia": false,
+                              "panelMediaPlacement": "top",
+                              "panelMediaWidth": "1-2",
+                              "elementMargin": "default",
+                              "panelVerticalAlign": "top",
+                              "panelTitleStyle": "h5",
+                              "panelTitleElement": "div",
+                              "linkTitle": true,
+                              "metaStyle": "text-small",
+                              "contentStyle": "small",
+                              "panelMetaHtmlElement": "div",
+                              "linkImage": false,
+                              "visualStyle": {
+                                "margin": {
+                                  "top": "var(--uk-global-margin)"
+                                },
+                                "card": {
+                                  "titleMargin": "0",
+                                  "buttonMargin": "0"
+                                },
+                                "layout": {
+                                  "marginMode": "default"
+                                },
+                                "effects": {}
+                              },
+                              "gridMetaAlign": "below-title",
+                              "gridMetaHtmlElement": "div",
+                              "elementPadding": "none",
+                              "spacingContract": "yootheme"
+                            }
+                          ]
+                        },
+                        {
+                          "id": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                          "responsiveWidths": {
+                            "medium": "3-4"
+                          },
+                          "background": {
+                            "position": "center center"
+                          },
+                          "sticky": {
+                            "breakpoint": "m"
+                          },
+                          "elements": [
+                            {
+                              "id": "yootheme-nav-0-0-0-0-fragment-0-1-0",
+                              "kind": "nav",
+                              "spacingContract": "yootheme",
+                              "navItems": [
+                                {
+                                  "id": "yootheme-nav-item-0-0-0-0-fragment-0-1-0-0",
+                                  "label": "",
+                                  "type": "link",
+                                  "target": "_self",
+                                  "dynamicContext": {
+                                    "provider": "wordpress",
+                                    "source": "menu-item",
+                                    "mode": "collection",
+                                    "query": {
+                                      "sourceQuery": {
+                                        "name": "customMenuItems",
+                                        "arguments": {
+                                          "id": 9,
+                                          "parent": "40",
+                                          "heading": ""
+                                        }
+                                      },
+                                      "menuId": "9",
+                                      "parentId": "40"
+                                    }
+                                  },
+                                  "dynamicBindings": {
+                                    "label": {
+                                      "path": "title",
+                                      "valueType": "string"
+                                    },
+                                    "url": {
+                                      "path": "url",
+                                      "valueType": "url"
+                                    },
+                                    "active": {
+                                      "path": "active",
+                                      "valueType": "string"
+                                    },
+                                    "meta": {
+                                      "path": "subtitle",
+                                      "valueType": "string"
+                                    },
+                                    "imageUrl": {
+                                      "path": "image",
+                                      "valueType": "url"
+                                    }
+                                  }
+                                }
+                              ],
+                              "navStyle": "secondary",
+                              "navColumns": 2,
+                              "navShowImage": true,
+                              "navShowMeta": true,
+                              "navImageVerticalAlign": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "htmlElement": "div",
+                  "disabled": false
+                },
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              }
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "yootheme-section-1-row-1",
+            "layout": "1-col",
+            "spacingContract": "yootheme",
+            "columns": [
+              {
+                "id": "yootheme-section-1-row-1-column-1",
+                "elements": [
+                  {
+                    "id": "yootheme-fragment-0-0-0-0",
+                    "kind": "sublayout",
+                    "spacingContract": "yootheme",
+                    "elementPadding": "none",
+                    "sublayoutHtmlId": "",
+                    "sublayoutClasses": "",
+                    "sublayoutAttributes": "",
+                    "sublayout": {
+                      "rows": [
+                        {
+                          "id": "yootheme-row-0-0-0-0-fragment-0",
+                          "layout": "quarters-1-3",
+                          "customLayout": {
+                            "template": "1-4,3-4",
+                            "columns": [
+                              {
+                                "columnId": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                                "widths": {
+                                  "medium": "1-4"
+                                }
+                              },
+                              {
+                                "columnId": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                                "widths": {
+                                  "medium": "3-4"
+                                }
+                              }
+                            ]
+                          },
+                          "divider": true,
+                          "spacingContract": "yootheme",
+                          "columns": [
+                            {
+                              "id": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                              "responsiveWidths": {
+                                "medium": "1-4"
+                              },
+                              "background": {
+                                "position": "center center"
+                              },
+                              "sticky": {
+                                "breakpoint": "m"
+                              },
+                              "elements": [
+                                {
+                                  "id": "yootheme-panel-0-0-0-0-fragment-0-0-0",
+                                  "kind": "panel",
+                                  "yoothemeSource": {
+                                    "type": "panel",
+                                    "props": {
+                                      "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                                      "content_column_breakpoint": "m",
+                                      "content_style": "text-small",
+                                      "icon_width": 80,
+                                      "image": "",
+                                      "image_align": "top",
+                                      "image_grid_breakpoint": "m",
+                                      "image_grid_width": "1-2",
+                                      "image_svg_color": "emphasis",
+                                      "link": "?page_id=19",
+                                      "link_style": "text",
+                                      "link_text": "Learn More",
+                                      "margin": "default",
+                                      "meta": "",
+                                      "meta_align": "below-title",
+                                      "meta_color": "muted",
+                                      "meta_element": "div",
+                                      "meta_style": "text-small",
+                                      "title": "Product Overview",
+                                      "title_align": "top",
+                                      "title_element": "div",
+                                      "title_grid_breakpoint": "m",
+                                      "title_grid_width": "1-2",
+                                      "title_hover_style": "reset",
+                                      "title_link": true,
+                                      "title_style": "h5"
+                                    }
+                                  },
+                                  "title": "Product Overview",
+                                  "eyebrow": "",
+                                  "body": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                                  "imageUrl": "",
+                                  "imageAlt": "",
+                                  "imageSvgColor": "emphasis",
+                                  "buttonLabel": "Learn More",
+                                  "buttonUrl": "?page_id=19",
+                                  "buttonStyle": "text",
+                                  "panelActionStyle": "text",
+                                  "buttonTarget": "_self",
+                                  "fullWidthButton": false,
+                                  "panelVariant": "blank",
+                                  "panelSize": "none",
+                                  "panelImageNoPadding": false,
+                                  "linkPanel": false,
+                                  "panelHover": false,
+                                  "panelHeightExpand": false,
+                                  "panelExpand": "none",
+                                  "panelMetaPosition": "below-title",
+                                  "panelShowMedia": false,
+                                  "panelMediaPlacement": "top",
+                                  "panelMediaWidth": "1-2",
+                                  "elementMargin": "default",
+                                  "panelVerticalAlign": "top",
+                                  "panelTitleStyle": "h5",
+                                  "panelTitleElement": "div",
+                                  "linkTitle": true,
+                                  "metaStyle": "text-small",
+                                  "contentStyle": "small",
+                                  "panelMetaHtmlElement": "div",
+                                  "linkImage": false,
+                                  "visualStyle": {
+                                    "margin": {
+                                      "top": "var(--uk-global-margin)"
+                                    },
+                                    "card": {
+                                      "titleMargin": "0",
+                                      "buttonMargin": "0"
+                                    },
+                                    "layout": {
+                                      "marginMode": "default"
+                                    },
+                                    "effects": {}
+                                  },
+                                  "gridMetaAlign": "below-title",
+                                  "gridMetaHtmlElement": "div",
+                                  "elementPadding": "none",
+                                  "spacingContract": "yootheme"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                              "responsiveWidths": {
+                                "medium": "3-4"
+                              },
+                              "background": {
+                                "position": "center center"
+                              },
+                              "sticky": {
+                                "breakpoint": "m"
+                              },
+                              "elements": [
+                                {
+                                  "id": "yootheme-nav-0-0-0-0-fragment-0-1-0",
+                                  "kind": "nav",
+                                  "spacingContract": "yootheme",
+                                  "navItems": [
+                                    {
+                                      "id": "yootheme-nav-item-0-0-0-0-fragment-0-1-0-0",
+                                      "label": "",
+                                      "type": "link",
+                                      "target": "_self",
+                                      "dynamicContext": {
+                                        "provider": "wordpress",
+                                        "source": "menu-item",
+                                        "mode": "collection",
+                                        "query": {
+                                          "sourceQuery": {
+                                            "name": "customMenuItems",
+                                            "arguments": {
+                                              "id": 9,
+                                              "parent": "40",
+                                              "heading": ""
+                                            }
+                                          },
+                                          "menuId": "9",
+                                          "parentId": "40"
+                                        }
+                                      },
+                                      "dynamicBindings": {
+                                        "label": {
+                                          "path": "title",
+                                          "valueType": "string"
+                                        },
+                                        "url": {
+                                          "path": "url",
+                                          "valueType": "url"
+                                        },
+                                        "active": {
+                                          "path": "active",
+                                          "valueType": "string"
+                                        },
+                                        "meta": {
+                                          "path": "subtitle",
+                                          "valueType": "string"
+                                        },
+                                        "imageUrl": {
+                                          "path": "image",
+                                          "valueType": "url"
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "navStyle": "secondary",
+                                  "navColumns": 2,
+                                  "navShowImage": true,
+                                  "navShowMeta": true,
+                                  "navImageVerticalAlign": false
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "htmlElement": "div",
+                      "disabled": false
+                    },
+                    "visualStyle": {
+                      "layout": {
+                        "marginMode": "default"
+                      },
+                      "effects": {},
+                      "card": {}
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-19T10:04:03.054Z"
+  },
+  {
     "id": "overlay-mtbma2xb-41oh",
     "title": "Overlay",
     "templateType": "element",

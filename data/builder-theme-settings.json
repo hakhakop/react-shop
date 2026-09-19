@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "devstack",
+  "displayName": "DevStack menu metadata",
+  "sourceConfig": {
+    "menuItems": {
+      "41": {
+        "image": "wp-content/uploads/yootheme/icon-deployment.svg",
+        "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy."
+      },
+      "42": {
+        "image": "wp-content/uploads/yootheme/icon-ci-cd.svg",
+        "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore."
+      },
+      "43": {
+        "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
+        "image": "wp-content/uploads/yootheme/icon-security.svg"
+      },
+      "44": {
+        "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam.",
+        "image": "wp-content/uploads/yootheme/icon-features.svg"
+      },
+      "45": {
+        "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
+        "image": "wp-content/uploads/yootheme/icon-automation.svg"
+      },
+      "46": {
+        "image": "wp-content/uploads/yootheme/icon-infrastructure.svg",
+        "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna."
+      },
+      "47": {
+        "image": "wp-content/uploads/yootheme/icon-integrations.svg",
+        "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat."
+      }
+    }
+  },
+  "resolved": {
+    "shellSettings": {},
+    "headerDocument": {}
+  },
+  "updatedAt": "2026-09-19T10:21:04.260043+00:00"
+}

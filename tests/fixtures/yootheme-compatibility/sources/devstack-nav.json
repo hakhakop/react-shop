@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "type": "nav",
+    "props": {
+      "grid": "2",
+      "grid_column_gap": "large",
+      "grid_row_gap": "large",
+      "image_margin": true,
+      "image_svg_inline": false,
+      "image_vertical_align": false,
+      "image_width": "50",
+      "nav_style": "secondary",
+      "show_image": true,
+      "show_meta": true
+    },
+    "children": [
+      {
+        "type": "nav_item",
+        "source": {
+          "query": {
+            "name": "customMenuItems",
+            "arguments": {
+              "id": 9,
+              "parent": "40",
+              "heading": ""
+            }
+          },
+          "props": {
+            "content": {
+              "filters": {
+                "search": ""
+              },
+              "name": "title"
+            },
+            "meta": {
+              "filters": {
+                "search": ""
+              },
+              "name": "subtitle"
+            },
+            "image": {
+              "filters": {
+                "search": ""
+              },
+              "name": "image"
+            },
+            "link": {
+              "filters": {
+                "search": ""
+              },
+              "name": "url"
+            },
+            "active": {
+              "filters": {
+                "search": ""
+              },
+              "name": "active"
+            }
+          }
+        },
+        "props": []
+      }
+    ]
+  },
+  "menuItems": {
+    "41": {
+      "image": "wp-content/uploads/yootheme/icon-deployment.svg",
+      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy."
+    },
+    "42": {
+      "image": "wp-content/uploads/yootheme/icon-ci-cd.svg",
+      "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore."
+    },
+    "43": {
+      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
+      "image": "wp-content/uploads/yootheme/icon-security.svg"
+    },
+    "44": {
+      "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam.",
+      "image": "wp-content/uploads/yootheme/icon-features.svg"
+    },
+    "45": {
+      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
+      "image": "wp-content/uploads/yootheme/icon-automation.svg"
+    },
+    "46": {
+      "image": "wp-content/uploads/yootheme/icon-infrastructure.svg",
+      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna."
+    },
+    "47": {
+      "image": "wp-content/uploads/yootheme/icon-integrations.svg",
+      "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat."
+    }
+  }
+}

@@ -7968,3 +7968,68 @@ body.is-visual-builder-active .uk-lightbox {
   outline: 2px solid currentColor;
   outline-offset: 4px;
 }
+
+/* Imported Nav uses the same Global Styles tokens as the YOOtheme theme. */
+.shop-builder-nav .uk-nav-default {
+  font-family: var(--uk-nav-default-font-family, inherit);
+  font-size: var(--uk-nav-default-font-size, 14px);
+  font-weight: var(--uk-nav-default-font-weight, 400);
+  font-style: var(--uk-nav-default-font-style, normal);
+  line-height: var(--uk-nav-default-line-height, 1.5);
+  letter-spacing: var(--uk-nav-default-letter-spacing, normal);
+  text-transform: var(--uk-nav-default-text-transform, none);
+}
+.shop-builder-nav .uk-nav-default > li > a { color: var(--uk-nav-default-item-color); }
+.shop-builder-nav .uk-nav-default > li > a:hover { color: var(--uk-nav-default-item-hover-color); }
+.shop-builder-nav .uk-nav-default > .uk-active > a { color: var(--uk-nav-default-item-active-color); }
+.shop-builder-nav .uk-nav-default .uk-nav-subtitle {
+  font-family: var(--uk-nav-default-subtitle-font-family, inherit);
+  font-size: var(--uk-nav-default-subtitle-font-size, 12px);
+  text-transform: var(--uk-nav-default-subtitle-text-transform, none);
+}
+.shop-builder-nav .uk-nav-primary:not(.uk-nav-medium):not(.uk-nav-large):not(.uk-nav-xlarge) { font-size: var(--uk-nav-primary-font-size, 22px); }
+.shop-builder-nav .uk-nav-primary > li > a { color: var(--uk-nav-primary-item-color); }
+.shop-builder-nav .uk-nav-primary > li > a:hover { color: var(--uk-nav-primary-item-hover-color); }
+.shop-builder-nav .uk-nav-primary > .uk-active > a { color: var(--uk-nav-primary-item-active-color); }
+.shop-builder-nav .uk-nav-primary .uk-nav-subtitle {
+  font-family: var(--uk-nav-primary-subtitle-font-family, inherit);
+  font-size: var(--uk-nav-primary-subtitle-font-size, 14px);
+  text-transform: var(--uk-nav-primary-subtitle-text-transform, none);
+}
+.shop-builder-nav .uk-nav-secondary {
+  font-family: var(--uk-nav-secondary-font-family, inherit);
+  font-size: var(--uk-nav-secondary-font-size, 16px);
+  font-weight: var(--uk-nav-secondary-font-weight, 400);
+  font-style: var(--uk-nav-secondary-font-style, normal);
+  line-height: var(--uk-nav-secondary-line-height, 1.6);
+  letter-spacing: var(--uk-nav-secondary-letter-spacing, normal);
+  text-transform: var(--uk-nav-secondary-text-transform, none);
+}
+.shop-builder-nav .uk-nav-secondary > li + li { margin-top: var(--uk-nav-secondary-margin-top, 0px); }
+.shop-builder-nav .uk-nav-secondary > li > a {
+  padding: var(--uk-nav-secondary-item-padding-vertical, 10px) var(--uk-nav-secondary-item-padding-horizontal, 10px);
+  border-radius: var(--uk-nav-secondary-item-border-radius, 0px);
+  color: var(--uk-nav-secondary-item-color, inherit);
+}
+.shop-builder-nav .uk-nav-secondary > li > a:hover {
+  color: var(--uk-nav-secondary-item-hover-color, inherit);
+  background: var(--uk-nav-secondary-item-hover-background, transparent);
+  box-shadow: var(--uk-nav-secondary-item-hover-box-shadow, none);
+}
+.shop-builder-nav .uk-nav-secondary > .uk-active > a {
+  color: var(--uk-nav-secondary-item-active-color, inherit);
+  background: var(--uk-nav-secondary-item-active-background, transparent);
+  box-shadow: var(--uk-nav-secondary-item-active-box-shadow, none);
+}
+.shop-builder-nav .uk-nav-secondary .uk-nav-subtitle {
+  color: var(--uk-nav-secondary-subtitle-color, inherit);
+  font-weight: var(--uk-nav-secondary-subtitle-font-weight, normal);
+}
+.shop-builder-nav .uk-nav-secondary > .uk-active > a .uk-nav-subtitle { color: var(--uk-nav-secondary-subtitle-active-color, inherit); }
+.shop-builder-nav .uk-nav-secondary > .uk-nav-header { color: var(--uk-nav-secondary-header-color, inherit); }
+.shop-builder-nav .uk-nav-secondary > .uk-nav-divider,
+.shop-builder-nav .uk-nav-secondary.uk-nav-divider > li:nth-child(n+2):not(.uk-nav-header):not(.uk-nav-divider) {
+  border-top-color: var(--uk-nav-secondary-divider-border, transparent);
+  border-top-width: var(--uk-nav-secondary-divider-border-width, 1px);
+  box-shadow: var(--uk-nav-secondary-divider-box-shadow, none);
+}

@@ -1,3 +1,4 @@
+import { getBuilderThemeSettings } from "@/lib/builderThemeSettings.server";
 import { getCmsConnection, getWordPressAuthHeaders } from "@/lib/cmsConnection";
 import { getWebsiteGraphQLEndpoint, graphqlFetch } from "@/lib/graphql";
 import { makeNavigationUrlPortable } from "@/lib/navigationPackage";
@@ -38,7 +39,7 @@ const loadMenus = (website?: SaaSWebsite | null) => {
   return value;
 };
 
-export function projectWordPressMenuContexts(menus: Menu[], input: DynamicContentProviderInput): DynamicItemContext[] {
+export function projectWordPressMenuContexts(menus: Menu[], input: DynamicContentProviderInput, themeMenuItems: Record<string, unknown> = {}): DynamicItemContext[] {
   const source = input.descriptor.query?.sourceQuery as { arguments?: Record<string, unknown> } | undefined;
   const args = source?.arguments ?? input.descriptor.query ?? {};
   const single = input.descriptor.mode === "single";
@@ -49,7 +50,16 @@ export function projectWordPressMenuContexts(menus: Menu[], input: DynamicConten
   return nodes.flatMap(node => {
     const type = node.cssClasses?.includes("uk-nav-divider") ? "divider" : node.cssClasses?.includes("uk-nav-header") || !node.url ? "header" : "link";
     if (!single && args.include_heading === false && type === "header") return [];
+    const raw = themeMenuItems[String(node.databaseId)];
+    const presentation = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};
+    const subtitle = typeof presentation.subtitle === "string" ? presentation.subtitle : "";
+    let image = typeof presentation.image === "string" ? presentation.image : "";
+    if (image && getCmsConnection(input.website).siteUrl) {
+      try { image = new URL(image, getCmsConnection(input.website).siteUrl + "/").href; } catch { image = ""; }
+    }
     return [{ id: node.databaseId, fields: {
+      subtitle: { type: "string", value: subtitle },
+      image: { type: "url", value: image },
       title: { type: "string", value: node.label },
       url: { type: "url", value: makeNavigationUrlPortable(node.path || node.url || "#", getCmsConnection(input.website).siteUrl) },
       type: { type: "string", value: type },
@@ -61,6 +71,9 @@ export function projectWordPressMenuContexts(menus: Menu[], input: DynamicConten
 }
 
 export async function resolveWordPressMenuContexts(input: DynamicContentProviderInput) {
-  const result = await loadMenus(input.website);
-  return projectWordPressMenuContexts(result.menus?.nodes ?? [], input);
+  const [result, theme] = await Promise.all([
+    loadMenus(input.website), getBuilderThemeSettings({ websiteId: input.website?.id }),
+  ]);
+  return projectWordPressMenuContexts(result.menus?.nodes ?? [], input,
+    theme.active ? (theme.sourceConfig.menuItems ?? theme.sourceConfig.menu?.items as Record<string, unknown> | undefined) : undefined);
 }

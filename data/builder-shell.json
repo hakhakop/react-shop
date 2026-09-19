@@ -269,7 +269,228 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "dropdownContent": {
+        "id": "yootheme-fragment-0-0-0-0",
+        "kind": "sublayout",
+        "spacingContract": "yootheme",
+        "elementPadding": "none",
+        "sublayoutHtmlId": "",
+        "sublayoutClasses": "",
+        "sublayoutAttributes": "",
+        "sublayout": {
+          "rows": [
+            {
+              "id": "yootheme-row-0-0-0-0-fragment-0",
+              "layout": "quarters-1-3",
+              "customLayout": {
+                "template": "1-4,3-4",
+                "columns": [
+                  {
+                    "columnId": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                    "widths": {
+                      "medium": "1-4"
+                    }
+                  },
+                  {
+                    "columnId": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                    "widths": {
+                      "medium": "3-4"
+                    }
+                  }
+                ]
+              },
+              "divider": true,
+              "spacingContract": "yootheme",
+              "columns": [
+                {
+                  "id": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                  "responsiveWidths": {
+                    "medium": "1-4"
+                  },
+                  "background": {
+                    "position": "center center"
+                  },
+                  "sticky": {
+                    "breakpoint": "m"
+                  },
+                  "elements": [
+                    {
+                      "id": "yootheme-panel-0-0-0-0-fragment-0-0-0",
+                      "kind": "panel",
+                      "yoothemeSource": {
+                        "type": "panel",
+                        "props": {
+                          "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                          "content_column_breakpoint": "m",
+                          "content_style": "text-small",
+                          "icon_width": 80,
+                          "image": "",
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_svg_color": "emphasis",
+                          "link": "?page_id=19",
+                          "link_style": "text",
+                          "link_text": "Learn More",
+                          "margin": "default",
+                          "meta": "",
+                          "meta_align": "below-title",
+                          "meta_color": "muted",
+                          "meta_element": "div",
+                          "meta_style": "text-small",
+                          "title": "Product Overview",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": true,
+                          "title_style": "h5"
+                        }
+                      },
+                      "title": "Product Overview",
+                      "eyebrow": "",
+                      "body": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
+                      "imageUrl": "",
+                      "imageAlt": "",
+                      "imageSvgColor": "emphasis",
+                      "buttonLabel": "Learn More",
+                      "buttonUrl": "?page_id=19",
+                      "buttonStyle": "text",
+                      "panelActionStyle": "text",
+                      "buttonTarget": "_self",
+                      "fullWidthButton": false,
+                      "panelVariant": "blank",
+                      "panelSize": "none",
+                      "panelImageNoPadding": false,
+                      "linkPanel": false,
+                      "panelHover": false,
+                      "panelHeightExpand": false,
+                      "panelExpand": "none",
+                      "panelMetaPosition": "below-title",
+                      "panelShowMedia": false,
+                      "panelMediaPlacement": "top",
+                      "panelMediaWidth": "1-2",
+                      "elementMargin": "default",
+                      "panelVerticalAlign": "top",
+                      "panelTitleStyle": "h5",
+                      "panelTitleElement": "div",
+                      "linkTitle": true,
+                      "metaStyle": "text-small",
+                      "contentStyle": "small",
+                      "panelMetaHtmlElement": "div",
+                      "linkImage": false,
+                      "visualStyle": {
+                        "margin": {
+                          "top": "var(--uk-global-margin)"
+                        },
+                        "card": {
+                          "titleMargin": "0",
+                          "buttonMargin": "0"
+                        },
+                        "layout": {
+                          "marginMode": "default"
+                        },
+                        "effects": {}
+                      },
+                      "gridMetaAlign": "below-title",
+                      "gridMetaHtmlElement": "div",
+                      "elementPadding": "none",
+                      "spacingContract": "yootheme"
+                    }
+                  ]
+                },
+                {
+                  "id": "yootheme-row-0-0-0-0-fragment-0-column-1",
+                  "responsiveWidths": {
+                    "medium": "3-4"
+                  },
+                  "background": {
+                    "position": "center center"
+                  },
+                  "sticky": {
+                    "breakpoint": "m"
+                  },
+                  "elements": [
+                    {
+                      "id": "yootheme-nav-0-0-0-0-fragment-0-1-0",
+                      "kind": "nav",
+                      "spacingContract": "yootheme",
+                      "navItems": [
+                        {
+                          "id": "yootheme-nav-item-0-0-0-0-fragment-0-1-0-0",
+                          "label": "",
+                          "type": "link",
+                          "target": "_self",
+                          "dynamicContext": {
+                            "provider": "wordpress",
+                            "source": "menu-item",
+                            "mode": "collection",
+                            "query": {
+                              "sourceQuery": {
+                                "name": "customMenuItems",
+                                "arguments": {
+                                  "id": 9,
+                                  "parent": "40",
+                                  "heading": ""
+                                }
+                              },
+                              "menuId": "9",
+                              "parentId": "40"
+                            }
+                          },
+                          "dynamicBindings": {
+                            "label": {
+                              "path": "title",
+                              "valueType": "string"
+                            },
+                            "url": {
+                              "path": "url",
+                              "valueType": "url"
+                            },
+                            "active": {
+                              "path": "active",
+                              "valueType": "string"
+                            },
+                            "meta": {
+                              "path": "subtitle",
+                              "valueType": "string"
+                            },
+                            "imageUrl": {
+                              "path": "image",
+                              "valueType": "url"
+                            }
+                          }
+                        }
+                      ],
+                      "navStyle": "secondary",
+                      "navColumns": 2,
+                      "navShowImage": true,
+                      "navShowMeta": true,
+                      "navImageVerticalAlign": false,
+                      "navGridColumnGap": "large",
+                      "navGridRowGap": "large",
+                      "imageWidth": "50",
+                      "navImageMargin": true,
+                      "imageLoading": "lazy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "htmlElement": "div",
+          "disabled": false
+        },
+        "visualStyle": {
+          "layout": {
+            "marginMode": "default"
+          },
+          "effects": {},
+          "card": {}
+        }
+      }
     },
     {
       "id": "dev-product-overview",
@@ -656,7 +877,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-09-16T08:33:52.604Z",
+  "updatedAt": "2026-09-19T10:04:12.387Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",
@@ -3768,5 +3989,8 @@
   "navbarDropdownNavSubtitleFontFamily": "inherit",
   "navbarDropdownNavSubtitleFontWeight": "400",
   "navbarDropdownNavSubtitleTextTransform": "none",
-  "inverseNavbarNavItemHoverColor": "inherit"
+  "inverseNavbarNavItemHoverColor": "inherit",
+  "navSecondaryFontWeight": "600",
+  "navSecondaryItemColor": "#0D0A46",
+  "navSecondarySubtitleColor": "#747A96"
 }

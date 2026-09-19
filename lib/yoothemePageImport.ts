@@ -2726,13 +2726,28 @@ const mapStaticElement = (
       return { id: sourcePathId(`${path}.${index}`, "nav-item"), label: sanitizeHtml(asString(item.content) ?? ""), url: asString(item.link) ?? undefined,
         type: item.type === "header" || item.type === "divider" ? item.type : "link", target: item.link_target === "blank" ? "_blank" : "_self",
         meta: asString(item.meta) ?? undefined, imageUrl: asString(item.image) ?? undefined,
+        imageAlt: asString(item.image_alt) ?? undefined, icon: asString(item.icon) ?? undefined,
+        active: item.active === true || item.active === "true" ? "true" : "", scroll: item.link_scroll === true,
         dynamicContext: dynamic.context, dynamicBindings: dynamic.bindings };
     });
-    warnUnsupported(path, props, ["grid", "image_vertical_align", "nav_style", "show_image", "show_meta", "margin", "margin_remove_top", "margin_remove_bottom", ...GENERAL_POSITION_KEYS], warnings);
+    warnUnsupported(path, props, ["grid", "grid_breakpoint", "grid_divider", "grid_column_gap", "grid_row_gap", "nav_divider", "nav_size", "html_element", "image_width", "image_height", "image_loading", "image_margin", "image_border", "image_svg_inline", "image_svg_color", "icon_width", "image_vertical_align", "nav_style", "show_image", "show_meta", "margin", "margin_remove_top", "margin_remove_bottom", ...GENERAL_POSITION_KEYS], warnings);
     return withSourceGeneralVisualStyle({ id: sourcePathId(path, "nav"), kind: "nav", spacingContract: "yootheme", navItems: items,
-      navStyle: props.nav_style === "primary" || props.nav_style === "secondary" ? props.nav_style : "default",
+      navStyle: props.nav_style === "navbar-dropdown-nav" ? "navbar" : props.nav_style === "primary" || props.nav_style === "secondary" || props.nav_style === "navbar" ? props.nav_style : "default",
       navColumns: Math.max(1, Number(props.grid) || 1), navShowImage: props.show_image !== false, navShowMeta: props.show_meta !== false,
       navImageVerticalAlign: props.image_vertical_align === true,
+      navSize: ["medium", "large", "xlarge"].includes(String(props.nav_size)) ? props.nav_size : undefined,
+      navDivider: props.nav_divider === true,
+      navHtmlElement: props.html_element === "nav" ? "nav" : "div",
+      navGridBreakpoint: ["s", "m", "l", "xl"].includes(String(props.grid_breakpoint)) ? props.grid_breakpoint : undefined,
+      navGridDivider: props.grid_divider === true,
+      navGridColumnGap: asString(props.grid_column_gap) || undefined,
+      navGridRowGap: asString(props.grid_row_gap) || undefined,
+      navImageMargin: props.image_margin !== false,
+      imageWidth: asString(props.image_width), imageHeight: asString(props.image_height),
+      imageLoading: props.image_loading === true || props.image_loading === "eager" ? "eager" : "lazy",
+      imageBorder: asString(props.image_border), imageSvgInline: props.image_svg_inline === true,
+      imageSvgColor: asString(props.image_svg_color),
+      iconSize: Number(props.icon_width) || undefined,
       ...(sourceMargin(props.margin) ? { margin: sourceMargin(props.margin) } : {}),
     } as BuilderLayoutBlock, props);
   }

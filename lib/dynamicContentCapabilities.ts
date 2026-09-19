@@ -300,7 +300,7 @@ export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceC
     } satisfies DynamicContentSourceCapability))),
   ...(["single", "collection"] as const).map(mode => ({
     key: `wordpress-menu-${mode}`, label: mode === "single" ? "Menu Item" : "Custom Menu Items", provider: "wordpress", source: "menu-item", mode,
-    fields: [{ path: "title", label: "Title", valueType: "string" }, { path: "url", label: "URL", valueType: "url" }, { path: "type", label: "Type", valueType: "string" }, { path: "active", label: "Active", valueType: "string" }],
+    fields: [{ path: "subtitle", label: "Subtitle", valueType: "string" }, { path: "image", label: "Image", valueType: "url" }, { path: "title", label: "Title", valueType: "string" }, { path: "url", label: "URL", valueType: "url" }, { path: "type", label: "Type", valueType: "string" }, { path: "active", label: "Active", valueType: "string" }],
     queryControls: [{ key: "menuId", label: "WordPress Menu ID", control: "text" }, { key: mode === "single" ? "itemId" : "parentId", label: mode === "single" ? "Menu Item ID" : "Parent Item ID", control: "text" }],
   } satisfies DynamicContentSourceCapability)),
   {

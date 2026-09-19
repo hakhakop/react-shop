@@ -1,22 +1,68 @@
 "use client";
+import React from "react";
+import { getUikitSvgColor } from "@/lib/uikitTokens";
 import { usePathname } from "next/navigation";
 import type { BuilderLayoutBlock } from "@/lib/builderLayouts";
+import type { BuilderNavItem } from "@/components/dashboard/builderTypes";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { sanitizeHtml } from "@/lib/safeHtml";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
+
+/** YOOtheme splits items into balanced, consecutive lists before building its grid. */
+export function splitNavColumns(items: BuilderNavItem[], count: number) {
+  const columns = Math.max(1, Math.min(6, Math.floor(count) || 1));
+  let offset = 0;
+  return Array.from({ length: columns }, (_, index) => {
+    const size = Math.floor(items.length / columns) + (index < items.length % columns ? 1 : 0);
+    const result = items.slice(offset, offset + size);
+    offset += size;
+    return result;
+  });
+}
+
+export function NavMarkup({ block, pathname }: { block: BuilderLayoutBlock; pathname?: string | null }) {
+  const columns = splitNavColumns(block.navItems ?? [], block.navColumns ?? 1);
+  const style = block.navStyle ?? "default";
+  const listClass = ["uk-margin-remove-bottom uk-nav", style === "navbar" ? "uk-navbar-dropdown-nav" : `uk-nav-${style}`,
+    block.navDivider && "uk-nav-divider", style === "primary" && block.navSize && `uk-nav-${block.navSize}`].filter(Boolean).join(" ");
+  const renderItem = (item: BuilderNavItem) => {
+    if (item.type === "divider") return <li key={item.id} className="el-item uk-nav-divider" role="separator" />;
+    if (item.type === "header") return <li key={item.id} className="el-item uk-nav-header" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.label) }} />;
+    const active = item.active === "true" || Boolean(item.url && item.url !== "#" && item.url === pathname);
+    const label = <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.label) }} />;
+    const text = block.navShowMeta !== false && item.meta
+      ? <div>{label}<div className="uk-nav-subtitle" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.meta) }} /></div> : label;
+    const width = Number(block.imageWidth) || undefined;
+    const height = Number(block.imageHeight) || undefined;
+    const imageClass = ["el-image", block.imageBorder && `uk-border-${block.imageBorder}`].filter(Boolean).join(" ");
+    const image = item.imageUrl ? <img src={item.imageUrl} alt={item.imageAlt ?? ""} width={width} height={height}
+      loading={block.imageLoading ?? "lazy"} className={imageClass} style={width && height ? { objectFit: "cover", width, height } : undefined} /> : item.icon
+      ? <span className="el-image" uk-icon={`icon: ${item.icon}${block.iconSize ? `; width: ${block.iconSize}` : ""}`} /> : null;
+    const media = item.imageUrl && block.imageSvgInline && /\.svg(?:[?#]|$)/i.test(item.imageUrl)
+      ? <UikitStylableSvg src={item.imageUrl} alt={item.imageAlt} className={imageClass}
+          style={{ width, height }} preserveIntrinsicSize={!width && !height} loading={block.imageLoading}
+          color={getUikitSvgColor(block.imageSvgColor)} fallback={image} /> : image;
+    return <li key={item.id} className={`el-item${active ? " uk-active" : ""}`}>
+      <a href={item.url || undefined} {...builderLinkTargetProps(item.target)} {...(item.scroll ? { "uk-scroll": "" } : {})}
+        aria-current={active ? "page" : undefined} className="el-link">
+        {block.navShowImage !== false && media ? <div className={`uk-grid-${block.navImageMargin === false ? "collapse" : "small"} uk-child-width-expand uk-flex-nowrap${block.navImageVerticalAlign ? " uk-flex-middle" : ""}`} uk-grid="">
+          <div className="uk-width-auto">{media}</div><div>{text}</div>
+        </div> : text}
+      </a>
+    </li>;
+  };
+  const lists = columns.map((items, index) => <ul key={index} className={listClass}>{items.map(renderItem)}</ul>);
+  const Wrapper = block.navHtmlElement === "nav" ? "nav" : "div";
+  const breakpoint = block.navGridBreakpoint;
+  const gapClasses = block.navGridColumnGap === block.navGridRowGap
+    ? block.navGridColumnGap ? [`uk-grid-${block.navGridColumnGap}`] : []
+    : [block.navGridColumnGap && `uk-grid-column-${block.navGridColumnGap}`, block.navGridRowGap && `uk-grid-row-${block.navGridRowGap}`];
+  return <Wrapper className="shop-builder-nav">{columns.length > 1 ? <div className={[
+    breakpoint ? `uk-child-width-1-1 uk-child-width-expand@${breakpoint}` : "uk-child-width-expand",
+    ...gapClasses, block.navGridDivider && "uk-grid-divider",
+  ].filter(Boolean).join(" ")} uk-grid="">{lists.map((list, index) => <div key={index}>{list}</div>)}</div> : lists[0]}</Wrapper>;
+}
 
 export default function UikitNav({ block }: { block: BuilderLayoutBlock }) {
-  const pathname = usePathname();
-  const columns = Math.max(1, Math.min(6, block.navColumns ?? 1));
-  return <ul className={`uk-nav uk-nav-${block.navStyle ?? "default"}`} style={columns > 1 ? { columns } : undefined}>
-    {(block.navItems ?? []).map(item => {
-      if (item.type === "divider") return <li key={item.id} className="uk-nav-divider" role="separator" />;
-      if (item.type === "header") return <li key={item.id} className="uk-nav-header">{item.label}</li>;
-      const active = item.active === "true" || Boolean(item.url && item.url !== "#" && item.url === pathname);
-      return <li key={item.id} className={active ? "uk-active" : undefined}>
-        <a href={item.url || undefined} {...builderLinkTargetProps(item.target)} aria-current={active ? "page" : undefined} className={item.imageUrl && block.navShowImage !== false ? `uk-flex ${block.navImageVerticalAlign ? "uk-flex-middle" : "uk-flex-top"}` : undefined}>
-          {block.navShowImage !== false && item.imageUrl && <img src={item.imageUrl} alt="" width={24} height={24} />}
-          <span>{item.label}{block.navShowMeta !== false && item.meta && <span className="uk-display-block uk-text-meta">{item.meta}</span>}</span>
-        </a>
-      </li>;
-    })}
-  </ul>;
+  return <NavMarkup block={block} pathname={usePathname()} />;
 }

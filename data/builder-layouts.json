@@ -387,8 +387,8 @@
                   {
                     "id": "yootheme-heading-0-0-0-0",
                     "kind": "heading",
-                    "headingText": "Build Anything on<br class=\"uk-visible@s\"> WebPages",
-                    "title": "Build Anything on<br class=\"uk-visible@s\"> WebPages",
+                    "headingText": "<p>Build Anything on<br>WebPages</p>",
+                    "title": "<p>Build Anything on<br>WebPages</p>",
                     "headingLevel": "h1",
                     "headingSize": "medium",
                     "headingAlign": "center",
@@ -4187,7 +4187,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-19T08:06:50.299Z"
+    "updatedAt": "2026-09-19T10:04:12.326Z"
   },
   "shop": {
     "version": 1,
