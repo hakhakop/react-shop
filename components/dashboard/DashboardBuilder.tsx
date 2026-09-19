@@ -6284,8 +6284,7 @@ export default function DashboardBuilder({
         }
         return;
       }
-      if (event.data.type === "scroll-start" && iframeDiagnosticMode === "settled") {
-        setIframeSelectionRect(null);
+      if (event.data.type === "scroll-start") {
         return;
       }
       if (event.data.type === "rect" && iframeDiagnosticMode !== "minimal") {
@@ -6296,14 +6295,16 @@ export default function DashboardBuilder({
           setIframeSelectionRect(null);
           return;
         }
-        const frameRect = frame.getBoundingClientRect();
-        const scale = frame.clientWidth > 0 ? frameRect.width / frame.clientWidth : 1;
-        setIframeSelectionRect({
-          left: frameRect.left + rect.x * scale,
-          top: frameRect.top + rect.y * scale,
-          width: rect.width * scale,
-          height: rect.height * scale,
-        });
+        const frameWindow = frame.contentWindow;
+        const nextRect = {
+          left: rect.x,
+          top: rect.y + (frameWindow?.scrollY ?? 0),
+          width: rect.width,
+          height: rect.height,
+        } satisfies BuilderInteractionLayerRect;
+        if (event.data.scrolling !== true) {
+          setIframeSelectionRect(nextRect);
+        }
         return;
       }
       if (event.data.type === "navigate" && (iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "full")) {
@@ -14316,6 +14317,7 @@ export default function DashboardBuilder({
           <IframeBuilderInteractionLayer
             target={iframeSelectedTarget}
             rect={iframeSelectionRect}
+            iframeRef={iframeComparisonRef}
             sections={builderState.sections}
             linkHref={
               iframeSelectionLink && builderTargetsEqual(iframeSelectionLink.target, iframeSelectedTarget)
@@ -17020,6 +17022,7 @@ function CanvasElementInsertionControl(_props: {
 function IframeBuilderInteractionLayer({
   target,
   rect,
+  iframeRef,
   sections,
   linkHref,
   linkLabel,
@@ -17044,6 +17047,7 @@ function IframeBuilderInteractionLayer({
 }: {
   target: BuilderInteractionTarget | null;
   rect: BuilderInteractionLayerRect | null;
+  iframeRef: { current: HTMLIFrameElement | null };
   sections: BuilderSection[];
   linkHref?: string | null;
   linkLabel?: string | null;
@@ -17069,14 +17073,16 @@ function IframeBuilderInteractionLayer({
   if (!target || !rect || typeof document === "undefined") return null;
   const section = sections.find((candidate) => candidate.id === target.sectionId);
   if (!section) return null;
+  const iframeDocument = iframeRef.current?.contentDocument;
+  if (!iframeDocument?.body) return null;
   const rows = resolveBuilderSectionStructure(section).rows;
   const rowIndex = target.type === "row"
     ? target.rowIndex
     : target.type === "column" || target.type === "block"
       ? rows.findIndex((row) => row.columns.some((column) => column.column.id === target.columnKey))
       : -1;
-  const toolbarTop = Math.min(rect.top + rect.height + 8, window.innerHeight - 58);
-  const toolbarLeft = Math.min(Math.max(rect.left + rect.width / 2, 210), window.innerWidth - 210);
+  const toolbarTop = rect.top + rect.height + 8;
+  const toolbarLeft = rect.left + rect.width / 2;
   let actions: ReactNode = null;
   if (target.type === "section") {
     const index = sections.findIndex((candidate) => candidate.id === target.sectionId);
@@ -17111,10 +17117,9 @@ function IframeBuilderInteractionLayer({
       onFollowLink={() => { if (linkHref) onFollowLink?.(linkHref); }} />;
   }
   return createPortal(<>
-    <div className={`builder-shared-interaction-frame is-selected is-${target.type}`} style={{ position: "fixed", left: rect.left, top: rect.top, width: rect.width, height: rect.height }} />
     <div className={`builder-fixed-selection-toolbar is-anchored${target.type === "block" ? " is-element" : ""}`}
       role="toolbar" aria-label="Selected iframe Builder object"
-      style={{ position: "fixed", left: toolbarLeft, top: toolbarTop, right: "auto", bottom: "auto" }}>
+      style={{ position: "absolute", left: toolbarLeft, top: toolbarTop, right: "auto", bottom: "auto" }}>
       <nav className="builder-fixed-selection-breadcrumb" aria-label="Builder object hierarchy">
         <button type="button" onClick={() => onSelectTarget({ type: "section", sectionId: target.sectionId })}>Section</button>
         {rowIndex >= 0 ? <button type="button" onClick={() => onSelectTarget({ type: "row", sectionId: target.sectionId, rowIndex })}>Row {rowIndex + 1}</button> : null}
@@ -17122,7 +17127,7 @@ function IframeBuilderInteractionLayer({
       </nav>
       <div className="builder-fixed-selection-actions">{actions}</div>
     </div>
-  </>, document.body);
+  </>, iframeDocument.body);
 }
 
 type BuilderInteractionLayerRect = {

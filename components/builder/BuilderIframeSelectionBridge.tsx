@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import type { BuilderInteractionTarget } from "@/components/dashboard/builderInteraction";
+import { BUILDER_PARALLAX_FRAME_EVENT } from "./builderAnimationRuntimeEvents";
 
 export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selection";
 
@@ -17,6 +18,7 @@ type SelectionMessage = {
   linkLabel?: string;
   shell?: "header" | "footer" | null;
   insertionIndex?: number;
+  scrolling?: boolean;
 };
 
 type SelectionRect = { x: number; y: number; width: number; height: number };
@@ -144,6 +146,7 @@ export default function BuilderIframeSelectionBridge({
     let scrollSettleTimer = 0;
     let scrolling = false;
     let selectedResizeObserver: ResizeObserver | null = null;
+    let selectedElement: HTMLElement | null = null;
     const draggableElements = new Set<HTMLElement>();
     let draggableObserver: MutationObserver | null = null;
     const enableDraggableElement = (element: HTMLElement) => {
@@ -165,8 +168,21 @@ export default function BuilderIframeSelectionBridge({
       // new position, so enable native dragging for the full authored surface.
       enableDraggableWithin(document);
     };
+    const syncSelectedElement = () => {
+      const nextElement = selectedTarget
+        ? document.querySelector<HTMLElement>(targetSelector(selectedTarget, editingShell))
+        : null;
+      if (selectedElement && selectedElement !== nextElement) {
+        selectedElement.removeAttribute("data-builder-iframe-selection");
+      }
+      selectedElement = nextElement;
+      if (selectedElement) {
+        selectedElement.setAttribute("data-builder-iframe-selection", "true");
+      }
+    };
     const reportRect = () => {
       frame = 0;
+      syncSelectedElement();
       const element = selectedTarget
         ? document.querySelector<HTMLElement>(targetSelector(selectedTarget, editingShell))
         : null;
@@ -183,6 +199,7 @@ export default function BuilderIframeSelectionBridge({
         type: "rect",
         target: selectedTarget ?? undefined,
         rect: visibleRect,
+        scrolling,
       };
       window.parent.postMessage(message, window.location.origin);
     };
@@ -217,11 +234,21 @@ export default function BuilderIframeSelectionBridge({
           target: selectedTarget ?? undefined,
         } satisfies SelectionMessage, window.location.origin);
       }
+      // The selection outline and toolbar are painted inside the iframe and
+      // therefore move with the document. The final measurement is enough to
+      // place the toolbar after any layout settling.
       window.clearTimeout(scrollSettleTimer);
       scrollSettleTimer = window.setTimeout(() => {
         scrolling = false;
         reportRect();
       }, 140);
+    };
+    const handleParallaxFrame = () => {
+      // During an active gesture the parent deliberately holds the toolbar
+      // rect. Measuring here is useful only once scrolling has settled; the
+      // selected outline itself remains inside the iframe and follows the
+      // compositor transform without any parent-driven repositioning.
+      if (!scrolling && selectedTarget) reportRect();
     };
     const selectTarget = (
       target: BuilderInteractionTarget,
@@ -229,6 +256,7 @@ export default function BuilderIframeSelectionBridge({
     ) => {
       selectedTarget = target;
       selectedLinkHref = link?.href || null;
+      syncSelectedElement();
       observeSelectedElement();
       window.parent.postMessage({
         source: BUILDER_IFRAME_SELECTION_SOURCE,
@@ -265,6 +293,9 @@ export default function BuilderIframeSelectionBridge({
         return;
       }
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+      if (event.target instanceof Element && event.target.closest(".builder-fixed-selection-toolbar")) {
+        return;
+      }
       // Header navigation links belong to the scoped preview router. They
       // synchronize the Builder document on the first click. Hash-only links
       // remain ordinary in-page preview navigation.
@@ -387,11 +418,13 @@ export default function BuilderIframeSelectionBridge({
         editingShell = event.data.shell === "header" || event.data.shell === "footer"
           ? event.data.shell
           : null;
+        syncSelectedElement();
         return;
       }
       if (event.data.type !== "focus" || !event.data.target) return;
       selectedTarget = event.data.target;
       selectedLinkHref = null;
+      syncSelectedElement();
       observeSelectedElement();
       const element = document.querySelector<HTMLElement>(targetSelector(event.data.target, editingShell));
       if (event.data.scrollIntoView && element) {
@@ -473,6 +506,7 @@ export default function BuilderIframeSelectionBridge({
           if (node instanceof HTMLElement) enableDraggableWithin(node);
         });
       }
+      syncSelectedElement();
     });
     draggableObserver.observe(document.documentElement, { childList: true, subtree: true });
     window.parent.postMessage({
@@ -482,12 +516,15 @@ export default function BuilderIframeSelectionBridge({
     if (diagnostics !== "minimal") {
       window.addEventListener("scroll", diagnostics === "settled" ? handleSettledScroll : scheduleRect, { passive: true });
       window.addEventListener("resize", scheduleRect);
+      document.addEventListener(BUILDER_PARALLAX_FRAME_EVENT, handleParallaxFrame);
     }
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       window.clearTimeout(scrollSettleTimer);
       selectedResizeObserver?.disconnect();
       draggableObserver?.disconnect();
+      selectedElement?.removeAttribute("data-builder-iframe-selection");
+      selectedElement = null;
       document.removeEventListener("click", handleClick, true);
       document.removeEventListener("dragstart", handleDragStart, true);
       document.removeEventListener("dragover", handleDragOver, true);
@@ -499,11 +536,63 @@ export default function BuilderIframeSelectionBridge({
       if (diagnostics !== "minimal") {
         window.removeEventListener("scroll", diagnostics === "settled" ? handleSettledScroll : scheduleRect);
         window.removeEventListener("resize", scheduleRect);
+        document.removeEventListener(BUILDER_PARALLAX_FRAME_EVENT, handleParallaxFrame);
       }
     };
   }, [diagnostics]);
 
-  return <style>{`
+  return <style data-builder-canvas-stable>{`
+    /* The editor must be geometrically stable while the user scrolls. */
+    html:has(style[data-builder-canvas-stable]),
+    body:has(style[data-builder-canvas-stable]) {
+      overflow-x: clip !important;
+    }
+    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"] {
+      position: sticky !important;
+      top: 0 !important;
+      transform: none !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"].site-header--scroll-hidden {
+      position: sticky !important;
+      top: 0 !important;
+      transform: translateY(-110%) !important;
+      visibility: visible !important;
+      pointer-events: none !important;
+    }
+    html:has(style[data-builder-canvas-stable]) [data-uk-sticky] {
+      position: static !important;
+      top: auto !important;
+    }
+    html:has(style[data-builder-canvas-stable]) [data-builder-animate] {
+      animation: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+      transition: none !important;
+      transform: none !important;
+    }
+    html:has(style[data-builder-canvas-stable]) .shop-builder-section--full[data-builder-animate] {
+      transform: translateX(-50%) !important;
+    }
+    html:has(style[data-builder-canvas-stable]) [data-builder-animate] > * {
+      animation: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+      transition: none !important;
+      transform: none !important;
+    }
+    /* Parallax is the one animation allowed in the selection canvas. It is
+       transform-only from the layout engine's point of view, and must not
+       interpolate between scroll frames or the selected image will shiver. */
+    html:has(style[data-builder-canvas-stable]) [data-builder-parallax],
+    html:has(style[data-builder-canvas-stable]) [data-builder-parallax-y] {
+      transition: none !important;
+    }
+    [data-builder-iframe-selection="true"] {
+      outline: 1.5px solid var(--builder-ui-accent, #0d73ff) !important;
+      outline-offset: -1px !important;
+    }
     .builder-iframe-drag-over-above, .builder-iframe-drag-over-below { position: relative; }
     .builder-iframe-drag-over-above::before, .builder-iframe-drag-over-below::before {
       content: ""; position: absolute; z-index: 2147483647; left: 0; right: 0;

@@ -8,6 +8,7 @@ import {
   type EffectiveHeaderTextMode,
 } from "@/lib/headerBackgroundContext";
 import type { HeaderBehavior } from "@/lib/headerBehavior";
+import { isBuilderIframePreview } from "@/lib/builderIframePreview";
 
 type HeaderFrameProps = {
   accentColor: string;
@@ -57,7 +58,8 @@ export default function HeaderFrame({
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
   const [hiddenByScroll, setHiddenByScroll] = React.useState(false);
-  const builderPreviewDetected = builderPreviewMode;
+  const builderIframePreview = isBuilderIframePreview();
+  const builderPreviewDetected = builderPreviewMode || builderIframePreview;
   const previousScrollYRef = React.useRef(0);
   const [autoTextState, setAutoTextState] = React.useState<{
     context: EffectiveHeaderBackgroundContext;
@@ -140,7 +142,10 @@ export default function HeaderFrame({
     // skip the local listener when an outer surface is actively supplying
     // scroll state; Builder mode itself is not evidence that window/iframe
     // scrolling is unavailable.
-    if (scrollState) return;
+    // Keep the editor canvas stable, but retain the intentional sticky
+    // show-on-up affordance. The stable canvas CSS keeps the header in its
+    // sticky layout slot so content never reflows.
+    if (scrollState || (builderPreviewDetected && behavior !== "sticky-on-scroll-up")) return;
     const getScrollY = () => {
       const previewShell = headerRef.current?.closest<HTMLElement>(".builder-preview-shell");
       if (previewShell) {
@@ -155,6 +160,17 @@ export default function HeaderFrame({
 
     const onScroll = () => {
       const nextScrollY = getScrollY();
+      if (builderIframePreview) {
+        const delta = nextScrollY - previousScrollYRef.current;
+        setHiddenByScroll((current) => {
+          if (nextScrollY <= 24) return false;
+          if (delta > 2) return true;
+          if (delta < -2) return false;
+          return current;
+        });
+        previousScrollYRef.current = nextScrollY;
+        return;
+      }
       const threshold = behavior === "pill-on-scroll" ? 56 : 24;
       setScrolled(behavior === "static" ? false : nextScrollY > threshold);
       if (behavior === "sticky-on-scroll-up") {
@@ -178,7 +194,7 @@ export default function HeaderFrame({
     // including the builder preview shell.
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, [behavior, builderPreviewDetected, scrollState]);
+  }, [behavior, builderIframePreview, builderPreviewDetected, scrollState]);
 
   React.useEffect(() => {
     const pill = headerRef.current?.querySelector<HTMLElement>("#site-header-pill");

@@ -66,6 +66,10 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
             sourceUrl
             altText
             caption
+            mediaDetails {
+              width
+              height
+            }
           }
         }
         # Keep the provider's GraphQL projection generic: aliases map the
@@ -79,6 +83,10 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
               sourceUrl
               altText
               caption
+              mediaDetails {
+                width
+                height
+              }
             }
           }
           teaser_image: teaserImage {
@@ -88,6 +96,10 @@ const WORDPRESS_POST_COLLECTION_QUERY = `
               sourceUrl
               altText
               caption
+              mediaDetails {
+                width
+                height
+              }
             }
           }
         }
@@ -189,6 +201,16 @@ type WordPressTermNode = {
   uri?: unknown;
 };
 
+type WordPressMediaNode = WordPressTermNode & {
+  sourceUrl?: unknown;
+  altText?: unknown;
+  caption?: unknown;
+  mediaDetails?: {
+    width?: unknown;
+    height?: unknown;
+  } | null;
+};
+
 type WordPressPostNode = {
   id?: unknown;
   databaseId?: unknown;
@@ -205,11 +227,7 @@ type WordPressPostNode = {
   categories?: { nodes?: WordPressTermNode[] | null } | null;
   tags?: { nodes?: WordPressTermNode[] | null } | null;
   featuredImage?: {
-    node?: (WordPressTermNode & {
-      sourceUrl?: unknown;
-      altText?: unknown;
-      caption?: unknown;
-    }) | null;
+    node?: WordPressMediaNode | null;
   } | null;
   /** Optional provider projection populated when WPGraphQL ACF is available. */
   acfFields?: Record<string, unknown> | null;
@@ -535,6 +553,23 @@ const setField = (
   if (value !== undefined) fields[path] = value;
 };
 
+const positiveMediaDimension = (value: unknown): number | undefined => {
+  const dimension = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(dimension) && dimension > 0 ? dimension : undefined;
+};
+
+const mediaDimensions = (media: Record<string, unknown> | undefined) => {
+  const details = media?.mediaDetails;
+  if (!details || typeof details !== "object" || Array.isArray(details)) return {};
+  const record = details as Record<string, unknown>;
+  const width = positiveMediaDimension(record.width);
+  const height = positiveMediaDimension(record.height);
+  return {
+    ...(width !== undefined ? { width } : {}),
+    ...(height !== undefined ? { height } : {}),
+  };
+};
+
 /** Normalize a selected WordPress post shape; the raw response is never retained. */
 export function normalizeWordPressPostContext(
   post: WordPressPostNode,
@@ -622,6 +657,7 @@ export function normalizeWordPressPostContext(
         id: identifierValue(image?.id) ?? identifierValue(image?.databaseId),
         ...(imageAlt !== undefined ? { alt: imageAlt } : {}),
         ...(imageCaption !== undefined ? { caption: imageCaption } : {}),
+        ...mediaDimensions(image as Record<string, unknown> | undefined),
       },
     });
   }
@@ -653,6 +689,7 @@ export function normalizeWordPressPostContext(
     const alt = stringValue(media.altText) ?? stringValue(media.alt);
     const caption = stringValue(media.caption);
     const id = identifierValue(media.databaseId) ?? identifierValue(media.id);
+    const dimensions = mediaDimensions(media);
     if (url !== undefined) setField(fields, `acf.${field.name}.url`, { type: "url", value: url });
     if (alt !== undefined) setField(fields, `acf.${field.name}.alt`, { type: "string", value: alt });
     if (caption !== undefined) setField(fields, `acf.${field.name}.caption`, { type: "richText", value: caption });
@@ -660,7 +697,7 @@ export function normalizeWordPressPostContext(
     if (url !== undefined) {
       setField(fields, `acf.${field.name}`, {
         type: "media",
-        value: { url, ...(id !== undefined ? { id } : {}), ...(alt !== undefined ? { alt } : {}), ...(caption !== undefined ? { caption } : {}) },
+        value: { url, ...(id !== undefined ? { id } : {}), ...(alt !== undefined ? { alt } : {}), ...(caption !== undefined ? { caption } : {}), ...dimensions },
       });
     }
   }

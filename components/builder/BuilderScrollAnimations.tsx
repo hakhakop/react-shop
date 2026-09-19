@@ -6,6 +6,8 @@ import {
   type BuilderAnimationLike,
 } from "@/lib/builderAnimation";
 import type { BuilderParallaxSettings, BuilderParallaxStop } from "@/components/dashboard/builderTypes";
+import { isBuilderIframePreview } from "@/lib/builderIframePreview";
+import { BUILDER_PARALLAX_FRAME_EVENT } from "./builderAnimationRuntimeEvents";
 
 const ANIMATED_ITEM_SELECTOR = [
   ".shop-builder-content-layout-heading",
@@ -209,7 +211,14 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
     const parallaxNodes = Array.from(
       document.querySelectorAll<HTMLElement>("[data-builder-parallax], [data-builder-parallax-y]"),
     );
-    const scrollProgressNodes = animatedNodes.filter((node) => {
+    const stableIframePreview = isBuilderIframePreview();
+    // The selection iframe keeps layout-affecting animation settled, but its
+    // parallax transforms are safe to run because they only move composited
+    // pixels and never change document flow. The generic animation runtime is
+    // therefore excluded from the iframe while the shared parallax runtime is
+    // allowed to continue below.
+    const animationNodes = stableIframePreview ? [] : animatedNodes;
+    const scrollProgressNodes = animationNodes.filter((node) => {
       const preset = node.dataset.builderAnimate;
       return (
         preset === "progress-line" ||
@@ -217,11 +226,19 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         preset === "scroll-progress-vertical"
       );
     });
-    const pinnedProgressNodes = animatedNodes.filter(
+    const pinnedProgressNodes = animationNodes.filter(
       (node) => node.dataset.builderPause === "true",
     );
 
     if (!animatedNodes.length && !parallaxNodes.length) return;
+
+    // The editor canvas is a measurement surface, not the published runtime.
+    // Keep authored motion at its settled state so scrolling cannot change
+    // layout geometry underneath selection chrome. Parallax is intentionally
+    // excluded here: its compositor transform does not participate in layout.
+    if (stableIframePreview) {
+      animatedNodes.forEach((node) => node.classList.add("is-builder-animated-in"));
+    }
 
     const parallaxRuntime = new Map<HTMLElement, ParallaxRuntime>();
     const parallaxScrollTargets = new Set<HTMLElement>();
@@ -620,10 +637,16 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         if (origin !== undefined) node.style.transformOrigin = origin;
         if (zIndex !== undefined) node.style.zIndex = zIndex;
       });
+      // The iframe bridge uses this only when its settled-scroll guard is
+      // idle. That keeps the toolbar stable during a gesture while allowing
+      // it to measure the same post-transform frame when the page is still.
+      if (stableIframePreview && writes.length > 0) {
+        document.dispatchEvent(new Event(BUILDER_PARALLAX_FRAME_EVENT));
+      }
     };
 
     if (reduceMotion) {
-      animatedNodes.forEach((node) =>
+      animationNodes.forEach((node) =>
         node.classList.add("is-builder-animated-in"),
       );
       scrollProgressNodes.forEach((node) => {
@@ -688,7 +711,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       },
     );
 
-    animatedNodes.forEach((node) => observer.observe(node));
+    animationNodes.forEach((node) => observer.observe(node));
     let rafId = 0;
     requestProgressUpdate = () => {
       if (documentHidden) return;

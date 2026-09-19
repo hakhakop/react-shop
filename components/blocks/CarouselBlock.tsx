@@ -109,6 +109,9 @@ export type CarouselSlide = {
   imageHoverTransition?: "none" | "scale-up" | "scale-down" | string | null;
   imageWidth?: string | null;
   imageHeight?: string | number | null;
+  /** Provider/source geometry used to reserve lazy media before decode. */
+  imageIntrinsicWidth?: number | null;
+  imageIntrinsicHeight?: number | null;
   imageBorder?: string | null;
   imageBoxShadow?: string | null;
   imageSvgInline?: boolean | null;
@@ -1381,6 +1384,11 @@ export default function CarouselBlock({
             const cardRatio = (() => {
               const explicitRatio = toCssAspectRatio(settings?.aspectRatio) ?? toCssAspectRatio(slide.imageRatio);
               if (explicitRatio) return explicitRatio;
+              const intrinsicWidth = Number(slide.imageIntrinsicWidth);
+              const intrinsicHeight = Number(slide.imageIntrinsicHeight);
+              if (intrinsicWidth > 0 && intrinsicHeight > 0) {
+                return `${intrinsicWidth} / ${intrinsicHeight}`;
+              }
               const w = slide.imageWidth ?? settings?.imageWidth;
               const h = slide.imageHeight ?? settings?.imageHeight;
               if (w && h) {
@@ -1439,6 +1447,8 @@ export default function CarouselBlock({
                       <img
                         src={slide.imageUrl!}
                         alt={slide.imageAlt ?? slide.title ?? ""}
+                        width={slide.imageIntrinsicWidth ?? undefined}
+                        height={slide.imageIntrinsicHeight ?? undefined}
                         className={`block ${usesNaturalOverlayWidth && !cardRatio ? "w-auto h-full object-cover max-w-none" : `w-full ${cardRatio || slide.imageHeight || (slide.imageRatio && slide.imageRatio !== "natural") ? "h-full object-cover" : "h-auto object-contain"}`} transition-transform duration-700 ${resolveOverlayImageTransition(slide.imageHoverTransition ?? settings?.imageHoverTransition)} ${isKenBurns ? "is-ken-burns" : ""}`}
                         style={{
                           width: usesNaturalOverlayWidth && !cardRatio ? "auto" : "100%",

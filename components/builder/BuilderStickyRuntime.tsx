@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { isBuilderIframePreview } from "@/lib/builderIframePreview";
 
 type UikitStickyInstance = {
   $destroy?: (removeElement?: boolean) => void;
@@ -13,10 +14,12 @@ type UikitRuntime = {
 /** Mount UIkit's canonical Sticky implementation for imported sections. */
 export default function BuilderStickyRuntime() {
   useEffect(() => {
+    // Sticky sections are published-site behavior. In the editor iframe they
+    // compete with selection geometry and can move the canvas while scrolling.
+    if (isBuilderIframePreview()) return;
     let disposed = false;
     let uikit: UikitRuntime | null = null;
     const instances = new Map<HTMLElement, UikitStickyInstance>();
-    let stickyScrollRaf = 0;
     const sync = () => {
       if (disposed || !uikit) return;
       const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-uk-sticky]"));
@@ -57,18 +60,6 @@ export default function BuilderStickyRuntime() {
         instance.$emit?.("update");
       }
     };
-    const prioritizeStickyScroll = () => {
-      // The shared parallax runtime schedules work from scroll. Ask the
-      // already-mounted UIkit instances to queue their canonical read/write
-      // pass during capture so a fast scroll cannot leave the reveal boundary
-      // one frame behind the heavier animation work in either surface.
-      if (stickyScrollRaf) return;
-      stickyScrollRaf = window.requestAnimationFrame(() => {
-        stickyScrollRaf = 0;
-        for (const instance of instances.values()) instance.$emit?.("scroll");
-      });
-    };
-    window.addEventListener("scroll", prioritizeStickyScroll, { capture: true, passive: true });
     void import("uikit").then((module) => {
       if (disposed) return;
       uikit = (module.default ?? module) as unknown as UikitRuntime;
@@ -79,8 +70,6 @@ export default function BuilderStickyRuntime() {
     return () => {
       disposed = true;
       observer.disconnect();
-      window.removeEventListener("scroll", prioritizeStickyScroll, { capture: true });
-      if (stickyScrollRaf) window.cancelAnimationFrame(stickyScrollRaf);
       for (const instance of instances.values()) instance.$destroy?.(false);
       instances.clear();
     };

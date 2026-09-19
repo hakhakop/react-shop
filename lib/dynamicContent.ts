@@ -172,6 +172,11 @@ const applyDynamicTransform = (
   return undefined;
 };
 
+const positiveMediaDimension = (value: unknown): number | undefined => {
+  const dimension = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(dimension) && dimension > 0 ? dimension : undefined;
+};
+
 /**
  * Resolve dynamic bindings over an authored static item. Missing or invalid
  * values retain the existing destination field as the static fallback.
@@ -195,6 +200,25 @@ export function resolveDynamicItem<
     if (value === undefined) continue;
     resolved ??= { ...staticItem };
     resolved[destination] = value;
+
+    // Image URLs are often bound to a provider-owned media field. Carry its
+    // intrinsic geometry alongside the resolved URL so the renderer can reserve
+    // the final box before a lazy image is decoded. This is deliberately kept in
+    // the shared resolver so Grid, Slider, and future repeatable media owners
+    // receive the same layout-stability contract.
+    if (destination === "imageUrl" && typeof value === "string") {
+      const bindingPath = binding.path.trim();
+      const mediaPath = bindingPath.endsWith(".url")
+        ? bindingPath.slice(0, -4)
+        : "";
+      const mediaEntry = mediaPath ? context.fields[mediaPath] : undefined;
+      if (mediaEntry?.type === "media" && isValidValue("media", mediaEntry.value)) {
+        const width = positiveMediaDimension(mediaEntry.value.width);
+        const height = positiveMediaDimension(mediaEntry.value.height);
+        if (width !== undefined) resolved.imageIntrinsicWidth = width;
+        if (height !== undefined) resolved.imageIntrinsicHeight = height;
+      }
+    }
   }
 
   return (resolved ?? staticItem) as Item;

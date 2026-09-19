@@ -19,6 +19,7 @@ import {
   MousePointerClick,
   Pencil,
   Plus,
+  Rows3,
   Sliders,
   Sparkles,
   Trash2,
@@ -868,22 +869,21 @@ export const WireframeColumn = memo(
                 </div>
               ) : null}
               {actions.openElements ? (
-                <button
-                  type="button"
-                  className="builder-structure-add-element-btn builder-structure-empty-target"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actions.selectColumn(sectionId, columnKey);
-                    actions.openElements?.({ sectionId, columnKey });
-                  }}
-                  title={`Add element to ${item.title || `Column ${index + 1}`}`}
-                  aria-label="Add element"
-                >
-                  <Plus size={10} />
-                  <span className="builder-structure-empty-label">
-                    {blocks.length === 0 ? "Add element" : "Add Element"}
-                  </span>
-                </button>
+                <div className="builder-structure-add-element-slot">
+                  <button
+                    type="button"
+                    className="builder-structure-add-element-btn builder-wireframe-add-element"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      actions.selectColumn(sectionId, columnKey);
+                      actions.openElements?.({ sectionId, columnKey });
+                    }}
+                    aria-label="Add element"
+                  >
+                    <Plus size={13} aria-hidden="true" />
+                    <span className="builder-structure-empty-label">Add element</span>
+                  </button>
+                </div>
               ) : null}
             </>
           )}
@@ -1457,14 +1457,14 @@ export const WireframeSection = memo(function WireframeSection({
               {actions.addRow ? (
                 <button
                   type="button"
-                  className="builder-structure-add-element-btn builder-structure-empty-target"
+                  className="builder-structure-add-element-btn builder-structure-empty-target builder-wireframe-add-first-row"
                   onClick={() =>
                     actions.addRow?.(section.id, 0, "after", "1-col")
                   }
                 >
-                  <Plus size={10} />
+                  <Rows3 size={12} aria-hidden="true" />
                   <span className="builder-structure-empty-label">
-                    Add first row
+                    Add row
                   </span>
                 </button>
               ) : null}
@@ -1531,9 +1531,9 @@ export const WireframeSection = memo(function WireframeSection({
                         aria-label={`Add row after Row ${rowIndex + 1}`}
                         title="Add row here"
                       >
-                        <Plus size={9} />
+                        <Rows3 size={11} aria-hidden="true" />
                         <span className="builder-structure-insert-label">
-                          Add Row
+                          Add row
                         </span>
                       </button>
                     </div>
@@ -1824,9 +1824,9 @@ export default function BuilderWireframePanel({
                       aria-label={`Add section after ${section.name || section.title || `Section ${index + 1}`}`}
                       title="Add section here"
                     >
-                      <Plus size={10} />
+                      <Layers3 size={11} aria-hidden="true" />
                       <span className="builder-structure-insert-label">
-                        Add Section
+                        Add section
                       </span>
                     </button>
                   </div>

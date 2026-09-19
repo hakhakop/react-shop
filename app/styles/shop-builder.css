@@ -2475,7 +2475,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 /* The rendered WebPages Grid is CSS Grid and owns its gutters through `gap`.
    UIkit's runtime still marks its second-row children with `uk-grid-margin`;
-   leaving that flex-grid margin in place doubles the visual row gap. */
+   leaving that flex-grid margin in place doubles the visual row gap. Runtime
+   grids use the canonical row-gap marker below instead of the CSS Grid gap. */
 .shop-builder-grid > .uk-grid-margin {
   margin-top: 0 !important;
 }
@@ -2499,7 +2500,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   width: var(--shop-builder-grid-item-basis, var(--shop-builder-grid-item-basis-base, auto));
 }
 
-.shop-builder-grid.shop-builder-uikit-grid--runtime > .uk-grid-margin {
+.shop-builder-grid.shop-builder-uikit-grid--runtime > .uk-grid-margin,
+.shop-builder-grid.shop-builder-uikit-grid--runtime > .shop-builder-grid-item--row-gap-base {
   margin-top: var(--shop-builder-grid-row-gap, var(--shop-builder-grid-gap, 0px)) !important;
 }
 
@@ -3485,6 +3487,15 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 .shop-builder-element-shell {
   background: var(--builder-element-bg, transparent);
+}
+
+/* Scroll-driven transforms are written on animation frames by the shared
+   public/builder runtime. A broad transition makes the element chase the
+   scroll position and visibly shiver; only the transform writer should own
+   that motion. */
+[data-builder-parallax],
+[data-builder-parallax-y] {
+  transition: none !important;
 }
 
 .shop-builder-element-shell.is-padding-small {

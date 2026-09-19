@@ -30,6 +30,16 @@ test("responsive policy has one JS/CSS resolution path for a valid custom shell 
   expect(css).toContain(".shop-builder-grid");
 });
 
+test("responsive Grid row-gap markers emit the active tier after inactive resets", () => {
+  const css = renderResponsiveBreakpointPolicyCss(resolveResponsiveBreakpointPolicy());
+  const largeRule = css.indexOf(".shop-builder-grid-item--row-gap-large{margin-top:var(--shop-builder-grid-row-gap");
+  const xlargeReset = css.lastIndexOf(".shop-builder-grid-item--row-gap-xlarge{margin-top:0px", largeRule);
+
+  expect(xlargeReset).toBeGreaterThan(largeRule - 1200);
+  expect(largeRule).toBeGreaterThan(xlargeReset);
+  expect(css.slice(xlargeReset, largeRule)).not.toContain("@media");
+});
+
 test("invalid persisted policy falls back as one complete default policy", () => {
   expect(resolveResponsiveBreakpointPolicy({ breakpointSmall: "1000px", breakpointMedium: "960px" }))
     .toMatchObject({ small: 640, medium: 960, large: 1200, xlarge: 1600 });

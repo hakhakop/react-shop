@@ -228,6 +228,9 @@ type Props = {
   loading?: "lazy" | "eager";
   /** Keep a no-width YOOtheme SVG at its source/viewBox dimensions. */
   preserveIntrinsicSize?: boolean;
+  /** Source geometry used to reserve the host before the SVG request resolves. */
+  intrinsicWidth?: number;
+  intrinsicHeight?: number;
   style?: CSSProperties;
   fallback: ReactNode;
 };
@@ -241,6 +244,8 @@ export default function UikitStylableSvg({
   fit = "contain",
   loading = "lazy",
   preserveIntrinsicSize = false,
+  intrinsicWidth,
+  intrinsicHeight,
   style,
   fallback,
 }: Props) {
@@ -250,6 +255,9 @@ export default function UikitStylableSvg({
   const markup = result.key === requestKey ? result.markup ?? null : null;
   const failed = result.key === requestKey && result.failed === true;
   const naturalAspectRatio = intrinsicSvgAspectRatio(markup, fit);
+  const reservedAspectRatio = intrinsicWidth && intrinsicHeight
+    ? `${intrinsicWidth} / ${intrinsicHeight}`
+    : undefined;
 
   useEffect(() => {
     let cancelled = false;
@@ -302,7 +310,13 @@ export default function UikitStylableSvg({
       data-svg-state={markup ? "ready" : "loading"}
       style={{
         display: "inline-block",
-        ...(naturalAspectRatio && style?.height === undefined ? { aspectRatio: naturalAspectRatio } : {}),
+        ...(reservedAspectRatio ? { aspectRatio: reservedAspectRatio } : {}),
+        ...(preserveIntrinsicSize && intrinsicWidth && style?.width === undefined
+          ? { width: `${intrinsicWidth}px` }
+          : {}),
+        ...(naturalAspectRatio && !reservedAspectRatio && style?.height === undefined
+          ? { aspectRatio: naturalAspectRatio }
+          : {}),
         ...(color ? { color } : {}),
         ...style,
       }}

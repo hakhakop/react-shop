@@ -388,6 +388,9 @@ export type BuilderLayoutBlock = {
     videoUrl?: string;
     hoverVideoUrl?: string;
     imageAlt?: string;
+    /** Provider/source geometry used to reserve lazy media before decode. */
+    imageIntrinsicWidth?: number;
+    imageIntrinsicHeight?: number;
     thumbnailUrl?: string;
     thumbnailPosition?: string;
     imagePadding?: string;
@@ -653,6 +656,9 @@ export type BuilderLayoutBlock = {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
+    /** Provider/source geometry used to reserve lazy media before decode. */
+    imageIntrinsicWidth?: number;
+    imageIntrinsicHeight?: number;
     eyebrow?: string;
     /** Canonical Grid filter metadata. Source tags normalize to this array. */
     tags?: string[];

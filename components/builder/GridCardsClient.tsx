@@ -215,6 +215,16 @@ export function GridCardsClient({
   const renderedItems = paginationEnabled
     ? filteredItems.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(({ item }) => item)
     : limitedItems;
+  const isRenderedItemVisible = (item: any) =>
+    !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter);
+  const initialRowGapClass = (itemIndex: number, columns: GridColumns, tier: string) => {
+    if (columns === "auto" || columns < 1) return "";
+    const visibleIndex = renderedItems
+      .slice(0, itemIndex)
+      .filter(isRenderedItemVisible)
+      .length;
+    return visibleIndex >= columns ? `shop-builder-grid-item--row-gap-${tier}` : "";
+  };
   const selectPage = (page: number) => {
     setPageState({ signature: pageSignature, page: Math.min(Math.max(1, page), pageCount) });
   };
@@ -361,13 +371,28 @@ export function GridCardsClient({
             "--shop-builder-grid-row-gap": rowGapCss,
             columnGap: columnGapCss,
             rowGap: hasGridRuntimeEffect ? 0 : rowGapCss,
+            // UIkit's Grid parallax adds this clearance during initialization.
+            // Reserve it in the first paint so mounting the runtime cannot move
+            // the following content under an active scroll.
+            paddingBottom: gridStructure.parallax !== undefined
+              ? `${Math.abs(gridStructure.parallax)}px`
+              : undefined,
           } as CSSProperties
         }
       >
-        {renderedItems.map((item) =>
+        {renderedItems.map((item, itemIndex) =>
           (() => {
             const sourceIndex = uniqueItems.indexOf(item);
-            const isVisible = !activeFilter || activeFilter === "all" || itemFilterTags(item).includes(activeFilter);
+            const isVisible = isRenderedItemVisible(item);
+            const initialRowGapClasses = hasGridRuntimeEffect
+              ? [
+                  initialRowGapClass(itemIndex, phonePortraitColumns, "base"),
+                  initialRowGapClass(itemIndex, phoneLandscapeColumns, "small"),
+                  initialRowGapClass(itemIndex, tabletLandscapeColumns, "medium"),
+                  initialRowGapClass(itemIndex, desktopColumns, "large"),
+                  initialRowGapClass(itemIndex, largeScreenColumns, "xlarge"),
+                ].filter(Boolean).join(" ")
+              : "";
             // Grid Card Style is canonical. Legacy Panel aliases may only fill
             // an absent value; they can never override an explicit `None`.
             const hasExplicitPanelStyle =
@@ -531,6 +556,13 @@ export function GridCardsClient({
             };
             const intrinsicImageWidth = isYoothemeGrid ? intrinsicImageDimension(rawBlock.imageWidth) : undefined;
             const intrinsicImageHeight = isYoothemeGrid ? intrinsicImageDimension(rawBlock.imageHeight) : undefined;
+            const itemIntrinsicImageWidth = intrinsicImageDimension(item.imageIntrinsicWidth);
+            const itemIntrinsicImageHeight = intrinsicImageDimension(item.imageIntrinsicHeight);
+            const resolvedIntrinsicImageWidth = itemIntrinsicImageWidth ?? intrinsicImageWidth;
+            const resolvedIntrinsicImageHeight = itemIntrinsicImageHeight ?? intrinsicImageHeight;
+            const intrinsicImageAspectRatio = resolvedIntrinsicImageWidth && resolvedIntrinsicImageHeight
+              ? `${resolvedIntrinsicImageWidth} / ${resolvedIntrinsicImageHeight}`
+              : undefined;
             const imageMaxWidth =
               typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
                 ? `${rawBlock.imageMaxWidth}px`
@@ -578,6 +610,9 @@ export function GridCardsClient({
               position: (item as any).imagePosition ?? (block as any).imagePosition,
             });
             const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
+            const isSvgAsset = /\.svg(?:[?#].*)?$/i.test(item.imageUrl ?? "");
+            const isStylableSvg = rawBlock.imageSvgInline === true && isSvgAsset;
+            const preserveIntrinsicSvgSize = isStylableSvg && !imageWidth && !imageHeight && !hasCropFrame;
             // Imported YOOtheme Grid items own their media/content split in
             // the inner `uk-grid` composition below. Applying the generic
             // Panel layout to the outer article as well creates a second
@@ -693,21 +728,18 @@ export function GridCardsClient({
                 objectPosition: mediaStyle.backgroundPosition,
                 borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
               } as CSSProperties;
-              const isSvgAsset = /\.svg(?:[?#].*)?$/i.test(item.imageUrl);
               const fallbackImage = (
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
-                  width={intrinsicImageWidth}
-                  height={intrinsicImageHeight}
+                  width={resolvedIntrinsicImageWidth}
+                  height={resolvedIntrinsicImageHeight}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   className={imageHoverTransitionClass}
                   style={{ ...imageElementStyle, ...(rawBlock.imageIconWidth && isSvgAsset ? { width: imageDimension(rawBlock.imageIconWidth) } : {}) }}
                 />
               );
-              const isStylableSvg = rawBlock.imageSvgInline === true && isSvgAsset;
               const svgColorClass = getUikitSvgColorClass(rawBlock.imageIconColor ?? rawBlock.imageSvgColor);
-              const preserveIntrinsicSvgSize = isStylableSvg && !imageWidth && !imageHeight && !hasCropFrame;
               // Grid's `icon_width` is an icon semantic, not an override for an
               // authored Image width. YOOtheme keeps both controls independent;
               // explicit image dimensions must therefore win for inline SVGs.
@@ -721,6 +753,8 @@ export function GridCardsClient({
                   fit={mediaStyle.objectFit === "cover" ? "cover" : "contain"}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   preserveIntrinsicSize={preserveIntrinsicSvgSize}
+                  intrinsicWidth={resolvedIntrinsicImageWidth}
+                  intrinsicHeight={resolvedIntrinsicImageHeight}
                   fallback={fallbackImage}
                   style={{ ...(preserveIntrinsicSvgSize ? { maxWidth: "100%" } : imageElementStyle), ...(svgIconWidth ? { width: imageDimension(svgIconWidth) } : {}) }}
                 />
@@ -732,7 +766,16 @@ export function GridCardsClient({
                   data-image-ratio={hasCropFrame ? "true" : undefined}
                   style={{
                     maxWidth: imageMaxWidth,
-                    aspectRatio: hasCropFrame ? mediaStyle.aspectRatio : "auto",
+                    // Inline SVGs size themselves through the SVG host.
+                    // Applying their source ratio to this full-width wrapper
+                    // turns an authored 68px icon into a 210px empty media
+                    // track. Raster media and fallback SVGs still reserve
+                    // their intrinsic ratio here to prevent late reflow.
+                    aspectRatio: hasCropFrame
+                      ? mediaStyle.aspectRatio
+                      : isStylableSvg
+                        ? "auto"
+                        : intrinsicImageAspectRatio ?? "auto",
                     justifyContent: mediaAlignment === "right" ? "flex-end" : mediaAlignment === "center" ? "center" : "flex-start",
                     // The Grid content body is a column flex container. Its
                     // intrinsic-width media wrapper therefore needs an
@@ -823,7 +866,7 @@ export function GridCardsClient({
               <article
                 key={item.id}
                 data-tag={itemFilterTags(item).map((tag: string) => tag.replace(/\s+/g, "-")).join(" ")}
-                className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} ${itemMaxWidthClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
+                className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} ${itemMaxWidthClass} ${initialRowGapClasses} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
                 } ${panelExpand === "content" || panelExpand === "both" ? "uk-flex-1" : ""} ${panelLinkClass} ${rawBlock.linkPanel === true ? "uk-link-toggle" : ""} ${isYoothemeGrid ? "el-item uk-flex-1 uk-margin-remove-first-child" : ""} ${rawBlock.spacingContract === "yootheme" ? "shop-builder-grid-card--yootheme" : ""} ${builderItemClassName ?? ""}`.trim()}
                 style={

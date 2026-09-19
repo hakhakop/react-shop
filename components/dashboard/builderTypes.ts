@@ -1021,6 +1021,9 @@ export type BuilderLayoutBlock = {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
+    /** Provider/source geometry used to reserve lazy media before decode. */
+    imageIntrinsicWidth?: number;
+    imageIntrinsicHeight?: number;
     thumbnailUrl?: string;
     thumbnailPosition?: BuilderCarouselImagePosition;
     eyebrow?: string;
@@ -1431,6 +1434,9 @@ export type BuilderSection = {
     buttonAriaLabel?: string;
     imageWidth?: string;
     imageHeight?: string | number;
+    /** Provider/source geometry used to reserve lazy media before decode. */
+    imageIntrinsicWidth?: number;
+    imageIntrinsicHeight?: number;
     imageLoading?: "lazy" | "eager";
     imageHoverTransition?: "none" | "scale-up" | "scale-down" | string;
     imageSvgInline?: boolean;

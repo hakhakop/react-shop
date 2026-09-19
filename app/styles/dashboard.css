@@ -21507,8 +21507,6 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
 }
 
 /* Last-cascade guard for the focused Structure UX. */
-
-/* Last-cascade guard for the focused Structure UX. */
 .builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
   width: auto;
   top: 4px;
@@ -21599,6 +21597,188 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
   border-radius: 4px;
   background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+/* Final insertion-control geometry. The row owns the editor chrome as well
+   as the wireframe items, so its border box must not clip a control that
+   floats over the boundary. Add Element stays a fixed blue handle; its
+   label is a single controlled tooltip instead of a second native title. */
+.builder-dashboard .builder-wireframe-row {
+  overflow: visible !important;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:hover,
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:focus-visible {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element .builder-structure-empty-label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 7px);
+  width: max-content;
+  max-width: 150px !important;
+  margin: 0 !important;
+  padding: 4px 7px;
+  overflow: visible !important;
+  border: 1px solid var(--builder-ui-border, #d9dde5);
+  border-radius: 5px;
+  background: var(--builder-ui-panel-solid, #ffffff);
+  color: var(--builder-ui-text, #1f2937);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-3px, -50%);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:hover .builder-structure-empty-label,
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:focus-visible .builder-structure-empty-label {
+  max-width: 150px !important;
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* Insertion controls use one visual language per hierarchy level: purple
+   sections, green rows, and compact blue elements. Keep element insertion
+   inside the column without turning the whole column into a button. */
+.builder-dashboard .builder-structure-add-element-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 5px 4px 4px;
+  border-top: 1px solid rgba(59, 130, 246, 0.12);
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.builder-dashboard .builder-wireframe-add-element {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border: 1px solid rgba(14, 165, 233, 0.34) !important;
+  border-radius: 7px !important;
+  background: rgba(14, 165, 233, 0.07) !important;
+  color: #0284c7 !important;
+  font-size: 10px !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease !important;
+}
+
+.builder-dashboard .builder-wireframe-add-element:hover,
+.builder-dashboard .builder-wireframe-add-element:focus-visible {
+  border-color: #0ea5e9 !important;
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.builder-dashboard .builder-wireframe-add-element svg {
+  flex: 0 0 auto;
+}
+
+.builder-dashboard .builder-wireframe-add-first-row {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgba(16, 185, 129, 0.34) !important;
+  border-radius: 8px !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+}
+
+.builder-dashboard .builder-wireframe-add-first-row:hover,
+.builder-dashboard .builder-wireframe-add-first-row:focus-visible {
+  border-color: #10b981 !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+}
+
+.builder-dashboard .builder-structure-empty-slot {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.builder-dashboard .builder-structure-insert-row-btn {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 10px !important;
+  border-color: rgba(16, 185, 129, 0.38) !important;
+  border-radius: 8px !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  opacity: 0.82 !important;
+}
+
+.builder-dashboard .builder-structure-insert-row-btn:hover,
+.builder-dashboard .builder-structure-insert-row-btn:focus-visible {
+  border-color: #10b981 !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.builder-dashboard .builder-structure-insert-section-btn,
+.builder-dashboard .builder-wireframe-insert-section,
+.builder-dashboard .builder-wireframe-add-section {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  border: 1px solid rgba(124, 58, 237, 0.34) !important;
+  border-radius: 8px !important;
+  background: rgba(124, 58, 237, 0.09) !important;
+  color: #7c3aed !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.02em;
+  opacity: 0.9 !important;
+}
+
+.builder-dashboard .builder-structure-insert-section-btn:hover,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible,
+.builder-dashboard .builder-wireframe-insert-section:hover,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible,
+.builder-dashboard .builder-wireframe-add-section:hover,
+.builder-dashboard .builder-wireframe-add-section:focus-visible {
+  border-color: #8b5cf6 !important;
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
 
 /* Final Inspector type authority. Keep this after legacy compatibility rules. */
@@ -24039,6 +24219,241 @@ body:has([data-scoped-builder-root])
 }
 
 /* Last-cascade guard for the focused Structure UX. */
+
+/* Final quiet insertion treatment. The plus handles float over boundaries so
+   they do not add permanent height or compete with the content preview. */
+.builder-dashboard .builder-wireframe-column {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.builder-dashboard .builder-structure-add-element-slot {
+  position: absolute !important;
+  z-index: 8;
+  right: 0;
+  bottom: -11px;
+  left: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  pointer-events: none;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: none !important;
+}
+
+.builder-dashboard .builder-wireframe-column:hover .builder-structure-add-element-slot .builder-wireframe-add-element,
+.builder-dashboard .builder-wireframe-column.is-selected .builder-structure-add-element-slot .builder-wireframe-add-element,
+.builder-dashboard .builder-wireframe-column:has(.builder-wireframe-item--block.is-selected) .builder-structure-add-element-slot .builder-wireframe-add-element,
+.builder-dashboard .builder-wireframe-column:focus-within .builder-structure-add-element-slot .builder-wireframe-add-element {
+  opacity: 0.92;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-structure-empty-label,
+.builder-dashboard .builder-structure-insert-row-btn .builder-structure-insert-label,
+.builder-dashboard .builder-structure-insert-section-btn .builder-structure-insert-label,
+.builder-dashboard .builder-wireframe-insert-section .builder-structure-insert-label {
+  max-width: 0;
+  margin-left: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:hover,
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:focus-visible,
+.builder-dashboard .builder-structure-insert-row-btn:hover,
+.builder-dashboard .builder-structure-insert-row-btn:focus-visible,
+.builder-dashboard .builder-structure-insert-section-btn:hover,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible,
+.builder-dashboard .builder-wireframe-insert-section:hover,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible {
+  width: auto !important;
+  max-width: 128px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  opacity: 1 !important;
+}
+
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:hover .builder-structure-empty-label,
+.builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element:focus-visible .builder-structure-empty-label,
+.builder-dashboard .builder-structure-insert-row-btn:hover .builder-structure-insert-label,
+.builder-dashboard .builder-structure-insert-row-btn:focus-visible .builder-structure-insert-label,
+.builder-dashboard .builder-structure-insert-section-btn:hover .builder-structure-insert-label,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible .builder-structure-insert-label,
+.builder-dashboard .builder-wireframe-insert-section:hover .builder-structure-insert-label,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible .builder-structure-insert-label {
+  max-width: 82px;
+  margin-left: 4px;
+  opacity: 1;
+}
+
+.builder-dashboard .builder-structure-row-slot {
+  position: relative;
+}
+
+.builder-dashboard .builder-structure-insert-row-slot {
+  position: relative !important;
+  z-index: 8;
+  height: 14px !important;
+  min-height: 14px !important;
+  margin: -7px 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+.builder-dashboard .builder-structure-insert-row-slot .builder-structure-insert-row-btn {
+  position: absolute !important;
+  top: 50%;
+  right: 4px;
+  left: auto;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  opacity: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) !important;
+}
+
+.builder-dashboard .builder-structure-row-slot:hover .builder-structure-insert-row-btn,
+.builder-dashboard .builder-structure-row-slot:has(.builder-wireframe-row.is-selected) .builder-structure-insert-row-btn,
+.builder-dashboard .builder-structure-row-slot:focus-within .builder-structure-insert-row-btn {
+  opacity: 0.86 !important;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-structure-insert-row-btn:hover,
+.builder-dashboard .builder-structure-insert-row-btn:focus-visible {
+  background: #059669 !important;
+}
+
+.builder-dashboard .builder-wireframe-section-slot {
+  position: relative;
+  padding-bottom: 5px !important;
+}
+
+.builder-dashboard .builder-wireframe-section-slot::after {
+  display: none !important;
+}
+
+.builder-dashboard .builder-structure-insert-section-row {
+  position: relative !important;
+  z-index: 8;
+  height: 14px !important;
+  min-height: 14px !important;
+  margin: -7px 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+.builder-dashboard .builder-structure-insert-section-row .builder-wireframe-insert-section,
+.builder-dashboard .builder-structure-insert-section-row .builder-structure-insert-section-btn {
+  position: absolute !important;
+  top: 50%;
+  right: auto;
+  left: 4px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  opacity: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) !important;
+}
+
+.builder-dashboard .builder-wireframe-section-slot:hover .builder-wireframe-insert-section,
+.builder-dashboard .builder-wireframe-section-slot:has(.builder-wireframe-section.is-selected) .builder-wireframe-insert-section,
+.builder-dashboard .builder-wireframe-section-slot:focus-within .builder-wireframe-insert-section {
+  opacity: 0.84 !important;
+  pointer-events: auto;
+}
+
+.builder-dashboard .builder-structure-insert-section-btn:hover,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible,
+.builder-dashboard .builder-wireframe-insert-section:hover,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible {
+  background: #6d28d9 !important;
+}
+
+/* Boundary controls use distinct anchors and stay icon-only. Labels on these
+   low-attention chrome items were expanding into their neighbours, while
+   their negative offsets made a zero-height parent clip the button. The
+   native title/ARIA label still provides the action name on hover/focus. */
+.builder-dashboard .builder-structure-insert-row-btn:hover,
+.builder-dashboard .builder-structure-insert-row-btn:focus-visible,
+.builder-dashboard .builder-structure-insert-section-btn:hover,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible,
+.builder-dashboard .builder-wireframe-insert-section:hover,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.builder-dashboard .builder-structure-insert-section-btn:hover,
+.builder-dashboard .builder-structure-insert-section-btn:focus-visible,
+.builder-dashboard .builder-wireframe-insert-section:hover,
+.builder-dashboard .builder-wireframe-insert-section:focus-visible {
+  width: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+}
+
+.builder-dashboard .builder-structure-insert-row-btn .builder-structure-insert-label,
+.builder-dashboard .builder-structure-insert-section-btn .builder-structure-insert-label,
+.builder-dashboard .builder-wireframe-insert-section .builder-structure-insert-label {
+  display: none !important;
+}
 .builder-dashboard .builder-wireframe-row > .builder-wireframe-rowline {
   width: auto;
   top: 4px;

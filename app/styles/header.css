@@ -2194,6 +2194,14 @@ html.dark .site-header {
   position: sticky !important;
 }
 
+/* Transparent overlay headers must not switch from absolute to in-flow sticky
+   when scrolling starts. Keep the header in a fixed layer so show-on-up can
+   reveal it without inserting the navbar height into the page mid-scroll. */
+.site-header.site-header--builder-overlay[data-header-behavior="sticky"],
+.site-header.site-header--builder-overlay[data-header-behavior="sticky-on-scroll-up"] {
+  position: fixed !important;
+}
+
 .site-header-princity-shell {
   width: 100%;
   background: transparent;
