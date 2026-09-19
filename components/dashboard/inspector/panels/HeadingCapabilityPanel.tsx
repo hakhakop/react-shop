@@ -16,6 +16,7 @@ import {
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { Link, Image as ImageIcon } from "lucide-react";
 import { TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import { InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -56,7 +57,7 @@ export default function HeadingCapabilityPanel({
       <div className="builder-inspector-stack" data-uikit-capability="heading-content">
         <InspectorDivision title="CONTENT">
           <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "headingText")}>
-            <InspectorTextarea
+            <InspectorContentEditor
               value={block.headingText ?? block.title ?? ""}
               onChange={(value) => update({ headingText: value, title: value })}
               placeholder="Build Anything on DevStack"

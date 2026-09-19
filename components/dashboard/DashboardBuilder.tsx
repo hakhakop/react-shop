@@ -487,6 +487,54 @@ type InspectorFloatingRect = {
   width: number;
   height: number;
 };
+type InspectorFloatingResizeDirection =
+  | "n"
+  | "e"
+  | "s"
+  | "w"
+  | "ne"
+  | "se"
+  | "sw"
+  | "nw";
+
+const inspectorFloatingResizeDirections: InspectorFloatingResizeDirection[] = [
+  "n",
+  "e",
+  "s",
+  "w",
+  "ne",
+  "se",
+  "sw",
+  "nw",
+];
+
+const inspectorFloatingResizeCursors: Record<
+  InspectorFloatingResizeDirection,
+  string
+> = {
+  n: "ns-resize",
+  e: "ew-resize",
+  s: "ns-resize",
+  w: "ew-resize",
+  ne: "nesw-resize",
+  se: "nwse-resize",
+  sw: "nesw-resize",
+  nw: "nwse-resize",
+};
+
+const inspectorFloatingResizeLabels: Record<
+  InspectorFloatingResizeDirection,
+  string
+> = {
+  n: "top edge",
+  e: "right edge",
+  s: "bottom edge",
+  w: "left edge",
+  ne: "top right corner",
+  se: "bottom right corner",
+  sw: "bottom left corner",
+  nw: "top left corner",
+};
 
 function readInspectorWidthPreference() {
   if (typeof window === "undefined") return INSPECTOR_DEFAULT_WIDTH;
@@ -3211,8 +3259,11 @@ export default function DashboardBuilder({
     pointerId: number;
     startX: number;
     startY: number;
+    originX: number;
+    originY: number;
     startWidth: number;
     startHeight: number;
+    direction: InspectorFloatingResizeDirection;
   } | null>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
     null,
@@ -11478,17 +11529,26 @@ export default function DashboardBuilder({
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
     if (effectiveInspectorMode !== "floating" || event.button !== 0) return;
+    const direction = event.currentTarget.dataset.direction as
+      | InspectorFloatingResizeDirection
+      | undefined;
+    if (!direction || !inspectorFloatingResizeDirections.includes(direction)) {
+      return;
+    }
     event.preventDefault();
     event.stopPropagation();
     inspectorFloatingResizeRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      originX: inspectorFloatingRect.x,
+      originY: inspectorFloatingRect.y,
       startWidth: inspectorFloatingRect.width,
       startHeight: inspectorFloatingRect.height,
+      direction,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
-    document.documentElement.style.cursor = "nwse-resize";
+    document.documentElement.style.cursor = inspectorFloatingResizeCursors[direction];
     document.body.style.userSelect = "none";
     setInspectorResizing(true);
   };
@@ -11499,11 +11559,25 @@ export default function DashboardBuilder({
     const resizeState = inspectorFloatingResizeRef.current;
     if (!resizeState || resizeState.pointerId !== event.pointerId) return;
     event.preventDefault();
+    const deltaX = event.clientX - resizeState.startX;
+    const deltaY = event.clientY - resizeState.startY;
+    const growsFromLeft = resizeState.direction.includes("w");
+    const growsFromTop = resizeState.direction.includes("n");
+    const growsToRight = resizeState.direction.includes("e");
+    const growsToBottom = resizeState.direction.includes("s");
     setInspectorFloatingRect((current) =>
       clampInspectorFloatingRect({
         ...current,
-        width: resizeState.startWidth + event.clientX - resizeState.startX,
-        height: resizeState.startHeight + event.clientY - resizeState.startY,
+        x: growsFromLeft ? resizeState.originX + deltaX : resizeState.originX,
+        y: growsFromTop ? resizeState.originY + deltaY : resizeState.originY,
+        width:
+          resizeState.startWidth +
+          (growsToRight ? deltaX : 0) -
+          (growsFromLeft ? deltaX : 0),
+        height:
+          resizeState.startHeight +
+          (growsToBottom ? deltaY : 0) -
+          (growsFromTop ? deltaY : 0),
       }),
     );
   };
@@ -14460,16 +14534,20 @@ export default function DashboardBuilder({
             </div>
           ) : null}
           {!elementLibraryOpen && effectiveInspectorMode === "floating" ? (
-            <div
-              className="builder-inspector-floating-resize-handle"
-              role="separator"
-              aria-label="Resize floating Inspector"
-              onPointerDown={startInspectorFloatingResize}
-              onPointerMove={moveInspectorFloatingResize}
-              onPointerUp={stopInspectorFloatingResize}
-              onPointerCancel={stopInspectorFloatingResize}
-              onLostPointerCapture={stopInspectorFloatingResize}
-            />
+            inspectorFloatingResizeDirections.map((direction) => (
+              <div
+                key={direction}
+                className={`builder-inspector-floating-resize-handle is-${direction}`}
+                data-direction={direction}
+                role="separator"
+                aria-label={`Resize floating Inspector from ${inspectorFloatingResizeLabels[direction]}`}
+                onPointerDown={startInspectorFloatingResize}
+                onPointerMove={moveInspectorFloatingResize}
+                onPointerUp={stopInspectorFloatingResize}
+                onPointerCancel={stopInspectorFloatingResize}
+                onLostPointerCapture={stopInspectorFloatingResize}
+              />
+            ))
           ) : null}
         </div>
       ) : null}

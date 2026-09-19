@@ -4,6 +4,7 @@ import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/bu
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
+import { InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 
 type Props = { block: BuilderLayoutBlock; tab: InspectorTab; update: (patch: Partial<BuilderLayoutBlock>) => void };
 type CoreProps = Props & { shellSettings: BuilderShellSettings };
@@ -15,7 +16,7 @@ const option = <T extends string>(value: T, label: string) => [{ value, label }]
 function TextContent({ block, update }: Pick<Props, "block" | "update">) {
   return <>
     <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? block.headingText ?? ""} onChange={(value) => update({ title: value, headingText: block.kind === "hero" ? value : block.headingText })} ariaLabel="Element title" /></InspectorFieldRow>
-    <InspectorFieldRow label="Body"><InspectorTextarea value={block.body ?? ""} onChange={(value) => update({ body: value })} ariaLabel="Element body" /></InspectorFieldRow>
+    <InspectorFieldRow label="Body"><InspectorContentEditor value={block.body ?? ""} onChange={(value) => update({ body: value })} placeholder="Write element content..." /></InspectorFieldRow>
   </>;
 }
 
@@ -27,7 +28,7 @@ export default function CoreContentCapabilityPanel({ block, tab, shellSettings, 
       {kind === "hero" && <>
         <InspectorFieldRow label="Eyebrow"><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => update({ eyebrow: value })} ariaLabel="Hero eyebrow" /></InspectorFieldRow>
         <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => update({ title: value })} ariaLabel="Hero title" /></InspectorFieldRow>
-        <InspectorFieldRow label="Body"><InspectorTextarea value={block.body ?? ""} onChange={(value) => update({ body: value })} ariaLabel="Hero body" /></InspectorFieldRow>
+        <InspectorFieldRow label="Body"><InspectorContentEditor value={block.body ?? ""} onChange={(value) => update({ body: value })} placeholder="Write hero content..." /></InspectorFieldRow>
       </>}
       {kind === "icon" && <>
         <InspectorFieldRow label="Icon">

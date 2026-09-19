@@ -16916,15 +16916,74 @@ body:has(.builder-dashboard[data-theme="light"]) .builder-row-layout-modal {
 .builder-inspector-floating-resize-handle {
   position: absolute;
   z-index: 40;
-  right: -3px;
-  bottom: -3px;
-  width: 22px;
-  height: 22px;
-  cursor: nwse-resize;
   touch-action: none;
 }
 
-.builder-inspector-floating-resize-handle::after {
+.builder-inspector-floating-resize-handle.is-n,
+.builder-inspector-floating-resize-handle.is-s {
+  right: 14px;
+  left: 14px;
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-n {
+  top: -5px;
+}
+
+.builder-inspector-floating-resize-handle.is-s {
+  bottom: -5px;
+}
+
+.builder-inspector-floating-resize-handle.is-e,
+.builder-inspector-floating-resize-handle.is-w {
+  top: 14px;
+  bottom: 14px;
+  width: 10px;
+  cursor: ew-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-e {
+  right: -5px;
+}
+
+.builder-inspector-floating-resize-handle.is-w {
+  left: -5px;
+}
+
+.builder-inspector-floating-resize-handle.is-ne,
+.builder-inspector-floating-resize-handle.is-se,
+.builder-inspector-floating-resize-handle.is-sw,
+.builder-inspector-floating-resize-handle.is-nw {
+  width: 14px;
+  height: 14px;
+}
+
+.builder-inspector-floating-resize-handle.is-ne {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-se {
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-nw {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.builder-inspector-floating-resize-handle.is-se::after {
   content: "";
   position: absolute;
   right: 5px;
@@ -21637,6 +21696,27 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 38%, var(--builder-ui-border));
   border-radius: 4px;
   background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+/* The final Inspector fidelity layer uses graphite controls by default. Keep
+   those controls authored by the dashboard light theme when hovered as well. */
+.builder-dashboard[data-theme="light"]
+  .builder-floating-inspector
+  .builder-inspector
+  .inspector-control {
+  border-color: var(--builder-ui-border, rgba(0, 0, 0, 0.12));
+  background-color: var(--builder-ui-surface, #f7f6f1);
+  color: var(--builder-ui-text-strong, #181815);
+  box-shadow: none;
+}
+
+.builder-dashboard[data-theme="light"]
+  .builder-floating-inspector
+  .builder-inspector
+  .inspector-control:hover {
+  border-color: var(--builder-ui-border-strong, rgba(0, 0, 0, 0.2));
+  background-color: var(--builder-ui-surface-hover, rgba(0, 0, 0, 0.06));
+  color: var(--builder-ui-text-strong, #181815);
 }
 
 /* Final insertion-control geometry. The row owns the editor chrome as well

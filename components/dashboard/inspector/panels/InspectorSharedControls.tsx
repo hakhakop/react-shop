@@ -11,7 +11,37 @@ import {
 import type { CategoryTreeItem } from "@/lib/categories";
 import { useInspector } from "@/components/dashboard/context/InspectorContext";
 import { InspectorSegmentedControl } from "@/components/dashboard/inspector/InspectorControls";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
 export { InspectorDivision } from "@/components/dashboard/inspector/InspectorControls";
+
+/**
+ * Canonical editor for semantic element content in the inspector.
+ * Technical fields such as CSS, attributes, URLs, and CSV data intentionally
+ * remain plain text controls.
+ */
+export function InspectorContentEditor({
+  value,
+  onChange,
+  placeholder = "Write your content...",
+  minHeight = "180px",
+  ariaLabel,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  minHeight?: string;
+  ariaLabel?: string;
+}) {
+  return (
+    <RichTextEditor
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      minHeight={minHeight}
+      ariaLabel={ariaLabel}
+    />
+  );
+}
 
 /**
  * Visual pill/indicator showing whether a property is inheriting from Global Settings or locally overridden.

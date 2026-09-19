@@ -11,7 +11,7 @@ import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
-import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import { BuilderImageUrlControl, InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import {
   TitleSettingsGroup,
   MetaSettingsGroup,
@@ -29,7 +29,6 @@ import {
   InspectorSelect,
   InspectorSwitch,
   InspectorTextField,
-  InspectorTextarea,
   InspectorDivision,
   InspectorAlignmentControl,
   InspectorMediaPlacementControl,
@@ -92,10 +91,10 @@ export function HeroCapabilityPanel({
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Body">
-            <InspectorTextarea
+            <InspectorContentEditor
               value={block.body ?? ""}
               onChange={(value) => update({ body: value })}
-              ariaLabel="Hero body"
+              placeholder="Write hero content..."
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Media source">
@@ -562,7 +561,7 @@ export function GridCapabilityPanel({
                       />
                     </InspectorFieldRow>
                     <InspectorFieldRow label="Body">
-                      <InspectorTextarea
+                      <InspectorContentEditor
                         value={item.text ?? ""}
                         onChange={(value) =>
                           updateItems(
@@ -573,7 +572,7 @@ export function GridCapabilityPanel({
                             ),
                           )
                         }
-                        ariaLabel={`Grid item ${index + 1} body`}
+                        placeholder="Write item content..."
                       />
                     </InspectorFieldRow>
                     <InspectorFieldRow label="Icon">

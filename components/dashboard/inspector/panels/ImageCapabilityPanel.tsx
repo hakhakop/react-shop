@@ -2,7 +2,7 @@
 
 import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
-import { BuilderImageUrlControl } from "./InspectorSharedControls";
+import { BuilderImageUrlControl, InspectorContentEditor } from "./InspectorSharedControls";
 import {
   InspectorDivision,
   InspectorFieldRow,
@@ -101,7 +101,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               <InspectorTextField value={image.meta ?? ""} onChange={(value) => update({ meta: value })} ariaLabel="Overlay meta" />
             </InspectorFieldRow>
             <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}>
-              <InspectorTextarea value={image.body ?? ""} onChange={(value) => update({ body: value })} ariaLabel="Overlay content" />
+              <InspectorContentEditor value={image.body ?? ""} onChange={(value) => update({ body: value })} placeholder="Write overlay content..." />
             </InspectorFieldRow>
             <InspectorFieldRow label="Hover Image">
               <BuilderImageUrlControl

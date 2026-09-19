@@ -20,7 +20,7 @@ import {
   MetaSettingsGroup,
   TitleSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
-import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import { BuilderImageUrlControl, InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import DynamicContentInspectorGroup, { DynamicContentSourceNotice, effectiveDynamicContentSource } from "@/components/dashboard/inspector/panels/DynamicContentInspectorGroup";
 import { ParallaxStopsEditor } from "@/components/dashboard/inspector/panels/ParallaxEditor";
 import {
@@ -273,7 +273,7 @@ export default function SliderCapabilityPanel({
           </InspectorFieldRow>
 
           <InspectorFieldRow label="Block Subtitle / Body">
-            <InspectorTextarea
+            <InspectorContentEditor
               value={rawBlock.body ?? ""}
               onChange={(value: string) => update({ body: value })}
               placeholder={`${elementLabel} intro text...`}
@@ -419,7 +419,7 @@ export default function SliderCapabilityPanel({
                             value={slide.text ?? ""}
                             onChange={(value) => updateSlide({ text: value })}
                             placeholder={`${itemLabel} content...`}
-                            minHeight="120px"
+                            minHeight="180px"
                           />
                         </>
                       </InspectorFieldRow>

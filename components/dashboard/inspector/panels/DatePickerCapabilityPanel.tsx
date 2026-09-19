@@ -3,11 +3,11 @@
 import React from "react";
 import type { BuilderLayoutBlock, InspectorTab, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import {
   InspectorDivision,
   InspectorFieldRow,
   InspectorTextField,
-  InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
@@ -44,7 +44,7 @@ export default function DatePickerCapabilityPanel({ block, tab, update }: Props)
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Body">
-            <InspectorTextarea
+            <InspectorContentEditor
               value={rawBlock.body ?? ""}
               onChange={(body) => update({ body } as any)}
               placeholder="Optional description"

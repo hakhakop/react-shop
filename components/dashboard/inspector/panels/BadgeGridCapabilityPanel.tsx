@@ -4,12 +4,12 @@ import React from "react";
 import type { BuilderLayoutBlock, InspectorTab, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import { InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import {
   InspectorDivision,
   InspectorFieldRow,
   InspectorSelect,
   InspectorTextField,
-  InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
@@ -103,7 +103,7 @@ export default function BadgeGridCapabilityPanel({ block, tab, update }: Props) 
                     />
                   </InspectorFieldRow>
                   <InspectorFieldRow label="Body">
-                    <InspectorTextarea
+                    <InspectorContentEditor
                       value={item.body ?? ""}
                       onChange={(body) => updateItem({ body })}
                       placeholder="Badge description"
@@ -124,7 +124,7 @@ export default function BadgeGridCapabilityPanel({ block, tab, update }: Props) 
             />
           </InspectorFieldRow>
           <InspectorFieldRow label="Block Body">
-            <InspectorTextarea
+            <InspectorContentEditor
               value={rawBlock.body ?? ""}
               onChange={(body) => update({ body } as any)}
               placeholder="Optional section body"

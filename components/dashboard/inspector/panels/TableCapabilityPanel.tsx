@@ -87,7 +87,7 @@ export default function TableCapabilityPanel({ block, tab, shellSettings, update
                   <InspectorTextField value={item.meta ?? ""} onChange={(value) => updateItem(index, { meta: value })} ariaLabel={`Table item ${index + 1} meta`} />
                 </InspectorFieldRow>}
                 {fields.has("content") && <InspectorFieldRow label="Content">
-                  <RichTextEditor value={item.content ?? ""} onChange={(value) => updateItem(index, { content: value })} minHeight="120px" />
+                  <RichTextEditor value={item.content ?? ""} onChange={(value) => updateItem(index, { content: value })} minHeight="180px" />
                 </InspectorFieldRow>}
                 {fields.has("link") && <>
                   <InspectorFieldRow label="Link URL">

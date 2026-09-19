@@ -21,7 +21,7 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
       <div className="builder-inspector-stack" data-uikit-capability="text-content">
         <div className="builder-element-inspector-note"><strong>Rich text content</strong><span>WebPages owns the semantic HTML and inline formatting.</span></div>
         <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}>
-          <RichTextEditor value={block.body ?? ""} onChange={(body) => update({ body })} placeholder="Write your text..." minHeight="180px" />
+          <RichTextEditor value={block.body ?? ""} onChange={(body) => update({ body })} placeholder="Write your text..." minHeight="180px" ariaLabel="Text content" />
         </InspectorFieldRow>
       </div>
     );

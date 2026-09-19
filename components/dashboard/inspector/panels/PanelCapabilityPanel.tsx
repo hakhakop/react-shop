@@ -2,8 +2,8 @@
 
 import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import { InspectorFieldRow, InspectorTextField, InspectorTextarea, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
+import { BuilderImageUrlControl, InspectorContentEditor } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import { InspectorFieldRow, InspectorTextField, inspectorDynamicBinding } from "@/components/dashboard/inspector/InspectorControls";
 import {
   ImageSettingsGroup,
   CardSettingsGroup,
@@ -106,7 +106,7 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           </div>
           <InspectorFieldRow label="Meta" dynamicBinding={inspectorDynamicBinding(block, update, "eyebrow")}><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => updateSemantic({ eyebrow: value })} ariaLabel="Panel meta" /></InspectorFieldRow>
           <InspectorFieldRow label="Title" dynamicBinding={inspectorDynamicBinding(block, update, "title")}><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
-          <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}><InspectorTextarea value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} ariaLabel="Panel content" /></InspectorFieldRow>
+          <InspectorFieldRow label="Content" dynamicBinding={inspectorDynamicBinding(block, update, "body")}><InspectorContentEditor value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} placeholder="Write panel content..." /></InspectorFieldRow>
           <ActionSettingsGroup
             block={block}
             update={updateSemantic}

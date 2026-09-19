@@ -1914,7 +1914,6 @@
                     "gridMetaHtmlElement": "div",
                     "textAlign": "center",
                     "headingAlign": "center",
-                    "elementPadding": "none",
                     "spacingContract": "yootheme"
                   }
                 ]
@@ -4188,7 +4187,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-16T08:36:22.290Z"
+    "updatedAt": "2026-09-19T08:06:50.299Z"
   },
   "shop": {
     "version": 1,
@@ -6295,8 +6294,6 @@
                     "imageUrl": "https://shop2.webpages.am/wp-content/uploads/yootheme/icon-truck.svg",
                     "imageIntrinsicWidth": 100,
                     "imageIntrinsicHeight": 100,
-                    "imageIntrinsicWidth": 100,
-                    "imageIntrinsicHeight": 100,
                     "imageAlt": "Free Standard Delivery",
                     "title": "Free Standard Delivery",
                     "meta": "",
@@ -6313,8 +6310,6 @@
                     "imageUrl": "https://shop2.webpages.am/wp-content/uploads/yootheme/icon-return.svg",
                     "imageIntrinsicWidth": 100,
                     "imageIntrinsicHeight": 100,
-                    "imageIntrinsicWidth": 100,
-                    "imageIntrinsicHeight": 100,
                     "imageAlt": "30-Days Return Policy",
                     "title": "30-Days Return Policy",
                     "meta": "",
@@ -6329,8 +6324,6 @@
                   {
                     "id": "yootheme-grid-item-0-0-0-0-2",
                     "imageUrl": "https://shop2.webpages.am/wp-content/uploads/yootheme/icon-secure-pay.svg",
-                    "imageIntrinsicWidth": 100,
-                    "imageIntrinsicHeight": 100,
                     "imageIntrinsicWidth": 100,
                     "imageIntrinsicHeight": 100,
                     "imageAlt": "Secure Payments",

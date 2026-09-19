@@ -30,13 +30,15 @@ type RichTextEditorProps = {
   onChange: (html: string) => void;
   placeholder?: string;
   minHeight?: string;
+  ariaLabel?: string;
 };
 
 export default function RichTextEditor({
   value,
   onChange,
   placeholder = "Write...",
-  minHeight = "120px",
+  minHeight = "180px",
+  ariaLabel,
 }: RichTextEditorProps) {
   const [mode, setMode] = useState<"visual" | "html">("visual");
   const [sourceValue, setSourceValue] = useState(value);
@@ -55,6 +57,12 @@ export default function RichTextEditor({
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder }),
     ],
+    editorProps: {
+      attributes: {
+        "aria-multiline": "true",
+        ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
+      },
+    },
     content: value,
     onUpdate: ({ editor }) => {
       visualWasEdited.current = true;
