@@ -121,6 +121,13 @@ export function resolveBuilderPersistenceTarget(input: {
     }
     return { kind: "document", documentId: requestedDocumentId };
   }
+  // Header and Footer remain standalone shell documents even when the URL
+  // carries the contextual page that opened them (for example
+  // `?page=header&context=home`). The page context is useful for navigation,
+  // but it is not the persistence owner for the shell document.
+  if (input.page === "header" || input.page === "footer") {
+    return { kind: "page" };
+  }
   // Header and Footer are standalone shell documents owned by the canonical
   // page-store endpoint. They do not receive a page-level editor context, so
   // their absence of context is expected rather than a reason to disable save.

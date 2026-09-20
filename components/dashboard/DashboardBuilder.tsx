@@ -3056,9 +3056,7 @@ export default function DashboardBuilder({
   const [footerSelected, setFooterSelected] = useState(false);
   const [headerHovered, setHeaderHovered] = useState(false);
   const [draggingHeaderElementId, setDraggingHeaderElementId] = useState<string | null>(null);
-  const [draggingHeaderRowId, setDraggingHeaderRowId] = useState<string | null>(null);
   const [headerDropTarget, setHeaderDropTarget] = useState<string | null>(null);
-  const [headerRowDropTarget, setHeaderRowDropTarget] = useState<string | null>(null);
 
   useEffect(() => {
     const clearHeaderDragState = () => {
@@ -5278,6 +5276,7 @@ export default function DashboardBuilder({
       : null;
     if (activeShellEntry && activeShellDocumentKey === activeHeaderDocumentKey) {
       headerRouteHydrationRef.current = routeIdentity;
+      setPublishedDocumentReady(true);
       return;
     }
     headerRouteHydrationRef.current = routeIdentity;
@@ -5521,6 +5520,13 @@ export default function DashboardBuilder({
     undoHistoryRef.current = [structuredClone(nextState)];
     setCommittedBuilderStateSignature(JSON.stringify(nextState));
     setBuilderState(nextState);
+    // Header and Footer are already resolved through their shell document
+    // loader before this transition commits. Keep the publish control usable
+    // for edits made immediately after entering a shell document; the normal
+    // page loader will continue to manage readiness for ordinary pages.
+    if (nextKey === "header" || nextKey === "footer") {
+      setPublishedDocumentReady(true);
+    }
     setSelectedId("");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
@@ -8100,58 +8106,6 @@ export default function DashboardBuilder({
       ...(targetBlockId ? { targetBlockKey: targetBlockId, placement } : { placement }),
     });
     setPublishStatus("Header element moved");
-  };
-
-  const moveHeaderBuilderRow = ({
-    sourceRowId,
-    targetRowId,
-    placement,
-  }: {
-    sourceRowId: string;
-    targetRowId: string;
-    placement: "before" | "after";
-  }) => {
-    if (sourceRowId === targetRowId) return;
-    setBuilderState((current) => {
-      if (current.page !== "header") return current;
-      const sections = current.sections.map((section) => {
-        if (section.id !== activeHeaderDocumentSectionId || !isLayoutContainerSection(section)) return section;
-        if (section.rows !== undefined) {
-          const sourceIndex = section.rows.findIndex((row) => row.id === sourceRowId);
-          const targetIndex = section.rows.findIndex((row) => row.id === targetRowId);
-          if (sourceIndex < 0 || targetIndex < 0) return section;
-          const nextRows = [...section.rows];
-          const [sourceRow] = nextRows.splice(sourceIndex, 1);
-          if (!sourceRow) return section;
-          const adjustedTargetIndex = nextRows.findIndex((row) => row.id === targetRowId);
-          nextRows.splice(
-            Math.max(0, adjustedTargetIndex + (placement === "after" ? 1 : 0)),
-            0,
-            sourceRow,
-          );
-          return { ...section, rows: nextRows };
-        }
-        const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
-        const sourceIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === sourceRowId));
-        const targetIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === targetRowId));
-        if (sourceIndex < 0 || targetIndex < 0) return section;
-
-        const nextRows = [...rows];
-        const [sourceRow] = nextRows.splice(sourceIndex, 1);
-        if (!sourceRow) return section;
-        const adjustedTargetIndex = nextRows.findIndex((row) => row === rows[targetIndex]);
-        const insertIndex = adjustedTargetIndex + (placement === "after" ? 1 : 0);
-        nextRows.splice(Math.max(0, insertIndex), 0, sourceRow);
-        return { ...section, headerUtilityMigrationVersion: 3 as const, layoutItems: nextRows.flatMap((row) => row.items) };
-      });
-      return { ...current, sections };
-    });
-
-    setSelectedId(activeHeaderDocumentSectionId);
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(null);
-    setSelectedLayoutBlockKey(null);
-    setPublishStatus("Header row moved");
   };
 
   const createLayoutBlockAtDrop = ({
@@ -14328,7 +14282,7 @@ export default function DashboardBuilder({
             >
               {builderState.page === "header" && (
                 <div
-                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === activeHeaderDocumentSectionId && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === activeHeaderDocumentSectionId ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
+                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === activeHeaderDocumentSectionId && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === activeHeaderDocumentSectionId ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
                   onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: activeHeaderDocumentSectionId })}
                   onMouseLeave={() => setHoveredBuilderTarget(null)}
                   onDragOver={(event) => {
@@ -14345,32 +14299,18 @@ export default function DashboardBuilder({
                   }}
                   onDragEndCapture={() => {
                     setDraggingHeaderElementId(null);
-                    setDraggingHeaderRowId(null);
                     setHeaderDropTarget(null);
-                    setHeaderRowDropTarget(null);
                   }}
                   onDropCapture={() => {
                     window.setTimeout(() => {
                       setDraggingHeaderElementId(null);
-                      setDraggingHeaderRowId(null);
                       setHeaderDropTarget(null);
-                      setHeaderRowDropTarget(null);
                     }, 0);
                   }}
                 >
                   {!currentHeaderDocumentSettings.visible ? (
                     <span className="builder-header-hidden-badge">Header hidden on website</span>
                   ) : null}
-                  <BuilderContextToolbar
-                    context="shell"
-                    label="Header"
-                    canMoveUp={false}
-                    canMoveDown={false}
-                    canDelete={false}
-                    onSelect={() => selectShellRoot("header")}
-                    onSettings={openHeaderDocumentInspector}
-                    onBackToPage={builderState.page === "header" ? exitShellEdit : undefined}
-                  />
                   <HeaderShellView
                     layoutOverride={shellSettings.headerLayout}
                     shellSettings={shellSettings}
@@ -14397,10 +14337,6 @@ export default function DashboardBuilder({
                     onContentLanguageChange={setContentLanguage}
                     renderBuilderElement={(element, content, flexItemStyle) => {
                       const columnId = element.columnId ?? "header-main-row";
-                      const columnElements = currentHeaderComposition.elements.filter(
-                        (candidate) => candidate.columnId === element.columnId,
-                      );
-                      const elementIndex = columnElements.findIndex((candidate) => candidate.id === element.id);
                       const dragPlacement = headerDropTarget?.startsWith(`${element.id}:`)
                         ? headerDropTarget.slice(element.id.length + 1) as "above" | "below"
                         : null;
@@ -14461,7 +14397,6 @@ export default function DashboardBuilder({
                             }));
                             event.dataTransfer.effectAllowed = "move";
                             setDraggingHeaderElementId(element.id);
-                            setDraggingHeaderRowId(null);
                             createDragGhost(event, element.type);
                           }}
                           onDragOver={(event) => {
@@ -14497,17 +14432,6 @@ export default function DashboardBuilder({
                             setHeaderDropTarget(null);
                           }}
                         >
-                          <BuilderElementToolbar
-                            label={element.type}
-                            canMoveUp={elementIndex > 0}
-                            canMoveDown={elementIndex >= 0 && elementIndex < columnElements.length - 1}
-                            onSettings={() => selectLayoutBlock(activeHeaderDocumentSectionId, columnId, element.id, true)}
-                            onMoveUp={() => moveLayoutBlockWithinColumn({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id, direction: -1 })}
-                            onMoveDown={() => moveLayoutBlockWithinColumn({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id, direction: 1 })}
-                            onSave={() => saveElementTemplateByKey(activeHeaderDocumentSectionId, columnId, element.id)}
-                            onDuplicate={() => duplicateLayoutBlock({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id })}
-                            onDelete={() => deleteLayoutBlock({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id })}
-                          />
                           <span className="builder-preview-drag-handle" aria-hidden="true">::</span>
                           <div className="builder-header-live-element-content">
                             {content}
@@ -14515,12 +14439,13 @@ export default function DashboardBuilder({
                         </div>
                       );
                     }}
-                    renderMobileDialogElement={headerBuilderView !== "mobile" ? undefined : (element, content) => {
+                    renderMobileDialogElement={headerBuilderView !== "mobile" ? undefined : (element, content, flexItemStyle) => {
                       const columnId = element.columnId ?? "header-mobile-dialog-row";
                       const dialogSectionId = headerBuilderDocumentSectionId("header-mobile-dialog");
                       return (
                         <div
                           id={element.id}
+                          style={flexItemStyle}
                           className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${hoveredBuilderTarget?.type === "block" && hoveredBuilderTarget.blockKey === element.id ? " is-hovered-block" : ""}`}
                           data-header-element={element.type}
                           onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
@@ -14532,17 +14457,6 @@ export default function DashboardBuilder({
                             selectLayoutBlock(dialogSectionId, columnId, element.id, true);
                           }}
                         >
-                          <BuilderElementToolbar
-                            label={element.type}
-                            canMoveUp={false}
-                            canMoveDown={false}
-                            onSettings={() => selectLayoutBlock(dialogSectionId, columnId, element.id, true)}
-                            onMoveUp={() => undefined}
-                            onMoveDown={() => undefined}
-                            onSave={() => saveElementTemplateByKey(dialogSectionId, columnId, element.id)}
-                            onDuplicate={() => duplicateLayoutBlock({ sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
-                            onDelete={() => deleteLayoutBlock({ sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
-                          />
                           <div className="builder-header-live-element-content">{content}</div>
                         </div>
                       );
@@ -14611,56 +14525,6 @@ export default function DashboardBuilder({
                           onMouseEnter={() => setHoveredBuilderTarget({ type: "row", sectionId: activeHeaderDocumentSectionId, rowIndex })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
                         >
-                          {(["before", "after"] as const).map((placement) => (
-                            <span
-                              key={placement}
-                              className={`builder-header-row-drop-target is-${placement}${headerRowDropTarget === `${rowId}:${placement}` ? " is-active" : ""}`}
-                              onDragOver={(event) => {
-                                if (!event.dataTransfer.types.includes("application/x-builder-header-row")) return;
-                                event.preventDefault();
-                                event.stopPropagation();
-                                setHeaderRowDropTarget(`${rowId}:${placement}`);
-                                event.dataTransfer.dropEffect = "move";
-                              }}
-                              onDragLeave={() => setHeaderRowDropTarget((current) => current === `${rowId}:${placement}` ? null : current)}
-                              onDrop={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                const sourceRowId = event.dataTransfer.getData("application/x-builder-header-row");
-                                if (sourceRowId && sourceRowId !== rowId) {
-                                  moveHeaderBuilderRow({ sourceRowId, targetRowId: rowId, placement });
-                                }
-                                setHeaderRowDropTarget(null);
-                              }}
-                              aria-hidden="true"
-                            />
-                          ))}
-                          <div className="builder-preview-row-toolbar builder-header-live-row-tools">
-                            <span>Row Layout</span>
-                            <button
-                              type="button"
-                              className="builder-header-row-drag-handle"
-                              title={`Drag Header Row ${rowIndex + 1}`}
-                              aria-label={`Drag Header Row ${rowIndex + 1}`}
-                              draggable
-                              onPointerDown={(event) => event.stopPropagation()}
-                              onDragStart={(event) => {
-                                event.stopPropagation();
-                                event.dataTransfer.setData("application/x-builder-header-row", rowId);
-                                event.dataTransfer.effectAllowed = "move";
-                                setDraggingHeaderRowId(rowId);
-                                setDraggingHeaderElementId(null);
-                              }}
-                              onDragEnd={(event) => {
-                                event.stopPropagation();
-                                setDraggingHeaderRowId(null);
-                                setHeaderRowDropTarget(null);
-                              }}
-                            ><GripVertical size={12} /></button>
-                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow(activeHeaderDocumentSectionId, rowIndex, true)}><Settings2 size={12} /></button>
-                            <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow(activeHeaderDocumentSectionId, rowIndex)}><Copy size={12} /></button>
-                            <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow(activeHeaderDocumentSectionId, rowIndex)}><Trash2 size={12} /></button>
-                          </div>
                           {content}
                           <button
                             type="button"
@@ -14987,7 +14851,7 @@ export default function DashboardBuilder({
           </motion.div>
         </div>
         )}
-        {iframeComparisonMode && (iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "toolbar" || iframeDiagnosticMode === "full") ? (
+        {iframeComparisonMode && builderState.page !== "header" && (iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "toolbar" || iframeDiagnosticMode === "full") ? (
           <IframeBuilderInteractionLayer
             target={iframeSelectedTarget}
             rect={iframeSelectionRect}
@@ -15027,14 +14891,10 @@ export default function DashboardBuilder({
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
-            onMoveRow={moveLayoutRow}
-            onDuplicateRow={duplicateLayoutRow}
-            onDeleteRow={deleteEmptyRow}
             onMoveBlock={moveLayoutBlockWithinColumn}
             onDuplicateBlock={duplicateLayoutBlock}
             onDeleteBlock={deleteLayoutBlock}
             onSaveSection={saveSectionTemplateById}
-            onSaveRow={saveRowTemplateByIndex}
             onSaveBlock={saveElementTemplateByKey}
             onAddSection={(sectionId) => addWireframeNear(1, 1, sectionId, "below", undefined, "section")}
             onAddRow={(sectionId, rowIndex) => addRowNear(sectionId, rowIndex, "after", "whole")}
@@ -16732,7 +16592,6 @@ function PreviewCanvas({
         onAddSection={onAddSection}
         onSelectTarget={selectInteractionTarget}
         onSelect={onSelect}
-        onSelectRow={onSelectRow}
         onSelectColumn={onSelectColumn}
         onSelectBlock={onSelectBlock}
         onOpenInspector={onOpenInspector}
@@ -16740,17 +16599,13 @@ function PreviewCanvas({
         onDuplicateSection={onDuplicateSection}
         onDeleteSection={onDeleteSection}
         onSaveSectionTemplate={onSaveSectionTemplate}
-        onChangeLayout={onChangeSectionLayout}
-        onMoveRow={onMoveRow}
-        onDuplicateRow={onDuplicateRow}
-        onDeleteRow={onDeleteRow}
-        onSaveRowTemplate={onSaveRowTemplate}
         onMoveBlock={onMoveBlock}
         onMoveBlockWithinColumn={onMoveBlockWithinColumn}
         onDuplicateBlock={onDuplicateBlock}
         onDeleteBlock={onDeleteBlock}
         onSaveElementTemplate={onSaveElementTemplate}
         onFollowLink={onFollowLink}
+        showCanvasToolbar={page !== "header"}
       />
       </div>
     </BuilderCarouselGeometryCoordinator>
@@ -17656,14 +17511,10 @@ function IframeBuilderInteractionLayer({
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
-  onMoveRow,
-  onDuplicateRow,
-  onDeleteRow,
   onMoveBlock,
   onDuplicateBlock,
   onDeleteBlock,
   onSaveSection,
-  onSaveRow,
   onSaveBlock,
   onAddSection,
   onAddRow,
@@ -17681,14 +17532,10 @@ function IframeBuilderInteractionLayer({
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
-  onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
-  onDuplicateRow: (sectionId: string, rowIndex: number) => void;
-  onDeleteRow: (sectionId: string, rowIndex: number) => void;
   onMoveBlock: (payload: { sectionId: string; columnKey: string; blockKey: string; direction: -1 | 1 }) => void;
   onDuplicateBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
   onDeleteBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
   onSaveSection: (sectionId: string) => void;
-  onSaveRow: (sectionId: string, rowIndex: number) => void;
   onSaveBlock: (sectionId: string, columnKey: string, blockKey: string) => void;
   onAddSection: (sectionId: string) => void;
   onAddRow: (sectionId: string, rowIndex: number) => void;
@@ -17699,12 +17546,14 @@ function IframeBuilderInteractionLayer({
   if (!section) return null;
   const iframeDocument = iframeRef.current?.contentDocument;
   if (!iframeDocument?.body) return null;
+  // Rows remain selectable through the structure tree, but do not create a
+  // floating action toolbar. Row actions are intentionally kept out of the
+  // canvas to avoid duplicating the structure tree controls.
+  if (target.type === "row") return null;
   const rows = resolveBuilderSectionStructure(section).rows;
-  const rowIndex = target.type === "row"
-    ? target.rowIndex
-    : target.type === "column" || target.type === "block"
-      ? rows.findIndex((row) => row.columns.some((column) => column.column.id === target.columnKey))
-      : -1;
+  const rowIndex = target.type === "column" || target.type === "block"
+    ? rows.findIndex((row) => row.columns.some((column) => column.column.id === target.columnKey))
+    : -1;
   const toolbarTop = rect.top + rect.height + 8;
   const toolbarLeft = rect.left + rect.width / 2;
   let actions: ReactNode = null;
@@ -17715,14 +17564,6 @@ function IframeBuilderInteractionLayer({
       onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }}
       onMoveUp={() => onMoveSection(target.sectionId, -1)} onMoveDown={() => onMoveSection(target.sectionId, 1)}
       onSave={() => onSaveSection(target.sectionId)} onDuplicate={() => onDuplicateSection(target.sectionId)} onDelete={() => onDeleteSection(target.sectionId)} />;
-  } else if (target.type === "row") {
-    const row = rows[target.rowIndex];
-    const empty = Boolean(row?.columns.every((column) => column.column.elements.length === 0));
-    actions = <BuilderContextToolbar context="layout" label={`Row ${target.rowIndex + 1}`}
-      canMoveUp={target.rowIndex > 0} canMoveDown={target.rowIndex < rows.length - 1} canDelete={empty}
-      onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }}
-      onMoveUp={() => onMoveRow(target.sectionId, target.rowIndex, -1)} onMoveDown={() => onMoveRow(target.sectionId, target.rowIndex, 1)}
-      onSave={() => onSaveRow(target.sectionId, target.rowIndex)} onDuplicate={() => onDuplicateRow(target.sectionId, target.rowIndex)} onDelete={() => onDeleteRow(target.sectionId, target.rowIndex)} />;
   } else if (target.type === "column") {
     actions = <BuilderContextToolbar context="layout" label="Column" canMoveUp={false} canMoveDown={false} canDelete={false}
       onSettings={() => { onSelectTarget(target, true); onOpenInspector(); }} />;
@@ -17781,7 +17622,6 @@ function BuilderInteractionLayer({
   onAddSection,
   onSelectTarget,
   onSelect,
-  onSelectRow,
   onSelectColumn,
   onSelectBlock,
   onOpenInspector,
@@ -17789,17 +17629,13 @@ function BuilderInteractionLayer({
   onDuplicateSection,
   onDeleteSection,
   onSaveSectionTemplate,
-  onChangeLayout,
-  onMoveRow,
-  onDuplicateRow,
-  onDeleteRow,
-  onSaveRowTemplate,
   onMoveBlock,
   onMoveBlockWithinColumn,
   onDuplicateBlock,
   onDeleteBlock,
   onSaveElementTemplate,
   onFollowLink,
+  showCanvasToolbar,
 }: {
   canvasRef: { current: HTMLDivElement | null };
   externalInteractionRootRef?: { current: HTMLDivElement | null };
@@ -17814,7 +17650,6 @@ function BuilderInteractionLayer({
   onAddSection: (targetSectionId: string, placement: "above" | "below") => void;
   onSelectTarget: (target: BuilderInteractionTarget) => void;
   onSelect: (sectionId: string) => void;
-  onSelectRow: (sectionId: string, rowIndex: number) => void;
   onSelectColumn: (sectionId: string, columnKey: string) => void;
   onSelectBlock: (sectionId: string, columnKey: string, blockKey: string) => void;
   onOpenInspector: () => void;
@@ -17822,11 +17657,6 @@ function BuilderInteractionLayer({
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
   onSaveSectionTemplate: (sectionId: string) => void;
-  onChangeLayout: (sectionId: string, rowIndex: number) => void;
-  onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
-  onDuplicateRow: (sectionId: string, rowIndex: number) => void;
-  onDeleteRow: (sectionId: string, rowIndex: number) => void;
-  onSaveRowTemplate: (sectionId: string, rowIndex: number) => void;
   onMoveBlock: (payload: {
     sectionId: string;
     targetSectionId?: string;
@@ -17841,6 +17671,7 @@ function BuilderInteractionLayer({
   onDeleteBlock: (payload: { sectionId: string; columnKey: string; blockKey: string }) => void;
   onSaveElementTemplate: (sectionId: string, columnKey: string, blockKey: string) => void;
   onFollowLink: (href: string) => void;
+  showCanvasToolbar: boolean;
 }) {
   const selectedVisualTarget = editingTarget ?? selectedTarget;
   // This layer is portaled to document.body. Keep its first client render
@@ -18180,22 +18011,7 @@ function BuilderInteractionLayer({
         onSave={() => onSaveSectionTemplate(section.id)} onDuplicate={() => onDuplicateSection(section.id)}
         onDelete={() => onDeleteSection(section.id)} />;
     }
-    if (target.type === "row") {
-      const rows = resolveBuilderSectionStructure(section).rows;
-      const row = rows[target.rowIndex];
-      if (!row) return null;
-      const preset = getBuilderRowLayoutPreset(row.row.layout);
-      const isEmpty = row.columns.every(
-        (column) => column.column.elements.length === 0,
-      );
-      return <BuilderContextToolbar context="layout" label={preset?.label ? `Layout · ${preset.label}` : "Layout"}
-        canMoveUp={target.rowIndex > 0} canMoveDown={target.rowIndex < rows.length - 1} canDelete={isEmpty}
-        onChangeLayout={() => onChangeLayout(section.id, target.rowIndex)}
-        onSettings={() => { onSelectRow(section.id, target.rowIndex); onOpenInspector(); }}
-        onMoveUp={() => onMoveRow(section.id, target.rowIndex, -1)} onMoveDown={() => onMoveRow(section.id, target.rowIndex, 1)}
-        onSave={() => onSaveRowTemplate(section.id, target.rowIndex)} onDuplicate={() => onDuplicateRow(section.id, target.rowIndex)}
-        onDelete={() => onDeleteRow(section.id, target.rowIndex)} />;
-    }
+    if (target.type === "row") return null;
     if (target.type === "column") {
       return <BuilderContextToolbar context="layout" label="Column"
         canMoveUp={false} canMoveDown={false} canDelete={false}
@@ -18255,7 +18071,7 @@ function BuilderInteractionLayer({
           style={{ display: "none" }}
         />
       </div>
-      {selectedVisualTarget && selectedHierarchy && !editingTarget ? (
+      {showCanvasToolbar && selectedVisualTarget && selectedHierarchy && selectedVisualTarget.type !== "row" && !editingTarget ? (
         <div
           className={`builder-fixed-selection-toolbar${selectedRect ? " is-anchored" : ""}${selectedVisualTarget.type === "block" ? " is-element" : ""}`}
           ref={selectedToolbarRef}

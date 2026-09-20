@@ -846,61 +846,119 @@ export default function HeaderShellView({
   const getMobileDrawerContent = () => {
     if (activeHeaderVariant !== "mobile" || !mobileDialogComposition?.elements.length) return undefined;
     const dialogSettings = activeDialogSettings ?? documentSettings;
-    return (
-      <div className="mobile-drawer-builder-content" data-mobile-dialog-builder-content>
-        {mobileDialogComposition.elements.map((element) => {
-          let content: ReactNode = null;
-          if (element.type === "navigation") content = renderMobileDialogNavigation(element);
-          if (element.type === "logo") content = renderLogoAndBrand(element);
-          if (element.type === "button") content = renderHeaderButton(element);
-          if (element.type === "spacer") content = <span className="header-builder-spacer-content" aria-hidden="true" />;
-          if (element.type === "social") content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
-          if (element.type === "utility" && element.utilityAction) {
-            content = element.utilityAction === "search"
-              ? <HeaderSearchControl layout={dialogSettings.searchLayout} stretch={dialogSettings.searchDropdownStretch} large={dialogSettings.searchDropdownLarge} iconPosition={dialogSettings.searchIconPosition} expandInput={dialogSettings.searchExpand} preventSubmit={dialogSettings.searchPreventSubmit} dropbarAnimation={dialogSettings.searchDropbarAnimation} removeHorizontalPadding={dialogSettings.searchDropbarRemoveHorizontalPadding} />
-              : <HeaderActions icons={[element.utilityAction as BuilderHeaderIconId]} iconVariant={(element.utilityVariant as BuilderHeaderIconVariant | undefined) ?? effectiveIconVariant} />;
-          }
-          if (element.type === "categories") content = renderCategoriesMega(element);
-          if (element.type === "language") {
-            content = (
-              <WebsiteLanguageSwitcher
-                activeLanguage={activeContentLanguage}
-                enabledLanguages={enabledContentLanguages}
-                preferenceKey={languagePreferenceKey}
-                previewOnly={languageSwitcherPreviewOnly}
-                display={element.languageDisplay}
-                onLanguageChange={onContentLanguageChange}
-                triggerStyle={typographyProps(element.typography, "button").style}
-              />
+    const dialogElements = mobileDialogComposition.elements;
+    const dialogColumns = mobileDialogComposition.columns ?? [];
+    const declaredRowIds = [
+      ...(mobileDialogComposition.rows ?? []).map((row) => row.rowId),
+      ...dialogColumns.map((column) => column.rowId),
+      ...dialogElements.map((element) => element.rowId),
+    ].filter((rowId): rowId is string => Boolean(rowId));
+    const dialogRowIds = Array.from(new Set(declaredRowIds));
+    const rowIds = dialogRowIds.length ? dialogRowIds : [mobileDialogSectionId];
+
+    const renderMobileDrawerElement = (
+      element: HeaderBuilderElement,
+      flexItemStyle: CSSProperties = {},
+    ) => {
+      let content: ReactNode = null;
+      if (element.type === "navigation") content = renderMobileDialogNavigation(element);
+      if (element.type === "logo") content = renderLogoAndBrand(element);
+      if (element.type === "button") content = renderHeaderButton(element);
+      if (element.type === "spacer") content = <span className="header-builder-spacer-content" aria-hidden="true" />;
+      if (element.type === "social") content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
+      if (element.type === "utility" && element.utilityAction) {
+        content = element.utilityAction === "search"
+          ? <HeaderSearchControl layout={dialogSettings.searchLayout} stretch={dialogSettings.searchDropdownStretch} large={dialogSettings.searchDropdownLarge} iconPosition={dialogSettings.searchIconPosition} expandInput={dialogSettings.searchExpand} preventSubmit={dialogSettings.searchPreventSubmit} dropbarAnimation={dialogSettings.searchDropbarAnimation} removeHorizontalPadding={dialogSettings.searchDropbarRemoveHorizontalPadding} />
+          : <HeaderActions icons={[element.utilityAction as BuilderHeaderIconId]} iconVariant={(element.utilityVariant as BuilderHeaderIconVariant | undefined) ?? effectiveIconVariant} />;
+      }
+      if (element.type === "categories") content = renderCategoriesMega(element);
+      if (element.type === "language") {
+        content = (
+          <WebsiteLanguageSwitcher
+            activeLanguage={activeContentLanguage}
+            enabledLanguages={enabledContentLanguages}
+            preferenceKey={languagePreferenceKey}
+            previewOnly={languageSwitcherPreviewOnly}
+            display={element.languageDisplay}
+            onLanguageChange={onContentLanguageChange}
+            triggerStyle={typographyProps(element.typography, "button").style}
+          />
+        );
+      }
+      if (!content) return null;
+      const elementContent = (
+        <div
+          className={`mobile-drawer-builder-element mobile-drawer-builder-element--${element.type}`}
+          style={visualStyleToCss(element.visualStyle)}
+        >
+          {content}
+        </div>
+      );
+      if (renderMobileDialogElementProp) {
+        return <div key={element.id} style={{ display: "contents" }}>{renderMobileDialogElementProp(element, elementContent, flexItemStyle)}</div>;
+      }
+      if (builderInteractionIdentity) {
+        return (
+          <div
+            key={element.id}
+            style={flexItemStyle}
+            data-builder-object-type="block"
+            data-builder-section-id={mobileDialogSectionId}
+            data-builder-column-key={element.columnId ?? "header-mobile-dialog-row"}
+            data-builder-block-key={element.id}
+          >
+            {elementContent}
+          </div>
+        );
+      }
+      return <div key={element.id} style={flexItemStyle}>{elementContent}</div>;
+    };
+
+    const renderMobileDrawerRow = (rowId: string) => {
+      const rowElements = dialogElements.filter((element) => !element.rowId || element.rowId === rowId);
+      const declaredColumns = dialogColumns.filter((column) => column.rowId === rowId);
+      const declaredColumnIds = new Set(declaredColumns.map((column) => column.id));
+      const missingColumns = Array.from(new Set(
+        rowElements
+          .map((element) => element.columnId)
+          .filter((columnId): columnId is string => typeof columnId === "string" && !declaredColumnIds.has(columnId)),
+      )).map((columnId) => ({ id: columnId, rowId, flex: 1 }));
+      const columns = declaredColumns.length
+        ? [...declaredColumns, ...missingColumns]
+        : Array.from(new Set(rowElements.map((element) => element.columnId).filter((columnId): columnId is string => Boolean(columnId))))
+            .map((columnId) => ({ id: columnId, rowId, flex: 1 }));
+      const resolvedColumns = columns.length ? columns : [{ id: `${rowId}-column-1`, rowId, flex: 1 }];
+      const fallbackColumnId = resolvedColumns[0]?.id;
+
+      return (
+        <div
+          key={rowId}
+          className={`mobile-drawer-builder-row ${getRowClass(rowId, mobileDialogComposition)}`}
+          style={getRowStyles(rowId, mobileDialogComposition)}
+          data-mobile-dialog-builder-row={rowId}
+        >
+          {resolvedColumns.map((column) => {
+            const columnElements = rowElements.filter((element) =>
+              (element.columnId ?? fallbackColumnId) === column.id,
             );
-          }
-          if (!content) return null;
-          const elementContent = (
-            <div
-              className="mobile-drawer-builder-element"
-              style={visualStyleToCss(element.visualStyle)}
-            >
-              {content}
-            </div>
-          );
-          if (renderMobileDialogElementProp) {
-            return <div key={element.id} style={{ display: "contents" }}>{renderMobileDialogElementProp(element, elementContent)}</div>;
-          }
-          if (builderInteractionIdentity) {
             return (
               <div
-                key={element.id}
-                data-builder-object-type="block"
-                data-builder-section-id={mobileDialogSectionId}
-                data-builder-column-key={element.columnId ?? "header-mobile-dialog-row"}
-                data-builder-block-key={element.id}
+                key={column.id}
+                className="header-builder-column mobile-drawer-builder-column"
+                style={{ flex: column.flex }}
+                data-mobile-dialog-builder-column={column.id}
               >
-                {elementContent}
+                {columnElements.map((element) => renderMobileDrawerElement(element))}
               </div>
             );
-          }
-          return <div key={element.id} style={{ display: "contents" }}>{elementContent}</div>;
-        })}
+          })}
+        </div>
+      );
+    };
+
+    return (
+      <div className="mobile-drawer-builder-content" data-mobile-dialog-builder-content>
+        {rowIds.map(renderMobileDrawerRow)}
       </div>
     );
   };
@@ -929,9 +987,12 @@ export default function HeaderShellView({
       }))
     : [];
 
-  const getRowStyles = (rowId: string | undefined): CSSProperties => {
+  const getRowStyles = (
+    rowId: string | undefined,
+    composition: HeaderBuilderComposition = headerComposition,
+  ): CSSProperties => {
     if (!rowId) return {};
-    const rowComp = headerComposition.rows?.find((r) => r.rowId === rowId);
+    const rowComp = composition.rows?.find((r) => r.rowId === rowId);
     if (!rowComp) return {};
 
     const visualStyles = visualStyleToCss(rowComp.rowVisualStyle);
@@ -1004,9 +1065,12 @@ export default function HeaderShellView({
     } as CSSProperties;
   };
 
-  const getRowClass = (rowId: string | undefined): string => {
+  const getRowClass = (
+    rowId: string | undefined,
+    composition: HeaderBuilderComposition = headerComposition,
+  ): string => {
     if (!rowId) return "";
-    const rowComp = headerComposition.rows?.find((r) => r.rowId === rowId);
+    const rowComp = composition.rows?.find((r) => r.rowId === rowId);
     if (!rowComp) return "";
 
     let cls = "";

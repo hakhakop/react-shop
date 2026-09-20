@@ -6202,7 +6202,15 @@
                 "id": "header-button",
                 "kind": "button",
                 "buttonLabel": "Register",
-                "buttonUrl": "#"
+                "buttonUrl": "#",
+                "buttonStyle": "default",
+                "size": "default"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -6289,7 +6297,7 @@
         "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg"
       }
     ],
-    "updatedAt": "2026-09-20T04:29:25.358Z"
+    "updatedAt": "2026-09-20T06:04:54.002Z"
   },
   "footer": {
     "version": 1,
@@ -26519,15 +26527,14 @@
                     "kind": "headerCart",
                     "headerUtilityAction": "cart",
                     "headerUtilityVariant": "muted"
-                  },
+                  }
+                ]
+              },
+              {
+                "id": "header-mobile-dialog-row-column-2",
+                "elements": [
                   {
                     "id": "header-utility-account",
-                    "kind": "headerAccount",
-                    "headerUtilityAction": "account",
-                    "headerUtilityVariant": "muted"
-                  },
-                  {
-                    "id": "headerAccount-block-mu9bpmp4-qqjng",
                     "kind": "headerAccount",
                     "headerUtilityAction": "account",
                     "headerUtilityVariant": "muted"
@@ -26535,12 +26542,15 @@
                 ]
               },
               {
-                "id": "header-mobile-dialog-row-column-2",
-                "elements": []
-              },
-              {
                 "id": "header-mobile-dialog-row-column-3",
-                "elements": []
+                "elements": [
+                  {
+                    "id": "header-button",
+                    "kind": "button",
+                    "buttonLabel": "Register",
+                    "buttonUrl": "#"
+                  }
+                ]
               }
             ]
           },
@@ -26564,7 +26574,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-19T17:35:40.088Z"
+    "updatedAt": "2026-09-20T06:10:31.108Z"
   },
   "header-mobile-dialog": {
     "version": 1,

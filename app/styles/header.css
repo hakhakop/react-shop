@@ -3653,6 +3653,14 @@ body[data-storefront-preset="princity"] .category-mega-card,
     display: none !important;
   }
 
+  /* The rules above hide legacy mobile action clusters. Authored Header
+     utility elements are intentional content, including Account in the
+     mobile bar and dialog, so keep their own controls visible. */
+  .header-builder-element--utility .site-header-actions > div:has(.header-account-pill),
+  .mobile-drawer-builder-element--utility .site-header-actions > div:has(.header-account-pill) {
+    display: flex !important;
+  }
+
   /* Reduce logo size on mobile, but keep container auto-sized for brand text */
   .site-header-logo-wrap {
     max-width: none !important;
@@ -3988,6 +3996,37 @@ body[data-storefront-preset="princity"] .category-mega-card,
     gap: 24px !important;
     -webkit-overflow-scrolling: touch !important;
     box-sizing: border-box !important;
+  }
+
+  /* The Mobile Menu Dialog is a normal Builder document. Preserve its row
+     and neighboring-column geometry inside the drawer instead of flattening
+     every authored element into one vertical list. */
+  .mobile-drawer-builder-content {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    gap: var(--header-builder-row-gap, 1rem) !important;
+  }
+
+  .mobile-drawer-builder-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: var(--header-builder-row-align, center) !important;
+    justify-content: var(--header-builder-row-justify, flex-start) !important;
+    gap: var(--header-builder-row-gap, 1rem) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-drawer-builder-column {
+    min-width: 0 !important;
+    align-items: center !important;
+  }
+
+  .mobile-drawer-builder-element {
+    min-width: 0;
   }
 
   /* Sections */
