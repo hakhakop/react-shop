@@ -100,6 +100,8 @@ export type BuilderLayoutRow = {
   id: string;
   items: LayoutItem[];
   layoutKey?: string;
+  /** Responsive ownership for rows normalized from a canonical Header document. */
+  headerVariant?: "desktop" | "mobile" | "mobile-dialog";
   startIndex: number;
 };
 

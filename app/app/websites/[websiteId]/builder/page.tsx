@@ -16,6 +16,7 @@ import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
 import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
+import { headerBuilderDocumentKeyForView } from "@/lib/headerBuilderDocumentKeys";
 import { resolveLegacyTemplateBuilderEntry } from "@/lib/templateBuilderContext.server";
 import { resolveBuilderEditorSession } from "@/lib/builderEditorContext.server";
 
@@ -97,10 +98,19 @@ export default async function WebsiteBuilderPage({
     ? contextTargetValue[0] ?? "home"
     : contextTargetValue;
   const requestedContextPage = normalizeBuilderLayoutKey(contextTarget);
-  const initialHydrationPage = resolveInitialBuilderHydrationPage(
-    initialPage,
-    requestedContextPage,
-  );
+  const requestedHeaderView = Array.isArray(resolvedSearchParams?.headerView)
+    ? resolvedSearchParams?.headerView[0]
+    : resolvedSearchParams?.headerView;
+  const initialHydrationPage = initialPage === "header"
+    ? headerBuilderDocumentKeyForView(
+        requestedHeaderView === "mobile" || requestedHeaderView === "dialog"
+          ? "mobile"
+          : "desktop",
+      )
+    : resolveInitialBuilderHydrationPage(
+        initialPage,
+        requestedContextPage,
+      );
   const hasStrictDocumentTarget = Boolean(
     resolvedSearchParams?.document ||
     resolvedSearchParams?.routingTemplate ||

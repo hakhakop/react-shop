@@ -41,6 +41,18 @@ test("settings-only YOOtheme Header import preserves authored construction", () 
   expect(result.sections[0]?.headerBehavior).toBe("sticky-on-scroll-up");
 });
 
+test("a recipe import creates independent desktop and mobile Builder rows", () => {
+  const source = JSON.parse(readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"));
+  const theme = createYoothemeThemeSettings(source);
+  const result = applyYoothemeHeaderImport(currentHeader, theme, "replace-from-recipe");
+
+  expect(result.sections[0]?.rows?.map((row) => row.headerVariant)).toEqual([
+    "desktop",
+    "mobile",
+  ]);
+  expect(result.sections[0]?.rows?.[0]?.id).not.toBe(result.sections[0]?.rows?.[1]?.id);
+});
+
 test("recipe mode creates ordinary semantic Header rows only when selected", () => {
   const source = JSON.parse(readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"));
   const theme = createYoothemeThemeSettings(source);
@@ -106,4 +118,42 @@ test("Woolberry positions compile into desktop and mobile semantic slots", () =>
     "header menu 80: link the imported WordPress menu resource in WebPages",
     "dialog-mobile menu 79: link the imported WordPress menu resource in WebPages",
   ]));
+});
+
+test("theme settings compile a center-logo mobile preset into ordinary Builder columns", () => {
+  const theme = createYoothemeThemeSettings({
+    header: { layout: "horizontal-center" },
+    navbar: { sticky: 1 },
+    mobile: {
+      breakpoint: "l",
+      header: { layout: "horizontal-center-logo" },
+      dialog: { toggle: "navbar-mobile:start", layout: "dropbar-top" },
+      search: "right",
+    },
+    logo: { text: "DevStack", image: "wp-content/uploads/yootheme/logo.svg" },
+    menu: { positions: { navbar: { menu: 9 }, "dialog-mobile": { menu: 11 } } },
+  });
+
+  const recipe = createYoothemeHeaderRecipe(theme);
+  const mobile = recipe.rows.find((row) => row.headerVariant === "mobile");
+
+  expect(recipe.settings).toMatchObject({
+    headerMobileBreakpoint: "1200px",
+    headerMobileLayout: "horizontal-center",
+    headerMobileComposition: "separate",
+  });
+  expect(mobile?.columns.map((item) => item.headerSlot)).toEqual([
+    "mobile-start",
+    "mobile-logo",
+    "mobile-end",
+  ]);
+  expect(mobile?.columns.find((item) => item.headerSlot === "mobile-start")?.elements.map((item) => item.kind)).toEqual([
+    "menu",
+  ]);
+  expect(mobile?.columns.find((item) => item.headerSlot === "mobile-logo")?.elements.map((item) => item.kind)).toEqual([
+    "image",
+  ]);
+  expect(mobile?.columns.find((item) => item.headerSlot === "mobile-end")?.elements.map((item) => item.kind)).toEqual([
+    "headerSearch",
+  ]);
 });

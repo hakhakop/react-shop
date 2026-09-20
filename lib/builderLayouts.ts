@@ -20,6 +20,10 @@ import type {
   DynamicItemContext,
 } from "@/lib/dynamicContent";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
+import {
+  isHeaderBuilderDocumentKey,
+  type HeaderBuilderDocumentKey,
+} from "@/lib/headerBuilderDocumentKeys";
 export type { BuilderSection };
 
 export type BuilderCustomPageKey = `page:${string}`;
@@ -31,7 +35,7 @@ export type BuilderTemplate =
   | "product-category"
   | "product-category-specific"
   | "search-results";
-export type BuilderDocumentKey = "header" | "footer";
+export type BuilderDocumentKey = HeaderBuilderDocumentKey | "footer";
 /** Internal storage key for a strictly validated opaque Builder document ID. */
 export type DynamicBuilderDocumentKey = `dynamic:${string}`;
 export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey | DynamicBuilderDocumentKey;
@@ -846,7 +850,7 @@ const templates = new Set([
   "product-category-specific",
   "search-results",
 ]);
-const layoutKeys = new Set([...pages, ...templates, "header", "footer"]);
+const layoutKeys = new Set([...pages, ...templates, "header", "header-mobile", "header-mobile-dialog", "footer"]);
 
 export function isBuilderCustomPageKey(
   value: string | null | undefined,
@@ -882,8 +886,10 @@ export function normalizeLayoutBlockKind(
 
 export function getBuilderTargetType(key: BuilderLayoutKey) {
   if (key.startsWith("dynamic:")) return "document";
-  return key === "header" || key === "footer"
-    ? key
+  return isHeaderBuilderDocumentKey(key)
+    ? "header"
+    : key === "footer"
+      ? "footer"
     : templates.has(key)
       ? "template"
       : "page";

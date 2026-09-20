@@ -96,3 +96,26 @@ test("Button inspector keeps the shared Content, Style, and Advanced rhythm", as
   await expect(inspector.locator(".builder-field").first()).toHaveCSS("font-size", "11px");
   await page.screenshot({ path: "test-results/dashboard-button-inspector.png", fullPage: true });
 });
+
+test("iframe canvas selection waits for an explicit Edit action before opening the inspector", async ({ page }) => {
+  await page.goto(builderUrl);
+  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  const canvas = page.frameLocator('iframe[title="Canonical tenant Builder canvas"]');
+  const block = canvas.locator('[data-builder-object-type="block"]').first();
+  await expect(block).toBeVisible();
+
+  const inspector = page.locator(".builder-floating-inspector");
+  const closeInspector = page.getByRole("button", { name: "Collapse Inspector", exact: true });
+  if (await closeInspector.isVisible()) await closeInspector.click();
+  await expect(inspector).toBeHidden();
+
+  await block.click();
+  await expect(page.locator(".builder-fixed-selection-toolbar")).toBeVisible();
+  await expect(inspector).toBeHidden();
+
+  await page
+    .locator(".builder-fixed-selection-toolbar")
+    .getByRole("button", { name: "Edit element", exact: true })
+    .click();
+  await expect(inspector).toBeVisible();
+});

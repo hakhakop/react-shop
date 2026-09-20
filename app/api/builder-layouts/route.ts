@@ -11,7 +11,12 @@ import {
 import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
 import { getBuilderShellSettings } from "@/lib/builderShell";
-import { getOrCreateHeaderBuilderLayout, migrateLegacyHeaderDocument } from "@/lib/headerBuilderDocument";
+import {
+  ensureHeaderBuilderDocuments,
+  getHeaderBuilderDocuments,
+  isHeaderBuilderLayoutKey,
+  migrateLegacyHeaderDocument,
+} from "@/lib/headerBuilderDocument";
 import { getOrCreateFooterBuilderLayout } from "@/lib/footerBuilderDocument";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
 import {
@@ -68,12 +73,28 @@ export async function GET(request: NextRequest) {
       request.nextUrl.searchParams.get("page")
   );
 
-  const layout = page === "header"
-    ? await getOrCreateHeaderBuilderLayout(
+  // Visiting a storefront or the desktop Header must remain read-only. The
+  // mobile surfaces are materialized only when the editor explicitly asks to
+  // edit one of them.
+  const headerDocuments = page === "header"
+    ? await getHeaderBuilderDocuments(
         await getBuilderShellSettings(access.scope),
         access.scope,
         !access.scope.websiteId,
       )
+    : page === "header-mobile" || page === "header-mobile-dialog"
+      ? await ensureHeaderBuilderDocuments(
+          await getBuilderShellSettings(access.scope),
+          access.scope,
+          !access.scope.websiteId,
+        )
+      : null;
+  const layout = page === "header"
+    ? headerDocuments!.desktop
+    : page === "header-mobile"
+      ? headerDocuments!.mobile
+      : page === "header-mobile-dialog"
+        ? headerDocuments!.dialog
     : page === "footer"
       ? await getOrCreateFooterBuilderLayout(access.scope)
     : await getPublishedBuilderLayout(page, access.scope);
@@ -185,7 +206,7 @@ export async function POST(request: NextRequest) {
     sections,
     updatedAt: new Date().toISOString(),
   };
-  if (page === "header") {
+  if (isHeaderBuilderLayoutKey(page)) {
     layout = migrateLegacyHeaderDocument(
       layout,
       await getBuilderShellSettings(access.scope),

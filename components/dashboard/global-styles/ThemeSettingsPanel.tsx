@@ -23,6 +23,8 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
   const [reading, setReading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  // Imports must not replace an authored Header unless the user explicitly
+  // chooses that destructive operation.
   const [headerMode, setHeaderMode] = useState<YoothemeHeaderImportMode>("settings-only");
 
   const handleFile = async (file?: File) => {
@@ -40,8 +42,8 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
       const recipe = createYoothemeHeaderRecipe(imported);
       setMessage(
         headerMode === "settings-only"
-          ? `${imported.displayName} settings imported; Header rows were preserved.`
-          : `${imported.displayName} settings imported; ${recipe.report.createdRows} Header rows created.${recipe.report.omitted.length ? ` ${recipe.report.omitted.length} external menu resource${recipe.report.omitted.length === 1 ? "" : "s"} still need linking.` : ""}`,
+          ? `${imported.displayName} settings imported into Desktop Header and Mobile Header & Menu; existing rows were preserved.`
+          : `${imported.displayName} settings imported; ${recipe.report.createdRows} Builder rows created for Desktop Header and Mobile Header, with the Mobile Menu Drawer as the next Mobile Header section.${recipe.report.omitted.length ? ` ${recipe.report.omitted.length} external menu resource${recipe.report.omitted.length === 1 ? "" : "s"} still need linking.` : ""}`,
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Theme settings import failed.");
@@ -60,7 +62,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
             <FileJson size={22} aria-hidden="true" />
             <div>
               <strong>Two authoritative YOOtheme sources</strong>
-              <p>Theme Settings maps Header structure and behavior, while `_import.less` maps the corresponding UIkit presentation tokens. Both resolve into the normal WebPages Header and Global Styles documents.</p>
+              <p>Theme Settings maps Desktop Header and Mobile Header &amp; Menu behavior, while `_import.less` maps the corresponding UIkit presentation tokens. Both resolve into normal WebPages Builder documents.</p>
             </div>
           </div>
 
@@ -93,7 +95,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
                   checked={headerMode === "settings-only"}
                   onChange={() => setHeaderMode("settings-only")}
                 />
-                <span><strong>Apply settings only</strong><small>Recommended. Keeps every existing Header row, column, and element.</small></span>
+                <span><strong>Apply settings only</strong><small>Recommended. Keeps existing rows and maps settings into Desktop Header and Mobile Header &amp; Menu.</small></span>
               </label>
               <label>
                 <input
@@ -103,7 +105,7 @@ export default function ThemeSettingsPanel({ themeSettings, onImport, onExport, 
                   checked={headerMode === "replace-from-recipe"}
                   onChange={() => setHeaderMode("replace-from-recipe")}
                 />
-                <span><strong>Create Header from recipe</strong><small>Explicitly replaces Header rows with ordinary Builder rows compiled from YOOtheme positions.</small></span>
+                <span><strong>Create Header from recipe</strong><small>Builds Desktop and Mobile Header rows from YOOtheme positions, with Mobile Menu Drawer as the next Mobile Header section.</small></span>
               </label>
             </span>
             <span className="builder-file-button">

@@ -7,7 +7,8 @@ export type BuilderTemplate =
   | "product-category"
   | "product-category-specific"
   | "search-results";
-export type BuilderDocumentKey = "header" | "footer";
+import type { HeaderBuilderDocumentKey } from "@/lib/headerBuilderDocumentKeys";
+export type BuilderDocumentKey = HeaderBuilderDocumentKey | "footer";
 export type DynamicBuilderDocumentKey = `dynamic:${string}`;
 export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey | DynamicBuilderDocumentKey;
 export type BuilderTargetType = "page" | "template" | "document" | BuilderDocumentKey;
@@ -466,7 +467,7 @@ export type BuilderRow = {
   /** Optional Header semantic; the row remains an ordinary Builder row. */
   role?: "toolbar";
   /** Optional responsive ownership inside the one canonical Header document. */
-  headerVariant?: "desktop" | "mobile";
+  headerVariant?: "desktop" | "mobile" | "mobile-dialog";
   dynamicContext?: DynamicContentContextDescriptor;
   layout: string;
   /** Provenance for source-specific structural spacing semantics. */
@@ -596,6 +597,9 @@ export type BuilderLayoutBlock = {
     hoverEffect?: boolean;
   };
   imageUrl?: string;
+  /** Alternate logo asset rendered by inverse or mobile Header surfaces. */
+  imageInverseUrl?: string | null;
+  imageMobileUrl?: string | null;
   imageAlt?: string;
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
@@ -1150,6 +1154,8 @@ export type WordPressMediaItem = {
 };
 
 export type BuilderSection = {
+  /** Identifies the independent Header Builder document that owns this section. */
+  headerDocumentVariant?: "desktop" | "mobile" | "dialog";
   /** Version 2 makes the Header document the canonical owner of Header-wide settings. */
   headerArchitectureVersion?: 2;
   headerPresetKey?: string;
@@ -1201,6 +1207,7 @@ export type BuilderSection = {
   headerClickModeEnabled?: boolean;
   headerDialogTogglePosition?: string;
   headerDialogLayout?: string;
+  headerDialogClose?: boolean;
   headerDialogMenuStyle?: string;
   headerDialogCenter?: boolean;
   headerDialogPushAfter?: number;
@@ -1346,7 +1353,7 @@ export type BuilderSection = {
     rowId?: string;
     rowLayout?: string;
     role?: "toolbar";
-    headerVariant?: "desktop" | "mobile";
+    headerVariant?: "desktop" | "mobile" | "mobile-dialog";
     maxWidth?: SectionContentMode;
     removeHorizontalPadding?: boolean;
     horizontalDistribution?: "justify" | "left" | "center";

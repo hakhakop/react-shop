@@ -28,6 +28,8 @@ type WebsitePreviewPageProps = {
     builderFrame?: string;
     builderBridge?: string;
     builderContext?: string;
+    headerPreviewVariant?: string;
+    headerPreviewDocument?: string;
     product_tag?: string;
     paged?: string;
   }>;
@@ -146,6 +148,18 @@ export default async function WebsitePreviewPage({
       dynamicItemContextOverride={commerceProjection?.dynamicContext}
       fallbackContent={corePageFallback}
       builderIframeSelection={query?.builderFrame === "selection"}
+      previewHeaderVariant={
+        query?.headerPreviewVariant === "desktop" || query?.headerPreviewVariant === "mobile"
+          ? query.headerPreviewVariant
+          : undefined
+      }
+      previewHeaderDocument={
+        query?.headerPreviewDocument === "header-mobile" ||
+        query?.headerPreviewDocument === "header-mobile-dialog" ||
+        query?.headerPreviewDocument === "header"
+          ? query.headerPreviewDocument
+          : undefined
+      }
       builderEditingContext={builderEditingContext}
       builderIframeDiagnostics={
         query?.builderBridge === "full"

@@ -1,6 +1,10 @@
 import { getBuilderRowLayoutPreset } from "@/components/dashboard/builderLayoutPresets";
 import type { BuilderLayout, BuilderLayoutBlock } from "@/lib/builderLayouts";
 import type { HeaderBuilderComposition, HeaderBuilderElement, HeaderRowComposition } from "@/lib/headerBuilderDocument";
+import {
+  headerBuilderViewForDocumentKey,
+  isHeaderBuilderDocumentKey,
+} from "@/lib/headerBuilderDocumentKeys";
 import { resolveHeaderElementAlignment } from "@/lib/headerElementAlignment";
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 
@@ -22,9 +26,12 @@ const headerButtonHoverEffect = (
 
 /** Pure, client-safe Header document resolver shared by Builder and storefront. */
 export function resolveHeaderBuilderComposition(
-  layout: Pick<BuilderLayout, "sections"> | null | undefined,
+  layout: (Pick<BuilderLayout, "sections"> & Partial<Pick<BuilderLayout, "key">>) | null | undefined,
+  options?: { sectionId?: string },
 ): HeaderBuilderComposition {
-  const section = layout?.sections[0];
+  const section = options?.sectionId
+    ? layout?.sections.find((candidate) => candidate.id === options.sectionId)
+    : layout?.sections[0];
   const headerRows = section ? normalizeBuilderSectionLayout(section).rows : [];
   const blocks = headerRows.flatMap((row) =>
     row.columns.flatMap((column) => column.elements),
@@ -249,6 +256,12 @@ export function resolveHeaderBuilderComposition(
   });
 
   return {
+    documentKey: isHeaderBuilderDocumentKey(layout?.key) ? layout.key : undefined,
+    documentSectionId: section?.id,
+    documentVariant: section?.headerDocumentVariant
+      ?? (isHeaderBuilderDocumentKey(layout?.key)
+        ? headerBuilderViewForDocumentKey(layout.key)
+        : "desktop"),
     elements,
     columns: headerRows.flatMap((item) => {
       const preset = getBuilderRowLayoutPreset(item.layout);
@@ -307,6 +320,7 @@ export function resolveHeaderBuilderComposition(
     documentClickModeEnabled: section?.headerClickModeEnabled,
     documentDialogTogglePosition: section?.headerDialogTogglePosition,
     documentDialogLayout: section?.headerDialogLayout,
+    documentDialogClose: section?.headerDialogClose,
     documentDialogMenuStyle: section?.headerDialogMenuStyle,
     documentDialogCenter: section?.headerDialogCenter,
     documentDialogPushAfter: section?.headerDialogPushAfter,

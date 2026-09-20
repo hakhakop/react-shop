@@ -6174,9 +6174,7 @@
                 "imageMaxWidth": 140,
                 "imageAlignment": "left",
                 "imageUrl": "https://store.webpages.am/wp-content/uploads/2026/08/logo-2-scaled.png",
-                "imageInverseUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
-                "imageMobileUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
-                "imageAlt": "DevStack logo"
+                "imageAlt": "DevStack"
               }
             ]
           },
@@ -6201,15 +6199,10 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-register",
+                "id": "header-button",
                 "kind": "button",
                 "buttonLabel": "Register",
-                "buttonUrl": "#",
-                "buttonStyle": "primary",
-                "headerButtonOverrides": {
-                  "variant": true
-                },
-                "size": "default"
+                "buttonUrl": "#"
               }
             ]
           }
@@ -6220,19 +6213,83 @@
         "headerTransparent": true,
         "headerOverlay": true,
         "headerHeight": "auto",
-        "headerLayout": "wordpress",
+        "headerCustomHeight": 92,
+        "headerLayout": "simple",
         "headerBehavior": "sticky-on-scroll-up",
-        "headerWidthMode": "boxed",
+        "headerWidthMode": "full",
         "headerBackgroundMode": "none",
         "headerTextMode": "auto",
         "headerZIndex": 40,
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "Fast support & setup by Webpages",
         "headerTopToolbarPhone": "+374 xx xx xx",
-        "headerTopToolbarMeta": "AMD ֏"
+        "headerTopToolbarMeta": "AMD ֏",
+        "headerMobileBreakpoint": "1200px",
+        "headerMobileLayout": "horizontal-center",
+        "headerMobileComposition": "separate",
+        "headerMobileBehavior": "sticky",
+        "headerMobileSearchPosition": "right",
+        "headerMobileSearchLayout": "input-dropdown",
+        "headerMobileSearchDropdownStretch": "navbar",
+        "headerMobileSearchDropdownLarge": true,
+        "headerMobileSearchIconPosition": "left",
+        "headerMobileSocialPosition": "hide",
+        "headerMobileSocialStyle": false,
+        "headerMobileSocialGap": "small",
+        "headerMobileSocialItems": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "headerMobileDialogLayout": "dropbar-top",
+        "headerMobileDialogTogglePosition": "navbar-mobile:start",
+        "headerMobileDialogClose": true,
+        "headerMobileDialogMenuStyle": "default",
+        "headerMobileDialogCenter": false,
+        "headerMobileDialogPushAfter": 1,
+        "headerMobileOffcanvasMode": "push",
+        "headerMobileOffcanvasFlip": false,
+        "headerMobileOffcanvasOverlay": true,
+        "headerMobileDialogDropbarAnimation": "reveal-top",
+        "headerDropdownAlign": "center",
+        "headerDropdownAlignToNavbar": false,
+        "headerDropbarEnabled": true,
+        "headerSearchPosition": "hide",
+        "headerSearchLayout": "input-dropdown",
+        "headerSearchDropdownStretch": "navbar",
+        "headerSearchDropdownLarge": true,
+        "headerSearchIconPosition": "left",
+        "headerSocialPosition": "hide",
+        "headerSocialStyle": false,
+        "headerSocialGap": "small",
+        "headerSocialItems": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "headerLogoPaddingRemove": false,
+        "headerDialogLayout": "offcanvas-top",
+        "headerDialogTogglePosition": "header-end",
+        "headerDialogMenuStyle": "default",
+        "headerOffcanvasMode": "slide",
+        "headerOffcanvasFlip": true,
+        "headerOffcanvasOverlay": true,
+        "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg"
       }
     ],
-    "updatedAt": "2026-09-15T12:57:03.754Z"
+    "updatedAt": "2026-09-20T04:29:25.358Z"
   },
   "footer": {
     "version": 1,
@@ -26258,5 +26315,395 @@
       }
     ],
     "updatedAt": "2026-08-16T14:37:37.088Z"
+  },
+  "header-mobile": {
+    "version": 1,
+    "key": "header-mobile",
+    "page": "header-mobile",
+    "targetType": "header",
+    "displayName": "Mobile Header",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-mobile-document",
+        "kind": "contentLayout",
+        "title": "Mobile Header",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": true,
+        "headerOverlay": true,
+        "headerHeight": "auto",
+        "headerCustomHeight": 92,
+        "headerLayout": "simple",
+        "headerBehavior": "sticky",
+        "headerWidthMode": "full",
+        "headerBackgroundMode": "none",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏",
+        "headerMobileBreakpoint": "1200px",
+        "headerMobileLayout": "horizontal-center",
+        "headerMobileComposition": "separate",
+        "headerMobileBehavior": "sticky",
+        "headerMobileSearchPosition": "right",
+        "headerMobileSearchLayout": "input-dropdown",
+        "headerMobileSearchDropdownStretch": "navbar",
+        "headerMobileSearchDropdownLarge": true,
+        "headerMobileSearchIconPosition": "left",
+        "headerMobileSocialPosition": "hide",
+        "headerMobileSocialStyle": false,
+        "headerMobileSocialGap": "small",
+        "headerMobileSocialItems": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "headerMobileDialogLayout": "dropbar-top",
+        "headerMobileDialogTogglePosition": "navbar-mobile:start",
+        "headerMobileDialogClose": true,
+        "headerMobileDialogMenuStyle": "default",
+        "headerMobileDialogCenter": false,
+        "headerMobileDialogPushAfter": 1,
+        "headerMobileOffcanvasMode": "push",
+        "headerMobileOffcanvasFlip": false,
+        "headerMobileOffcanvasOverlay": true,
+        "headerMobileDialogDropbarAnimation": "reveal-top",
+        "headerDropdownAlign": "center",
+        "headerDropdownAlignToNavbar": false,
+        "headerDropbarEnabled": true,
+        "headerSearchPosition": "right",
+        "headerSearchLayout": "input-dropdown",
+        "headerSearchDropdownStretch": "navbar",
+        "headerSearchDropdownLarge": true,
+        "headerSearchIconPosition": "left",
+        "headerSocialPosition": "hide",
+        "headerSocialStyle": false,
+        "headerSocialGap": "small",
+        "headerSocialItems": [
+          {
+            "link": "https://twitter.com/"
+          },
+          {
+            "link": "https://dribbble.com/"
+          },
+          {
+            "link": "https://github.com/"
+          }
+        ],
+        "headerLogoPaddingRemove": false,
+        "headerDialogLayout": "dropbar-top",
+        "headerDialogTogglePosition": "navbar-mobile:start",
+        "headerDialogMenuStyle": "default",
+        "headerOffcanvasMode": "push",
+        "headerOffcanvasFlip": false,
+        "headerOffcanvasOverlay": true,
+        "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
+        "headerDocumentVariant": "mobile",
+        "headerBreakpoint": "1200px",
+        "headerDialogClose": true,
+        "headerDialogCenter": false,
+        "headerDialogPushAfter": 1,
+        "headerDialogDropbarAnimation": "reveal-top",
+        "rows": [
+          {
+            "id": "header-mobile-row",
+            "layout": "3-col-equal",
+            "columns": [
+              {
+                "id": "header-main-left",
+                "elements": [
+                  {
+                    "id": "header-mobile-logo",
+                    "kind": "image",
+                    "headerBrandMode": "logo",
+                    "headerBrandText": "DevStack",
+                    "imageMaxWidth": 140,
+                    "imageAlignment": "left",
+                    "imageUrl": "https://store.webpages.am/wp-content/uploads/2026/08/logo-2-scaled.png",
+                    "imageAlt": "DevStack"
+                  }
+                ]
+              },
+              {
+                "id": "header-main-center",
+                "elements": []
+              },
+              {
+                "id": "header-main-right",
+                "elements": [
+                  {
+                    "id": "header-mobile-navigation",
+                    "kind": "menu",
+                    "title": "Mobile navigation",
+                    "menuSource": "main",
+                    "menuActiveIndicator": "underline",
+                    "elementAlign": "center"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "header-mobile-dialog-document",
+        "kind": "contentLayout",
+        "title": "Mobile Menu Dialog",
+        "headerDocumentVariant": "dialog",
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerBehavior": "static",
+        "headerWidthMode": "full",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 1,
+        "visible": true,
+        "layoutRows": 2,
+        "rows": [
+          {
+            "id": "header-mobile-dialog-row",
+            "layout": "3-col-equal",
+            "columns": [
+              {
+                "id": "header-mobile-dialog-content",
+                "elements": [
+                  {
+                    "id": "header-utility-cart",
+                    "kind": "headerCart",
+                    "headerUtilityAction": "cart",
+                    "headerUtilityVariant": "muted"
+                  },
+                  {
+                    "id": "header-utility-account",
+                    "kind": "headerAccount",
+                    "headerUtilityAction": "account",
+                    "headerUtilityVariant": "muted"
+                  },
+                  {
+                    "id": "headerAccount-block-mu9bpmp4-qqjng",
+                    "kind": "headerAccount",
+                    "headerUtilityAction": "account",
+                    "headerUtilityVariant": "muted"
+                  }
+                ]
+              },
+              {
+                "id": "header-mobile-dialog-row-column-2",
+                "elements": []
+              },
+              {
+                "id": "header-mobile-dialog-row-column-3",
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mu9bp05c",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mu9bp05c-column-1",
+                "elements": [
+                  {
+                    "id": "header-mobile-dialog-navigation",
+                    "kind": "menu",
+                    "title": "Mobile menu",
+                    "menuSource": "main"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-19T17:35:40.088Z"
+  },
+  "header-mobile-dialog": {
+    "version": 1,
+    "key": "header-mobile-dialog",
+    "page": "header-mobile-dialog",
+    "targetType": "header",
+    "displayName": "Mobile Menu Dialog",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-mobile-dialog-document",
+        "kind": "contentLayout",
+        "title": "Mobile Menu Dialog",
+        "headerDocumentVariant": "dialog",
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerBehavior": "static",
+        "headerWidthMode": "full",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "header-mobile-dialog-content",
+            "rowId": "header-mobile-dialog-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "headerAccount-block-mu9bpmp4-qqjng",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mu9bp05c-column-1",
+            "rowId": "layout-row-mu9bp05c",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "header-mobile-dialog-navigation",
+                "kind": "menu",
+                "title": "Mobile menu",
+                "menuSource": "main"
+              }
+            ]
+          }
+        ],
+        "visible": true,
+        "layoutRows": 2,
+        "rows": [
+          {
+            "id": "header-mobile-dialog-row",
+            "layout": "3-col-equal",
+            "columns": [
+              {
+                "id": "header-mobile-dialog-content",
+                "elements": [
+                  {
+                    "id": "header-utility-cart",
+                    "kind": "headerCart",
+                    "headerUtilityAction": "cart",
+                    "headerUtilityVariant": "muted"
+                  }
+                ]
+              },
+              {
+                "id": "header-mobile-dialog-row-column-2",
+                "elements": []
+              },
+              {
+                "id": "header-mobile-dialog-row-column-3",
+                "elements": []
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mu9bp05c",
+            "layout": "1-col",
+            "columns": [
+              {
+                "id": "layout-row-mu9bp05c-column-1",
+                "elements": [
+                  {
+                    "id": "header-mobile-dialog-navigation",
+                    "kind": "menu",
+                    "title": "Mobile menu",
+                    "menuSource": "main"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-09-20T04:35:51.812Z"
   }
 }

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import type { BuilderInteractionTarget } from "@/components/dashboard/builderInteraction";
 import { BUILDER_PARALLAX_FRAME_EVENT } from "./builderAnimationRuntimeEvents";
+import { isHeaderBuilderDocumentSectionId } from "@/lib/headerBuilderDocumentKeys";
 
 export const BUILDER_IFRAME_SELECTION_SOURCE = "webpages-builder-iframe-selection";
 
@@ -64,7 +65,8 @@ function targetFromClick(event: MouseEvent | DragEvent): BuilderInteractionTarge
   }
   const owner = element?.closest<HTMLElement>("[data-builder-object-type]");
   if (!owner && element?.closest(".site-header")) {
-    return { type: "section", sectionId: "header-document" };
+    const header = element.closest<HTMLElement>(".site-header");
+    return { type: "section", sectionId: header?.dataset.builderSectionId ?? "header-document" };
   }
   if (!owner && element?.closest('footer[data-builder-page-root="true"]')) {
     return { type: "section", sectionId: "footer-document" };
@@ -91,12 +93,12 @@ function targetSelector(
   target: BuilderInteractionTarget,
   editingShell: "header" | "footer" | null,
 ) {
-  if (target.type === "section" && target.sectionId === "header-document") return ".site-header";
+  if (target.type === "section" && isHeaderBuilderDocumentSectionId(target.sectionId)) return ".site-header";
   if (target.type === "section" && target.sectionId === "footer-document") return 'footer[data-builder-page-root="true"]';
   const sectionId = CSS.escape(target.sectionId);
   const documentScope = editingShell === "footer"
     ? 'footer[data-builder-page-root="true"]'
-    : editingShell === "header"
+    : editingShell === "header" || target.sectionId.startsWith("header-")
       ? ".site-header"
       : 'main[data-builder-page-root="true"]';
   let selector: string;

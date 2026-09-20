@@ -877,7 +877,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-09-19T10:04:12.387Z",
+  "updatedAt": "2026-09-19T16:02:34.216Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",
@@ -3992,5 +3992,7 @@
   "inverseNavbarNavItemHoverColor": "inherit",
   "navSecondaryFontWeight": "600",
   "navSecondaryItemColor": "#0D0A46",
-  "navSecondarySubtitleColor": "#747A96"
+  "navSecondarySubtitleColor": "#747A96",
+  "themePageLayout": "full",
+  "themePageContainerAlignment": "center"
 }

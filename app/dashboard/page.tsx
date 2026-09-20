@@ -9,6 +9,7 @@ import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import { normalizeBuilderLayoutKey } from "@/lib/builderLayouts";
 import { resolveInitialBuilderPage } from "@/lib/initialBuilderPage.server";
 import { resolveInitialBuilderHydrationPage } from "@/lib/builderShellRoute";
+import { headerBuilderDocumentKeyForView } from "@/lib/headerBuilderDocumentKeys";
 
 export const metadata = {
   title: "Root Website Builder",
@@ -61,12 +62,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ? contextTargetValue[0] ?? "home"
     : contextTargetValue;
   const requestedContextPage = normalizeBuilderLayoutKey(contextTarget);
+  const requestedHeaderView = Array.isArray(resolvedSearchParams?.headerView)
+    ? resolvedSearchParams?.headerView[0]
+    : resolvedSearchParams?.headerView;
+  const initialHeaderDocument = headerBuilderDocumentKeyForView(
+    requestedHeaderView === "mobile" || requestedHeaderView === "dialog"
+      ? "mobile"
+      : "desktop",
+  );
   // A direct Header/Footer URL must hydrate the active document itself. The
   // context page is only the locked preview canvas; using it as the authored
   // Builder state lets an older page draft overwrite the shell after refresh.
   const initialHydrationPage =
-    initialPage === "header" || initialPage === "footer"
-      ? initialPage
+    initialPage === "header"
+      ? initialHeaderDocument
+      : initialPage === "footer"
+        ? initialPage
       : resolveInitialBuilderHydrationPage(initialPage, requestedContextPage);
   const hasStrictDocumentTarget = Boolean(
     resolvedSearchParams?.document ||

@@ -1,6 +1,7 @@
 import HeaderShell, {
   resolveHeaderDropdownProjections,
 } from "@/components/HeaderShell";
+import type { HeaderBuilderDocumentKey } from "@/lib/headerBuilderDocumentKeys";
 import FooterShell from "@/components/FooterShell";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import WebPagesFontLoader from "@/components/builder/WebPagesFontLoader";
@@ -75,6 +76,8 @@ type WebsiteFrontendProps = {
   layoutOverride?: BuilderLayout;
   dynamicItemContextOverride?: DynamicItemContext;
   builderIframeSelection?: boolean;
+  previewHeaderVariant?: "desktop" | "mobile";
+  previewHeaderDocument?: HeaderBuilderDocumentKey;
   builderEditingContext?: "header" | "footer" | null;
   builderIframeDiagnostics?: "minimal" | "settled" | "rect" | "toolbar" | "full";
   pageNumber?: number;
@@ -308,6 +311,8 @@ export default async function WebsiteFrontend({
   layoutOverride,
   dynamicItemContextOverride,
   builderIframeSelection = false,
+  previewHeaderVariant,
+  previewHeaderDocument,
   builderEditingContext = null,
   builderIframeDiagnostics = "minimal",
   pageNumber,
@@ -487,6 +492,8 @@ export default async function WebsiteFrontend({
               builderInteractionIdentity={builderIframeSelection}
               builderPreviewMode={builderIframeSelection}
               builderDraftPreview={builderIframeSelection}
+              previewHeaderVariant={previewHeaderVariant}
+              previewHeaderDocument={previewHeaderDocument}
               tenantPathMode={isTenantPath}
               themeSettingsOverride={themeSettings as BuilderThemeSettings}
               dropdownProjectionsOverride={headerDropdownProjections}

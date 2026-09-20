@@ -152,7 +152,17 @@ type HeaderShellViewProps = {
   hideSaaSEntry?: boolean;
   categoriesContent?: ReactNode;
   headerComposition: HeaderBuilderComposition;
+  /** Mobile bar section authored inside the Mobile Header document. */
+  mobileHeaderComposition?: HeaderBuilderComposition;
+  /** Mobile drawer section authored directly after the mobile bar. */
+  mobileDialogComposition?: HeaderBuilderComposition;
   renderBuilderElement?: (
+    element: HeaderBuilderElement,
+    content: ReactNode,
+    flexItemStyle?: CSSProperties,
+  ) => ReactNode;
+  /** Selection wrapper for the mobile drawer section. */
+  renderMobileDialogElement?: (
     element: HeaderBuilderElement,
     content: ReactNode,
     flexItemStyle?: CSSProperties,
@@ -161,6 +171,11 @@ type HeaderShellViewProps = {
   renderBuilderRow?: (rowId: string, content: ReactNode) => ReactNode;
   builderInteractionIdentity?: boolean;
   builderPreviewMode?: boolean;
+  /** Keep the mobile menu open while editing its document in Builder. */
+  forceMobileDialogOpen?: boolean;
+  /** The Builder device control represents an intended viewport even when the
+   * scaled canvas is physically narrower than that viewport. */
+  previewHeaderVariant?: "desktop" | "mobile";
   builderDraftPreview?: boolean;
   activeContentLanguage?: string;
   enabledContentLanguages?: string[];
@@ -190,11 +205,16 @@ export default function HeaderShellView({
   hideSaaSEntry = false,
   categoriesContent,
   headerComposition: initialHeaderComposition,
+  mobileHeaderComposition: initialMobileHeaderComposition,
+  mobileDialogComposition: initialMobileDialogComposition,
   renderBuilderElement: renderBuilderElementProp,
+  renderMobileDialogElement: renderMobileDialogElementProp,
   renderBuilderColumn: renderBuilderColumnProp,
   renderBuilderRow: renderBuilderRowProp,
   builderInteractionIdentity = false,
   builderPreviewMode = false,
+  forceMobileDialogOpen = false,
+  previewHeaderVariant,
   builderDraftPreview = false,
   activeContentLanguage = "hy",
   enabledContentLanguages = ["hy"],
@@ -205,6 +225,8 @@ export default function HeaderShellView({
   scrollState,
 }: HeaderShellViewProps) {
   const [liveHeaderComposition, setLiveHeaderComposition] = useState<HeaderBuilderComposition | null>(null);
+  const [liveMobileHeaderComposition, setLiveMobileHeaderComposition] = useState<HeaderBuilderComposition | null>(null);
+  const [liveMobileDialogComposition, setLiveMobileDialogComposition] = useState<HeaderBuilderComposition | null>(null);
   const [liveShellSettings, setLiveShellSettings] = useState<Partial<BuilderShellSettings> | null>(null);
   const liveHeaderRevisionRef = useRef(0);
   const liveShellRevisionRef = useRef(0);
@@ -212,6 +234,8 @@ export default function HeaderShellView({
     liveHeaderRevisionRef.current = 0;
     liveShellRevisionRef.current = 0;
     setLiveHeaderComposition(null);
+    setLiveMobileHeaderComposition(null);
+    setLiveMobileDialogComposition(null);
     setLiveShellSettings(null);
     if (!builderDraftPreview) return;
 
@@ -234,6 +258,11 @@ export default function HeaderShellView({
         setLiveShellSettings(nextShellSettings);
       }
       if (event.data.documentKey !== "header") return;
+      const headerDocumentKey = event.data.headerDocumentKey === "header-mobile"
+        ? "header-mobile"
+        : event.data.headerDocumentKey === "header-mobile-dialog"
+          ? "header-mobile-dialog"
+          : "header";
       const state = event.data.state as BuilderState | undefined;
       if (!Number.isFinite(revision)) return;
       if (revision <= liveHeaderRevisionRef.current) {
@@ -247,14 +276,34 @@ export default function HeaderShellView({
       }
       if (!state || state.page !== "header" || !Array.isArray(state.sections)) return;
 
-      // Header draft messages can race a page/shell URL transition. Only
-      // replace the rendered Header with a structurally complete composition;
-      // otherwise retain the server-hydrated document instead of blanking it.
+      // Header draft messages can race a page/shell URL transition. A Mobile
+      // Header document can contain both authored surfaces in order: its bar
+      // followed by the mobile drawer. Resolve each root separately so an
+      // edit to the drawer never becomes an element of the bar.
       try {
-        const candidate = resolveHeaderBuilderComposition({ sections: state.sections });
-        if (!candidate.elements.length || !candidate.columns?.length) return;
+        const resolveCandidate = (sectionId?: string) =>
+          resolveHeaderBuilderComposition(
+            { sections: state.sections },
+            sectionId ? { sectionId } : undefined,
+          );
+        if (headerDocumentKey === "header-mobile") {
+          const mobileCandidate = resolveCandidate("header-mobile-document");
+          if (!mobileCandidate.documentSectionId) return;
+          setLiveMobileHeaderComposition(mobileCandidate);
+          const dialogCandidate = resolveCandidate("header-mobile-dialog-document");
+          if (dialogCandidate.documentSectionId) {
+            setLiveMobileDialogComposition(dialogCandidate);
+          }
+        } else if (headerDocumentKey === "header-mobile-dialog") {
+          const candidate = resolveCandidate();
+          if (!candidate.documentSectionId) return;
+          setLiveMobileDialogComposition(candidate);
+        } else {
+          const candidate = resolveCandidate();
+          if (!candidate.documentSectionId) return;
+          setLiveHeaderComposition(candidate);
+        }
         liveHeaderRevisionRef.current = revision;
-        setLiveHeaderComposition(candidate);
         window.parent.postMessage({
           source: BUILDER_IFRAME_DRAFT_SOURCE,
           type: BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
@@ -269,15 +318,22 @@ export default function HeaderShellView({
     return () => window.removeEventListener("message", handleDraftMessage);
   }, [builderDraftPreview]);
   const effectiveShellSettings = liveShellSettings ?? shellSettings;
-  const headerComposition = liveHeaderComposition ?? initialHeaderComposition;
-  const canonicalRows = headerComposition.rows ?? [];
-  const hasCanonicalMobileRows = canonicalRows.some((row) => row.headerVariant === "mobile");
+  const desktopHeaderComposition = liveHeaderComposition ?? initialHeaderComposition;
+  const mobileHeaderComposition = liveMobileHeaderComposition ?? initialMobileHeaderComposition;
+  const mobileDialogComposition = liveMobileDialogComposition ?? initialMobileDialogComposition;
+  const desktopCanonicalRows = desktopHeaderComposition.rows ?? [];
+  const hasCanonicalMobileRows = desktopCanonicalRows.some((row) => row.headerVariant === "mobile");
+  const hasSeparateMobileHeader = Boolean(mobileHeaderComposition?.elements.length);
   const mobileBreakpoint = normalizeHeaderMobileBreakpoint(
-    headerComposition.documentMobileBreakpoint ?? effectiveShellSettings.headerMobileBreakpoint,
+    desktopHeaderComposition.documentMobileBreakpoint ?? effectiveShellSettings.headerMobileBreakpoint,
   );
   const [activeHeaderVariant, setActiveHeaderVariant] = useState<"desktop" | "mobile">("desktop");
   useEffect(() => {
-    if (!hasCanonicalMobileRows) {
+    if (previewHeaderVariant) {
+      setActiveHeaderVariant(previewHeaderVariant);
+      return;
+    }
+    if (!hasCanonicalMobileRows && !hasSeparateMobileHeader) {
       setActiveHeaderVariant("desktop");
       return;
     }
@@ -286,7 +342,14 @@ export default function HeaderShellView({
     update();
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
-  }, [hasCanonicalMobileRows, mobileBreakpoint]);
+  }, [hasCanonicalMobileRows, hasSeparateMobileHeader, mobileBreakpoint, previewHeaderVariant]);
+  const usesSeparateMobileDocument = activeHeaderVariant === "mobile" && hasSeparateMobileHeader;
+  const headerComposition = usesSeparateMobileDocument
+    ? mobileHeaderComposition!
+    : desktopHeaderComposition;
+  const activeDocumentSectionId = headerComposition.documentSectionId ?? "header-document";
+  const mobileDialogSectionId = mobileDialogComposition?.documentSectionId ?? "header-mobile-dialog-document";
+  const canonicalRows = headerComposition.rows ?? [];
   const activeRowIds = new Set(
     canonicalRows
       .filter((row) => !row.headerVariant || row.headerVariant === activeHeaderVariant)
@@ -297,20 +360,20 @@ export default function HeaderShellView({
   );
   const renderBuilderElement = renderBuilderElementProp ?? (builderInteractionIdentity
     ? (element: HeaderBuilderElement, content: ReactNode, flexItemStyle?: CSSProperties) => (
-        <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id="header-document"
+        <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id={activeDocumentSectionId}
           data-builder-column-key={element.columnId ?? "header-main-row"} data-builder-block-key={element.id}>{content}</div>
       )
     : undefined);
   const renderBuilderColumn = renderBuilderColumnProp ?? (builderInteractionIdentity
     ? (columnId: string, content: ReactNode) => (
-        <div data-builder-object-type="column" data-builder-section-id="header-document"
+        <div data-builder-object-type="column" data-builder-section-id={activeDocumentSectionId}
           data-builder-column-key={columnId} style={{ display: "contents" }}>{content}</div>
       )
     : undefined);
   const renderBuilderRow = renderBuilderRowProp ?? (builderInteractionIdentity
     ? (rowId: string, content: ReactNode) => {
         const rowIndex = (headerComposition.rows ?? []).findIndex((row) => row.rowId === rowId);
-        return <div data-builder-object-type="row" data-builder-section-id="header-document"
+        return <div data-builder-object-type="row" data-builder-section-id={activeDocumentSectionId}
           data-builder-row-index={Math.max(0, rowIndex)} style={{ display: "contents" }}>{content}</div>;
       }
     : undefined);
@@ -356,21 +419,32 @@ export default function HeaderShellView({
     headerComposition,
     effectiveShellSettings,
   );
+  // The mobile bar and drawer are distinct roots within one Mobile Header
+  // document. The drawer's placement, animation, overlay and close control
+  // remain owned by its drawer root rather than by the mobile bar.
+  const mobileDialogSettings = mobileDialogComposition
+    ? resolveHeaderDocumentSettings(mobileDialogComposition, effectiveShellSettings)
+    : null;
+  const activeDialogSettings = activeHeaderVariant === "mobile" && mobileDialogSettings
+    ? mobileDialogSettings
+    : null;
   // `wordpress` is the canonical persisted name for YOOtheme's
   // horizontal-justify preset. Do not fall back to the legacy theme setting,
   // otherwise an imported Header document silently loses its layout.
   const layoutValue = documentSettings.layout === "wordpress"
     ? "wordpress"
     : documentSettings.layout ?? layoutOverride ?? asString(settings.layout, "centered");
-  const layout = activeHeaderVariant === "mobile" && hasCanonicalMobileRows
+  const layout = activeHeaderVariant === "mobile" && (hasCanonicalMobileRows || hasSeparateMobileHeader)
     ? "simple"
     : normalizeLayout(layoutValue);
   // The Header document behavior is already the canonical variant selected by
   // the document. Do not reinterpret an explicit `sticky` value using the
   // legacy compatibility flag: that changes the live runtime variant while
   // leaving the persisted mapping looking correct.
-  const effectiveHeaderBehavior = activeHeaderVariant === "mobile" && hasCanonicalMobileRows
-    ? documentSettings.mobileBehavior ?? "static"
+  const effectiveHeaderBehavior = usesSeparateMobileDocument
+    ? documentSettings.behavior
+    : activeHeaderVariant === "mobile" && hasCanonicalMobileRows
+      ? documentSettings.mobileBehavior ?? "static"
     : documentSettings.behavior;
   const headerHeight = resolveHeaderHeightCss(
     documentSettings.height,
@@ -524,11 +598,13 @@ export default function HeaderShellView({
       ? "site-header--document-background"
       : "",
     `site-header--builder-width-${documentSettings.widthMode}`,
-    hasCanonicalMobileRows ? `site-header--canonical-${activeHeaderVariant}` : "",
-    activeHeaderVariant === "mobile" && documentSettings.mobileLayout
+    hasCanonicalMobileRows || hasSeparateMobileHeader ? `site-header--canonical-${activeHeaderVariant}` : "",
+    activeHeaderVariant === "mobile" && !usesSeparateMobileDocument && documentSettings.mobileLayout
       ? `site-header--mobile-layout-${documentSettings.mobileLayout}`
       : "",
-    activeHeaderVariant === "mobile" ? (documentSettings.mobileLogoPaddingRemove ? "site-header--logo-padding-remove" : "") : (documentSettings.logoPaddingRemove ? "site-header--logo-padding-remove" : ""),
+    activeHeaderVariant === "mobile"
+      ? ((usesSeparateMobileDocument ? documentSettings.logoPaddingRemove : documentSettings.mobileLogoPaddingRemove) ? "site-header--logo-padding-remove" : "")
+      : (documentSettings.logoPaddingRemove ? "site-header--logo-padding-remove" : ""),
   ]
     .filter(Boolean)
     .join(" ");
@@ -602,12 +678,6 @@ export default function HeaderShellView({
             linkProjection={scopedPreviewWebsiteId ? { mode: scopedLinkMode ?? "preview", context: { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages, systemRouteAliases: getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings) } } : undefined} />]))}
         items={filterSaaSItems(menuItems)}
         presentationById={menuPresentation}
-        categories={
-          (!source || source === "main") && compositionTypes.has("categories")
-            ? categories
-            : null
-        }
-        serviceHomepageMode={serviceHomepageMode}
         scopedPreviewWebsiteId={scopedPreviewWebsiteId}
         activePageKey={scopedPreviewPage}
         scopedPreviewPages={scopedPreviewPages}
@@ -617,16 +687,18 @@ export default function HeaderShellView({
         dropdownIndicator={dropdownIndicator}
         parentIconEnabled={parentIconEnabled}
         clickModeEnabled={clickModeEnabled}
-        canonicalMobile={activeHeaderVariant === "mobile" && hasCanonicalMobileRows}
-        dialogLayout={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogLayout : documentSettings.dialogLayout}
-        dialogMenuStyle={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogMenuStyle : documentSettings.dialogMenuStyle}
-        dialogCenter={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogCenter : documentSettings.dialogCenter}
-        dialogPushAfter={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogPushAfter : documentSettings.dialogPushAfter}
-        dialogClose={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogClose : true}
-        offcanvasMode={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasMode : documentSettings.offcanvasMode}
-        offcanvasFlip={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasFlip : documentSettings.offcanvasFlip}
-        offcanvasOverlay={activeHeaderVariant === "mobile" ? documentSettings.mobileOffcanvasOverlay : documentSettings.offcanvasOverlay}
-        dropbarAnimation={activeHeaderVariant === "mobile" ? documentSettings.mobileDialogDropbarAnimation : documentSettings.dialogDropbarAnimation}
+        canonicalMobile={activeHeaderVariant === "mobile" && (hasCanonicalMobileRows || hasSeparateMobileHeader)}
+        dialogLayout={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogLayout ?? (usesSeparateMobileDocument ? documentSettings.dialogLayout : documentSettings.mobileDialogLayout)) : documentSettings.dialogLayout}
+        dialogMenuStyle={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogMenuStyle ?? (usesSeparateMobileDocument ? documentSettings.dialogMenuStyle : documentSettings.mobileDialogMenuStyle)) : documentSettings.dialogMenuStyle}
+        dialogCenter={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogCenter ?? (usesSeparateMobileDocument ? documentSettings.dialogCenter : documentSettings.mobileDialogCenter)) : documentSettings.dialogCenter}
+        dialogPushAfter={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogPushAfter ?? (usesSeparateMobileDocument ? documentSettings.dialogPushAfter : documentSettings.mobileDialogPushAfter)) : documentSettings.dialogPushAfter}
+        dialogClose={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogClose ?? (usesSeparateMobileDocument ? documentSettings.dialogClose : documentSettings.mobileDialogClose)) : true}
+        offcanvasMode={activeHeaderVariant === "mobile" ? (activeDialogSettings?.offcanvasMode ?? (usesSeparateMobileDocument ? documentSettings.offcanvasMode : documentSettings.mobileOffcanvasMode)) : documentSettings.offcanvasMode}
+        offcanvasFlip={activeHeaderVariant === "mobile" ? (activeDialogSettings?.offcanvasFlip ?? (usesSeparateMobileDocument ? documentSettings.offcanvasFlip : documentSettings.mobileOffcanvasFlip)) : documentSettings.offcanvasFlip}
+        offcanvasOverlay={activeHeaderVariant === "mobile" ? (activeDialogSettings?.offcanvasOverlay ?? (usesSeparateMobileDocument ? documentSettings.offcanvasOverlay : documentSettings.mobileOffcanvasOverlay)) : documentSettings.offcanvasOverlay}
+        dropbarAnimation={activeHeaderVariant === "mobile" ? (activeDialogSettings?.dialogDropbarAnimation ?? (usesSeparateMobileDocument ? documentSettings.dialogDropbarAnimation : documentSettings.mobileDialogDropbarAnimation)) : documentSettings.dialogDropbarAnimation}
+        mobileDrawerContent={getMobileDrawerContent()}
+        forceMobileMenuOpen={forceMobileDialogOpen && activeHeaderVariant === "mobile"}
         style={typographyProps(element.typography, "body").style}
       />
     );
@@ -713,7 +785,7 @@ export default function HeaderShellView({
       </div>
     );
   };
-  const renderHeaderButton = (buttonElement?: HeaderBuilderElement) => showButtonElement ? (
+  const renderHeaderButton = (buttonElement?: HeaderBuilderElement) => (showButtonElement || Boolean(buttonElement)) ? (
     <UikitButton
       scopeClassName="shop-builder-main"
       block={{
@@ -744,6 +816,94 @@ export default function HeaderShellView({
       }}
     />
   ) : null;
+  const renderMobileDialogNavigation = (element: HeaderBuilderElement) => {
+    const source = element.menuSource?.trim();
+    const sourceItems = resolveHeaderMenuSourceItems(effectiveShellSettings, source);
+    const hasNamedSource = Boolean(
+      source &&
+      source !== "main" &&
+      effectiveShellSettings.namedMenus?.some((menu) => menu.id === source),
+    );
+    const menuItems = hasNamedSource ? buildReactMenuTree(sourceItems) : defaultMenuItems;
+    return (
+      <HeaderNav
+        items={filterSaaSItems(menuItems)}
+        presentationById={menuPresentation}
+        scopedPreviewWebsiteId={scopedPreviewWebsiteId}
+        activePageKey={scopedPreviewPage}
+        scopedPreviewPages={scopedPreviewPages}
+        systemRouteAliases={getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings)}
+        scopedLinkMode={scopedLinkMode}
+        dropdownIndicator={dropdownIndicator}
+        parentIconEnabled={parentIconEnabled}
+        clickModeEnabled={clickModeEnabled}
+        dialogPushAfter={(activeDialogSettings ?? documentSettings).dialogPushAfter}
+        mobileMenuOnly
+        style={typographyProps(element.typography, "body").style}
+      />
+    );
+  };
+  const getMobileDrawerContent = () => {
+    if (activeHeaderVariant !== "mobile" || !mobileDialogComposition?.elements.length) return undefined;
+    const dialogSettings = activeDialogSettings ?? documentSettings;
+    return (
+      <div className="mobile-drawer-builder-content" data-mobile-dialog-builder-content>
+        {mobileDialogComposition.elements.map((element) => {
+          let content: ReactNode = null;
+          if (element.type === "navigation") content = renderMobileDialogNavigation(element);
+          if (element.type === "logo") content = renderLogoAndBrand(element);
+          if (element.type === "button") content = renderHeaderButton(element);
+          if (element.type === "spacer") content = <span className="header-builder-spacer-content" aria-hidden="true" />;
+          if (element.type === "social") content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
+          if (element.type === "utility" && element.utilityAction) {
+            content = element.utilityAction === "search"
+              ? <HeaderSearchControl layout={dialogSettings.searchLayout} stretch={dialogSettings.searchDropdownStretch} large={dialogSettings.searchDropdownLarge} iconPosition={dialogSettings.searchIconPosition} expandInput={dialogSettings.searchExpand} preventSubmit={dialogSettings.searchPreventSubmit} dropbarAnimation={dialogSettings.searchDropbarAnimation} removeHorizontalPadding={dialogSettings.searchDropbarRemoveHorizontalPadding} />
+              : <HeaderActions icons={[element.utilityAction as BuilderHeaderIconId]} iconVariant={(element.utilityVariant as BuilderHeaderIconVariant | undefined) ?? effectiveIconVariant} />;
+          }
+          if (element.type === "categories") content = renderCategoriesMega(element);
+          if (element.type === "language") {
+            content = (
+              <WebsiteLanguageSwitcher
+                activeLanguage={activeContentLanguage}
+                enabledLanguages={enabledContentLanguages}
+                preferenceKey={languagePreferenceKey}
+                previewOnly={languageSwitcherPreviewOnly}
+                display={element.languageDisplay}
+                onLanguageChange={onContentLanguageChange}
+                triggerStyle={typographyProps(element.typography, "button").style}
+              />
+            );
+          }
+          if (!content) return null;
+          const elementContent = (
+            <div
+              className="mobile-drawer-builder-element"
+              style={visualStyleToCss(element.visualStyle)}
+            >
+              {content}
+            </div>
+          );
+          if (renderMobileDialogElementProp) {
+            return <div key={element.id} style={{ display: "contents" }}>{renderMobileDialogElementProp(element, elementContent)}</div>;
+          }
+          if (builderInteractionIdentity) {
+            return (
+              <div
+                key={element.id}
+                data-builder-object-type="block"
+                data-builder-section-id={mobileDialogSectionId}
+                data-builder-column-key={element.columnId ?? "header-mobile-dialog-row"}
+                data-builder-block-key={element.id}
+              >
+                {elementContent}
+              </div>
+            );
+          }
+          return <div key={element.id} style={{ display: "contents" }}>{elementContent}</div>;
+        })}
+      </div>
+    );
+  };
   const toolbarRowIds = new Set(
     canonicalRows
       .filter((row) => activeRowIds.has(row.rowId) && row.role === "toolbar")
@@ -898,14 +1058,14 @@ export default function HeaderShellView({
     if (element.type === "utility" && element.utilityAction) {
       content = element.utilityAction === "search" ? (
         <HeaderSearchControl
-          layout={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchLayout : documentSettings.searchLayout}
-          stretch={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownStretch : documentSettings.searchDropdownStretch}
-          large={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropdownLarge : documentSettings.searchDropdownLarge}
-          iconPosition={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchIconPosition : documentSettings.searchIconPosition}
-          expandInput={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchExpand : documentSettings.searchExpand}
-          preventSubmit={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchPreventSubmit : documentSettings.searchPreventSubmit}
-          dropbarAnimation={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropbarAnimation : documentSettings.searchDropbarAnimation}
-          removeHorizontalPadding={activeHeaderVariant === "mobile" ? documentSettings.mobileSearchDropbarRemoveHorizontalPadding : documentSettings.searchDropbarRemoveHorizontalPadding}
+          layout={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchLayout : documentSettings.mobileSearchLayout) : documentSettings.searchLayout}
+          stretch={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchDropdownStretch : documentSettings.mobileSearchDropdownStretch) : documentSettings.searchDropdownStretch}
+          large={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchDropdownLarge : documentSettings.mobileSearchDropdownLarge) : documentSettings.searchDropdownLarge}
+          iconPosition={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchIconPosition : documentSettings.mobileSearchIconPosition) : documentSettings.searchIconPosition}
+          expandInput={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchExpand : documentSettings.mobileSearchExpand) : documentSettings.searchExpand}
+          preventSubmit={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchPreventSubmit : documentSettings.mobileSearchPreventSubmit) : documentSettings.searchPreventSubmit}
+          dropbarAnimation={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchDropbarAnimation : documentSettings.mobileSearchDropbarAnimation) : documentSettings.searchDropbarAnimation}
+          removeHorizontalPadding={activeHeaderVariant === "mobile" ? (usesSeparateMobileDocument ? documentSettings.searchDropbarRemoveHorizontalPadding : documentSettings.mobileSearchDropbarRemoveHorizontalPadding) : documentSettings.searchDropbarRemoveHorizontalPadding}
         />
       ) : (
         <HeaderActions
@@ -1164,8 +1324,9 @@ export default function HeaderShellView({
       overlapHeader={documentSettings.overlay}
       builderPreviewMode={builderPreviewMode}
       scrollState={scrollState}
-      activeVariant={hasCanonicalMobileRows ? activeHeaderVariant : undefined}
-      mobileBreakpoint={hasCanonicalMobileRows ? mobileBreakpoint : undefined}
+      activeVariant={hasCanonicalMobileRows || hasSeparateMobileHeader ? activeHeaderVariant : undefined}
+      mobileBreakpoint={hasCanonicalMobileRows || hasSeparateMobileHeader ? mobileBreakpoint : undefined}
+      builderSectionId={activeDocumentSectionId}
       style={{
         ...documentVisualCss,
         ...visualStyleToCss(headerComposition.rowVisualStyle),

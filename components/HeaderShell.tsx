@@ -15,7 +15,7 @@ import type { SaaSWebsite } from "@/lib/websites";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderShellView from "./HeaderShellView";
 import {
-  getOrCreateHeaderBuilderLayout,
+  getHeaderBuilderDocuments,
 } from "@/lib/headerBuilderDocument";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
@@ -23,6 +23,10 @@ import { resolveContentSections } from "@/lib/builderContentLanguages";
 import type { BuilderThemeSettings } from "@/lib/builderThemeSettings";
 import { menuDropdownRenderLayout } from "@/lib/menuDropdownLayout";
 import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMaterializer.server";
+import {
+  headerBuilderDocumentSectionId,
+  type HeaderBuilderDocumentKey,
+} from "@/lib/headerBuilderDocumentKeys";
 
 type HeaderShellProps = {
   layoutOverride?: BuilderHeaderLayout;
@@ -37,6 +41,8 @@ type HeaderShellProps = {
   builderInteractionIdentity?: boolean;
   builderPreviewMode?: boolean;
   builderDraftPreview?: boolean;
+  previewHeaderVariant?: "desktop" | "mobile";
+  previewHeaderDocument?: HeaderBuilderDocumentKey;
   tenantPathMode?: boolean;
   dropdownProjectionsOverride?: HeaderDropdownProjections;
 };
@@ -156,6 +162,8 @@ export default async function HeaderShell({
   builderInteractionIdentity = false,
   builderPreviewMode = false,
   builderDraftPreview = false,
+  previewHeaderVariant,
+  previewHeaderDocument,
   tenantPathMode = false,
   dropdownProjectionsOverride,
 }: HeaderShellProps) {
@@ -185,12 +193,12 @@ export default async function HeaderShell({
       };
   const navigationWebsiteId = scopedPreviewWebsiteId ?? (tenantPathMode ? website?.slug : undefined);
   const serviceHomepageMode = !website && !scopedPreviewWebsiteId;
-  const storedHeaderLayout = await getOrCreateHeaderBuilderLayout(
+  const storedHeaderDocuments = await getHeaderBuilderDocuments(
     shellSettings,
     scope ?? {},
     serviceHomepageMode,
   );
-  const headerLayout = storedHeaderLayout;
+  const headerLayout = storedHeaderDocuments.desktop;
   const cookieStore = await cookies();
   const langKey = `website_content_language_${website?.id ?? "root"}`;
   const languageCookie = cookieStore.get(langKey)?.value;
@@ -208,6 +216,42 @@ export default async function HeaderShell({
     ) as typeof headerLayout.sections,
   };
   const headerComposition = resolveHeaderBuilderComposition(localizedHeaderLayout);
+  const localizedMobileHeaderLayout = storedHeaderDocuments.mobile
+    ? {
+        ...storedHeaderDocuments.mobile,
+        sections: resolveContentSections(
+          storedHeaderDocuments.mobile.sections as never,
+          selectedContentLanguage,
+          website?.primaryLanguage ?? selectedContentLanguage,
+        ) as typeof storedHeaderDocuments.mobile.sections,
+      }
+    : null;
+  const mobileHeaderComposition = localizedMobileHeaderLayout
+    ? resolveHeaderBuilderComposition(localizedMobileHeaderLayout, {
+        sectionId: headerBuilderDocumentSectionId("header-mobile"),
+      })
+    : undefined;
+  // New Mobile Header documents own both authored surfaces in reading order:
+  // the mobile bar first, followed by the drawer content. Keep the old
+  // standalone document as a storefront fallback until an explicit mobile
+  // Builder or Theme Settings action migrates an existing site.
+  const embeddedDialogSectionId = headerBuilderDocumentSectionId("header-mobile-dialog");
+  const mobileDialogComposition = localizedMobileHeaderLayout?.sections.some(
+    (section) => section.id === embeddedDialogSectionId,
+  )
+    ? resolveHeaderBuilderComposition(localizedMobileHeaderLayout, {
+        sectionId: embeddedDialogSectionId,
+      })
+    : storedHeaderDocuments.dialog
+      ? resolveHeaderBuilderComposition({
+          ...storedHeaderDocuments.dialog,
+          sections: resolveContentSections(
+            storedHeaderDocuments.dialog.sections as never,
+            selectedContentLanguage,
+            website?.primaryLanguage ?? selectedContentLanguage,
+          ) as typeof storedHeaderDocuments.dialog.sections,
+        })
+      : undefined;
   const documentSettings = resolveHeaderDocumentSettings(
     headerComposition,
     shellSettings,
@@ -256,6 +300,8 @@ export default async function HeaderShell({
         />
       ) : null}
       headerComposition={headerComposition}
+      mobileHeaderComposition={mobileHeaderComposition}
+      mobileDialogComposition={mobileDialogComposition}
       publicAnchorId={localizedHeaderLayout.sections[0]?.anchorId}
       activeContentLanguage={selectedContentLanguage}
       enabledContentLanguages={website?.enabledLanguages ?? ["hy", "en", "ru"]}
@@ -263,6 +309,11 @@ export default async function HeaderShell({
       builderInteractionIdentity={builderInteractionIdentity}
       builderPreviewMode={builderPreviewMode}
       builderDraftPreview={builderDraftPreview}
+      previewHeaderVariant={previewHeaderVariant}
+      forceMobileDialogOpen={
+        previewHeaderDocument === "header-mobile-dialog" ||
+        (builderDraftPreview && previewHeaderDocument === "header-mobile")
+      }
     />
   );
 }

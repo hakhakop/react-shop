@@ -7,17 +7,20 @@ import {
   getPublishedBuilderLayout,
   mutateBuilderLayoutStore,
 } from "@/lib/builderLayouts";
+import { isHeaderBuilderDocumentKey } from "@/lib/headerBuilderDocumentKeys";
 
 export const builderDocumentConfig: Record<
   BuilderDocumentKey,
   { sectionId: `${BuilderDocumentKey}-document`; label: string }
 > = {
   header: { sectionId: "header-document", label: "Header" },
+  "header-mobile": { sectionId: "header-mobile-document", label: "Mobile Header" },
+  "header-mobile-dialog": { sectionId: "header-mobile-dialog-document", label: "Mobile Menu Dialog" },
   footer: { sectionId: "footer-document", label: "Footer" },
 };
 
 export function isBuilderDocumentKey(value: unknown): value is BuilderDocumentKey {
-  return value === "header" || value === "footer";
+  return isHeaderBuilderDocumentKey(value) || value === "footer";
 }
 
 export function hydrateBuilderDocumentState<

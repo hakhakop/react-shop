@@ -3637,8 +3637,10 @@ body[data-storefront-preset="princity"] .category-mega-card,
     flex: 0 0 auto !important;
   }
 
-  /* Hide horizontal nav links and categories toggle in the header row on mobile */
-  .site-header-nav,
+  /* Hide only the horizontal nav in the header row. The Mobile Menu Builder
+     also renders a `.site-header-nav` inside the drawer, where it must stay
+     visible while the dialog is open. */
+  .site-header-nav-container > .site-header-nav,
   .site-header-categories,
   .site-header-categories-toggle {
     display: none !important;
@@ -4498,15 +4500,21 @@ body[data-storefront-preset="princity"] .category-mega-card,
   padding-inline: 1rem;
 }
 
-.site-header[data-header-active-variant="mobile"] .header-builder-columns {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 1rem;
+.site-header[data-header-active-variant="mobile"] .site-header-main-inner,
+.site-header[data-header-active-variant="mobile"] .site-header-princity-inner,
+.site-header[data-header-active-variant="mobile"] .site-header-hero-inner {
+  position: relative;
 }
 
+/* A separate Mobile Header is an ordinary Builder document. Keep the base
+   flex row so every selected Row layout owns its column ratios. A fixed
+   two-track grid here made a three-column Row wrap its final column. */
+
 .site-header--mobile-layout-horizontal-center .header-builder-columns {
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
 }
 
 .site-header--mobile-layout-horizontal-center .header-builder-column:nth-of-type(2) {
@@ -4530,7 +4538,9 @@ body[data-storefront-preset="princity"] .category-mega-card,
 }
 
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile {
-  position: relative;
+  /* The mobile drawer is a full Header surface, not a 34px menu-button
+     popover. Its positioned boundary is the Header row. */
+  position: static;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -4553,10 +4563,10 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile > .site-header-mobile-drawer-backdrop,
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile > .site-header-mobile-drawer-wrapper {
   position: absolute !important;
-  top: calc(100% + 1rem) !important;
-  right: -1rem !important;
-  left: auto !important;
-  width: 100vw !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
   height: calc(100vh - var(--header-builder-height, 64px)) !important;
 }
 
@@ -4616,6 +4626,22 @@ body[data-storefront-preset="princity"] .category-mega-card,
   display: flex !important;
   flex-direction: column !important;
   gap: 0.25rem !important;
+}
+
+/* The dialog Menu is a real HeaderNav instance inside the Builder wrapper.
+   Make that nested nav own the same vertical flow as ordinary drawer items;
+   otherwise its five items remain on one clipped horizontal line. */
+.site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile .mobile-drawer-nav-items > .site-header-nav--mobile-dialog {
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  gap: 0.25rem !important;
+}
+
+.site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile .mobile-drawer-nav-items > .site-header-nav--mobile-dialog > .site-header-nav-item {
+  width: 100% !important;
+  align-items: stretch !important;
 }
 
 /* Canonical YOOtheme Search/Social controls share the Header document runtime. */
@@ -4729,6 +4755,24 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile.dialog-layout-dropbar-center > .site-header-mobile-drawer-wrapper.is-open,
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile.dialog-layout-offcanvas-top > .site-header-mobile-drawer-wrapper.is-open,
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile.dialog-layout-offcanvas-center > .site-header-mobile-drawer-wrapper.is-open { transform: translateY(0); }
+
+/* The canonical mobile shell gives an ordinary drawer its viewport height.
+   A YOOtheme Dropbar instead ends after its authored dialog content. Keep
+   that distinction after the full-width positioning override above. */
+.site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile.dialog-layout-dropbar-top > .site-header-mobile-drawer-wrapper,
+.site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile.dialog-layout-dropbar-center > .site-header-mobile-drawer-wrapper {
+  height: auto !important;
+}
+
+.site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile[class*="dialog-layout-dropbar"] .site-header-mobile-drawer {
+  position: relative !important;
+  inset: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - var(--header-builder-height, 64px)) !important;
+  overflow-y: auto !important;
+}
+
 .site-header[data-header-active-variant="mobile"] .site-header-nav-container.is-canonical-mobile[class*="dialog-layout-dropbar"] .site-header-mobile-drawer {
   width: 100%;
   height: auto;

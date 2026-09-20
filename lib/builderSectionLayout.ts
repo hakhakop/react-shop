@@ -280,7 +280,7 @@ export function normalizeBuilderSectionLayout(
       id,
       layout,
       ...(resolvedFields.role === "toolbar" ? { role: "toolbar" as const } : {}),
-      ...(resolvedFields.headerVariant === "desktop" || resolvedFields.headerVariant === "mobile"
+      ...(resolvedFields.headerVariant === "desktop" || resolvedFields.headerVariant === "mobile" || resolvedFields.headerVariant === "mobile-dialog"
         ? { headerVariant: resolvedFields.headerVariant }
         : {}),
       ...(resolvedFields.maxWidth ? { maxWidth: resolvedFields.maxWidth as BuilderRow["maxWidth"] } : {}),

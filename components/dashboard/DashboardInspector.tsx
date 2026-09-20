@@ -105,6 +105,10 @@ import {
 } from "@/lib/headerElementAlignment";
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import { findCanonicalBuilderColumn } from "@/lib/builderColumnEditing";
+import {
+  isHeaderBuilderDocumentSectionId,
+  type HeaderBuilderView,
+} from "@/lib/headerBuilderDocumentKeys";
 
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import {
@@ -526,6 +530,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlockInheritedDynamicContext?: BuilderLayoutBlock["dynamicContext"];
   selectedSection: BuilderSection | undefined;
   headerDocumentRoot?: boolean;
+  headerDocumentVariant?: HeaderBuilderView;
   footerDocumentRoot?: boolean;
   anchorIdEntries?: Array<{ sectionId: string; anchorId: string }>;
   selectedSectionIsFirstVisible?: boolean;
@@ -851,6 +856,7 @@ type HeaderDocumentSettingsValues = Pick<
   | "headerClickModeEnabled"
   | "headerDialogTogglePosition"
   | "headerDialogLayout"
+  | "headerDialogClose"
   | "headerDialogMenuStyle"
   | "headerDialogCenter"
   | "headerDialogPushAfter"
@@ -883,19 +889,155 @@ type HeaderDocumentSettingsValues = Pick<
 
 type HeaderDocumentPatch = Partial<HeaderDocumentSettingsValues>;
 
+type HeaderDocumentSettingsProps = {
+  headerSettings: HeaderDocumentSettingsValues;
+  headerVisible: boolean;
+  headerHeight?: string;
+  headerCustomHeight?: number;
+  onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
+  variant?: HeaderBuilderView;
+};
+
+function MobileHeaderDocumentSettings({
+  headerSettings,
+  headerHeight,
+  headerCustomHeight,
+  onHeaderDocumentChange,
+}: HeaderDocumentSettingsProps) {
+  return (
+    <div className="builder-inspector-stack">
+      <InspectorDivision title="Mobile bar" description="Settings for the header bar visitors see at the mobile breakpoint." className="builder-document-division">
+        <InspectorFieldRow label="Header behavior">
+          <InspectorSelect value={headerSettings.headerBehavior ?? "static"} options={[{ value: "static", label: "Static" }, { value: "sticky", label: "Sticky" }, { value: "sticky-on-scroll-up", label: "Sticky on scroll up" }, { value: "pill-on-scroll", label: "Pill on scroll" }]} onChange={(headerBehavior) => onHeaderDocumentChange({ headerBehavior: headerBehavior as BuilderSection["headerBehavior"] })} ariaLabel="Mobile Header Behavior" />
+        </InspectorFieldRow>
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Header width</span>
+            <select value={headerSettings.headerWidthMode ?? "boxed"} onChange={(event) => onHeaderDocumentChange({ headerWidthMode: event.target.value as BuilderSection["headerWidthMode"] })}>
+              <option value="boxed">Boxed</option>
+              <option value="full">Full width</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Z-index</span>
+            <input type="number" min={0} max={999} value={headerSettings.headerZIndex ?? 40} onChange={(event) => onHeaderDocumentChange({ headerZIndex: Number(event.target.value) })} />
+          </label>
+        </div>
+        <HeaderHeightControl height={headerHeight} customHeight={headerCustomHeight} onChange={onHeaderDocumentChange} />
+        <HeaderDocumentSwitch label="Transparent header" checked={headerSettings.headerTransparent === true} onChange={(headerTransparent) => onHeaderDocumentChange({ headerTransparent })} />
+        <HeaderDocumentSwitch label="Overlay content" checked={headerSettings.headerOverlay === true} onChange={(headerOverlay) => onHeaderDocumentChange({ headerOverlay })} />
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Background mode</span>
+            <select value={headerSettings.headerBackgroundMode ?? "default"} onChange={(event) => onHeaderDocumentChange({ headerBackgroundMode: event.target.value as BuilderSection["headerBackgroundMode"] })}>
+              <option value="default">Default</option>
+              <option value="glass">Glass</option>
+              <option value="accent">Accent</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Text mode</span>
+            <select value={headerSettings.headerTextMode ?? "auto"} onChange={(event) => onHeaderDocumentChange({ headerTextMode: event.target.value as BuilderSection["headerTextMode"] })}>
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
+      </InspectorDivision>
+
+      <InspectorDivision title="Mobile menu trigger" description="Choose where the Mobile Menu button belongs in this authored bar." className="builder-document-division">
+        <label className="builder-field">
+          <span>Menu trigger position</span>
+          <select value={headerSettings.headerDialogTogglePosition ?? "mobile-end"} onChange={(event) => onHeaderDocumentChange({ headerDialogTogglePosition: event.target.value })}>
+            <option value="navbar-mobile-start">Navbar start</option>
+            <option value="navbar-mobile-end">Navbar end</option>
+            <option value="mobile-start">Header start</option>
+            <option value="mobile-end">Header end</option>
+          </select>
+        </label>
+        <div className="builder-shell-note">
+          <strong>Mobile menu content</strong>
+          <span>Use Mobile → Menu to build the drawer that opens from this trigger.</span>
+        </div>
+      </InspectorDivision>
+
+      <InspectorDivision title="Search" description="Mobile search placement and presentation." className="builder-document-division">
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Search position</span><select value={headerSettings.headerSearchPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerSearchPosition: event.target.value })}><option value="hide">Hide</option><option value="navbar-mobile-start">Navbar start</option><option value="navbar-mobile-end">Navbar end</option><option value="mobile-start">Header start</option><option value="mobile-end">Header end</option><option value="dialog-mobile-start">Menu start</option><option value="dialog-mobile-end">Menu end</option><option value="logo-mobile-end">Logo end</option></select></label>
+          <label className="builder-field"><span>Search layout</span><select value={headerSettings.headerSearchLayout ?? "input-dropdown"} onChange={(event) => onHeaderDocumentChange({ headerSearchLayout: event.target.value })}><option value="input-dropdown">Input dropdown</option><option value="dropdown">Toggle dropdown</option><option value="input-dropbar">Input dropbar</option><option value="dropbar">Toggle dropbar</option><option value="modal">Toggle modal</option></select></label>
+        </div>
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Search dropdown stretch</span><select value={headerSettings.headerSearchDropdownStretch ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSearchDropdownStretch: event.target.value })}><option value="">None</option><option value="navbar">Navbar</option><option value="navbar-container">Navbar container</option></select></label>
+          <label className="builder-field"><span>Search icon</span><select value={headerSettings.headerSearchIconPosition ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSearchIconPosition: event.target.value as BuilderSection["headerSearchIconPosition"] })}><option value="">None</option><option value="left">Left</option><option value="right">Right</option></select></label>
+          <HeaderDocumentSwitch label="Large search padding" checked={headerSettings.headerSearchDropdownLarge === true} onChange={(headerSearchDropdownLarge) => onHeaderDocumentChange({ headerSearchDropdownLarge })} />
+          <HeaderDocumentSwitch label="Expand search input" checked={headerSettings.headerSearchExpand === true} onChange={(headerSearchExpand) => onHeaderDocumentChange({ headerSearchExpand })} />
+          <HeaderDocumentSwitch label="Prevent search form submit" checked={headerSettings.headerSearchPreventSubmit === true} onChange={(headerSearchPreventSubmit) => onHeaderDocumentChange({ headerSearchPreventSubmit })} />
+          <HeaderDocumentSwitch label="Remove search dropbar padding" checked={headerSettings.headerSearchDropbarRemoveHorizontalPadding === true} onChange={(headerSearchDropbarRemoveHorizontalPadding) => onHeaderDocumentChange({ headerSearchDropbarRemoveHorizontalPadding })} />
+          <HeaderDocumentSwitch label="Remove logo-side padding" checked={headerSettings.headerLogoPaddingRemove === true} onChange={(headerLogoPaddingRemove) => onHeaderDocumentChange({ headerLogoPaddingRemove })} />
+        </div>
+        <label className="builder-field"><span>Search dropbar animation</span><select value={headerSettings.headerSearchDropbarAnimation ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSearchDropbarAnimation: event.target.value || undefined })}><option value="">Fade</option><option value="reveal-top">Slide top</option><option value="slide-left">Slide left</option><option value="slide-right">Slide right</option></select></label>
+      </InspectorDivision>
+
+      <InspectorDivision title="Social" description="Mobile social-menu placement and presentation." className="builder-document-division">
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Social position</span><select value={headerSettings.headerSocialPosition ?? "hide"} onChange={(event) => onHeaderDocumentChange({ headerSocialPosition: event.target.value })}><option value="hide">Hide</option><option value="navbar-mobile-start">Navbar start</option><option value="navbar-mobile-end">Navbar end</option><option value="mobile-start">Header start</option><option value="mobile-end">Header end</option><option value="dialog-mobile-start">Menu start</option><option value="dialog-mobile-end">Menu end</option><option value="logo-mobile-end">Logo end</option></select></label>
+          <label className="builder-field"><span>Social gap</span><select value={headerSettings.headerSocialGap ?? ""} onChange={(event) => onHeaderDocumentChange({ headerSocialGap: event.target.value })}><option value="collapse">None</option><option value="small">Small</option><option value="medium">Medium</option><option value="">Default</option><option value="large">Large</option></select></label>
+          <HeaderDocumentSwitch label="Display social icons as buttons" checked={headerSettings.headerSocialStyle === true} onChange={(headerSocialStyle) => onHeaderDocumentChange({ headerSocialStyle })} />
+        </div>
+        <label className="builder-field"><span>Social links (one URL per line)</span><textarea value={(headerSettings.headerSocialItems ?? []).map((item) => item.link).join("\n")} onChange={(event) => onHeaderDocumentChange({ headerSocialItems: event.target.value.split(/\r?\n/).map((link) => link.trim()).filter(Boolean).map((link) => ({ link })) })} /></label>
+      </InspectorDivision>
+
+      <div className="builder-shell-note">
+        <strong>Responsive handoff</strong>
+        <span>The Desktop Header selects the breakpoint. This document owns only the mobile bar and its elements.</span>
+      </div>
+    </div>
+  );
+}
+
+function MobileDialogDocumentSettings({
+  headerSettings,
+  onHeaderDocumentChange,
+}: HeaderDocumentSettingsProps) {
+  return (
+    <div className="builder-inspector-stack">
+      <InspectorDivision title="Mobile menu" description="Presentation for the drawer visitors see after opening the Mobile Menu." className="builder-document-division">
+        <div className="builder-two-column">
+          <label className="builder-field"><span>Menu layout</span><select value={headerSettings.headerDialogLayout ?? "offcanvas-top"} onChange={(event) => onHeaderDocumentChange({ headerDialogLayout: event.target.value })}><option value="dropbar-top">Dropbar top</option><option value="dropbar-center">Dropbar center</option><option value="offcanvas-top">Offcanvas top</option><option value="offcanvas-center">Offcanvas center</option><option value="modal-top">Modal top</option><option value="modal-center">Modal center</option></select></label>
+          <label className="builder-field"><span>Menu style</span><select value={headerSettings.headerDialogMenuStyle ?? "default"} onChange={(event) => onHeaderDocumentChange({ headerDialogMenuStyle: event.target.value })}><option value="default">Default</option><option value="primary">Primary</option><option value="secondary">Secondary</option></select></label>
+          <label className="builder-field"><span>Offcanvas mode</span><select value={headerSettings.headerOffcanvasMode ?? "slide"} onChange={(event) => onHeaderDocumentChange({ headerOffcanvasMode: event.target.value })}><option value="slide">Slide</option><option value="reveal">Reveal</option><option value="push">Push</option></select></label>
+          <label className="builder-field"><span>Dropbar animation</span><select value={headerSettings.headerDialogDropbarAnimation ?? ""} onChange={(event) => onHeaderDocumentChange({ headerDialogDropbarAnimation: event.target.value })}><option value="">Fade</option><option value="reveal-top">Slide top</option><option value="slide-left">Slide left</option><option value="slide-right">Slide right</option></select></label>
+          <label className="builder-field"><span>Push after item</span><input type="number" min={0} max={10} value={headerSettings.headerDialogPushAfter ?? 0} onChange={(event) => onHeaderDocumentChange({ headerDialogPushAfter: Number(event.target.value) || undefined })} /></label>
+          <HeaderDocumentSwitch label="Show close button" checked={headerSettings.headerDialogClose !== false} onChange={(headerDialogClose) => onHeaderDocumentChange({ headerDialogClose })} />
+          <HeaderDocumentSwitch label="Center menu content" checked={headerSettings.headerDialogCenter === true} onChange={(headerDialogCenter) => onHeaderDocumentChange({ headerDialogCenter })} />
+          <HeaderDocumentSwitch label="Open from the right" checked={headerSettings.headerOffcanvasFlip === true} onChange={(headerOffcanvasFlip) => onHeaderDocumentChange({ headerOffcanvasFlip })} />
+          <HeaderDocumentSwitch label="Overlay the site" checked={headerSettings.headerOffcanvasOverlay === true} onChange={(headerOffcanvasOverlay) => onHeaderDocumentChange({ headerOffcanvasOverlay })} />
+        </div>
+      </InspectorDivision>
+      <div className="builder-shell-note">
+        <strong>Drawer content</strong>
+        <span>Build the menu, search, buttons, and other content in the canvas. The drawer stays open while this surface is selected.</span>
+      </div>
+    </div>
+  );
+}
+
 function HeaderDocumentSettings({
   headerSettings,
   headerVisible,
   headerHeight,
   headerCustomHeight,
   onHeaderDocumentChange,
-}: {
-  headerSettings: HeaderDocumentSettingsValues;
-  headerVisible: boolean;
-  headerHeight?: string;
-  headerCustomHeight?: number;
-  onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
-}) {
+  variant = "desktop",
+}: HeaderDocumentSettingsProps) {
+  if (variant === "mobile") {
+    return <MobileHeaderDocumentSettings headerSettings={headerSettings} headerVisible={headerVisible} headerHeight={headerHeight} headerCustomHeight={headerCustomHeight} onHeaderDocumentChange={onHeaderDocumentChange} />;
+  }
+  if (variant === "dialog") {
+    return <MobileDialogDocumentSettings headerSettings={headerSettings} headerVisible={headerVisible} headerHeight={headerHeight} headerCustomHeight={headerCustomHeight} onHeaderDocumentChange={onHeaderDocumentChange} />;
+  }
   return (
     <div className="builder-inspector-stack">
       <InspectorDivision title="Behavior" description="Document-wide behavior shared by every Header row and element." className="builder-document-division">
@@ -1026,7 +1168,8 @@ function HeaderDocumentSettings({
         </div>
       </InspectorDivision>
 
-      <InspectorDivision title="Mobile header" description="Responsive composition, search, social, and mobile dialog behavior." className="builder-document-division">
+      {headerSettings.headerMobileComposition === "responsive" ? (
+      <InspectorDivision title="Legacy mobile settings" description="Compatibility controls for a legacy combined Header document." className="builder-document-division">
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Mobile layout</span>
@@ -1078,6 +1221,19 @@ function HeaderDocumentSettings({
           <HeaderDocumentSwitch label="Center mobile dialog" checked={headerSettings.headerMobileDialogCenter === true} onChange={(headerMobileDialogCenter) => onHeaderDocumentChange({ headerMobileDialogCenter })} />
           <HeaderDocumentSwitch label="Mobile offcanvas on right" checked={headerSettings.headerMobileOffcanvasFlip === true} onChange={(headerMobileOffcanvasFlip) => onHeaderDocumentChange({ headerMobileOffcanvasFlip })} />
           <HeaderDocumentSwitch label="Mobile overlay site" checked={headerSettings.headerMobileOffcanvasOverlay === true} onChange={(headerMobileOffcanvasOverlay) => onHeaderDocumentChange({ headerMobileOffcanvasOverlay })} />
+        </div>
+      </InspectorDivision>
+      ) : null}
+
+      <InspectorDivision title="Responsive handoff" description="The mobile bar and menu are their own Builder documents." className="builder-document-division">
+        <label className="builder-field">
+          <span>Mobile breakpoint</span>
+          <input value={headerSettings.headerMobileBreakpoint ?? ""} placeholder="1200px" onChange={(event) => onHeaderDocumentChange({ headerMobileBreakpoint: event.target.value || undefined })} />
+          <small>At and below this width, the Mobile Header document replaces this desktop header.</small>
+        </label>
+        <div className="builder-shell-note">
+          <strong>Independent mobile surfaces</strong>
+          <span>Use Mobile → Header for the bar and Mobile → Menu for the drawer content and presentation.</span>
         </div>
       </InspectorDivision>
 
@@ -1233,6 +1389,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     setSelectedLayoutRowIndex,
     selectedSection,
     headerDocumentRoot = false,
+    headerDocumentVariant,
     footerDocumentRoot = false,
     anchorIdEntries = [],
     selectedSectionIsFirstVisible = false,
@@ -1287,9 +1444,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     uploadSelectedSlideImage,
   } = props;
   const isHeaderDocumentSection =
-    headerDocumentRoot || selectedSection?.id === "header-document";
+    headerDocumentRoot || isHeaderBuilderDocumentSectionId(selectedSection?.id);
   const hasLocalButtonStyles = (block: BuilderLayoutBlock) =>
-    selectedSection?.id === "header-document" &&
+    isHeaderBuilderDocumentSectionId(selectedSection?.id) &&
     (block.id === "header-button" || block.kind === "button")
       ? Object.values(block.headerButtonOverrides ?? {}).some(Boolean)
       : hasStoredLocalButtonStyles(block);
@@ -2412,6 +2569,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             !selectedLayoutBlock &&
             !selectedLayoutRow ? (
               <HeaderDocumentSettings
+                variant={headerDocumentVariant ?? selectedSection.headerDocumentVariant ?? "desktop"}
                 headerSettings={{
                   headerVisible: selectedSection.headerVisible ?? shellSettings.headerVisible ?? true,
                   headerTransparent: selectedSection.headerTransparent ?? shellSettings.headerTransparent,
@@ -2560,7 +2718,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         <select
                           value={selectedRowItem?.headerVariant ?? "shared"}
                           onChange={(event) => onUpdateRowStyle({
-                            headerVariant: event.target.value === "desktop" || event.target.value === "mobile"
+                            headerVariant: event.target.value === "desktop" || event.target.value === "mobile" || event.target.value === "mobile-dialog"
                               ? event.target.value
                               : undefined,
                           })}
@@ -2568,6 +2726,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           <option value="shared">Shared / legacy</option>
                           <option value="desktop">Desktop</option>
                           <option value="mobile">Mobile</option>
+                          <option value="mobile-dialog">Mobile menu dialog</option>
                         </select>
                       </label>
                       <label className="builder-field">

@@ -434,8 +434,14 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
           : string(sourceMobile.breakpoint);
   if (mobileBreakpoint) patch.headerMobileBreakpoint = mobileBreakpoint;
   const sourceMobileLayout = string(sourceMobileHeader.layout)?.toLowerCase();
-  if (sourceMobileLayout === "horizontal-left" || sourceMobileLayout === "horizontal-center" || sourceMobileLayout === "horizontal-right") {
-    patch.headerMobileLayout = sourceMobileLayout;
+  // `horizontal-center-logo` is YOOtheme's preset name. The Builder still
+  // creates normal mobile-start, mobile-logo, and mobile-end columns; this
+  // value simply records the source's initial center alignment.
+  const mobileLayout = sourceMobileLayout === "horizontal-center-logo"
+    ? "horizontal-center"
+    : sourceMobileLayout;
+  if (mobileLayout === "horizontal-left" || mobileLayout === "horizontal-center" || mobileLayout === "horizontal-right") {
+    patch.headerMobileLayout = mobileLayout;
     patch.headerMobileComposition = "separate";
   }
   const mobileSticky = sourceMobileNavbar.sticky;

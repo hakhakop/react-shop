@@ -10,11 +10,6 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { useWishlist } from "./WishlistProvider";
-import { useCart } from "./CartProvider";
-import { useSearch } from "./SearchProvider";
-import ThemeToggle from "./ThemeToggle";
-import HeaderAccountButton from "./HeaderAccountButton";
 import type { MenuItem } from "../lib/navigation";
 import {
   getScopedWebsiteIdFromPath,
@@ -31,8 +26,6 @@ interface HeaderNavProps {
   dropdownContentById?: Record<string, ReactNode>;
   items: MenuItem[];
   presentationById?: Record<string, MenuPresentationSettings>;
-  categories?: ReactNode;
-  serviceHomepageMode?: boolean;
   scopedPreviewWebsiteId?: string;
   activePageKey?: BuilderLayoutKey;
   scopedPreviewPages?: ScopedPreviewPage[];
@@ -52,6 +45,12 @@ interface HeaderNavProps {
   offcanvasFlip?: boolean;
   offcanvasOverlay?: boolean;
   dropbarAnimation?: string;
+  /** Builder-authored content for the mobile menu dialog. */
+  mobileDrawerContent?: ReactNode;
+  /** Render only the mobile menu list, for use inside the drawer section. */
+  mobileMenuOnly?: boolean;
+  /** Builder preview only: keep the dialog visible while it is being edited. */
+  forceMobileMenuOpen?: boolean;
   style?: CSSProperties;
 }
 
@@ -379,8 +378,6 @@ export default function HeaderNav({
   dropdownContentById,
   items,
   presentationById,
-  categories,
-  serviceHomepageMode,
   scopedPreviewWebsiteId,
   activePageKey,
   scopedPreviewPages,
@@ -400,6 +397,9 @@ export default function HeaderNav({
   offcanvasFlip = false,
   offcanvasOverlay = true,
   dropbarAnimation = "",
+  mobileDrawerContent,
+  mobileMenuOnly = false,
+  forceMobileMenuOpen = false,
   style,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
@@ -410,15 +410,16 @@ export default function HeaderNav({
     () => new Set(),
   );
   const navContainerRef = useRef<HTMLDivElement>(null);
-  const { totalCount: wishlistCount } = useWishlist();
-  const { totalCount: cartCount, openMiniCart } = useCart();
-  const { openSearch } = useSearch();
 
   // Close mobile navigation panel when path changes
   useEffect(() => {
     setIsMobileOpen(false);
     setExpandedMobileIds(new Set());
   }, [rawPathname, canonicalMobile]);
+
+  useEffect(() => {
+    if (forceMobileMenuOpen) setIsMobileOpen(true);
+  }, [forceMobileMenuOpen]);
 
   const toggleMenuItem = (id: string) => {
     setExpandedMobileIds((current) => {
@@ -506,17 +507,43 @@ export default function HeaderNav({
         })
     : undefined;
 
+  const mobileMenu = (
+    <nav className="site-header-nav site-header-nav--mobile-dialog" style={style}>
+      {renderMenuItems(
+        items,
+        currentPath,
+        dashboardMode,
+        presentationById,
+        0,
+        hrefResolver,
+        dropdownIndicator,
+        parentIconEnabled,
+        clickModeEnabled,
+        true,
+        expandedMobileIds,
+        toggleMenuItem,
+        dialogPushAfter,
+      )}
+    </nav>
+  );
+
+  if (mobileMenuOnly) {
+    return <div className="mobile-drawer-nav-items">{mobileMenu}</div>;
+  }
+
+  const mobileMenuOpen = forceMobileMenuOpen || isMobileOpen;
+
   return (
     <div
       ref={navContainerRef}
-      className={`site-header-nav-container${canonicalMobile ? " is-canonical-mobile" : ""}${isMobileOpen ? " is-open" : ""} dialog-layout-${dialogLayout} dialog-menu-${dialogMenuStyle} offcanvas-mode-${offcanvasMode}${offcanvasFlip ? " is-flipped" : ""}${offcanvasOverlay ? " has-overlay" : ""}${dialogCenter ? " is-dialog-centered" : ""}${dialogClose ? " has-dialog-close" : ""}${dropbarAnimation ? ` dropbar-animation-${dropbarAnimation}` : ""}`}
+      className={`site-header-nav-container${canonicalMobile ? " is-canonical-mobile" : ""}${mobileMenuOpen ? " is-open" : ""} dialog-layout-${dialogLayout} dialog-menu-${dialogMenuStyle} offcanvas-mode-${offcanvasMode}${offcanvasFlip ? " is-flipped" : ""}${offcanvasOverlay ? " has-overlay" : ""}${dialogCenter ? " is-dialog-centered" : ""}${dialogClose ? " has-dialog-close" : ""}${dropbarAnimation ? ` dropbar-animation-${dropbarAnimation}` : ""}`}
       data-dialog-layout={dialogLayout}
     >
       <button
         type="button"
         className="site-header-mobile-menu-toggle"
         onClick={() => setIsMobileOpen((prev) => !prev)}
-        aria-expanded={isMobileOpen}
+        aria-expanded={mobileMenuOpen}
         aria-label="Toggle navigation menu"
       >
         <div className="mobile-menu-grid-dot-wrap">
@@ -548,15 +575,15 @@ export default function HeaderNav({
 
       {/* Unified Mobile Right Slide-in Drawer */}
       <div
-        className={`site-header-mobile-drawer-backdrop${isMobileOpen ? " is-open" : ""}`}
+        className={`site-header-mobile-drawer-backdrop${mobileMenuOpen ? " is-open" : ""}`}
         onClick={() => setIsMobileOpen(false)}
       />
 
-      <div className={`site-header-mobile-drawer-wrapper${isMobileOpen ? " is-open" : ""}`}>
+      <div className={`site-header-mobile-drawer-wrapper${mobileMenuOpen ? " is-open" : ""}`}>
         <div className="site-header-mobile-drawer">
           {/* 1. Header (Menu / close) */}
           <div className="mobile-drawer-header">
-            <span className="mobile-drawer-title">Menu</span>
+            {!mobileDrawerContent ? <span className="mobile-drawer-title">Menu</span> : null}
             {dialogClose && <button
               type="button"
               className="mobile-drawer-close"
@@ -570,103 +597,8 @@ export default function HeaderNav({
             </button>}
           </div>
 
-          {/* 2. Top Actions (Account, Wishlist, Cart, Theme Toggle) */}
-          {!canonicalMobile && <div className="mobile-drawer-top-actions">
-            <div className="mobile-drawer-top-action-wrapper mobile-drawer-account-wrap" onClick={() => setIsMobileOpen(false)}>
-              <HeaderAccountButton />
-            </div>
-
-            <Link
-              href="/wishlist"
-              className="mobile-drawer-top-action-btn"
-              onClick={() => setIsMobileOpen(false)}
-              aria-label={`Wishlist (${wishlistCount} items)`}
-            >
-              <div className="mobile-drawer-top-action-icon-wrap">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span className="mobile-drawer-top-action-badge">{wishlistCount}</span>
-                )}
-              </div>
-            </Link>
-
-            <button
-              type="button"
-              className="mobile-drawer-top-action-btn"
-              onClick={() => {
-                setIsMobileOpen(false);
-                openMiniCart();
-              }}
-              aria-label={`Cart (${cartCount} items)`}
-            >
-              <div className="mobile-drawer-top-action-icon-wrap">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="21" r="1" />
-                  <circle cx="20" cy="21" r="1" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                </svg>
-                {cartCount > 0 && (
-                  <span className="mobile-drawer-top-action-badge">{cartCount}</span>
-                )}
-              </div>
-            </button>
-
-            <div className="mobile-drawer-top-action-wrapper">
-              <ThemeToggle size="md" />
-            </div>
-          </div>}
-
           <div className="mobile-drawer-scrollable-content">
-            {/* 3. Main Navigation Links */}
-            <div className="mobile-drawer-section mobile-drawer-nav-links">
-              <span className="mobile-drawer-section-title">Navigation</span>
-              <div className="mobile-drawer-nav-items">
-                {renderMenuItems(
-                  items,
-                  currentPath,
-                  dashboardMode,
-                  presentationById,
-                  0,
-                  hrefResolver,
-                  dropdownIndicator,
-                  parentIconEnabled,
-                  clickModeEnabled,
-                  true,
-                  expandedMobileIds,
-                  toggleMenuItem,
-                  dialogPushAfter,
-                )}
-                {serviceHomepageMode && (
-                  <div className="site-header-nav-item">
-                    <Link
-                      href={hrefResolver ? hrefResolver("/client") : "/client"}
-                      className="site-header-nav-link mobile-drawer-builder-direct-link"
-                      onClick={() => setIsMobileOpen(false)}
-                    >
-                      <span className="site-header-nav-icon">
-                        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                          <rect x="2" y="2" width="16" height="16" rx="2" />
-                          <path d="M6,6 L14,6 M6,10 L14,10 M6,14 L10,14" />
-                        </svg>
-                      </span>
-                      <span>Start Builder</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 4. Categories */}
-            {!canonicalMobile && categories && (
-              <div className="mobile-drawer-section mobile-drawer-categories">
-                <span className="mobile-drawer-section-title">Categories</span>
-                <div className="mobile-drawer-categories-wrap">
-                  {categories}
-                </div>
-              </div>
-            )}
+            {mobileDrawerContent ?? <div className="mobile-drawer-nav-items">{mobileMenu}</div>}
           </div>
         </div>
       </div>

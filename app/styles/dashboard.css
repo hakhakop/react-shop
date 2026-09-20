@@ -426,7 +426,7 @@ body:has(.builder-dashboard) .site-header--service {
   right: 10px;
   top: 50%;
   transform: translateY(-50%) !important;
-  pointer-events: none;
+  pointer-events: auto;
   color: #94a3b8;
   display: flex;
   align-items: center;
@@ -2302,6 +2302,46 @@ body:has(.builder-dashboard) .site-header--service {
   border-bottom: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.06));
   background: var(--builder-ui-panel, rgba(18, 18, 22, 0.65));
   flex: 0 0 auto;
+}
+
+.builder-header-surface-switcher {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  border-bottom: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--builder-ui-panel, #17171d) 88%, var(--builder-ui-accent, #0d73ff) 12%);
+}
+
+.builder-header-surface-switcher-primary {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.builder-header-surface-switcher button {
+  min-height: 25px;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--builder-ui-muted, #a3a3ad);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.builder-header-surface-switcher button:hover,
+.builder-header-surface-switcher button.is-active {
+  border-color: color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 62%, var(--builder-ui-border));
+  background: color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 16%, transparent);
+  color: var(--builder-ui-text-strong, #fff);
+}
+
+.builder-header-surface-switcher p {
+  margin: 1px 2px 0;
+  color: var(--builder-ui-soft-muted, #85858f);
+  font-size: 9px;
+  line-height: 1.35;
 }
 
 .builder-structure-library-button {
@@ -24362,7 +24402,7 @@ body:has([data-scoped-builder-root])
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .builder-dashboard .builder-structure-add-element-slot .builder-wireframe-add-element {
@@ -24380,9 +24420,9 @@ body:has([data-scoped-builder-root])
   background: #0ea5e9 !important;
   color: #ffffff !important;
   font-size: 10px !important;
-  opacity: 0;
+  opacity: 0.78;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: auto;
   transform: none !important;
 }
 

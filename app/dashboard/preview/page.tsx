@@ -25,6 +25,8 @@ type RootPreviewPageProps = {
     page?: string;
     builderFrame?: string;
     builderBridge?: string;
+    headerPreviewVariant?: string;
+    headerPreviewDocument?: string;
   }>;
 };
 
@@ -118,6 +120,18 @@ export default async function RootPreviewPage({ searchParams }: RootPreviewPageP
         builderInteractionIdentity={builderIframeSelection}
         builderPreviewMode={builderIframeSelection}
         builderDraftPreview={builderIframeSelection}
+        previewHeaderVariant={
+          query?.headerPreviewVariant === "desktop" || query?.headerPreviewVariant === "mobile"
+            ? query.headerPreviewVariant
+            : undefined
+        }
+        previewHeaderDocument={
+          query?.headerPreviewDocument === "header-mobile" ||
+          query?.headerPreviewDocument === "header-mobile-dialog" ||
+          query?.headerPreviewDocument === "header"
+            ? query.headerPreviewDocument
+            : undefined
+        }
       />
       <StorefrontBuilderRenderer
         layout={renderLayout ?? draftPreviewLayout}

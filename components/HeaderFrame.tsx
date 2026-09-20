@@ -32,6 +32,8 @@ type HeaderFrameProps = {
   /** Active responsive row variant from the canonical Header document. */
   activeVariant?: "desktop" | "mobile";
   mobileBreakpoint?: string;
+  /** Builder document root that owns this rendered header surface. */
+  builderSectionId?: string;
 };
 
 /**
@@ -54,6 +56,7 @@ export default function HeaderFrame({
   scrollState,
   activeVariant,
   mobileBreakpoint,
+  builderSectionId = "header-document",
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
@@ -456,7 +459,7 @@ export default function HeaderFrame({
         data-header-sticky-animation={stickyAnimation || undefined}
         data-builder-preview={builderPreviewDetected ? "true" : undefined}
         data-builder-object-type={builderPreviewMode ? "section" : undefined}
-        data-builder-section-id={builderPreviewMode ? "header-document" : undefined}
+        data-builder-section-id={builderPreviewMode ? builderSectionId : undefined}
         data-scrolled={scrolled ? "true" : "false"}
         data-overlap-header={effectiveOverlapHeader ? "true" : "false"}
         data-section-header-transparent={sectionTransparent ? "true" : "false"}

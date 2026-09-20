@@ -49,6 +49,7 @@ export type ResolvedHeaderDocumentSettings = {
   clickModeEnabled: boolean;
   dialogTogglePosition: string | undefined;
   dialogLayout: string | undefined;
+  dialogClose: boolean;
   dialogMenuStyle: string | undefined;
   dialogCenter: boolean;
   dialogPushAfter: number | undefined;
@@ -193,6 +194,7 @@ export function resolveHeaderDocumentSettings(
     | "documentClickModeEnabled"
     | "documentDialogTogglePosition"
     | "documentDialogLayout"
+    | "documentDialogClose"
     | "documentDialogMenuStyle"
     | "documentDialogCenter"
     | "documentDialogPushAfter"
@@ -277,6 +279,7 @@ export function resolveHeaderDocumentSettings(
     clickModeEnabled: composition.documentClickModeEnabled ?? fallback.headerClickModeEnabled ?? false,
     dialogTogglePosition: composition.documentDialogTogglePosition ?? fallback.headerDialogTogglePosition,
     dialogLayout: composition.documentDialogLayout ?? fallback.headerDialogLayout,
+    dialogClose: composition.documentDialogClose ?? true,
     dialogMenuStyle: composition.documentDialogMenuStyle ?? fallback.headerDialogMenuStyle,
     dialogCenter: composition.documentDialogCenter ?? fallback.headerDialogCenter ?? false,
     dialogPushAfter: composition.documentDialogPushAfter ?? fallback.headerDialogPushAfter,

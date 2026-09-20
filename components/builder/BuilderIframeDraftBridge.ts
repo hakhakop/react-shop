@@ -10,6 +10,8 @@ export type BuilderIframeDraftMessage = {
   source: typeof BUILDER_IFRAME_DRAFT_SOURCE;
   type: typeof BUILDER_IFRAME_DRAFT_MESSAGE;
   documentKey: string;
+  /** Persistent Header surface when the shared canvas state uses page="header". */
+  headerDocumentKey?: "header" | "header-mobile" | "header-mobile-dialog";
   /** Route key rendered by the iframe when it differs from the authored document key. */
   renderPage?: string;
   revision: number;

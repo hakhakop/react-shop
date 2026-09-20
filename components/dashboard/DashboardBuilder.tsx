@@ -78,6 +78,15 @@ import {
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
+import {
+  HEADER_BUILDER_DOCUMENT_LABELS,
+  headerBuilderDocumentKeyForSectionId,
+  headerBuilderDocumentKeyForView,
+  headerBuilderDocumentSectionId,
+  isHeaderBuilderDocumentKey,
+  type HeaderBuilderDocumentKey,
+  type HeaderBuilderView,
+} from "@/lib/headerBuilderDocumentKeys";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import type { LayoutLibraryType } from "@/lib/layoutLibrary";
 import type { BuilderLayout } from "@/lib/builderLayouts";
@@ -85,7 +94,6 @@ import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
   HEADER_BLOCK_DRAG_TYPE,
-  moveHeaderBlockById,
   type HeaderBlockDragPayload,
 } from "@/lib/headerBuilderBlockMove";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -416,7 +424,7 @@ import {
   type BuilderThemeSettings,
 } from "@/lib/builderThemeSettings";
 import {
-  applyYoothemeHeaderImport,
+  applyYoothemeHeaderDocumentImport,
   type YoothemeHeaderImportMode,
 } from "@/lib/yoothemeHeaderRecipe";
 import { invalidateImportedBuilderDraft } from "@/lib/builderDraftInvalidation";
@@ -1423,14 +1431,15 @@ function inferTypographyArea(
 }
 
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
-  if (key === "header") {
+  if (isHeaderBuilderDocumentKey(key)) {
     const defaultHeaderSection = headerPresets.find((preset) => preset.key === "minimal")?.sections[0];
-    return {
-      ...structuredClone(defaultState),
-      page: "header",
-      targetType: "header",
-      template: undefined,
-      sections: [structuredClone(defaultHeaderSection ?? {
+    const headerView: HeaderBuilderView = key === "header-mobile"
+      ? "mobile"
+      : key === "header-mobile-dialog"
+        ? "dialog"
+        : "desktop";
+    const primarySection: BuilderSection = structuredClone({
+      ...(defaultHeaderSection ?? {
         id: "header-document",
         kind: "contentLayout",
         title: "Header",
@@ -1443,7 +1452,53 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
         headerUtilityMigrationVersion: 3,
         layoutItems: [],
         visible: true,
-      })],
+      }),
+      id: headerBuilderDocumentSectionId(key),
+      title: HEADER_BUILDER_DOCUMENT_LABELS[headerView],
+      headerDocumentVariant: headerView,
+    } as BuilderSection);
+    const mobileDrawerSection: BuilderSection | null = key === "header-mobile"
+      ? {
+          id: headerBuilderDocumentSectionId("header-mobile-dialog"),
+          kind: "contentLayout",
+          title: "Mobile Menu Drawer",
+          headerDocumentVariant: "dialog",
+          headerArchitectureVersion: 2,
+          headerVisible: true,
+          headerBehavior: "static",
+          headerWidthMode: "full",
+          headerBackgroundMode: "default",
+          headerTextMode: "auto",
+          background: "transparent",
+          backgroundMode: "full",
+          contentMode: "boxed",
+          colorScheme: "inherit",
+          layout: "header-row",
+          layoutColumns: 1,
+          rows: [{
+            id: "header-mobile-dialog-row",
+            layout: "whole",
+            columns: [{
+              id: "header-mobile-dialog-content",
+              elements: [{
+                id: "header-mobile-dialog-navigation",
+                kind: "menu",
+                title: "Mobile menu",
+                menuSource: "main",
+              }],
+            }],
+          }],
+          visible: true,
+        }
+      : null;
+    return {
+      ...structuredClone(defaultState),
+      page: key,
+      targetType: "header",
+      template: undefined,
+      sections: mobileDrawerSection
+        ? [primarySection, mobileDrawerSection]
+        : [primarySection],
     };
   }
 
@@ -1692,6 +1747,7 @@ function normalizeBuilderState(
 ): BuilderState {
   const key = state.page ?? fallbackKey;
   const isTemplate = key in defaultTemplateStates;
+  const isHeaderDocument = isHeaderBuilderDocumentKey(key);
   const migratedSections =
     key === "product-single"
       ? migrateProductTemplateSections(state.sections)
@@ -1704,7 +1760,7 @@ function normalizeBuilderState(
       layoutItems: section.layoutItems?.map((item) => ({
         ...item,
         blocks: (item.blocks ?? []).map((block, blockIndex) => {
-          if (key === "header") {
+          if (isHeaderDocument) {
             const baseId = block.id?.trim() ||
               `header-${block.kind ?? "element"}-${item.id ?? "column"}-${blockIndex}`;
             let canonicalId = baseId;
@@ -1939,8 +1995,10 @@ function normalizeBuilderState(
     ...state,
     page: key,
     targetType:
-      key === "header" || key === "footer"
-        ? key
+      isHeaderDocument
+        ? "header"
+        : key === "footer"
+          ? key
         : key.startsWith("dynamic:")
           ? "document"
         : isTemplate
@@ -1958,6 +2016,58 @@ function normalizeBuilderState(
           ...defaultDesign,
           ...(state.design ?? {}),
         },
+  };
+}
+
+/**
+ * Header editor state always uses `page: "header"` so it can share one
+ * canvas protocol, but its root section remains the persistent document
+ * identity. Never infer ownership from the selected URL: route changes are
+ * asynchronous and doing so can write the prior surface into the next one.
+ */
+function headerDocumentKeyFromEditorState(
+  state: Pick<BuilderState, "page" | "sections">,
+): HeaderBuilderDocumentKey | null {
+  const rootKey = headerBuilderDocumentKeyForSectionId(state.sections[0]?.id);
+  if (rootKey) return rootKey;
+  return isHeaderBuilderDocumentKey(state.page) ? state.page : null;
+}
+
+function asHeaderEditorState(
+  state: BuilderState,
+  key: HeaderBuilderDocumentKey,
+): BuilderState {
+  const normalized = normalizeBuilderState(
+    { ...state, page: key, targetType: "header" },
+    key,
+  );
+  return {
+    ...normalized,
+    page: "header",
+    targetType: "header",
+    template: undefined,
+  };
+}
+
+/**
+ * The Mobile Header document contains two normal Builder roots: the bar and
+ * its drawer. This projection is only for runtime composition; mutations and
+ * persistence continue to use the one complete mobile document.
+ */
+function headerSectionEditorState(
+  state: BuilderState | null | undefined,
+  key: HeaderBuilderDocumentKey,
+): BuilderState | null {
+  const section = state?.sections.find(
+    (candidate) => candidate.id === headerBuilderDocumentSectionId(key),
+  );
+  if (!section || !state) return null;
+  return {
+    ...state,
+    page: "header",
+    targetType: "header",
+    template: undefined,
+    sections: [section],
   };
 }
 
@@ -2287,6 +2397,15 @@ export default function DashboardBuilder({
   );
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  // The mobile bar and its drawer are one Builder document. Retain the old
+  // `dialog` URL only as a compatibility alias so bookmarked editor links
+  // land on the unified Mobile Header surface instead of a third workspace.
+  const headerBuilderView: HeaderBuilderView =
+    searchParams.get("headerView") === "mobile" || searchParams.get("headerView") === "dialog"
+      ? "mobile"
+      : "desktop";
+  const activeHeaderDocumentKey = headerBuilderDocumentKeyForView(headerBuilderView);
+  const activeHeaderDocumentSectionId = headerBuilderDocumentSectionId(activeHeaderDocumentKey);
 
   const [activeDynamicDocumentId, setActiveDynamicDocumentId] = useState<string | null>(null);
   const [contextualLibraryOpen, setContextualLibraryOpen] = useState(false);
@@ -2517,34 +2636,44 @@ export default function DashboardBuilder({
   );
   const initialRequestedPage =
     hasStrictBuilderTarget ? null : initialResolvedPage;
-  const initialPublishedState = useMemo(() => initialPageHydration?.authoredLayout
-    ? normalizeBuilderState({
-        page: initialPageHydration.authoredLayout.page,
-        targetType: initialPageHydration.authoredLayout.targetType ?? "page",
-        template: initialPageHydration.authoredLayout.template,
-        documentId: initialPageHydration.authoredLayout.documentId,
-        displayName: initialPageHydration.authoredLayout.displayName,
-        design: {
-          ...defaultDesign,
-          ...(initialPageHydration.authoredLayout.design ?? {}),
-        } as BuilderState["design"],
-        sections: initialPageHydration.authoredLayout.sections,
-      }, initialPageHydration.authoredLayout.page)
-    : null, [initialPageHydration]);
-  const initialRenderState = useMemo(() => initialPageHydration?.renderLayout
-    ? normalizeBuilderState({
-        page: initialPageHydration.renderLayout.page,
-        targetType: initialPageHydration.renderLayout.targetType ?? "page",
-        template: initialPageHydration.renderLayout.template,
-        documentId: initialPageHydration.renderLayout.documentId,
-        displayName: initialPageHydration.renderLayout.displayName,
-        design: {
-          ...defaultDesign,
-          ...(initialPageHydration.renderLayout.design ?? {}),
-        } as BuilderState["design"],
-        sections: initialPageHydration.renderLayout.sections,
-      }, initialPageHydration.renderLayout.page)
-    : null, [initialPageHydration]);
+  const initialPublishedState = useMemo(() => {
+    const layout = initialPageHydration?.authoredLayout;
+    if (!layout) return null;
+    const state = {
+      page: layout.page,
+      targetType: layout.targetType ?? "page",
+      template: layout.template,
+      documentId: layout.documentId,
+      displayName: layout.displayName,
+      design: {
+        ...defaultDesign,
+        ...(layout.design ?? {}),
+      } as BuilderState["design"],
+      sections: layout.sections,
+    } as BuilderState;
+    return isHeaderBuilderDocumentKey(layout.page)
+      ? asHeaderEditorState(state, layout.page)
+      : normalizeBuilderState(state, layout.page);
+  }, [initialPageHydration]);
+  const initialRenderState = useMemo(() => {
+    const layout = initialPageHydration?.renderLayout;
+    if (!layout) return null;
+    const state = {
+      page: layout.page,
+      targetType: layout.targetType ?? "page",
+      template: layout.template,
+      documentId: layout.documentId,
+      displayName: layout.displayName,
+      design: {
+        ...defaultDesign,
+        ...(layout.design ?? {}),
+      } as BuilderState["design"],
+      sections: layout.sections,
+    } as BuilderState;
+    return isHeaderBuilderDocumentKey(layout.page)
+      ? asHeaderEditorState(state, layout.page)
+      : normalizeBuilderState(state, layout.page);
+  }, [initialPageHydration]);
   const initialRenderProjection = useMemo(() => initialPublishedState && initialRenderState
     ? {
         page: initialPublishedState.page,
@@ -2561,6 +2690,12 @@ export default function DashboardBuilder({
           )
         : defaultState
     ),
+  );
+  const builderStateHeaderDocumentKey = useMemo(
+    () => builderState.page === "header"
+      ? headerDocumentKeyFromEditorState(builderState)
+      : null,
+    [builderState],
   );
   useEffect(() => {
     if (builderState.page !== "header" && builderState.page !== "footer") {
@@ -2682,6 +2817,16 @@ export default function DashboardBuilder({
     editorContext: builderEditorContext,
     page: builderState.page,
   }), [builderEditorContext, builderState.page, requestedPersistenceDocumentId]);
+  const serializeBuilderStateForPersistence = useCallback((state: BuilderState) => {
+    if (state.page !== "header") return state;
+    const documentKey = headerDocumentKeyFromEditorState(state);
+    if (!documentKey) return state;
+    return {
+      ...state,
+      page: documentKey,
+      targetType: "header",
+    } as BuilderState;
+  }, []);
   const refreshRoutingTemplateManagerContext = useCallback(async () => {
     const params: Record<string, string> = {};
     const documentId = searchParams.get("document") ?? activeDynamicDocumentId;
@@ -2847,6 +2992,8 @@ export default function DashboardBuilder({
     signature: string;
   } | null>(null);
   const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
+  const [mobileHeaderDocumentPreviewState, setMobileHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
+  const [mobileDialogDocumentPreviewState, setMobileDialogDocumentPreviewState] = useState<BuilderState | null>(null);
   const headerRouteHydrationRef = useRef<string | null>(null);
   const footerRouteHydrationRef = useRef<string | null>(null);
   const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
@@ -2925,7 +3072,29 @@ export default function DashboardBuilder({
       window.removeEventListener("drop", clearHeaderDragState);
     };
   }, []);
-  const [device, setDevice] = useState<PreviewDevice>("desktop");
+  const [device, setDevice] = useState<PreviewDevice>(() => (
+    searchParams.get("page") === "header" &&
+    (searchParams.get("headerView") === "mobile" || searchParams.get("headerView") === "dialog")
+      ? "mobile"
+      : "desktop"
+  ));
+  useEffect(() => {
+    if (searchParams.get("page") !== "header" || searchParams.get("headerView") !== "dialog") return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("headerView", "mobile");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [pathname, router, searchParams]);
+  // A direct Header URL picks the owning surface, while later device clicks
+  // preserve their precise desktop/laptop/tablet/phone viewport.
+  useEffect(() => {
+    if (builderState.page !== "header") return;
+    setDevice((current) => {
+      if (headerBuilderView === "desktop") {
+        return current === "tablet" || current === "mobile" ? "desktop" : current;
+      }
+      return current === "desktop" || current === "laptop" ? "mobile" : current;
+    });
+  }, [builderState.page, headerBuilderView]);
   // The canonical tenant preview is the production Builder canvas. The old
   // inline renderer is intentionally no longer user-selectable: it cannot
   // represent strict/dynamic documents and could make a complete page appear
@@ -3429,6 +3598,18 @@ export default function DashboardBuilder({
   }, [builderEditorContext?.content.mode, builderEditorContext?.content.pageType, headerContextState.page]);
   const iframeComparisonHref = useMemo(() => {
     const params = new URLSearchParams({ page: iframeComparisonPage });
+    // The comparison iframe is scaled into the available editor width. Carry
+    // the selected device explicitly so responsive Header rows follow the
+    // device control rather than that scaled physical width.
+    params.set(
+      "headerPreviewVariant",
+      builderState.page === "header"
+        ? (headerBuilderView === "desktop" ? "desktop" : "mobile")
+        : (device === "desktop" || device === "laptop" ? "desktop" : "mobile"),
+    );
+    if (builderState.page === "header") {
+      params.set("headerPreviewDocument", activeHeaderDocumentKey);
+    }
     const categorySlug = searchParams.get("category");
     const selectedTemplateCandidate = templatePreviewCandidates.find((candidate) =>
       candidate.identity.provider === templatePreviewIdentity?.provider &&
@@ -3470,7 +3651,10 @@ export default function DashboardBuilder({
     }
     return `/app/websites/${encodeURIComponent(tenantRouteSegment)}/preview?${params.toString()}`;
   }, [
+    activeHeaderDocumentKey,
     builderState.page,
+    device,
+    headerBuilderView,
     iframeComparisonPage,
     individualBuilderContext?.slug,
     previewProducts,
@@ -3516,11 +3700,83 @@ export default function DashboardBuilder({
       : null,
     [builderWebsiteLinkProjection, materializedPreviewSections],
   );
+  const activeHeaderDocumentPreviewState = activeHeaderDocumentKey === "header"
+    ? headerDocumentPreviewState
+    : activeHeaderDocumentKey === "header-mobile"
+      ? mobileHeaderDocumentPreviewState
+      : mobileDialogDocumentPreviewState;
+  const activeHeaderDocumentFallbackState = useMemo(
+    () => asHeaderEditorState(
+      getDefaultStateForKey(activeHeaderDocumentKey),
+      activeHeaderDocumentKey,
+    ),
+    [activeHeaderDocumentKey],
+  );
   const headerDocumentState = useMemo(
-    () => builderState.page === "header"
+    () => {
+      const activeState = builderState.page === "header" && builderStateHeaderDocumentKey === activeHeaderDocumentKey
+        ? builderState
+        : activeHeaderDocumentPreviewState ?? activeHeaderDocumentFallbackState;
+      return activeHeaderDocumentKey === "header-mobile"
+        ? headerSectionEditorState(activeState, "header-mobile") ?? activeHeaderDocumentFallbackState
+        : activeState;
+    },
+    [
+      activeHeaderDocumentFallbackState,
+      activeHeaderDocumentKey,
+      activeHeaderDocumentPreviewState,
+      builderState,
+      builderStateHeaderDocumentKey,
+    ],
+  );
+  const desktopHeaderDocumentState = useMemo(
+    () => builderState.page === "header" && builderStateHeaderDocumentKey === "header"
       ? builderState
-      : headerDocumentPreviewState ?? hydrateDocumentBuilderState(loadDraftForKey("header", storageKeys), shellSettings),
-    [builderState, headerDocumentPreviewState, shellSettings, storageKeys],
+      : headerDocumentPreviewState ?? asHeaderEditorState(getDefaultStateForKey("header"), "header"),
+    [builderState, builderStateHeaderDocumentKey, headerDocumentPreviewState],
+  );
+  const mobileHeaderDocumentState = useMemo(
+    () => {
+      const mobileState = builderState.page === "header" && builderStateHeaderDocumentKey === "header-mobile"
+        ? builderState
+        : mobileHeaderDocumentPreviewState ?? (
+            activeHeaderDocumentKey === "header-mobile"
+              ? activeHeaderDocumentFallbackState
+              : undefined
+          );
+      return headerSectionEditorState(mobileState, "header-mobile") ?? mobileState;
+    },
+    [
+      activeHeaderDocumentFallbackState,
+      activeHeaderDocumentKey,
+      builderState,
+      builderStateHeaderDocumentKey,
+      mobileHeaderDocumentPreviewState,
+    ],
+  );
+  const mobileDialogDocumentState = useMemo(
+    () => {
+      const mobileWorkspace = builderState.page === "header" && builderStateHeaderDocumentKey === "header-mobile"
+        ? builderState
+        : mobileHeaderDocumentPreviewState;
+      const embeddedDialog = headerSectionEditorState(mobileWorkspace, "header-mobile-dialog");
+      if (embeddedDialog) return embeddedDialog;
+      return builderState.page === "header" && builderStateHeaderDocumentKey === "header-mobile-dialog"
+        ? builderState
+        : mobileDialogDocumentPreviewState ?? (
+            activeHeaderDocumentKey === "header-mobile-dialog"
+              ? activeHeaderDocumentFallbackState
+              : undefined
+          );
+    },
+    [
+      activeHeaderDocumentFallbackState,
+      activeHeaderDocumentKey,
+      builderState,
+      builderStateHeaderDocumentKey,
+      mobileHeaderDocumentPreviewState,
+      mobileDialogDocumentPreviewState,
+    ],
   );
   const footerDocumentState = useMemo(
     () => builderState.page === "footer"
@@ -3556,10 +3812,50 @@ export default function DashboardBuilder({
   );
   const currentHeaderComposition = useMemo(
     () => {
-      const composition = resolveHeaderBuilderComposition({ sections: headerCompositionSections });
+      const composition = resolveHeaderBuilderComposition({
+        key: activeHeaderDocumentKey,
+        sections: headerCompositionSections,
+      });
       return { ...composition, columns: composition.columns ?? [] };
     },
-    [headerCompositionSections],
+    [activeHeaderDocumentKey, headerCompositionSections],
+  );
+  const desktopHeaderComposition = useMemo(
+    () => resolveHeaderBuilderComposition({
+      key: "header",
+      sections: resolveContentSections(
+        desktopHeaderDocumentState.sections,
+        contentLanguage,
+        primaryContentLanguage,
+      ),
+    }),
+    [contentLanguage, desktopHeaderDocumentState.sections, primaryContentLanguage],
+  );
+  const mobileHeaderComposition = useMemo(
+    () => mobileHeaderDocumentState
+      ? resolveHeaderBuilderComposition({
+          key: "header-mobile",
+          sections: resolveContentSections(
+            mobileHeaderDocumentState.sections,
+            contentLanguage,
+            primaryContentLanguage,
+          ),
+        })
+      : undefined,
+    [contentLanguage, mobileHeaderDocumentState, primaryContentLanguage],
+  );
+  const mobileDialogComposition = useMemo(
+    () => mobileDialogDocumentState
+      ? resolveHeaderBuilderComposition({
+          key: "header-mobile-dialog",
+          sections: resolveContentSections(
+            mobileDialogDocumentState.sections,
+            contentLanguage,
+            primaryContentLanguage,
+          ),
+        })
+      : undefined,
+    [contentLanguage, mobileDialogDocumentState, primaryContentLanguage],
   );
   const currentHeaderDocumentSettings = useMemo(
     () => resolveHeaderDocumentSettings(currentHeaderComposition, shellSettings),
@@ -4744,6 +5040,15 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (!draftReady || !publishedDocumentReady) return;
+    // Header route changes are asynchronous. Until the selected surface has
+    // loaded, `builderState` can still be the preceding document; never write
+    // that state into the newly selected document's local draft.
+    if (
+      builderState.page === "header" &&
+      builderStateHeaderDocumentKey !== activeHeaderDocumentKey
+    ) {
+      return;
+    }
     // A published document is already the authoritative fallback. Persisting
     // it again as a draft makes a subsequent fresh import vulnerable to an
     // old browser draft winning during hydration.
@@ -4775,16 +5080,19 @@ export default function DashboardBuilder({
     } catch {
       drafts = {};
     }
-    drafts[builderState.page] = builderState;
+    const draftKey: BuilderLayoutKey = builderState.page === "header"
+      ? builderStateHeaderDocumentKey ?? "header"
+      : builderState.page;
+    drafts[draftKey] = builderState;
     window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
     const metadata = loadBuilderDraftMetadata(storageKeys.draftMetadata);
-    metadata[builderState.page] = {
+    metadata[draftKey] = {
       ...(committedBuilderStateSignature
         ? { basePublishedSignature: committedBuilderStateSignature }
         : {}),
     };
     draftMetadataRef.current = metadata;
-    restoredDraftKeysRef.current.add(builderState.page);
+    restoredDraftKeysRef.current.add(draftKey);
     window.localStorage.setItem(
       storageKeys.draftMetadata,
       JSON.stringify(metadata),
@@ -4793,6 +5101,8 @@ export default function DashboardBuilder({
     builderState,
     builderStateSignature,
     committedBuilderStateSignature,
+    activeHeaderDocumentKey,
+    builderStateHeaderDocumentKey,
     draftReady,
     publishedDocumentReady,
     storageKeys,
@@ -4815,8 +5125,8 @@ export default function DashboardBuilder({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(target.kind === "document"
-          ? { ...pending.state, action: "save", documentId: target.documentId }
-          : pending.state),
+          ? { ...serializeBuilderStateForPersistence(pending.state), action: "save", documentId: target.documentId }
+          : serializeBuilderStateForPersistence(pending.state)),
       });
       iframeSaveInFlightRef.current = false;
       if (!response.ok) {
@@ -4828,7 +5138,7 @@ export default function DashboardBuilder({
         queueMicrotask(() => iframeRunSaveRef.current());
       }
     })();
-  }, [builderApiUrl, persistenceTarget]);
+  }, [builderApiUrl, persistenceTarget, serializeBuilderStateForPersistence]);
   useEffect(() => {
     iframeRunSaveRef.current = runNextIframeSave;
     iframeFlushSaveRef.current = () => {
@@ -4841,7 +5151,10 @@ export default function DashboardBuilder({
   }, [runNextIframeSave]);
 
   useEffect(() => {
-    if (!iframeMutationSyncEnabled || (iframeDiagnosticMode !== "settled" && iframeDiagnosticMode !== "full") || !iframeComparisonMode || !draftReady || !publishedDocumentReady) {
+    const headerSurfaceMatchesState =
+      builderState.page !== "header" ||
+      builderStateHeaderDocumentKey === activeHeaderDocumentKey;
+    if (!iframeMutationSyncEnabled || (iframeDiagnosticMode !== "settled" && iframeDiagnosticMode !== "full") || !iframeComparisonMode || !draftReady || !publishedDocumentReady || !headerSurfaceMatchesState) {
       iframeSavedSignatureRef.current = null;
       iframePendingSaveRef.current = null;
       return;
@@ -4872,6 +5185,8 @@ export default function DashboardBuilder({
     };
   }, [
     builderState,
+    builderStateHeaderDocumentKey,
+    activeHeaderDocumentKey,
     draftReady,
     iframeComparisonMode,
     iframeDiagnosticMode,
@@ -4894,7 +5209,19 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (builderState.page === "header") {
-      setHeaderDocumentPreviewState(builderState);
+      const documentKey = headerDocumentKeyFromEditorState(builderState);
+      if (documentKey === "header-mobile") {
+        setMobileHeaderDocumentPreviewState(builderState);
+        const embeddedDialog = headerSectionEditorState(
+          builderState,
+          "header-mobile-dialog",
+        );
+        if (embeddedDialog) setMobileDialogDocumentPreviewState(embeddedDialog);
+      } else if (documentKey === "header-mobile-dialog") {
+        setMobileDialogDocumentPreviewState(builderState);
+      } else if (documentKey === "header") {
+        setHeaderDocumentPreviewState(builderState);
+      }
     }
     if (builderState.page === "footer" && footerDocumentPreviewState) {
       setFooterDocumentPreviewState(builderState);
@@ -4940,11 +5267,16 @@ export default function DashboardBuilder({
     const requestedPage = searchParams.get("page") ?? searchParams.get("template");
     if (!draftReady || requestedPage !== "header") return;
 
-    const routeIdentity = `${websiteId ?? "root"}:header:${searchParams.toString()}`;
+    const routeIdentity = `${websiteId ?? "root"}:${activeHeaderDocumentKey}:${searchParams.toString()}`;
     if (headerRouteHydrationRef.current === routeIdentity) return;
     // Shell entry has already selected its authoritative in-memory state. Do
-    // not replace active edits when the URL is synchronized by that entry.
-    if (activeShellEntry) {
+    // not replace active edits when the URL is synchronized by that same
+    // document. A desktop entry must not suppress loading the Mobile Header
+    // or Menu after the switcher changes `headerView`.
+    const activeShellDocumentKey = activeShellEntry?.shellType === "header"
+      ? headerBuilderDocumentKeyForSectionId(activeShellEntry.rootId)
+      : null;
+    if (activeShellEntry && activeShellDocumentKey === activeHeaderDocumentKey) {
       headerRouteHydrationRef.current = routeIdentity;
       return;
     }
@@ -4953,17 +5285,41 @@ export default function DashboardBuilder({
     let cancelled = false;
     void (async () => {
       try {
-        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "header" }), {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: activeHeaderDocumentKey }), {
           cache: "no-store",
         });
         if (!response.ok || cancelled) return;
         const payload = (await response.json()) as { layout?: BuilderState | null };
         if (cancelled || !payload.layout?.sections?.length) return;
         const nextState = hydrateDocumentBuilderState(
-          normalizeBuilderState(payload.layout, "header"),
+          asHeaderEditorState(payload.layout, activeHeaderDocumentKey),
           shellSettings,
         );
-        setHeaderDocumentPreviewState(nextState);
+        if (activeHeaderDocumentKey === "header-mobile") {
+          setMobileHeaderDocumentPreviewState(nextState);
+        } else if (activeHeaderDocumentKey === "header-mobile-dialog") {
+          setMobileDialogDocumentPreviewState(nextState);
+          // Opening Menu materializes the paired mobile Header too. Load it
+          // for the live canvas so the authored bar and dialog are previewed
+          // together instead of falling back to desktop during this session.
+          if (!mobileHeaderDocumentPreviewState) {
+            void fetch(builderApiUrl("/api/builder-layouts", { key: "header-mobile" }), {
+              cache: "no-store",
+            }).then(async (mobileResponse) => {
+              if (!mobileResponse.ok || cancelled) return;
+              const mobilePayload = await mobileResponse.json() as { layout?: BuilderState | null };
+              if (!mobilePayload.layout?.sections?.length || cancelled) return;
+              setMobileHeaderDocumentPreviewState(hydrateDocumentBuilderState(
+                asHeaderEditorState(mobilePayload.layout, "header-mobile"),
+                shellSettings,
+              ));
+            }).catch(() => {
+              // The dialog still remains editable when its paired bar cannot be refreshed.
+            });
+          }
+        } else {
+          setHeaderDocumentPreviewState(nextState);
+        }
         setBuilderState(nextState);
         undoHistoryRef.current = [structuredClone(nextState)];
         setCommittedBuilderStateSignature(JSON.stringify(nextState));
@@ -4972,9 +5328,9 @@ export default function DashboardBuilder({
         setSelectedLayoutColumnKey(null);
         setSelectedLayoutBlockKey(null);
         setOpenLayoutItemId(null);
-        removeBuilderDraft(storageKeys, "header");
-        restoredDraftKeysRef.current.delete("header");
-        delete draftMetadataRef.current.header;
+        removeBuilderDraft(storageKeys, activeHeaderDocumentKey);
+        restoredDraftKeysRef.current.delete(activeHeaderDocumentKey);
+        delete draftMetadataRef.current[activeHeaderDocumentKey];
       } catch {
         // Keep the current state if the persisted Header cannot be read.
       }
@@ -4983,7 +5339,7 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, [activeShellEntry, builderApiUrl, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
+  }, [activeHeaderDocumentKey, activeShellEntry, builderApiUrl, draftReady, mobileHeaderDocumentPreviewState, searchParams, shellSettings, storageKeys, websiteId]);
 
   useEffect(() => {
     const requestedPage = searchParams.get("page") ?? searchParams.get("template");
@@ -5123,9 +5479,10 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
-    setInspectorOpen(true);
     // Shell entry establishes the initial root selection only. Descendant
-    // clicks must continue through the ordinary Builder selection path.
+    // clicks must continue through the ordinary Builder selection path. The
+    // Inspector remains closed until the user explicitly chooses Settings or
+    // Edit from the selection toolbar.
     setActiveShellEntry(null);
   }, [activeShellEntry, builderState.page, builderState.sections, selectedId]);
 
@@ -5268,7 +5625,7 @@ export default function DashboardBuilder({
       ? findLayoutBlock(currentSection, blockKey, columnKey)
       : null;
     const isHeaderButton =
-      sectionId === "header-document" &&
+      sectionId === activeHeaderDocumentSectionId &&
       (currentBlock?.id === "header-button" || currentBlock?.kind === "button");
     const headerButtonOverrideFields: Array<[
       keyof BuilderLayoutBlock,
@@ -6000,8 +6357,8 @@ export default function DashboardBuilder({
 
     const rootId =
       builderState.sections[0]?.id ??
-      loadDraftForKey(shellType, storageKeys).sections[0]?.id ??
-      (shellType === "header" ? "header-document" : "footer-document");
+      loadDraftForKey(shellType === "header" ? activeHeaderDocumentKey : shellType, storageKeys).sections[0]?.id ??
+      (shellType === "header" ? activeHeaderDocumentSectionId : "footer-document");
     selectSection(rootId, shouldOpenInspector);
     setHeaderSelected(shellType === "header");
     setFooterSelected(shellType === "footer");
@@ -6116,6 +6473,9 @@ export default function DashboardBuilder({
     // Using the surrounding shell context here can label a Home draft as
     // Header/Footer, causing the renderer to reject an otherwise valid live
     // mutation before it ever reaches the canvas.
+    const headerDraftDocumentKey = state.page === "header"
+      ? headerDocumentKeyFromEditorState(state) ?? undefined
+      : undefined;
     const rendersContextualRoute =
       state.page !== "header" &&
       state.page !== "footer" &&
@@ -6128,6 +6488,7 @@ export default function DashboardBuilder({
           : null,
       shellSettings,
       documentKey: rendersContextualRoute ? iframeComparisonPage : state.page,
+      headerDocumentKey: headerDraftDocumentKey,
       renderPage: rendersContextualRoute ? iframeComparisonPage : null,
     });
     const previousMessage = iframeDraftDeliveryRef.current;
@@ -6149,6 +6510,7 @@ export default function DashboardBuilder({
       // (`product-category`, `product-single`, and so on). Address the
       // receiver by that route without rewriting the persisted document.
       documentKey: rendersContextualRoute ? iframeComparisonPage : state.page,
+      ...(headerDraftDocumentKey ? { headerDocumentKey: headerDraftDocumentKey } : {}),
       ...(rendersContextualRoute ? { renderPage: iframeComparisonPage } : {}),
       revision: iframeDraftRevisionRef.current,
       state,
@@ -6391,7 +6753,7 @@ export default function DashboardBuilder({
       const shell = iframeDiagnosticMode === "settled" || iframeDiagnosticMode === "full"
         ? event.data.shell === "header" || event.data.shell === "footer"
           ? event.data.shell
-          : target.sectionId === "header-document"
+          : target.sectionId === activeHeaderDocumentSectionId
             ? "header"
             : target.sectionId === "footer-document"
               ? "footer"
@@ -6403,10 +6765,14 @@ export default function DashboardBuilder({
         return;
       }
       if (!builderState.sections.some((section) => section.id === target.sectionId)) return;
+      // A canvas click chooses an object and draws its selection toolbar. It
+      // must not also cover the canvas with the Inspector; the toolbar's Edit
+      // action is the deliberate request to open it. This matches the inline
+      // PreviewCanvas selection contract.
       if (target.type === "section") {
-        selectSection(target.sectionId, true);
+        selectSection(target.sectionId);
       } else if (target.type === "row" && Number.isInteger(target.rowIndex)) {
-        selectLayoutRow(target.sectionId, target.rowIndex, true);
+        selectLayoutRow(target.sectionId, target.rowIndex);
       } else if (target.type === "column" && target.columnKey) {
         setHeaderSelected(false);
         setFooterSelected(false);
@@ -6416,9 +6782,8 @@ export default function DashboardBuilder({
         setSelectedLayoutBlockKey(null);
         setOpenLayoutItemId(target.columnKey);
         setInspectorTab("layout");
-        openInspectorPanel();
       } else if (target.type === "block" && target.columnKey && target.blockKey) {
-        selectLayoutBlock(target.sectionId, target.columnKey, target.blockKey, true);
+        selectLayoutBlock(target.sectionId, target.columnKey, target.blockKey);
       }
     };
     window.addEventListener("message", handleIframeSelection);
@@ -6450,7 +6815,6 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(target.type === "block" ? target.blockKey : null);
     setOpenLayoutItemId(target.type === "column" || target.type === "block" ? target.columnKey : null);
     setInspectorTab(target.type === "block" ? "content" : target.type === "row" ? "settings" : "layout");
-    setInspectorOpen(true);
   }, [builderState.page]);
 
   const enterShellEdit = async (shellType: "header" | "footer") => {
@@ -6465,26 +6829,36 @@ export default function DashboardBuilder({
     const targetState = shellType === "footer"
       ? footerDocumentPreviewState ?? await loadFooterDocumentPreview()
       : null;
-    let nextState = targetState ?? hydrateDocumentBuilderState(
-      loadDraftForKey(shellType, storageKeys),
-      shellSettings,
+    let nextState = targetState ?? (
+      shellType === "header"
+        ? activeHeaderDocumentPreviewState ?? activeHeaderDocumentFallbackState
+        : hydrateDocumentBuilderState(
+            loadDraftForKey(shellType, storageKeys),
+            shellSettings,
+          )
     );
 
-    if (shellType === "header" && !headerDocumentPreviewState) {
+    if (shellType === "header" && !activeHeaderDocumentPreviewState) {
       // Header entry must be anchored to the persisted document. A local draft
       // can belong to an older saved revision and would otherwise resurrect
       // deleted blocks or reintroduce stale layout/design values after refresh.
       try {
-        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "header" }), {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: activeHeaderDocumentKey }), {
           cache: "no-store",
         });
         const payload = (await response.json()) as { layout?: BuilderState | null };
         if (response.ok && payload.layout?.sections?.length) {
           nextState = hydrateDocumentBuilderState(
-            normalizeBuilderState(payload.layout, "header"),
+            asHeaderEditorState(payload.layout, activeHeaderDocumentKey),
             shellSettings,
           );
-          setHeaderDocumentPreviewState(nextState);
+          if (activeHeaderDocumentKey === "header-mobile") {
+            setMobileHeaderDocumentPreviewState(nextState);
+          } else if (activeHeaderDocumentKey === "header-mobile-dialog") {
+            setMobileDialogDocumentPreviewState(nextState);
+          } else {
+            setHeaderDocumentPreviewState(nextState);
+          }
         }
       } catch {
         // Keep the local draft fallback when the persisted Header cannot load.
@@ -6513,12 +6887,15 @@ export default function DashboardBuilder({
     }
     const shellRootId =
       nextState.sections[0]?.id ??
-      (shellType === "header" ? "header-document" : "footer-document");
+      (shellType === "header" ? activeHeaderDocumentSectionId : "footer-document");
     shellTransitionRef.current = { direction: "enter", page: shellType };
     setActiveShellEntry({ shellType, rootId: shellRootId });
     setHeaderContextKey(contextKey);
     switchBuilderTarget(shellType, { syncUrl: false, state: nextState });
-    router.replace(`${pathname}?page=${shellType}&context=${encodeURIComponent(contextKey)}`, { scroll: false });
+    router.replace(
+      `${pathname}?page=${shellType}&context=${encodeURIComponent(contextKey)}${shellType === "header" ? `&headerView=${headerBuilderView}` : ""}`,
+      { scroll: false },
+    );
     setHeaderSelected(shellType === "header");
     setFooterSelected(shellType === "footer");
     setSelectedId(shellRootId);
@@ -6537,6 +6914,52 @@ export default function DashboardBuilder({
     enterShellEdit("header");
   };
 
+  const switchHeaderBuilderView = (view: HeaderBuilderView) => {
+    const normalizedView: HeaderBuilderView = view === "dialog" ? "mobile" : view;
+    if (builderState.page !== "header") {
+      // Header is the only entry point into this grouped workspace. Once it
+      // has loaded, the route-driven switcher below owns the selected surface.
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "header");
+      params.set("headerView", normalizedView);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      return;
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "header");
+    params.set("headerView", normalizedView);
+    if (!params.get("context")) params.set("context", headerContextKey);
+    setDevice(normalizedView === "desktop" ? "desktop" : "mobile");
+    const nextDocumentKey = headerBuilderDocumentKeyForView(normalizedView);
+    const cachedTargetState = nextDocumentKey === "header"
+      ? headerDocumentPreviewState
+      : nextDocumentKey === "header-mobile"
+        ? mobileHeaderDocumentPreviewState
+        : mobileDialogDocumentPreviewState;
+    // The route effect will fetch the authoritative document. When it is
+    // already cached, switch the editor immediately; otherwise keep the
+    // current document untouched until that fetch finishes rather than
+    // briefly copying it into the target surface.
+    if (cachedTargetState) setBuilderState(cachedTargetState);
+    setActiveShellEntry(null);
+    setSelectedId(headerBuilderDocumentSectionId(nextDocumentKey));
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setInspectorTab("layout");
+    setSectionSettingsOpen(true);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const selectPreviewDevice = (nextDevice: PreviewDevice) => {
+    setDevice(nextDevice);
+    if (builderState.page !== "header") return;
+    const nextView: HeaderBuilderView =
+      nextDevice === "desktop" || nextDevice === "laptop" ? "desktop" : "mobile";
+    if (nextView !== headerBuilderView) switchHeaderBuilderView(nextView);
+  };
+
   // The Header toolbar's edit action must target the Header document root,
   // not the generic section-settings panel. Keep this separate from
   // selectSection because HeaderDocumentSettings is document-scoped.
@@ -6545,7 +6968,7 @@ export default function DashboardBuilder({
       enterShellEdit("header");
       return;
     }
-    const rootId = builderState.sections[0]?.id ?? "header-document";
+    const rootId = builderState.sections[0]?.id ?? activeHeaderDocumentSectionId;
     setHeaderSelected(true);
     setFooterSelected(false);
     setSelectedId(rootId);
@@ -6792,7 +7215,7 @@ export default function DashboardBuilder({
           },
         );
 
-        if (section.id === "header-document" && preset.ratios.length > 1) {
+        if (section.id === activeHeaderDocumentSectionId && preset.ratios.length > 1) {
           const allHeaderBlocks = normalizedItems.flatMap((item) =>
             getLayoutItemBlocks(item),
           );
@@ -6811,7 +7234,7 @@ export default function DashboardBuilder({
         }
 
         if (
-          section.id !== "header-document" &&
+          section.id !== activeHeaderDocumentSectionId &&
           normalizedItems.length > preset.ratios.length
         ) {
           const overflowBlocks = normalizedItems
@@ -6972,7 +7395,7 @@ export default function DashboardBuilder({
       ? selectedLayoutBlock
       : getLayoutItemBlocks(rawSelectedSection.layoutItems?.[columnIndex] ?? {})[blockIndex];
     const isHeaderButton =
-      (builderState.page === "header" || rawSelectedSection.id === "header-document") &&
+      (builderState.page === "header" || rawSelectedSection.id === activeHeaderDocumentSectionId) &&
       (targetForProvenance?.id === "header-button" || targetForProvenance?.kind === "button");
     const buttonOverrideFields: Array<[keyof BuilderLayoutBlock, keyof NonNullable<BuilderLayoutBlock["headerButtonOverrides"]>]> = [
       ["buttonStyle", "variant"],
@@ -7417,7 +7840,7 @@ export default function DashboardBuilder({
       sections: current.sections.map((section) => {
         if (
           section.id !== sectionId ||
-          (!isLayoutContainerSection(section) && section.id !== "header-document")
+          (!isLayoutContainerSection(section) && section.id !== activeHeaderDocumentSectionId)
         ) {
           return section;
         }
@@ -7460,7 +7883,7 @@ export default function DashboardBuilder({
       sections: current.sections.map((section) => {
         if (
           section.id !== sectionId ||
-          (!isLayoutContainerSection(section) && section.id !== "header-document")
+          (!isLayoutContainerSection(section) && section.id !== activeHeaderDocumentSectionId)
         ) {
           return section;
         }
@@ -7508,7 +7931,7 @@ export default function DashboardBuilder({
       sections: current.sections.map((section) => {
         if (
           section.id !== sectionId ||
-          (!isLayoutContainerSection(section) && section.id !== "header-document")
+          (!isLayoutContainerSection(section) && section.id !== activeHeaderDocumentSectionId)
         ) {
           return section;
         }
@@ -7551,7 +7974,7 @@ export default function DashboardBuilder({
       const targetSection = current.sections.find(
         (section) =>
           section.id === targetSectionId &&
-          (isLayoutContainerSection(section) || section.id === "header-document"),
+          (isLayoutContainerSection(section) || section.id === activeHeaderDocumentSectionId),
       );
       const hasTargetColumn = targetSection
         ? Boolean(findLayoutColumn(targetSection, targetColumnKey))
@@ -7562,7 +7985,7 @@ export default function DashboardBuilder({
       const sectionsWithoutBlock = current.sections.map((section) => {
         if (
           section.id !== sectionId ||
-          (!isLayoutContainerSection(section) && section.id !== "header-document")
+          (!isLayoutContainerSection(section) && section.id !== activeHeaderDocumentSectionId)
         ) {
           return section;
         }
@@ -7595,7 +8018,7 @@ export default function DashboardBuilder({
         sections: sectionsWithoutBlock.map((section) => {
           if (
             section.id !== targetSectionId ||
-            !isLayoutContainerSection(section) && section.id !== "header-document"
+            !isLayoutContainerSection(section) && section.id !== activeHeaderDocumentSectionId
           ) {
             return section;
           }
@@ -7651,7 +8074,6 @@ export default function DashboardBuilder({
 
   const moveHeaderBuilderElement = ({
     payload,
-    targetRowId,
     targetColumnId,
     targetBlockId,
     placement = "below",
@@ -7662,31 +8084,21 @@ export default function DashboardBuilder({
     targetBlockId?: string;
     placement?: "above" | "below";
   }) => {
-    setBuilderState((current) => {
-      if (current.page !== "header") return current;
-      const sectionIndex = current.sections.findIndex((section) => section.id === "header-document");
-      const section = current.sections[sectionIndex];
-      if (!section || !isLayoutContainerSection(section)) return current;
-      const result = moveHeaderBlockById(section.layoutItems ?? [], payload, {
-        targetRowId,
-        targetColumnId,
-        targetBlockId,
-        placement,
-      });
-      if (!result.moved) return current;
-
-      const sections = [...current.sections];
-      sections[sectionIndex] = {
-        ...section,
-        layoutItems: result.layoutItems,
-      };
-      return { ...current, sections };
+    const sourceSection = builderState.sections.find((section) =>
+      Boolean(findLayoutBlock(section, payload.blockId, payload.sourceColumnId)),
+    );
+    const targetSection = builderState.sections.find((section) =>
+      Boolean(findLayoutColumn(section, targetColumnId)),
+    );
+    if (!sourceSection || !targetSection) return;
+    moveLayoutBlock({
+      sectionId: sourceSection.id,
+      targetSectionId: targetSection.id,
+      sourceColumnKey: payload.sourceColumnId,
+      sourceBlockKey: payload.blockId,
+      targetColumnKey: targetColumnId,
+      ...(targetBlockId ? { targetBlockKey: targetBlockId, placement } : { placement }),
     });
-
-    setSelectedId("header-document");
-    setSelectedLayoutColumnKey(targetColumnId);
-    setSelectedLayoutBlockKey(payload.blockId);
-    setOpenLayoutItemId(targetColumnId);
     setPublishStatus("Header element moved");
   };
 
@@ -7703,7 +8115,22 @@ export default function DashboardBuilder({
     setBuilderState((current) => {
       if (current.page !== "header") return current;
       const sections = current.sections.map((section) => {
-        if (section.id !== "header-document" || !isLayoutContainerSection(section)) return section;
+        if (section.id !== activeHeaderDocumentSectionId || !isLayoutContainerSection(section)) return section;
+        if (section.rows !== undefined) {
+          const sourceIndex = section.rows.findIndex((row) => row.id === sourceRowId);
+          const targetIndex = section.rows.findIndex((row) => row.id === targetRowId);
+          if (sourceIndex < 0 || targetIndex < 0) return section;
+          const nextRows = [...section.rows];
+          const [sourceRow] = nextRows.splice(sourceIndex, 1);
+          if (!sourceRow) return section;
+          const adjustedTargetIndex = nextRows.findIndex((row) => row.id === targetRowId);
+          nextRows.splice(
+            Math.max(0, adjustedTargetIndex + (placement === "after" ? 1 : 0)),
+            0,
+            sourceRow,
+          );
+          return { ...section, rows: nextRows };
+        }
         const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
         const sourceIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === sourceRowId));
         const targetIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === targetRowId));
@@ -7720,7 +8147,7 @@ export default function DashboardBuilder({
       return { ...current, sections };
     });
 
-    setSelectedId("header-document");
+    setSelectedId(activeHeaderDocumentSectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
@@ -7875,44 +8302,53 @@ export default function DashboardBuilder({
       };
       const headerElement = headerElementByKind[kind];
       if (!headerElement?.id) return;
-      const headerSection = builderState.sections.find(
-        (section) => section.id === "header-document",
-      );
-      const existingLocation = headerSection?.layoutItems?.find((item) =>
-        (item.blocks ?? []).some((block) => block.id === headerElement.id),
-      );
-      const elementToInsert = existingLocation
+      const headerSection = explicitTarget
+        ? builderState.sections.find((section) => section.id === explicitTarget.sectionId)
+        : builderState.sections.find((section) => section.id === selectedId)
+          ?? builderState.sections.find((section) => section.id === activeHeaderDocumentSectionId);
+      if (!headerSection || !isLayoutContainerSection(headerSection)) return;
+      const requestedColumnKey = explicitTarget?.columnKey
+        ?? preferredHeaderColumnKey
+        ?? selectedLayoutColumnKey;
+      const firstCanonicalColumnId = normalizeBuilderSectionLayout(headerSection)
+        .rows[0]?.columns[0]?.id;
+      const headerColumn = (requestedColumnKey
+        ? findLayoutColumn(headerSection, requestedColumnKey)
+        : null)
+        ?? (firstCanonicalColumnId
+          ? findLayoutColumn(headerSection, firstCanonicalColumnId)
+          : null)
+        ?? headerSection.layoutItems?.[0]
+        ?? null;
+      if (!headerColumn?.id) {
+        setPublishStatus("Add a column before adding elements");
+        return;
+      }
+      const elementToInsert = findLayoutBlock(headerSection, headerElement.id)
         ? { ...headerElement, id: createBlockId(kind) }
         : headerElement;
-      const headerRow = headerSection?.layoutItems?.find(
-        (item) => item.id === (preferredHeaderColumnKey ?? selectedLayoutColumnKey),
-      ) ?? headerSection?.layoutItems?.find((item) => item.id === "header-main-row")
-        ?? headerSection?.layoutItems?.[0];
-      if (!headerSection || !headerRow) return;
       setBuilderState((current) => ({
         ...current,
         sections: current.sections.map((section) =>
           section.id !== headerSection.id
             ? section
-            : {
-                ...section,
-                layoutItems: (section.layoutItems ?? []).map((item) => {
-                  if (item.id !== headerRow.id) return item;
-                  const blocks = [...(item.blocks ?? [])];
-                  const targetIndex = targetHeaderBlockId
-                    ? blocks.findIndex((block) => block.id === targetHeaderBlockId)
-                    : -1;
-                  const insertIndex = targetIndex < 0
+            : updateLayoutColumn(section, headerColumn.id!, (column) => {
+                const blocks = [...(column.blocks ?? [])];
+                const targetIndex = targetHeaderBlockId
+                  ? blocks.findIndex((block) => block.id === targetHeaderBlockId)
+                  : -1;
+                const insertIndex = explicitTarget?.insertionIndex === undefined
+                  ? targetIndex < 0
                     ? blocks.length
-                    : targetIndex + (placement === "below" ? 1 : 0);
-                  blocks.splice(insertIndex, 0, elementToInsert);
-                  return { ...item, blocks };
-                }),
-              },
+                    : targetIndex + (placement === "below" ? 1 : 0)
+                  : Math.max(0, Math.min(explicitTarget.insertionIndex, blocks.length));
+                blocks.splice(insertIndex, 0, elementToInsert);
+                return { ...column, blocks };
+              }),
         ),
       }));
       setSelectedId(headerSection.id);
-      setSelectedLayoutColumnKey(headerRow.id ?? "header-main-row");
+      setSelectedLayoutColumnKey(headerColumn.id);
       setSelectedLayoutBlockKey(elementToInsert.id ?? null);
       setInspectorOpen(true);
       setPublishStatus(`${layoutBlockLabels[kind]} restored`);
@@ -9344,8 +9780,8 @@ export default function DashboardBuilder({
       },
       body: JSON.stringify(
         target.kind === "document"
-          ? { ...builderState, action: "save", documentId: target.documentId }
-          : builderState,
+          ? { ...serializeBuilderStateForPersistence(builderState), action: "save", documentId: target.documentId }
+          : serializeBuilderStateForPersistence(builderState),
       ),
     });
 
@@ -9619,35 +10055,126 @@ export default function DashboardBuilder({
     }
 
     if (Object.keys(nextThemeSettings.resolved.headerDocument).length) {
-      const currentHeaderState = builderStateRef.current.page === "header"
-        ? builderStateRef.current
-        : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
-            loadDraftForKey("header", storageKeys),
-            shellSettings,
-          );
-      const nextHeaderState = resolveBuilderMediaUrls(
-        applyYoothemeHeaderImport(currentHeaderState, nextThemeSettings, headerMode),
-        wordpressMediaOrigin,
+      const asHeaderEditorState = (layout: BuilderState) => hydrateDocumentBuilderState(
+        normalizeBuilderState({ ...layout, page: "header", targetType: "header" }, "header"),
+        shellSettings,
       );
-      setHeaderDocumentPreviewState(nextHeaderState);
-      if (builderStateRef.current.page === "header") setBuilderState(nextHeaderState);
-      try {
-        const drafts = JSON.parse(window.localStorage.getItem(storageKeys.drafts) ?? "{}") as Partial<Record<BuilderLayoutKey, BuilderState>>;
-        drafts.header = nextHeaderState;
-        window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
-      } catch {
-        // The in-memory Header document remains authoritative for this session.
-      }
-      await fetch(builderApiUrl("/api/builder-layouts"), {
+      const persistHeaderDocument = async (
+        key: HeaderBuilderDocumentKey,
+        state: BuilderState,
+      ) => fetch(builderApiUrl("/api/builder-layouts"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nextHeaderState),
+        body: JSON.stringify({ ...state, page: key, targetType: "header" }),
       });
+      const readHeaderDocument = async (key: HeaderBuilderDocumentKey) => {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key }), {
+          cache: "no-store",
+        });
+        if (!response.ok) return null;
+        const payload = await response.json() as { layout?: BuilderState | null };
+        return payload.layout?.sections?.length ? asHeaderEditorState(payload.layout) : null;
+      };
+
+      // Save Desktop first. Reading either mobile surface below is the
+      // explicit import action that creates the optional bundle, so storefront
+      // rendering remains read-only for existing sites.
+      const currentDesktopState = desktopHeaderDocumentState;
+      const nextDesktopState = resolveBuilderMediaUrls(
+        applyYoothemeHeaderDocumentImport(
+          currentDesktopState,
+          nextThemeSettings,
+          "desktop",
+          headerMode,
+        ),
+        wordpressMediaOrigin,
+      );
+      const desktopSave = await persistHeaderDocument("header", nextDesktopState);
+      if (!desktopSave.ok) {
+        setTemplateStatus("Theme settings imported, but the Desktop Header could not be saved");
+        return;
+      }
+
+      const seededMobileState = await readHeaderDocument("header-mobile");
+      if (!seededMobileState) {
+        setTemplateStatus("Theme settings imported, but the Mobile Header could not be prepared");
+        return;
+      }
+      const mobileBarState = headerSectionEditorState(seededMobileState, "header-mobile");
+      const embeddedDialogState = headerSectionEditorState(
+        seededMobileState,
+        "header-mobile-dialog",
+      );
+      // `ensureHeaderBuilderDocuments` creates this second normal Builder
+      // section. The legacy read is only a defensive bridge for a document
+      // saved by an earlier build while its migration is still in flight.
+      const legacyDialogState = embeddedDialogState
+        ? null
+        : await readHeaderDocument("header-mobile-dialog");
+      const dialogState = embeddedDialogState ?? legacyDialogState;
+      if (!mobileBarState || !dialogState) {
+        setTemplateStatus("Theme settings imported, but the Mobile Header and Menu could not be prepared");
+        return;
+      }
+      const nextMobileBarState = resolveBuilderMediaUrls(
+        applyYoothemeHeaderDocumentImport(
+          mobileBarState,
+          nextThemeSettings,
+          "mobile",
+          headerMode,
+        ),
+        wordpressMediaOrigin,
+      );
+      const nextDialogState = resolveBuilderMediaUrls(
+        applyYoothemeHeaderDocumentImport(
+          dialogState,
+          nextThemeSettings,
+          "dialog",
+          headerMode,
+        ),
+        wordpressMediaOrigin,
+      );
+      const nextMobileState: BuilderState = resolveBuilderMediaUrls({
+        ...seededMobileState,
+        page: "header" as BuilderLayoutKey,
+        targetType: "header" as const,
+        sections: [
+          nextMobileBarState.sections[0]!,
+          nextDialogState.sections[0]!,
+        ],
+      }, wordpressMediaOrigin);
+      const mobileSave = await persistHeaderDocument("header-mobile", nextMobileState);
+      if (!mobileSave.ok) {
+        setTemplateStatus("Theme settings imported, but the Mobile Header could not be saved");
+        return;
+      }
+
+      setHeaderDocumentPreviewState(nextDesktopState);
+      setMobileHeaderDocumentPreviewState(nextMobileState);
+      setMobileDialogDocumentPreviewState(
+        headerSectionEditorState(nextMobileState, "header-mobile-dialog") ?? nextDialogState,
+      );
+      if (builderStateRef.current.page === "header") {
+        setBuilderState(
+          activeHeaderDocumentKey === "header-mobile"
+            ? nextMobileState
+            : nextDesktopState,
+        );
+      }
+      try {
+        const drafts = JSON.parse(window.localStorage.getItem(storageKeys.drafts) ?? "{}") as Partial<Record<BuilderLayoutKey, BuilderState>>;
+        drafts.header = nextDesktopState;
+        drafts["header-mobile"] = nextMobileState;
+        delete drafts["header-mobile-dialog"];
+        window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+      } catch {
+        // The in-memory Header documents remain authoritative for this session.
+      }
     }
     setTemplateStatus(
       headerMode === "settings-only"
-        ? `${nextThemeSettings.displayName} settings imported; Header structure preserved`
-        : `${nextThemeSettings.displayName} settings imported; Header created from recipe`,
+        ? `${nextThemeSettings.displayName} settings imported across Desktop and Mobile Header & Menu`
+        : `${nextThemeSettings.displayName} imported into Desktop and Mobile Header & Menu`,
     );
   };
 
@@ -10152,7 +10679,7 @@ export default function DashboardBuilder({
 
     if (templateType === "header") {
       const currentHeaderSection = builderState.sections.find(
-        (section) => section.id === "header-document",
+        (section) => section.id === activeHeaderDocumentSectionId,
       ) ?? builderState.sections[0];
       const savedHeaderSection = clonedSections[0];
       if (!savedHeaderSection) {
@@ -11094,7 +11621,7 @@ export default function DashboardBuilder({
       page: "header",
       targetType: "header",
       sections: currentHeaderState.sections.map((section, index) =>
-        index === 0 || section.id === "header-document"
+        index === 0 || section.id === activeHeaderDocumentSectionId
           ? { ...section, ...patch, headerArchitectureVersion: 2 }
           : section,
       ),
@@ -11693,6 +12220,9 @@ export default function DashboardBuilder({
       selectedLayoutBlockInheritedDynamicContext={selectedLayoutBlockInheritedDynamicContext}
       selectedSection={selectedSection}
       headerDocumentRoot={builderState.page === "header"}
+      headerDocumentVariant={builderState.page === "header"
+        ? (selectedSection?.headerDocumentVariant === "dialog" ? "dialog" : headerBuilderView)
+        : undefined}
       footerDocumentRoot={footerSelected}
       anchorIdEntries={composedAnchorIdEntries}
       selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
@@ -11777,8 +12307,18 @@ export default function DashboardBuilder({
   const activeDocumentKindLabel = builderState.page === "footer"
     ? "Footer"
     : builderState.page === "header"
-      ? "Header"
+      ? HEADER_BUILDER_DOCUMENT_LABELS[headerBuilderView]
       : builderDocumentKindLabel(builderEditorContext);
+  const activeDocumentDisplayName = builderState.page === "header"
+    ? builderState.displayName || HEADER_BUILDER_DOCUMENT_LABELS[headerBuilderView]
+    : builderState.displayName ||
+      (builderState.page === "footer" ? "Footer" : getLayoutLabel(builderState.page, customPages));
+  // Header views share the same Builder route, so the initial page context can
+  // describe the prior surface after switching between Desktop and Mobile.
+  // The active header document is the authoritative label in that workspace.
+  const activeDocumentContextDisplayName = builderState.page === "header"
+    ? activeDocumentDisplayName
+    : builderEditorContext?.document.displayName;
 
   const wireframeActions = useStableCallbackObject<BuilderWireframeActions>({
     addSection: (targetSectionId, placement) =>
@@ -11816,11 +12356,15 @@ export default function DashboardBuilder({
   const builderWireframePanel = (
     <BuilderWireframePanel
       page={builderState.page}
-      pageLabel={builderEditorContext?.document.displayName ?? getLayoutLabel(builderState.page, customPages)}
+      pageLabel={activeDocumentContextDisplayName ?? getLayoutLabel(builderState.page, customPages)}
       documentKindLabel={activeDocumentKindLabel}
       documentBadgeLabel={activeDocumentKindLabel}
-      structureLabel={`${activeDocumentKindLabel} structure`}
-      structureAriaLabel={`${activeDocumentKindLabel} structure`}
+      structureLabel={builderState.page === "header" && headerBuilderView === "mobile"
+        ? "Mobile Header & Menu"
+        : `${activeDocumentKindLabel} structure`}
+      structureAriaLabel={builderState.page === "header" && headerBuilderView === "mobile"
+        ? "Mobile Header and Menu structure"
+        : `${activeDocumentKindLabel} structure`}
       sections={builderState.sections}
       selectedSectionId={selectedId}
       selectedLayoutRowIndex={selectedLayoutRowIndex}
@@ -11830,6 +12374,8 @@ export default function DashboardBuilder({
       actions={wireframeActions}
       renameSectionId={renameSectionRequestId}
       onOpenLibrary={() => openContextualLibrary()}
+      headerBuilderView={builderState.page === "header" ? headerBuilderView : undefined}
+      onHeaderBuilderViewChange={builderState.page === "header" ? switchHeaderBuilderView : undefined}
     />
   );
 
@@ -13159,8 +13705,6 @@ export default function DashboardBuilder({
     />
   );
 
-  const activeDocumentDisplayName = builderState.displayName ||
-    (builderState.page === "footer" ? "Footer" : builderState.page === "header" ? "Header" : getLayoutLabel(builderState.page, customPages));
   const documentOwnershipLabel = builderDocumentOwnershipLabel(builderEditorContext);
   const showDocumentOwnership = Boolean(
     documentOwnershipLabel && documentOwnershipLabel !== activeDocumentKindLabel,
@@ -13182,7 +13726,7 @@ export default function DashboardBuilder({
             </button>
           ) : <span className="builder-document-back-placeholder">Builder</span>}
           <span aria-hidden="true">/</span>
-          <span>{builderEditorContext ? builderEditorContext.document.displayName : activeDocumentDisplayName}</span>
+          <span>{activeDocumentContextDisplayName ?? activeDocumentDisplayName}</span>
         </div>
         <div className="builder-document-header-main">
           <div className="builder-document-identity">
@@ -13206,8 +13750,8 @@ export default function DashboardBuilder({
               </div>
             ) : (
               <div className="builder-document-title-row">
-                <h1>{builderEditorContext?.document.displayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : activeDocumentDisplayName)}</h1>
-                {(builderState.page === "header" || builderState.page === "footer") && !builderEditorContext ? (
+                <h1>{activeDocumentContextDisplayName ?? (sidebarTab === "globalStyles" ? shellSettingsLabel : activeDocumentDisplayName)}</h1>
+                {(builderState.page === "header" || builderState.page === "footer") && (!builderEditorContext || builderState.page === "header") ? (
                   <button
                     type="button"
                     className="builder-icon-button"
@@ -13328,7 +13872,7 @@ export default function DashboardBuilder({
         <button
           type="button"
           className={`builder-responsive-mode-button${device === "desktop" ? " is-active" : ""}`}
-          onClick={() => setDevice("desktop")}
+          onClick={() => selectPreviewDevice("desktop")}
           title="Desktop preview"
           aria-label="Desktop preview"
           aria-pressed={device === "desktop"}
@@ -13338,7 +13882,7 @@ export default function DashboardBuilder({
         <button
           type="button"
           className={`builder-responsive-mode-button${device === "laptop" ? " is-active" : ""}`}
-          onClick={() => setDevice("laptop")}
+          onClick={() => selectPreviewDevice("laptop")}
           title="Laptop preview"
           aria-label="Laptop preview"
           aria-pressed={device === "laptop"}
@@ -13348,7 +13892,7 @@ export default function DashboardBuilder({
         <button
           type="button"
           className={`builder-responsive-mode-button${device === "tablet" ? " is-active" : ""}`}
-          onClick={() => setDevice("tablet")}
+          onClick={() => selectPreviewDevice("tablet")}
           title="Tablet preview"
           aria-label="Tablet preview"
           aria-pressed={device === "tablet"}
@@ -13358,7 +13902,7 @@ export default function DashboardBuilder({
         <button
           type="button"
           className={`builder-responsive-mode-button${device === "mobile" ? " is-active" : ""}`}
-          onClick={() => setDevice("mobile")}
+          onClick={() => selectPreviewDevice("mobile")}
           title="Phone preview"
           aria-label="Phone preview"
           aria-pressed={device === "mobile"}
@@ -13784,8 +14328,8 @@ export default function DashboardBuilder({
             >
               {builderState.page === "header" && (
                 <div
-                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === "header-document" && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
-                  onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: "header-document" })}
+                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === activeHeaderDocumentSectionId && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === activeHeaderDocumentSectionId ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
+                  onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: activeHeaderDocumentSectionId })}
                   onMouseLeave={() => setHoveredBuilderTarget(null)}
                   onDragOver={(event) => {
                     if (!Array.from(event.dataTransfer.types).includes("application/x-builder-new-block")) return;
@@ -13838,10 +14382,14 @@ export default function DashboardBuilder({
                     scopedPreviewPages={scopedPreviewPages}
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
-                    headerComposition={currentHeaderComposition}
+                    headerComposition={desktopHeaderComposition}
+                    mobileHeaderComposition={mobileHeaderComposition}
+                    mobileDialogComposition={mobileDialogComposition}
                     builderPreviewMode={true}
+                    previewHeaderVariant={headerBuilderView === "desktop" ? "desktop" : "mobile"}
+                    forceMobileDialogOpen={headerBuilderView === "mobile"}
                     scrollState={builderHeaderScrollState}
-                    publicAnchorId={builderState.sections.find((section) => section.id === "header-document")?.anchorId}
+                    publicAnchorId={builderState.sections.find((section) => section.id === activeHeaderDocumentSectionId)?.anchorId}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
                     languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
@@ -13872,9 +14420,9 @@ export default function DashboardBuilder({
                             if (target.closest(".builder-preview-block-tools")) return;
                             event.preventDefault();
                             event.stopPropagation();
-                            selectLayoutBlock("header-document", columnId, element.id, true);
+                            selectLayoutBlock(activeHeaderDocumentSectionId, columnId, element.id, true);
                           }}
-                          onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
+                          onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
                           onMouseDown={(event) => {
                             const target = event.target as HTMLElement;
@@ -13885,7 +14433,7 @@ export default function DashboardBuilder({
                             }
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
-                              selectLayoutBlock("header-document", columnId, element.id, true);
+                              selectLayoutBlock(activeHeaderDocumentSectionId, columnId, element.id, true);
                             }
                           }}
                           onClick={(event) => {
@@ -13897,7 +14445,7 @@ export default function DashboardBuilder({
                             event.preventDefault();
                             event.stopPropagation();
                             if (selectedLayoutBlockKey !== element.id) {
-                              selectLayoutBlock("header-document", columnId, element.id, true);
+                              selectLayoutBlock(activeHeaderDocumentSectionId, columnId, element.id, true);
                             }
                           }}
                           onDragStart={(event) => {
@@ -13953,12 +14501,12 @@ export default function DashboardBuilder({
                             label={element.type}
                             canMoveUp={elementIndex > 0}
                             canMoveDown={elementIndex >= 0 && elementIndex < columnElements.length - 1}
-                            onSettings={() => selectLayoutBlock("header-document", columnId, element.id, true)}
-                            onMoveUp={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: -1 })}
-                            onMoveDown={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: 1 })}
-                            onSave={() => saveElementTemplateByKey("header-document", columnId, element.id)}
-                            onDuplicate={() => duplicateLayoutBlock({ sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
-                            onDelete={() => deleteLayoutBlock({ sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
+                            onSettings={() => selectLayoutBlock(activeHeaderDocumentSectionId, columnId, element.id, true)}
+                            onMoveUp={() => moveLayoutBlockWithinColumn({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id, direction: -1 })}
+                            onMoveDown={() => moveLayoutBlockWithinColumn({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id, direction: 1 })}
+                            onSave={() => saveElementTemplateByKey(activeHeaderDocumentSectionId, columnId, element.id)}
+                            onDuplicate={() => duplicateLayoutBlock({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id })}
+                            onDelete={() => deleteLayoutBlock({ sectionId: activeHeaderDocumentSectionId, columnKey: columnId, blockKey: element.id })}
                           />
                           <span className="builder-preview-drag-handle" aria-hidden="true">::</span>
                           <div className="builder-header-live-element-content">
@@ -13967,19 +14515,51 @@ export default function DashboardBuilder({
                         </div>
                       );
                     }}
+                    renderMobileDialogElement={headerBuilderView !== "mobile" ? undefined : (element, content) => {
+                      const columnId = element.columnId ?? "header-mobile-dialog-row";
+                      const dialogSectionId = headerBuilderDocumentSectionId("header-mobile-dialog");
+                      return (
+                        <div
+                          id={element.id}
+                          className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${hoveredBuilderTarget?.type === "block" && hoveredBuilderTarget.blockKey === element.id ? " is-hovered-block" : ""}`}
+                          data-header-element={element.type}
+                          onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
+                          onMouseLeave={() => setHoveredBuilderTarget(null)}
+                          onClickCapture={(event) => {
+                            if ((event.target as HTMLElement).closest(".mobile-drawer-close")) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            selectLayoutBlock(dialogSectionId, columnId, element.id, true);
+                          }}
+                        >
+                          <BuilderElementToolbar
+                            label={element.type}
+                            canMoveUp={false}
+                            canMoveDown={false}
+                            onSettings={() => selectLayoutBlock(dialogSectionId, columnId, element.id, true)}
+                            onMoveUp={() => undefined}
+                            onMoveDown={() => undefined}
+                            onSave={() => saveElementTemplateByKey(dialogSectionId, columnId, element.id)}
+                            onDuplicate={() => duplicateLayoutBlock({ sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
+                            onDelete={() => deleteLayoutBlock({ sectionId: dialogSectionId, columnKey: columnId, blockKey: element.id })}
+                          />
+                          <div className="builder-header-live-element-content">{content}</div>
+                        </div>
+                      );
+                    }}
                     renderBuilderColumn={(columnId, content) => (
                       <div
                         id={columnId}
                         className={`builder-header-live-column${selectedLayoutColumnKey === columnId && !selectedLayoutBlockKey ? " is-selected" : ""}${hoveredBuilderTarget?.type === "column" && hoveredBuilderTarget.columnKey === columnId ? " is-hovered-column" : ""}${headerDropTarget === `column:${columnId}` ? " is-drag-over" : ""}`}
                         style={{ flex: currentHeaderComposition.columns.find((column) => column.id === columnId)?.flex ?? 1 }}
-                        onMouseEnter={() => setHoveredBuilderTarget({ type: "column", sectionId: "header-document", columnKey: columnId })}
+                        onMouseEnter={() => setHoveredBuilderTarget({ type: "column", sectionId: activeHeaderDocumentSectionId, columnKey: columnId })}
                         onMouseLeave={() => setHoveredBuilderTarget(null)}
                         onClick={(event) => {
                           if ((event.target as HTMLElement).closest(".builder-header-live-element")) return;
                           event.preventDefault();
                           event.stopPropagation();
                           setHeaderDropTarget(`column:${columnId}`);
-                          selectLayoutColumn("header-document", columnId);
+                          selectLayoutColumn(activeHeaderDocumentSectionId, columnId);
                         }}
                         onDragOver={(event) => {
                           const types = Array.from(event.dataTransfer.types);
@@ -14017,14 +14597,18 @@ export default function DashboardBuilder({
                       </div>
                     )}
                     renderBuilderRow={(rowId, content) => {
-                      const headerSection = builderState.sections.find((section) => section.id === "header-document");
-                      const headerRows = headerSection ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []) : [];
-                      const rowIndex = headerRows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === rowId));
+                      const headerSection = builderState.sections.find((section) => section.id === activeHeaderDocumentSectionId);
+                      const rowIndex = headerSection?.rows !== undefined
+                        ? headerSection.rows.findIndex((row) => row.id === rowId)
+                        : (headerSection
+                          ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? [])
+                            .findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === rowId))
+                          : -1);
                       return (
                         <div
                           id={rowId}
                           className={`builder-header-live-row${selectedLayoutRowIndex === rowIndex ? " is-selected" : ""}${hoveredBuilderTarget?.type === "row" && hoveredBuilderTarget.rowIndex === rowIndex ? " is-hovered-row" : ""}`}
-                          onMouseEnter={() => setHoveredBuilderTarget({ type: "row", sectionId: "header-document", rowIndex })}
+                          onMouseEnter={() => setHoveredBuilderTarget({ type: "row", sectionId: activeHeaderDocumentSectionId, rowIndex })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
                         >
                           {(["before", "after"] as const).map((placement) => (
@@ -14073,9 +14657,9 @@ export default function DashboardBuilder({
                                 setHeaderRowDropTarget(null);
                               }}
                             ><GripVertical size={12} /></button>
-                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow("header-document", rowIndex, true)}><Settings2 size={12} /></button>
-                            <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow("header-document", rowIndex)}><Copy size={12} /></button>
-                            <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow("header-document", rowIndex)}><Trash2 size={12} /></button>
+                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow(activeHeaderDocumentSectionId, rowIndex, true)}><Settings2 size={12} /></button>
+                            <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow(activeHeaderDocumentSectionId, rowIndex)}><Copy size={12} /></button>
+                            <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow(activeHeaderDocumentSectionId, rowIndex)}><Trash2 size={12} /></button>
                           </div>
                           {content}
                           <button
@@ -14086,7 +14670,7 @@ export default function DashboardBuilder({
                             onClick={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
-                              addRowNear("header-document", rowIndex, "after", "whole");
+                              addRowNear(activeHeaderDocumentSectionId, rowIndex, "after", "whole");
                             }}
                           >
                             <Plus size={13} />
@@ -14130,8 +14714,11 @@ export default function DashboardBuilder({
                     scopedPreviewPages={scopedPreviewPages}
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
-                    headerComposition={currentHeaderComposition}
+                    headerComposition={desktopHeaderComposition}
+                    mobileHeaderComposition={mobileHeaderComposition}
+                    mobileDialogComposition={mobileDialogComposition}
                     builderPreviewMode={true}
+                    previewHeaderVariant={device === "desktop" || device === "laptop" ? "desktop" : "mobile"}
                     scrollState={builderHeaderScrollState}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}

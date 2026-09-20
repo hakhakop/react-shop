@@ -46,6 +46,7 @@ import {
 import { layoutColumnHasContent } from "@/lib/builderNestedLayout";
 import { normalizeBuilderSectionLayout } from "@/lib/builderSectionLayout";
 import type { BuilderInteractionTarget } from "@/components/dashboard/builderInteraction";
+import type { HeaderBuilderView } from "@/lib/headerBuilderDocumentKeys";
 
 export type BuilderHoverTarget = BuilderInteractionTarget;
 
@@ -123,6 +124,8 @@ type Props = {
   actions: BuilderWireframeActions;
   renameSectionId?: string | null;
   onOpenLibrary?: () => void;
+  headerBuilderView?: HeaderBuilderView;
+  onHeaderBuilderViewChange?: (view: HeaderBuilderView) => void;
 };
 
 function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
@@ -131,6 +134,7 @@ function getWireframeRows(section: BuilderSection): BuilderLayoutRow[] {
     return normalized.rows.map((row) => ({
       id: row.id,
       layoutKey: row.layout,
+      headerVariant: row.headerVariant,
       startIndex: 0,
       items: row.columns.map((column) => ({
         id: column.id,
@@ -1030,7 +1034,15 @@ export const WireframeRow = memo(function WireframeRow({
           }}
           style={{ cursor: "pointer" }}
         >
-          <span className="builder-structure-row-name">Row {index + 1}</span>
+          <span className="builder-structure-row-name">
+            {row.headerVariant === "desktop"
+              ? "Desktop header"
+              : row.headerVariant === "mobile"
+                ? "Mobile header"
+                : row.headerVariant === "mobile-dialog"
+                  ? "Mobile menu dialog"
+                : `Row ${index + 1}`}
+          </span>
           <span className="builder-structure-badge builder-structure-badge--row">
             {preset.label || `${row.items.length} Col`}
           </span>
@@ -1564,6 +1576,8 @@ export default function BuilderWireframePanel({
   actions,
   renameSectionId = null,
   onOpenLibrary,
+  headerBuilderView = "desktop",
+  onHeaderBuilderViewChange,
 }: Props) {
   const treeRef = useRef<HTMLDivElement>(null);
   const renameDraftRef = useRef("");
@@ -1699,6 +1713,34 @@ export default function BuilderWireframePanel({
           </small>
         </div>
       </div>
+
+      {header && onHeaderBuilderViewChange ? (
+        <div className="builder-header-surface-switcher" aria-label="Header builder documents">
+          <div className="builder-header-surface-switcher-primary" role="group" aria-label="Header device">
+            <button
+              type="button"
+              className={headerBuilderView === "desktop" ? "is-active" : ""}
+              aria-pressed={headerBuilderView === "desktop"}
+              onClick={() => onHeaderBuilderViewChange("desktop")}
+            >
+              Desktop
+            </button>
+            <button
+              type="button"
+              className={headerBuilderView === "mobile" ? "is-active" : ""}
+              aria-pressed={headerBuilderView === "mobile"}
+              onClick={() => onHeaderBuilderViewChange("mobile")}
+            >
+              Mobile
+            </button>
+          </div>
+          <p>
+            {headerBuilderView === "desktop"
+              ? "Build the header shown above the mobile breakpoint."
+              : "Build the mobile bar first, then the Mobile Menu Drawer section directly beneath it."}
+          </p>
+        </div>
+      ) : null}
 
       {onOpenLibrary ? (
         <div className="builder-structure-library-bar">

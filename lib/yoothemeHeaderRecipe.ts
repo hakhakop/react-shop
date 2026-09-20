@@ -8,6 +8,7 @@ import type {
 import type { BuilderThemeSettings } from "@/lib/builderThemeSettings";
 
 export type YoothemeHeaderImportMode = "settings-only" | "replace-from-recipe";
+export type YoothemeHeaderDocumentVariant = "desktop" | "mobile" | "dialog";
 
 export type YoothemeHeaderRecipe = {
   schemaVersion: 1;
@@ -156,9 +157,6 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
       id: "header-mobile-logo",
       imageUrl: text(logo.image_mobile) || logoImage,
     } : null;
-    positioned(settings.headerMobileSearchPosition, mobileStart, mobileEnd,
-      settings.headerMobileSearchPosition && settings.headerMobileSearchPosition !== "hide"
-        ? utility("header-mobile-search", "headerSearch", "search") : null);
     if (settings.headerMobileDialogTogglePosition && settings.headerMobileDialogTogglePosition !== "hide") {
       omitted.push("mobile dialog toggle: supplied by the mobile Navigation element");
     }
@@ -167,6 +165,19 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
       id: "header-mobile-navigation",
       title: "Mobile navigation",
     } : null;
+    // The YOOtheme dialog toggle names the slot for the Navigation block. It
+    // is an import hint for this ordinary Builder row, not a second mobile
+    // header model. When the source omits a slot, preserve the established
+    // end-of-row placement as the editable starting point.
+    positioned(
+      settings.headerMobileDialogTogglePosition ?? "mobile-end",
+      mobileStart,
+      mobileEnd,
+      mobileNavigation,
+    );
+    positioned(settings.headerMobileSearchPosition, mobileStart, mobileEnd,
+      settings.headerMobileSearchPosition && settings.headerMobileSearchPosition !== "hide"
+        ? utility("header-mobile-search", "headerSearch", "search") : null);
     rows.push({
       id: "header-mobile-row",
       headerVariant: "mobile",
@@ -175,10 +186,7 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
       columns: [
         column("header-mobile-start", "mobile-start", mobileStart),
         column("header-mobile-logo-slot", "mobile-logo", mobileLogo ? [mobileLogo] : []),
-        column("header-mobile-end", "mobile-end", [
-          ...(mobileNavigation ? [mobileNavigation] : []),
-          ...mobileEnd,
-        ]),
+        column("header-mobile-end", "mobile-end", mobileEnd),
       ],
     });
     createdElements.push("mobile composition");
@@ -198,6 +206,137 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
 const STRUCTURAL_KEYS = new Set<keyof BuilderSection>([
   "rows", "layoutItems", "layout", "layoutColumns", "headerPresetKey",
 ]);
+
+function definedSectionPatch(values: Partial<BuilderSection>): Partial<BuilderSection> {
+  return Object.fromEntries(
+    Object.entries(values).filter(([, value]) => value !== undefined),
+  ) as Partial<BuilderSection>;
+}
+
+/**
+ * Map YOOtheme's combined Header provider fields onto the document that owns
+ * them in WebPages. Desktop owns the breakpoint, mobile owns the bar, and
+ * dialog owns the drawer presentation. This leaves no live setting stranded
+ * in the former `headerMobile*` compatibility fields after import.
+ */
+export function getYoothemeHeaderDocumentSettings(
+  theme: BuilderThemeSettings,
+  variant: YoothemeHeaderDocumentVariant,
+): Partial<BuilderSection> {
+  const source = theme.resolved.headerDocument;
+  if (variant === "desktop") {
+    const desktop = Object.fromEntries(
+      Object.entries(source).filter(([key]) =>
+        !key.startsWith("headerMobile") ||
+        key === "headerMobileBreakpoint" ||
+        key === "headerMobileComposition",
+      ),
+    ) as Partial<BuilderSection>;
+    return {
+      ...desktop,
+      headerArchitectureVersion: 2,
+      headerMobileComposition: "separate",
+    };
+  }
+
+  if (variant === "mobile") {
+    return definedSectionPatch({
+      headerArchitectureVersion: 2,
+      headerDocumentVariant: "mobile",
+      headerMobileComposition: "separate",
+      headerBreakpoint: source.headerMobileBreakpoint ?? source.headerBreakpoint,
+      headerBehavior: source.headerMobileBehavior ?? source.headerBehavior,
+      headerSearchPosition: source.headerMobileSearchPosition ?? source.headerSearchPosition,
+      headerSearchLayout: source.headerMobileSearchLayout ?? source.headerSearchLayout,
+      headerSearchDropdownStretch: source.headerMobileSearchDropdownStretch ?? source.headerSearchDropdownStretch,
+      headerSearchDropdownLarge: source.headerMobileSearchDropdownLarge ?? source.headerSearchDropdownLarge,
+      headerSearchIconPosition: source.headerMobileSearchIconPosition ?? source.headerSearchIconPosition,
+      headerSearchExpand: source.headerMobileSearchExpand ?? source.headerSearchExpand,
+      headerSearchPreventSubmit: source.headerMobileSearchPreventSubmit ?? source.headerSearchPreventSubmit,
+      headerSearchDropbarAnimation: source.headerMobileSearchDropbarAnimation ?? source.headerSearchDropbarAnimation,
+      headerSearchDropbarRemoveHorizontalPadding:
+        source.headerMobileSearchDropbarRemoveHorizontalPadding
+        ?? source.headerSearchDropbarRemoveHorizontalPadding,
+      headerSocialPosition: source.headerMobileSocialPosition ?? source.headerSocialPosition,
+      headerSocialStyle: source.headerMobileSocialStyle ?? source.headerSocialStyle,
+      headerSocialGap: source.headerMobileSocialGap ?? source.headerSocialGap,
+      headerSocialItems: source.headerMobileSocialItems ?? source.headerSocialItems,
+      headerLogoPaddingRemove: source.headerMobileLogoPaddingRemove ?? source.headerLogoPaddingRemove,
+      headerDialogTogglePosition:
+        source.headerMobileDialogTogglePosition ?? source.headerDialogTogglePosition,
+      headerMobileLogoUrl: source.headerMobileLogoUrl,
+      headerInverseLogoUrl: source.headerInverseLogoUrl,
+      headerZIndex: source.headerZIndex,
+    });
+  }
+
+  return definedSectionPatch({
+    headerArchitectureVersion: 2,
+    headerDocumentVariant: "dialog",
+    headerDialogLayout: source.headerMobileDialogLayout ?? source.headerDialogLayout,
+    headerDialogClose: source.headerMobileDialogClose ?? source.headerDialogClose,
+    headerDialogMenuStyle: source.headerMobileDialogMenuStyle ?? source.headerDialogMenuStyle,
+    headerDialogCenter: source.headerMobileDialogCenter ?? source.headerDialogCenter,
+    headerDialogPushAfter: source.headerMobileDialogPushAfter ?? source.headerDialogPushAfter,
+    headerOffcanvasMode: source.headerMobileOffcanvasMode ?? source.headerOffcanvasMode,
+    headerOffcanvasFlip: source.headerMobileOffcanvasFlip ?? source.headerOffcanvasFlip,
+    headerOffcanvasOverlay: source.headerMobileOffcanvasOverlay ?? source.headerOffcanvasOverlay,
+    headerDialogDropbarAnimation:
+      source.headerMobileDialogDropbarAnimation ?? source.headerDialogDropbarAnimation,
+    headerZIndex: source.headerZIndex,
+  });
+}
+
+/** Apply a provider import to one independently authored Header surface. */
+export function applyYoothemeHeaderDocumentImport(
+  current: BuilderState,
+  theme: BuilderThemeSettings,
+  variant: YoothemeHeaderDocumentVariant,
+  mode: YoothemeHeaderImportMode,
+): BuilderState {
+  const currentSection = current.sections[0];
+  if (!currentSection) return current;
+  const recipe = createYoothemeHeaderRecipe(theme);
+  const recipeRows = variant === "dialog"
+    ? []
+    : recipe.rows
+      .filter((row) => row.headerVariant === variant)
+      .map((row) => ({ ...structuredClone(row), headerVariant: undefined }));
+
+  // The legacy combined Header persisted mobile options on the desktop
+  // document. Once a document is split, those settings must not survive a
+  // Theme Settings import and compete with the actual Mobile Header / Menu
+  // owners. `headerMobileLogoUrl` is retained on the mobile document because
+  // it is the authored mobile-logo asset used by the existing renderer.
+  const ownedSection = { ...currentSection } as Record<string, unknown>;
+  Object.keys(ownedSection).forEach((key) => {
+    if (!key.startsWith("headerMobile")) return;
+    const retainOnDesktop = key === "headerMobileBreakpoint" || key === "headerMobileComposition";
+    const retainOnMobile = key === "headerMobileLogoUrl" || key === "headerMobileComposition";
+    if ((variant === "desktop" && retainOnDesktop) || (variant === "mobile" && retainOnMobile)) return;
+    delete ownedSection[key];
+  });
+  if (variant === "desktop") delete ownedSection.headerDocumentVariant;
+
+  const nextSection: BuilderSection = {
+    ...ownedSection as BuilderSection,
+    ...getYoothemeHeaderDocumentSettings(theme, variant),
+    ...(mode === "replace-from-recipe" && recipeRows.length
+      ? {
+          headerPresetKey: undefined,
+          layout: "header-row",
+          layoutItems: undefined,
+          rows: recipeRows,
+        }
+      : {}),
+  };
+  return {
+    ...current,
+    page: "header",
+    targetType: "header",
+    sections: [nextSection, ...current.sections.slice(1)],
+  };
+}
 
 export function applyYoothemeHeaderImport(
   current: BuilderState,
