@@ -56,3 +56,4 @@ npm-debug.log*
 yarn-error.log*
 data/backups/
 test-results/
+/.dev-data/

@@ -1,0 +1,27 @@
+{
+  "id": "27079c03-3661-4c23-bf79-790cc8d73320",
+  "ownerId": "dev-fixture-owner",
+  "name": "Circle",
+  "slug": "circle",
+  "type": "business",
+  "domain": null,
+  "primaryDomain": null,
+  "domains": [],
+  "description": "Git-tracked WebPages development tenant.",
+  "websiteCategory": "Development",
+  "companyName": "WebPages Development",
+  "personName": "Development Fixture",
+  "logoUrl": "",
+  "contactPhone": "",
+  "contactEmail": "",
+  "socialLinks": "",
+  "timeZone": "Asia/Yerevan",
+  "language": "hy",
+  "primaryLanguage": "hy",
+  "enabledLanguages": [
+    "hy"
+  ],
+  "status": "active",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z"
+}

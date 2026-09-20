@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "seed:development": "node scripts/seed-development-webpages-starter.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:header-browser": "playwright test tests/header-browser-parity.spec.ts",

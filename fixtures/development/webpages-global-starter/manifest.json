@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "website": "website.json",
+  "globalStarter": "global-starter.json",
+  "builderDirectory": "builder",
+  "builderFiles": [
+    "builder-layouts.json",
+    "builder-pages.json",
+    "builder-routing.json",
+    "builder-shell.json"
+  ]
+}
