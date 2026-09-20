@@ -6211,6 +6211,12 @@
                 "kind": "headerAccount",
                 "headerUtilityAction": "account",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -6297,7 +6303,7 @@
         "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg"
       }
     ],
-    "updatedAt": "2026-09-20T06:04:54.002Z"
+    "updatedAt": "2026-09-20T06:33:05.132Z"
   },
   "footer": {
     "version": 1,
@@ -26545,10 +26551,10 @@
                 "id": "header-mobile-dialog-row-column-3",
                 "elements": [
                   {
-                    "id": "header-button",
-                    "kind": "button",
-                    "buttonLabel": "Register",
-                    "buttonUrl": "#"
+                    "id": "header-utility-theme",
+                    "kind": "headerTheme",
+                    "headerUtilityAction": "theme",
+                    "headerUtilityVariant": "muted"
                   }
                 ]
               }
@@ -26574,7 +26580,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-09-20T06:10:31.108Z"
+    "updatedAt": "2026-09-20T06:36:30.266Z"
   },
   "header-mobile-dialog": {
     "version": 1,

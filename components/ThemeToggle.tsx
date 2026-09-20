@@ -21,6 +21,7 @@ export default function ThemeToggle({
       icon={theme === "dark" ? "moon" : "sun"}
       variant={variant}
       size={size}
+      className="theme-toggle-btn"
       onClick={toggleTheme}
       aria-label={i18n?.t("theme.toggle") ?? "Toggle dark mode"}
     />

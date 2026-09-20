@@ -3649,15 +3649,17 @@ body[data-storefront-preset="princity"] .category-mega-card,
   /* Hide wishlist, account, and theme toggle actions in the header row on mobile */
   .site-header-actions > div:has(a[href="/wishlist"]),
   .site-header-actions > div:has(.header-account-pill),
-  .site-header-actions > div:has([aria-label="Toggle dark mode"]) {
+  .site-header-actions > div:has(.theme-toggle-btn) {
     display: none !important;
   }
 
   /* The rules above hide legacy mobile action clusters. Authored Header
-     utility elements are intentional content, including Account in the
-     mobile bar and dialog, so keep their own controls visible. */
+     utility elements are intentional content, including Account and Theme
+     in the mobile bar and dialog, so keep their own controls visible. */
   .header-builder-element--utility .site-header-actions > div:has(.header-account-pill),
-  .mobile-drawer-builder-element--utility .site-header-actions > div:has(.header-account-pill) {
+  .mobile-drawer-builder-element--utility .site-header-actions > div:has(.header-account-pill),
+  .header-builder-element--utility .site-header-actions > div:has(.theme-toggle-btn),
+  .mobile-drawer-builder-element--utility .site-header-actions > div:has(.theme-toggle-btn) {
     display: flex !important;
   }
 
