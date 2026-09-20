@@ -32,6 +32,7 @@ export default function AuthForm({
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isRegister = mode === "register";
+  const authSwitchHref = `${isRegister ? "/login" : "/register"}?next=${encodeURIComponent(nextPath)}`;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -179,7 +180,7 @@ export default function AuthForm({
 
       <p className="saas-auth-switch">
         {isRegister ? t("auth.haveAccount") : t("auth.needAccount")}{" "}
-        <Link href={isRegister ? "/login" : "/register"}>
+        <Link href={authSwitchHref}>
           {isRegister ? t("auth.goToLogin") : t("auth.goToRegister")}
         </Link>
       </p>

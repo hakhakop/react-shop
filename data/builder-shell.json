@@ -4,28 +4,24 @@
   "topToolbarText": "Fast support & setup by Webpages",
   "topToolbarPhone": "+374 xx xx xx",
   "topToolbarMeta": "AMD ֏",
-  "headerBackgroundMode": "none",
-  "headerTextMode": "auto",
-  "headerLayout": "wordpress",
+  "headerBackgroundMode": "default",
+  "headerTextMode": "dark",
+  "headerLayout": "simple",
   "headerBrandMode": "logo",
-  "headerBrandText": "DevStack",
-  "headerLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
-  "headerLogoAlt": "DevStack",
-  "headerLogoMaxWidth": 140,
-  "headerButtonLabel": "Register",
-  "headerButtonUrl": "#",
+  "headerBrandText": "WebPages",
+  "headerLogoUrl": "/uploads/onboarding/webpages_full_animated_once.svg",
+  "headerLogoAlt": "WebPages",
+  "headerLogoMaxWidth": 150,
+  "headerButtonLabel": "Create Website",
+  "headerButtonUrl": "/app/websites/new",
   "headerIconVariant": "muted",
   "headerIconOrder": [
-    "wishlist",
-    "cart",
-    "account",
-    "theme",
-    "search"
+    "theme"
   ],
-  "headerActiveIndicator": "princity",
+  "headerActiveIndicator": "underline",
   "headerBehavior": "sticky-on-scroll-up",
-  "headerTransparent": true,
-  "headerOverlay": true,
+  "headerTransparent": false,
+  "headerOverlay": false,
   "headerWidthMode": "boxed",
   "headerHeight": "auto",
   "headerZIndex": 40,
@@ -260,602 +256,49 @@
   "buttonHoverEffect": "lift",
   "menuItems": [
     {
-      "id": "dev-why",
-      "label": "Why DevStack?",
-      "url": "/why-devstack",
+      "id": "webpages-home",
+      "label": "Home",
+      "url": "/",
       "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
-      "dropdownContent": {
-        "id": "yootheme-fragment-0-0-0-0",
-        "kind": "sublayout",
-        "spacingContract": "yootheme",
-        "elementPadding": "none",
-        "sublayoutHtmlId": "",
-        "sublayoutClasses": "",
-        "sublayoutAttributes": "",
-        "sublayout": {
-          "rows": [
-            {
-              "id": "yootheme-row-0-0-0-0-fragment-0",
-              "layout": "quarters-1-3",
-              "customLayout": {
-                "template": "1-4,3-4",
-                "columns": [
-                  {
-                    "columnId": "yootheme-row-0-0-0-0-fragment-0-column-0",
-                    "widths": {
-                      "medium": "1-4"
-                    }
-                  },
-                  {
-                    "columnId": "yootheme-row-0-0-0-0-fragment-0-column-1",
-                    "widths": {
-                      "medium": "3-4"
-                    }
-                  }
-                ]
-              },
-              "divider": true,
-              "spacingContract": "yootheme",
-              "columns": [
-                {
-                  "id": "yootheme-row-0-0-0-0-fragment-0-column-0",
-                  "responsiveWidths": {
-                    "medium": "1-4"
-                  },
-                  "background": {
-                    "position": "center center"
-                  },
-                  "sticky": {
-                    "breakpoint": "m"
-                  },
-                  "elements": [
-                    {
-                      "id": "yootheme-panel-0-0-0-0-fragment-0-0-0",
-                      "kind": "panel",
-                      "yoothemeSource": {
-                        "type": "panel",
-                        "props": {
-                          "content": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
-                          "content_column_breakpoint": "m",
-                          "content_style": "text-small",
-                          "icon_width": 80,
-                          "image": "",
-                          "image_align": "top",
-                          "image_grid_breakpoint": "m",
-                          "image_grid_width": "1-2",
-                          "image_svg_color": "emphasis",
-                          "link": "?page_id=19",
-                          "link_style": "text",
-                          "link_text": "Learn More",
-                          "margin": "default",
-                          "meta": "",
-                          "meta_align": "below-title",
-                          "meta_color": "muted",
-                          "meta_element": "div",
-                          "meta_style": "text-small",
-                          "title": "Product Overview",
-                          "title_align": "top",
-                          "title_element": "div",
-                          "title_grid_breakpoint": "m",
-                          "title_grid_width": "1-2",
-                          "title_hover_style": "reset",
-                          "title_link": true,
-                          "title_style": "h5"
-                        }
-                      },
-                      "title": "Product Overview",
-                      "eyebrow": "",
-                      "body": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.",
-                      "imageUrl": "",
-                      "imageAlt": "",
-                      "imageSvgColor": "emphasis",
-                      "buttonLabel": "Learn More",
-                      "buttonUrl": "?page_id=19",
-                      "buttonStyle": "text",
-                      "panelActionStyle": "text",
-                      "buttonTarget": "_self",
-                      "fullWidthButton": false,
-                      "panelVariant": "blank",
-                      "panelSize": "none",
-                      "panelImageNoPadding": false,
-                      "linkPanel": false,
-                      "panelHover": false,
-                      "panelHeightExpand": false,
-                      "panelExpand": "none",
-                      "panelMetaPosition": "below-title",
-                      "panelShowMedia": false,
-                      "panelMediaPlacement": "top",
-                      "panelMediaWidth": "1-2",
-                      "elementMargin": "default",
-                      "panelVerticalAlign": "top",
-                      "panelTitleStyle": "h5",
-                      "panelTitleElement": "div",
-                      "linkTitle": true,
-                      "metaStyle": "text-small",
-                      "contentStyle": "small",
-                      "panelMetaHtmlElement": "div",
-                      "linkImage": false,
-                      "visualStyle": {
-                        "margin": {
-                          "top": "var(--uk-global-margin)"
-                        },
-                        "card": {
-                          "titleMargin": "0",
-                          "buttonMargin": "0"
-                        },
-                        "layout": {
-                          "marginMode": "default"
-                        },
-                        "effects": {}
-                      },
-                      "gridMetaAlign": "below-title",
-                      "gridMetaHtmlElement": "div",
-                      "elementPadding": "none",
-                      "spacingContract": "yootheme"
-                    }
-                  ]
-                },
-                {
-                  "id": "yootheme-row-0-0-0-0-fragment-0-column-1",
-                  "responsiveWidths": {
-                    "medium": "3-4"
-                  },
-                  "background": {
-                    "position": "center center"
-                  },
-                  "sticky": {
-                    "breakpoint": "m"
-                  },
-                  "elements": [
-                    {
-                      "id": "yootheme-nav-0-0-0-0-fragment-0-1-0",
-                      "kind": "nav",
-                      "spacingContract": "yootheme",
-                      "navItems": [
-                        {
-                          "id": "yootheme-nav-item-0-0-0-0-fragment-0-1-0-0",
-                          "label": "",
-                          "type": "link",
-                          "target": "_self",
-                          "dynamicContext": {
-                            "provider": "wordpress",
-                            "source": "menu-item",
-                            "mode": "collection",
-                            "query": {
-                              "sourceQuery": {
-                                "name": "customMenuItems",
-                                "arguments": {
-                                  "id": 9,
-                                  "parent": "40",
-                                  "heading": ""
-                                }
-                              },
-                              "menuId": "9",
-                              "parentId": "40"
-                            }
-                          },
-                          "dynamicBindings": {
-                            "label": {
-                              "path": "title",
-                              "valueType": "string"
-                            },
-                            "url": {
-                              "path": "url",
-                              "valueType": "url"
-                            },
-                            "active": {
-                              "path": "active",
-                              "valueType": "string"
-                            },
-                            "meta": {
-                              "path": "subtitle",
-                              "valueType": "string"
-                            },
-                            "imageUrl": {
-                              "path": "image",
-                              "valueType": "url"
-                            }
-                          }
-                        }
-                      ],
-                      "navStyle": "secondary",
-                      "navColumns": 2,
-                      "navShowImage": true,
-                      "navShowMeta": true,
-                      "navImageVerticalAlign": false,
-                      "navGridColumnGap": "large",
-                      "navGridRowGap": "large",
-                      "imageWidth": "50",
-                      "navImageMargin": true,
-                      "imageLoading": "lazy"
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "htmlElement": "div",
-          "disabled": false
-        },
-        "visualStyle": {
-          "layout": {
-            "marginMode": "default"
-          },
-          "effects": {},
-          "card": {}
-        }
-      }
-    },
-    {
-      "id": "dev-product-overview",
-      "label": "Product Overview",
-      "url": "/devstack",
-      "parentId": "dev-why",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
     {
-      "id": "dev-learn-more",
-      "label": "Learn More",
-      "url": "/devstack",
-      "parentId": "dev-why",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
+      "id": "webpages-templates",
+      "label": "Templates",
+      "url": "/templates",
+      "parentId": null,
       "target": "_self",
       "visibility": "all"
     },
     {
-      "id": "dev-deployment",
-      "label": "Deployment",
-      "url": "/devstack#deployment",
-      "parentId": "dev-why",
-      "iconName": "deployment",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-deployment.svg",
-      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-ci-cd",
-      "label": "CI/CD",
-      "url": "/devstack#ci-cd",
-      "parentId": "dev-why",
-      "iconName": "ci-cd",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-ci-cd.svg",
-      "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-security",
-      "label": "Security",
-      "url": "/devstack#security",
-      "parentId": "dev-why",
-      "iconName": "security",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-security.svg",
-      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-features",
+      "id": "webpages-features",
       "label": "Features",
-      "url": "/devstack#features",
-      "parentId": "dev-why",
-      "iconName": "features",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-features.svg",
-      "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-automation",
-      "label": "Automation",
-      "url": "/devstack#automation",
-      "parentId": "dev-why",
-      "iconName": "automation",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-automation.svg",
-      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-infrastructure",
-      "label": "Infrastructure",
-      "url": "/devstack#infrastructure",
-      "parentId": "dev-why",
-      "iconName": "infrastructure",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-infrastructure.svg",
-      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-integrations",
-      "label": "Integrations",
-      "url": "/devstack#integrations",
-      "parentId": "dev-why",
-      "iconName": "integrations",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-integrations.svg",
-      "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-enterprise",
-      "label": "Enterprise",
-      "url": "/enterprise",
+      "url": "/#features",
       "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
     {
-      "id": "dev-api",
-      "label": "Powerful API",
-      "url": "/enterprise#powerful-api",
-      "parentId": "dev-enterprise",
-      "iconName": "powerful-api",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-powerful-api.svg",
-      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-project-management",
-      "label": "Project Management",
-      "url": "/enterprise#project-management",
-      "parentId": "dev-enterprise",
-      "iconName": "project-management",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-project-management.svg",
-      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-customer-stories",
-      "label": "Customer Stories",
-      "url": "/enterprise#customer-stories",
-      "parentId": "dev-enterprise",
-      "iconName": "client-stories",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-client-stories.svg",
-      "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-efficient-workflow",
-      "label": "Efficient Workflow",
-      "url": "/enterprise#efficient-workflow",
-      "parentId": "dev-enterprise",
-      "iconName": "efficient-workflow",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-efficient-workflow.svg",
-      "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-collaboration",
-      "label": "Collaboration",
-      "url": "/enterprise#collaboration",
-      "parentId": "dev-enterprise",
-      "iconName": "collaboration",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-collaboration.svg",
-      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-community",
-      "label": "Community",
-      "url": "/enterprise#community",
-      "parentId": "dev-enterprise",
-      "iconName": "community",
-      "iconUrl": "https://store.webpages.am/wp-content/uploads/yootheme/icon-community.svg",
-      "subtitle": "Nonumy eirmod tempor invidunt ut labore et dolore magna erat.",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-pricing",
+      "id": "webpages-pricing",
       "label": "Pricing",
-      "url": "/pricing",
+      "url": "/#pricing",
       "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     },
     {
-      "id": "dev-developers",
-      "label": "Developers",
-      "url": "/feature-index",
+      "id": "webpages-login",
+      "label": "Log In",
+      "url": "/login",
       "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-feature-index",
-      "label": "Feature Index",
-      "url": "/feature-index",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-deployment-index",
-      "label": "Deployment",
-      "url": "/feature-index#deployment",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-devops",
-      "label": "DevOps",
-      "url": "/feature-index#DevOps",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-automation-index",
-      "label": "Automation",
-      "url": "/feature-index#automation",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-project-management-index",
-      "label": "Project Management",
-      "url": "/feature-index#project-management",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-ci-cd-index",
-      "label": "CI/CD",
-      "url": "/feature-index#ci-cd",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-infrastructure-index",
-      "label": "Infrastructure",
-      "url": "/feature-index#infrastructure",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-security-index",
-      "label": "Security",
-      "url": "/feature-index#security",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-docs",
-      "label": "Documentation",
-      "url": "/support",
-      "parentId": "dev-developers",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-company",
-      "label": "Company",
-      "url": "/about",
-      "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-about",
-      "label": "About DevStack",
-      "url": "/about",
-      "parentId": "dev-company",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all"
-    },
-    {
-      "id": "dev-careers",
-      "label": "See Our Open Positions",
-      "url": "/about#open-positions",
-      "parentId": "dev-company",
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
       "target": "_self",
       "visibility": "all"
     }
   ],
   "namedMenus": [],
-  "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
-  "headerMobileLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo.svg",
+  "headerInverseLogoUrl": "/uploads/onboarding/webpages_full_animated_once.svg",
+  "headerMobileLogoUrl": "/uploads/onboarding/webpages_full_animated_once.svg",
   "sectionStyle": "default",
   "sectionTextColor": "none",
   "sectionMaxWidth": "small",

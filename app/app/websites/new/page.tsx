@@ -27,7 +27,10 @@ async function createWebsiteAction(formData: FormData): Promise<WebsiteCreationR
   if ("error" in parsed) return { ok: false, error: String(parsed.error ?? "Invalid website details") };
 
   const starterValue = formData.get("starterId");
-  const starterId = isStarterWebsiteId(starterValue) ? starterValue : "modern-business";
+  if (!isStarterWebsiteId(starterValue)) {
+    return { ok: false, error: "Choose a valid starter before creating your website." };
+  }
+  const starterId = starterValue;
   const logo = formData.get("logo");
   const logoResult = await saveOnboardingLogo(logo instanceof File ? logo : null);
   if ("error" in logoResult) return { ok: false, error: String(logoResult.error ?? "Logo upload failed") };
@@ -59,13 +62,19 @@ async function createWebsiteAction(formData: FormData): Promise<WebsiteCreationR
   };
 }
 
-export default async function NewWebsitePage({ searchParams }: { searchParams?: Promise<{ error?: string }> }) {
-  const user = await getCurrentUser(await cookies());
-  if (!user) redirect(loginRedirectFor("/app/websites/new"));
+export default async function NewWebsitePage({ searchParams }: { searchParams?: Promise<{ error?: string; starterId?: string }> }) {
   const params = await searchParams;
+  const initialStarterId = isStarterWebsiteId(params?.starterId) ? params.starterId : "modern-business";
+  const user = await getCurrentUser(await cookies());
+  if (!user) {
+    const destination = params?.starterId && isStarterWebsiteId(params.starterId)
+      ? `/app/websites/new?starterId=${encodeURIComponent(params.starterId)}`
+      : "/app/websites/new";
+    redirect(loginRedirectFor(destination));
+  }
   return (
     <SaaSShell user={user} title={<T k="wizard.title" />}>
-      <WebsiteCreationWizard action={createWebsiteAction} creationRequestId={crypto.randomUUID()} error={params?.error} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
+      <WebsiteCreationWizard action={createWebsiteAction} creationRequestId={crypto.randomUUID()} error={params?.error} initialStarterId={initialStarterId} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
     </SaaSShell>
   );
 }

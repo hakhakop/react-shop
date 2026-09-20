@@ -47,21 +47,29 @@ export default function WebsiteCreationWizard({
   creationRequestId,
   starters,
   error,
+  initialStarterId = "modern-business",
 }: {
   action: (data: FormData) => Promise<WebsiteCreationResult>;
   creationRequestId: string;
   starters: Starter[];
   error?: string;
+  initialStarterId?: string;
 }) {
   const router = useRouter();
   const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const submittedRef = useRef(false);
   const redirectTimerRef = useRef<number | null>(null);
+  const selectedInitialStarterId = starters.some((item) => item.id === initialStarterId)
+    ? initialStarterId
+    : "modern-business";
+  const initialWebsiteType = websiteTypes.find(
+    (item) => item.starter === selectedInitialStarterId,
+  )?.name ?? "Business";
   const [step, setStep] = useState(1);
   const [websiteName, setWebsiteName] = useState("");
-  const [type, setType] = useState("Business");
-  const [starter, setStarter] = useState("modern-business");
+  const [type, setType] = useState(initialWebsiteType);
+  const [starter, setStarter] = useState(selectedInitialStarterId);
   const [phase, setPhase] = useState<GenerationPhase>("form");
   const [progress, setProgress] = useState(12);
   const [hasSubmitted, setHasSubmitted] = useState(false);

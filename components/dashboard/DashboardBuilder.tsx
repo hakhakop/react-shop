@@ -5511,6 +5511,17 @@ export default function DashboardBuilder({
     setTemplateBuilderContext(null);
     setIndividualBuilderContext(null);
     setBuilderEditorContext(null);
+    const leavingCurrentDocument = builderState.page !== nextKey;
+    const isOrdinaryDocument = nextKey !== "header" && nextKey !== "footer";
+    if (leavingCurrentDocument && isOrdinaryDocument) {
+      // A page may have been loaded earlier in this session. Returning to it
+      // after editing a shell must still rehydrate its ownership context;
+      // otherwise the cached request identity skips the loader after the
+      // shell transition clears builderEditorContext.
+      ordinaryLoadIdentityRef.current = "";
+      ordinaryLoadRequestRef.current += 1;
+      setPublishedDocumentReady(false);
+    }
     setTemplatePreviewCandidates([]);
     setTemplatePreviewIdentity(null);
     const nextState = options.state ?? hydrateDocumentBuilderState(
