@@ -11,6 +11,7 @@ type ScopedPreviewLinkRouterProps = {
   websiteId?: string;
   pages?: ScopedPreviewPage[];
   systemRouteAliases?: NavigationRouteAlias[];
+  globalStarterId?: string;
   /** The same router is used by the standalone preview and the Builder shell. */
   mode?: "preview" | "builder" | "tenant-path";
   /** Limit interception to a rendered preview boundary when mounted in Builder. */
@@ -23,6 +24,7 @@ export default function ScopedPreviewLinkRouter({
   websiteId,
   pages,
   systemRouteAliases,
+  globalStarterId,
   mode = "preview",
   scopeSelector,
   onNavigate,
@@ -71,7 +73,7 @@ export default function ScopedPreviewLinkRouter({
       const resolvedHref = websiteId
         ? projectWebsiteHref(href, {
             mode,
-            context: { websiteId, pages, systemRouteAliases },
+            context: { websiteId, pages, systemRouteAliases, globalStarterId },
           })
         : href;
       const navigationHandled = onNavigate?.(href, resolvedHref) === true;
@@ -93,7 +95,7 @@ export default function ScopedPreviewLinkRouter({
         delete header.dataset.scopedPreviewHidden;
       });
     };
-  }, [mode, onNavigate, pages, scopeSelector, systemRouteAliases, websiteId]);
+  }, [globalStarterId, mode, onNavigate, pages, scopeSelector, systemRouteAliases, websiteId]);
 
   return (
     <style>{`

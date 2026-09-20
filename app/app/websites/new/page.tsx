@@ -6,7 +6,8 @@ import WebsiteCreationWizard from "@/components/saas/WebsiteCreationWizard";
 import { getCurrentUser } from "@/lib/auth";
 import { createWebsite, normalizeWebsiteType, validateWebsiteInput } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { isStarterWebsiteId, starterWebsiteLibrary } from "@/lib/starterWebsites";
+import { starterWebsiteLibrary } from "@/lib/starterWebsites";
+import { isStarterSelectionId, listPublicGlobalStarters } from "@/lib/globalStarters";
 import { saveOnboardingLogo } from "@/lib/onboardingUploads";
 import { T } from "@/components/i18n/LanguageProvider";
 
@@ -27,7 +28,7 @@ async function createWebsiteAction(formData: FormData): Promise<WebsiteCreationR
   if ("error" in parsed) return { ok: false, error: String(parsed.error ?? "Invalid website details") };
 
   const starterValue = formData.get("starterId");
-  if (!isStarterWebsiteId(starterValue)) {
+  if (!isStarterSelectionId(starterValue)) {
     return { ok: false, error: "Choose a valid starter before creating your website." };
   }
   const starterId = starterValue;
@@ -64,17 +65,31 @@ async function createWebsiteAction(formData: FormData): Promise<WebsiteCreationR
 
 export default async function NewWebsitePage({ searchParams }: { searchParams?: Promise<{ error?: string; starterId?: string }> }) {
   const params = await searchParams;
-  const initialStarterId = isStarterWebsiteId(params?.starterId) ? params.starterId : "modern-business";
+  const globalStarters = await listPublicGlobalStarters();
+  const starters = [
+    ...starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview })),
+    ...globalStarters,
+  ];
+  const requestedStarterId = params?.starterId;
+  const requestedStarterIsAvailable = requestedStarterId
+    ? starters.some((item) => item.id === requestedStarterId)
+    : true;
+  if (requestedStarterId && !requestedStarterIsAvailable) {
+    redirect("/templates");
+  }
+  const initialStarterId = isStarterSelectionId(requestedStarterId)
+    ? requestedStarterId
+    : "modern-business";
   const user = await getCurrentUser(await cookies());
   if (!user) {
-    const destination = params?.starterId && isStarterWebsiteId(params.starterId)
+    const destination = params?.starterId && isStarterSelectionId(params.starterId)
       ? `/app/websites/new?starterId=${encodeURIComponent(params.starterId)}`
       : "/app/websites/new";
     redirect(loginRedirectFor(destination));
   }
   return (
     <SaaSShell user={user} title={<T k="wizard.title" />}>
-      <WebsiteCreationWizard action={createWebsiteAction} creationRequestId={crypto.randomUUID()} error={params?.error} initialStarterId={initialStarterId} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
+      <WebsiteCreationWizard action={createWebsiteAction} creationRequestId={crypto.randomUUID()} error={params?.error} initialStarterId={initialStarterId} starters={starters} />
     </SaaSShell>
   );
 }

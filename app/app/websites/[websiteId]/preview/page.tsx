@@ -1,18 +1,22 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
+import WebsiteReadinessNotice from "@/components/saas/WebsiteReadinessNotice";
+import SaaSShell from "@/components/saas/SaaSShell";
 import CartPageClient from "@/components/CartPageClient";
 import CheckoutPageClient from "@/components/CheckoutPageClient";
 import MyAccountPageContent from "@/components/MyAccountPageContent";
 import WebsiteFrontend from "@/components/website/WebsiteFrontend";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   canAccessWebsiteBuilder,
   getWebsiteByIdOrSlug,
+  isWebsitePreparing,
 } from "@/lib/websites";
 import { getWooCommerceConnection } from "@/lib/woocommerce";
 import { resolveCommerceRouteProjection } from "@/lib/commerceRouteProjection.server";
+import { resolveEnabledGlobalStarter } from "@/lib/globalStarters";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +34,7 @@ type WebsitePreviewPageProps = {
     builderContext?: string;
     headerPreviewVariant?: string;
     headerPreviewDocument?: string;
+    globalStarterId?: string;
     product_tag?: string;
     paged?: string;
   }>;
@@ -55,15 +60,30 @@ export default async function WebsitePreviewPage({
     getCurrentUser(await cookies()),
     searchParams,
   ]);
+  const globalStarterId = query?.globalStarterId?.trim() || undefined;
+  const [website, globalStarter] = await Promise.all([
+    getWebsiteByIdOrSlug(websiteId),
+    globalStarterId ? resolveEnabledGlobalStarter(globalStarterId) : Promise.resolve(null),
+  ]);
+  const isPublicGlobalStarterPreview = Boolean(
+    globalStarterId &&
+      globalStarter &&
+      website &&
+      globalStarter.sourceWebsite.id === website.id,
+  );
+  if (globalStarterId && !isPublicGlobalStarterPreview) notFound();
   const requestedPage = query?.path ?? query?.page ?? "home";
   const productSlug = query?.product;
   const categorySlug = query?.category;
   const builderEditingContext =
-    query?.builderContext === "header" || query?.builderContext === "footer"
+    !isPublicGlobalStarterPreview &&
+    (query?.builderContext === "header" || query?.builderContext === "footer")
       ? query.builderContext
       : null;
   const deferPageDocumentToBuilder =
-    query?.builderFrame === "selection" && builderEditingContext === null;
+    !isPublicGlobalStarterPreview &&
+    query?.builderFrame === "selection" &&
+    builderEditingContext === null;
   const requestedPath = previewPathWithSearch(
     websiteId,
     requestedPage,
@@ -72,13 +92,23 @@ export default async function WebsitePreviewPage({
     query?.path,
   );
 
-  if (!user) {
+  if (!user && !isPublicGlobalStarterPreview) {
     redirect(loginRedirectFor(requestedPath));
   }
 
-  const website = await getWebsiteByIdOrSlug(websiteId);
-  if (!website || !canAccessWebsiteBuilder(user, website)) {
+  if (!website || (!isPublicGlobalStarterPreview && !canAccessWebsiteBuilder(user, website))) {
     return <AccessDenied />;
+  }
+
+  if (isWebsitePreparing(website) && !isSaaSAdmin(user)) {
+    if (isPublicGlobalStarterPreview) {
+      return <WebsiteReadinessNotice websiteName={website.name} publicSurface />;
+    }
+    return (
+      <SaaSShell user={user!} title={website.name} eyebrow="Website setup">
+        <WebsiteReadinessNotice websiteName={website.name} />
+      </SaaSShell>
+    );
   }
 
   const commerceSlug = requestedPage === "product-category" ? categorySlug : productSlug;
@@ -147,22 +177,27 @@ export default async function WebsitePreviewPage({
       layoutOverride={commerceProjection?.layout ?? undefined}
       dynamicItemContextOverride={commerceProjection?.dynamicContext}
       fallbackContent={corePageFallback}
-      builderIframeSelection={query?.builderFrame === "selection"}
+      builderIframeSelection={!isPublicGlobalStarterPreview && query?.builderFrame === "selection"}
       previewHeaderVariant={
-        query?.headerPreviewVariant === "desktop" || query?.headerPreviewVariant === "mobile"
+        !isPublicGlobalStarterPreview &&
+        (query?.headerPreviewVariant === "desktop" || query?.headerPreviewVariant === "mobile")
           ? query.headerPreviewVariant
           : undefined
       }
       previewHeaderDocument={
-        query?.headerPreviewDocument === "header-mobile" ||
-        query?.headerPreviewDocument === "header-mobile-dialog" ||
-        query?.headerPreviewDocument === "header"
+        !isPublicGlobalStarterPreview && (
+          query?.headerPreviewDocument === "header-mobile" ||
+          query?.headerPreviewDocument === "header-mobile-dialog" ||
+          query?.headerPreviewDocument === "header"
+        )
           ? query.headerPreviewDocument
           : undefined
       }
       builderEditingContext={builderEditingContext}
       builderIframeDiagnostics={
-        query?.builderBridge === "full"
+        isPublicGlobalStarterPreview
+          ? "minimal"
+          : query?.builderBridge === "full"
           ? "full"
           : query?.builderBridge === "settled"
             ? "settled"
@@ -172,6 +207,8 @@ export default async function WebsitePreviewPage({
             ? "rect"
             : "minimal"
       }
+      publicSurface={isPublicGlobalStarterPreview}
+      publicPreviewToken={isPublicGlobalStarterPreview ? globalStarterId : undefined}
       pageNumber={Math.max(1, Number.parseInt(query?.paged ?? "1", 10) || 1)}
       requestProductTagSlugs={query?.product_tag?.split(",").map((item) => item.trim()).filter(Boolean)}
     />

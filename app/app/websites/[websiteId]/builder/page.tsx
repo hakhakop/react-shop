@@ -2,13 +2,16 @@ import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
+import WebsiteReadinessNotice from "@/components/saas/WebsiteReadinessNotice";
+import SaaSShell from "@/components/saas/SaaSShell";
 import DashboardBuilder from "@/components/dashboard/DashboardBuilder";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   canAccessWebsiteBuilder,
   getWebsiteByIdOrSlug,
   getWebsiteRouteSegment,
+  isWebsitePreparing,
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 import { getWordPressBaseUrl, getWordPressMediaOrigin } from "@/lib/wordpressUrl";
@@ -78,6 +81,14 @@ export default async function WebsiteBuilderPage({
   const website = await getWebsiteByIdOrSlug(websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return <AccessDenied />;
+  }
+
+  if (isWebsitePreparing(website) && !isSaaSAdmin(user)) {
+    return (
+      <SaaSShell user={user} title={website.name} eyebrow="Website setup">
+        <WebsiteReadinessNotice websiteName={website.name} />
+      </SaaSShell>
+    );
   }
 
   await ensureWebsiteBuilderData(website.id);

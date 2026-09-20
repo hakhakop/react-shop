@@ -29,7 +29,10 @@ export default async function AdminPage() {
   const activeWebsites = websites.filter((website) => website.status === "active");
   const activePackages = packages.filter((item) => item.isActive);
   const creatingWebsites = websites.filter(
-    (website) => website.status === "creating" || website.status === "maintenance",
+    (website) =>
+      website.status === "creating" ||
+      website.status === "preparing" ||
+      website.status === "maintenance",
   );
 
   return (

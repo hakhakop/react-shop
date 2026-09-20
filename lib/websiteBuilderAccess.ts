@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { canAccessWebsiteBuilder, getWebsiteByIdOrSlug } from "@/lib/websites";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
+import {
+  canAccessWebsiteBuilder,
+  getWebsiteByIdOrSlug,
+  isWebsitePreparing,
+} from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export async function getAuthorizedWebsiteBuilderScope(request: NextRequest) {
@@ -23,6 +27,15 @@ export async function getAuthorizedWebsiteBuilderScope(request: NextRequest) {
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return {
       error: NextResponse.json({ error: "Access denied." }, { status: 403 }),
+    };
+  }
+
+  if (isWebsitePreparing(website) && !isSaaSAdmin(user)) {
+    return {
+      error: NextResponse.json(
+        { error: "This website is still being prepared." },
+        { status: 409 },
+      ),
     };
   }
 

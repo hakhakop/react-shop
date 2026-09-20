@@ -35,6 +35,7 @@ type HeaderShellProps = {
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
+  scopedPreviewGlobalStarterId?: string;
   hideSaaSEntry?: boolean;
   website?: SaaSWebsite | null;
   activeContentLanguage?: string;
@@ -156,6 +157,7 @@ export default async function HeaderShell({
   scopedPreviewWebsiteId,
   scopedPreviewPage,
   scopedPreviewPages,
+  scopedPreviewGlobalStarterId,
   hideSaaSEntry = false,
   website,
   activeContentLanguage,
@@ -268,7 +270,11 @@ export default async function HeaderShell({
   const projectHeaderHref = (href: string) => navigationWebsiteId
     ? projectWebsiteHref(href, {
         mode: scopedLinkMode,
-        context: { websiteId: navigationWebsiteId, pages: scopedPreviewPages },
+        context: {
+          websiteId: navigationWebsiteId,
+          pages: scopedPreviewPages,
+          globalStarterId: scopedPreviewGlobalStarterId,
+        },
       })
     : href;
 
@@ -289,6 +295,7 @@ export default async function HeaderShell({
       scopedPreviewWebsiteId={navigationWebsiteId}
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
+      scopedPreviewGlobalStarterId={scopedPreviewGlobalStarterId}
       scopedLinkMode={scopedLinkMode}
       hideSaaSEntry={hideSaaSEntry}
       categoriesContent={categoryElement ? (

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, LayoutTemplate } from "lucide-react";
 import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { createStarterWebsiteData, getStarterWebsite, isStarterWebsiteId } from "@/lib/starterWebsites";
+import { createStarterWebsiteData, getStarterWebsite, isStarterWebsiteId, type StarterWebsiteId } from "@/lib/starterWebsites";
+import { getGlobalStarter } from "@/lib/globalStarters";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +16,20 @@ export default async function TemplatePreviewPage({
   params: Promise<{ starterId: string }>;
 }) {
   const { starterId } = await params;
-  if (!isStarterWebsiteId(starterId)) notFound();
+  const globalStarter = isStarterWebsiteId(starterId)
+    ? null
+    : await getGlobalStarter(starterId);
+  if (!isStarterWebsiteId(starterId) && !globalStarter) notFound();
 
-  const starter = getStarterWebsite(starterId);
-  const starterData = createStarterWebsiteData({ starterId, websiteName: starter.name });
+  if (globalStarter) {
+    redirect(
+      `/app/websites/${encodeURIComponent(globalStarter.sourceWebsiteId)}/preview?globalStarterId=${encodeURIComponent(starterId)}`,
+    );
+  }
+
+  const staticStarterId = starterId as StarterWebsiteId;
+  const starter = getStarterWebsite(staticStarterId);
+  const starterData = createStarterWebsiteData({ starterId: staticStarterId, websiteName: starter.name });
   const layout = starterData.layouts.home;
   if (!layout) notFound();
 

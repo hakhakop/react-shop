@@ -1,9 +1,16 @@
 import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/authRoles";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 import { type CmsConnection } from "@/lib/cmsConnection";
-import type { StarterWebsiteId } from "@/lib/starterWebsites";
+import { isStarterWebsiteId } from "@/lib/starterWebsites";
+import { isGlobalStarterId, hasEnabledGlobalStarterSource } from "@/lib/globalStarters";
 
-export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
+export type WebsiteStatus =
+  | "preparing"
+  | "ready"
+  | "creating"
+  | "active"
+  | "maintenance"
+  | "suspended";
 export type WebsiteType = "business" | "e-commerce";
 export type WebsiteContentLanguage = "hy" | "en" | "ru";
 export const websiteContentLanguages: WebsiteContentLanguage[] = ["hy", "en", "ru"];
@@ -45,6 +52,67 @@ export type SaaSWebsite = {
   createdAt: string;
   updatedAt: string;
 };
+
+/**
+ * Keep the canonical website record on the server while exposing only the
+ * public storefront context to client renderers. The CMS URLs are needed by
+ * public dynamic-content renderers; credentials and operational metadata are
+ * never part of this projection.
+ */
+export function toPublicWebsite(website: SaaSWebsite): SaaSWebsite {
+  const publicCmsConnection = website.cmsConnection
+    ? {
+        provider: website.cmsConnection.provider,
+        siteUrl: website.cmsConnection.siteUrl,
+        adminUrl: "",
+        graphqlUrl: website.cmsConnection.graphqlUrl,
+        wooCommerceApiUrl: website.cmsConnection.wooCommerceApiUrl,
+        wooCommerceConsumerKey: "",
+        wooCommerceConsumerSecret: "",
+        wordpressUsername: "",
+        wordpressApplicationPassword: "",
+        storeStatusNotes: "",
+        technicalNotes: "",
+        updatedAt: "",
+      }
+    : undefined;
+
+  return {
+    id: website.id,
+    name: website.name,
+    slug: website.slug,
+    type: website.type,
+    domain: null,
+    primaryDomain: null,
+    domains: [],
+    description: website.description,
+    timeZone: website.timeZone,
+    language: website.language,
+    primaryLanguage: website.primaryLanguage,
+    enabledLanguages: website.enabledLanguages,
+    status: website.status,
+    ...(publicCmsConnection ? { cmsConnection: publicCmsConnection } : {}),
+  } as unknown as SaaSWebsite;
+}
+
+/**
+ * Readiness is intentionally represented by the existing website status
+ * field. Legacy statuses remain usable; only the explicit new `preparing`
+ * value blocks owner-facing Builder/storefront access.
+ */
+export function isWebsitePreparing(
+  websiteOrStatus:
+    | Pick<SaaSWebsite, "status">
+    | WebsiteStatus
+    | null
+    | undefined,
+) {
+  const status =
+    typeof websiteOrStatus === "string"
+      ? websiteOrStatus
+      : websiteOrStatus?.status;
+  return status === "preparing";
+}
 
 type StoredWebsite = Omit<SaaSWebsite, "status"> & {
   type?: WebsiteType;
@@ -154,6 +222,8 @@ function isStoredWebsite(value: unknown): value is StoredWebsite {
       website.domain === null) &&
     (status === "creating" ||
       status === "draft" ||
+      status === "preparing" ||
+      status === "ready" ||
       status === "active" ||
       status === "maintenance" ||
       status === "suspended") &&
@@ -273,7 +343,11 @@ function normalizeCmsConnection(
 }
 
 function normalizeWebsiteStatus(value: unknown): WebsiteStatus | null {
-  return value === "active" || value === "maintenance" || value === "suspended"
+  return value === "preparing" ||
+    value === "ready" ||
+    value === "active" ||
+    value === "maintenance" ||
+    value === "suspended"
     ? value
     : null;
 }
@@ -502,7 +576,7 @@ export async function createWebsite(input: {
   name: string;
   slug: string;
   type?: WebsiteType;
-  starterId?: StarterWebsiteId;
+  starterId?: string;
   websiteCategory?: string;
   companyName?: string;
   personName?: string;
@@ -513,6 +587,14 @@ export async function createWebsite(input: {
   socialLinks?: string;
   creationRequestId?: string;
 }) {
+  if (
+    input.starterId &&
+    !isStarterWebsiteId(input.starterId) &&
+    !isGlobalStarterId(input.starterId)
+  ) {
+    return { error: "Choose a valid starter before creating your website." };
+  }
+
   const websites = await readWebsites();
   const slug = normalizeSlug(input.slug);
   const creationRequestId = normalizeLongText(input.creationRequestId, 80);
@@ -556,21 +638,36 @@ export async function createWebsite(input: {
     language: "hy",
     primaryLanguage: "hy",
     enabledLanguages: ["hy"],
-    status: "creating",
+    status: "preparing",
     creationRequestId: creationRequestId || undefined,
     createdAt: now,
     updatedAt: now,
   };
 
   try {
-    const { initializeWebsiteBuilderData } = await import(
-      "@/lib/websiteBuilderData"
-    );
-    await initializeWebsiteBuilderData({
-      websiteId: website.id,
-      websiteName: website.name,
-      starterId: input.starterId,
-    });
+    if (input.starterId && isGlobalStarterId(input.starterId)) {
+      const { resolveEnabledGlobalStarter } = await import("@/lib/globalStarters");
+      const globalStarter = await resolveEnabledGlobalStarter(input.starterId);
+      if (!globalStarter) {
+        throw new Error("The selected Global Starter is no longer available.");
+      }
+      const { cloneWebsiteBuilderData } = await import("@/lib/websiteBuilderData");
+      await cloneWebsiteBuilderData({
+        sourceWebsiteId: globalStarter.sourceWebsite.id,
+        destinationWebsiteId: website.id,
+      });
+    } else {
+      const { initializeWebsiteBuilderData } = await import(
+        "@/lib/websiteBuilderData"
+      );
+      await initializeWebsiteBuilderData({
+        websiteId: website.id,
+        websiteName: website.name,
+        starterId: input.starterId && isStarterWebsiteId(input.starterId)
+          ? input.starterId
+          : undefined,
+      });
+    }
     await writeWebsites([...websites, website]);
   } catch (error) {
     const { getWebsiteBuilderDir } = await import("@/lib/websiteBuilderData");
@@ -618,6 +715,38 @@ export async function recordWebsitePublication(input: { websiteId: string }) {
     ...website,
     lastPublishedAt: now,
     updatedAt: now,
+  };
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+  return { website: updatedWebsite };
+}
+
+export async function updateWebsiteReadiness(input: {
+  websiteId: string;
+  status: "preparing" | "ready";
+}) {
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) return { error: "Website not found." };
+
+  if (
+    input.status !== website.status &&
+    ((input.status === "ready" && website.status !== "preparing") ||
+      (input.status === "preparing" && website.status !== "ready"))
+  ) {
+    return {
+      error:
+        input.status === "ready"
+          ? "Only a website that is being prepared can be marked ready."
+          : "Only a ready website can be returned to preparing.",
+    };
+  }
+
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    status: input.status,
+    updatedAt: new Date().toISOString(),
   };
   await writeWebsites(
     websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
@@ -713,6 +842,13 @@ export async function deleteWebsite(input: { websiteId: string }) {
 
   if (!website) {
     return { error: "Website not found." };
+  }
+
+  if (await hasEnabledGlobalStarterSource(website.id)) {
+    return {
+      error:
+        "This website is an enabled Global Starter. Disable or remove the Global Starter designation before deleting it.",
+    };
   }
 
   await writeWebsites(websites.filter((item) => item.id !== website.id));

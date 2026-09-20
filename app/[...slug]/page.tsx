@@ -5,6 +5,8 @@ import { graphqlFetch } from "../../lib/graphql";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import StorefrontBuilderRenderer from "../../components/builder/StorefrontBuilderRenderer";
 import WebsiteFrontend from "../../components/website/WebsiteFrontend";
+import WebsiteReadinessNotice from "@/components/saas/WebsiteReadinessNotice";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import {
   getPublishedBuilderLayout,
   readBuilderCustomPages,
@@ -14,6 +16,7 @@ import { materializeBuilderDynamicContent } from "@/lib/builderDynamicContentMat
 import {
   getWebsiteByDomainHost,
   getWebsiteByIdOrSlug,
+  isWebsitePreparing,
 } from "../../lib/websites";
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
@@ -132,8 +135,12 @@ export default async function WPPage({
   const requestedPageNumber = Math.max(1, Number.parseInt(queryValue("paged") ?? "1", 10) || 1);
   const slugSegments = resolved.slug;
   const domainWebsite = await getWebsiteByDomainHost((await headers()).get("host"));
+  const viewer = await getCurrentUser(await cookies());
 
   if (domainWebsite && slugSegments?.length === 1) {
+    if (isWebsitePreparing(domainWebsite) && !isSaaSAdmin(viewer)) {
+      return <WebsiteReadinessNotice websiteName={domainWebsite.name} publicSurface />;
+    }
     const domainPages = await readBuilderCustomPages({ websiteId: domainWebsite.id });
     if (!domainPages.some((page) => page.slug === slugSegments[0])) {
       try {
@@ -146,6 +153,9 @@ export default async function WPPage({
   }
 
   if (domainWebsite) {
+    if (isWebsitePreparing(domainWebsite) && !isSaaSAdmin(viewer)) {
+      return <WebsiteReadinessNotice websiteName={domainWebsite.name} publicSurface />;
+    }
     return (
       <WebsiteFrontend
         website={domainWebsite}
@@ -165,6 +175,9 @@ export default async function WPPage({
   if (tenantSlug) {
     const tenantWebsite = await getWebsiteByIdOrSlug(tenantSlug);
     if (tenantWebsite?.slug === tenantSlug) {
+      if (isWebsitePreparing(tenantWebsite) && !isSaaSAdmin(viewer)) {
+        return <WebsiteReadinessNotice websiteName={tenantWebsite.name} publicSurface />;
+      }
       if (tenantPath.length === 1) {
         const tenantPages = await readBuilderCustomPages({ websiteId: tenantWebsite.id });
         if (!tenantPages.some((page) => page.slug === tenantPath[0])) {

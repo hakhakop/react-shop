@@ -19,6 +19,12 @@ const BUILDER_THEME_SETTINGS_FILE = "builder-theme-settings.json";
 
 type BuilderFileName = (typeof BUILDER_FILES)[number];
 type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE | typeof BUILDER_ROUTING_FILE | typeof BUILDER_THEME_SETTINGS_FILE;
+const WEBSITE_BUILDER_BUNDLE_FILES: readonly RuntimeBuilderFileName[] = [
+  ...BUILDER_FILES,
+  BUILDER_THEME_SETTINGS_FILE,
+  BUILDER_ROUTING_FILE,
+  BUILDER_TEMPLATES_FILE,
+];
 type BuilderFileState = "missing" | "empty" | "non-empty" | "invalid";
 let rootBuilderDataEnsurePromise: Promise<void> | null = null;
 // Builder files are initialized once per process. Re-checking the filesystem
@@ -39,7 +45,7 @@ export function getWebsiteBuilderDir(websiteId: string) {
 
 export function getWebsiteBuilderFilePath(
   websiteId: string,
-  fileName: BuilderFileName,
+  fileName: RuntimeBuilderFileName,
 ) {
   return path.join(getWebsiteBuilderDir(websiteId), fileName);
 }
@@ -244,6 +250,43 @@ export async function ensureWebsiteBuilderData(websiteId: string) {
     websiteBuilderDataEnsurePromises.delete(websiteId);
     throw error;
   }
+}
+
+/**
+ * Clone the current scoped Builder bundle into a new website scope.
+ * Optional files are copied only when they exist on the source. Backups and
+ * operational website data intentionally remain outside this bundle.
+ */
+export async function cloneWebsiteBuilderData(input: {
+  sourceWebsiteId: string;
+  destinationWebsiteId: string;
+}) {
+  if (input.sourceWebsiteId === input.destinationWebsiteId) {
+    throw new Error("A website cannot be cloned into itself.");
+  }
+
+  await ensureWebsiteBuilderData(input.sourceWebsiteId);
+  const sourceDir = getWebsiteBuilderDir(input.sourceWebsiteId);
+  const destinationDir = getWebsiteBuilderDir(input.destinationWebsiteId);
+  await mkdir(destinationDir, { recursive: true });
+
+  const destinationHasData = await Promise.all(
+    WEBSITE_BUILDER_BUNDLE_FILES.map((fileName) =>
+      fileExists(getWebsiteBuilderFilePath(input.destinationWebsiteId, fileName)),
+    ),
+  );
+  if (destinationHasData.some(Boolean)) {
+    throw new Error("Website Builder data already exists and was not replaced.");
+  }
+
+  await Promise.all(
+    WEBSITE_BUILDER_BUNDLE_FILES.map(async (fileName) => {
+      const sourcePath = path.join(sourceDir, fileName);
+      if (await fileExists(sourcePath)) {
+        await copyFile(sourcePath, getWebsiteBuilderFilePath(input.destinationWebsiteId, fileName));
+      }
+    }),
+  );
 }
 
 export async function initializeWebsiteBuilderData(input: {

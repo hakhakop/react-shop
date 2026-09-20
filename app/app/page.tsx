@@ -12,7 +12,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
-import { getWebsitesForOwner } from "@/lib/websites";
+import { getWebsitesForOwner, isWebsitePreparing } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 import { T } from "@/components/i18n/LanguageProvider";
@@ -38,7 +38,7 @@ export default async function AppDashboardPage({
     (website) => website.status === "active",
   );
   const creatingWebsites = websites.filter(
-    (website) => website.status === "creating",
+    (website) => website.status === "creating" || isWebsitePreparing(website),
   );
   const websiteCards = await Promise.all(
     websites.slice(0, 3).map(async (website) => ({
@@ -115,20 +115,40 @@ export default async function AppDashboardPage({
                 </Link>
               </div>
               <div className="saas-dashboard-website-list">
-                {websiteCards.map(({ website, builderHref }) => (
-                  <Link href={builderHref} key={website.id}>
-                    <span className={`saas-phase-one-status is-${website.status}`}>
-                      {website.status}
-                    </span>
-                    <div>
-                      <h3>{website.name}</h3>
-                      <p>{website.description || `/${website.slug}`}</p>
+                {websiteCards.map(({ website, builderHref }) => {
+                  const content = (
+                    <>
+                      <span className={`saas-phase-one-status is-${website.status}`}>
+                        {isWebsitePreparing(website)
+                          ? "Preparing"
+                          : website.status === "ready"
+                            ? "Ready"
+                            : website.status}
+                      </span>
+                      <div>
+                        <h3>{website.name}</h3>
+                        <p>
+                          {isWebsitePreparing(website)
+                            ? "Creating your website… You’ll be able to start editing when it’s ready."
+                            : website.description || `/${website.slug}`}
+                        </p>
+                      </div>
+                      <span className="saas-dashboard-website-arrow" aria-hidden="true">
+                        <ArrowRight size={17} />
+                      </span>
+                    </>
+                  );
+
+                  return isWebsitePreparing(website) ? (
+                    <div key={website.id} className="saas-dashboard-website-item is-preparing">
+                      {content}
                     </div>
-                    <span className="saas-dashboard-website-arrow" aria-hidden="true">
-                      <ArrowRight size={17} />
-                    </span>
-                  </Link>
-                ))}
+                  ) : (
+                    <Link href={builderHref} key={website.id}>
+                      {content}
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}

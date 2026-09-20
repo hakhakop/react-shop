@@ -29,6 +29,7 @@ interface HeaderNavProps {
   scopedPreviewWebsiteId?: string;
   activePageKey?: BuilderLayoutKey;
   scopedPreviewPages?: ScopedPreviewPage[];
+  scopedPreviewGlobalStarterId?: string;
   systemRouteAliases?: NavigationRouteAlias[];
   scopedLinkMode?: "builder" | "preview" | "tenant-path";
   activeContentLanguage?: string;
@@ -381,6 +382,7 @@ export default function HeaderNav({
   scopedPreviewWebsiteId,
   activePageKey,
   scopedPreviewPages,
+  scopedPreviewGlobalStarterId,
   systemRouteAliases,
   scopedLinkMode = "preview",
   activeContentLanguage,
@@ -503,6 +505,7 @@ export default function HeaderNav({
             websiteId: activeScopedWebsiteId,
             pages: scopedPreviewPages,
             systemRouteAliases,
+            globalStarterId: scopedPreviewGlobalStarterId,
           },
         })
     : undefined;

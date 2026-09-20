@@ -16,7 +16,11 @@ import DeleteWebsiteButton from "@/components/saas/DeleteWebsiteButton";
 import GoLiveButton from "@/components/saas/GoLiveButton";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSSuperAdmin } from "@/lib/auth";
-import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
+import {
+  getWebsiteRouteSegment,
+  getWebsitesForOwner,
+  isWebsitePreparing,
+} from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 import { T } from "@/components/i18n/LanguageProvider";
@@ -29,6 +33,12 @@ function getLifecycleStatus(
   lastPublishedAt?: string,
   primaryDomain?: string | null,
 ) {
+  if (status === "preparing") {
+    return { label: "Preparing", tone: "preparing" };
+  }
+  if (status === "ready") {
+    return { label: "Ready", tone: "ready" };
+  }
   if (status === "active" && primaryDomain) {
     return { label: "Live", tone: "live" };
   }
@@ -165,6 +175,7 @@ export default async function WebsitesPage() {
                 website.primaryDomain,
               );
               const isLive = lifecycle.tone === "live";
+              const isPreparing = isWebsitePreparing(website);
               return (
                 <article className="saas-premium-website-card is-control-center" key={website.id}>
                 <div className="saas-premium-website-visual">
@@ -211,19 +222,29 @@ export default async function WebsitesPage() {
                     </div>
                   </dl>
                   <div className="saas-premium-website-actions">
-                    <div className="saas-website-primary-actions">
-                      <Link className="is-edit-primary" href={builderHref}><LayoutDashboard size={15} /> Edit Website</Link>
-                      <Link href={previewHref}><ExternalLink size={15} /> Preview Website</Link>
-                      <GoLiveButton
-                        websiteId={website.id}
-                        websiteSlug={website.slug}
-                        websiteName={website.name}
-                        packages={subscriptionPackages}
-                        isLive={isLive}
-                        activePackageId={plan?.packageId}
-                        activeDomain={website.primaryDomain ?? undefined}
-                      />
-                    </div>
+                    {isPreparing ? (
+                      <div className="saas-website-readiness-state" role="status">
+                        <Clock3 size={16} />
+                        <div>
+                          <strong>Creating your website…</strong>
+                          <span>We’re setting everything up. You’ll be able to start editing when your website is ready.</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="saas-website-primary-actions">
+                        <Link className="is-edit-primary" href={builderHref}><LayoutDashboard size={15} /> Edit Website</Link>
+                        <Link href={previewHref}><ExternalLink size={15} /> Preview Website</Link>
+                        <GoLiveButton
+                          websiteId={website.id}
+                          websiteSlug={website.slug}
+                          websiteName={website.name}
+                          packages={subscriptionPackages}
+                          isLive={isLive}
+                          activePackageId={plan?.packageId}
+                          activeDomain={website.primaryDomain ?? undefined}
+                        />
+                      </div>
+                    )}
                     <div className="saas-website-management-actions" aria-label="Website management">
                       <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}><Settings2 size={15} /> <T k="common.settings" /></Link>
                       <a href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`} title="Export backup"><Download size={15} /><span><T k="common.export" /></span></a>

@@ -236,5 +236,14 @@
     "role": "user",
     "createdAt": "2026-08-21T15:23:25.323Z",
     "updatedAt": "2026-08-21T15:23:25.323Z"
+  },
+  {
+    "id": "f6a1202b-9567-4fd3-a1fb-576df4a5f432",
+    "email": "hakop28ol4@yahoo.com",
+    "passwordHash": "$2b$12$XvljSpl503nH9iv00j9hGujPoMWTFQnMXDLgn/u1oxnIPOz5fFEmO",
+    "name": "Hakob Jaghatspanyan",
+    "role": "user",
+    "createdAt": "2026-09-20T11:25:57.810Z",
+    "updatedAt": "2026-09-20T11:25:57.810Z"
   }
 ]

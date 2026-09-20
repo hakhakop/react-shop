@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, updateUserSubscription } from "@/lib/auth";
+import { getCurrentUser, isSaaSAdmin, updateUserSubscription } from "@/lib/auth";
 import { findSubscriptionPackageById } from "@/lib/subscriptions";
-import { activateWebsite, addWebsiteDomain, canAccessWebsiteBuilder, getWebsiteByIdOrSlug } from "@/lib/websites";
+import {
+  activateWebsite,
+  addWebsiteDomain,
+  canAccessWebsiteBuilder,
+  getWebsiteByIdOrSlug,
+  isWebsitePreparing,
+} from "@/lib/websites";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +17,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const website = await getWebsiteByIdOrSlug((await params).websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) return NextResponse.json({ error: "Website not found." }, { status: 404 });
+  if (isWebsitePreparing(website) && !isSaaSAdmin(user)) {
+    return NextResponse.json({ error: "This website is still being prepared." }, { status: 409 });
+  }
   const body = await request.json() as { packageId?: string; domainMode?: string; domain?: string };
   const selectedPackage = body.packageId ? await findSubscriptionPackageById(body.packageId) : null;
   if (!selectedPackage?.isActive) return NextResponse.json({ error: "Choose an active subscription." }, { status: 400 });

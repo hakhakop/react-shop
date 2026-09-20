@@ -1,0 +1,22 @@
+[
+  {
+    "id": "global-4d6c1c2f-80b7-4535-aac1-184d670ed4da",
+    "sourceWebsiteId": "27079c03-3661-4c23-bf79-790cc8d73320",
+    "title": "Circle",
+    "description": "wery nice template",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-20T10:25:35.274Z",
+    "updatedAt": "2026-09-20T10:25:57.165Z"
+  }
+]

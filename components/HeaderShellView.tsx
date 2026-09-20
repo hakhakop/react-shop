@@ -148,6 +148,7 @@ type HeaderShellViewProps = {
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug" | "systemRole">[];
+  scopedPreviewGlobalStarterId?: string;
   scopedLinkMode?: "builder" | "preview" | "tenant-path";
   hideSaaSEntry?: boolean;
   categoriesContent?: ReactNode;
@@ -201,6 +202,7 @@ export default function HeaderShellView({
   scopedPreviewWebsiteId,
   scopedPreviewPage,
   scopedPreviewPages,
+  scopedPreviewGlobalStarterId,
   scopedLinkMode,
   hideSaaSEntry = false,
   categoriesContent,
@@ -675,12 +677,13 @@ export default function HeaderShellView({
             initialSignature={dropdownProjections?.[item.id]?.signature}
             initialWarnings={dropdownProjections?.[item.id]?.warnings}
             draft={builderDraftPreview} websiteId={scopedPreviewWebsiteId} page={scopedPreviewPage} shellSettings={effectiveShellSettings}
-            linkProjection={scopedPreviewWebsiteId ? { mode: scopedLinkMode ?? "preview", context: { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages, systemRouteAliases: getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings) } } : undefined} />]))}
+            linkProjection={scopedPreviewWebsiteId ? { mode: scopedLinkMode ?? "preview", context: { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages, systemRouteAliases: getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings), globalStarterId: scopedPreviewGlobalStarterId } } : undefined} />]))}
         items={filterSaaSItems(menuItems)}
         presentationById={menuPresentation}
         scopedPreviewWebsiteId={scopedPreviewWebsiteId}
         activePageKey={scopedPreviewPage}
         scopedPreviewPages={scopedPreviewPages}
+        scopedPreviewGlobalStarterId={scopedPreviewGlobalStarterId}
         systemRouteAliases={getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings)}
         scopedLinkMode={scopedLinkMode}
         activeContentLanguage={activeContentLanguage}
@@ -832,6 +835,7 @@ export default function HeaderShellView({
         scopedPreviewWebsiteId={scopedPreviewWebsiteId}
         activePageKey={scopedPreviewPage}
         scopedPreviewPages={scopedPreviewPages}
+        scopedPreviewGlobalStarterId={scopedPreviewGlobalStarterId}
         systemRouteAliases={getNavigationRouteAliases(effectiveShellSettings as BuilderShellSettings)}
         scopedLinkMode={scopedLinkMode}
         dropdownIndicator={dropdownIndicator}

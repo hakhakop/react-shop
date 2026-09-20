@@ -25,6 +25,7 @@ import {
   getWebsiteByIdOrSlug,
   getWebsiteRouteSegment,
   isRootWebsiteIdentifier,
+  isWebsitePreparing,
   removeWebsiteDomain,
   setWebsitePrimaryDomain,
   updateWebsiteDomain,
@@ -182,7 +183,10 @@ async function saveWebsiteSettingsAction(formData: FormData) {
     language: formData.get("language"),
     primaryLanguage: formData.get("primaryLanguage"),
     enabledLanguages: formData.getAll("enabledLanguages"),
-    status: formData.get("status"),
+    status:
+      isWebsitePreparing(targetWebsite) && !isSaaSAdmin(user)
+        ? "preparing"
+        : formData.get("status"),
   });
 
   if ("error" in parsed && parsed.error) {
@@ -595,6 +599,8 @@ export default async function WebsiteSettingsPage({
         ...baseSettingsSections.slice(3),
       ];
   const websiteRouteSegment = getWebsiteRouteSegment(website);
+  const readinessStatusLocked =
+    isWebsitePreparing(website) && !isSaaSAdmin(user);
   const restoreSource = query?.restoreSource === "upload" ? "upload" : "existing";
   const cmsConnection = getCmsConnection(isRootWebsite ? undefined : website);
   const cmsActionLinks = getCmsActionLinks(cmsConnection).filter(
@@ -718,14 +724,20 @@ export default async function WebsiteSettingsPage({
                 <span><T k="websites.status" /></span>
                 <select
                   name="status"
+                  disabled={readinessStatusLocked}
                   defaultValue={
                     website.status === "creating" ? "maintenance" : website.status
                   }
                 >
+                  <option value="preparing">Preparing</option>
+                  <option value="ready">Ready</option>
                   <option value="active">Active</option>
                   <option value="maintenance">Maintenance</option>
                   <option value="suspended">Suspended</option>
                 </select>
+                {readinessStatusLocked && (
+                  <input type="hidden" name="status" value="preparing" />
+                )}
               </label>
 
               {user.role === "super_admin" ? (

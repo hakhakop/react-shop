@@ -12,6 +12,7 @@ export type ScopedWebsiteLinkContext = {
   websiteId: string;
   pages?: ScopedPreviewPage[];
   systemRouteAliases?: NavigationRouteAlias[];
+  globalStarterId?: string;
 };
 
 export type WebsiteLinkDeliveryMode = "domain" | "tenant-path" | "preview" | "builder";
@@ -245,7 +246,7 @@ export function projectWebsiteHref(
       const parsed = new URL(href, "https://webpages.local");
       const scopedRoot = `/app/websites/${encodeURIComponent(projection.context.websiteId)}/${projection.mode}`;
       if (parsed.pathname === scopedRoot || parsed.pathname.startsWith(`${scopedRoot}/`)) {
-        return href;
+        return withGlobalStarterPreviewIntent(href, projection);
       }
     } catch {
       return href;
@@ -254,7 +255,30 @@ export function projectWebsiteHref(
   if (projection.mode === "tenant-path") {
     return resolveTenantPathHref(href, projection.context);
   }
-  return resolveScopedWebsiteHref(href, projection.context, projection.mode);
+  return withGlobalStarterPreviewIntent(
+    resolveScopedWebsiteHref(href, projection.context, projection.mode),
+    projection,
+  );
+}
+
+function withGlobalStarterPreviewIntent(
+  href: string,
+  projection: WebsiteLinkProjection,
+) {
+  const starterId = projection.context.globalStarterId?.trim();
+  if (!starterId || projection.mode !== "preview") return href;
+
+  try {
+    const url = new URL(href, "https://webpages.local");
+    const scopedRoot = `/app/websites/${encodeURIComponent(projection.context.websiteId)}/preview`;
+    if (url.pathname !== scopedRoot && !url.pathname.startsWith(`${scopedRoot}/`)) {
+      return href;
+    }
+    url.searchParams.set("globalStarterId", starterId);
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return href;
+  }
 }
 
 const WEBSITE_AUTHORED_LINK_FIELDS = new Set([

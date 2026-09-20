@@ -32,7 +32,7 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
-import { getWebsiteRouteSegment, type SaaSWebsite } from "@/lib/websites";
+import { getWebsiteRouteSegment, toPublicWebsite, type SaaSWebsite } from "@/lib/websites";
 import { cookies } from "next/headers";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { Sparkles } from "lucide-react";
@@ -82,6 +82,11 @@ type WebsiteFrontendProps = {
   builderIframeDiagnostics?: "minimal" | "settled" | "rect" | "toolbar" | "full";
   pageNumber?: number;
   requestProductTagSlugs?: string[];
+  /** Public registry-backed previews keep source resolution server-side while
+   * giving client renderers only non-sensitive storefront context. */
+  publicSurface?: boolean;
+  /** Preserves a public Global Starter preview across authored navigation. */
+  publicPreviewToken?: string;
 };
 
 type FrontendMaterializationCacheEntry = {
@@ -317,6 +322,8 @@ export default async function WebsiteFrontend({
   builderIframeDiagnostics = "minimal",
   pageNumber,
   requestProductTagSlugs,
+  publicSurface = false,
+  publicPreviewToken,
 }: WebsiteFrontendProps) {
   await ensureWebsiteBuilderData(website.id);
 
@@ -450,8 +457,10 @@ export default async function WebsiteFrontend({
       websiteId: websiteRouteSegment,
       pages: scopedPreviewPages,
       systemRouteAliases,
+      globalStarterId: publicPreviewToken,
     },
   };
+  const rendererWebsite = publicSurface ? toPublicWebsite(website) : website;
 
   return (
     <div className={builderGlobalVisibilityClassName({
@@ -466,6 +475,7 @@ export default async function WebsiteFrontend({
           websiteId={websiteRouteSegment}
           pages={scopedPreviewPages}
           systemRouteAliases={systemRouteAliases}
+          globalStarterId={publicPreviewToken}
           mode={builderIframeSelection ? "builder" : isTenantPath ? "tenant-path" : "preview"}
         />
       )}
@@ -486,6 +496,7 @@ export default async function WebsiteFrontend({
               scopedPreviewWebsiteId={isPreview ? websiteRouteSegment : undefined}
               scopedPreviewPage={page}
               scopedPreviewPages={scopedPreviewPages}
+              scopedPreviewGlobalStarterId={publicPreviewToken}
               hideSaaSEntry={!isPreview}
               website={website}
               activeContentLanguage={activeContentLanguage}
@@ -503,7 +514,7 @@ export default async function WebsiteFrontend({
                 layout={renderLayout ?? draftPreviewLayout}
                 page={page}
                 pageLabel={pageLabelOverride ?? commerceProjection?.pageLabel ?? pageLabel(page, customPages)}
-                website={website}
+                website={rendererWebsite}
                 headerOverlay={headerDocumentSettings.overlay}
                 {...effectiveRendererProps}
                 builderInteractionIdentity={builderIframeSelection || effectiveRendererProps.builderInteractionIdentity}
@@ -516,6 +527,7 @@ export default async function WebsiteFrontend({
             )}
             <FooterShell
               website={website}
+              publicSurface={publicSurface}
               activeContentLanguage={activeContentLanguage}
               builderInteractionIdentity={builderIframeSelection}
               shellSettingsOverride={shellSettings}

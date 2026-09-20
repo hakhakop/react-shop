@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 import AccessDenied from "@/components/saas/AccessDenied";
 import DeleteWebsiteButton from "@/components/saas/DeleteWebsiteButton";
+import WebsiteReadinessButton from "@/components/saas/WebsiteReadinessButton";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin, readPublicUsers } from "@/lib/auth";
 import { getWebsiteRouteSegment, readWebsites } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
+import { readGlobalStarters } from "@/lib/globalStarters";
+import GlobalStarterManager from "@/components/saas/GlobalStarterManager";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +33,8 @@ export default async function AdminWebsitesPage() {
     return <AccessDenied />;
   }
 
-  const [websites, users] = await Promise.all([readWebsites(), readPublicUsers()]);
+  const [websites, users, globalStarters] = await Promise.all([readWebsites(), readPublicUsers(), readGlobalStarters()]);
+  const globalStartersBySource = new Map(globalStarters.map((starter) => [starter.sourceWebsiteId, starter]));
   const usersById = new Map(users.map((item) => [item.id, item]));
   const websiteRows = await Promise.all(
     websites.map(async (website) => {
@@ -97,11 +101,17 @@ export default async function AdminWebsitesPage() {
                     <Link href={previewHref}><ExternalLink size={14} /> Preview</Link>
                     <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}><Settings2 size={14} /> Settings</Link>
                     <a href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`}><Download size={14} /> Export</a>
+                    <WebsiteReadinessButton websiteId={website.id} status={website.status} />
                     <DeleteWebsiteButton
                       websiteId={getWebsiteRouteSegment(website)}
                       websiteName={website.name}
                     />
                   </div>
+                  <GlobalStarterManager
+                    websiteId={website.id}
+                    websiteName={website.name}
+                    starter={globalStartersBySource.get(website.id) ?? null}
+                  />
                 </article>
               );
             })}

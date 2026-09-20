@@ -4,11 +4,16 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { starterWebsiteLibrary } from "@/lib/starterWebsites";
+import { listPublicGlobalStarters } from "@/lib/globalStarters";
 
 export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
   const user = await getCurrentUser(await cookies());
+  const starters = [
+    ...starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview })),
+    ...(await listPublicGlobalStarters()),
+  ];
 
   return (
     <div className="saas-phase-one-page saas-websites-page">
@@ -24,7 +29,7 @@ export default async function TemplatesPage() {
       </section>
 
       <section className="saas-premium-website-grid" aria-label="WebPages templates">
-        {starterWebsiteLibrary.map((starter) => {
+        {starters.map((starter) => {
           const destination = `/app/websites/new?starterId=${encodeURIComponent(starter.id)}`;
           const startHref = user ? destination : loginRedirectFor(destination);
           return (
