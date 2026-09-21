@@ -17,6 +17,126 @@
       ]
     },
     "createdAt": "2026-09-20T10:25:35.274Z",
-    "updatedAt": "2026-09-20T10:25:57.165Z"
+    "updatedAt": "2026-09-21T08:36:16.481Z"
+  },
+  {
+    "id": "global-0e5aa14f-bab7-4e25-96f2-db968b544afe",
+    "sourceWebsiteId": "4eeaf9a9-7f88-46b8-a874-d4eeeb45733f",
+    "title": "Devstack",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:35:59.120Z",
+    "updatedAt": "2026-09-21T08:36:13.889Z"
+  },
+  {
+    "id": "global-63324e42-99f0-42b9-8fd7-a4f8a8d0360c",
+    "sourceWebsiteId": "fd4072d5-18cf-472c-99d3-ea369504ea91",
+    "title": "Jack",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:36:03.264Z",
+    "updatedAt": "2026-09-21T08:36:11.246Z"
+  },
+  {
+    "id": "global-ba86debb-0869-41c6-a4ce-349fd52c9d97",
+    "sourceWebsiteId": "27ed19c1-e8e8-4112-abda-17f7a2abc3b9",
+    "title": "Yard",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:36:04.710Z",
+    "updatedAt": "2026-09-21T08:36:10.180Z"
+  },
+  {
+    "id": "global-8e908228-5002-450e-a644-b8404672c8df",
+    "sourceWebsiteId": "b1fe403f-b57b-4f93-a33e-5c061e4ebea2",
+    "title": "Design",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:36:21.476Z",
+    "updatedAt": "2026-09-21T08:36:23.523Z"
+  },
+  {
+    "id": "global-bd611373-3923-4ad5-87d5-046584d105d0",
+    "sourceWebsiteId": "76f3e619-b66c-4391-90b6-2671fa960132",
+    "title": "Woolberry",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:36:26.049Z",
+    "updatedAt": "2026-09-21T08:36:28.434Z"
+  },
+  {
+    "id": "global-f448b6b5-17d7-46cf-8b14-9ee4c332f27f",
+    "sourceWebsiteId": "aa74e534-2e8d-4648-a2ed-d6ead3ed9dd2",
+    "title": "Balou",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-21T08:36:34.003Z",
+    "updatedAt": "2026-09-21T08:36:36.539Z"
   }
 ]
