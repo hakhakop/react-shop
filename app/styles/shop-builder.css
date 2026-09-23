@@ -2853,6 +2853,18 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   overflow: visible;
 }
 
+/* Grid item alternate media follows the shared YOOtheme image transition
+ * contract. The video is rendered after the hover image so an authored hover
+ * video is the final alternate media when both are present. */
+.shop-builder-grid-image--hover-media {
+  overflow: hidden;
+}
+.shop-builder-grid-hover-image,
+.shop-builder-grid-hover-video {
+  z-index: 1;
+  pointer-events: none;
+}
+
 .shop-builder-grid-card.is-image-frameless .shop-builder-grid-image,
 .shop-builder-grid-card .uk-card-media-top {
   width: 100% !important;

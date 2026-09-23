@@ -119,6 +119,35 @@ test("Grid parent alignment is not shadowed by synthetic item-top defaults", () 
   expect(grid.gridItems?.[0]?.mediaPlacement).toBeUndefined();
 });
 
+test("Grid preserves YOOtheme hover image and hover video item media", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout", children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "grid",
+      props: { show_hover_image: true, show_hover_video: true },
+      children: [{
+        type: "grid_item",
+        props: { image: "/image.jpg", image_hover: "/hover.jpg", video_hover: "/hover.mp4" },
+      }],
+    }] }] }] }],
+  } as any);
+  const grid = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+  expect(grid.gridShowHoverImage).toBe(true);
+  expect(grid.gridShowHoverVideo).toBe(true);
+  expect(grid.gridItems?.[0]).toMatchObject({
+    imageUrl: "/image.jpg",
+    hoverImageUrl: "/hover.jpg",
+    hoverVideoUrl: "/hover.mp4",
+  });
+});
+
+test("Grid hover media renderer keeps alternate video above alternate image and empty values inert", () => {
+  const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
+  expect(renderer).toContain('rawBlock.gridShowHoverImage !== false && Boolean(hoverImageUrl)');
+  expect(renderer).toContain('rawBlock.gridShowHoverVideo !== false && Boolean(hoverVideoUrl)');
+  expect(renderer.indexOf("shop-builder-grid-hover-image")).toBeLessThan(renderer.indexOf("shop-builder-grid-hover-video"));
+  expect(renderer).toContain('className={`shop-builder-grid-hover-video uk-position-cover ${hoverMediaTransitionClass}`}');
+});
+
 test("Grid Meta settings retain canonical style, alignment, element, and margin owners", () => {
   const mapped = mapYoothemeStaticContent({
     type: "layout", children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{

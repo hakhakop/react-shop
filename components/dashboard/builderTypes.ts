@@ -952,7 +952,7 @@ export type BuilderLayoutBlock = {
   tableWidthTitle?: "expand" | "shrink" | "small" | "medium";
   tableWidthMeta?: "expand" | "shrink" | "small" | "medium";
   tableWidthContent?: "expand" | "shrink" | "small" | "medium";
-  gridSource?: "static" | "products";
+  gridSource?: "static" | "products" | "global-starters";
   gridRows?: number;
   gridGap?: "none" | "small" | "medium" | "large" | "max" | string;
   gridMargin?: "inherit" | "none" | "small" | "medium" | "large";
@@ -1008,6 +1008,8 @@ export type BuilderLayoutBlock = {
   lightboxAnimation?: string;
   lightboxNav?: string;
   gridShowImage?: boolean;
+  gridShowHoverImage?: boolean;
+  gridShowHoverVideo?: boolean;
   gridShowEyebrow?: boolean;
   gridShowMeta?: boolean;
   gridShowText?: boolean;
@@ -1038,6 +1040,8 @@ export type BuilderLayoutBlock = {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
+    hoverImageUrl?: string;
+    hoverVideoUrl?: string;
     /** Provider/source geometry used to reserve lazy media before decode. */
     imageIntrinsicWidth?: number;
     imageIntrinsicHeight?: number;
@@ -1081,6 +1085,8 @@ export type BuilderLayoutBlock = {
     dynamicBindings?: DynamicFieldBindings<
       | "imageUrl"
       | "imageAlt"
+      | "hoverImageUrl"
+      | "hoverVideoUrl"
       | "eyebrow"
       | "title"
       | "meta"

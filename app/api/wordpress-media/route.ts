@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { getWordPressMediaAuthHeaders } from "@/lib/cmsConnection";
 import { getCmsConnectionForRequest } from "@/lib/cmsConnectionServer";
 import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
@@ -85,6 +86,30 @@ async function resolveMediaCms(request: NextRequest) {
   if ("error" in access && access.error) {
     return { error: access.error };
   }
+
+  // The Root Website is represented by an empty builder scope rather than a
+  // tenant record. Protect that scope explicitly because the shared builder
+  // access helper only authenticates requests that carry a tenant websiteId.
+  if (!access.scope.websiteId) {
+    const user = await getCurrentUser(request.cookies);
+    if (!user) {
+      return {
+        error: NextResponse.json(
+          { error: "Authentication required." },
+          { status: 401 },
+        ),
+      };
+    }
+    if (!isSaaSAdmin(user)) {
+      return {
+        error: NextResponse.json(
+          { error: "Administrator access is required for Root media." },
+          { status: 403 },
+        ),
+      };
+    }
+  }
+
   return {
     cms: await getCmsConnectionForRequest(request, access.website),
   };

@@ -565,6 +565,51 @@ async function materializeGridBlock(
 ): Promise<BuilderLayoutBlock> {
   if (block.kind !== "grid") return block;
 
+  if (block.gridSource === "global-starters") {
+    const templateItem = block.gridItems?.[0];
+    if (!templateItem?.id?.trim()) {
+      diagnostics.push({
+        status: "fallback",
+        ...location,
+        message: "Global Starter Grid content requires one authored template item with a stable ID.",
+      });
+      return block;
+    }
+    try {
+      const authoredDescriptor = resolveInheritedDescriptor(templateItem.dynamicContext, inheritedContext);
+      const descriptor = authoredDescriptor ?? {
+        provider: "webpages",
+        source: "global-starter",
+        mode: "collection" as const,
+      };
+      const quantity = typeof block.gridLimit === "number" && block.gridLimit > 0
+        ? Math.round(block.gridLimit)
+        : typeof descriptor.query?.quantity === "number" && descriptor.query.quantity > 0
+          ? Math.round(descriptor.query.quantity)
+          : undefined;
+      const resolvedDescriptor = quantity
+        ? { ...descriptor, query: { ...(descriptor.query ?? {}), quantity } }
+        : descriptor;
+      const contexts = await resolveContexts({ website, descriptor: resolvedDescriptor });
+      const identifiedContexts = contexts.filter(
+        (context): context is DynamicItemContext & { id: string | number } =>
+          (typeof context.id === "string" && context.id.length > 0) ||
+          (typeof context.id === "number" && Number.isFinite(context.id)),
+      );
+      const template = staticGridTemplate(templateItem);
+      const gridItems = identifiedContexts.map((context) => ({
+        ...resolveDynamicItem(template, context, templateItem.dynamicBindings),
+        id: dynamicGridRenderItemId(templateItem.id!, context.id),
+      }));
+      diagnostics.push({ status: "materialized", ...location, contextCount: contexts.length });
+      materializedGridBlocks.push(location);
+      return { ...block, gridItems };
+    } catch (error) {
+      diagnostics.push({ status: "fallback", ...location, message: safeErrorMessage(error) });
+      return block;
+    }
+  }
+
   if (block.gridSource === "products") {
     const quantity = typeof block.gridLimit === "number" && block.gridLimit > 0
       ? Math.round(block.gridLimit)

@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
     title: body.title,
     description: body.description,
     category: body.category,
+    previewImageUrl: body.previewImageUrl,
+    hoverImageUrl: body.hoverImageUrl,
+    hoverVideoUrl: body.hoverVideoUrl,
     sortOrder: body.sortOrder,
   });
   if ("error" in result) {
@@ -64,6 +67,9 @@ export async function PUT(request: NextRequest) {
     title: body.title,
     description: body.description,
     category: body.category,
+    previewImageUrl: body.previewImageUrl,
+    hoverImageUrl: body.hoverImageUrl,
+    hoverVideoUrl: body.hoverVideoUrl,
     sortOrder: body.sortOrder,
     enabled: body.enabled,
   });

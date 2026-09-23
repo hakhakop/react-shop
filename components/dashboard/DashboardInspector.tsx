@@ -6614,6 +6614,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         <option value="products">
                                                           WooCommerce products
                                                         </option>
+                                                        <option value="global-starters">
+                                                          Global Starters
+                                                        </option>
                                                       </select>
                                                     </label>
                                                     <label className="builder-field">

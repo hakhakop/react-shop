@@ -94,7 +94,7 @@ export default async function AdminPackagesPage({
       title="Subscription Packages"
       eyebrow="Super Admin"
       actionHref="/admin/users"
-      actionLabel="Users"
+      actionLabel="Customers"
     >
       <div className="saas-phase-one-page saas-admin-packages-page">
         {params?.error && <p className="saas-auth-error">{params.error}</p>}

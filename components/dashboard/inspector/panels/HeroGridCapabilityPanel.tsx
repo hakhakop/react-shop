@@ -411,7 +411,7 @@ export function GridCapabilityPanel({
           <InspectorFieldRow label="Source">
             <InspectorPillGroup
               value={block.gridSource ?? "static"}
-              options={opts(["static", "products"] as const)}
+              options={opts(["static", "products", "global-starters"] as const)}
               onChange={(value) => update({ gridSource: value })}
               ariaLabel="Grid source"
             />

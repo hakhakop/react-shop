@@ -15,6 +15,9 @@ export type GlobalStarterRecord = {
   title: string;
   description: string;
   category: string;
+  previewImageUrl?: string;
+  hoverImageUrl?: string;
+  hoverVideoUrl?: string;
   sortOrder: number;
   enabled: boolean;
   preview: GlobalStarterPreview;
@@ -26,6 +29,10 @@ export type GlobalStarterCatalogItem = {
   id: string;
   name: string;
   description: string;
+  category: string;
+  previewImageUrl?: string;
+  hoverImageUrl?: string;
+  hoverVideoUrl?: string;
   preview: GlobalStarterPreview;
 };
 
@@ -61,6 +68,9 @@ function isGlobalStarterRecord(value: unknown): value is GlobalStarterRecord {
     typeof record.title === "string" &&
     typeof record.description === "string" &&
     typeof record.category === "string" &&
+    (record.previewImageUrl === undefined || typeof record.previewImageUrl === "string") &&
+    (record.hoverImageUrl === undefined || typeof record.hoverImageUrl === "string") &&
+    (record.hoverVideoUrl === undefined || typeof record.hoverVideoUrl === "string") &&
     typeof record.sortOrder === "number" &&
     typeof record.enabled === "boolean" &&
     isPreview(record.preview) &&
@@ -135,6 +145,10 @@ export async function listPublicGlobalStarters(): Promise<GlobalStarterCatalogIt
         id: record.id,
         name: record.title || sourceWebsite.name,
         description: record.description || sourceWebsite.description,
+        category: record.category,
+        ...(record.previewImageUrl ? { previewImageUrl: record.previewImageUrl } : {}),
+        ...(record.hoverImageUrl ? { hoverImageUrl: record.hoverImageUrl } : {}),
+        ...(record.hoverVideoUrl ? { hoverVideoUrl: record.hoverVideoUrl } : {}),
         preview: record.preview,
       } satisfies GlobalStarterCatalogItem;
     }),
@@ -148,6 +162,9 @@ export async function createGlobalStarter(input: {
   title?: unknown;
   description?: unknown;
   category?: unknown;
+  previewImageUrl?: unknown;
+  hoverImageUrl?: unknown;
+  hoverVideoUrl?: unknown;
   sortOrder?: unknown;
 }) {
   const { getWebsiteById } = await import("@/lib/websites");
@@ -166,6 +183,9 @@ export async function createGlobalStarter(input: {
     title: normalizeCatalogText(input.title, sourceWebsite.name, 120),
     description: normalizeCatalogText(input.description, sourceWebsite.description, 240),
     category: normalizeCatalogText(input.category, "WebPages", 80),
+    previewImageUrl: normalizeOptionalUrl(input.previewImageUrl),
+    hoverImageUrl: normalizeOptionalUrl(input.hoverImageUrl),
+    hoverVideoUrl: normalizeOptionalUrl(input.hoverVideoUrl),
     sortOrder: normalizeSortOrder(input.sortOrder),
     enabled: true,
     preview: { ...DEFAULT_PREVIEW, rows: [...DEFAULT_PREVIEW.rows] },
@@ -181,6 +201,9 @@ export async function updateGlobalStarter(input: {
   title?: unknown;
   description?: unknown;
   category?: unknown;
+  previewImageUrl?: unknown;
+  hoverImageUrl?: unknown;
+  hoverVideoUrl?: unknown;
   sortOrder?: unknown;
   enabled?: unknown;
 }) {
@@ -193,6 +216,9 @@ export async function updateGlobalStarter(input: {
     title: normalizeCatalogText(input.title, current.title, 120),
     description: normalizeCatalogText(input.description, current.description, 240),
     category: normalizeCatalogText(input.category, current.category, 80),
+    previewImageUrl: normalizeOptionalUrl(input.previewImageUrl, current.previewImageUrl),
+    hoverImageUrl: normalizeOptionalUrl(input.hoverImageUrl, current.hoverImageUrl),
+    hoverVideoUrl: normalizeOptionalUrl(input.hoverVideoUrl, current.hoverVideoUrl),
     sortOrder: normalizeSortOrder(input.sortOrder, current.sortOrder),
     enabled: typeof input.enabled === "boolean" ? input.enabled : current.enabled,
     updatedAt: new Date().toISOString(),
@@ -212,6 +238,12 @@ export async function removeGlobalStarter(id: string) {
 function normalizeCatalogText(value: unknown, fallback: string, maxLength: number) {
   const normalized = typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
   return (normalized || fallback).slice(0, maxLength);
+}
+
+function normalizeOptionalUrl(value: unknown, fallback?: string) {
+  if (value === undefined) return fallback;
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return normalized ? normalized.slice(0, 2048) : undefined;
 }
 
 function normalizeSortOrder(value: unknown, fallback = 0) {

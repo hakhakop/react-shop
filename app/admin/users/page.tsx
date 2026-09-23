@@ -27,13 +27,13 @@ export default async function AdminUsersPage() {
   return (
     <SaaSShell
       user={user}
-      title="Users"
-      eyebrow="Admin workspace"
+      title="Customers"
+      eyebrow="Platform administration"
       actionHref="/admin/websites"
-      actionLabel="All Websites"
+      actionLabel="Websites"
     >
       <section className="saas-panel">
-        <h2>Registered SaaS users</h2>
+        <h2>Registered customers</h2>
         <div className="saas-users-table" role="table">
           <div className="saas-users-row is-heading" role="row">
             <span>Name</span>
@@ -51,7 +51,7 @@ export default async function AdminUsersPage() {
               <span>{item.subscription?.packageName ?? "Not selected"}</span>
               <span>{websiteCounts.get(item.id) ?? 0}</span>
               <span className="saas-row-actions">
-                <Link href={`/admin/users/${item.id}`}>View User</Link>
+                <Link href={`/admin/users/${item.id}`}>View Customer</Link>
                 <DeleteUserButton
                   userId={item.id}
                   userName={item.name}

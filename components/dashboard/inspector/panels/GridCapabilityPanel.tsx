@@ -257,6 +257,20 @@ export default function GridCapabilityPanel({
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="grid-content">
+        <InspectorDivision title="CONTENT SOURCE">
+          <InspectorFieldRow label="Source">
+            <InspectorSelect
+              value={block.gridSource ?? "static"}
+              options={[
+                { value: "static", label: "Static items" },
+                { value: "products", label: "WooCommerce products" },
+                { value: "global-starters", label: "Global Starters" },
+              ]}
+              onChange={(value) => update({ gridSource: value as BuilderLayoutBlock["gridSource"] })}
+              ariaLabel="Grid content source"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
         {/* ITEMS SECTION */}
         <InspectorDivision title="ITEMS">
           <RepeatableItemShell
@@ -405,6 +419,40 @@ export default function GridCapabilityPanel({
                           />
                         </>
                       </InspectorFieldRow>
+                      <InspectorFieldRow label="Hover Image" dynamicBinding={dynamicBinding("hoverImageUrl")}>
+                        <>
+                          <BuilderImageUrlControl
+                            value={item.hoverImageUrl ?? ""}
+                            onChange={(event) =>
+                              updateItems(
+                                items.map((entry, i) => (i === index ? { ...entry, hoverImageUrl: event.target.value.trim() || undefined } : entry))
+                              )
+                            }
+                            onChoose={() =>
+                              openWordPressMediaPicker?.({
+                                title: `Item ${index + 1} Hover Image`,
+                                currentUrl: item.hoverImageUrl,
+                                onSelect: (media) =>
+                                  updateItems(
+                                    items.map((entry, i) => (i === index ? { ...entry, hoverImageUrl: media.sourceUrl } : entry))
+                                  ),
+                              })
+                            }
+                          />
+                        </>
+                      </InspectorFieldRow>
+                      <InspectorFieldRow label="Hover Video" dynamicBinding={dynamicBinding("hoverVideoUrl")}>
+                        <InspectorTextField
+                          value={item.hoverVideoUrl ?? ""}
+                          onChange={(value) =>
+                            updateItems(
+                              items.map((entry, i) => (i === index ? { ...entry, hoverVideoUrl: value.trim() || undefined } : entry))
+                            )
+                          }
+                          placeholder="https://..."
+                          ariaLabel={`Item ${index + 1} hover video`}
+                        />
+                      </InspectorFieldRow>
                       <InspectorFieldRow label="Link" dynamicBinding={dynamicBinding("buttonUrl")}>
                         <>
                           <InspectorTextField
@@ -544,6 +592,22 @@ export default function GridCapabilityPanel({
                 onChange={(e) => update({ gridShowImage: e.target.checked })}
               />
               <span>Show the image</span>
+            </label>
+            <label className="builder-inspector-checkbox-row">
+              <input
+                type="checkbox"
+                checked={block.gridShowHoverImage !== false}
+                onChange={(e) => update({ gridShowHoverImage: e.target.checked })}
+              />
+              <span>Show the hover image</span>
+            </label>
+            <label className="builder-inspector-checkbox-row">
+              <input
+                type="checkbox"
+                checked={block.gridShowHoverVideo !== false}
+                onChange={(e) => update({ gridShowHoverVideo: e.target.checked })}
+              />
+              <span>Show the hover video</span>
             </label>
             <label className="builder-inspector-checkbox-row">
               <input

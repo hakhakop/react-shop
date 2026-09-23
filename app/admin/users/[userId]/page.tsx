@@ -42,7 +42,7 @@ export default async function AdminUserDetailPage({
         title="User Not Found"
         eyebrow="Admin workspace"
         actionHref="/admin/users"
-        actionLabel="Users"
+        actionLabel="Customers"
       >
         <section className="saas-empty-state">
           <span>User not found</span>
@@ -73,9 +73,9 @@ export default async function AdminUserDetailPage({
     <SaaSShell
       user={currentUser}
       title={publicUser.name}
-      eyebrow="Admin user detail"
+      eyebrow="Customer detail"
       actionHref="/admin/users"
-      actionLabel="Users"
+      actionLabel="Customers"
     >
       <section className="saas-panel">
         <div className="saas-panel-heading">
@@ -84,7 +84,7 @@ export default async function AdminUserDetailPage({
             <p>{publicUser.email}</p>
           </div>
           <Link className="saas-auth-submit" href="/admin/users">
-            Back to Users
+            Back to Customers
           </Link>
           <DeleteUserButton
             userId={publicUser.id}

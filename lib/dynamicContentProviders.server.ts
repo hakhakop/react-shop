@@ -12,6 +12,7 @@ import { projectImportedDynamicContentProvider } from "@/lib/importedDynamicCont
 import { resolveWooCommerceTermContexts } from "@/lib/woocommerceTermContentProvider.server";
 import type { SaaSWebsite } from "@/lib/websites";
 import { resolveWordPressMenuContexts } from "@/lib/wordpressMenuContentProvider.server";
+import { resolveGlobalStarterContexts } from "@/lib/globalStarterContentProvider.server";
 
 export type DynamicContentProviderInput = {
   website?: SaaSWebsite | null;
@@ -29,6 +30,7 @@ const providers: Readonly<Record<string, DynamicContentProvider>> = {
   "woocommerce/product": resolveWooCommerceProductContexts,
   "woocommerce/product-category": resolveWooCommerceTermContexts,
   "woocommerce/product-tag": resolveWooCommerceTermContexts,
+  "webpages/global-starter": resolveGlobalStarterContexts,
 };
 
 /** Provider-owned composition at the shared template inheritance boundary. */

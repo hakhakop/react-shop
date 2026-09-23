@@ -651,6 +651,8 @@ export type BuilderLayoutBlock = {
   addToCartVisibility?: string;
   addToCartDisplay?: string;
   gridShowImage?: boolean;
+  gridShowHoverImage?: boolean;
+  gridShowHoverVideo?: boolean;
   gridShowEyebrow?: boolean;
   gridShowMeta?: boolean;
   gridShowText?: boolean;
@@ -682,6 +684,8 @@ export type BuilderLayoutBlock = {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
+    hoverImageUrl?: string;
+    hoverVideoUrl?: string;
     /** Provider/source geometry used to reserve lazy media before decode. */
     imageIntrinsicWidth?: number;
     imageIntrinsicHeight?: number;
@@ -723,6 +727,8 @@ export type BuilderLayoutBlock = {
     dynamicBindings?: DynamicFieldBindings<
       | "imageUrl"
       | "imageAlt"
+      | "hoverImageUrl"
+      | "hoverVideoUrl"
       | "eyebrow"
       | "title"
       | "meta"

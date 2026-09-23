@@ -61,6 +61,17 @@ function getUikitHoverTransitionClass(val?: string) {
   return `uk-transition-${val} uk-transition-opaque`;
 }
 
+function getGridHoverMediaTransitionClass(val?: string) {
+  // YOOtheme's alternate media is hidden until the Grid item is hovered or
+  // focused. A missing/None transition still needs the shared fade state so
+  // the primary image remains visible before interaction.
+  return val === "scale-up"
+    ? "uk-transition-scale-up"
+    : val === "scale-down"
+      ? "uk-transition-scale-down"
+      : "uk-transition-fade";
+}
+
 function getUikitLinkStyleClass(val?: string, size?: string, fullWidth?: boolean) {
   // The shared Button resolver owns the complete YOOtheme vocabulary. In
   // particular, `link`, `link-muted`, and `link-text` are distinct canonical
@@ -704,6 +715,12 @@ export function GridCardsClient({
 
             const renderImage = () => {
               if (!canShowImage || !item.imageUrl) return null;
+              const hoverImageUrl = typeof item.hoverImageUrl === "string" ? item.hoverImageUrl.trim() : "";
+              const hoverVideoUrl = typeof item.hoverVideoUrl === "string" ? item.hoverVideoUrl.trim() : "";
+              const hasHoverImage = rawBlock.gridShowHoverImage !== false && Boolean(hoverImageUrl);
+              const hasHoverVideo = rawBlock.gridShowHoverVideo !== false && Boolean(hoverVideoUrl);
+              const hasHoverMedia = hasHoverImage || hasHoverVideo;
+              const hoverMediaTransitionClass = getGridHoverMediaTransitionClass(rawBlock.imageHoverTransition);
               const placement = item.mediaPlacement && item.mediaPlacement !== "top"
                 ? item.mediaPlacement
                 : (block as any).gridMediaPlacement ?? item.mediaPlacement ?? "top";
@@ -762,7 +779,7 @@ export function GridCardsClient({
 
               return (
                 <div
-                  className={`${mediaClass} ${mediaMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageHoverBoxShadow} ${imageDecorationClass} ${imageHoverBorderClass} ${imageTextColorClass} ${imageInverseClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
+                  className={`${mediaClass} ${mediaMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageHoverBoxShadow} ${imageDecorationClass} ${imageHoverBorderClass} ${imageTextColorClass} ${imageInverseClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment} ${hasHoverMedia ? "uk-transition-toggle shop-builder-grid-image--hover-media" : ""}`.trim()}
                   data-image-ratio={hasCropFrame ? "true" : undefined}
                   style={{
                     maxWidth: imageMaxWidth,
@@ -782,6 +799,7 @@ export function GridCardsClient({
                     // explicit cross-axis position; justify-content only
                     // aligns the SVG inside that wrapper.
                     alignSelf: mediaAlignment === "right" ? "flex-end" : mediaAlignment === "center" ? "center" : "flex-start",
+                    ...(hasHoverMedia ? { position: "relative" } : {}),
                   } as CSSProperties}
                 >
                   {rawBlock.enableLightbox ? (
@@ -794,6 +812,38 @@ export function GridCardsClient({
                     </a>
                   ) : (
                     imageEl
+                  )}
+                  {hasHoverImage && (
+                    <img
+                      className={`shop-builder-grid-hover-image uk-position-cover ${hoverMediaTransitionClass}`}
+                      src={hoverImageUrl}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      style={{
+                        objectFit: mediaStyle.objectFit,
+                        objectPosition: rawBlock.imageHoverFocalPoint ?? mediaStyle.backgroundPosition,
+                        pointerEvents: "none",
+                      }}
+                    />
+                  )}
+                  {hasHoverVideo && (
+                    <video
+                      className={`shop-builder-grid-hover-video uk-position-cover ${hoverMediaTransitionClass}`}
+                      src={hoverVideoUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      aria-hidden="true"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: mediaStyle.objectFit,
+                        objectPosition: rawBlock.imageHoverFocalPoint ?? mediaStyle.backgroundPosition,
+                        pointerEvents: "none",
+                      }}
+                    />
                   )}
                 </div>
               );

@@ -57,6 +57,7 @@ export type DynamicBindingDestination =
   | "linkAriaLabel"
   | "iconName"
   | "imageUrl"
+  | "hoverImageUrl"
   | "backgroundImageUrl"
   | "imageAlt"
   | "videoUrl"
@@ -98,6 +99,7 @@ export const DYNAMIC_BINDING_DESTINATION_CAPABILITIES: Readonly<
   linkAriaLabel: { label: "Link ARIA Label", acceptedTypes: ["string", "richText"] },
   iconName: { label: "Icon", acceptedTypes: ["string"] },
   imageUrl: { label: "Image", acceptedTypes: ["url"] },
+  hoverImageUrl: { label: "Hover Image", acceptedTypes: ["url"] },
   backgroundImageUrl: { label: "Background Image", acceptedTypes: ["url"] },
   imageAlt: { label: "Image Alt", acceptedTypes: ["string", "richText"] },
   videoUrl: { label: "Video", acceptedTypes: ["url"] },
@@ -261,6 +263,29 @@ const WOOCOMMERCE_PRODUCT_CATEGORY_ACF_FIELDS: readonly DynamicContentSourceFiel
  */
 export const DYNAMIC_CONTENT_SOURCE_CAPABILITIES: readonly DynamicContentSourceCapability[] = [
   { key: "static", label: "None / Static" },
+  {
+    key: "webpages-global-starter-collection",
+    label: "Global Starters",
+    provider: "webpages",
+    source: "global-starter",
+    mode: "collection",
+    fields: [
+      { path: "title", label: "Title", valueType: "string" },
+      { path: "description", label: "Description", valueType: "richText" },
+      { path: "category", label: "Category", valueType: "string" },
+      { path: "meta", label: "Meta", valueType: "richText" },
+      { path: "previewImageUrl", label: "Preview Image", valueType: "url" },
+      { path: "hoverImageUrl", label: "Hover Image", valueType: "url" },
+      { path: "hoverVideoUrl", label: "Hover Video", valueType: "url" },
+      { path: "publicUrl", label: "Template URL", valueType: "url" },
+      { path: "previewUrl", label: "Preview URL", valueType: "url" },
+      { path: "startUrl", label: "Start URL", valueType: "url" },
+    ],
+    queryControls: [
+      { key: "start", label: "Start", control: "integer", minimum: 0, placeholder: "0" },
+      { key: "quantity", label: "Quantity", control: "integer", minimum: 1, placeholder: "10" },
+    ],
+  },
   ...(["product-tag", "product-category"] as const).flatMap(source =>
     (["single", "collection"] as const).map(mode => ({
       key: `woocommerce-${source}-${mode}`,

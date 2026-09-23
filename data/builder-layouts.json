@@ -488,6 +488,307 @@
     ],
     "updatedAt": "2026-09-20T00:00:00.000Z"
   },
+  "page:templates": {
+    "version": 1,
+    "key": "page:templates",
+    "page": "page:templates",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f5f7f4",
+      "textColor": "#14231d",
+      "mutedTextColor": "#65736b",
+      "accentColor": "#2f6657",
+      "surfaceColor": "#e6eee8",
+      "buttonBackground": "#14231d",
+      "buttonTextColor": "#ffffff",
+      "radius": "18px",
+      "sectionMaxWidth": "1280px",
+      "sectionGutter": "clamp(20px, 4vw, 64px)",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 6vw, 84px)",
+      "headingWeight": "720",
+      "headingLineHeight": "1.02",
+      "cardBg": "#ffffff",
+      "cardRadius": "18px",
+      "cardBorder": "rgba(20,35,29,0.1)",
+      "cardShadow": "0 12px 32px rgba(20,35,29,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(20,35,29,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "templates-intro",
+        "kind": "contentLayout",
+        "title": "Templates",
+        "background": "#f5f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "maxWidth": "large",
+        "colorScheme": "inherit",
+        "sectionPadding": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "templates-intro-copy",
+            "rowId": "templates-intro-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "templates-intro-heading",
+                "kind": "heading",
+                "headingText": "Start with a direction that feels right.",
+                "headingLevel": "h1",
+                "headingSize": "xlarge",
+                "headingAlign": "left",
+                "elementAlign": "left",
+                "elementPadding": "none"
+              },
+              {
+                "id": "templates-intro-text",
+                "kind": "text",
+                "body": "Choose a considered starting point, preview it, and continue directly into the visual Builder.",
+                "textVariant": "lead",
+                "textAlign": "left",
+                "elementPadding": "small"
+              }
+            ]
+          },
+          {
+            "id": "templates-intro-action",
+            "rowId": "templates-intro-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "templates-intro-button",
+                "kind": "button",
+                "buttonLabel": "Create Website",
+                "buttonUrl": "/app/websites/new",
+                "buttonStyle": "primary",
+                "size": "default"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "templates-static",
+        "kind": "contentLayout",
+        "title": "Static Starters",
+        "background": "#e6eee8",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "maxWidth": "large",
+        "colorScheme": "inherit",
+        "sectionPadding": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "templates-static-column",
+            "rowId": "templates-static-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "templates-static-heading",
+                "kind": "heading",
+                "headingText": "A strong starting point, already in place.",
+                "headingLevel": "h2",
+                "headingSize": "medium",
+                "headingAlign": "left",
+                "elementAlign": "left",
+                "elementPadding": "none"
+              },
+              {
+                "id": "templates-static-grid",
+                "kind": "grid",
+                "title": "",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "large",
+                "gridCardHover": true,
+                "gridItems": [
+                  {
+                    "id": "starter-modern-business",
+                    "eyebrow": "Modern Business",
+                    "title": "A polished foundation for a growing company.",
+                    "text": "A clear, confident structure for services, proof, and the next conversation.",
+                    "buttonLabel": "Preview",
+                    "buttonUrl": "/templates/modern-business",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "starter-creative-agency",
+                    "eyebrow": "Creative Agency",
+                    "title": "An expressive home for thoughtful work.",
+                    "text": "A portfolio-led direction for studios, teams, and creative practices.",
+                    "buttonLabel": "Preview",
+                    "buttonUrl": "/templates/creative-agency",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "starter-local-services",
+                    "eyebrow": "Local Services",
+                    "title": "A dependable path from enquiry to service.",
+                    "text": "A practical lead-focused structure for trusted local businesses.",
+                    "buttonLabel": "Preview",
+                    "buttonUrl": "/templates/local-services",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "starter-blank",
+                    "eyebrow": "Blank Website",
+                    "title": "A clean canvas for your own direction.",
+                    "text": "Start with the core documents and build a site completely from scratch.",
+                    "buttonLabel": "Preview",
+                    "buttonUrl": "/templates/blank",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "templates-global",
+        "kind": "contentLayout",
+        "title": "Global Starters",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "maxWidth": "large",
+        "colorScheme": "inherit",
+        "sectionPadding": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "templates-global-column",
+            "rowId": "templates-global-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "templates-global-heading",
+                "kind": "heading",
+                "headingText": "Made by the WebPages community.",
+                "headingLevel": "h2",
+                "headingSize": "medium",
+                "headingAlign": "left",
+                "elementAlign": "left",
+                "elementPadding": "none"
+              },
+              {
+                "id": "templates-global-intro",
+                "kind": "text",
+                "body": "Explore enabled starters from real WebPages websites. Each one stays connected to its current public source until you choose it.",
+                "textVariant": "lead",
+                "textAlign": "left",
+                "elementPadding": "small"
+              },
+              {
+                "id": "templates-global-grid",
+                "kind": "grid",
+                "title": "",
+                "gridSource": "global-starters",
+                "columns": 3,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "large",
+                "gridCardHover": true,
+                "gridItems": [
+                  {
+                    "id": "global-starter-template",
+                    "eyebrow": "Global Starter",
+                    "title": "Starter title",
+                    "meta": "Preview this template",
+                    "text": "Starter description",
+                    "imageAlt": "Starter title",
+                    "buttonLabel": "Create a website with this template",
+                    "buttonUrl": "/templates",
+                    "buttonStyle": "link",
+                    "dynamicContext": {
+                      "provider": "webpages",
+                      "source": "global-starter",
+                      "mode": "collection",
+                      "query": {}
+                    },
+                    "dynamicBindings": {
+                      "eyebrow": {
+                        "path": "category",
+                        "valueType": "string"
+                      },
+                      "title": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "meta": {
+                        "path": "meta",
+                        "valueType": "richText"
+                      },
+                      "text": {
+                        "path": "description",
+                        "valueType": "richText"
+                      },
+                      "imageUrl": {
+                        "path": "previewImageUrl",
+                        "valueType": "url"
+                      },
+                      "hoverImageUrl": {
+                        "path": "hoverImageUrl",
+                        "valueType": "url"
+                      },
+                      "hoverVideoUrl": {
+                        "path": "hoverVideoUrl",
+                        "valueType": "url"
+                      },
+                      "imageAlt": {
+                        "path": "title",
+                        "valueType": "string"
+                      },
+                      "buttonUrl": {
+                        "path": "startUrl",
+                        "valueType": "url"
+                      }
+                    }
+                  }
+                ],
+                "buttonStyle": "default"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-09-22T11:33:48.450Z"
+  },
   "shop": {
     "version": 1,
     "key": "shop",

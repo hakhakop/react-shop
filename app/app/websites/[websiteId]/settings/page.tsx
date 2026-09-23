@@ -613,7 +613,7 @@ export default async function WebsiteSettingsPage({
       title={<T k="websites.websiteSettings" />}
       eyebrow={website.name}
       actionHref={isSaaSAdmin(user) ? "/admin/websites" : "/app/websites"}
-      actionLabel={isSaaSAdmin(user) ? <T k="navigation.allWebsites" /> : <T k="websites.title" />}
+      actionLabel={isSaaSAdmin(user) ? <T k="navigation.websites" /> : <T k="websites.title" />}
     >
       <div className="saas-phase-one-page saas-website-settings-page">
         <section className="saas-phase-one-intro is-compact">

@@ -21296,9 +21296,9 @@ const PreviewSection = memo(function PreviewSection({
                               </>
                             )}
                             itemProps={(_, itemIndex) => ({
-                              draggable: block.gridSource !== "products",
+                              draggable: block.gridSource !== "products" && block.gridSource !== "global-starters",
                               onDragStart: (event) => {
-                                if (block.gridSource === "products") return;
+                                if (block.gridSource === "products" || block.gridSource === "global-starters") return;
                                 event.stopPropagation();
                                 setDraggingItem({ kind: "grid", blockKey, fromIndex: itemIndex });
                               },

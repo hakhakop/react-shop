@@ -1026,6 +1026,7 @@ type DynamicImportDestination =
   | "body"
   | "eyebrow"
   | "imageUrl"
+  | "hoverImageUrl"
   | "backgroundImageUrl"
   | "backgroundVideoUrl"
   | "imageAlt"
@@ -1079,7 +1080,7 @@ const dynamicBinding = (
   allowUnregistered = false,
 ) => {
   const fallbackValueType: DynamicContentValueType =
-    destination === "videoUrl" || destination === "imageUrl" || destination === "backgroundImageUrl" || destination === "backgroundVideoUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
+    destination === "videoUrl" || destination === "imageUrl" || destination === "hoverImageUrl" || destination === "backgroundImageUrl" || destination === "backgroundVideoUrl" || destination === "imageLinkUrl" || destination === "hoverVideoUrl" || destination === "buttonUrl" || destination === "linkUrl" || destination === "link" || destination === "url"
       ? "url"
       : destination === "text" || destination === "body" || destination === "content"
         ? "richText"
@@ -1569,6 +1570,10 @@ const sourceGridItem = (
       content: "text",
       image: "imageUrl",
       image_alt: "imageAlt",
+      image_hover: "hoverImageUrl",
+      hover_image: "hoverImageUrl",
+      video_hover: "hoverVideoUrl",
+      hover_video: "hoverVideoUrl",
       link_text: "buttonLabel",
       link: "buttonUrl",
     },
@@ -1590,6 +1595,8 @@ const sourceGridItem = (
     id: sourcePathId(path, "grid-item"),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
+    hoverImageUrl: resolveYoothemeAssetUrl(props.image_hover ?? props.hover_image),
+    hoverVideoUrl: resolveYoothemeAssetUrl(props.video_hover ?? props.hover_video),
     // Both source fields are authored as rich HTML in the DevStack fixtures.
     // Normalize them at the same safe boundary used by the WebPages rich editor.
     title: sanitizeHtml(asString(props.title) ?? ""),
@@ -2243,7 +2250,7 @@ const mapStaticElement = (
       "image_hover", "video_hover", "hover_image", "hover_video", "height_expand", "element", "html_element", "overlay_mode", "overlay_link", "overlay_style", "overlay_position", "overlay_hover", "overlay_animate_background", "overlay_expand", "overlay_maxwidth", "overlay_max_width", "overlay_transition", "overlay_padding", "overlay_margin", "text_color",
       "title", "meta", "content", "title_transition", "title_style", "title_hover_style", "title_link", "title_decoration", "title_font_family", "title_color", "title_element", "title_margin", "meta_transition", "meta_font_family", "meta_style", "meta_color", "meta_align", "meta_element", "meta_margin", "content_transition", "content_font_family", "content_style", "content_margin",
       "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "link_transition", "link_aria_label", "panel_padding", "panel_style",
-      "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
+      "show_content", "show_hover_image", "show_hover_video", "show_image", "show_link", "show_meta", "show_title", "text_align", "lightbox",
       "title_element", "title_style", "title_align", "title_grid_width", "title_grid_column_gap", "title_grid_row_gap", "title_grid_breakpoint", "title_decoration", "title_color", "title_font_family", "title_link", "meta_align", "meta_element", "meta_style", "meta_color", "content_style", "content_align", "content_dropcap", "content_column", "content_column_divider", "content_column_breakpoint", "text_color",
       "title_margin", "meta_margin", "content_margin", "link_margin", "margin", "margin_remove_bottom",
       // Filter navigation has an existing Grid owner. More detailed filter
@@ -2258,6 +2265,8 @@ const mapStaticElement = (
       gridSource: "static",
       gridItems: items,
       gridShowImage: props.show_image !== false,
+      gridShowHoverImage: props.show_hover_image !== false,
+      gridShowHoverVideo: props.show_hover_video !== false,
       gridShowMeta: props.show_meta !== false,
       gridShowText: props.show_content !== false,
       gridShowButton: props.show_link !== false,
