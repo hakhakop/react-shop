@@ -84,20 +84,32 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     resolvedSearchParams?.routingTemplate ||
     resolvedSearchParams?.individual,
   );
-  const initialPageHydration =
+  const contentLanguage = ["hy", "en", "ru"].includes(
+    cookieStore.get("website_content_language_root")?.value as never,
+  )
+    ? cookieStore.get("website_content_language_root")!.value
+    : "hy";
+  const [initialPageHydration, initialContextPageHydration] =
     !hasStrictDocumentTarget
-      ? await resolveInitialBuilderPage({
-          page: initialHydrationPage,
-          contentLanguage: ["hy", "en", "ru"].includes(
-            cookieStore.get("website_content_language_root")?.value as never,
-          )
-            ? cookieStore.get("website_content_language_root")!.value
-            : "hy",
-          primaryContentLanguage: "hy",
-          wordpressMediaOrigin: getWordPressBaseUrl(),
-          deferDynamicContent: true,
-        })
-      : undefined;
+      ? await Promise.all([
+          resolveInitialBuilderPage({
+            page: initialHydrationPage,
+            contentLanguage,
+            primaryContentLanguage: "hy",
+            wordpressMediaOrigin: getWordPressBaseUrl(),
+            deferDynamicContent: true,
+          }),
+          initialPage === "header" || initialPage === "footer"
+            ? resolveInitialBuilderPage({
+                page: requestedContextPage,
+                contentLanguage,
+                primaryContentLanguage: "hy",
+                wordpressMediaOrigin: getWordPressBaseUrl(),
+                deferDynamicContent: true,
+              })
+            : Promise.resolve(undefined),
+        ])
+      : [undefined, undefined];
 
   return (
     <SaaSI18nProvider userLocale={user.language} persistForUser>
@@ -109,6 +121,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           wordpressMediaOrigin={getWordPressBaseUrl()}
           wordpressSiteUrl={getWordPressBaseUrl()}
           initialPageHydration={initialPageHydration}
+          initialContextPageHydration={initialContextPageHydration}
         />
       </Suspense>
     </SaaSI18nProvider>

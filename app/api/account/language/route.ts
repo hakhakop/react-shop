@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getCurrentUser, updateUserLanguage } from "@/lib/auth";
-import { localeCookieName, normalizeLocale } from "@/lib/i18n";
+import { isLocale, localeCookieName, normalizeLocale } from "@/lib/i18n";
 
 export async function PATCH(request: Request) {
   const cookieStore = await cookies();
@@ -9,7 +9,7 @@ export async function PATCH(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = (await request.json().catch(() => ({}))) as { locale?: unknown };
-  if (body.locale !== "en" && body.locale !== "hy") {
+  if (!isLocale(body.locale)) {
     return NextResponse.json({ error: "Unsupported language" }, { status: 400 });
   }
 

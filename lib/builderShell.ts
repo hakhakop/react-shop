@@ -58,6 +58,7 @@ export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>
 
 export type ReactMenuItem = {
   dropdownContent?: MenuDropdownContent;
+  contentTranslations?: Record<string, Record<string, unknown>>;
   id: string;
   label: string;
   url: string;
@@ -1687,6 +1688,10 @@ function normalizeMenuItems(
         id,
         label,
         url: url || "",
+        contentTranslations:
+          raw.contentTranslations && typeof raw.contentTranslations === "object" && !Array.isArray(raw.contentTranslations)
+            ? raw.contentTranslations as ReactMenuItem["contentTranslations"]
+            : undefined,
         parentId: parentId || null,
         iconName: typeof raw.iconName === "string" ? raw.iconName.trim() || null : null,
         iconUrl: typeof raw.iconUrl === "string" ? raw.iconUrl.trim() || null : null,

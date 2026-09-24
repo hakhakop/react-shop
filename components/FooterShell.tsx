@@ -37,15 +37,20 @@ export default async function FooterShell({
   )?.value;
   const language =
     activeContentLanguage ??
-    (website?.enabledLanguages.includes(languageCookie as never)
-      ? languageCookie!
-      : website?.primaryLanguage ?? "hy");
+    (website
+      ? website.enabledLanguages.includes(languageCookie as never)
+        ? languageCookie!
+        : website.primaryLanguage
+      : ["hy", "en", "ru"].includes(languageCookie as never)
+        ? languageCookie!
+        : "hy");
+  const primaryContentLanguage = website?.primaryLanguage ?? "hy";
   const localizedLayout = {
     ...layout,
     sections: resolveContentSections(
       layout.sections as never,
       language,
-      website?.primaryLanguage ?? language,
+      primaryContentLanguage,
     ) as typeof layout.sections,
   };
 

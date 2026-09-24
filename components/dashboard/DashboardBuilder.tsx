@@ -141,6 +141,7 @@ import {
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_READY_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
+  BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE,
   type BuilderIframeDraftMessage,
 } from "@/components/builder/BuilderIframeDraftBridge";
 import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
@@ -2395,6 +2396,7 @@ export default function DashboardBuilder({
     () => `builder_preview_language_${websiteId ?? "root"}`,
     [websiteId],
   );
+  const skipPreviewLanguagePersistenceRef = useRef(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   // The mobile bar and its drawer are one Builder document. Retain the old
@@ -2546,11 +2548,19 @@ export default function DashboardBuilder({
   useEffect(() => {
     const storedLanguage = window.sessionStorage.getItem(previewLanguageStorageKey);
     if (storedLanguage && enabledContentLanguages.includes(storedLanguage)) {
+      // The persistence effect also runs for the initial primary language.
+      // Skip that one write so it cannot overwrite a previously selected
+      // Builder locale before the restored state has rendered.
+      skipPreviewLanguagePersistenceRef.current = true;
       setContentLanguage(storedLanguage);
     }
   }, [enabledContentLanguages, previewLanguageStorageKey]);
 
   useEffect(() => {
+    if (skipPreviewLanguagePersistenceRef.current) {
+      skipPreviewLanguagePersistenceRef.current = false;
+      return;
+    }
     window.sessionStorage.setItem(previewLanguageStorageKey, contentLanguage);
   }, [contentLanguage, previewLanguageStorageKey]);
   const storageKeys = useMemo(() => getBuilderStorageKeys(websiteId), [websiteId]);
@@ -3579,12 +3589,29 @@ export default function DashboardBuilder({
     });
     return () => controller.abort();
   }, [builderApiUrl, builderState.page, headerContextState, shellContextDynamicSignature]);
-  const iframeContextRenderState = useMemo<BuilderState | null>(() =>
-    shellContextRenderProjection?.page === headerContextState.page &&
-    shellContextRenderProjection.sourceSignature === JSON.stringify(headerContextState)
-      ? { ...headerContextState, sections: shellContextRenderProjection.sections }
-      : null,
-  [headerContextState, shellContextRenderProjection]);
+  const iframeContextRenderState = useMemo<BuilderState | null>(() => {
+    const projectionMatchesContext =
+      shellContextRenderProjection?.page === headerContextState.page &&
+      shellContextRenderProjection.sourceSignature === JSON.stringify(headerContextState);
+    // Static shell contexts do not need a provider projection, but they still
+    // need the same locale-resolved document that the inline canvas uses.
+    // Keep unresolved dynamic contexts out of the bridge so the server's
+    // materialized preview remains authoritative until its projection arrives.
+    if (!projectionMatchesContext && shellContextDynamicSignature !== "[]") return null;
+    const sections = projectionMatchesContext
+      ? shellContextRenderProjection!.sections
+      : headerContextState.sections;
+    return {
+      ...headerContextState,
+      sections: resolveContentSections(sections, contentLanguage, primaryContentLanguage),
+    };
+  }, [
+    contentLanguage,
+    headerContextState,
+    primaryContentLanguage,
+    shellContextDynamicSignature,
+    shellContextRenderProjection,
+  ]);
   const iframeComparisonPage = useMemo(() => {
     return builderEditorContext?.content.mode === "preview"
       ? builderEditorContext.content.pageType === "taxonomy:product_cat"
@@ -6504,6 +6531,7 @@ export default function DashboardBuilder({
           ? iframeContextRenderState
           : null,
       shellSettings,
+      activeContentLanguage: contentLanguage,
       documentKey: rendersContextualRoute ? iframeComparisonPage : state.page,
       headerDocumentKey: headerDraftDocumentKey,
       renderPage: rendersContextualRoute ? iframeComparisonPage : null,
@@ -6535,6 +6563,7 @@ export default function DashboardBuilder({
         ? { contextState: iframeContextRenderState }
         : {}),
       shellSettings,
+      activeContentLanguage: contentLanguage,
     };
     iframeDraftPayloadSignatureRef.current = payloadSignature;
     iframeDraftDeliveryRef.current = message;
@@ -6558,7 +6587,7 @@ export default function DashboardBuilder({
       );
     };
     deliver(0);
-  }, [iframeComparisonPage, iframeContextRenderState, shellSettings]);
+  }, [contentLanguage, iframeComparisonPage, iframeContextRenderState, shellSettings]);
 
   useEffect(() => {
     if (!iframeComparisonMode) return;
@@ -6569,6 +6598,7 @@ export default function DashboardBuilder({
           ? iframeContextRenderState
           : null,
       shellSettings,
+      activeContentLanguage: contentLanguage,
     });
     if (iframeDraftSignatureRef.current === signature) return;
     iframeDraftSignatureRef.current = signature;
@@ -6580,7 +6610,7 @@ export default function DashboardBuilder({
       iframeDraftPendingRef.current = null;
       if (pending) postIframeDraftSnapshot(pending);
     });
-  }, [iframeComparisonMode, iframeContextRenderState, iframeRenderState, postIframeDraftSnapshot, shellSettings]);
+  }, [contentLanguage, iframeComparisonMode, iframeContextRenderState, iframeRenderState, postIframeDraftSnapshot, shellSettings]);
 
   useEffect(() => () => {
     if (iframeDraftFrameRef.current !== null) {
@@ -6638,6 +6668,15 @@ export default function DashboardBuilder({
         event.source !== iframeComparisonRef.current?.contentWindow
       ) return;
       if (event.data?.source === BUILDER_IFRAME_DRAFT_SOURCE) {
+        if (event.data.type === BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE) {
+          const nextLanguage = typeof event.data.language === "string"
+            ? event.data.language
+            : "";
+          if (enabledContentLanguages.includes(nextLanguage)) {
+            setContentLanguage(nextLanguage);
+          }
+          return;
+        }
         const readyState = iframeRenderStateRef.current;
         const readyDocumentKey =
           readyState.page !== "header" &&
@@ -6807,6 +6846,7 @@ export default function DashboardBuilder({
     return () => window.removeEventListener("message", handleIframeSelection);
   }, [
     builderState.sections,
+    enabledContentLanguages,
     handleScopedBuilderNavigate,
     iframeComparisonMode,
     iframeComparisonPage,

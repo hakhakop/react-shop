@@ -59,6 +59,7 @@ export function resolveHeaderBuilderComposition(
   });
   const row = headerRows[0];
   const sharedElementFields = (block: (typeof blocks)[number]) => ({
+    contentTranslations: block.contentTranslations,
     rowId: blockRowIds.get(block),
     columnId: blockColumnMeta.get(block)?.id,
     columnFlex: blockColumnMeta.get(block)?.flex,

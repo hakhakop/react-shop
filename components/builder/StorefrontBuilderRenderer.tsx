@@ -3318,18 +3318,21 @@ function StorefrontBuilderRendererBase({
       }, window.location.origin);
     };
     const handleDraftMessage = (event: MessageEvent) => {
+      const contextState = event.data?.contextState as BuilderState | undefined;
+      const isContextSnapshot =
+        (event.data?.documentKey === "header" || event.data?.documentKey === "footer") &&
+        contextState?.page === page;
       if (
         event.origin !== window.location.origin ||
         event.source !== window.parent ||
         event.data?.source !== BUILDER_IFRAME_DRAFT_SOURCE ||
         event.data?.type !== BUILDER_IFRAME_DRAFT_MESSAGE ||
-        event.data?.documentKey !== page
+        (event.data?.documentKey !== page && !isContextSnapshot)
       ) {
         return;
       }
       const revision = Number(event.data.revision);
       const authoredState = event.data.state as BuilderState | undefined;
-      const contextState = event.data.contextState as BuilderState | undefined;
       const rendersCurrentRoute =
         documentRuntimeOwnedExternally && event.data.renderPage === page;
       const state = authoredState?.page === page || rendersCurrentRoute

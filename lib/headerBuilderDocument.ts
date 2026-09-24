@@ -45,6 +45,7 @@ export type HeaderBuilderElementType =
 export type HeaderBuilderElement = {
   id: string;
   type: HeaderBuilderElementType;
+  contentTranslations?: Record<string, Record<string, unknown>>;
   rowId?: string;
   columnId?: string;
   columnFlex?: number;

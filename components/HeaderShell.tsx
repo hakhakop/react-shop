@@ -209,12 +209,13 @@ export default async function HeaderShell({
     ((website?.enabledLanguages?.includes(languageCookie as never) || (!website && ["hy", "en", "ru"].includes(languageCookie as never)))
       ? languageCookie!
       : website?.primaryLanguage ?? "hy");
+  const primaryContentLanguage = website?.primaryLanguage ?? "hy";
   const localizedHeaderLayout = {
     ...headerLayout,
     sections: resolveContentSections(
       headerLayout.sections as never,
       selectedContentLanguage,
-      website?.primaryLanguage ?? selectedContentLanguage,
+      primaryContentLanguage,
     ) as typeof headerLayout.sections,
   };
   const headerComposition = resolveHeaderBuilderComposition(localizedHeaderLayout);
@@ -224,7 +225,7 @@ export default async function HeaderShell({
         sections: resolveContentSections(
           storedHeaderDocuments.mobile.sections as never,
           selectedContentLanguage,
-          website?.primaryLanguage ?? selectedContentLanguage,
+          primaryContentLanguage,
         ) as typeof storedHeaderDocuments.mobile.sections,
       }
     : null;
@@ -250,7 +251,7 @@ export default async function HeaderShell({
           sections: resolveContentSections(
             storedHeaderDocuments.dialog.sections as never,
             selectedContentLanguage,
-            website?.primaryLanguage ?? selectedContentLanguage,
+            primaryContentLanguage,
           ) as typeof storedHeaderDocuments.dialog.sections,
         })
       : undefined;

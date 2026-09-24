@@ -257,7 +257,15 @@
   "menuItems": [
     {
       "id": "webpages-home",
-      "label": "Home",
+      "label": "Գլխավոր",
+      "contentTranslations": {
+        "en": {
+          "label": "Home"
+        },
+        "ru": {
+          "label": "Главная"
+        }
+      },
       "url": "/",
       "parentId": null,
       "target": "_self",
@@ -265,7 +273,15 @@
     },
     {
       "id": "webpages-templates",
-      "label": "Templates",
+      "label": "Ձևանմուշներ",
+      "contentTranslations": {
+        "en": {
+          "label": "Templates"
+        },
+        "ru": {
+          "label": "Шаблоны"
+        }
+      },
       "url": "/templates",
       "parentId": null,
       "target": "_self",
@@ -273,7 +289,15 @@
     },
     {
       "id": "webpages-features",
-      "label": "Features",
+      "label": "Հնարավորություններ",
+      "contentTranslations": {
+        "en": {
+          "label": "Features"
+        },
+        "ru": {
+          "label": "Возможности"
+        }
+      },
       "url": "/#features",
       "parentId": null,
       "target": "_self",
@@ -281,7 +305,15 @@
     },
     {
       "id": "webpages-pricing",
-      "label": "Pricing",
+      "label": "Գներ",
+      "contentTranslations": {
+        "en": {
+          "label": "Pricing"
+        },
+        "ru": {
+          "label": "Цены"
+        }
+      },
       "url": "/#pricing",
       "parentId": null,
       "target": "_self",
@@ -289,7 +321,15 @@
     },
     {
       "id": "webpages-login",
-      "label": "Log In",
+      "label": "Մուտք",
+      "contentTranslations": {
+        "en": {
+          "label": "Log In"
+        },
+        "ru": {
+          "label": "Войти"
+        }
+      },
       "url": "/login",
       "parentId": null,
       "target": "_self",

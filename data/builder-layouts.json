@@ -53,12 +53,12 @@
                 "id": "webpages-hero-element",
                 "kind": "hero",
                 "eyebrow": "WebPages",
-                "title": "A website you can build on.",
-                "body": "Create a professional website, shape it visually, and keep everything you need in one place.",
-                "buttonLabel": "Create Website",
+                "title": "Կայք, որը կարող եք զարգացնել։",
+                "body": "<p>Ստեղծեք պրոֆեսիոնալ կայք, տեսողականորեն ձևավորեք այն և ձեզ անհրաժեշտ ամեն ինչ պահեք մեկ վայրում։</p>",
+                "buttonLabel": "Ստեղծել կայք",
                 "buttonUrl": "/app/websites/new",
                 "buttonStyle": "primary",
-                "secondaryButtonLabel": "Explore Templates",
+                "secondaryButtonLabel": "Դիտել ձևանմուշները",
                 "secondaryButtonUrl": "/templates",
                 "secondaryButtonStyle": "outline",
                 "heroHeadingElement": "h1",
@@ -104,6 +104,21 @@
                     "letterSpacing": "0",
                     "textAlign": "left"
                   }
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "A website you can build on.2",
+                    "eyebrow": "WebPages",
+                    "body": "<p>Create a professional website, shape it visually, and keep everything you need in one place.2</p>",
+                    "buttonLabel": "Create Website",
+                    "secondaryButtonLabel": "Explore Templates"
+                  },
+                  "ru": {
+                    "title": "Сайт, который можно развивать.",
+                    "body": "<p>Создайте профессиональный сайт, визуально формируйте его и держите всё необходимое в одном месте.</p>",
+                    "buttonLabel": "Создать сайт",
+                    "secondaryButtonLabel": "Посмотреть шаблоны"
+                  }
                 }
               }
             ]
@@ -124,17 +139,230 @@
                 "imageShadow": "small",
                 "imageLoading": "eager",
                 "imageLinkTarget": "_self",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "WebPages"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "WebPages"
+          }
+        }
+      },
+      {
+        "id": "contentLayout-mucjzhw2-vwo0h",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-mucjzhw2-1-column-1",
+            "rowId": "layout-row-mucjzhw2-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "grid-block-mucjzqwd-qpge3",
+                "kind": "grid",
+                "title": "Ձեր նպատակների շուրջ մշակված ծառայություններ",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridCardHover": false,
+                "gridRowGap": "medium",
+                "gridStacking": "inherit",
+                "gridItems": [
+                  {
+                    "id": "grid-block-mucjzqwd-qpge3-1",
+                    "eyebrow": "01",
+                    "title": "Գործնական մոտեցմամբ ռազմավարություն",
+                    "meta": "Հստակությունը՝ բարդությունից առաջ",
+                    "text": "Սահմանեք լսարանը, ուղերձը և առաջնահերթությունները, որպեսզի դիզայնի յուրաքանչյուր որոշում ավելի հեշտ լինի։",
+                    "buttonLabel": "Ուսումնասիրել ռազմավարությունը",
+                    "buttonUrl": "/",
+                    "titleElement": "h3",
+                    "titleStyle": "inherit",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Ջերմ ճարտարապետական ձևեր, որոնք ներկայացնում են ռազմավարական պլանավորումը",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "01",
+                        "title": "Strategy with a practical point of view",
+                        "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                        "meta": "Clarity before complexity",
+                        "buttonLabel": "Explore Strategy",
+                        "imageAlt": "Warm architectural forms representing strategic planning"
+                      },
+                      "ru": {
+                        "title": "Стратегия с практичным взглядом",
+                        "meta": "Ясность прежде сложности",
+                        "text": "Определите аудиторию, сообщение и приоритеты, чтобы каждое дизайнерское решение давалось проще.",
+                        "buttonLabel": "Изучить стратегию",
+                        "imageAlt": "Тёплые архитектурные формы, символизирующие стратегическое планирование"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-block-mucjzqwd-qpge3-2",
+                    "eyebrow": "02",
+                    "title": "Տարբերակիչ և բնական դիզայն",
+                    "meta": "Իրական մարդկանց համար",
+                    "text": "Ստեղծեք հարմարվող փորձառություն՝ ուժեղ տեսողական ռիթմով և մտածված փոխազդեցություններով։",
+                    "buttonLabel": "Դիտել ընտրված աշխատանքները",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Խմբագրական կոմպոզիցիա, որը ներկայացնում է ինտերֆեյսի դիզայնը",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "02",
+                        "title": "Design that feels distinctive and effortless",
+                        "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                        "meta": "Made for real people",
+                        "buttonLabel": "View Selected Work",
+                        "imageAlt": "Editorial composition representing interface design"
+                      },
+                      "ru": {
+                        "title": "Выразительный и лёгкий дизайн",
+                        "meta": "Для реальных людей",
+                        "text": "Создайте адаптивный опыт с сильным визуальным ритмом и продуманными взаимодействиями.",
+                        "buttonLabel": "Посмотреть избранные работы",
+                        "imageAlt": "Редакционная композиция, иллюстрирующая дизайн интерфейса"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-block-mucjzqwd-qpge3-3",
+                    "eyebrow": "03",
+                    "title": "Անընդհատ զարգանալու համար ստեղծված հիմք",
+                    "meta": "Ավելին, քան գործարկումը",
+                    "text": "Չափեք կարևորն, բարելավեք օգտատիրոջ ճանապարհը և զարգացրեք կայքը բիզնեսի աճին զուգահեռ։",
+                    "buttonLabel": "Քննարկել ձեր նպատակները",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Վեր բարձրացող աբստրակտ ձևեր, որոնք ներկայացնում են կայուն աճը",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "03",
+                        "title": "A foundation designed to keep improving",
+                        "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                        "meta": "Built beyond launch",
+                        "buttonLabel": "Discuss Your Goals",
+                        "imageAlt": "Abstract rising forms representing sustainable growth"
+                      },
+                      "ru": {
+                        "title": "Основа, которая постоянно совершенствуется",
+                        "meta": "Больше, чем запуск",
+                        "text": "Измеряйте важное, улучшайте путь пользователя и развивайте сайт вместе с бизнесом.",
+                        "buttonLabel": "Обсудить ваши цели",
+                        "imageAlt": "Абстрактные восходящие формы, символизирующие устойчивый рост"
+                      }
+                    }
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "16:9",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Services designed around your goals"
+                  },
+                  "ru": {
+                    "title": "Услуги, созданные вокруг ваших целей"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "webpages-features",
         "kind": "contentLayout",
-        "title": "Features",
+        "title": "Հնարավորություններ",
         "anchorId": "features",
         "background": "#ffffff",
         "backgroundMode": "full",
@@ -154,12 +382,20 @@
               {
                 "id": "webpages-features-heading",
                 "kind": "heading",
-                "headingText": "Everything important stays close.",
+                "headingText": "Ամենակարևորն՝ անմիջապես հասանելի է։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Everything important stays close."
+                  },
+                  "ru": {
+                    "headingText": "Всё важное — под рукой."
+                  }
+                }
               },
               {
                 "id": "webpages-features-grid",
@@ -183,32 +419,73 @@
                   {
                     "id": "webpages-feature-builder",
                     "eyebrow": "01",
-                    "title": "Visual Builder",
-                    "text": "Build pages from real, editable elements and see the result as you work."
+                    "title": "Վիզուալ Builder",
+                    "text": "Կառուցեք էջեր իրական, խմբագրելի տարրերից և տեսեք արդյունքը աշխատանքի ընթացքում։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "01",
+                        "title": "Visual Builder",
+                        "text": "Build pages from real, editable elements and see the result as you work."
+                      },
+                      "ru": {
+                        "title": "Визуальный Builder",
+                        "text": "Создавайте страницы из настоящих редактируемых элементов и сразу видите результат работы."
+                      }
+                    }
                   },
                   {
                     "id": "webpages-feature-starters",
                     "eyebrow": "02",
-                    "title": "Professional starters",
-                    "text": "Begin with a considered direction, then make it your own without starting from zero."
+                    "title": "Պրոֆեսիոնալ մեկնարկային լուծումներ",
+                    "text": "Սկսեք մտածված ուղղությունից և հարմարեցրեք այն ձեզ՝ առանց զրոյից սկսելու։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "02",
+                        "title": "Professional starters",
+                        "text": "Begin with a considered direction, then make it your own without starting from zero."
+                      },
+                      "ru": {
+                        "title": "Профессиональные стартовые решения",
+                        "text": "Начните с продуманного направления и адаптируйте его под себя, не начиная с нуля."
+                      }
+                    }
                   },
                   {
                     "id": "webpages-feature-management",
                     "eyebrow": "03",
-                    "title": "One workspace",
-                    "text": "Manage your websites, previews, publishing, and next ideas from one calm workspace."
+                    "title": "Մեկ աշխատանքային տարածք",
+                    "text": "Կառավարեք կայքերը, նախադիտումները, հրապարակումը և հաջորդ գաղափարները մեկ հարմար աշխատանքային տարածքից։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "03",
+                        "title": "One workspace",
+                        "text": "Manage your websites, previews, publishing, and next ideas from one calm workspace."
+                      },
+                      "ru": {
+                        "title": "Одно рабочее пространство",
+                        "text": "Управляйте сайтами, предпросмотром, публикацией и следующими идеями из одного спокойного рабочего пространства."
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Features"
+          },
+          "ru": {
+            "title": "Возможности"
+          }
+        }
       },
       {
         "id": "webpages-templates",
         "kind": "contentLayout",
-        "title": "Templates",
+        "title": "Ձևանմուշներ",
         "anchorId": "templates",
         "background": "#e6eee8",
         "backgroundMode": "full",
@@ -228,20 +505,36 @@
               {
                 "id": "webpages-templates-heading",
                 "kind": "heading",
-                "headingText": "Start with a direction that feels right.",
+                "headingText": "Սկսեք ձեզ համապատասխան ուղղությունից։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Start with a direction that feels right."
+                  },
+                  "ru": {
+                    "headingText": "Начните с направления, которое вам подходит."
+                  }
+                }
               },
               {
                 "id": "webpages-templates-intro",
                 "kind": "text",
-                "body": "Choose a starter for a business, studio, or local service and continue directly into the Builder.",
+                "body": "Ընտրեք մեկնարկային լուծում բիզնեսի, ստուդիայի կամ տեղական ծառայության համար և անմիջապես անցեք Builder։",
                 "textVariant": "lead",
                 "textAlign": "left",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Choose a starter for a business, studio, or local service and continue directly into the Builder."
+                  },
+                  "ru": {
+                    "body": "Выберите стартовый вариант для бизнеса, студии или локального сервиса и сразу переходите в Builder."
+                  }
+                }
               },
               {
                 "id": "webpages-templates-grid",
@@ -264,46 +557,110 @@
                 "gridItems": [
                   {
                     "id": "webpages-template-modern-business",
-                    "eyebrow": "Modern Business",
-                    "title": "A polished foundation for a growing company.",
-                    "text": "A clear, confident structure for services, proof, and the next conversation.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Ժամանակակից բիզնես",
+                    "title": "Հղկված հիմք աճող ընկերության համար։",
+                    "text": "Հստակ և վստահելի կառուցվածք ծառայությունների, ձեռքբերումների և հաջորդ զրույցի համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/modern-business",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Modern Business",
+                        "title": "A polished foundation for a growing company.",
+                        "text": "A clear, confident structure for services, proof, and the next conversation.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Современный бизнес",
+                        "title": "Отточенная основа для растущей компании.",
+                        "text": "Чёткая и уверенная структура для услуг, доказательств и следующего разговора.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "webpages-template-creative-agency",
-                    "eyebrow": "Creative Agency",
-                    "title": "An expressive home for thoughtful work.",
-                    "text": "A portfolio-led direction for studios, teams, and creative practices.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Ստեղծագործական գործակալություն",
+                    "title": "Արտահայտիչ տարածք մտածված աշխատանքի համար։",
+                    "text": "Պորտֆոլիոյի վրա հիմնված ուղղություն ստուդիաների, թիմերի և ստեղծագործական նախագծերի համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/creative-agency",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Creative Agency",
+                        "title": "An expressive home for thoughtful work.",
+                        "text": "A portfolio-led direction for studios, teams, and creative practices.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Креативное агентство",
+                        "title": "Выразительное пространство для продуманной работы.",
+                        "text": "Направление с акцентом на портфолио для студий, команд и творческих практик.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "webpages-template-local-services",
-                    "eyebrow": "Local Services",
-                    "title": "A dependable path from enquiry to service.",
-                    "text": "A practical lead-focused structure for trusted local businesses.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Տեղական ծառայություններ",
+                    "title": "Հուսալի ճանապարհ հարցումից մինչև ծառայություն։",
+                    "text": "Գործնական՝ դիմումների վրա կենտրոնացած կառուցվածք վստահելի տեղական բիզնեսների համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/local-services",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Local Services",
+                        "title": "A dependable path from enquiry to service.",
+                        "text": "A practical lead-focused structure for trusted local businesses.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Локальные услуги",
+                        "title": "Надёжный путь от запроса до услуги.",
+                        "text": "Практичная структура для привлечения клиентов местными компаниями, которым доверяют.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "webpages-template-blank",
-                    "eyebrow": "Blank Website",
-                    "title": "A clean canvas for your own direction.",
-                    "text": "Start with the core documents and build a site completely from scratch.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Դատարկ կայք",
+                    "title": "Մաքուր կտավ ձեր սեփական ուղղության համար։",
+                    "text": "Սկսեք հիմնական փաստաթղթերից և կայքը կառուցեք ամբողջությամբ զրոյից։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/blank",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Blank Website",
+                        "title": "A clean canvas for your own direction.",
+                        "text": "Start with the core documents and build a site completely from scratch.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Пустой сайт",
+                        "title": "Чистый холст для вашего направления.",
+                        "text": "Начните с основных документов и создайте сайт полностью с нуля.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Templates"
+          },
+          "ru": {
+            "title": "Шаблоны"
+          }
+        }
       },
       {
         "id": "webpages-builder",
@@ -330,11 +687,19 @@
                 "id": "webpages-builder-image",
                 "kind": "image",
                 "imageUrl": "/uploads/onboarding/webpages_w_animated_once.svg",
-                "imageAlt": "WebPages builder mark",
+                "imageAlt": "WebPages Builder-ի նշանը",
                 "imageMaxWidth": 260,
                 "imageAlignment": "center",
                 "imageLoading": "lazy",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "WebPages builder mark"
+                  },
+                  "ru": {
+                    "imageAlt": "Знак Builder WebPages"
+                  }
+                }
               }
             ]
           },
@@ -346,38 +711,69 @@
               {
                 "id": "webpages-builder-heading",
                 "kind": "heading",
-                "headingText": "Your site stays yours.",
+                "headingText": "Ձեր կայքը մնում է ձերը։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingColor": "light",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Your site stays yours."
+                  },
+                  "ru": {
+                    "headingText": "Ваш сайт остаётся вашим."
+                  }
+                }
               },
               {
                 "id": "webpages-builder-text",
                 "kind": "text",
-                "body": "Use the visual Builder to shape the details, keep the structure editable, and publish when it is ready.",
+                "body": "Օգտագործեք վիզուալ Builder-ը մանրամասները ձևավորելու, կառուցվածքը խմբագրելի պահելու և պատրաստ լինելու դեպքում հրապարակելու համար։",
                 "textVariant": "lead",
                 "textColor": "muted",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Use the visual Builder to shape the details, keep the structure editable, and publish when it is ready."
+                  },
+                  "ru": {
+                    "body": "Используйте визуальный Builder, настраивайте детали, сохраняйте структуру редактируемой и публикуйте, когда всё будет готово."
+                  }
+                }
               },
               {
                 "id": "webpages-builder-button",
                 "kind": "button",
-                "buttonLabel": "Open the Builder",
+                "buttonLabel": "Բացել Builder-ը",
                 "buttonUrl": "/app",
-                "buttonStyle": "light",
+                "buttonStyle": "default",
                 "size": "default",
-                "elementPadding": "small"
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Open the Builder"
+                  },
+                  "ru": {
+                    "buttonLabel": "Открыть Builder"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Builder"
+          },
+          "ru": {
+            "title": "Builder"
+          }
+        }
       },
       {
         "id": "webpages-management",
         "kind": "contentLayout",
-        "title": "Management",
+        "title": "Կառավարում",
         "anchorId": "management",
         "background": "#ffffff",
         "backgroundMode": "full",
@@ -397,12 +793,20 @@
               {
                 "id": "webpages-management-heading",
                 "kind": "heading",
-                "headingText": "From first draft to live website.",
+                "headingText": "Առաջին սևագրից մինչև գործող կայք։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "From first draft to live website."
+                  },
+                  "ru": {
+                    "headingText": "От первого черновика до готового сайта."
+                  }
+                }
               },
               {
                 "id": "webpages-management-grid",
@@ -425,33 +829,77 @@
                 "gridItems": [
                   {
                     "id": "webpages-management-websites",
-                    "eyebrow": "Manage",
-                    "title": "Keep every website close.",
-                    "text": "Move between projects from a dashboard designed for the work you actually do."
+                    "eyebrow": "Կառավարել",
+                    "title": "Բոլոր կայքերը՝ ձեռքի տակ։",
+                    "text": "Անցեք նախագծից նախագիծ վահանակից, որը ստեղծված է ձեր իրական աշխատանքի համար։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Manage",
+                        "title": "Keep every website close.",
+                        "text": "Move between projects from a dashboard designed for the work you actually do."
+                      },
+                      "ru": {
+                        "eyebrow": "Управление",
+                        "title": "Все сайты рядом.",
+                        "text": "Переключайтесь между проектами из панели, созданной для вашей реальной работы."
+                      }
+                    }
                   },
                   {
                     "id": "webpages-management-preview",
-                    "eyebrow": "Preview",
-                    "title": "Check the details before launch.",
-                    "text": "Review the public experience and make the next edit with confidence."
+                    "eyebrow": "Նախադիտում",
+                    "title": "Ստուգեք մանրամասները գործարկումից առաջ։",
+                    "text": "Վերանայեք հանրային փորձառությունը և վստահությամբ կատարեք հաջորդ փոփոխությունը։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Preview",
+                        "title": "Check the details before launch.",
+                        "text": "Review the public experience and make the next edit with confidence."
+                      },
+                      "ru": {
+                        "eyebrow": "Предпросмотр",
+                        "title": "Проверьте детали до запуска.",
+                        "text": "Оцените публичный опыт и уверенно внесите следующие изменения."
+                      }
+                    }
                   },
                   {
                     "id": "webpages-management-publish",
-                    "eyebrow": "Publish",
-                    "title": "Go live when it feels ready.",
-                    "text": "Keep the path from a finished design to a live website straightforward."
+                    "eyebrow": "Հրապարակել",
+                    "title": "Գործարկեք, երբ պատրաստ զգաք։",
+                    "text": "Պահեք պատրաստ դիզայնից մինչև գործող կայք տանող ճանապարհը պարզ։",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Publish",
+                        "title": "Go live when it feels ready.",
+                        "text": "Keep the path from a finished design to a live website straightforward."
+                      },
+                      "ru": {
+                        "eyebrow": "Публикация",
+                        "title": "Запускайте, когда всё готово.",
+                        "text": "Сохраняйте простой путь от готового дизайна до опубликованного сайта."
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Management"
+          },
+          "ru": {
+            "title": "Управление"
+          }
+        }
       },
       {
         "id": "webpages-pricing",
         "kind": "contentLayout",
-        "title": "Pricing",
+        "title": "Գներ",
         "anchorId": "pricing",
         "background": "#e6eee8",
         "backgroundMode": "full",
@@ -471,22 +919,44 @@
               {
                 "id": "webpages-pricing-element",
                 "kind": "hero",
-                "eyebrow": "Simple to start",
-                "title": "Create your next website with WebPages.",
-                "body": "Choose a starter, make it yours, and move forward when the site is ready.",
-                "buttonLabel": "Create Website",
+                "eyebrow": "Հեշտ է սկսել",
+                "title": "Ստեղծեք ձեր հաջորդ կայքը WebPages-ի միջոցով։",
+                "body": "Ընտրեք մեկնարկային լուծում, հարմարեցրեք այն ձեզ և առաջ շարժվեք, երբ կայքը պատրաստ լինի։",
+                "buttonLabel": "Ստեղծել կայք",
                 "buttonUrl": "/app/websites/new",
                 "buttonStyle": "primary",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "eyebrow": "Simple to start",
+                    "title": "Create your next website with WebPages.",
+                    "body": "Choose a starter, make it yours, and move forward when the site is ready.",
+                    "buttonLabel": "Create Website"
+                  },
+                  "ru": {
+                    "eyebrow": "Легко начать",
+                    "title": "Создайте следующий сайт с WebPages.",
+                    "body": "Выберите стартовый вариант, адаптируйте его под себя и двигайтесь дальше, когда сайт будет готов.",
+                    "buttonLabel": "Создать сайт"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Pricing"
+          },
+          "ru": {
+            "title": "Цены"
+          }
+        }
       }
     ],
-    "updatedAt": "2026-09-20T00:00:00.000Z"
+    "updatedAt": "2026-09-24T06:45:43.955Z"
   },
   "page:templates": {
     "version": 1,
@@ -522,7 +992,7 @@
       {
         "id": "templates-intro",
         "kind": "contentLayout",
-        "title": "Templates",
+        "title": "Ձևանմուշներ",
         "background": "#f5f7f4",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -541,20 +1011,36 @@
               {
                 "id": "templates-intro-heading",
                 "kind": "heading",
-                "headingText": "Start with a direction that feels right.",
+                "headingText": "Սկսեք ձեզ համապատասխան ուղղությունից։",
                 "headingLevel": "h1",
                 "headingSize": "xlarge",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Start with a direction that feels right."
+                  },
+                  "ru": {
+                    "headingText": "Начните с направления, которое вам подходит."
+                  }
+                }
               },
               {
                 "id": "templates-intro-text",
                 "kind": "text",
-                "body": "Choose a considered starting point, preview it, and continue directly into the visual Builder.",
+                "body": "Ընտրեք մտածված մեկնարկային կետ, նախադիտեք այն և անմիջապես անցեք վիզուալ Builder։",
                 "textVariant": "lead",
                 "textAlign": "left",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Choose a considered starting point, preview it, and continue directly into the visual Builder."
+                  },
+                  "ru": {
+                    "body": "Выберите продуманную отправную точку, просмотрите её и сразу перейдите в визуальный Builder."
+                  }
+                }
               }
             ]
           },
@@ -566,20 +1052,36 @@
               {
                 "id": "templates-intro-button",
                 "kind": "button",
-                "buttonLabel": "Create Website",
+                "buttonLabel": "Ստեղծել կայք",
                 "buttonUrl": "/app/websites/new",
                 "buttonStyle": "primary",
-                "size": "default"
+                "size": "default",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Create Website"
+                  },
+                  "ru": {
+                    "buttonLabel": "Создать сайт"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Templates"
+          },
+          "ru": {
+            "title": "Шаблоны"
+          }
+        }
       },
       {
         "id": "templates-static",
         "kind": "contentLayout",
-        "title": "Static Starters",
+        "title": "Ստատիկ մեկնարկային լուծումներ",
         "background": "#e6eee8",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -598,12 +1100,20 @@
               {
                 "id": "templates-static-heading",
                 "kind": "heading",
-                "headingText": "A strong starting point, already in place.",
+                "headingText": "Ուժեղ մեկնարկային հիմքն արդեն պատրաստ է։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "A strong starting point, already in place."
+                  },
+                  "ru": {
+                    "headingText": "Надёжная основа уже готова."
+                  }
+                }
               },
               {
                 "id": "templates-static-grid",
@@ -626,51 +1136,115 @@
                 "gridItems": [
                   {
                     "id": "starter-modern-business",
-                    "eyebrow": "Modern Business",
-                    "title": "A polished foundation for a growing company.",
-                    "text": "A clear, confident structure for services, proof, and the next conversation.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Ժամանակակից բիզնես",
+                    "title": "Հղկված հիմք աճող ընկերության համար։",
+                    "text": "Հստակ և վստահելի կառուցվածք ծառայությունների, ձեռքբերումների և հաջորդ զրույցի համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/modern-business",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Modern Business",
+                        "title": "A polished foundation for a growing company.",
+                        "text": "A clear, confident structure for services, proof, and the next conversation.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Современный бизнес",
+                        "title": "Отточенная основа для растущей компании.",
+                        "text": "Чёткая и уверенная структура для услуг, доказательств и следующего разговора.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "starter-creative-agency",
-                    "eyebrow": "Creative Agency",
-                    "title": "An expressive home for thoughtful work.",
-                    "text": "A portfolio-led direction for studios, teams, and creative practices.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Ստեղծագործական գործակալություն",
+                    "title": "Արտահայտիչ տարածք մտածված աշխատանքի համար։",
+                    "text": "Պորտֆոլիոյի վրա հիմնված ուղղություն ստուդիաների, թիմերի և ստեղծագործական նախագծերի համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/creative-agency",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Creative Agency",
+                        "title": "An expressive home for thoughtful work.",
+                        "text": "A portfolio-led direction for studios, teams, and creative practices.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Креативное агентство",
+                        "title": "Выразительное пространство для продуманной работы.",
+                        "text": "Направление с акцентом на портфолио для студий, команд и творческих практик.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "starter-local-services",
-                    "eyebrow": "Local Services",
-                    "title": "A dependable path from enquiry to service.",
-                    "text": "A practical lead-focused structure for trusted local businesses.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Տեղական ծառայություններ",
+                    "title": "Հուսալի ճանապարհ հարցումից մինչև ծառայություն։",
+                    "text": "Գործնական՝ դիմումների վրա կենտրոնացած կառուցվածք վստահելի տեղական բիզնեսների համար։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/local-services",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Local Services",
+                        "title": "A dependable path from enquiry to service.",
+                        "text": "A practical lead-focused structure for trusted local businesses.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Локальные услуги",
+                        "title": "Надёжный путь от запроса до услуги.",
+                        "text": "Практичная структура для привлечения клиентов местными компаниями, которым доверяют.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   },
                   {
                     "id": "starter-blank",
-                    "eyebrow": "Blank Website",
-                    "title": "A clean canvas for your own direction.",
-                    "text": "Start with the core documents and build a site completely from scratch.",
-                    "buttonLabel": "Preview",
+                    "eyebrow": "Դատարկ կայք",
+                    "title": "Մաքուր կտավ ձեր սեփական ուղղության համար։",
+                    "text": "Սկսեք հիմնական փաստաթղթերից և կայքը կառուցեք ամբողջությամբ զրոյից։",
+                    "buttonLabel": "Նախադիտել",
                     "buttonUrl": "/templates/blank",
-                    "buttonStyle": "link"
+                    "buttonStyle": "link",
+                    "contentTranslations": {
+                      "en": {
+                        "eyebrow": "Blank Website",
+                        "title": "A clean canvas for your own direction.",
+                        "text": "Start with the core documents and build a site completely from scratch.",
+                        "buttonLabel": "Preview"
+                      },
+                      "ru": {
+                        "eyebrow": "Пустой сайт",
+                        "title": "Чистый холст для вашего направления.",
+                        "text": "Начните с основных документов и создайте сайт полностью с нуля.",
+                        "buttonLabel": "Предпросмотр"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Static Starters"
+          },
+          "ru": {
+            "title": "Стартовые решения"
+          }
+        }
       },
       {
         "id": "templates-global",
         "kind": "contentLayout",
-        "title": "Global Starters",
+        "title": "Գլոբալ մեկնարկային լուծումներ",
         "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -689,20 +1263,36 @@
               {
                 "id": "templates-global-heading",
                 "kind": "heading",
-                "headingText": "Made by the WebPages community.",
+                "headingText": "Ստեղծված WebPages համայնքի կողմից։",
                 "headingLevel": "h2",
                 "headingSize": "medium",
                 "headingAlign": "left",
                 "elementAlign": "left",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Made by the WebPages community."
+                  },
+                  "ru": {
+                    "headingText": "Создано сообществом WebPages."
+                  }
+                }
               },
               {
                 "id": "templates-global-intro",
                 "kind": "text",
-                "body": "Explore enabled starters from real WebPages websites. Each one stays connected to its current public source until you choose it.",
+                "body": "Ուսումնասիրեք իրական WebPages կայքերից հասանելի մեկնարկային լուծումները։ Յուրաքանչյուրը մնում է կապված իր ընթացիկ հանրային աղբյուրին, մինչև ընտրեք այն։",
                 "textVariant": "lead",
                 "textAlign": "left",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Explore enabled starters from real WebPages websites. Each one stays connected to its current public source until you choose it."
+                  },
+                  "ru": {
+                    "body": "Изучайте доступные стартовые решения с реальных сайтов WebPages. Каждый остаётся связанным со своим текущим публичным источником, пока вы его не выберете."
+                  }
+                }
               },
               {
                 "id": "templates-global-grid",
@@ -725,12 +1315,12 @@
                 "gridItems": [
                   {
                     "id": "global-starter-template",
-                    "eyebrow": "Global Starter",
+                    "eyebrow": "Գլոբալ մեկնարկային լուծում",
                     "title": "Starter title",
                     "meta": "Preview this template",
                     "text": "Starter description",
                     "imageAlt": "Starter title",
-                    "buttonLabel": "Create a website with this template",
+                    "buttonLabel": "Ստեղծել կայք այս ձևանմուշով",
                     "buttonUrl": "/templates",
                     "buttonStyle": "link",
                     "dynamicContext": {
@@ -776,6 +1366,15 @@
                         "path": "startUrl",
                         "valueType": "url"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Create a website with this template"
+                      },
+                      "ru": {
+                        "eyebrow": "Глобальное стартовое решение",
+                        "buttonLabel": "Создать сайт с этим шаблоном"
+                      }
                     }
                   }
                 ],
@@ -784,7 +1383,15 @@
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Global Starters"
+          },
+          "ru": {
+            "title": "Глобальные стартовые решения"
+          }
+        }
       }
     ],
     "updatedAt": "2026-09-22T11:33:48.450Z"
@@ -2752,7 +3359,7 @@
       {
         "id": "header-document",
         "kind": "contentLayout",
-        "title": "Header",
+        "title": "Գլխամաս",
         "headerUtilityMigrationVersion": 3,
         "background": "transparent",
         "backgroundMode": "full",
@@ -2774,7 +3381,12 @@
                 "imageMaxWidth": 150,
                 "imageAlignment": "left",
                 "imageUrl": "/uploads/onboarding/webpages_full_animated_once.svg",
-                "imageAlt": "WebPages"
+                "imageAlt": "WebPages",
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "WebPages"
+                  }
+                }
               }
             ]
           },
@@ -2786,10 +3398,18 @@
               {
                 "id": "header-navigation",
                 "kind": "menu",
-                "title": "Navigation",
+                "title": "Նավիգացիա",
                 "menuSource": "main",
                 "menuActiveIndicator": "underline",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Navigation"
+                  },
+                  "ru": {
+                    "title": "Навигация"
+                  }
+                }
               }
             ]
           },
@@ -2801,17 +3421,30 @@
               {
                 "id": "header-button",
                 "kind": "button",
-                "buttonLabel": "Create Website",
+                "buttonLabel": "Ստեղծել կայք",
                 "buttonUrl": "/app/websites/new",
                 "buttonStyle": "primary",
                 "size": "default",
-                "headerButtonOverrides": {}
+                "headerButtonOverrides": {},
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Create Website"
+                  },
+                  "ru": {
+                    "buttonLabel": "Создать сайт"
+                  }
+                }
               },
               {
                 "id": "header-utility-theme",
                 "kind": "headerTheme",
                 "headerUtilityAction": "theme",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -2895,10 +3528,18 @@
         "headerOffcanvasMode": "slide",
         "headerOffcanvasFlip": true,
         "headerOffcanvasOverlay": true,
-        "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg"
+        "headerInverseLogoUrl": "https://store.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
+        "contentTranslations": {
+          "en": {
+            "title": "Header"
+          },
+          "ru": {
+            "title": "Шапка сайта"
+          }
+        }
       }
     ],
-    "updatedAt": "2026-09-20T08:40:26.799Z"
+    "updatedAt": "2026-09-24T06:13:03.574Z"
   },
   "footer": {
     "version": 1,
@@ -2923,7 +3564,7 @@
       {
         "id": "webpages-footer",
         "kind": "contentLayout",
-        "title": "Footer",
+        "title": "Տողատակ",
         "background": "#14231d",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -2947,14 +3588,27 @@
                 "headingLevel": "h3",
                 "headingSize": "small",
                 "headingColor": "light",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "WebPages"
+                  }
+                }
               },
               {
                 "id": "webpages-footer-about-text",
                 "kind": "text",
-                "body": "Create a professional website, keep it editable, and move it forward when you are ready.",
+                "body": "Ստեղծեք պրոֆեսիոնալ կայք, պահեք այն խմբագրելի և զարգացրեք, երբ պատրաստ լինեք։",
                 "textColor": "muted",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Create a professional website, keep it editable, and move it forward when you are ready."
+                  },
+                  "ru": {
+                    "body": "Создайте профессиональный сайт, сохраняйте его редактируемым и развивайте, когда будете готовы."
+                  }
+                }
               }
             ]
           },
@@ -2966,15 +3620,35 @@
               {
                 "id": "webpages-footer-explore-list",
                 "kind": "list",
-                "title": "Explore",
+                "title": "Ուսումնասիրել",
                 "items": [
-                  "Templates",
-                  "Features",
-                  "Pricing",
-                  "Log In"
+                  "Ձևանմուշներ",
+                  "Հնարավորություններ",
+                  "Գներ",
+                  "Մուտք"
                 ],
                 "listIcon": "arrowRight",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Explore",
+                    "items": [
+                      "Templates",
+                      "Features",
+                      "Pricing",
+                      "Log In"
+                    ]
+                  },
+                  "ru": {
+                    "title": "Обзор",
+                    "items": [
+                      "Шаблоны",
+                      "Возможности",
+                      "Цены",
+                      "Войти"
+                    ]
+                  }
+                }
               }
             ]
           },
@@ -2986,37 +3660,69 @@
               {
                 "id": "webpages-footer-start-heading",
                 "kind": "heading",
-                "headingText": "Ready to begin?",
+                "headingText": "Պատրա՞ստ եք սկսել։",
                 "headingLevel": "h3",
                 "headingSize": "small",
                 "headingColor": "light",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Ready to begin?"
+                  },
+                  "ru": {
+                    "headingText": "Готовы начать?"
+                  }
+                }
               },
               {
                 "id": "webpages-footer-start-text",
                 "kind": "text",
-                "body": "Choose a starter and open the visual Builder.",
+                "body": "Ընտրեք մեկնարկային լուծում և բացեք վիզուալ Builder-ը։",
                 "textColor": "muted",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "body": "Choose a starter and open the visual Builder."
+                  },
+                  "ru": {
+                    "body": "Выберите стартовый вариант и откройте визуальный Builder."
+                  }
+                }
               },
               {
                 "id": "webpages-footer-start-button",
                 "kind": "button",
-                "buttonLabel": "Create Website",
+                "buttonLabel": "Ստեղծել կայք",
                 "buttonUrl": "/app/websites/new",
                 "buttonStyle": "light",
                 "size": "default",
-                "elementPadding": "small"
+                "elementPadding": "small",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Create Website"
+                  },
+                  "ru": {
+                    "buttonLabel": "Создать сайт"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Footer"
+          },
+          "ru": {
+            "title": "Подвал сайта"
+          }
+        }
       },
       {
         "id": "webpages-footer-meta",
         "kind": "contentLayout",
-        "title": "Footer Meta",
+        "title": "Տողատակի տվյալներ",
         "background": "#14231d",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -3038,12 +3744,25 @@
                 "kind": "text",
                 "body": "© 2026 WebPages",
                 "textColor": "muted",
-                "elementPadding": "none"
+                "elementPadding": "none",
+                "contentTranslations": {
+                  "en": {
+                    "body": "© 2026 WebPages"
+                  }
+                }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Footer Meta"
+          },
+          "ru": {
+            "title": "Служебная информация"
+          }
+        }
       }
     ],
     "updatedAt": "2026-09-20T00:00:00.000Z"

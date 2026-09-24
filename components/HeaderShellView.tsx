@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 
 import HeaderActions from "./HeaderActions";
@@ -41,9 +41,11 @@ import {
   BUILDER_IFRAME_DRAFT_ACK_MESSAGE,
   BUILDER_IFRAME_DRAFT_MESSAGE,
   BUILDER_IFRAME_DRAFT_SOURCE,
+  BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE,
 } from "@/components/builder/BuilderIframeDraftBridge";
 import type { BuilderState } from "@/components/dashboard/builderTypes";
 import { normalizeHeaderMobileBreakpoint } from "@/lib/headerResponsive";
+import { resolveContentEntity } from "@/lib/builderContentLanguages";
 
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -230,6 +232,7 @@ export default function HeaderShellView({
   const [liveMobileHeaderComposition, setLiveMobileHeaderComposition] = useState<HeaderBuilderComposition | null>(null);
   const [liveMobileDialogComposition, setLiveMobileDialogComposition] = useState<HeaderBuilderComposition | null>(null);
   const [liveShellSettings, setLiveShellSettings] = useState<Partial<BuilderShellSettings> | null>(null);
+  const [liveContentLanguage, setLiveContentLanguage] = useState(activeContentLanguage);
   const liveHeaderRevisionRef = useRef(0);
   const liveShellRevisionRef = useRef(0);
   useEffect(() => {
@@ -239,6 +242,7 @@ export default function HeaderShellView({
     setLiveMobileHeaderComposition(null);
     setLiveMobileDialogComposition(null);
     setLiveShellSettings(null);
+    setLiveContentLanguage(activeContentLanguage);
     if (!builderDraftPreview) return;
 
     const handleDraftMessage = (event: MessageEvent) => {
@@ -258,6 +262,9 @@ export default function HeaderShellView({
       ) {
         liveShellRevisionRef.current = revision;
         setLiveShellSettings(nextShellSettings);
+      }
+      if (typeof event.data.activeContentLanguage === "string") {
+        setLiveContentLanguage(event.data.activeContentLanguage);
       }
       if (event.data.documentKey !== "header") return;
       const headerDocumentKey = event.data.headerDocumentKey === "header-mobile"
@@ -318,11 +325,52 @@ export default function HeaderShellView({
     };
     window.addEventListener("message", handleDraftMessage);
     return () => window.removeEventListener("message", handleDraftMessage);
-  }, [builderDraftPreview]);
-  const effectiveShellSettings = liveShellSettings ?? shellSettings;
-  const desktopHeaderComposition = liveHeaderComposition ?? initialHeaderComposition;
-  const mobileHeaderComposition = liveMobileHeaderComposition ?? initialMobileHeaderComposition;
-  const mobileDialogComposition = liveMobileDialogComposition ?? initialMobileDialogComposition;
+  }, [activeContentLanguage, builderDraftPreview]);
+  const handleBuilderPreviewLanguageChange = (language: string) => {
+    if (!builderDraftPreview || onContentLanguageChange) return;
+    window.parent.postMessage({
+      source: BUILDER_IFRAME_DRAFT_SOURCE,
+      type: BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE,
+      language,
+    }, window.location.origin);
+  };
+  const effectiveContentLanguageChange = onContentLanguageChange ?? (
+    builderDraftPreview ? handleBuilderPreviewLanguageChange : undefined
+  );
+  const rawShellSettings = liveShellSettings ?? shellSettings;
+  const effectiveShellSettings = useMemo(() => {
+    const localizeMenuItems = (items: ReactMenuItem[] = []) =>
+      items.map((item) => resolveContentEntity(item, liveContentLanguage, "hy"));
+    return {
+      ...rawShellSettings,
+      menuItems: localizeMenuItems(rawShellSettings.menuItems),
+      namedMenus: rawShellSettings.namedMenus?.map((menu) => ({
+        ...menu,
+        items: localizeMenuItems(menu.items),
+      })),
+    };
+  }, [liveContentLanguage, rawShellSettings]);
+  const localizeHeaderComposition = (composition: HeaderBuilderComposition | undefined) =>
+    composition
+      ? {
+          ...composition,
+          elements: composition.elements.map((element) =>
+            resolveContentEntity(element, liveContentLanguage, "hy"),
+          ),
+        }
+      : undefined;
+  const desktopHeaderComposition = useMemo(
+    () => localizeHeaderComposition(liveHeaderComposition ?? initialHeaderComposition)!,
+    [initialHeaderComposition, liveContentLanguage, liveHeaderComposition],
+  );
+  const mobileHeaderComposition = useMemo(
+    () => localizeHeaderComposition(liveMobileHeaderComposition ?? initialMobileHeaderComposition),
+    [initialMobileHeaderComposition, liveContentLanguage, liveMobileHeaderComposition],
+  );
+  const mobileDialogComposition = useMemo(
+    () => localizeHeaderComposition(liveMobileDialogComposition ?? initialMobileDialogComposition),
+    [initialMobileDialogComposition, liveContentLanguage, liveMobileDialogComposition],
+  );
   const desktopCanonicalRows = desktopHeaderComposition.rows ?? [];
   const hasCanonicalMobileRows = desktopCanonicalRows.some((row) => row.headerVariant === "mobile");
   const hasSeparateMobileHeader = Boolean(mobileHeaderComposition?.elements.length);
@@ -879,12 +927,12 @@ export default function HeaderShellView({
       if (element.type === "language") {
         content = (
           <WebsiteLanguageSwitcher
-            activeLanguage={activeContentLanguage}
+            activeLanguage={liveContentLanguage}
             enabledLanguages={enabledContentLanguages}
             preferenceKey={languagePreferenceKey}
             previewOnly={languageSwitcherPreviewOnly}
             display={element.languageDisplay}
-            onLanguageChange={onContentLanguageChange}
+            onLanguageChange={effectiveContentLanguageChange}
             triggerStyle={typographyProps(element.typography, "button").style}
           />
         );
@@ -1159,12 +1207,12 @@ export default function HeaderShellView({
       };
       content = (
         <WebsiteLanguageSwitcher
-          activeLanguage={activeContentLanguage}
+          activeLanguage={liveContentLanguage}
           enabledLanguages={enabledContentLanguages}
           preferenceKey={languagePreferenceKey}
           previewOnly={languageSwitcherPreviewOnly}
           display={element.languageDisplay}
-          onLanguageChange={onContentLanguageChange}
+          onLanguageChange={effectiveContentLanguageChange}
           triggerStyle={triggerStyle}
         />
       );

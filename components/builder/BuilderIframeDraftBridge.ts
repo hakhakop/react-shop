@@ -5,6 +5,7 @@ export const BUILDER_IFRAME_DRAFT_SOURCE = "webpages-builder-draft";
 export const BUILDER_IFRAME_DRAFT_MESSAGE = "draft-snapshot";
 export const BUILDER_IFRAME_DRAFT_READY_MESSAGE = "draft-receiver-ready";
 export const BUILDER_IFRAME_DRAFT_ACK_MESSAGE = "draft-applied";
+export const BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE = "language-change";
 
 export type BuilderIframeDraftMessage = {
   source: typeof BUILDER_IFRAME_DRAFT_SOURCE;
@@ -19,6 +20,14 @@ export type BuilderIframeDraftMessage = {
   /** The page rendered behind a Header/Footer document in shell editing mode. */
   contextState?: BuilderState;
   shellSettings?: BuilderShellSettings;
+  /** Canonical editing/preview locale owned by DashboardBuilder. */
+  activeContentLanguage?: string;
+};
+
+export type BuilderIframeLanguageChangeMessage = {
+  source: typeof BUILDER_IFRAME_DRAFT_SOURCE;
+  type: typeof BUILDER_IFRAME_LANGUAGE_CHANGE_MESSAGE;
+  language: string;
 };
 
 export type BuilderIframeDraftLifecycleMessage = {
