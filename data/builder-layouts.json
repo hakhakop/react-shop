@@ -135,8 +135,8 @@
                 "imageAlt": "WebPages",
                 "imageMaxWidth": 520,
                 "imageAlignment": "center",
-                "imageShape": "rounded",
-                "imageShadow": "small",
+                "imageShape": "none",
+                "imageShadow": "none",
                 "imageLoading": "eager",
                 "imageLinkTarget": "_self",
                 "elementPadding": "none",
@@ -144,7 +144,9 @@
                   "en": {
                     "imageAlt": "WebPages"
                   }
-                }
+                },
+                "imageBorder": "none",
+                "imageBoxShadow": "none"
               }
             ]
           }
@@ -155,209 +157,6 @@
             "title": "WebPages"
           }
         }
-      },
-      {
-        "id": "contentLayout-mucjzhw2-vwo0h",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "1-col",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-row-mucjzhw2-1-column-1",
-            "rowId": "layout-row-mucjzhw2-1",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "grid-block-mucjzqwd-qpge3",
-                "kind": "grid",
-                "title": "Ձեր նպատակների շուրջ մշակված ծառայություններ",
-                "gridSource": "static",
-                "columns": 3,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "inherit",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "none",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "gridItemRenderer": "plain",
-                "gridCardVariant": "default",
-                "gridCardSize": "default",
-                "gridCardHover": false,
-                "gridRowGap": "medium",
-                "gridStacking": "inherit",
-                "gridItems": [
-                  {
-                    "id": "grid-block-mucjzqwd-qpge3-1",
-                    "eyebrow": "01",
-                    "title": "Գործնական մոտեցմամբ ռազմավարություն",
-                    "meta": "Հստակությունը՝ բարդությունից առաջ",
-                    "text": "Սահմանեք լսարանը, ուղերձը և առաջնահերթությունները, որպեսզի դիզայնի յուրաքանչյուր որոշում ավելի հեշտ լինի։",
-                    "buttonLabel": "Ուսումնասիրել ռազմավարությունը",
-                    "buttonUrl": "/",
-                    "titleElement": "h3",
-                    "titleStyle": "inherit",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Ջերմ ճարտարապետական ձևեր, որոնք ներկայացնում են ռազմավարական պլանավորումը",
-                    "contentTranslations": {
-                      "en": {
-                        "eyebrow": "01",
-                        "title": "Strategy with a practical point of view",
-                        "text": "Define the audience, message, and priorities that will make every design decision easier.",
-                        "meta": "Clarity before complexity",
-                        "buttonLabel": "Explore Strategy",
-                        "imageAlt": "Warm architectural forms representing strategic planning"
-                      },
-                      "ru": {
-                        "title": "Стратегия с практичным взглядом",
-                        "meta": "Ясность прежде сложности",
-                        "text": "Определите аудиторию, сообщение и приоритеты, чтобы каждое дизайнерское решение давалось проще.",
-                        "buttonLabel": "Изучить стратегию",
-                        "imageAlt": "Тёплые архитектурные формы, символизирующие стратегическое планирование"
-                      }
-                    }
-                  },
-                  {
-                    "id": "grid-block-mucjzqwd-qpge3-2",
-                    "eyebrow": "02",
-                    "title": "Տարբերակիչ և բնական դիզայն",
-                    "meta": "Իրական մարդկանց համար",
-                    "text": "Ստեղծեք հարմարվող փորձառություն՝ ուժեղ տեսողական ռիթմով և մտածված փոխազդեցություններով։",
-                    "buttonLabel": "Դիտել ընտրված աշխատանքները",
-                    "buttonUrl": "/",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Խմբագրական կոմպոզիցիա, որը ներկայացնում է ինտերֆեյսի դիզայնը",
-                    "contentTranslations": {
-                      "en": {
-                        "eyebrow": "02",
-                        "title": "Design that feels distinctive and effortless",
-                        "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
-                        "meta": "Made for real people",
-                        "buttonLabel": "View Selected Work",
-                        "imageAlt": "Editorial composition representing interface design"
-                      },
-                      "ru": {
-                        "title": "Выразительный и лёгкий дизайн",
-                        "meta": "Для реальных людей",
-                        "text": "Создайте адаптивный опыт с сильным визуальным ритмом и продуманными взаимодействиями.",
-                        "buttonLabel": "Посмотреть избранные работы",
-                        "imageAlt": "Редакционная композиция, иллюстрирующая дизайн интерфейса"
-                      }
-                    }
-                  },
-                  {
-                    "id": "grid-block-mucjzqwd-qpge3-3",
-                    "eyebrow": "03",
-                    "title": "Անընդհատ զարգանալու համար ստեղծված հիմք",
-                    "meta": "Ավելին, քան գործարկումը",
-                    "text": "Չափեք կարևորն, բարելավեք օգտատիրոջ ճանապարհը և զարգացրեք կայքը բիզնեսի աճին զուգահեռ։",
-                    "buttonLabel": "Քննարկել ձեր նպատակները",
-                    "buttonUrl": "/",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Վեր բարձրացող աբստրակտ ձևեր, որոնք ներկայացնում են կայուն աճը",
-                    "contentTranslations": {
-                      "en": {
-                        "eyebrow": "03",
-                        "title": "A foundation designed to keep improving",
-                        "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
-                        "meta": "Built beyond launch",
-                        "buttonLabel": "Discuss Your Goals",
-                        "imageAlt": "Abstract rising forms representing sustainable growth"
-                      },
-                      "ru": {
-                        "title": "Основа, которая постоянно совершенствуется",
-                        "meta": "Больше, чем запуск",
-                        "text": "Измеряйте важное, улучшайте путь пользователя и развивайте сайт вместе с бизнесом.",
-                        "buttonLabel": "Обсудить ваши цели",
-                        "imageAlt": "Абстрактные восходящие формы, символизирующие устойчивый рост"
-                      }
-                    }
-                  }
-                ],
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "16:9",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  }
-                },
-                "contentTranslations": {
-                  "en": {
-                    "title": "Services designed around your goals"
-                  },
-                  "ru": {
-                    "title": "Услуги, созданные вокруг ваших целей"
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
       },
       {
         "id": "webpages-features",
@@ -956,7 +755,7 @@
         }
       }
     ],
-    "updatedAt": "2026-09-24T06:45:43.955Z"
+    "updatedAt": "2026-09-24T17:45:08.414Z"
   },
   "page:templates": {
     "version": 1,

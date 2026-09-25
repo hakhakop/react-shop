@@ -22,12 +22,14 @@
     "language": "hy",
     "primaryLanguage": "hy",
     "enabledLanguages": [
-      "hy"
+      "hy",
+      "en",
+      "ru"
     ],
     "status": "active",
     "creationRequestId": "eb7e0384-62f2-4c88-b866-2d836df014df",
     "createdAt": "2026-08-21T15:24:17.584Z",
-    "updatedAt": "2026-08-29T13:57:00.285Z",
+    "updatedAt": "2026-09-24T20:20:19.823Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://circle.webpages.am",
@@ -42,7 +44,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-21T18:02:10.824Z"
     },
-    "lastPublishedAt": "2026-08-27T09:54:58.547Z"
+    "lastPublishedAt": "2026-09-24T18:04:13.964Z"
   },
   {
     "id": "4eeaf9a9-7f88-46b8-a874-d4eeeb45733f",
@@ -65,13 +67,15 @@
     "language": "hy",
     "primaryLanguage": "hy",
     "enabledLanguages": [
-      "hy"
+      "hy",
+      "en",
+      "ru"
     ],
-    "status": "creating",
+    "status": "maintenance",
     "creationRequestId": "8283a4a7-e3bc-4cb0-84ed-0bc7b5958d22",
     "createdAt": "2026-08-27T05:41:51.697Z",
-    "updatedAt": "2026-09-03T20:29:56.755Z",
-    "lastPublishedAt": "2026-09-03T20:29:56.755Z",
+    "updatedAt": "2026-09-24T20:56:37.955Z",
+    "lastPublishedAt": "2026-09-24T08:42:17.803Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://store.webpages.am",
@@ -113,7 +117,7 @@
     "status": "creating",
     "creationRequestId": "704bde98-3cb6-4828-924e-ef93aacd5d97",
     "createdAt": "2026-08-27T10:33:05.155Z",
-    "updatedAt": "2026-08-27T20:00:23.725Z",
+    "updatedAt": "2026-09-24T18:05:51.161Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://jack.webpages.am",
@@ -128,7 +132,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-27T10:33:59.695Z"
     },
-    "lastPublishedAt": "2026-08-27T20:00:23.725Z"
+    "lastPublishedAt": "2026-09-24T18:05:51.161Z"
   },
   {
     "id": "27ed19c1-e8e8-4112-abda-17f7a2abc3b9",
@@ -156,7 +160,7 @@
     "status": "creating",
     "creationRequestId": "51ed1adf-7383-4256-ab71-0155d38622a5",
     "createdAt": "2026-08-28T06:24:34.781Z",
-    "updatedAt": "2026-08-29T11:34:18.601Z",
+    "updatedAt": "2026-09-24T18:07:33.445Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://yard.webpages.am",
@@ -171,7 +175,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-28T06:50:18.433Z"
     },
-    "lastPublishedAt": "2026-08-29T11:34:18.601Z"
+    "lastPublishedAt": "2026-09-24T18:07:33.445Z"
   },
   {
     "id": "b1fe403f-b57b-4f93-a33e-5c061e4ebea2",
@@ -199,7 +203,7 @@
     "status": "creating",
     "creationRequestId": "c11978b9-11fa-482f-bad3-3a11368649c1",
     "createdAt": "2026-08-28T12:35:35.064Z",
-    "updatedAt": "2026-08-29T18:14:25.277Z",
+    "updatedAt": "2026-09-24T18:07:54.533Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://design.webpages.am",
@@ -214,7 +218,7 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-29T18:14:25.276Z"
     },
-    "lastPublishedAt": "2026-08-29T11:31:32.423Z"
+    "lastPublishedAt": "2026-09-24T18:07:54.533Z"
   },
   {
     "id": "76f3e619-b66c-4391-90b6-2671fa960132",
@@ -242,8 +246,8 @@
     "status": "creating",
     "creationRequestId": "1d8112e4-0755-403a-bb40-c16340360cc8",
     "createdAt": "2026-08-30T08:05:49.930Z",
-    "updatedAt": "2026-09-15T08:05:57.356Z",
-    "lastPublishedAt": "2026-09-15T08:05:57.356Z",
+    "updatedAt": "2026-09-24T18:08:14.897Z",
+    "lastPublishedAt": "2026-09-24T18:08:14.897Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://woolberry.webpages.am",
@@ -258,63 +262,6 @@
       "technicalNotes": "",
       "updatedAt": "2026-08-30T09:35:58.707Z"
     }
-  },
-  {
-    "id": "a80e0a66-3376-4583-ade4-e6da6951266d",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "Navigation Lab A",
-    "slug": "navigation-lab-a",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Blank",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "9fff01fe-14ff-4a07-89b1-a8f74a841176",
-    "createdAt": "2026-08-30T09:10:42.613Z",
-    "updatedAt": "2026-08-30T09:14:14.884Z",
-    "lastPublishedAt": "2026-08-30T09:14:14.884Z"
-  },
-  {
-    "id": "a7aef437-0e33-44bb-ab17-458301fbf7f8",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "Navigation Lab B",
-    "slug": "navigation-lab-b",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Blank",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "28e726fb-a2d2-4f25-9c54-816d19e60604",
-    "createdAt": "2026-08-30T09:11:03.589Z",
-    "updatedAt": "2026-08-30T09:11:03.589Z"
   },
   {
     "id": "aa74e534-2e8d-4648-a2ed-d6ead3ed9dd2",
@@ -342,8 +289,8 @@
     "status": "creating",
     "creationRequestId": "89440334-f297-4ba3-8f17-672e7d8c9734",
     "createdAt": "2026-09-06T15:29:27.058Z",
-    "updatedAt": "2026-09-06T15:40:56.639Z",
-    "lastPublishedAt": "2026-09-06T15:33:30.476Z",
+    "updatedAt": "2026-09-24T18:08:36.451Z",
+    "lastPublishedAt": "2026-09-24T18:08:36.451Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://balou.webpages.am",
@@ -360,80 +307,10 @@
     }
   },
   {
-    "id": "2ec2fa97-5d02-4252-a0a1-18bcf98e40ec",
+    "id": "2da7603a-594f-4017-b24c-4918957c91f3",
     "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "new",
-    "slug": "new",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "62ef7bc8-3d39-4c68-be69-b78f5eeb7cc8",
-    "createdAt": "2026-09-20T09:13:42.684Z",
-    "updatedAt": "2026-09-20T09:13:42.684Z"
-  },
-  {
-    "id": "6f353a0b-2c18-47fd-b075-f8ecb2988971",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "1111",
-    "slug": "1111",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "creating",
-    "creationRequestId": "d47e1d56-e9ce-43f1-9613-12ac292bbe4d",
-    "createdAt": "2026-09-20T10:27:55.462Z",
-    "updatedAt": "2026-09-20T10:41:00.502Z",
-    "cmsConnection": {
-      "provider": "wordpress",
-      "siteUrl": "https://circle.webpages.am",
-      "adminUrl": "https://circle.webpages.am/wp-admin",
-      "graphqlUrl": "https://circle.webpages.am/graphql",
-      "wooCommerceApiUrl": "https://circle.webpages.am/wp-json/wc/v3",
-      "wooCommerceConsumerKey": "ck_8806b1f69c5f78748707f764241be157bf61efca",
-      "wooCommerceConsumerSecret": "cs_a7776b8a9031d7538704dfc17d4d90fd7491032e",
-      "wordpressUsername": "hakhakop",
-      "wordpressApplicationPassword": "cnTN 1hxa ChLW Tauy 3RKJ r7Tu",
-      "storeStatusNotes": "",
-      "technicalNotes": "",
-      "updatedAt": "2026-09-20T10:41:00.501Z"
-    }
-  },
-  {
-    "id": "6aa6d914-4c61-4e71-8bde-1b4ca0a1dfda",
-    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "helo",
-    "slug": "helo",
+    "name": "Makai",
+    "slug": "makai",
     "type": "business",
     "domain": null,
     "primaryDomain": null,
@@ -453,36 +330,23 @@
       "hy"
     ],
     "status": "preparing",
-    "creationRequestId": "f0e7c39f-308a-4067-abdf-8504b1ec771b",
-    "createdAt": "2026-09-20T11:24:57.127Z",
-    "updatedAt": "2026-09-20T11:24:57.127Z"
-  },
-  {
-    "id": "6baf7d57-0798-4518-b39a-85ec0ed62a90",
-    "ownerId": "f6a1202b-9567-4fd3-a1fb-576df4a5f432",
-    "name": "hihiu",
-    "slug": "hihiu",
-    "type": "business",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "ready",
-    "creationRequestId": "6a7c6d0f-1fc1-4876-8ee8-871ec8314737",
-    "createdAt": "2026-09-20T11:26:05.370Z",
-    "updatedAt": "2026-09-20T11:26:39.026Z"
+    "creationRequestId": "5d2e3a6f-034f-4e66-90b7-bcfe28921bfe",
+    "createdAt": "2026-09-25T18:42:16.102Z",
+    "updatedAt": "2026-09-25T18:51:00.843Z",
+    "cmsConnection": {
+      "provider": "wordpress",
+      "siteUrl": "https://makai.webpages.am",
+      "adminUrl": "https://makai.webpages.am/wp-admin",
+      "graphqlUrl": "https://makai.webpages.am/graphql",
+      "wooCommerceApiUrl": "https://makai.webpages.am/wp-json/wc/v3",
+      "wooCommerceConsumerKey": "",
+      "wooCommerceConsumerSecret": "",
+      "wordpressUsername": "hakhakop",
+      "wordpressApplicationPassword": "ZJZG fztA VsMS Udyz 2Xx1 4dSt",
+      "storeStatusNotes": "",
+      "technicalNotes": "",
+      "updatedAt": "2026-09-25T18:50:34.639Z"
+    },
+    "lastPublishedAt": "2026-09-25T18:51:00.843Z"
   }
 ]

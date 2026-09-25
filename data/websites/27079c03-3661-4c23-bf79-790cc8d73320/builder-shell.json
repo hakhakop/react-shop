@@ -236,7 +236,7 @@
   "menuItems": [
     {
       "id": "circle-home",
-      "label": "Home",
+      "label": "Գլխավոր",
       "url": "/",
       "parentId": null,
       "iconName": null,
@@ -244,11 +244,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Home"
+        },
+        "ru": {
+          "label": "Главная"
+        }
+      }
     },
     {
       "id": "circle-product",
-      "label": "Product",
+      "label": "Ապրանք",
       "url": "/product-2",
       "parentId": null,
       "iconName": null,
@@ -256,11 +264,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Product"
+        },
+        "ru": {
+          "label": "Продукт"
+        }
+      }
     },
     {
       "id": "circle-product-video-effects",
-      "label": "Video Effects",
+      "label": "Տեսանյութի էֆեկտներ",
       "url": "/product-2#video-effects",
       "parentId": "circle-product",
       "iconName": "lighting",
@@ -268,11 +284,21 @@
       "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Video Effects",
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam"
+        },
+        "ru": {
+          "label": "Видеоэффекты",
+          "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam"
+        }
+      }
     },
     {
       "id": "circle-product-full-control",
-      "label": "Full Control",
+      "label": "Լիակատար վերահսկողություն",
       "url": "/product-2#full-control",
       "parentId": "circle-product",
       "iconName": "trouble-shooting",
@@ -280,11 +306,21 @@
       "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Full Control",
+          "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum"
+        },
+        "ru": {
+          "label": "Полный контроль",
+          "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum"
+        }
+      }
     },
     {
       "id": "circle-product-data-privacy",
-      "label": "Data Privacy",
+      "label": "Տվյալների գաղտնիություն",
       "url": "/product-2#data-privacy",
       "parentId": "circle-product",
       "iconName": "lock",
@@ -292,11 +328,21 @@
       "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Data Privacy",
+          "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt"
+        },
+        "ru": {
+          "label": "Конфиденциальность данных",
+          "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt"
+        }
+      }
     },
     {
       "id": "circle-product-chat-features",
-      "label": "Chat Features",
+      "label": "Զրույցի հնարավորություններ",
       "url": "/product-2#chat-features",
       "parentId": "circle-product",
       "iconName": "chat",
@@ -304,11 +350,21 @@
       "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et",
       "mobileUrl": "/product-2#chat-features-mobile",
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Chat Features",
+          "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et"
+        },
+        "ru": {
+          "label": "Возможности чата",
+          "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et"
+        }
+      }
     },
     {
       "id": "circle-product-more-features",
-      "label": "More Features",
+      "label": "Այլ գործառույթներ",
       "url": "/product-2#more-features",
       "parentId": "circle-product",
       "iconName": "rocket",
@@ -316,11 +372,21 @@
       "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "More Features",
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat"
+        },
+        "ru": {
+          "label": "Дополнительные функции",
+          "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat"
+        }
+      }
     },
     {
       "id": "circle-pricing",
-      "label": "Pricing",
+      "label": "Գներ",
       "url": "/pricing",
       "parentId": null,
       "iconName": null,
@@ -328,11 +394,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Pricing"
+        },
+        "ru": {
+          "label": "Цены"
+        }
+      }
     },
     {
       "id": "circle-about",
-      "label": "About",
+      "label": "Մեր մասին",
       "url": "/about",
       "parentId": null,
       "iconName": null,
@@ -340,11 +414,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "About"
+        },
+        "ru": {
+          "label": "О нас"
+        }
+      }
     },
     {
       "id": "circle-careers",
-      "label": "Careers ✨",
+      "label": "Աշխատատեղեր ✨",
       "url": "/careers",
       "parentId": null,
       "iconName": null,
@@ -352,11 +434,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Careers ✨"
+        },
+        "ru": {
+          "label": "Вакансии"
+        }
+      }
     },
     {
       "id": "circle-careers-job-description",
-      "label": "Job Description",
+      "label": "Աշխատանքի նկարագրություն",
       "url": "/job-description",
       "parentId": "circle-careers",
       "iconName": null,
@@ -364,11 +454,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "mobile"
+      "visibility": "mobile",
+      "contentTranslations": {
+        "en": {
+          "label": "Job Description"
+        },
+        "ru": {
+          "label": "Должностная инструкция"
+        }
+      }
     },
     {
       "id": "circle-support",
-      "label": "Support",
+      "label": "Աջակցություն",
       "url": "/support",
       "parentId": null,
       "iconName": null,
@@ -376,11 +474,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Support"
+        },
+        "ru": {
+          "label": "Поддержка"
+        }
+      }
     },
     {
       "id": "circle-support-help-center",
-      "label": "Help Center",
+      "label": "Օգնության կենտրոն",
       "url": "/support#help-center",
       "parentId": "circle-support",
       "iconName": "chat",
@@ -388,11 +494,21 @@
       "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Help Center",
+          "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        },
+        "ru": {
+          "label": "Центр помощи",
+          "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        }
+      }
     },
     {
       "id": "circle-support-first-steps",
-      "label": "First Steps",
+      "label": "Առաջին քայլեր",
       "url": "/support#first-steps",
       "parentId": "circle-support",
       "iconName": "tutorials",
@@ -400,11 +516,21 @@
       "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "First Steps",
+          "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua"
+        },
+        "ru": {
+          "label": "Первые шаги",
+          "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua"
+        }
+      }
     },
     {
       "id": "circle-support-documentation",
-      "label": "Documentation",
+      "label": "Փաստաթղթեր",
       "url": "/support#documentation",
       "parentId": "circle-support",
       "iconName": "technology",
@@ -412,23 +538,43 @@
       "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Documentation",
+          "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        },
+        "ru": {
+          "label": "Документация",
+          "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        }
+      }
     },
     {
       "id": "circle-support-accounts",
-      "label": "Accounts",
+      "label": "Հաշիվներ",
       "url": "/support#accounts",
       "parentId": "circle-support",
       "iconName": "account",
       "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-account.svg",
-      "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "subtitle": "Էլիտր սեդ դիամ նոնումի էիրմոդ ժամանակավոր ինվիդունտ ուտ լաբորե և դոլորե մագնա ալիքվյամ",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Accounts",
+          "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        },
+        "ru": {
+          "label": "Учётные записи",
+          "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
+        }
+      }
     },
     {
       "id": "circle-support-community",
-      "label": "Our Community",
+      "label": "Մեր համայնքը",
       "url": "/support#our-community",
       "parentId": "circle-support",
       "iconName": "heart",
@@ -436,11 +582,21 @@
       "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Our Community",
+          "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt"
+        },
+        "ru": {
+          "label": "Наше сообщество",
+          "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt"
+        }
+      }
     },
     {
       "id": "circle-support-updates",
-      "label": "Updates",
+      "label": "Թարմացումներ",
       "url": "/updates",
       "parentId": "circle-support",
       "iconName": "download",
@@ -448,11 +604,21 @@
       "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore",
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Updates",
+          "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore"
+        },
+        "ru": {
+          "label": "Обновления",
+          "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore"
+        }
+      }
     },
     {
       "id": "circle-blog",
-      "label": "Blog",
+      "label": "Բլոգ",
       "url": "/blog",
       "parentId": null,
       "iconName": null,
@@ -460,7 +626,15 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Blog"
+        },
+        "ru": {
+          "label": "Блог"
+        }
+      }
     }
   ],
   "headerInverseLogoUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",

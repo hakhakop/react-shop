@@ -9,7 +9,7 @@
       {
         "id": "yootheme-section-1",
         "kind": "contentLayout",
-        "title": "Hero",
+        "title": "Հերոսություն",
         "background": "transparent",
         "backgroundRole": "secondary",
         "sectionVariant": "secondary",
@@ -76,6 +76,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles",
+                    "title": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles"
+                  },
+                  "ru": {
+                    "headingText": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles",
+                    "title": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles"
+                  }
                 }
               }
             ]
@@ -148,18 +158,36 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles",
+                        "title": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles"
+                      },
+                      "ru": {
+                        "headingText": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles",
+                        "title": "Jack Baker<br> is a photogra&shy;pher<br class=\"uk-visible@s\"> & director based in Los Angeles"
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Hero"
+          },
+          "ru": {
+            "title": "Герой"
+          }
+        }
       },
       {
         "id": "yootheme-section-2",
         "kind": "contentLayout",
-        "title": "Portfolio",
+        "title": "Պորտֆոլիո",
         "background": "transparent",
         "backgroundRole": "secondary",
         "sectionVariant": "secondary",
@@ -202,8 +230,8 @@
               {
                 "id": "yootheme-heading-1-0-0-0",
                 "kind": "heading",
-                "headingText": "Selected projects",
-                "title": "Selected projects",
+                "headingText": "Ընտրված նախագծեր",
+                "title": "Ընտրված նախագծեր",
                 "headingLevel": "h2",
                 "maxWidth": "2xlarge",
                 "elementPadding": "none",
@@ -215,6 +243,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Selected projects",
+                    "title": "Selected projects"
+                  },
+                  "ru": {
+                    "headingText": "Избранные проекты",
+                    "title": "Избранные проекты"
+                  }
                 }
               },
               {
@@ -223,10 +261,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-1-0-0-1-0",
-                    "label": "View all",
+                    "label": "Դիտել բոլորը",
                     "url": "?page_id=2",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "View all"
+                      },
+                      "ru": {
+                        "label": "Смотреть все"
+                      }
+                    }
                   }
                 ],
                 "fullWidthButton": false,
@@ -266,7 +312,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Little Paradise",
-                "meta": "Travel Report",
+                "meta": "Ճամփորդության հաշվետվություն",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -290,6 +336,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Little Paradise",
+                    "meta": "Travel Report"
+                  },
+                  "ru": {
+                    "title": "Little Paradise",
+                    "meta": "Отчёт о путешествии"
+                  }
                 }
               },
               {
@@ -316,7 +372,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Robert",
-                "meta": "Portrait",
+                "meta": "Դիմանկար",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -340,6 +396,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Robert",
+                    "meta": "Portrait"
+                  },
+                  "ru": {
+                    "title": "Robert",
+                    "meta": "Портрет"
+                  }
                 }
               },
               {
@@ -366,7 +432,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Alice &amp; George",
-                "meta": "Wedding",
+                "meta": "Հարսանիք",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -390,6 +456,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Alice &amp; George",
+                    "meta": "Wedding"
+                  },
+                  "ru": {
+                    "title": "Alice &amp; George",
+                    "meta": "Wedding"
+                  }
                 }
               },
               {
@@ -415,8 +491,8 @@
                 "overlayAnimateBackground": false,
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
-                "title": "Josh &amp; Kelly",
-                "meta": "Couple Shooting",
+                "title": "Ջոշ և Քելլի",
+                "meta": "Զույգի ֆոտոշարք",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -440,6 +516,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Josh &amp; Kelly",
+                    "meta": "Couple Shooting"
+                  },
+                  "ru": {
+                    "title": "Джош и Келли",
+                    "meta": "Съёмка пары"
+                  }
                 }
               },
               {
@@ -466,7 +552,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Carf Watches",
-                "meta": "Advertisement",
+                "meta": "Գովազդ",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -490,6 +576,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Carf Watches",
+                    "meta": "Advertisement"
+                  },
+                  "ru": {
+                    "title": "Карфовые часы",
+                    "meta": "Реклама"
+                  }
                 }
               }
             ]
@@ -523,7 +619,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Chloé &amp; Marc",
-                "meta": "for Ink Tattoo Convention",
+                "meta": "Ink Tattoo Convention-ի համար",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -547,6 +643,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Chloé &amp; Marc",
+                    "meta": "for Ink Tattoo Convention"
+                  },
+                  "ru": {
+                    "title": "Хлоя и Марк",
+                    "meta": "Для Ink Tattoo Convention"
+                  }
                 }
               },
               {
@@ -573,7 +679,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Benjamin Smoke",
-                "meta": "Advertisement",
+                "meta": "Գովազդ",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -597,6 +703,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Benjamin Smoke",
+                    "meta": "Advertisement"
+                  },
+                  "ru": {
+                    "title": "Benjamin Smoke",
+                    "meta": "Реклама"
+                  }
                 }
               },
               {
@@ -623,7 +739,7 @@
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
                 "title": "Eric Handerson",
-                "meta": "Lost Places",
+                "meta": "Կորած վայրեր",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -647,6 +763,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Eric Handerson",
+                    "meta": "Lost Places"
+                  },
+                  "ru": {
+                    "title": "Eric Handerson",
+                    "meta": "Затерянные места"
+                  }
                 }
               },
               {
@@ -672,8 +798,8 @@
                 "overlayAnimateBackground": false,
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
-                "title": "Tropical Jungle",
-                "meta": "for Urban Clothing",
+                "title": "Արևադարձային ջունգլիներ",
+                "meta": "քաղաքային հագուստի համար",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -697,6 +823,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Tropical Jungle",
+                    "meta": "for Urban Clothing"
+                  },
+                  "ru": {
+                    "title": "Тропические джунгли",
+                    "meta": "для городской одежды"
+                  }
                 }
               },
               {
@@ -722,8 +858,8 @@
                 "overlayAnimateBackground": false,
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
-                "title": "Keven &amp; Alice",
-                "meta": "Couple Shooting",
+                "title": "Քևեն և Ալիս",
+                "meta": "Զույգի ֆոտոշարք",
                 "titleTransition": "slide-bottom-small",
                 "titleStyle": "h3",
                 "titleHoverStyle": "reset",
@@ -747,6 +883,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Keven &amp; Alice",
+                    "meta": "Couple Shooting"
+                  },
+                  "ru": {
+                    "title": "Кевен и Элис",
+                    "meta": "Съёмка пары"
+                  }
                 }
               }
             ]
@@ -790,8 +936,8 @@
                   {
                     "id": "yootheme-heading-1-0-0-0",
                     "kind": "heading",
-                    "headingText": "Selected projects",
-                    "title": "Selected projects",
+                    "headingText": "Ընտրված նախագծեր",
+                    "title": "Ընտրված նախագծեր",
                     "headingLevel": "h2",
                     "maxWidth": "2xlarge",
                     "elementPadding": "none",
@@ -803,6 +949,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Selected projects",
+                        "title": "Selected projects"
+                      },
+                      "ru": {
+                        "headingText": "Избранные проекты",
+                        "title": "Избранные проекты"
+                      }
                     }
                   },
                   {
@@ -811,10 +967,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-1-0-0-1-0",
-                        "label": "View all",
+                        "label": "Դիտել բոլորը",
                         "url": "?page_id=2",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "View all"
+                          },
+                          "ru": {
+                            "label": "Смотреть все"
+                          }
+                        }
                       }
                     ],
                     "fullWidthButton": false,
@@ -853,7 +1017,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Little Paradise",
-                    "meta": "Travel Report",
+                    "meta": "Ճամփորդության հաշվետվություն",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -877,6 +1041,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Little Paradise",
+                        "meta": "Travel Report"
+                      },
+                      "ru": {
+                        "title": "Little Paradise",
+                        "meta": "Отчёт о путешествии"
+                      }
                     }
                   },
                   {
@@ -903,7 +1077,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Robert",
-                    "meta": "Portrait",
+                    "meta": "Դիմանկար",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -927,6 +1101,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Robert",
+                        "meta": "Portrait"
+                      },
+                      "ru": {
+                        "title": "Robert",
+                        "meta": "Портрет"
+                      }
                     }
                   },
                   {
@@ -953,7 +1137,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Alice &amp; George",
-                    "meta": "Wedding",
+                    "meta": "Հարսանիք",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -977,6 +1161,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Alice &amp; George",
+                        "meta": "Wedding"
+                      },
+                      "ru": {
+                        "title": "Alice &amp; George",
+                        "meta": "Wedding"
+                      }
                     }
                   },
                   {
@@ -1002,8 +1196,8 @@
                     "overlayAnimateBackground": false,
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
-                    "title": "Josh &amp; Kelly",
-                    "meta": "Couple Shooting",
+                    "title": "Ջոշ և Քելլի",
+                    "meta": "Զույգի ֆոտոշարք",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1027,6 +1221,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Josh &amp; Kelly",
+                        "meta": "Couple Shooting"
+                      },
+                      "ru": {
+                        "title": "Джош и Келли",
+                        "meta": "Съёмка пары"
+                      }
                     }
                   },
                   {
@@ -1053,7 +1257,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Carf Watches",
-                    "meta": "Advertisement",
+                    "meta": "Գովազդ",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1077,6 +1281,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Carf Watches",
+                        "meta": "Advertisement"
+                      },
+                      "ru": {
+                        "title": "Карфовые часы",
+                        "meta": "Реклама"
+                      }
                     }
                   }
                 ]
@@ -1117,7 +1331,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Chloé &amp; Marc",
-                    "meta": "for Ink Tattoo Convention",
+                    "meta": "Ink Tattoo Convention-ի համար",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1141,6 +1355,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Chloé &amp; Marc",
+                        "meta": "for Ink Tattoo Convention"
+                      },
+                      "ru": {
+                        "title": "Хлоя и Марк",
+                        "meta": "Для Ink Tattoo Convention"
+                      }
                     }
                   },
                   {
@@ -1167,7 +1391,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Benjamin Smoke",
-                    "meta": "Advertisement",
+                    "meta": "Գովազդ",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1191,6 +1415,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Benjamin Smoke",
+                        "meta": "Advertisement"
+                      },
+                      "ru": {
+                        "title": "Benjamin Smoke",
+                        "meta": "Реклама"
+                      }
                     }
                   },
                   {
@@ -1217,7 +1451,7 @@
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
                     "title": "Eric Handerson",
-                    "meta": "Lost Places",
+                    "meta": "Կորած վայրեր",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1241,6 +1475,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Eric Handerson",
+                        "meta": "Lost Places"
+                      },
+                      "ru": {
+                        "title": "Eric Handerson",
+                        "meta": "Затерянные места"
+                      }
                     }
                   },
                   {
@@ -1266,8 +1510,8 @@
                     "overlayAnimateBackground": false,
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
-                    "title": "Tropical Jungle",
-                    "meta": "for Urban Clothing",
+                    "title": "Արևադարձային ջունգլիներ",
+                    "meta": "քաղաքային հագուստի համար",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1291,6 +1535,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Tropical Jungle",
+                        "meta": "for Urban Clothing"
+                      },
+                      "ru": {
+                        "title": "Тропические джунгли",
+                        "meta": "для городской одежды"
+                      }
                     }
                   },
                   {
@@ -1316,8 +1570,8 @@
                     "overlayAnimateBackground": false,
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
-                    "title": "Keven &amp; Alice",
-                    "meta": "Couple Shooting",
+                    "title": "Քևեն և Ալիս",
+                    "meta": "Զույգի ֆոտոշարք",
                     "titleTransition": "slide-bottom-small",
                     "titleStyle": "h3",
                     "titleHoverStyle": "reset",
@@ -1341,18 +1595,36 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Keven &amp; Alice",
+                        "meta": "Couple Shooting"
+                      },
+                      "ru": {
+                        "title": "Кевен и Элис",
+                        "meta": "Съёмка пары"
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Portfolio"
+          },
+          "ru": {
+            "title": "Портфолио"
+          }
+        }
       },
       {
         "id": "yootheme-section-3",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "secondary",
         "sectionVariant": "secondary",
@@ -1395,8 +1667,8 @@
               {
                 "id": "yootheme-heading-2-0-0-0",
                 "kind": "heading",
-                "headingText": "I tell stories of happiness and love through pictures.",
-                "title": "I tell stories of happiness and love through pictures.",
+                "headingText": "Ես պատմում եմ երջանկության և սիրո մասին նկարների միջոցով ։",
+                "title": "Ես պատմում եմ երջանկության և սիրո մասին նկարների միջոցով ։",
                 "headingLevel": "h2",
                 "headingSize": "h1",
                 "maxWidth": "large",
@@ -1409,6 +1681,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "I tell stories of happiness and love through pictures.",
+                    "title": "I tell stories of happiness and love through pictures."
+                  },
+                  "ru": {
+                    "headingText": "Я рассказываю истории счастья и любви через картинки.",
+                    "title": "Я рассказываю истории счастья и любви через картинки."
+                  }
                 }
               },
               {
@@ -1417,17 +1699,33 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-2-0-0-1-0",
-                    "label": "About Me",
+                    "label": "Իմ մասին",
                     "url": "?page_id=4",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "About Me"
+                      },
+                      "ru": {
+                        "label": "Обо мне"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-2-0-0-1-1",
-                    "label": "Services",
+                    "label": "Ծառայություններ",
                     "url": "?page_id=8",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Services"
+                      },
+                      "ru": {
+                        "label": "Услуги"
+                      }
+                    }
                   }
                 ],
                 "fullWidthButton": false,
@@ -1450,21 +1748,45 @@
                     "label": "500px",
                     "url": "https://500px.com/",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "500px"
+                      },
+                      "ru": {
+                        "label": "500px"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-2-0-1-0-1",
                     "label": "Instagram",
                     "url": "https://www.instagram.com/",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Instagram"
+                      },
+                      "ru": {
+                        "label": "Instagram"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-2-0-1-0-2",
                     "label": "Facebook",
                     "url": "https://www.facebook.com/",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Facebook"
+                      },
+                      "ru": {
+                        "label": "Facebook"
+                      }
+                    }
                   }
                 ],
                 "fullWidthButton": false,
@@ -1525,8 +1847,8 @@
                   {
                     "id": "yootheme-heading-2-0-0-0",
                     "kind": "heading",
-                    "headingText": "I tell stories of happiness and love through pictures.",
-                    "title": "I tell stories of happiness and love through pictures.",
+                    "headingText": "Ես պատմում եմ երջանկության և սիրո մասին նկարների միջոցով ։",
+                    "title": "Ես պատմում եմ երջանկության և սիրո մասին նկարների միջոցով ։",
                     "headingLevel": "h2",
                     "headingSize": "h1",
                     "maxWidth": "large",
@@ -1539,6 +1861,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "I tell stories of happiness and love through pictures.",
+                        "title": "I tell stories of happiness and love through pictures."
+                      },
+                      "ru": {
+                        "headingText": "Я рассказываю истории счастья и любви через картинки.",
+                        "title": "Я рассказываю истории счастья и любви через картинки."
+                      }
                     }
                   },
                   {
@@ -1547,17 +1879,33 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-2-0-0-1-0",
-                        "label": "About Me",
+                        "label": "Իմ մասին",
                         "url": "?page_id=4",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "About Me"
+                          },
+                          "ru": {
+                            "label": "Обо мне"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-2-0-0-1-1",
-                        "label": "Services",
+                        "label": "Ծառայություններ",
                         "url": "?page_id=8",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Services"
+                          },
+                          "ru": {
+                            "label": "Услуги"
+                          }
+                        }
                       }
                     ],
                     "fullWidthButton": false
@@ -1585,21 +1933,45 @@
                         "label": "500px",
                         "url": "https://500px.com/",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "500px"
+                          },
+                          "ru": {
+                            "label": "500px"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-2-0-1-0-1",
                         "label": "Instagram",
                         "url": "https://www.instagram.com/",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Instagram"
+                          },
+                          "ru": {
+                            "label": "Instagram"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-2-0-1-0-2",
                         "label": "Facebook",
                         "url": "https://www.facebook.com/",
                         "target": "_self",
-                        "style": "link"
+                        "style": "link",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Facebook"
+                          },
+                          "ru": {
+                            "label": "Facebook"
+                          }
+                        }
                       }
                     ],
                     "fullWidthButton": false,
@@ -1622,12 +1994,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       },
       {
         "id": "yootheme-section-4",
         "kind": "contentLayout",
-        "title": "Call to action",
+        "title": "Գործողության կանչ",
         "background": "transparent",
         "backgroundRole": "secondary",
         "sectionVariant": "secondary",
@@ -1690,8 +2070,8 @@
                 "overlayAnimateBackground": false,
                 "overlayExpandContent": false,
                 "overlayTransition": "fade",
-                "title": "Ready to start a project?",
-                "meta": "Drop me a line",
+                "title": "Պատրա ՞ ստ եք նախագիծ սկսել ։",
+                "meta": "Տող գցեք ինձ",
                 "titleStyle": "heading-medium",
                 "titleHoverStyle": "reset",
                 "titleLink": false,
@@ -1712,6 +2092,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Ready to start a project?",
+                    "meta": "Drop me a line"
+                  },
+                  "ru": {
+                    "title": "Готовы начать проект?",
+                    "meta": "Черкните мне несколько строк"
+                  }
                 }
               }
             ]
@@ -1759,8 +2149,8 @@
                     "overlayAnimateBackground": false,
                     "overlayExpandContent": false,
                     "overlayTransition": "fade",
-                    "title": "Ready to start a project?",
-                    "meta": "Drop me a line",
+                    "title": "Պատրա ՞ ստ եք նախագիծ սկսել ։",
+                    "meta": "Տող գցեք ինձ",
                     "titleStyle": "heading-medium",
                     "titleHoverStyle": "reset",
                     "titleLink": false,
@@ -1781,13 +2171,31 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Ready to start a project?",
+                        "meta": "Drop me a line"
+                      },
+                      "ru": {
+                        "title": "Готовы начать проект?",
+                        "meta": "Черкните мне несколько строк"
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Call to action"
+          },
+          "ru": {
+            "title": "Призыв к действию"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-27T19:16:42.570Z"
@@ -1826,7 +2234,7 @@
       {
         "id": "header-document",
         "kind": "contentLayout",
-        "title": "Header",
+        "title": "Էջագլուխ",
         "headerUtilityMigrationVersion": 3,
         "background": "transparent",
         "backgroundMode": "full",
@@ -1848,7 +2256,15 @@
                 "imageMaxWidth": 140,
                 "imageAlignment": "left",
                 "imageUrl": null,
-                "imageAlt": "Jack logo"
+                "imageAlt": "Ջեքի պատկերանշան",
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "Jack logo"
+                  },
+                  "ru": {
+                    "imageAlt": "Логотип Jack"
+                  }
+                }
               }
             ]
           },
@@ -1860,10 +2276,18 @@
               {
                 "id": "header-navigation",
                 "kind": "menu",
-                "title": "Navigation",
+                "title": "Նավագնացություն",
                 "menuSource": "main",
                 "menuActiveIndicator": "underline",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Navigation"
+                  },
+                  "ru": {
+                    "title": "Навигация"
+                  }
+                }
               }
             ]
           },
@@ -1873,18 +2297,9 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "muted",
-                "elementAlign": "right"
-              },
-              {
-                "id": "header-utility-cart",
-                "kind": "headerCart",
-                "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted",
-                "elementAlign": "right"
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -1904,10 +2319,18 @@
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "",
         "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerTopToolbarMeta": "",
+        "contentTranslations": {
+          "en": {
+            "title": "Header"
+          },
+          "ru": {
+            "title": "Шапка"
+          }
+        }
       }
     ],
-    "updatedAt": "2026-08-27T21:01:11.153Z"
+    "updatedAt": "2026-09-24T18:05:51.129Z"
   },
   "footer": {
     "version": 1,
@@ -1920,7 +2343,7 @@
       {
         "id": "yootheme-section-1",
         "kind": "contentLayout",
-        "title": "Footer",
+        "title": "էջատակ",
         "background": "transparent",
         "backgroundRole": "secondary",
         "sectionVariant": "secondary",
@@ -2008,7 +2431,15 @@
                     "label": "hello@example.com",
                     "url": "mailto:hello@example.com",
                     "target": "_self",
-                    "scroll": false
+                    "scroll": false,
+                    "contentTranslations": {
+                      "en": {
+                        "label": "hello@example.com"
+                      },
+                      "ru": {
+                        "label": "hello@example.com"
+                      }
+                    }
                   }
                 ],
                 "subnavStyle": "default",
@@ -2036,7 +2467,7 @@
               {
                 "id": "yootheme-text-0-1-1-0",
                 "kind": "text",
-                "body": "Tell your friends!",
+                "body": "Տեղեկացրեք ձեր ընկերներին:",
                 "textVariant": "default",
                 "textColor": "primary",
                 "textColumnBreakpoint": "medium",
@@ -2053,6 +2484,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Tell your friends!"
+                  },
+                  "ru": {
+                    "body": "Ой!"
+                  }
                 }
               }
             ]
@@ -2071,7 +2510,7 @@
               {
                 "id": "yootheme-text-0-2-0-0",
                 "kind": "text",
-                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer։ Բոլոր իրավունքները պաշտպանված են ։<br> Սնուցվում է <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a> կողմից:",
                 "textVariant": "small",
                 "textColumnBreakpoint": "medium",
                 "textAlign": "left",
@@ -2087,6 +2526,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>."
+                  },
+                  "ru": {
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. Все права защищены.<br> Работает на <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>."
+                  }
                 }
               }
             ]
@@ -2199,7 +2646,15 @@
                         "label": "hello@example.com",
                         "url": "mailto:hello@example.com",
                         "target": "_self",
-                        "scroll": false
+                        "scroll": false,
+                        "contentTranslations": {
+                          "en": {
+                            "label": "hello@example.com"
+                          },
+                          "ru": {
+                            "label": "hello@example.com"
+                          }
+                        }
                       }
                     ],
                     "subnavStyle": "default",
@@ -2234,7 +2689,7 @@
                   {
                     "id": "yootheme-text-0-1-1-0",
                     "kind": "text",
-                    "body": "Tell your friends!",
+                    "body": "Տեղեկացրեք ձեր ընկերներին:",
                     "textVariant": "default",
                     "textColor": "primary",
                     "textColumnBreakpoint": "medium",
@@ -2251,6 +2706,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Tell your friends!"
+                      },
+                      "ru": {
+                        "body": "Ой!"
+                      }
                     }
                   }
                 ]
@@ -2289,7 +2752,7 @@
                   {
                     "id": "yootheme-text-0-2-0-0",
                     "kind": "text",
-                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>.",
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer։ Բոլոր իրավունքները պաշտպանված են ։<br> Սնուցվում է <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a> կողմից:",
                     "textVariant": "small",
                     "textColumnBreakpoint": "medium",
                     "textAlign": "left",
@@ -2305,13 +2768,29 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. All rights reserved.<br> Powered by <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>."
+                      },
+                      "ru": {
+                        "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>'); </script> Jack Backer. Все права защищены.<br> Работает на <a class=\"uk-link-muted\" href=\"https://yootheme.com/\">YOOtheme</a>."
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Footer"
+          },
+          "ru": {
+            "title": "Footer"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-27T11:54:32.585Z"
@@ -2394,7 +2873,7 @@
       {
         "id": "yootheme-section-1",
         "kind": "contentLayout",
-        "title": "Chloé & Marc",
+        "title": "Քլոե և Մարկ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -2475,8 +2954,8 @@
                     "title_style": "h2"
                   }
                 },
-                "title": "Chloé & Marc",
-                "eyebrow": "Winner tattoo contest",
+                "title": "Քլոե և Մարկ",
+                "eyebrow": "Հաղթողի դաջվածքների մրցույթ",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
                 "imageAlt": "",
@@ -2485,7 +2964,7 @@
                 "imageAlignment": "right",
                 "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=21",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -2542,7 +3021,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Chloé & Marc",
+                    "eyebrow": "Winner tattoo contest",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Chloé & Marc",
+                    "eyebrow": "Победитель конкурса татуировок",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -2632,8 +3125,8 @@
                         "title_style": "h2"
                       }
                     },
-                    "title": "Chloé & Marc",
-                    "eyebrow": "Winner tattoo contest",
+                    "title": "Քլոե և Մարկ",
+                    "eyebrow": "Հաղթողի դաջվածքների մրցույթ",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-01.jpg",
                     "imageAlt": "",
@@ -2642,7 +3135,7 @@
                     "imageAlignment": "right",
                     "imageSvgColor": "emphasis",
                     "imageLoading": "eager",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=21",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -2699,7 +3192,21 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Chloé & Marc",
+                        "eyebrow": "Winner tattoo contest",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Chloé & Marc",
+                        "eyebrow": "Победитель конкурса татуировок",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -2718,7 +3225,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Chloé & Marc"
+          },
+          "ru": {
+            "title": "Chloé & Marc"
+          }
+        }
       },
       {
         "id": "yootheme-section-2",
@@ -2811,7 +3326,7 @@
                   }
                 },
                 "title": "Benjamin Smoke",
-                "eyebrow": "Portrait Shooting",
+                "eyebrow": "Դիմանկարի նկարահանում",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
                 "imageAlt": "",
@@ -2820,7 +3335,7 @@
                 "imageAlignment": "left",
                 "imageSvgColor": "emphasis",
                 "imageLoading": "eager",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=23",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -2877,7 +3392,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Benjamin Smoke",
+                    "eyebrow": "Portrait Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Benjamin Smoke",
+                    "eyebrow": "Портретная съемка",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           }
@@ -2975,7 +3504,7 @@
                       }
                     },
                     "title": "Benjamin Smoke",
-                    "eyebrow": "Portrait Shooting",
+                    "eyebrow": "Դիմանկարի նկարահանում",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-02.jpg",
                     "imageAlt": "",
@@ -2984,7 +3513,7 @@
                     "imageAlignment": "left",
                     "imageSvgColor": "emphasis",
                     "imageLoading": "eager",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=23",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -3041,18 +3570,40 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Benjamin Smoke",
+                        "eyebrow": "Portrait Shooting",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Benjamin Smoke",
+                        "eyebrow": "Портретная съемка",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Benjamin Smoke"
+          },
+          "ru": {
+            "title": "Benjamin Smoke"
+          }
+        }
       },
       {
         "id": "yootheme-section-3",
         "kind": "contentLayout",
-        "title": "Clara & David",
+        "title": "Կլարա և Դեյվիդ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -3133,8 +3684,8 @@
                     "title_style": "h2"
                   }
                 },
-                "title": "Clara & David",
-                "eyebrow": "Couple Shooting",
+                "title": "Կլարա և Դեյվիդ",
+                "eyebrow": "Զույգի ֆոտոշարք",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
                 "imageAlt": "",
@@ -3142,7 +3693,7 @@
                 "imageWidth": "610px",
                 "imageAlignment": "right",
                 "imageSvgColor": "emphasis",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=21",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -3199,7 +3750,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Clara & David",
+                    "eyebrow": "Couple Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Клара и Дэвид",
+                    "eyebrow": "Съёмка пары",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -3288,8 +3853,8 @@
                         "title_style": "h2"
                       }
                     },
-                    "title": "Clara & David",
-                    "eyebrow": "Couple Shooting",
+                    "title": "Կլարա և Դեյվիդ",
+                    "eyebrow": "Զույգի ֆոտոշարք",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-03.jpg",
                     "imageAlt": "",
@@ -3297,7 +3862,7 @@
                     "imageWidth": "610px",
                     "imageAlignment": "right",
                     "imageSvgColor": "emphasis",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=21",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -3354,7 +3919,21 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Clara & David",
+                        "eyebrow": "Couple Shooting",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Клара и Дэвид",
+                        "eyebrow": "Съёмка пары",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -3373,12 +3952,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Clara & David"
+          },
+          "ru": {
+            "title": "Клара и Дэвид"
+          }
+        }
       },
       {
         "id": "yootheme-section-4",
         "kind": "contentLayout",
-        "title": "Welcome little Emma",
+        "title": "Բարի գալուստ փոքրիկ Էմմա",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -3464,8 +4051,8 @@
                     "title_style": "h2"
                   }
                 },
-                "title": "Welcome,<br> little Emma!",
-                "eyebrow": "Family Shooting",
+                "title": "Բարի գալուստ,<br> փոքրիկ Էմմա ։",
+                "eyebrow": "Ընտանեկան նկարահանում",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
                 "imageAlt": "",
@@ -3473,7 +4060,7 @@
                 "imageWidth": "610px",
                 "imageAlignment": "left",
                 "imageSvgColor": "emphasis",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=21",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -3530,7 +4117,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Welcome,<br> little Emma!",
+                    "eyebrow": "Family Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Добро пожаловать,<br> маленькая Эмма!",
+                    "eyebrow": "Семейная съемка",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           }
@@ -3626,8 +4227,8 @@
                         "title_style": "h2"
                       }
                     },
-                    "title": "Welcome,<br> little Emma!",
-                    "eyebrow": "Family Shooting",
+                    "title": "Բարի գալուստ,<br> փոքրիկ Էմմա ։",
+                    "eyebrow": "Ընտանեկան նկարահանում",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-04.jpg",
                     "imageAlt": "",
@@ -3635,7 +4236,7 @@
                     "imageWidth": "610px",
                     "imageAlignment": "left",
                     "imageSvgColor": "emphasis",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=21",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -3692,18 +4293,40 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Welcome,<br> little Emma!",
+                        "eyebrow": "Family Shooting",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Добро пожаловать,<br> маленькая Эмма!",
+                        "eyebrow": "Семейная съемка",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Welcome little Emma"
+          },
+          "ru": {
+            "title": "Добро пожаловать, маленькая Эмма"
+          }
+        }
       },
       {
         "id": "yootheme-section-5",
         "kind": "contentLayout",
-        "title": "Alexandra & Stephan",
+        "title": "Ալեքսանդրա և Ստեֆան",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -3783,8 +4406,8 @@
                     "title_style": "h2"
                   }
                 },
-                "title": "Alexandra <br>& Stephan",
-                "eyebrow": "Couple Shooting",
+                "title": "Ալեքսանդրա <br>և Ստեֆան",
+                "eyebrow": "Զույգի ֆոտոշարք",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
                 "imageAlt": "",
@@ -3792,7 +4415,7 @@
                 "imageWidth": "610px",
                 "imageAlignment": "right",
                 "imageSvgColor": "emphasis",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=21",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -3849,7 +4472,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Alexandra <br>& Stephan",
+                    "eyebrow": "Couple Shooting",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Александра <br>и Стефан",
+                    "eyebrow": "Съёмка пары",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -3938,8 +4575,8 @@
                         "title_style": "h2"
                       }
                     },
-                    "title": "Alexandra <br>& Stephan",
-                    "eyebrow": "Couple Shooting",
+                    "title": "Ալեքսանդրա <br>և Ստեֆան",
+                    "eyebrow": "Զույգի ֆոտոշարք",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-05.jpg",
                     "imageAlt": "",
@@ -3947,7 +4584,7 @@
                     "imageWidth": "610px",
                     "imageAlignment": "right",
                     "imageSvgColor": "emphasis",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=21",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -4004,7 +4641,21 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Alexandra <br>& Stephan",
+                        "eyebrow": "Couple Shooting",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Александра <br>и Стефан",
+                        "eyebrow": "Съёмка пары",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -4023,12 +4674,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Alexandra & Stephan"
+          },
+          "ru": {
+            "title": "Александра и Стефан"
+          }
+        }
       },
       {
         "id": "yootheme-section-6",
         "kind": "contentLayout",
-        "title": "Lennie James",
+        "title": "Լենի Ջեյմս",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -4114,8 +4773,8 @@
                     "title_style": "h2"
                   }
                 },
-                "title": "Lennie James",
-                "eyebrow": "Portrait Photography",
+                "title": "Լենի Ջեյմս",
+                "eyebrow": "Դիմանկարների նկարահանում",
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                 "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
                 "imageAlt": "",
@@ -4123,7 +4782,7 @@
                 "imageWidth": "610px",
                 "imageAlignment": "left",
                 "imageSvgColor": "emphasis",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonUrl": "?page_id=21",
                 "buttonStyle": "text",
                 "panelActionStyle": "text",
@@ -4180,7 +4839,21 @@
                   }
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Lennie James",
+                    "eyebrow": "Portrait Photography",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "title": "Ленни Джеймс",
+                    "eyebrow": "Портретная фотосъемка",
+                    "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           }
@@ -4276,8 +4949,8 @@
                         "title_style": "h2"
                       }
                     },
-                    "title": "Lennie James",
-                    "eyebrow": "Portrait Photography",
+                    "title": "Լենի Ջեյմս",
+                    "eyebrow": "Դիմանկարների նկարահանում",
                     "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
                     "imageUrl": "https://jack.webpages.am/wp-content/uploads/yootheme/stories-06.jpg",
                     "imageAlt": "",
@@ -4285,7 +4958,7 @@
                     "imageWidth": "610px",
                     "imageAlignment": "left",
                     "imageSvgColor": "emphasis",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonUrl": "?page_id=21",
                     "buttonStyle": "text",
                     "panelActionStyle": "text",
@@ -4342,18 +5015,40 @@
                       }
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Lennie James",
+                        "eyebrow": "Portrait Photography",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "title": "Ленни Джеймс",
+                        "eyebrow": "Портретная фотосъемка",
+                        "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Lennie James"
+          },
+          "ru": {
+            "title": "Ленни Джеймс"
+          }
+        }
       },
       {
         "id": "yootheme-section-7",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -4497,8 +5192,8 @@
               {
                 "id": "yootheme-heading-6-0-1-1",
                 "kind": "heading",
-                "headingText": "Read my story",
-                "title": "Read my story",
+                "headingText": "Կարդացեք իմ պատմությունը",
+                "title": "Կարդացեք իմ պատմությունը",
                 "headingLevel": "div",
                 "headingSize": "h1",
                 "animation": {
@@ -4522,6 +5217,16 @@
                   "layout": {},
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Read my story",
+                    "title": "Read my story"
+                  },
+                  "ru": {
+                    "headingText": "Моя история",
+                    "title": "Моя история"
+                  }
                 }
               }
             ]
@@ -4680,8 +5385,8 @@
                   {
                     "id": "yootheme-heading-6-0-1-1",
                     "kind": "heading",
-                    "headingText": "Read my story",
-                    "title": "Read my story",
+                    "headingText": "Կարդացեք իմ պատմությունը",
+                    "title": "Կարդացեք իմ պատմությունը",
                     "headingLevel": "div",
                     "headingSize": "h1",
                     "animation": {
@@ -4705,13 +5410,31 @@
                       "layout": {},
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Read my story",
+                        "title": "Read my story"
+                      },
+                      "ru": {
+                        "headingText": "Моя история",
+                        "title": "Моя история"
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-27T19:17:22.955Z"

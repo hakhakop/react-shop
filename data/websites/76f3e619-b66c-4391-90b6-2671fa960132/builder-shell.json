@@ -207,7 +207,7 @@
   "menuItems": [
     {
       "id": "starter-home",
-      "label": "Home",
+      "label": "Գլխավոր",
       "url": "/",
       "parentId": null,
       "iconName": null,
@@ -215,11 +215,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Home"
+        },
+        "ru": {
+          "label": "Главная"
+        }
+      }
     },
     {
       "id": "starter-about",
-      "label": "About",
+      "label": "Մեր մասին",
       "url": "/#about",
       "parentId": null,
       "iconName": null,
@@ -227,11 +235,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "About"
+        },
+        "ru": {
+          "label": "О нас"
+        }
+      }
     },
     {
       "id": "starter-services",
-      "label": "Services",
+      "label": "Ծառայություններ",
       "url": "/#services",
       "parentId": null,
       "iconName": null,
@@ -239,11 +255,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Services"
+        },
+        "ru": {
+          "label": "Услуги"
+        }
+      }
     },
     {
       "id": "starter-contact",
-      "label": "Contact",
+      "label": "Կապ",
       "url": "/#contact",
       "parentId": null,
       "iconName": null,
@@ -251,7 +275,15 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Contact"
+        },
+        "ru": {
+          "label": "Контакты"
+        }
+      }
     }
   ],
   "namedMenus": [
@@ -266,7 +298,7 @@
       "items": [
         {
           "id": "main-menu-nav-8diy5d",
-          "label": "New In",
+          "label": "Նոր Մեջ",
           "url": "/new-in/",
           "parentId": null,
           "iconName": null,
@@ -423,11 +455,19 @@
             "pageKey": "shop",
             "uri": "/new-in/",
             "sourceDatabaseId": 1416
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "New In"
+            },
+            "ru": {
+              "label": "New In"
+            }
           }
         },
         {
           "id": "main-menu-nav-10kp0a5",
-          "label": "Women",
+          "label": "Կանայք",
           "url": "/women",
           "parentId": null,
           "iconName": null,
@@ -1210,11 +1250,19 @@
             "pageKey": "page:women",
             "slug": "women",
             "uri": "/women"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Women"
+            },
+            "ru": {
+              "label": "Женщины"
+            }
           }
         },
         {
           "id": "main-menu-nav-hrmd0p",
-          "label": "Clothing",
+          "label": "Հագուստ",
           "url": "/product-category/women/clothing/",
           "parentId": "main-menu-nav-10kp0a5",
           "iconName": null,
@@ -1230,11 +1278,19 @@
             "slug": "clothing",
             "uri": "/product-category/women/clothing/",
             "sourceDatabaseId": 24
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Clothing"
+            },
+            "ru": {
+              "label": "Одежда"
+            }
           }
         },
         {
           "id": "main-menu-nav-1fzbpwg",
-          "label": "All Clothes",
+          "label": "Ամբողջ Հագուստ",
           "url": "/product-category/women/clothing/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1250,11 +1306,19 @@
             "slug": "clothing",
             "uri": "/product-category/women/clothing/",
             "sourceDatabaseId": 24
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Clothes"
+            },
+            "ru": {
+              "label": "All Clothes"
+            }
           }
         },
         {
           "id": "main-menu-nav-1fq9xy7",
-          "label": "Coats & Jackets",
+          "label": "Բաճկոններ և բաճկոններ",
           "url": "/product-category/women/clothing/coats-jackets/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1270,11 +1334,19 @@
             "slug": "coats-jackets",
             "uri": "/product-category/women/clothing/coats-jackets/",
             "sourceDatabaseId": 25
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Coats & Jackets"
+            },
+            "ru": {
+              "label": "Coats & Jackets"
+            }
           }
         },
         {
           "id": "main-menu-nav-rb1vpj",
-          "label": "Jeans",
+          "label": "Ջինս",
           "url": "/product-category/women/clothing/jeans/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1290,11 +1362,19 @@
             "slug": "jeans",
             "uri": "/product-category/women/clothing/jeans/",
             "sourceDatabaseId": 26
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Jeans"
+            },
+            "ru": {
+              "label": "Jeans"
+            }
           }
         },
         {
           "id": "main-menu-nav-15x0juf",
-          "label": "Trousers",
+          "label": "Տաբատ",
           "url": "/product-category/women/clothing/trousers/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1310,11 +1390,19 @@
             "slug": "trousers",
             "uri": "/product-category/women/clothing/trousers/",
             "sourceDatabaseId": 27
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Trousers"
+            },
+            "ru": {
+              "label": "Trousers"
+            }
           }
         },
         {
           "id": "main-menu-nav-e7cj5e",
-          "label": "Sweatshirts & Hoodies",
+          "label": "Սվիտերներ և գլխարկներ",
           "url": "/product-category/women/clothing/sweatshirts-hoodies/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1330,11 +1418,19 @@
             "slug": "sweatshirts-hoodies",
             "uri": "/product-category/women/clothing/sweatshirts-hoodies/",
             "sourceDatabaseId": 31
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sweatshirts & Hoodies"
+            },
+            "ru": {
+              "label": "Sweatshirts & Hoodies"
+            }
           }
         },
         {
           "id": "main-menu-nav-1wwhv7k",
-          "label": "T-Shirts & Tops",
+          "label": "Շապիկներ և վերնաշապիկներ",
           "url": "/product-category/women/clothing/t-shirts-tops/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1350,11 +1446,19 @@
             "slug": "t-shirts-tops",
             "uri": "/product-category/women/clothing/t-shirts-tops/",
             "sourceDatabaseId": 28
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "T-Shirts & Tops"
+            },
+            "ru": {
+              "label": "T-Shirts & Tops"
+            }
           }
         },
         {
           "id": "main-menu-nav-2mftw6",
-          "label": "Shirts & Blouses",
+          "label": "Վերնաշապիկներ և վերնաշապիկներ",
           "url": "/product-category/women/clothing/shirts-blouses/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1370,11 +1474,19 @@
             "slug": "shirts-blouses",
             "uri": "/product-category/women/clothing/shirts-blouses/",
             "sourceDatabaseId": 29
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shirts & Blouses"
+            },
+            "ru": {
+              "label": "Shirts & Blouses"
+            }
           }
         },
         {
           "id": "main-menu-nav-1aig74t",
-          "label": "Knitwear",
+          "label": "Տրիկոտաժ",
           "url": "/product-category/women/clothing/knitwear/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1390,11 +1502,19 @@
             "slug": "knitwear",
             "uri": "/product-category/women/clothing/knitwear/",
             "sourceDatabaseId": 30
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Knitwear"
+            },
+            "ru": {
+              "label": "Трикотаж"
+            }
           }
         },
         {
           "id": "main-menu-nav-1f2vs5b",
-          "label": "Dresses",
+          "label": "Զգեստներ",
           "url": "/product-category/women/clothing/dresses/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1410,11 +1530,19 @@
             "slug": "dresses",
             "uri": "/product-category/women/clothing/dresses/",
             "sourceDatabaseId": 32
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Dresses"
+            },
+            "ru": {
+              "label": "Dresses"
+            }
           }
         },
         {
           "id": "main-menu-nav-1ww2xqb",
-          "label": "Skirts & Shorts",
+          "label": "Կիսաշրջազգեստ և շորտեր",
           "url": "/product-category/women/clothing/skirts-shorts/",
           "parentId": "main-menu-nav-hrmd0p",
           "iconName": null,
@@ -1430,11 +1558,19 @@
             "slug": "skirts-shorts",
             "uri": "/product-category/women/clothing/skirts-shorts/",
             "sourceDatabaseId": 33
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Skirts & Shorts"
+            },
+            "ru": {
+              "label": "Skirts & Shorts"
+            }
           }
         },
         {
           "id": "main-menu-nav-1wj86q7",
-          "label": "Accessories",
+          "label": "Աքսեսուարներ",
           "url": "/product-category/women/accessories/",
           "parentId": "main-menu-nav-10kp0a5",
           "iconName": null,
@@ -1450,11 +1586,19 @@
             "slug": "accessories",
             "uri": "/product-category/women/accessories/",
             "sourceDatabaseId": 34
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Accessories"
+            },
+            "ru": {
+              "label": "Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-70i13c",
-          "label": "All Accessories",
+          "label": "Բոլոր Աքսեսուարները",
           "url": "/product-category/women/accessories/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1470,11 +1614,19 @@
             "slug": "accessories",
             "uri": "/product-category/women/accessories/",
             "sourceDatabaseId": 34
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Accessories"
+            },
+            "ru": {
+              "label": "All Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-1hykw8y",
-          "label": "Backpacks & Bags",
+          "label": "Ուսապարկեր և պայուսակներ",
           "url": "/product-category/women/accessories/backpacks-bags/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1490,11 +1642,19 @@
             "slug": "backpacks-bags",
             "uri": "/product-category/women/accessories/backpacks-bags/",
             "sourceDatabaseId": 35
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Backpacks & Bags"
+            },
+            "ru": {
+              "label": "Backpacks & Bags"
+            }
           }
         },
         {
           "id": "main-menu-nav-fyq472",
-          "label": "Wallets",
+          "label": "Դրամապանակներ",
           "url": "/product-category/women/accessories/wallets/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1510,11 +1670,19 @@
             "slug": "wallets",
             "uri": "/product-category/women/accessories/wallets/",
             "sourceDatabaseId": 36
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Wallets"
+            },
+            "ru": {
+              "label": "Wallets"
+            }
           }
         },
         {
           "id": "main-menu-nav-1yapr26",
-          "label": "Sunglasses",
+          "label": "Արևային ակնոցներ",
           "url": "/product-category/women/accessories/sunglasses/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1530,11 +1698,19 @@
             "slug": "sunglasses",
             "uri": "/product-category/women/accessories/sunglasses/",
             "sourceDatabaseId": 37
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sunglasses"
+            },
+            "ru": {
+              "label": "Sunglasses"
+            }
           }
         },
         {
           "id": "main-menu-nav-m747ze",
-          "label": "Belts",
+          "label": "Գոտիներ",
           "url": "/product-category/women/accessories/belts/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1550,11 +1726,19 @@
             "slug": "belts",
             "uri": "/product-category/women/accessories/belts/",
             "sourceDatabaseId": 38
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Belts"
+            },
+            "ru": {
+              "label": "Belts"
+            }
           }
         },
         {
           "id": "main-menu-nav-10eoey5",
-          "label": "Hats & Caps",
+          "label": "Գլխարկներ և գլխարկներ",
           "url": "/product-category/women/accessories/hats-caps/",
           "parentId": "main-menu-nav-1wj86q7",
           "iconName": null,
@@ -1570,11 +1754,19 @@
             "slug": "hats-caps",
             "uri": "/product-category/women/accessories/hats-caps/",
             "sourceDatabaseId": 39
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Hats & Caps"
+            },
+            "ru": {
+              "label": "Hats & Caps"
+            }
           }
         },
         {
           "id": "main-menu-nav-wlbvde",
-          "label": "Highlights",
+          "label": "Առանձնահատկություններ",
           "url": "#",
           "parentId": "main-menu-nav-10kp0a5",
           "iconName": null,
@@ -1587,11 +1779,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Highlights"
+            },
+            "ru": {
+              "label": "Highlights"
+            }
           }
         },
         {
           "id": "main-menu-nav-129zukp",
-          "label": "New In",
+          "label": "Նոր Մեջ",
           "url": "/product-category/women/",
           "parentId": "main-menu-nav-wlbvde",
           "iconName": null,
@@ -1607,11 +1807,19 @@
             "slug": "women",
             "uri": "/product-category/women/",
             "sourceDatabaseId": 23
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "New In"
+            },
+            "ru": {
+              "label": "New In"
+            }
           }
         },
         {
           "id": "main-menu-nav-1s5its2",
-          "label": "Bestsellers",
+          "label": "Բեսթսելերներ",
           "url": "/?product_cat=women&orderby=popularity",
           "parentId": "main-menu-nav-wlbvde",
           "iconName": null,
@@ -1624,11 +1832,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=women&orderby=popularity"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Bestsellers"
+            },
+            "ru": {
+              "label": "Бестселлеры"
+            }
           }
         },
         {
           "id": "main-menu-nav-4261rk",
-          "label": "Sale",
+          "label": "Վաճառք",
           "url": "/?product_cat=women&product_tag=sale",
           "parentId": "main-menu-nav-wlbvde",
           "iconName": null,
@@ -1641,11 +1857,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=women&product_tag=sale"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sale"
+            },
+            "ru": {
+              "label": "Sale"
+            }
           }
         },
         {
           "id": "main-menu-nav-1qjfyvh",
-          "label": "Gifts",
+          "label": "Նվերներ",
           "url": "/?product_cat=women&product_tag=gift",
           "parentId": "main-menu-nav-wlbvde",
           "iconName": null,
@@ -1658,11 +1882,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=women&product_tag=gift"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Gifts"
+            },
+            "ru": {
+              "label": "Gifts"
+            }
           }
         },
         {
           "id": "main-menu-nav-wd24pg",
-          "label": "Collections",
+          "label": "Հավաքածուներ",
           "url": "#",
           "parentId": "main-menu-nav-10kp0a5",
           "iconName": null,
@@ -1675,11 +1907,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Collections"
+            },
+            "ru": {
+              "label": "Коллекции"
+            }
           }
         },
         {
           "id": "main-menu-nav-7pat47",
-          "label": "Revolutionary Muse",
+          "label": "Հեղափոխական մուսա",
           "url": "/product-tag/revolutionary-muse-women/",
           "parentId": "main-menu-nav-wd24pg",
           "iconName": null,
@@ -1692,11 +1932,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/product-tag/revolutionary-muse-women/"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Revolutionary Muse"
+            },
+            "ru": {
+              "label": "Revolutionary Muse"
+            }
           }
         },
         {
           "id": "main-menu-nav-1p69rth",
-          "label": "Color Essentials",
+          "label": "Գույնի հիմնական տարրեր",
           "url": "/product-tag/color-essentials-women/",
           "parentId": "main-menu-nav-wd24pg",
           "iconName": null,
@@ -1709,11 +1957,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/product-tag/color-essentials-women/"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Color Essentials"
+            },
+            "ru": {
+              "label": "Основы цвета"
+            }
           }
         },
         {
           "id": "main-menu-nav-lmi8bt",
-          "label": "Shoes",
+          "label": "Կոշիկ",
           "url": "/product-category/women/shoes/",
           "parentId": "main-menu-nav-10kp0a5",
           "iconName": null,
@@ -1729,11 +1985,19 @@
             "slug": "shoes",
             "uri": "/product-category/women/shoes/",
             "sourceDatabaseId": 40
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shoes"
+            },
+            "ru": {
+              "label": "Shoes"
+            }
           }
         },
         {
           "id": "main-menu-nav-1a8w842",
-          "label": "All Shoes",
+          "label": "Բոլոր կոշիկները",
           "url": "/product-category/women/shoes/",
           "parentId": "main-menu-nav-lmi8bt",
           "iconName": null,
@@ -1749,11 +2013,19 @@
             "slug": "shoes",
             "uri": "/product-category/women/shoes/",
             "sourceDatabaseId": 40
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Shoes"
+            },
+            "ru": {
+              "label": "All Shoes"
+            }
           }
         },
         {
           "id": "main-menu-nav-k49uw6",
-          "label": "Sneakers",
+          "label": "Սպորտային կոշիկներ",
           "url": "/product-category/women/shoes/sneakers/",
           "parentId": "main-menu-nav-lmi8bt",
           "iconName": null,
@@ -1769,11 +2041,19 @@
             "slug": "sneakers",
             "uri": "/product-category/women/shoes/sneakers/",
             "sourceDatabaseId": 41
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sneakers"
+            },
+            "ru": {
+              "label": "Sneakers"
+            }
           }
         },
         {
           "id": "main-menu-nav-1ixtfoj",
-          "label": "Boots",
+          "label": "Կոշիկներ",
           "url": "/product-category/women/shoes/boots/",
           "parentId": "main-menu-nav-lmi8bt",
           "iconName": null,
@@ -1789,11 +2069,19 @@
             "slug": "boots",
             "uri": "/product-category/women/shoes/boots/",
             "sourceDatabaseId": 42
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Boots"
+            },
+            "ru": {
+              "label": "Boots"
+            }
           }
         },
         {
           "id": "main-menu-nav-1u9nu7r",
-          "label": "Men",
+          "label": "Տղամարդիկ",
           "url": "/men",
           "parentId": null,
           "iconName": null,
@@ -2573,11 +2861,19 @@
             "pageKey": "page:men",
             "slug": "men",
             "uri": "/men"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Men"
+            },
+            "ru": {
+              "label": "Мужчины"
+            }
           }
         },
         {
           "id": "main-menu-nav-1gu2khx",
-          "label": "Clothing",
+          "label": "Հագուստ",
           "url": "/product-category/men/clothing-2/",
           "parentId": "main-menu-nav-1u9nu7r",
           "iconName": null,
@@ -2593,11 +2889,19 @@
             "slug": "clothing-2",
             "uri": "/product-category/men/clothing-2/",
             "sourceDatabaseId": 44
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Clothing"
+            },
+            "ru": {
+              "label": "Одежда"
+            }
           }
         },
         {
           "id": "main-menu-nav-1fxp5v0",
-          "label": "All Clothes",
+          "label": "Ամբողջ Հագուստ",
           "url": "/product-category/men/clothing-2/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2613,11 +2917,19 @@
             "slug": "clothing-2",
             "uri": "/product-category/men/clothing-2/",
             "sourceDatabaseId": 44
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Clothes"
+            },
+            "ru": {
+              "label": "All Clothes"
+            }
           }
         },
         {
           "id": "main-menu-nav-q391kw",
-          "label": "Coats & Jackets",
+          "label": "Բաճկոններ և բաճկոններ",
           "url": "/product-category/men/clothing-2/coats-jackets-2/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2633,11 +2945,19 @@
             "slug": "coats-jackets-2",
             "uri": "/product-category/men/clothing-2/coats-jackets-2/",
             "sourceDatabaseId": 45
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Coats & Jackets"
+            },
+            "ru": {
+              "label": "Coats & Jackets"
+            }
           }
         },
         {
           "id": "main-menu-nav-oy24rk",
-          "label": "Jeans",
+          "label": "Ջինս",
           "url": "/product-category/men/clothing-2/jeans-2/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2653,11 +2973,19 @@
             "slug": "jeans-2",
             "uri": "/product-category/men/clothing-2/jeans-2/",
             "sourceDatabaseId": 46
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Jeans"
+            },
+            "ru": {
+              "label": "Jeans"
+            }
           }
         },
         {
           "id": "main-menu-nav-1dvaukn",
-          "label": "Trousers & Shorts",
+          "label": "Տաբատ և շորտեր",
           "url": "/product-category/men/clothing-2/trousers-shorts/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2673,11 +3001,19 @@
             "slug": "trousers-shorts",
             "uri": "/product-category/men/clothing-2/trousers-shorts/",
             "sourceDatabaseId": 47
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Trousers & Shorts"
+            },
+            "ru": {
+              "label": "Trousers & Shorts"
+            }
           }
         },
         {
           "id": "main-menu-nav-h3lwlh",
-          "label": "Sweatshirts & Hoodies",
+          "label": "Սվիտերներ և գլխարկներ",
           "url": "/product-category/men/clothing-2/sweatshirts-hoodies-2/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2693,11 +3029,19 @@
             "slug": "sweatshirts-hoodies-2",
             "uri": "/product-category/men/clothing-2/sweatshirts-hoodies-2/",
             "sourceDatabaseId": 48
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sweatshirts & Hoodies"
+            },
+            "ru": {
+              "label": "Sweatshirts & Hoodies"
+            }
           }
         },
         {
           "id": "main-menu-nav-d12ffx",
-          "label": "T-Shirts",
+          "label": "Շապիկներ",
           "url": "/product-category/men/clothing-2/t-shirts/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2713,11 +3057,19 @@
             "slug": "t-shirts",
             "uri": "/product-category/men/clothing-2/t-shirts/",
             "sourceDatabaseId": 50
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "T-Shirts"
+            },
+            "ru": {
+              "label": "T-Shirts"
+            }
           }
         },
         {
           "id": "main-menu-nav-1ti53hi",
-          "label": "Shirts",
+          "label": "Շապիկներ",
           "url": "/product-category/men/clothing-2/shirts/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2733,11 +3085,19 @@
             "slug": "shirts",
             "uri": "/product-category/men/clothing-2/shirts/",
             "sourceDatabaseId": 51
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shirts"
+            },
+            "ru": {
+              "label": "Shirts"
+            }
           }
         },
         {
           "id": "main-menu-nav-slqgm8",
-          "label": "Knitwear",
+          "label": "Տրիկոտաժ",
           "url": "/product-category/men/clothing-2/knitwear-2/",
           "parentId": "main-menu-nav-1gu2khx",
           "iconName": null,
@@ -2753,11 +3113,19 @@
             "slug": "knitwear-2",
             "uri": "/product-category/men/clothing-2/knitwear-2/",
             "sourceDatabaseId": 49
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Knitwear"
+            },
+            "ru": {
+              "label": "Трикотаж"
+            }
           }
         },
         {
           "id": "main-menu-nav-1vrd3yd",
-          "label": "Accessories",
+          "label": "Աքսեսուարներ",
           "url": "/product-category/men/accessories-2/",
           "parentId": "main-menu-nav-1u9nu7r",
           "iconName": null,
@@ -2773,11 +3141,19 @@
             "slug": "accessories-2",
             "uri": "/product-category/men/accessories-2/",
             "sourceDatabaseId": 52
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Accessories"
+            },
+            "ru": {
+              "label": "Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-1ikzsba",
-          "label": "All Accessories",
+          "label": "Բոլոր Աքսեսուարները",
           "url": "/product-category/men/accessories-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2793,11 +3169,19 @@
             "slug": "accessories-2",
             "uri": "/product-category/men/accessories-2/",
             "sourceDatabaseId": 52
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Accessories"
+            },
+            "ru": {
+              "label": "All Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-yimqsp",
-          "label": "Backpacks & Bags",
+          "label": "Ուսապարկեր և պայուսակներ",
           "url": "/product-category/men/accessories-2/backpacks-bags-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2813,11 +3197,19 @@
             "slug": "backpacks-bags-2",
             "uri": "/product-category/men/accessories-2/backpacks-bags-2/",
             "sourceDatabaseId": 53
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Backpacks & Bags"
+            },
+            "ru": {
+              "label": "Backpacks & Bags"
+            }
           }
         },
         {
           "id": "main-menu-nav-otowbb",
-          "label": "Wallets",
+          "label": "Դրամապանակներ",
           "url": "/product-category/men/accessories-2/wallets-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2833,11 +3225,19 @@
             "slug": "wallets-2",
             "uri": "/product-category/men/accessories-2/wallets-2/",
             "sourceDatabaseId": 54
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Wallets"
+            },
+            "ru": {
+              "label": "Wallets"
+            }
           }
         },
         {
           "id": "main-menu-nav-1fidm01",
-          "label": "Sunglasses",
+          "label": "Արևային ակնոցներ",
           "url": "/product-category/men/accessories-2/sunglasses-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2853,11 +3253,19 @@
             "slug": "sunglasses-2",
             "uri": "/product-category/men/accessories-2/sunglasses-2/",
             "sourceDatabaseId": 55
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sunglasses"
+            },
+            "ru": {
+              "label": "Sunglasses"
+            }
           }
         },
         {
           "id": "main-menu-nav-8hcxwr",
-          "label": "Belts",
+          "label": "Գոտիներ",
           "url": "/product-category/men/accessories-2/belts-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2873,11 +3281,19 @@
             "slug": "belts-2",
             "uri": "/product-category/men/accessories-2/belts-2/",
             "sourceDatabaseId": 56
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Belts"
+            },
+            "ru": {
+              "label": "Belts"
+            }
           }
         },
         {
           "id": "main-menu-nav-7gh1ds",
-          "label": "Hats & Caps",
+          "label": "Գլխարկներ և գլխարկներ",
           "url": "/product-category/men/accessories-2/hats-caps-2/",
           "parentId": "main-menu-nav-1vrd3yd",
           "iconName": null,
@@ -2893,11 +3309,19 @@
             "slug": "hats-caps-2",
             "uri": "/product-category/men/accessories-2/hats-caps-2/",
             "sourceDatabaseId": 57
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Hats & Caps"
+            },
+            "ru": {
+              "label": "Hats & Caps"
+            }
           }
         },
         {
           "id": "main-menu-nav-wvbh2d",
-          "label": "Highlights",
+          "label": "Առանձնահատկություններ",
           "url": "#",
           "parentId": "main-menu-nav-1u9nu7r",
           "iconName": null,
@@ -2910,11 +3334,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Highlights"
+            },
+            "ru": {
+              "label": "Highlights"
+            }
           }
         },
         {
           "id": "main-menu-nav-eltc7h",
-          "label": "New In",
+          "label": "Նոր Մեջ",
           "url": "/product-category/men/",
           "parentId": "main-menu-nav-wvbh2d",
           "iconName": null,
@@ -2930,11 +3362,19 @@
             "slug": "men",
             "uri": "/product-category/men/",
             "sourceDatabaseId": 43
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "New In"
+            },
+            "ru": {
+              "label": "New In"
+            }
           }
         },
         {
           "id": "main-menu-nav-pgnezw",
-          "label": "Bestsellers",
+          "label": "Բեսթսելերներ",
           "url": "/?product_cat=men&orderby=popularity",
           "parentId": "main-menu-nav-wvbh2d",
           "iconName": null,
@@ -2947,11 +3387,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=men&orderby=popularity"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Bestsellers"
+            },
+            "ru": {
+              "label": "Бестселлеры"
+            }
           }
         },
         {
           "id": "main-menu-nav-6ktgr2",
-          "label": "Sale",
+          "label": "Վաճառք",
           "url": "/?product_cat=men&product_tag=sale",
           "parentId": "main-menu-nav-wvbh2d",
           "iconName": null,
@@ -2964,11 +3412,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=men&product_tag=sale"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sale"
+            },
+            "ru": {
+              "label": "Sale"
+            }
           }
         },
         {
           "id": "main-menu-nav-1am56bn",
-          "label": "Gifts",
+          "label": "Նվերներ",
           "url": "/?product_cat=men&product_tag=gift",
           "parentId": "main-menu-nav-wvbh2d",
           "iconName": null,
@@ -2981,11 +3437,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=men&product_tag=gift"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Gifts"
+            },
+            "ru": {
+              "label": "Gifts"
+            }
           }
         },
         {
           "id": "main-menu-nav-wn1qef",
-          "label": "Collections",
+          "label": "Հավաքածուներ",
           "url": "#",
           "parentId": "main-menu-nav-1u9nu7r",
           "iconName": null,
@@ -2998,11 +3462,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Collections"
+            },
+            "ru": {
+              "label": "Коллекции"
+            }
           }
         },
         {
           "id": "main-menu-nav-sq983h",
-          "label": "Revolutionary Muse",
+          "label": "Հեղափոխական մուսա",
           "url": "/product-tag/revolutionary-muse-men/",
           "parentId": "main-menu-nav-wn1qef",
           "iconName": null,
@@ -3015,11 +3487,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/product-tag/revolutionary-muse-men/"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Revolutionary Muse"
+            },
+            "ru": {
+              "label": "Revolutionary Muse"
+            }
           }
         },
         {
           "id": "main-menu-nav-4krynz",
-          "label": "Color Essentials",
+          "label": "Գույնի հիմնական տարրեր",
           "url": "/product-tag/color-essentials-men/",
           "parentId": "main-menu-nav-wn1qef",
           "iconName": null,
@@ -3032,11 +3512,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/product-tag/color-essentials-men/"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Color Essentials"
+            },
+            "ru": {
+              "label": "Основы цвета"
+            }
           }
         },
         {
           "id": "main-menu-nav-1x22ekz",
-          "label": "Shoes",
+          "label": "Կոշիկ",
           "url": "/product-category/men/shoes-2/",
           "parentId": "main-menu-nav-1u9nu7r",
           "iconName": null,
@@ -3052,11 +3540,19 @@
             "slug": "shoes-2",
             "uri": "/product-category/men/shoes-2/",
             "sourceDatabaseId": 58
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shoes"
+            },
+            "ru": {
+              "label": "Shoes"
+            }
           }
         },
         {
           "id": "main-menu-nav-1m5gqck",
-          "label": "All Shoes",
+          "label": "Բոլոր կոշիկները",
           "url": "/product-category/men/shoes-2/",
           "parentId": "main-menu-nav-1x22ekz",
           "iconName": null,
@@ -3072,11 +3568,19 @@
             "slug": "shoes-2",
             "uri": "/product-category/men/shoes-2/",
             "sourceDatabaseId": 58
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "All Shoes"
+            },
+            "ru": {
+              "label": "All Shoes"
+            }
           }
         },
         {
           "id": "main-menu-nav-ehtww5",
-          "label": "Sneakers",
+          "label": "Սպորտային կոշիկներ",
           "url": "/product-category/men/shoes-2/sneakers-2/",
           "parentId": "main-menu-nav-1x22ekz",
           "iconName": null,
@@ -3092,11 +3596,19 @@
             "slug": "sneakers-2",
             "uri": "/product-category/men/shoes-2/sneakers-2/",
             "sourceDatabaseId": 59
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sneakers"
+            },
+            "ru": {
+              "label": "Sneakers"
+            }
           }
         },
         {
           "id": "main-menu-nav-vn3qka",
-          "label": "Boots",
+          "label": "Կոշիկներ",
           "url": "/product-category/men/shoes-2/boots-2/",
           "parentId": "main-menu-nav-1x22ekz",
           "iconName": null,
@@ -3112,11 +3624,19 @@
             "slug": "boots-2",
             "uri": "/product-category/men/shoes-2/boots-2/",
             "sourceDatabaseId": 60
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Boots"
+            },
+            "ru": {
+              "label": "Boots"
+            }
           }
         },
         {
           "id": "main-menu-nav-1g954zy",
-          "label": "Kids",
+          "label": "Երեխաներ",
           "url": "/kids",
           "parentId": null,
           "iconName": null,
@@ -3827,11 +4347,19 @@
             "pageKey": "page:kids",
             "slug": "kids",
             "uri": "/kids"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Kids"
+            },
+            "ru": {
+              "label": "Дети"
+            }
           }
         },
         {
           "id": "main-menu-nav-l3pen4",
-          "label": "Babies 0-24 Months",
+          "label": "Երեխաներ 0-24 ամսական",
           "url": "/product-category/kids/babies-0-24-months/",
           "parentId": "main-menu-nav-1g954zy",
           "iconName": null,
@@ -3847,11 +4375,19 @@
             "slug": "babies-0-24-months",
             "uri": "/product-category/kids/babies-0-24-months/",
             "sourceDatabaseId": 62
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Babies 0-24 Months"
+            },
+            "ru": {
+              "label": "Babies 0-24 Months"
+            }
           }
         },
         {
           "id": "main-menu-nav-nhnfhn",
-          "label": "Shop All",
+          "label": "Գնել բոլորը",
           "url": "/product-category/kids/babies-0-24-months/",
           "parentId": "main-menu-nav-l3pen4",
           "iconName": null,
@@ -3867,11 +4403,19 @@
             "slug": "babies-0-24-months",
             "uri": "/product-category/kids/babies-0-24-months/",
             "sourceDatabaseId": 62
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shop All"
+            },
+            "ru": {
+              "label": "Shop All"
+            }
           }
         },
         {
           "id": "main-menu-nav-y4tnlv",
-          "label": "Clothing",
+          "label": "Հագուստ",
           "url": "/product-category/kids/babies-0-24-months/clothing-2-2/",
           "parentId": "main-menu-nav-l3pen4",
           "iconName": null,
@@ -3887,11 +4431,19 @@
             "slug": "clothing-2-2",
             "uri": "/product-category/kids/babies-0-24-months/clothing-2-2/",
             "sourceDatabaseId": 63
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Clothing"
+            },
+            "ru": {
+              "label": "Одежда"
+            }
           }
         },
         {
           "id": "main-menu-nav-dqq63d",
-          "label": "Accessories",
+          "label": "Աքսեսուարներ",
           "url": "/product-category/kids/babies-0-24-months/accessories-2-2/",
           "parentId": "main-menu-nav-l3pen4",
           "iconName": null,
@@ -3907,11 +4459,19 @@
             "slug": "accessories-2-2",
             "uri": "/product-category/kids/babies-0-24-months/accessories-2-2/",
             "sourceDatabaseId": 64
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Accessories"
+            },
+            "ru": {
+              "label": "Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-d6f34q",
-          "label": "Kids 2-6 Years",
+          "label": "Երեխաներ 2-6 տարեկան",
           "url": "/product-category/kids/kids-2-6-years/",
           "parentId": "main-menu-nav-1g954zy",
           "iconName": null,
@@ -3927,11 +4487,19 @@
             "slug": "kids-2-6-years",
             "uri": "/product-category/kids/kids-2-6-years/",
             "sourceDatabaseId": 65
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Kids 2-6 Years"
+            },
+            "ru": {
+              "label": "Kids 2-6 Years"
+            }
           }
         },
         {
           "id": "main-menu-nav-zo1o63",
-          "label": "Shop All",
+          "label": "Գնել բոլորը",
           "url": "/product-category/kids/kids-2-6-years/",
           "parentId": "main-menu-nav-d6f34q",
           "iconName": null,
@@ -3947,11 +4515,19 @@
             "slug": "kids-2-6-years",
             "uri": "/product-category/kids/kids-2-6-years/",
             "sourceDatabaseId": 65
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shop All"
+            },
+            "ru": {
+              "label": "Shop All"
+            }
           }
         },
         {
           "id": "main-menu-nav-1mpccox",
-          "label": "Clothing",
+          "label": "Հագուստ",
           "url": "/product-category/kids/kids-2-6-years/clothing-2-2-2/",
           "parentId": "main-menu-nav-d6f34q",
           "iconName": null,
@@ -3967,11 +4543,19 @@
             "slug": "clothing-2-2-2",
             "uri": "/product-category/kids/kids-2-6-years/clothing-2-2-2/",
             "sourceDatabaseId": 66
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Clothing"
+            },
+            "ru": {
+              "label": "Одежда"
+            }
           }
         },
         {
           "id": "main-menu-nav-12f1ukp",
-          "label": "Accessories",
+          "label": "Աքսեսուարներ",
           "url": "/product-category/kids/kids-2-6-years/accessories-2-2-2/",
           "parentId": "main-menu-nav-d6f34q",
           "iconName": null,
@@ -3987,11 +4571,19 @@
             "slug": "accessories-2-2-2",
             "uri": "/product-category/kids/kids-2-6-years/accessories-2-2-2/",
             "sourceDatabaseId": 67
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Accessories"
+            },
+            "ru": {
+              "label": "Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-1kihdo9",
-          "label": "Youth 7+ Years",
+          "label": "Երիտասարդություն 7+ տարի",
           "url": "/product-category/kids/youth-7-years/",
           "parentId": "main-menu-nav-1g954zy",
           "iconName": null,
@@ -4007,11 +4599,19 @@
             "slug": "youth-7-years",
             "uri": "/product-category/kids/youth-7-years/",
             "sourceDatabaseId": 68
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Youth 7+ Years"
+            },
+            "ru": {
+              "label": "Youth 7+ Years"
+            }
           }
         },
         {
           "id": "main-menu-nav-afxrer",
-          "label": "Shop All",
+          "label": "Գնել բոլորը",
           "url": "/product-category/kids/youth-7-years/",
           "parentId": "main-menu-nav-1kihdo9",
           "iconName": null,
@@ -4027,11 +4627,19 @@
             "slug": "youth-7-years",
             "uri": "/product-category/kids/youth-7-years/",
             "sourceDatabaseId": 68
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Shop All"
+            },
+            "ru": {
+              "label": "Shop All"
+            }
           }
         },
         {
           "id": "main-menu-nav-13qn6ib",
-          "label": "Clothing",
+          "label": "Հագուստ",
           "url": "/product-category/kids/youth-7-years/clothing-2-2-2-2/",
           "parentId": "main-menu-nav-1kihdo9",
           "iconName": null,
@@ -4047,11 +4655,19 @@
             "slug": "clothing-2-2-2-2",
             "uri": "/product-category/kids/youth-7-years/clothing-2-2-2-2/",
             "sourceDatabaseId": 69
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Clothing"
+            },
+            "ru": {
+              "label": "Одежда"
+            }
           }
         },
         {
           "id": "main-menu-nav-17b95vt",
-          "label": "Accessories",
+          "label": "Աքսեսուարներ",
           "url": "/product-category/kids/youth-7-years/accessories-2-2-2-2/",
           "parentId": "main-menu-nav-1kihdo9",
           "iconName": null,
@@ -4067,11 +4683,19 @@
             "slug": "accessories-2-2-2-2",
             "uri": "/product-category/kids/youth-7-years/accessories-2-2-2-2/",
             "sourceDatabaseId": 70
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Accessories"
+            },
+            "ru": {
+              "label": "Accessories"
+            }
           }
         },
         {
           "id": "main-menu-nav-w1cnzg",
-          "label": "Highlights",
+          "label": "Առանձնահատկություններ",
           "url": "#",
           "parentId": "main-menu-nav-1g954zy",
           "iconName": null,
@@ -4084,11 +4708,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Highlights"
+            },
+            "ru": {
+              "label": "Highlights"
+            }
           }
         },
         {
           "id": "main-menu-nav-4emd8b",
-          "label": "New In",
+          "label": "Նոր Մեջ",
           "url": "/product-category/kids/",
           "parentId": "main-menu-nav-w1cnzg",
           "iconName": null,
@@ -4104,11 +4736,19 @@
             "slug": "kids",
             "uri": "/product-category/kids/",
             "sourceDatabaseId": 61
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "New In"
+            },
+            "ru": {
+              "label": "New In"
+            }
           }
         },
         {
           "id": "main-menu-nav-94y1ur",
-          "label": "Bestsellers",
+          "label": "Բեսթսելերներ",
           "url": "/?product_cat=kids&orderby=popularity",
           "parentId": "main-menu-nav-w1cnzg",
           "iconName": null,
@@ -4121,11 +4761,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=kids&orderby=popularity"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Bestsellers"
+            },
+            "ru": {
+              "label": "Бестселлеры"
+            }
           }
         },
         {
           "id": "main-menu-nav-1087q63",
-          "label": "Sale",
+          "label": "Վաճառք",
           "url": "/?product_cat=kids&product_tag=sale",
           "parentId": "main-menu-nav-w1cnzg",
           "iconName": null,
@@ -4138,11 +4786,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=kids&product_tag=sale"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sale"
+            },
+            "ru": {
+              "label": "Sale"
+            }
           }
         },
         {
           "id": "main-menu-nav-1crlor8",
-          "label": "Gifts",
+          "label": "Նվերներ",
           "url": "/?product_cat=kids&product_tag=gift",
           "parentId": "main-menu-nav-w1cnzg",
           "iconName": null,
@@ -4155,11 +4811,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?product_cat=kids&product_tag=gift"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Gifts"
+            },
+            "ru": {
+              "label": "Gifts"
+            }
           }
         },
         {
           "id": "main-menu-nav-wx1c3e",
-          "label": "Collections",
+          "label": "Հավաքածուներ",
           "url": "#",
           "parentId": "main-menu-nav-1g954zy",
           "iconName": null,
@@ -4172,11 +4836,19 @@
           "navigationTarget": {
             "kind": "anchor",
             "url": "#"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Collections"
+            },
+            "ru": {
+              "label": "Коллекции"
+            }
           }
         },
         {
           "id": "main-menu-nav-zivc40",
-          "label": "Tiny Essentials",
+          "label": "Փոքրիկ անհրաժեշտ իրեր",
           "url": "/product-tag/tiny-essentials/",
           "parentId": "main-menu-nav-wx1c3e",
           "iconName": null,
@@ -4189,11 +4861,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/product-tag/tiny-essentials/"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Tiny Essentials"
+            },
+            "ru": {
+              "label": "Маленькие необходимые вещи"
+            }
           }
         },
         {
           "id": "main-menu-nav-14cs0ni",
-          "label": "Gifts",
+          "label": "Նվերներ",
           "url": "/gifts",
           "parentId": null,
           "iconName": null,
@@ -4208,11 +4888,19 @@
             "pageKey": "page:gifts",
             "slug": "gifts",
             "uri": "/gifts"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Gifts"
+            },
+            "ru": {
+              "label": "Gifts"
+            }
           }
         },
         {
           "id": "main-menu-nav-aech2w",
-          "label": "About",
+          "label": "Մեր մասին",
           "url": "/about/",
           "parentId": null,
           "iconName": null,
@@ -4228,11 +4916,19 @@
             "slug": "about",
             "uri": "/about/",
             "sourceDatabaseId": 4
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "About"
+            },
+            "ru": {
+              "label": "О нас"
+            }
           }
         },
         {
           "id": "main-menu-nav-9uukpm",
-          "label": "Sustainability",
+          "label": "Կայունություն",
           "url": "/sustainability/",
           "parentId": "main-menu-nav-aech2w",
           "iconName": null,
@@ -4248,11 +4944,19 @@
             "slug": "sustainability",
             "uri": "/sustainability/",
             "sourceDatabaseId": 227
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Sustainability"
+            },
+            "ru": {
+              "label": "Sustainability"
+            }
           }
         },
         {
           "id": "main-menu-nav-9c5l9o",
-          "label": "Stories",
+          "label": "Պատմություններ",
           "url": "/stories/",
           "parentId": "main-menu-nav-aech2w",
           "iconName": null,
@@ -4268,11 +4972,19 @@
             "slug": "stories",
             "uri": "/stories/",
             "sourceDatabaseId": 1501
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Stories"
+            },
+            "ru": {
+              "label": "Stories"
+            }
           }
         },
         {
           "id": "main-menu-nav-1q7jbmv",
-          "label": "Campaigns",
+          "label": "Արշավներ",
           "url": "/category/campaigns/",
           "parentId": "main-menu-nav-9c5l9o",
           "iconName": null,
@@ -4288,11 +5000,19 @@
             "slug": "campaigns",
             "uri": "/category/campaigns/",
             "sourceDatabaseId": 16
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Campaigns"
+            },
+            "ru": {
+              "label": "Campaigns"
+            }
           }
         },
         {
           "id": "main-menu-nav-1vqunma",
-          "label": "People & Events",
+          "label": "Մարդիկ և իրադարձություններ",
           "url": "/category/people-events/",
           "parentId": "main-menu-nav-9c5l9o",
           "iconName": null,
@@ -4308,11 +5028,19 @@
             "slug": "people-events",
             "uri": "/category/people-events/",
             "sourceDatabaseId": 17
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "People & Events"
+            },
+            "ru": {
+              "label": "People & Events"
+            }
           }
         },
         {
           "id": "main-menu-nav-1wo6m3u",
-          "label": "Fashion Shows",
+          "label": "Նորաձևության ցուցադրություններ",
           "url": "/category/fashion-shows/",
           "parentId": "main-menu-nav-9c5l9o",
           "iconName": null,
@@ -4328,11 +5056,19 @@
             "slug": "fashion-shows",
             "uri": "/category/fashion-shows/",
             "sourceDatabaseId": 18
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Fashion Shows"
+            },
+            "ru": {
+              "label": "Fashion Shows"
+            }
           }
         },
         {
           "id": "main-menu-nav-9rvrg2",
-          "label": "Our Values",
+          "label": "Մեր արժեքները",
           "url": "/category/our-values/",
           "parentId": "main-menu-nav-9c5l9o",
           "iconName": null,
@@ -4348,11 +5084,19 @@
             "slug": "our-values",
             "uri": "/category/our-values/",
             "sourceDatabaseId": 19
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Our Values"
+            },
+            "ru": {
+              "label": "Our Values"
+            }
           }
         },
         {
           "id": "main-menu-nav-6nyv72",
-          "label": "Careers",
+          "label": "Կարիերա",
           "url": "/careers/",
           "parentId": "main-menu-nav-aech2w",
           "iconName": null,
@@ -4368,11 +5112,19 @@
             "slug": "careers",
             "uri": "/careers/",
             "sourceDatabaseId": 228
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Careers"
+            },
+            "ru": {
+              "label": "Карьера"
+            }
           }
         },
         {
           "id": "main-menu-nav-1v3lt6v",
-          "label": "Open Positions",
+          "label": "Բաց դիրքեր",
           "url": "/open-positions/",
           "parentId": "main-menu-nav-6nyv72",
           "iconName": null,
@@ -4388,11 +5140,19 @@
             "slug": "open-positions",
             "uri": "/open-positions/",
             "sourceDatabaseId": 233
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Open Positions"
+            },
+            "ru": {
+              "label": "Open Positions"
+            }
           }
         },
         {
           "id": "main-menu-nav-60ytv2",
-          "label": "Job Description",
+          "label": "Աշխատանքի նկարագրություն",
           "url": "/job-description/",
           "parentId": "main-menu-nav-6nyv72",
           "iconName": null,
@@ -4408,6 +5168,14 @@
             "slug": "job-description",
             "uri": "/job-description/",
             "sourceDatabaseId": 235
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Job Description"
+            },
+            "ru": {
+              "label": "Должностная инструкция"
+            }
           }
         }
       ]

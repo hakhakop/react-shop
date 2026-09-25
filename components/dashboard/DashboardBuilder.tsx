@@ -3504,9 +3504,20 @@ export default function DashboardBuilder({
         rebaseProjection(value, projectedRecord[key], key),
       ]));
     };
-    const sections = builderRenderProjection.sourceSignature === authoredRevisionSignature
-      ? builderRenderProjection.sections
-      : rebaseProjection(builderState.sections, builderRenderProjection.sections) as BuilderSection[];
+    // A server projection may already be resolved for the locale that was
+    // active during the initial request. Rebase it over the current authored
+    // locale before rendering so switching back to the primary language does
+    // not retain that initial localized snapshot. Dynamic repeated content is
+    // still retained by rebaseProjection's dynamic-array handling.
+    const localizedAuthoredSections = resolveContentSections(
+      builderState.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    );
+    const sections = rebaseProjection(
+      localizedAuthoredSections,
+      builderRenderProjection.sections,
+    ) as BuilderSection[];
     // Dynamic materialization owns repeated/resolved content, while the
     // authored draft owns Row inspector presentation. Rebase those row values
     // even when the previous projection is temporarily retained during a
@@ -3519,7 +3530,6 @@ export default function DashboardBuilder({
     return resolveContentSections(liveRowSections, contentLanguage, primaryContentLanguage);
   }, [
     builderRenderProjection,
-    authoredRevisionSignature,
     builderState,
     contentLanguage,
     primaryContentLanguage,
@@ -3531,10 +3541,28 @@ export default function DashboardBuilder({
   // projection could reach the inline preview but never the iframe until a
   // full reload performed server-side materialization again.
   const iframeRenderState = useMemo<BuilderState>(
-    () => materializedPreviewSections
-      ? { ...builderState, sections: materializedPreviewSections }
-      : builderState,
-    [builderState, materializedPreviewSections],
+    () => ({
+      ...builderState,
+      // The iframe is the canonical Builder canvas. Even when there is no
+      // transient Dynamic Content projection, it must receive the same
+      // locale-resolved sections as the inline canvas. Otherwise the Header's
+      // live locale message updates immediately while the page body remains
+      // on the server-initialized language until a reload.
+      // Keep authored media references untouched, but give the canonical
+      // iframe the same active-website URL projection as the server-rendered
+      // preview. Without this, the live draft bridge replaces correctly
+      // rebased WordPress URLs with the imported source site's URLs.
+      sections: resolveBuilderMediaUrls(
+        materializedPreviewSections ?? localizedSections,
+        wordpressMediaOrigin,
+      ),
+    }),
+    [
+      builderState,
+      localizedSections,
+      materializedPreviewSections,
+      wordpressMediaOrigin,
+    ],
   );
   const iframeRenderStateRef = useRef(iframeRenderState);
   iframeRenderStateRef.current = iframeRenderState;

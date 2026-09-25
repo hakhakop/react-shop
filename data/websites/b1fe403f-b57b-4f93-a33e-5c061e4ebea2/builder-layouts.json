@@ -9,7 +9,7 @@
       {
         "id": "contentLayout-mtd1we4g-eg2xa",
         "kind": "contentLayout",
-        "title": "Hero",
+        "title": "Հերոսություն",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -61,7 +61,7 @@
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "buttonLabel": "View House",
+                    "buttonLabel": "Դիտել տունը",
                     "itemElement": "article",
                     "dynamicContext": {
                       "provider": "wordpress",
@@ -113,6 +113,14 @@
                       "buttonUrl": {
                         "path": "link",
                         "valueType": "url"
+                      }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "View House"
+                      },
+                      "ru": {
+                        "buttonLabel": "View House"
                       }
                     }
                   }
@@ -220,7 +228,7 @@
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
                         "showAction": false,
-                        "buttonLabel": "View House",
+                        "buttonLabel": "Դիտել տունը",
                         "itemElement": "article",
                         "dynamicContext": {
                           "provider": "wordpress",
@@ -272,6 +280,14 @@
                           "buttonUrl": {
                             "path": "link",
                             "valueType": "url"
+                          }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "View House"
+                          },
+                          "ru": {
+                            "buttonLabel": "View House"
                           }
                         }
                       }
@@ -348,12 +364,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Hero"
+          },
+          "ru": {
+            "title": "Герой"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4g-bbxv2",
         "kind": "contentLayout",
-        "title": "Latest Accommodations",
+        "title": "Վերջին կացարանները",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -397,8 +421,8 @@
               {
                 "id": "heading-block-mtd1we4g-mm7u9",
                 "kind": "heading",
-                "headingText": "Latest Homes",
-                "title": "Latest Homes",
+                "headingText": "Վերջին տները",
+                "title": "Վերջին տները",
                 "headingLevel": "h2",
                 "headingSize": "h3",
                 "elementAlign": "center",
@@ -411,6 +435,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Latest Homes",
+                    "title": "Latest Homes"
+                  },
+                  "ru": {
+                    "headingText": "Последние дома",
+                    "title": "Последние дома"
+                  }
                 }
               }
             ]
@@ -426,10 +460,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-1-0-1-0-0",
-                    "label": "View All",
+                    "label": "Դիտել բոլորը",
                     "url": "?post_type=accommodation",
                     "target": "_self",
-                    "style": "text"
+                    "style": "text",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "View All"
+                      },
+                      "ru": {
+                        "label": "Смотреть все"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -629,8 +671,8 @@
                   {
                     "id": "heading-block-mtd1we4g-5zxla",
                     "kind": "heading",
-                    "headingText": "Latest Homes",
-                    "title": "Latest Homes",
+                    "headingText": "Վերջին տները",
+                    "title": "Վերջին տները",
                     "headingLevel": "h2",
                     "headingSize": "h3",
                     "elementAlign": "center",
@@ -643,6 +685,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Latest Homes",
+                        "title": "Latest Homes"
+                      },
+                      "ru": {
+                        "headingText": "Последние дома",
+                        "title": "Последние дома"
+                      }
                     }
                   }
                 ]
@@ -666,10 +718,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-1-0-1-0-0",
-                        "label": "View All",
+                        "label": "Դիտել բոլորը",
                         "url": "?post_type=accommodation",
                         "target": "_self",
-                        "style": "text"
+                        "style": "text",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "View All"
+                          },
+                          "ru": {
+                            "label": "Смотреть все"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -844,12 +904,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Latest Accommodations"
+          },
+          "ru": {
+            "title": "Последние варианты проживания"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4h-axhmj",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -891,8 +959,8 @@
               {
                 "id": "heading-block-mtd1we4h-xdxn4",
                 "kind": "heading",
-                "headingText": "What Makes Us Special",
-                "title": "What Makes Us Special",
+                "headingText": "Ինչն է մեզ առանձնահատուկ դարձնում",
+                "title": "Ինչն է մեզ առանձնահատուկ դարձնում",
                 "headingLevel": "h2",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -905,13 +973,23 @@
                   "layout": {},
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "What Makes Us Special",
+                    "title": "What Makes Us Special"
+                  },
+                  "ru": {
+                    "headingText": "Что делает нас особенными",
+                    "title": "Что делает нас особенными"
+                  }
                 }
               },
               {
                 "id": "heading-block-mtd1we4h-85nzm",
                 "kind": "heading",
-                "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
-                "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                "headingText": "Մենք տրամադրում ենք բացառիկ, անկրկնելի հանգստյան տների ցանց, որոնք կօգնեն ձեզ պլանավորել ապահով, հանգիստ և անմոռանալի հանգիստ:",
+                "title": "Մենք տրամադրում ենք բացառիկ, անկրկնելի հանգստյան տների ցանց, որոնք կօգնեն ձեզ պլանավորել ապահով, հանգիստ և անմոռանալի հանգիստ:",
                 "headingLevel": "div",
                 "headingSize": "h3",
                 "animation": {
@@ -925,6 +1003,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                    "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation."
+                  },
+                  "ru": {
+                    "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                    "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation."
+                  }
                 }
               },
               {
@@ -935,54 +1023,110 @@
                   {
                     "id": "yootheme-grid-item-2-0-0-2-0",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-handpicked-locations.svg",
-                    "imageAlt": "Handpicked Locations",
-                    "title": "Handpicked Locations",
+                    "imageAlt": "Խնամքով ընտրված վայրեր",
+                    "title": "Խնամքով ընտրված վայրեր",
                     "meta": "",
                     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h5"
+                    "titleStyle": "h5",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Handpicked Locations",
+                        "title": "Handpicked Locations",
+                        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Тщательно выбранные места",
+                        "title": "Тщательно выбранные места",
+                        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-2-0-0-2-1",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-exclusive-experiences.svg",
-                    "imageAlt": "Exclusive Experiences",
-                    "title": "Exclusive Experiences",
+                    "imageAlt": "Բացառիկ փորձառություններ",
+                    "title": "Բացառիկ փորձառություններ",
                     "meta": "",
                     "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h5"
+                    "titleStyle": "h5",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Exclusive Experiences",
+                        "title": "Exclusive Experiences",
+                        "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Эксклюзивные впечатления",
+                        "title": "Эксклюзивные впечатления",
+                        "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-2-0-0-2-2",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-unique-design.svg",
-                    "imageAlt": "Unique Design",
-                    "title": "Unique Design",
+                    "imageAlt": "Յուրահատուկ դիզայն",
+                    "title": "Յուրահատուկ դիզայն",
                     "meta": "",
                     "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h5"
+                    "titleStyle": "h5",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Unique Design",
+                        "title": "Unique Design",
+                        "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Уникальный дизайн",
+                        "title": "Уникальный дизайн",
+                        "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-2-0-0-2-3",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-sustainable-architecture.svg",
-                    "imageAlt": "Sustainable Architecture",
-                    "title": "Sustainable Architecture",
+                    "imageAlt": "Կայուն ճարտարապետություն",
+                    "title": "Կայուն ճարտարապետություն",
                     "meta": "",
                     "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h5"
+                    "titleStyle": "h5",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Sustainable Architecture",
+                        "title": "Sustainable Architecture",
+                        "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Устойчивая архитектура",
+                        "title": "Устойчивая архитектура",
+                        "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -1045,7 +1189,7 @@
                 "gridContentColumnDivider": false,
                 "gridContentColumnBreakpoint": "m",
                 "contentMarginTop": "small",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonStyle": "default",
                 "buttonTarget": "_self",
                 "fullWidthButton": false,
@@ -1063,7 +1207,15 @@
                   "effects": {}
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -1157,8 +1309,8 @@
                   {
                     "id": "heading-block-mtd1we4h-cutbq",
                     "kind": "heading",
-                    "headingText": "What Makes Us Special",
-                    "title": "What Makes Us Special",
+                    "headingText": "Ինչն է մեզ առանձնահատուկ դարձնում",
+                    "title": "Ինչն է մեզ առանձնահատուկ դարձնում",
                     "headingLevel": "h2",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -1171,13 +1323,23 @@
                       "layout": {},
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "What Makes Us Special",
+                        "title": "What Makes Us Special"
+                      },
+                      "ru": {
+                        "headingText": "Что делает нас особенными",
+                        "title": "Что делает нас особенными"
+                      }
                     }
                   },
                   {
                     "id": "heading-block-mtd1we4h-mb2cl",
                     "kind": "heading",
-                    "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
-                    "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                    "headingText": "Մենք տրամադրում ենք բացառիկ, անկրկնելի հանգստյան տների ցանց, որոնք կօգնեն ձեզ պլանավորել ապահով, հանգիստ և անմոռանալի հանգիստ:",
+                    "title": "Մենք տրամադրում ենք բացառիկ, անկրկնելի հանգստյան տների ցանց, որոնք կօգնեն ձեզ պլանավորել ապահով, հանգիստ և անմոռանալի հանգիստ:",
                     "headingLevel": "div",
                     "headingSize": "h3",
                     "animation": {
@@ -1191,6 +1353,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                        "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation."
+                      },
+                      "ru": {
+                        "headingText": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation.",
+                        "title": "We provide a network of exclusive, one-of-a-kind holiday homes to help you plan a safe, relaxing and unforgettable vacation."
+                      }
                     }
                   },
                   {
@@ -1201,54 +1373,110 @@
                       {
                         "id": "yootheme-grid-item-2-0-0-2-0",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-handpicked-locations.svg",
-                        "imageAlt": "Handpicked Locations",
-                        "title": "Handpicked Locations",
+                        "imageAlt": "Խնամքով ընտրված վայրեր",
+                        "title": "Խնամքով ընտրված վայրեր",
                         "meta": "",
                         "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h5"
+                        "titleStyle": "h5",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Handpicked Locations",
+                            "title": "Handpicked Locations",
+                            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Тщательно выбранные места",
+                            "title": "Тщательно выбранные места",
+                            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-2-0-0-2-1",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-exclusive-experiences.svg",
-                        "imageAlt": "Exclusive Experiences",
-                        "title": "Exclusive Experiences",
+                        "imageAlt": "Բացառիկ փորձառություններ",
+                        "title": "Բացառիկ փորձառություններ",
                         "meta": "",
                         "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h5"
+                        "titleStyle": "h5",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Exclusive Experiences",
+                            "title": "Exclusive Experiences",
+                            "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Эксклюзивные впечатления",
+                            "title": "Эксклюзивные впечатления",
+                            "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure.",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-2-0-0-2-2",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-unique-design.svg",
-                        "imageAlt": "Unique Design",
-                        "title": "Unique Design",
+                        "imageAlt": "Յուրահատուկ դիզայն",
+                        "title": "Յուրահատուկ դիզայն",
                         "meta": "",
                         "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h5"
+                        "titleStyle": "h5",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Unique Design",
+                            "title": "Unique Design",
+                            "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Уникальный дизайн",
+                            "title": "Уникальный дизайн",
+                            "text": "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-2-0-0-2-3",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/icon-sustainable-architecture.svg",
-                        "imageAlt": "Sustainable Architecture",
-                        "title": "Sustainable Architecture",
+                        "imageAlt": "Կայուն ճարտարապետություն",
+                        "title": "Կայուն ճարտարապետություն",
                         "meta": "",
                         "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h5"
+                        "titleStyle": "h5",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Sustainable Architecture",
+                            "title": "Sustainable Architecture",
+                            "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Устойчивая архитектура",
+                            "title": "Устойчивая архитектура",
+                            "text": "Sunt in culpa qui officia deserunt mollit anim est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -1311,7 +1539,7 @@
                     "gridContentColumnDivider": false,
                     "gridContentColumnBreakpoint": "m",
                     "contentMarginTop": "small",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonStyle": "default",
                     "buttonTarget": "_self",
                     "fullWidthButton": false,
@@ -1329,7 +1557,15 @@
                       "effects": {}
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -1396,12 +1632,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4h-7cizt",
         "kind": "contentLayout",
-        "title": "Tag Cozy Places",
+        "title": "Նշել հարմարավետ վայրերը",
         "dynamicContext": {
           "provider": "wordpress",
           "source": "content",
@@ -1563,7 +1807,7 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-3-0-0-1-0",
-                    "label": "Discover More",
+                    "label": "Բացահայտեք ավելին",
                     "url": "#",
                     "dynamicBindings": {
                       "url": {
@@ -1572,7 +1816,15 @@
                       }
                     },
                     "target": "_self",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Discover More"
+                      },
+                      "ru": {
+                        "label": "Узнать больше"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -1750,7 +2002,7 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-3-0-1-1-0",
-                    "label": "Discover More",
+                    "label": "Բացահայտեք ավելին",
                     "url": "#",
                     "dynamicBindings": {
                       "url": {
@@ -1759,7 +2011,15 @@
                       }
                     },
                     "target": "_self",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Discover More"
+                      },
+                      "ru": {
+                        "label": "Узнать больше"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -1916,7 +2176,7 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-3-0-0-1-0",
-                        "label": "Discover More",
+                        "label": "Բացահայտեք ավելին",
                         "url": "#",
                         "dynamicBindings": {
                           "url": {
@@ -1925,7 +2185,15 @@
                           }
                         },
                         "target": "_self",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Discover More"
+                          },
+                          "ru": {
+                            "label": "Узнать больше"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -2109,7 +2377,7 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-3-0-1-1-0",
-                        "label": "Discover More",
+                        "label": "Բացահայտեք ավելին",
                         "url": "#",
                         "dynamicBindings": {
                           "url": {
@@ -2118,7 +2386,15 @@
                           }
                         },
                         "target": "_self",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Discover More"
+                          },
+                          "ru": {
+                            "label": "Узнать больше"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -2144,12 +2420,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Tag Cozy Places"
+          },
+          "ru": {
+            "title": "Отметить уютные места"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4i-wrhbx",
         "kind": "contentLayout",
-        "title": "Get Inspired",
+        "title": "Ոգեշնչվեք",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -2190,8 +2474,8 @@
               {
                 "id": "heading-block-mtd1we4i-ibjek",
                 "kind": "heading",
-                "headingText": "Get Inspired",
-                "title": "Get Inspired",
+                "headingText": "Ոգեշնչվեք",
+                "title": "Ոգեշնչվեք",
                 "headingLevel": "h2",
                 "headingSize": "h3",
                 "elementAlign": "center",
@@ -2204,6 +2488,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Get Inspired",
+                    "title": "Get Inspired"
+                  },
+                  "ru": {
+                    "headingText": "Вдохновляйтесь",
+                    "title": "Вдохновляйтесь"
+                  }
                 }
               }
             ]
@@ -2219,10 +2513,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-4-0-1-0-0",
-                    "label": "View All",
+                    "label": "Դիտել բոլորը",
                     "url": "?page_id=19",
                     "target": "_self",
-                    "style": "text"
+                    "style": "text",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "View All"
+                      },
+                      "ru": {
+                        "label": "Смотреть все"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -2698,8 +3000,8 @@
               {
                 "id": "heading-block-mtd1we4i-lyamf",
                 "kind": "heading",
-                "headingText": "More Inspiration",
-                "title": "More Inspiration",
+                "headingText": "Ավելի շատ ոգեշնչում",
+                "title": "Ավելի շատ ոգեշնչում",
                 "headingLevel": "h3",
                 "elementAlign": "center",
                 "elementPadding": "none",
@@ -2711,6 +3013,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "More Inspiration",
+                    "title": "More Inspiration"
+                  },
+                  "ru": {
+                    "headingText": "Больше вдохновения",
+                    "title": "Больше вдохновения"
+                  }
                 }
               },
               {
@@ -3031,8 +3343,8 @@
                   {
                     "id": "heading-block-mtd1we4i-d7rrj",
                     "kind": "heading",
-                    "headingText": "Get Inspired",
-                    "title": "Get Inspired",
+                    "headingText": "Ոգեշնչվեք",
+                    "title": "Ոգեշնչվեք",
                     "headingLevel": "h2",
                     "headingSize": "h3",
                     "elementAlign": "center",
@@ -3045,6 +3357,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Get Inspired",
+                        "title": "Get Inspired"
+                      },
+                      "ru": {
+                        "headingText": "Вдохновляйтесь",
+                        "title": "Вдохновляйтесь"
+                      }
                     }
                   }
                 ]
@@ -3068,10 +3390,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-4-0-1-0-0",
-                        "label": "View All",
+                        "label": "Դիտել բոլորը",
                         "url": "?page_id=19",
                         "target": "_self",
-                        "style": "text"
+                        "style": "text",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "View All"
+                          },
+                          "ru": {
+                            "label": "Смотреть все"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -3606,8 +3936,8 @@
                   {
                     "id": "heading-block-mtd1we4i-2ez49",
                     "kind": "heading",
-                    "headingText": "More Inspiration",
-                    "title": "More Inspiration",
+                    "headingText": "Ավելի շատ ոգեշնչում",
+                    "title": "Ավելի շատ ոգեշնչում",
                     "headingLevel": "h3",
                     "elementAlign": "center",
                     "elementPadding": "none",
@@ -3619,6 +3949,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "More Inspiration",
+                        "title": "More Inspiration"
+                      },
+                      "ru": {
+                        "headingText": "Больше вдохновения",
+                        "title": "Больше вдохновения"
+                      }
                     }
                   },
                   {
@@ -3947,12 +4287,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Get Inspired"
+          },
+          "ru": {
+            "title": "Вдохновляйтесь"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4j-cqfes",
         "kind": "contentLayout",
-        "title": "Call to Action",
+        "title": "Գործողության կոչ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -4013,6 +4361,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                    "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                  },
+                  "ru": {
+                    "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                    "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                  }
                 }
               },
               {
@@ -4042,6 +4400,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                  }
                 }
               },
               {
@@ -4050,17 +4416,33 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-5-0-0-2-0",
-                    "label": "Contact Us",
+                    "label": "Կապվել մեզ հետ",
                     "url": "mailto:info@example.com",
                     "target": "_self",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Contact Us"
+                      },
+                      "ru": {
+                        "label": "Связаться с нами"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-5-0-0-2-1",
-                    "label": "Read the FAQ",
+                    "label": "Կարդալ հաճախ տրվող հարցերը",
                     "url": "?page_id=4#faq",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Read the FAQ"
+                      },
+                      "ru": {
+                        "label": "Читать ответы на вопросы"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -4201,6 +4583,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                        "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                      },
+                      "ru": {
+                        "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                        "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                      }
                     }
                   },
                   {
@@ -4230,6 +4622,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                      }
                     }
                   },
                   {
@@ -4238,17 +4638,33 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-5-0-0-2-0",
-                        "label": "Contact Us",
+                        "label": "Կապվել մեզ հետ",
                         "url": "mailto:info@example.com",
                         "target": "_self",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Contact Us"
+                          },
+                          "ru": {
+                            "label": "Связаться с нами"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-5-0-0-2-1",
-                        "label": "Read the FAQ",
+                        "label": "Կարդալ հաճախ տրվող հարցերը",
                         "url": "?page_id=4#faq",
                         "target": "_self",
-                        "style": "default"
+                        "style": "default",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Read the FAQ"
+                          },
+                          "ru": {
+                            "label": "Читать ответы на вопросы"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -4336,12 +4752,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Call to Action"
+          },
+          "ru": {
+            "title": "Вызов действия"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd1we4j-nb1z9",
         "kind": "contentLayout",
-        "title": "Latest Posts",
+        "title": "Վերջին հրապարակումները",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -4384,8 +4808,8 @@
               {
                 "id": "heading-block-mtd1we4j-qa2pk",
                 "kind": "heading",
-                "headingText": "Latest Articles",
-                "title": "Latest Articles",
+                "headingText": "Վերջին հոդվածները",
+                "title": "Վերջին հոդվածները",
                 "headingLevel": "h2",
                 "headingSize": "h3",
                 "elementAlign": "center",
@@ -4398,6 +4822,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Latest Articles",
+                    "title": "Latest Articles"
+                  },
+                  "ru": {
+                    "headingText": "Последние статьи",
+                    "title": "Последние статьи"
+                  }
                 }
               }
             ]
@@ -4413,10 +4847,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-6-0-1-0-0",
-                    "label": "View All",
+                    "label": "Դիտել բոլորը",
                     "url": "?post_type=post",
                     "target": "_self",
-                    "style": "text"
+                    "style": "text",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "View All"
+                      },
+                      "ru": {
+                        "label": "Смотреть все"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -4628,8 +5070,8 @@
                   {
                     "id": "heading-block-mtd1we4j-v1ewg",
                     "kind": "heading",
-                    "headingText": "Latest Articles",
-                    "title": "Latest Articles",
+                    "headingText": "Վերջին հոդվածները",
+                    "title": "Վերջին հոդվածները",
                     "headingLevel": "h2",
                     "headingSize": "h3",
                     "elementAlign": "center",
@@ -4642,6 +5084,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Latest Articles",
+                        "title": "Latest Articles"
+                      },
+                      "ru": {
+                        "headingText": "Последние статьи",
+                        "title": "Последние статьи"
+                      }
                     }
                   }
                 ]
@@ -4665,10 +5117,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-6-0-1-0-0",
-                        "label": "View All",
+                        "label": "Դիտել բոլորը",
                         "url": "?post_type=post",
                         "target": "_self",
-                        "style": "text"
+                        "style": "text",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "View All"
+                          },
+                          "ru": {
+                            "label": "Смотреть все"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -4856,7 +5316,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Latest Posts"
+          },
+          "ru": {
+            "title": "Последние публикации"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-29T11:02:17.590Z"
@@ -4866,13 +5334,36 @@
     "key": "header",
     "page": "header",
     "targetType": "header",
-    "updatedAt": "2026-08-28T12:35:35.069Z",
-    "design": {},
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
     "sections": [
       {
         "id": "header-document",
         "kind": "contentLayout",
-        "title": "Header",
+        "title": "Էջագլուխ",
         "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -4893,7 +5384,15 @@
                 "headerBrandMode": "brand",
                 "headerBrandText": "Design",
                 "imageAlt": "Design logo",
-                "imageMaxWidth": 180
+                "imageMaxWidth": 180,
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "Design logo"
+                  },
+                  "ru": {
+                    "imageAlt": "Design logo"
+                  }
+                }
               }
             ]
           },
@@ -4905,9 +5404,17 @@
               {
                 "id": "header-navigation",
                 "kind": "menu",
-                "title": "Navigation",
+                "title": "Նավագնացություն",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "menuActiveIndicator": "underline",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Navigation"
+                  },
+                  "ru": {
+                    "title": "Навигация"
+                  }
+                }
               }
             ]
           },
@@ -4919,9 +5426,23 @@
               {
                 "id": "header-button",
                 "kind": "button",
-                "buttonLabel": "Contact Us",
+                "buttonLabel": "Կապվել մեզ հետ",
                 "buttonUrl": "#contact",
-                "buttonStyle": "primary"
+                "buttonStyle": "primary",
+                "size": "default",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Contact Us"
+                  },
+                  "ru": {
+                    "buttonLabel": "Связаться с нами"
+                  }
+                }
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -4942,9 +5463,18 @@
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "",
         "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": ""
+        "headerTopToolbarMeta": "",
+        "contentTranslations": {
+          "en": {
+            "title": "Header"
+          },
+          "ru": {
+            "title": "Шапка"
+          }
+        }
       }
-    ]
+    ],
+    "updatedAt": "2026-09-24T18:07:54.516Z"
   },
   "footer": {
     "version": 1,
@@ -4980,7 +5510,7 @@
       {
         "id": "contentLayout-mtd45w0n-isqdu",
         "kind": "contentLayout",
-        "title": "Newsletter",
+        "title": "Նորություններ",
         "background": "transparent",
         "backgroundRole": "primary",
         "sectionVariant": "primary",
@@ -5021,8 +5551,8 @@
               {
                 "id": "heading-block-mtd45w0n-u6my6",
                 "kind": "heading",
-                "headingText": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
-                "title": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
+                "headingText": "Երբեք բաց մի թողեք ձեր<br class=\"uk-visible@m\"> հաջորդ երազանքի արձակուրդը",
+                "title": "Երբեք բաց մի թողեք ձեր<br class=\"uk-visible@m\"> հաջորդ երազանքի արձակուրդը",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "textAlign": "left",
@@ -5036,6 +5566,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
+                    "title": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays"
+                  },
+                  "ru": {
+                    "headingText": "Не пропустите свой<br class=\"uk-visible@m\"> следующий отпуск мечты",
+                    "title": "Не пропустите свой<br class=\"uk-visible@m\"> следующий отпуск мечты"
+                  }
                 }
               }
             ]
@@ -5086,8 +5626,8 @@
                   {
                     "id": "heading-block-mtd45w0n-qazd2",
                     "kind": "heading",
-                    "headingText": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
-                    "title": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
+                    "headingText": "Երբեք բաց մի թողեք ձեր<br class=\"uk-visible@m\"> հաջորդ երազանքի արձակուրդը",
+                    "title": "Երբեք բաց մի թողեք ձեր<br class=\"uk-visible@m\"> հաջորդ երազանքի արձակուրդը",
                     "headingLevel": "h2",
                     "headingAlign": "left",
                     "textAlign": "left",
@@ -5101,6 +5641,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays",
+                        "title": "Never Miss Your <br class=\"uk-visible@m\"> Next Dream Holidays"
+                      },
+                      "ru": {
+                        "headingText": "Не пропустите свой<br class=\"uk-visible@m\"> следующий отпуск мечты",
+                        "title": "Не пропустите свой<br class=\"uk-visible@m\"> следующий отпуск мечты"
+                      }
                     }
                   }
                 ]
@@ -5122,12 +5672,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Newsletter"
+          },
+          "ru": {
+            "title": "Рассылка"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd45w0o-krd7h",
         "kind": "contentLayout",
-        "title": "Footer",
+        "title": "էջատակ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -5203,6 +5761,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "Design Escapes"
+                  },
+                  "ru": {
+                    "imageAlt": "Design Escapes"
+                  }
                 }
               },
               {
@@ -5226,6 +5792,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Ut consequat semper viverra nam libero. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel."
+                  },
+                  "ru": {
+                    "body": "Ut consequat semper viverra nam libero. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel."
+                  }
                 }
               }
             ]
@@ -5238,8 +5812,8 @@
               {
                 "id": "heading-block-mtd45w0o-ow4cz",
                 "kind": "heading",
-                "headingText": "Discover",
-                "title": "Discover",
+                "headingText": "Բացահայտել",
+                "title": "Բացահայտել",
                 "headingLevel": "h3",
                 "headingSize": "h6",
                 "headingAlign": "left",
@@ -5253,6 +5827,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Discover",
+                    "title": "Discover"
+                  },
+                  "ru": {
+                    "headingText": "Открыть",
+                    "title": "Открыть"
+                  }
                 }
               },
               {
@@ -5263,37 +5847,85 @@
                     "id": "yootheme-list-item-1-0-1-1-0",
                     "text": "Norway",
                     "url": "?page_id=40",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Norway"
+                      },
+                      "ru": {
+                        "text": "Norway"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-1-1-1",
                     "text": "Great Britain",
                     "url": "?page_id=44",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Great Britain"
+                      },
+                      "ru": {
+                        "text": "Great Britain"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-1-1-2",
                     "text": "Spain\t",
                     "url": "?page_id=43",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Spain\t"
+                      },
+                      "ru": {
+                        "text": "Spain\t"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-1-1-3",
                     "text": "Germany",
                     "url": "?page_id=42",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Germany"
+                      },
+                      "ru": {
+                        "text": "Germany"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-1-1-4",
                     "text": "Italy",
                     "url": "?page_id=41",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Italy"
+                      },
+                      "ru": {
+                        "text": "Italy"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-1-1-5",
                     "text": "France",
                     "url": "?page_id=45",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "France"
+                      },
+                      "ru": {
+                        "text": "France"
+                      }
+                    }
                   }
                 ],
                 "listType": "vertical",
@@ -5328,8 +5960,8 @@
               {
                 "id": "heading-block-mtd45w0o-enf56",
                 "kind": "heading",
-                "headingText": "Accommodations",
-                "title": "Accommodations",
+                "headingText": "Կացարաններ",
+                "title": "Կացարաններ",
                 "headingLevel": "h3",
                 "headingSize": "h6",
                 "headingAlign": "left",
@@ -5343,6 +5975,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Accommodations",
+                    "title": "Accommodations"
+                  },
+                  "ru": {
+                    "headingText": "Варианты проживания",
+                    "title": "Варианты проживания"
+                  }
                 }
               },
               {
@@ -5428,6 +6070,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Design Escapes",
+                    "title": "Design Escapes"
+                  },
+                  "ru": {
+                    "headingText": "Design Escapes",
+                    "title": "Design Escapes"
+                  }
                 }
               },
               {
@@ -5436,27 +6088,59 @@
                 "listItems": [
                   {
                     "id": "yootheme-list-item-1-0-3-1-0",
-                    "text": "About",
+                    "text": "Մեր մասին",
                     "url": "?page_id=4",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "About"
+                      },
+                      "ru": {
+                        "text": "О нас"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-3-1-1",
-                    "text": "Contact",
+                    "text": "Կապ",
                     "url": "mailto:info@example.com",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Contact"
+                      },
+                      "ru": {
+                        "text": "Контакты"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-3-1-2",
-                    "text": "Blog",
+                    "text": "Բլոգ",
                     "url": "?post_type=post",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "Blog"
+                      },
+                      "ru": {
+                        "text": "Блог"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-list-item-1-0-3-1-3",
-                    "text": "FAQ",
+                    "text": "Հաճախ տրվող հարցեր",
                     "url": "?page_id=4#faq",
-                    "target": "_self"
+                    "target": "_self",
+                    "contentTranslations": {
+                      "en": {
+                        "text": "FAQ"
+                      },
+                      "ru": {
+                        "text": "Часто задаваемые вопросы"
+                      }
+                    }
                   }
                 ],
                 "listType": "vertical",
@@ -5575,6 +6259,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Design Escapes"
+                      },
+                      "ru": {
+                        "imageAlt": "Design Escapes"
+                      }
                     }
                   },
                   {
@@ -5598,6 +6290,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Ut consequat semper viverra nam libero. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel."
+                      },
+                      "ru": {
+                        "body": "Ut consequat semper viverra nam libero. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel."
+                      }
                     }
                   }
                 ]
@@ -5619,8 +6319,8 @@
                   {
                     "id": "heading-block-mtd45w0o-qc4zg",
                     "kind": "heading",
-                    "headingText": "Discover",
-                    "title": "Discover",
+                    "headingText": "Բացահայտել",
+                    "title": "Բացահայտել",
                     "headingLevel": "h3",
                     "headingSize": "h6",
                     "headingAlign": "left",
@@ -5634,6 +6334,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Discover",
+                        "title": "Discover"
+                      },
+                      "ru": {
+                        "headingText": "Открыть",
+                        "title": "Открыть"
+                      }
                     }
                   },
                   {
@@ -5644,37 +6354,85 @@
                         "id": "yootheme-list-item-1-0-1-1-0",
                         "text": "Norway",
                         "url": "?page_id=40",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Norway"
+                          },
+                          "ru": {
+                            "text": "Norway"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-1-1-1",
                         "text": "Great Britain",
                         "url": "?page_id=44",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Great Britain"
+                          },
+                          "ru": {
+                            "text": "Great Britain"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-1-1-2",
                         "text": "Spain\t",
                         "url": "?page_id=43",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Spain\t"
+                          },
+                          "ru": {
+                            "text": "Spain\t"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-1-1-3",
                         "text": "Germany",
                         "url": "?page_id=42",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Germany"
+                          },
+                          "ru": {
+                            "text": "Germany"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-1-1-4",
                         "text": "Italy",
                         "url": "?page_id=41",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Italy"
+                          },
+                          "ru": {
+                            "text": "Italy"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-1-1-5",
                         "text": "France",
                         "url": "?page_id=45",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "France"
+                          },
+                          "ru": {
+                            "text": "France"
+                          }
+                        }
                       }
                     ],
                     "listType": "vertical",
@@ -5718,8 +6476,8 @@
                   {
                     "id": "heading-block-mtd45w0o-pskgn",
                     "kind": "heading",
-                    "headingText": "Accommodations",
-                    "title": "Accommodations",
+                    "headingText": "Կացարաններ",
+                    "title": "Կացարաններ",
                     "headingLevel": "h3",
                     "headingSize": "h6",
                     "headingAlign": "left",
@@ -5733,6 +6491,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Accommodations",
+                        "title": "Accommodations"
+                      },
+                      "ru": {
+                        "headingText": "Варианты проживания",
+                        "title": "Варианты проживания"
+                      }
                     }
                   },
                   {
@@ -5826,6 +6594,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Design Escapes",
+                        "title": "Design Escapes"
+                      },
+                      "ru": {
+                        "headingText": "Design Escapes",
+                        "title": "Design Escapes"
+                      }
                     }
                   },
                   {
@@ -5834,27 +6612,59 @@
                     "listItems": [
                       {
                         "id": "yootheme-list-item-1-0-3-1-0",
-                        "text": "About",
+                        "text": "Մեր մասին",
                         "url": "?page_id=4",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "About"
+                          },
+                          "ru": {
+                            "text": "О нас"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-3-1-1",
-                        "text": "Contact",
+                        "text": "Կապ",
                         "url": "mailto:info@example.com",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Contact"
+                          },
+                          "ru": {
+                            "text": "Контакты"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-3-1-2",
-                        "text": "Blog",
+                        "text": "Բլոգ",
                         "url": "?post_type=post",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "Blog"
+                          },
+                          "ru": {
+                            "text": "Блог"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-list-item-1-0-3-1-3",
-                        "text": "FAQ",
+                        "text": "Հաճախ տրվող հարցեր",
                         "url": "?page_id=4#faq",
-                        "target": "_self"
+                        "target": "_self",
+                        "contentTranslations": {
+                          "en": {
+                            "text": "FAQ"
+                          },
+                          "ru": {
+                            "text": "Часто задаваемые вопросы"
+                          }
+                        }
                       }
                     ],
                     "listType": "vertical",
@@ -5883,12 +6693,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Footer"
+          },
+          "ru": {
+            "title": "Footer"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd45w0o-dd5s2",
         "kind": "contentLayout",
-        "title": "Copyright",
+        "title": "Իրավունք",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -5966,6 +6784,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>');     </script> Design Escapes. All rights reserved. Powered by <a href=\"https://yootheme.com/\" target=\"_blank\">YOOtheme</a>."
+                  },
+                  "ru": {
+                    "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>');     </script> Design Escapes. All rights reserved. Powered by <a href=\"https://yootheme.com/\" target=\"_blank\">YOOtheme</a>."
+                  }
                 }
               }
             ]
@@ -6073,13 +6899,29 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>');     </script> Design Escapes. All rights reserved. Powered by <a href=\"https://yootheme.com/\" target=\"_blank\">YOOtheme</a>."
+                      },
+                      "ru": {
+                        "body": "© <script> document.currentScript.insertAdjacentHTML('afterend', '<time datetime=\"' + new Date().toJSON() + '\">' + new Intl.DateTimeFormat(document.documentElement.lang, {year: 'numeric'}).format() + '</time>');     </script> Design Escapes. All rights reserved. Powered by <a href=\"https://yootheme.com/\" target=\"_blank\">YOOtheme</a>."
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Copyright"
+          },
+          "ru": {
+            "title": "Права использования"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-28T15:35:55.899Z"
@@ -6162,7 +7004,7 @@
       {
         "id": "contentLayout-mtd9uj3m-96bsm",
         "kind": "contentLayout",
-        "title": "Categories",
+        "title": "Կատեգորիաներ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -6207,7 +7049,7 @@
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-0",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6245,12 +7087,20 @@
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
+                      }
                     }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-1",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6288,12 +7138,20 @@
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
+                      }
                     }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-2",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6331,12 +7189,20 @@
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
+                      }
                     }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-3",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6374,36 +7240,72 @@
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
+                      }
                     }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-4",
                     "title": "Croatia",
-                    "meta": "Discover",
-                    "text": "Coming soon!",
+                    "meta": "Բացահայտել",
+                    "text": "Շուտով։",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-croatia-intro.jpg",
                     "imageAlt": "Croatia",
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "textColor": "light"
+                    "textColor": "light",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Croatia",
+                        "meta": "Discover",
+                        "text": "Coming soon!",
+                        "imageAlt": "Croatia"
+                      },
+                      "ru": {
+                        "title": "Croatia",
+                        "meta": "Открыть",
+                        "text": "Скоро!",
+                        "imageAlt": "Croatia"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-5",
                     "title": "Portugal",
-                    "meta": "Discover",
-                    "text": "Coming soon!",
+                    "meta": "Բացահայտել",
+                    "text": "Շուտով։",
                     "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-portugal-intro.jpg",
                     "imageAlt": "Portugal",
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
                     "showAction": false,
-                    "textColor": "light"
+                    "textColor": "light",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Portugal",
+                        "meta": "Discover",
+                        "text": "Coming soon!",
+                        "imageAlt": "Portugal"
+                      },
+                      "ru": {
+                        "title": "Portugal",
+                        "meta": "Открыть",
+                        "text": "Скоро!",
+                        "imageAlt": "Portugal"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-6",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6441,12 +7343,20 @@
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
                       }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
+                      }
                     }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-7",
                     "title": "",
-                    "meta": "Discover",
+                    "meta": "Բացահայտել",
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
@@ -6483,6 +7393,14 @@
                       "imageAlt": {
                         "path": "acf.accommodation_intro_image.alt",
                         "valueType": "string"
+                      }
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "meta": "Discover"
+                      },
+                      "ru": {
+                        "meta": "Открыть"
                       }
                     }
                   }
@@ -6569,7 +7487,7 @@
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-0",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6607,12 +7525,20 @@
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
                           }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
+                          }
                         }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-1",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6650,12 +7576,20 @@
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
                           }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
+                          }
                         }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-2",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6693,12 +7627,20 @@
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
                           }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
+                          }
                         }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-3",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6736,36 +7678,72 @@
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
                           }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
+                          }
                         }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-4",
                         "title": "Croatia",
-                        "meta": "Discover",
-                        "text": "Coming soon!",
+                        "meta": "Բացահայտել",
+                        "text": "Շուտով։",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-croatia-intro.jpg",
                         "imageAlt": "Croatia",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
                         "showAction": false,
-                        "textColor": "light"
+                        "textColor": "light",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Croatia",
+                            "meta": "Discover",
+                            "text": "Coming soon!",
+                            "imageAlt": "Croatia"
+                          },
+                          "ru": {
+                            "title": "Croatia",
+                            "meta": "Открыть",
+                            "text": "Скоро!",
+                            "imageAlt": "Croatia"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-5",
                         "title": "Portugal",
-                        "meta": "Discover",
-                        "text": "Coming soon!",
+                        "meta": "Բացահայտել",
+                        "text": "Շուտով։",
                         "imageUrl": "https://design.webpages.am/wp-content/uploads/yootheme/accommodations-category-portugal-intro.jpg",
                         "imageAlt": "Portugal",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
                         "showAction": false,
-                        "textColor": "light"
+                        "textColor": "light",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Portugal",
+                            "meta": "Discover",
+                            "text": "Coming soon!",
+                            "imageAlt": "Portugal"
+                          },
+                          "ru": {
+                            "title": "Portugal",
+                            "meta": "Открыть",
+                            "text": "Скоро!",
+                            "imageAlt": "Portugal"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-6",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6803,12 +7781,20 @@
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
                           }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
+                          }
                         }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-7",
                         "title": "",
-                        "meta": "Discover",
+                        "meta": "Բացահայտել",
                         "text": "",
                         "imageUrl": "",
                         "imageAlt": "",
@@ -6845,6 +7831,14 @@
                           "imageAlt": {
                             "path": "acf.accommodation_intro_image.alt",
                             "valueType": "string"
+                          }
+                        },
+                        "contentTranslations": {
+                          "en": {
+                            "meta": "Discover"
+                          },
+                          "ru": {
+                            "meta": "Открыть"
                           }
                         }
                       }
@@ -6910,12 +7904,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Categories"
+          },
+          "ru": {
+            "title": "Категории"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd9uj3m-0vgm7",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -6956,9 +7958,19 @@
               {
                 "id": "heading-block-mtd9uj3m-8urzi",
                 "kind": "heading",
-                "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
-                "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
-                "headingLevel": "h2"
+                "headingText": "Գտեք ձեր տունը<br class=\"uk-visible@m\"> տնից հեռու",
+                "title": "Գտեք ձեր տունը<br class=\"uk-visible@m\"> տնից հեռու",
+                "headingLevel": "h2",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                    "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home"
+                  },
+                  "ru": {
+                    "headingText": "Найдите свой дом<br class=\"uk-visible@m\"> вдали от дома",
+                    "title": "Найдите свой дом<br class=\"uk-visible@m\"> вдали от дома"
+                  }
+                }
               }
             ]
           },
@@ -6982,6 +7994,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+                  },
+                  "ru": {
+                    "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+                  }
                 }
               }
             ]
@@ -7025,9 +8045,19 @@
                   {
                     "id": "heading-block-mtd9uj3m-69d62",
                     "kind": "heading",
-                    "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
-                    "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
-                    "headingLevel": "h2"
+                    "headingText": "Գտեք ձեր տունը<br class=\"uk-visible@m\"> տնից հեռու",
+                    "title": "Գտեք ձեր տունը<br class=\"uk-visible@m\"> տնից հեռու",
+                    "headingLevel": "h2",
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Find Your Home<br class=\"uk-visible@m\"> Away From Home",
+                        "title": "Find Your Home<br class=\"uk-visible@m\"> Away From Home"
+                      },
+                      "ru": {
+                        "headingText": "Найдите свой дом<br class=\"uk-visible@m\"> вдали от дома",
+                        "title": "Найдите свой дом<br class=\"uk-visible@m\"> вдали от дома"
+                      }
+                    }
                   }
                 ]
               },
@@ -7058,18 +8088,34 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+                      },
+                      "ru": {
+                        "body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+                      }
                     }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd9uj3n-lh5br",
         "kind": "contentLayout",
-        "title": "Tags",
+        "title": "Թեգեր",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -9613,12 +10659,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Tags"
+          },
+          "ru": {
+            "title": "Теги"
+          }
+        }
       },
       {
         "id": "contentLayout-mtd9uj3n-9xd67",
         "kind": "contentLayout",
-        "title": "Call to Action",
+        "title": "Գործողության կոչ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -9668,8 +10722,8 @@
               {
                 "id": "heading-block-mtd9uj3n-5qpdh",
                 "kind": "heading",
-                "headingText": "Ask Design Escapes",
-                "title": "Ask Design Escapes",
+                "headingText": "Հարցրեք Design Escapes-ին",
+                "title": "Հարցրեք Design Escapes-ին",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingAlign": "left",
@@ -9690,13 +10744,23 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Ask Design Escapes",
+                    "title": "Ask Design Escapes"
+                  },
+                  "ru": {
+                    "headingText": "Спросите Design Escapes",
+                    "title": "Спросите Design Escapes"
+                  }
                 }
               },
               {
                 "id": "heading-block-mtd9uj3n-gcren",
                 "kind": "heading",
-                "headingText": "Need Help Making a Decision?",
-                "title": "Need Help Making a Decision?",
+                "headingText": "Օգնությո՞ւն է պետք որոշում կայացնելու համար",
+                "title": "Օգնությո՞ւն է պետք որոշում կայացնելու համար",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "textAlign": "left",
@@ -9712,6 +10776,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Need Help Making a Decision?",
+                    "title": "Need Help Making a Decision?"
+                  },
+                  "ru": {
+                    "headingText": "Нужна помощь в принятии решения?",
+                    "title": "Нужна помощь в принятии решения?"
+                  }
                 }
               },
               {
@@ -9735,6 +10809,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt."
+                  }
                 }
               },
               {
@@ -9743,10 +10825,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-3-0-1-3-0",
-                    "label": "Contact Us",
+                    "label": "Կապվել մեզ հետ",
                     "url": "mailto:info@example.com",
                     "target": "_self",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Contact Us"
+                      },
+                      "ru": {
+                        "label": "Связаться с нами"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -9831,8 +10921,8 @@
                   {
                     "id": "heading-block-mtd9uj3n-ikv34",
                     "kind": "heading",
-                    "headingText": "Ask Design Escapes",
-                    "title": "Ask Design Escapes",
+                    "headingText": "Հարցրեք Design Escapes-ին",
+                    "title": "Հարցրեք Design Escapes-ին",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingAlign": "left",
@@ -9853,13 +10943,23 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Ask Design Escapes",
+                        "title": "Ask Design Escapes"
+                      },
+                      "ru": {
+                        "headingText": "Спросите Design Escapes",
+                        "title": "Спросите Design Escapes"
+                      }
                     }
                   },
                   {
                     "id": "heading-block-mtd9uj3n-h8z36",
                     "kind": "heading",
-                    "headingText": "Need Help Making a Decision?",
-                    "title": "Need Help Making a Decision?",
+                    "headingText": "Օգնությո՞ւն է պետք որոշում կայացնելու համար",
+                    "title": "Օգնությո՞ւն է պետք որոշում կայացնելու համար",
                     "headingLevel": "h2",
                     "headingAlign": "left",
                     "textAlign": "left",
@@ -9875,6 +10975,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Need Help Making a Decision?",
+                        "title": "Need Help Making a Decision?"
+                      },
+                      "ru": {
+                        "headingText": "Нужна помощь в принятии решения?",
+                        "title": "Нужна помощь в принятии решения?"
+                      }
                     }
                   },
                   {
@@ -9898,6 +11008,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipis cing elit, sed do eiusmod tempor incididunt."
+                      }
                     }
                   },
                   {
@@ -9906,10 +11024,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-3-0-1-3-0",
-                        "label": "Contact Us",
+                        "label": "Կապվել մեզ հետ",
                         "url": "mailto:info@example.com",
                         "target": "_self",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Contact Us"
+                          },
+                          "ru": {
+                            "label": "Связаться с нами"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -9937,7 +11063,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Call to Action"
+          },
+          "ru": {
+            "title": "Вызов действия"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-28T18:15:55.491Z"
@@ -9952,7 +11086,7 @@
       {
         "id": "contentLayout-mteavdhy-43yle",
         "kind": "contentLayout",
-        "title": "Benefits",
+        "title": "Առավելությունները",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -10064,6 +11198,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes",
+                    "title": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes"
+                  },
+                  "ru": {
+                    "headingText": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes",
+                    "title": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes"
+                  }
                 }
               }
             ]
@@ -10115,8 +11259,8 @@
               {
                 "id": "heading-block-mteavdhy-232vd",
                 "kind": "heading",
-                "headingText": "Handpicked Locations",
-                "title": "Handpicked Locations",
+                "headingText": "Խնամքով ընտրված վայրեր",
+                "title": "Խնամքով ընտրված վայրեր",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -10131,6 +11275,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Handpicked Locations",
+                    "title": "Handpicked Locations"
+                  },
+                  "ru": {
+                    "headingText": "Тщательно выбранные места",
+                    "title": "Тщательно выбранные места"
+                  }
                 }
               },
               {
@@ -10147,6 +11301,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses",
+                    "title": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses"
+                  },
+                  "ru": {
+                    "headingText": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses",
+                    "title": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses"
+                  }
                 }
               },
               {
@@ -10163,6 +11327,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Sed faucibus turpis in eu mi bibendum."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Sed faucibus turpis in eu mi bibendum."
+                  }
                 }
               }
             ]
@@ -10184,10 +11356,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-0-3-0-0-1",
@@ -10196,10 +11376,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -10263,7 +11451,7 @@
                 "gridContentColumnDivider": false,
                 "gridContentColumnBreakpoint": "m",
                 "contentMarginTop": "small",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonStyle": "default",
                 "buttonTarget": "_self",
                 "fullWidthButton": false,
@@ -10281,7 +11469,15 @@
                   "effects": {}
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -10293,8 +11489,8 @@
               {
                 "id": "heading-block-mteavdhy-bs4gs",
                 "kind": "heading",
-                "headingText": "Unique Architecture",
-                "title": "Unique Architecture",
+                "headingText": "Յուրահատուկ ճարտարապետություն",
+                "title": "Յուրահատուկ ճարտարապետություն",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -10309,6 +11505,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Unique Architecture",
+                    "title": "Unique Architecture"
+                  },
+                  "ru": {
+                    "headingText": "Уникальная архитектура",
+                    "title": "Уникальная архитектура"
+                  }
                 }
               },
               {
@@ -10330,6 +11536,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design",
+                    "title": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design"
+                  },
+                  "ru": {
+                    "headingText": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design",
+                    "title": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design"
+                  }
                 }
               },
               {
@@ -10349,6 +11565,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  }
                 }
               }
             ]
@@ -10370,10 +11594,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-0-4-0-0-1",
@@ -10382,10 +11614,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -10448,7 +11688,7 @@
                 "gridContentColumnDivider": false,
                 "gridContentColumnBreakpoint": "m",
                 "contentMarginTop": "small",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonStyle": "default",
                 "buttonTarget": "_self",
                 "fullWidthButton": false,
@@ -10466,7 +11706,15 @@
                   "effects": {}
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           },
@@ -10478,8 +11726,8 @@
               {
                 "id": "heading-block-mteavdhy-cpj75",
                 "kind": "heading",
-                "headingText": "Bring the Kids",
-                "title": "Bring the Kids",
+                "headingText": "Երեխաներին էլ բերեք",
+                "title": "Երեխաներին էլ բերեք",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -10494,6 +11742,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Bring the Kids",
+                    "title": "Bring the Kids"
+                  },
+                  "ru": {
+                    "headingText": "Берите детей с собой",
+                    "title": "Берите детей с собой"
+                  }
                 }
               },
               {
@@ -10512,6 +11770,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities",
+                    "title": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities"
+                  },
+                  "ru": {
+                    "headingText": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities",
+                    "title": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities"
+                  }
                 }
               },
               {
@@ -10528,6 +11796,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  }
                 }
               }
             ]
@@ -10540,8 +11816,8 @@
               {
                 "id": "heading-block-mteavdhy-j25hr",
                 "kind": "heading",
-                "headingText": "Exclusive Experiences",
-                "title": "Exclusive Experiences",
+                "headingText": "Բացառիկ փորձառություններ",
+                "title": "Բացառիկ փորձառություններ",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -10556,6 +11832,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Exclusive Experiences",
+                    "title": "Exclusive Experiences"
+                  },
+                  "ru": {
+                    "headingText": "Эксклюзивные впечатления",
+                    "title": "Эксклюзивные впечатления"
+                  }
                 }
               }
             ]
@@ -10570,7 +11856,17 @@
                 "kind": "heading",
                 "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
                 "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
-                "headingLevel": "h2"
+                "headingLevel": "h2",
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
+                    "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences"
+                  },
+                  "ru": {
+                    "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
+                    "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences"
+                  }
+                }
               }
             ]
           },
@@ -10599,6 +11895,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  }
                 }
               }
             ]
@@ -10824,6 +12128,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes",
+                        "title": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes"
+                      },
+                      "ru": {
+                        "headingText": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes",
+                        "title": "Reasons to Travel<br class=\"uk-visible@s\">\nWith Design Escapes"
+                      }
                     }
                   }
                 ]
@@ -10918,8 +12232,8 @@
                   {
                     "id": "heading-block-mteavdhy-8j80h",
                     "kind": "heading",
-                    "headingText": "Handpicked Locations",
-                    "title": "Handpicked Locations",
+                    "headingText": "Խնամքով ընտրված վայրեր",
+                    "title": "Խնամքով ընտրված վայրեր",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -10934,6 +12248,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Handpicked Locations",
+                        "title": "Handpicked Locations"
+                      },
+                      "ru": {
+                        "headingText": "Тщательно выбранные места",
+                        "title": "Тщательно выбранные места"
+                      }
                     }
                   },
                   {
@@ -10950,6 +12274,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses",
+                        "title": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses"
+                      },
+                      "ru": {
+                        "headingText": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses",
+                        "title": "Handpicked, Exclusive<br class=\"uk-visible@m\">\n& Unique Houses"
+                      }
                     }
                   },
                   {
@@ -10966,6 +12300,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Sed faucibus turpis in eu mi bibendum."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Sed faucibus turpis in eu mi bibendum."
+                      }
                     }
                   }
                 ]
@@ -11026,10 +12368,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-0-3-0-0-1",
@@ -11038,10 +12388,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -11105,7 +12463,7 @@
                     "gridContentColumnDivider": false,
                     "gridContentColumnBreakpoint": "m",
                     "contentMarginTop": "small",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonStyle": "default",
                     "buttonTarget": "_self",
                     "fullWidthButton": false,
@@ -11123,7 +12481,15 @@
                       "effects": {}
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -11146,8 +12512,8 @@
                   {
                     "id": "heading-block-mteavdhy-l7wvy",
                     "kind": "heading",
-                    "headingText": "Unique Architecture",
-                    "title": "Unique Architecture",
+                    "headingText": "Յուրահատուկ ճարտարապետություն",
+                    "title": "Յուրահատուկ ճարտարապետություն",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -11162,6 +12528,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Unique Architecture",
+                        "title": "Unique Architecture"
+                      },
+                      "ru": {
+                        "headingText": "Уникальная архитектура",
+                        "title": "Уникальная архитектура"
+                      }
                     }
                   },
                   {
@@ -11183,6 +12559,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design",
+                        "title": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design"
+                      },
+                      "ru": {
+                        "headingText": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design",
+                        "title": "Architecture &<br class=\"uk-visible@m\">\nSustainable Design"
+                      }
                     }
                   },
                   {
@@ -11202,6 +12588,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      }
                     }
                   }
                 ]
@@ -11259,10 +12653,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-0-4-0-0-1",
@@ -11271,10 +12673,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -11337,7 +12747,7 @@
                     "gridContentColumnDivider": false,
                     "gridContentColumnBreakpoint": "m",
                     "contentMarginTop": "small",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonStyle": "default",
                     "buttonTarget": "_self",
                     "fullWidthButton": false,
@@ -11355,7 +12765,15 @@
                       "effects": {}
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               },
@@ -11375,8 +12793,8 @@
                   {
                     "id": "heading-block-mteavdhy-rhu6v",
                     "kind": "heading",
-                    "headingText": "Bring the Kids",
-                    "title": "Bring the Kids",
+                    "headingText": "Երեխաներին էլ բերեք",
+                    "title": "Երեխաներին էլ բերեք",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -11391,6 +12809,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Bring the Kids",
+                        "title": "Bring the Kids"
+                      },
+                      "ru": {
+                        "headingText": "Берите детей с собой",
+                        "title": "Берите детей с собой"
+                      }
                     }
                   },
                   {
@@ -11409,6 +12837,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities",
+                        "title": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities"
+                      },
+                      "ru": {
+                        "headingText": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities",
+                        "title": "Family-Friendly<br class=\"uk-visible@m\">\nHomes & Activities"
+                      }
                     }
                   },
                   {
@@ -11425,6 +12863,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      }
                     }
                   }
                 ]
@@ -11449,8 +12895,8 @@
                   {
                     "id": "heading-block-mteavdhz-own0q",
                     "kind": "heading",
-                    "headingText": "Exclusive Experiences",
-                    "title": "Exclusive Experiences",
+                    "headingText": "Բացառիկ փորձառություններ",
+                    "title": "Բացառիկ փորձառություններ",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -11465,6 +12911,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Exclusive Experiences",
+                        "title": "Exclusive Experiences"
+                      },
+                      "ru": {
+                        "headingText": "Эксклюзивные впечатления",
+                        "title": "Эксклюзивные впечатления"
+                      }
                     }
                   }
                 ]
@@ -11513,7 +12969,17 @@
                     "kind": "heading",
                     "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
                     "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
-                    "headingLevel": "h2"
+                    "headingLevel": "h2",
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
+                        "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences"
+                      },
+                      "ru": {
+                        "headingText": "Creating Unique<br class=\"uk-visible@m\">\nExperiences",
+                        "title": "Creating Unique<br class=\"uk-visible@m\">\nExperiences"
+                      }
+                    }
                   }
                 ]
               },
@@ -11549,6 +13015,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      }
                     }
                   }
                 ]
@@ -11686,12 +13160,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Benefits"
+          },
+          "ru": {
+            "title": "Преимущества"
+          }
+        }
       },
       {
         "id": "contentLayout-mteavdhz-zgxu4",
         "kind": "contentLayout",
-        "title": "Awards",
+        "title": "Մրցանակներ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -11754,6 +13236,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Awards And Recognitions",
+                    "title": "Awards And Recognitions"
+                  },
+                  "ru": {
+                    "headingText": "Awards And Recognitions",
+                    "title": "Awards And Recognitions"
+                  }
                 }
               },
               {
@@ -11779,6 +13271,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "We've won several awards and were featured in these shows and magazines.",
+                    "title": "We've won several awards and were featured in these shows and magazines."
+                  },
+                  "ru": {
+                    "headingText": "We've won several awards and were featured in these shows and magazines.",
+                    "title": "We've won several awards and were featured in these shows and magazines."
+                  }
                 }
               },
               {
@@ -11804,6 +13306,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  }
                 }
               }
             ]
@@ -11825,10 +13335,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-1",
@@ -11837,10 +13355,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-2",
@@ -11849,10 +13375,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-3",
@@ -11861,10 +13395,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-4",
@@ -11873,10 +13415,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-5",
@@ -11885,10 +13435,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-6",
@@ -11897,10 +13455,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-7",
@@ -11909,10 +13475,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-1-0-1-0-8",
@@ -11921,10 +13495,18 @@
                     "title": "",
                     "meta": "",
                     "text": "",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
-                    "titleElement": "h3"
+                    "titleElement": "h3",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -11984,7 +13566,7 @@
                 "gridContentColumnDivider": false,
                 "gridContentColumnBreakpoint": "m",
                 "contentMarginTop": "small",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonStyle": "default",
                 "buttonTarget": "_self",
                 "fullWidthButton": false,
@@ -12003,7 +13585,15 @@
                   "effects": {}
                 },
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               }
             ]
           }
@@ -12070,6 +13660,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Awards And Recognitions",
+                        "title": "Awards And Recognitions"
+                      },
+                      "ru": {
+                        "headingText": "Awards And Recognitions",
+                        "title": "Awards And Recognitions"
+                      }
                     }
                   },
                   {
@@ -12095,6 +13695,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "We've won several awards and were featured in these shows and magazines.",
+                        "title": "We've won several awards and were featured in these shows and magazines."
+                      },
+                      "ru": {
+                        "headingText": "We've won several awards and were featured in these shows and magazines.",
+                        "title": "We've won several awards and were featured in these shows and magazines."
+                      }
                     }
                   },
                   {
@@ -12120,6 +13730,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      }
                     }
                   }
                 ]
@@ -12148,10 +13766,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-1",
@@ -12160,10 +13786,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-2",
@@ -12172,10 +13806,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-3",
@@ -12184,10 +13826,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-4",
@@ -12196,10 +13846,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-5",
@@ -12208,10 +13866,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-6",
@@ -12220,10 +13886,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-7",
@@ -12232,10 +13906,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-1-0-1-0-8",
@@ -12244,10 +13926,18 @@
                         "title": "",
                         "meta": "",
                         "text": "",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
-                        "titleElement": "h3"
+                        "titleElement": "h3",
+                        "contentTranslations": {
+                          "en": {
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -12307,7 +13997,7 @@
                     "gridContentColumnDivider": false,
                     "gridContentColumnBreakpoint": "m",
                     "contentMarginTop": "small",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonStyle": "default",
                     "buttonTarget": "_self",
                     "fullWidthButton": false,
@@ -12326,18 +14016,34 @@
                       "effects": {}
                     },
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Awards"
+          },
+          "ru": {
+            "title": "Награды"
+          }
+        }
       },
       {
         "id": "contentLayout-mteavdhz-u8wav",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -12401,6 +14107,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Our Story by Mads Ericsson and Isabelle Anders",
+                    "title": "Our Story by Mads Ericsson and Isabelle Anders"
+                  },
+                  "ru": {
+                    "headingText": "Our Story by Mads Ericsson and Isabelle Anders",
+                    "title": "Our Story by Mads Ericsson and Isabelle Anders"
+                  }
                 }
               },
               {
@@ -12426,6 +14142,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                  }
                 }
               },
               {
@@ -12437,7 +14161,15 @@
                     "label": "Watch Video",
                     "url": "#",
                     "target": "_self",
-                    "style": "secondary"
+                    "style": "secondary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Watch Video"
+                      },
+                      "ru": {
+                        "label": "Watch Video"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -12504,6 +14236,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Our Story by Mads Ericsson and Isabelle Anders",
+                        "title": "Our Story by Mads Ericsson and Isabelle Anders"
+                      },
+                      "ru": {
+                        "headingText": "Our Story by Mads Ericsson and Isabelle Anders",
+                        "title": "Our Story by Mads Ericsson and Isabelle Anders"
+                      }
                     }
                   },
                   {
@@ -12529,6 +14271,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                      }
                     }
                   },
                   {
@@ -12540,7 +14290,15 @@
                         "label": "Watch Video",
                         "url": "#",
                         "target": "_self",
-                        "style": "secondary"
+                        "style": "secondary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Watch Video"
+                          },
+                          "ru": {
+                            "label": "Watch Video"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -12568,12 +14326,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       },
       {
         "id": "contentLayout-mteavdhz-ofzgt",
         "kind": "contentLayout",
-        "title": "Call to Action",
+        "title": "Գործողության կոչ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -12635,6 +14401,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                    "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                  },
+                  "ru": {
+                    "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                    "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                  }
                 }
               },
               {
@@ -12664,6 +14440,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                  },
+                  "ru": {
+                    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                  }
                 }
               },
               {
@@ -12672,17 +14456,33 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-3-0-0-2-0",
-                    "label": "Contact Us",
+                    "label": "Կապվել մեզ հետ",
                     "url": "mailto:info@example.com",
                     "target": "_self",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Contact Us"
+                      },
+                      "ru": {
+                        "label": "Связаться с нами"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-3-0-0-2-1",
-                    "label": "Read the FAQ",
+                    "label": "Կարդալ հաճախ տրվող հարցերը",
                     "url": "#faq",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Read the FAQ"
+                      },
+                      "ru": {
+                        "label": "Читать ответы на вопросы"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -12822,6 +14622,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                        "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                      },
+                      "ru": {
+                        "headingText": "Get listed today and become part of the most exclusive luxury vacation home network worldwide.",
+                        "title": "Get listed today and become part of the most exclusive luxury vacation home network worldwide."
+                      }
                     }
                   },
                   {
@@ -12851,6 +14661,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                      },
+                      "ru": {
+                        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies. "
+                      }
                     }
                   },
                   {
@@ -12859,17 +14677,33 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-3-0-0-2-0",
-                        "label": "Contact Us",
+                        "label": "Կապվել մեզ հետ",
                         "url": "mailto:info@example.com",
                         "target": "_self",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Contact Us"
+                          },
+                          "ru": {
+                            "label": "Связаться с нами"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-3-0-0-2-1",
-                        "label": "Read the FAQ",
+                        "label": "Կարդալ հաճախ տրվող հարցերը",
                         "url": "#faq",
                         "target": "_self",
-                        "style": "default"
+                        "style": "default",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Read the FAQ"
+                          },
+                          "ru": {
+                            "label": "Читать ответы на вопросы"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -12955,12 +14789,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Call to Action"
+          },
+          "ru": {
+            "title": "Вызов действия"
+          }
+        }
       },
       {
         "id": "contentLayout-mteavdi0-ub6en",
         "kind": "contentLayout",
-        "title": "FAQ",
+        "title": "Հաճախ տրվող հարցեր",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -13004,8 +14846,8 @@
               {
                 "id": "heading-block-mteavdi0-o5s7x",
                 "kind": "heading",
-                "headingText": "Frequently Asked Questions",
-                "title": "Frequently Asked Questions",
+                "headingText": "ՀԱՃԱԽԱԿԻ ՏՐՎՈՂ ՀԱՐՑԵՐ (FAQ)",
+                "title": "ՀԱՃԱԽԱԿԻ ՏՐՎՈՂ ՀԱՐՑԵՐ (FAQ)",
                 "headingLevel": "div",
                 "headingSize": "h6",
                 "headingColor": "primary",
@@ -13018,6 +14860,16 @@
                   "layout": {},
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Frequently Asked Questions",
+                    "title": "Frequently Asked Questions"
+                  },
+                  "ru": {
+                    "headingText": "Часто задаваемые вопросы",
+                    "title": "Часто задаваемые вопросы"
+                  }
                 }
               },
               {
@@ -13036,6 +14888,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions",
+                    "title": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions"
+                  },
+                  "ru": {
+                    "headingText": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions",
+                    "title": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions"
+                  }
                 }
               }
             ]
@@ -13052,32 +14914,80 @@
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-0",
                     "title": "Can I use Design Escapes despite COVID-19?",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Can I use Design Escapes despite COVID-19?"
+                      },
+                      "ru": {
+                        "title": "Can I use Design Escapes despite COVID-19?"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-1",
                     "title": "What's a host exactly?",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "What's a host exactly?"
+                      },
+                      "ru": {
+                        "title": "What's a host exactly?"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-2",
                     "title": "What info do I need to provide when I book?",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "What info do I need to provide when I book?"
+                      },
+                      "ru": {
+                        "title": "What info do I need to provide when I book?"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-3",
                     "title": "How can I pay for my reservation?",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "How can I pay for my reservation?"
+                      },
+                      "ru": {
+                        "title": "How can I pay for my reservation?"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-4",
                     "title": "Do you have any extra tips for travelling safely?",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Do you have any extra tips for travelling safely?"
+                      },
+                      "ru": {
+                        "title": "Do you have any extra tips for travelling safely?"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-accordion-item-4-0-1-0-5",
                     "title": "Help! I need to cancel my reservation.",
-                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                    "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Help! I need to cancel my reservation."
+                      },
+                      "ru": {
+                        "title": "Help! I need to cancel my reservation."
+                      }
+                    }
                   }
                 ],
                 "accordionMultiple": false,
@@ -13136,8 +15046,8 @@
                   {
                     "id": "heading-block-mteavdi0-7hpgc",
                     "kind": "heading",
-                    "headingText": "Frequently Asked Questions",
-                    "title": "Frequently Asked Questions",
+                    "headingText": "ՀԱՃԱԽԱԿԻ ՏՐՎՈՂ ՀԱՐՑԵՐ (FAQ)",
+                    "title": "ՀԱՃԱԽԱԿԻ ՏՐՎՈՂ ՀԱՐՑԵՐ (FAQ)",
                     "headingLevel": "div",
                     "headingSize": "h6",
                     "headingColor": "primary",
@@ -13150,6 +15060,16 @@
                       "layout": {},
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Frequently Asked Questions",
+                        "title": "Frequently Asked Questions"
+                      },
+                      "ru": {
+                        "headingText": "Часто задаваемые вопросы",
+                        "title": "Часто задаваемые вопросы"
+                      }
                     }
                   },
                   {
@@ -13168,6 +15088,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions",
+                        "title": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions"
+                      },
+                      "ru": {
+                        "headingText": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions",
+                        "title": "Find Answers to<br class=\"uk-visible-medium\">\nCommon Questions"
+                      }
                     }
                   }
                 ]
@@ -13191,32 +15121,80 @@
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-0",
                         "title": "Can I use Design Escapes despite COVID-19?",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Can I use Design Escapes despite COVID-19?"
+                          },
+                          "ru": {
+                            "title": "Can I use Design Escapes despite COVID-19?"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-1",
                         "title": "What's a host exactly?",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "What's a host exactly?"
+                          },
+                          "ru": {
+                            "title": "What's a host exactly?"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-2",
                         "title": "What info do I need to provide when I book?",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "What info do I need to provide when I book?"
+                          },
+                          "ru": {
+                            "title": "What info do I need to provide when I book?"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-3",
                         "title": "How can I pay for my reservation?",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "How can I pay for my reservation?"
+                          },
+                          "ru": {
+                            "title": "How can I pay for my reservation?"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-4",
                         "title": "Do you have any extra tips for travelling safely?",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Do you have any extra tips for travelling safely?"
+                          },
+                          "ru": {
+                            "title": "Do you have any extra tips for travelling safely?"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-accordion-item-4-0-1-0-5",
                         "title": "Help! I need to cancel my reservation.",
-                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies."
+                        "content": "rem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nascetur ridiculus mus mauris vitae ultricies.",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Help! I need to cancel my reservation."
+                          },
+                          "ru": {
+                            "title": "Help! I need to cancel my reservation."
+                          }
+                        }
                       }
                     ],
                     "accordionMultiple": false,
@@ -13238,7 +15216,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "FAQ"
+          },
+          "ru": {
+            "title": "Часто задаваемые вопросы"
+          }
+        }
       }
     ],
     "updatedAt": "2026-08-29T11:31:32.392Z"

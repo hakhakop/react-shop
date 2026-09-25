@@ -21,12 +21,7 @@ import {
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
 import { getPublishedHeaderDocumentSettings } from "../../lib/publishedHeaderDocumentSettings";
-import { getCanonicalPostSingularBySlug } from "@/lib/postSingularContext.server";
-import { resolveLayout, type SingularRouteContext } from "@/lib/layoutRouting";
-import {
-  ensurePostSingleRoutingCompatibility,
-  getBuilderLayoutByDocumentId,
-} from "@/lib/layoutRoutingStore.server";
+import { resolvePostRouteProjection } from "@/lib/postRouteProjection.server";
 import type { SaaSWebsite } from "@/lib/websites";
 
 type WPPageParams = {
@@ -46,71 +41,35 @@ async function renderCanonicalPost(
   website?: SaaSWebsite | null,
   websiteMode: "domain" | "tenant-path" = "domain",
 ) {
-  const canonical = await getCanonicalPostSingularBySlug(slug, website);
-  if (!canonical) return null;
-  const { post } = canonical;
-  const context: SingularRouteContext = {
-    view: "singular",
-    pageType: "singular:post",
-    provider: "wordpress",
-    contentType: "post",
-    contentId: post.id,
-    ...(post.databaseId !== undefined ? { databaseId: post.databaseId } : {}),
-    slug: post.slug,
-    uri: post.uri ?? `/${post.slug}/`,
-    taxonomyTerms: canonical.taxonomyTerms,
-  };
   const scope = website ? { websiteId: website.id } : {};
-  let selectedLayout = null;
-  try {
-    const registry = await ensurePostSingleRoutingCompatibility(scope);
-    const resolution = resolveLayout({
-      context,
-      individualOverrides: registry.individualOverrides,
-      routingTemplates: registry.routingTemplates,
-      nativeFallbackAvailable: true,
-    });
-    if (resolution.outcome === "individual" || resolution.outcome === "routing-template") {
-      selectedLayout = await getBuilderLayoutByDocumentId(resolution.layoutId, scope);
-    }
-  } catch (error) {
-    console.error("[layout-routing] Post resolution failed", error);
-  }
-
-  const fallbackContent = (
-    <main className="page">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: post.title, href: post.uri ?? `/${post.slug}/` }]} />
-      <h1 className="page-title">{post.title}</h1>
-      {post.featuredImage?.sourceUrl ? <img src={post.featuredImage.sourceUrl} alt={post.featuredImage.altText ?? ""} /> : null}
-      <article className="prose" dangerouslySetInnerHTML={{ __html: post.content ?? post.excerpt ?? "" }} />
-    </main>
-  );
+  const projection = await resolvePostRouteProjection({ slug, website, scope });
+  if (!projection) return null;
 
   if (website) {
     return (
       <WebsiteFrontend
         website={website}
         requestedPage="post-single"
-        pageLabelOverride={post.title}
+        pageLabelOverride={projection.pageLabel}
         mode={websiteMode}
-        layoutOverride={selectedLayout ?? undefined}
-        dynamicItemContextOverride={canonical.dynamicContext}
-        fallbackContent={fallbackContent}
-        rendererProps={{ breadcrumbItems: [{ label: "Home", href: "/" }, { label: post.title }] }}
+        layoutOverride={projection.layout ?? undefined}
+        dynamicItemContextOverride={projection.dynamicContext}
+        fallbackContent={projection.fallbackContent}
+        rendererProps={projection.rendererProps}
       />
     );
   }
-  if (!selectedLayout) return fallbackContent;
+  if (!projection.layout) return projection.fallbackContent;
   const [materialization, shellSettings] = await Promise.all([
-    materializeBuilderDynamicContent(selectedLayout, { rootContext: canonical.dynamicContext }),
+    materializeBuilderDynamicContent(projection.layout, { rootContext: projection.dynamicContext }),
     getBuilderShellSettings(),
   ]);
   return (
     <StorefrontBuilderRenderer
       layout={materialization.renderLayout}
       page="post-single"
-      pageLabel={post.title}
-      breadcrumbItems={[{ label: "Home", href: "/" }, { label: post.title }]}
+      pageLabel={projection.pageLabel}
+      {...projection.rendererProps}
       shellSettings={shellSettings}
     />
   );

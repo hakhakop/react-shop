@@ -204,7 +204,7 @@
   "menuItems": [
     {
       "id": "starter-home",
-      "label": "Home",
+      "label": "Գլխավոր",
       "url": "/",
       "parentId": null,
       "iconName": null,
@@ -212,11 +212,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Home"
+        },
+        "ru": {
+          "label": "Главная"
+        }
+      }
     },
     {
       "id": "starter-about",
-      "label": "About",
+      "label": "Մեր մասին",
       "url": "/#about",
       "parentId": null,
       "iconName": null,
@@ -224,11 +232,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "About"
+        },
+        "ru": {
+          "label": "О нас"
+        }
+      }
     },
     {
       "id": "starter-services",
-      "label": "Services",
+      "label": "Ծառայություններ",
       "url": "/#services",
       "parentId": null,
       "iconName": null,
@@ -236,11 +252,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Services"
+        },
+        "ru": {
+          "label": "Услуги"
+        }
+      }
     },
     {
       "id": "starter-contact",
-      "label": "Contact",
+      "label": "Կապ",
       "url": "/#contact",
       "parentId": null,
       "iconName": null,
@@ -248,7 +272,15 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Contact"
+        },
+        "ru": {
+          "label": "Контакты"
+        }
+      }
     }
   ],
   "namedMenus": [],

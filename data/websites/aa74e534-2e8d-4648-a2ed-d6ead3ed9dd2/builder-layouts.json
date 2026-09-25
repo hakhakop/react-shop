@@ -33,7 +33,7 @@
       {
         "id": "contentLayout-mtpz1akq-qn6os",
         "kind": "contentLayout",
-        "title": "Hero",
+        "title": "Հերոսություն",
         "background": "transparent",
         "backgroundRole": "primary",
         "sectionVariant": "primary",
@@ -78,39 +78,75 @@
                 "slides": [
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-0",
-                    "title": "Knit &amp; More",
-                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "title": "Տրիկոտաժ և ավելին",
+                    "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                     "text": "",
                     "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-01.png",
                     "imageAlt": "Knit & More",
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
-                    "showAction": false
+                    "showAction": false,
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "imageAlt": "Knit & More"
+                      },
+                      "ru": {
+                        "title": "Трикотаж и другое",
+                        "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                        "imageAlt": "Knit & More"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-1",
-                    "title": "Knit &amp; More",
-                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "title": "Տրիկոտաժ և ավելին",
+                    "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                     "text": "",
                     "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-02.png",
                     "imageAlt": "Knit & More",
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
-                    "showAction": false
+                    "showAction": false,
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "imageAlt": "Knit & More"
+                      },
+                      "ru": {
+                        "title": "Трикотаж и другое",
+                        "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                        "imageAlt": "Knit & More"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-0-2",
-                    "title": "Knit &amp; More",
-                    "meta": "Inspired by Our Children & The Passion for Crafts",
+                    "title": "Տրիկոտաժ և ավելին",
+                    "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                     "text": "",
                     "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-03.png",
                     "imageAlt": "Knit & More",
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "imageLoading": "eager",
-                    "showAction": false
+                    "showAction": false,
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Knit &amp; More",
+                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "imageAlt": "Knit & More"
+                      },
+                      "ru": {
+                        "title": "Трикотаж и другое",
+                        "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                        "imageAlt": "Knit & More"
+                      }
+                    }
                   }
                 ],
                 "carouselSettings": {
@@ -196,17 +232,33 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-0-0-0-1-0",
-                    "label": "Products",
+                    "label": "Ապրանքներ",
                     "url": "?post_type=product",
                     "target": "_self",
-                    "style": "secondary"
+                    "style": "secondary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Products"
+                      },
+                      "ru": {
+                        "label": "Товары"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-0-0-0-1-1",
-                    "label": "Etsy Shop",
+                    "label": "Etsy խանութ",
                     "url": "https://www.etsy.com/",
                     "target": "_blank",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Etsy Shop"
+                      },
+                      "ru": {
+                        "label": "Магазин Etsy"
+                      }
+                    }
                   }
                 ],
                 "size": "large",
@@ -238,17 +290,33 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-0-0-0-2-0",
-                    "label": "Products",
+                    "label": "Ապրանքներ",
                     "url": "?post_type=product",
                     "target": "_self",
-                    "style": "secondary"
+                    "style": "secondary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Products"
+                      },
+                      "ru": {
+                        "label": "Товары"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-button-0-0-0-2-1",
-                    "label": "Etsy Shop",
+                    "label": "Etsy խանութ",
                     "url": "https://www.etsy.com/",
                     "target": "_blank",
-                    "style": "primary"
+                    "style": "primary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Etsy Shop"
+                      },
+                      "ru": {
+                        "label": "Магазин Etsy"
+                      }
+                    }
                   }
                 ],
                 "buttonColumnGap": "small",
@@ -302,39 +370,75 @@
                     "slides": [
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-0",
-                        "title": "Knit &amp; More",
-                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "title": "Տրիկոտաժ և ավելին",
+                        "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                         "text": "",
                         "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-01.png",
                         "imageAlt": "Knit & More",
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
-                        "showAction": false
+                        "showAction": false,
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Knit &amp; More",
+                            "meta": "Inspired by Our Children & The Passion for Crafts",
+                            "imageAlt": "Knit & More"
+                          },
+                          "ru": {
+                            "title": "Трикотаж и другое",
+                            "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                            "imageAlt": "Knit & More"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-1",
-                        "title": "Knit &amp; More",
-                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "title": "Տրիկոտաժ և ավելին",
+                        "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                         "text": "",
                         "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-02.png",
                         "imageAlt": "Knit & More",
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
-                        "showAction": false
+                        "showAction": false,
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Knit &amp; More",
+                            "meta": "Inspired by Our Children & The Passion for Crafts",
+                            "imageAlt": "Knit & More"
+                          },
+                          "ru": {
+                            "title": "Трикотаж и другое",
+                            "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                            "imageAlt": "Knit & More"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-0-0-0-0-2",
-                        "title": "Knit &amp; More",
-                        "meta": "Inspired by Our Children & The Passion for Crafts",
+                        "title": "Տրիկոտաժ և ավելին",
+                        "meta": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                         "text": "",
                         "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/home-slideshow-03.png",
                         "imageAlt": "Knit & More",
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "imageLoading": "eager",
-                        "showAction": false
+                        "showAction": false,
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Knit &amp; More",
+                            "meta": "Inspired by Our Children & The Passion for Crafts",
+                            "imageAlt": "Knit & More"
+                          },
+                          "ru": {
+                            "title": "Трикотаж и другое",
+                            "meta": "Вдохновлено нашими детьми и любовью к рукоделию",
+                            "imageAlt": "Knit & More"
+                          }
+                        }
                       }
                     ],
                     "carouselSettings": {
@@ -420,17 +524,33 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-0-0-0-1-0",
-                        "label": "Products",
+                        "label": "Ապրանքներ",
                         "url": "?post_type=product",
                         "target": "_self",
-                        "style": "secondary"
+                        "style": "secondary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Products"
+                          },
+                          "ru": {
+                            "label": "Товары"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-0-0-0-1-1",
-                        "label": "Etsy Shop",
+                        "label": "Etsy խանութ",
                         "url": "https://www.etsy.com/",
                         "target": "_blank",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Etsy Shop"
+                          },
+                          "ru": {
+                            "label": "Магазин Etsy"
+                          }
+                        }
                       }
                     ],
                     "size": "large",
@@ -462,17 +582,33 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-0-0-0-2-0",
-                        "label": "Products",
+                        "label": "Ապրանքներ",
                         "url": "?post_type=product",
                         "target": "_self",
-                        "style": "secondary"
+                        "style": "secondary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Products"
+                          },
+                          "ru": {
+                            "label": "Товары"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-button-0-0-0-2-1",
-                        "label": "Etsy Shop",
+                        "label": "Etsy խանութ",
                         "url": "https://www.etsy.com/",
                         "target": "_blank",
-                        "style": "primary"
+                        "style": "primary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Etsy Shop"
+                          },
+                          "ru": {
+                            "label": "Магазин Etsy"
+                          }
+                        }
                       }
                     ],
                     "buttonColumnGap": "small",
@@ -501,12 +637,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Hero"
+          },
+          "ru": {
+            "title": "Герой"
+          }
+        }
       },
       {
         "id": "contentLayout-mtpz1akq-u4ygv",
         "kind": "contentLayout",
-        "title": "Featured Products",
+        "title": "Ընտրված ապրանքներ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -1562,12 +1706,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Featured Products"
+          },
+          "ru": {
+            "title": "Избранные товары"
+          }
+        }
       },
       {
         "id": "contentLayout-mtpz1akr-d0jqj",
         "kind": "contentLayout",
-        "title": "Products",
+        "title": "Ապրանքներ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -1766,8 +1918,8 @@
               {
                 "id": "heading-block-mtpz1akr-c7za4",
                 "kind": "heading",
-                "headingText": "Products",
-                "title": "Products",
+                "headingText": "Ապրանքներ",
+                "title": "Ապրանքներ",
                 "headingLevel": "h2",
                 "headingSize": "h1",
                 "headingAlign": "center",
@@ -1781,6 +1933,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Products",
+                    "title": "Products"
+                  },
+                  "ru": {
+                    "headingText": "Товары",
+                    "title": "Товары"
+                  }
                 }
               },
               {
@@ -1820,6 +1982,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor."
+                  },
+                  "ru": {
+                    "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor."
+                  }
                 }
               },
               {
@@ -2054,15 +2224,25 @@
                   {
                     "id": "yootheme-grid-item-2-1-0-0-1",
                     "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/products-category-custom-order.jpg",
-                    "imageAlt": "Custom Order",
-                    "title": "Custom Order",
+                    "imageAlt": "Անհատական պատվեր",
+                    "title": "Անհատական պատվեր",
                     "meta": "",
                     "text": "",
                     "buttonUrl": "?page_id=5",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h6"
+                    "titleStyle": "h6",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Custom Order",
+                        "title": "Custom Order"
+                      },
+                      "ru": {
+                        "imageAlt": "Индивидуальный заказ",
+                        "title": "Индивидуальный заказ"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -2358,8 +2538,8 @@
                   {
                     "id": "heading-block-mtpz1akr-0khkg",
                     "kind": "heading",
-                    "headingText": "Products",
-                    "title": "Products",
+                    "headingText": "Ապրանքներ",
+                    "title": "Ապրանքներ",
                     "headingLevel": "h2",
                     "headingSize": "h1",
                     "headingAlign": "center",
@@ -2373,6 +2553,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Products",
+                        "title": "Products"
+                      },
+                      "ru": {
+                        "headingText": "Товары",
+                        "title": "Товары"
+                      }
                     }
                   },
                   {
@@ -2412,6 +2602,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor."
+                      },
+                      "ru": {
+                        "body": "Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes. Aenean commodo ligula eget dolor."
+                      }
                     }
                   },
                   {
@@ -2667,15 +2865,25 @@
                       {
                         "id": "yootheme-grid-item-2-1-0-0-1",
                         "imageUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/products-category-custom-order.jpg",
-                        "imageAlt": "Custom Order",
-                        "title": "Custom Order",
+                        "imageAlt": "Անհատական պատվեր",
+                        "title": "Անհատական պատվեր",
                         "meta": "",
                         "text": "",
                         "buttonUrl": "?page_id=5",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h6"
+                        "titleStyle": "h6",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Custom Order",
+                            "title": "Custom Order"
+                          },
+                          "ru": {
+                            "imageAlt": "Индивидуальный заказ",
+                            "title": "Индивидуальный заказ"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -2761,12 +2969,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Products"
+          },
+          "ru": {
+            "title": "Товары"
+          }
+        }
       },
       {
         "id": "contentLayout-mtpz1akr-jdeey",
         "kind": "contentLayout",
-        "title": "About",
+        "title": "Մեր մասին",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -3006,8 +3222,8 @@
               {
                 "id": "heading-block-mtpz1akr-xet8y",
                 "kind": "heading",
-                "headingText": "Inspired by Our Children & The Passion for Crafts",
-                "title": "Inspired by Our Children & The Passion for Crafts",
+                "headingText": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
+                "title": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "elementAlign": "center",
@@ -3025,6 +3241,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Inspired by Our Children & The Passion for Crafts",
+                    "title": "Inspired by Our Children & The Passion for Crafts"
+                  },
+                  "ru": {
+                    "headingText": "Вдохновлено нашими детьми и любовью к рукоделию",
+                    "title": "Вдохновлено нашими детьми и любовью к рукоделию"
+                  }
                 }
               },
               {
@@ -3050,6 +3276,14 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum."
+                  },
+                  "ru": {
+                    "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum."
+                  }
                 }
               },
               {
@@ -3058,10 +3292,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-3-0-1-4-0",
-                    "label": "Our Story",
+                    "label": "Մեր պատմությունը",
                     "url": "?page_id=6",
                     "target": "_self",
-                    "style": "secondary"
+                    "style": "secondary",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Our Story"
+                      },
+                      "ru": {
+                        "label": "Наша история"
+                      }
+                    }
                   }
                 ],
                 "size": "large",
@@ -3400,8 +3642,8 @@
                   {
                     "id": "heading-block-mtpz1akr-ncd9q",
                     "kind": "heading",
-                    "headingText": "Inspired by Our Children & The Passion for Crafts",
-                    "title": "Inspired by Our Children & The Passion for Crafts",
+                    "headingText": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
+                    "title": "Ոգեշնչված մեր երեխաներով և ձեռագործի սիրով",
                     "headingLevel": "h2",
                     "headingAlign": "left",
                     "elementAlign": "center",
@@ -3419,6 +3661,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Inspired by Our Children & The Passion for Crafts",
+                        "title": "Inspired by Our Children & The Passion for Crafts"
+                      },
+                      "ru": {
+                        "headingText": "Вдохновлено нашими детьми и любовью к рукоделию",
+                        "title": "Вдохновлено нашими детьми и любовью к рукоделию"
+                      }
                     }
                   },
                   {
@@ -3444,6 +3696,14 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum."
+                      },
+                      "ru": {
+                        "body": "Vivamus elementum semper nisi. Aenean vulputate  porttitor eu, consequat vitae, eleifend enim. Maecenas tempus, tellus condimentum rhoncus, sem quam semper libero, sit adipiscing sem neque sed ipsum."
+                      }
                     }
                   },
                   {
@@ -3452,10 +3712,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-3-0-1-4-0",
-                        "label": "Our Story",
+                        "label": "Մեր պատմությունը",
                         "url": "?page_id=6",
                         "target": "_self",
-                        "style": "secondary"
+                        "style": "secondary",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Our Story"
+                          },
+                          "ru": {
+                            "label": "Наша история"
+                          }
+                        }
                       }
                     ],
                     "size": "large",
@@ -3542,12 +3810,20 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "About"
+          },
+          "ru": {
+            "title": "О нас"
+          }
+        }
       },
       {
         "id": "contentLayout-mtpz1aks-g0hcc",
         "kind": "contentLayout",
-        "title": "Contact",
+        "title": "Կապ",
         "background": "transparent",
         "backgroundRole": "default",
         "sectionVariant": "default",
@@ -3681,8 +3957,8 @@
               {
                 "id": "heading-block-mtpz1aks-55pyz",
                 "kind": "heading",
-                "headingText": "Visit Our Tiny Store in the Beautiful City Center",
-                "title": "Visit Our Tiny Store in the Beautiful City Center",
+                "headingText": "Այցելեք մեր փոքրիկ խանութը քաղաքի գեղեցիկ կենտրոնում",
+                "title": "Այցելեք մեր փոքրիկ խանութը քաղաքի գեղեցիկ կենտրոնում",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "elementAlign": "center",
@@ -3700,6 +3976,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Visit Our Tiny Store in the Beautiful City Center",
+                    "title": "Visit Our Tiny Store in the Beautiful City Center"
+                  },
+                  "ru": {
+                    "headingText": "Посетите наш маленький магазин в красивом центре города",
+                    "title": "Посетите наш маленький магазин в красивом центре города"
+                  }
                 }
               },
               {
@@ -3710,28 +3996,56 @@
                   {
                     "id": "yootheme-grid-item-4-0-1-1-0",
                     "imageUrl": "",
-                    "imageAlt": "Contact",
-                    "title": "Contact",
+                    "imageAlt": "Կապ",
+                    "title": "Կապ",
                     "meta": "",
                     "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h6"
+                    "titleStyle": "h6",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Contact",
+                        "title": "Contact",
+                        "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Контакты",
+                        "title": "Контакты",
+                        "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-grid-item-4-0-1-1-1",
                     "imageUrl": "",
-                    "imageAlt": "Opening Hours",
-                    "title": "Opening Hours",
+                    "imageAlt": "Աշխատանքային ժամեր",
+                    "title": "Աշխատանքային ժամեր",
                     "meta": "",
                     "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonTarget": "_self",
                     "mediaFit": "natural",
                     "titleElement": "h3",
-                    "titleStyle": "h6"
+                    "titleStyle": "h6",
+                    "contentTranslations": {
+                      "en": {
+                        "imageAlt": "Opening Hours",
+                        "title": "Opening Hours",
+                        "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "imageAlt": "Часы работы",
+                        "title": "Часы работы",
+                        "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   }
                 ],
                 "gridShowImage": true,
@@ -3794,7 +4108,7 @@
                 "gridContentColumnDivider": false,
                 "gridContentColumnBreakpoint": "m",
                 "contentMarginTop": "small",
-                "buttonLabel": "Read more",
+                "buttonLabel": "Կարդալ ավելին",
                 "buttonStyle": "default",
                 "buttonTarget": "_self",
                 "fullWidthButton": false,
@@ -3819,7 +4133,15 @@
                 "maxWidth": "xlarge",
                 "elementAlign": "center",
                 "elementPadding": "none",
-                "spacingContract": "yootheme"
+                "spacingContract": "yootheme",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Read more"
+                  },
+                  "ru": {
+                    "buttonLabel": "Читать далее"
+                  }
+                }
               },
               {
                 "id": "button-block-mtpz1aks-wq19n",
@@ -3827,10 +4149,18 @@
                 "buttons": [
                   {
                     "id": "yootheme-button-4-0-1-2-0",
-                    "label": "Contact",
+                    "label": "Կապ",
                     "url": "?page_id=8",
                     "target": "_self",
-                    "style": "default"
+                    "style": "default",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Contact"
+                      },
+                      "ru": {
+                        "label": "Контакты"
+                      }
+                    }
                   }
                 ],
                 "size": "large",
@@ -4054,8 +4384,8 @@
                   {
                     "id": "heading-block-mtpz1aks-30825",
                     "kind": "heading",
-                    "headingText": "Visit Our Tiny Store in the Beautiful City Center",
-                    "title": "Visit Our Tiny Store in the Beautiful City Center",
+                    "headingText": "Այցելեք մեր փոքրիկ խանութը քաղաքի գեղեցիկ կենտրոնում",
+                    "title": "Այցելեք մեր փոքրիկ խանութը քաղաքի գեղեցիկ կենտրոնում",
                     "headingLevel": "h2",
                     "headingAlign": "left",
                     "elementAlign": "center",
@@ -4073,6 +4403,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Visit Our Tiny Store in the Beautiful City Center",
+                        "title": "Visit Our Tiny Store in the Beautiful City Center"
+                      },
+                      "ru": {
+                        "headingText": "Посетите наш маленький магазин в красивом центре города",
+                        "title": "Посетите наш маленький магазин в красивом центре города"
+                      }
                     }
                   },
                   {
@@ -4083,28 +4423,56 @@
                       {
                         "id": "yootheme-grid-item-4-0-1-1-0",
                         "imageUrl": "",
-                        "imageAlt": "Contact",
-                        "title": "Contact",
+                        "imageAlt": "Կապ",
+                        "title": "Կապ",
                         "meta": "",
                         "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h6"
+                        "titleStyle": "h6",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Contact",
+                            "title": "Contact",
+                            "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Контакты",
+                            "title": "Контакты",
+                            "text": "<p>Balou Crochet &amp; Knit Wear<br>\nMain Street 1234<br>\n1236 Anytown</p>\n\nPhone: <a href=\"tel:+5551234678\" class=\"uk-link-text\" rel=\"noopener noreferrer\">+ 555 - 12 34 678</a><br>\nEmail: <a href=\"mailto:info@example.com\" class=\"uk-link-text\" rel=\"noopener noreferrer\">info@example.com</a>",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-grid-item-4-0-1-1-1",
                         "imageUrl": "",
-                        "imageAlt": "Opening Hours",
-                        "title": "Opening Hours",
+                        "imageAlt": "Աշխատանքային ժամեր",
+                        "title": "Աշխատանքային ժամեր",
                         "meta": "",
                         "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
-                        "buttonLabel": "Read more",
+                        "buttonLabel": "Կարդալ ավելին",
                         "buttonTarget": "_self",
                         "mediaFit": "natural",
                         "titleElement": "h3",
-                        "titleStyle": "h6"
+                        "titleStyle": "h6",
+                        "contentTranslations": {
+                          "en": {
+                            "imageAlt": "Opening Hours",
+                            "title": "Opening Hours",
+                            "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                            "buttonLabel": "Read more"
+                          },
+                          "ru": {
+                            "imageAlt": "Часы работы",
+                            "title": "Часы работы",
+                            "text": "<div class=\"uk-margin-small\">Opening Hours</div>\nMonday–Thursday: 9 am – 6 pm<br>\nFriday: 2 pm – 7 pm<br>\nSaturday: 11 am – 7 pm",
+                            "buttonLabel": "Читать далее"
+                          }
+                        }
                       }
                     ],
                     "gridShowImage": true,
@@ -4167,7 +4535,7 @@
                     "gridContentColumnDivider": false,
                     "gridContentColumnBreakpoint": "m",
                     "contentMarginTop": "small",
-                    "buttonLabel": "Read more",
+                    "buttonLabel": "Կարդալ ավելին",
                     "buttonStyle": "default",
                     "buttonTarget": "_self",
                     "fullWidthButton": false,
@@ -4192,7 +4560,15 @@
                     "maxWidth": "xlarge",
                     "elementAlign": "center",
                     "elementPadding": "none",
-                    "spacingContract": "yootheme"
+                    "spacingContract": "yootheme",
+                    "contentTranslations": {
+                      "en": {
+                        "buttonLabel": "Read more"
+                      },
+                      "ru": {
+                        "buttonLabel": "Читать далее"
+                      }
+                    }
                   },
                   {
                     "id": "button-block-mtpz1aks-sl3ro",
@@ -4200,10 +4576,18 @@
                     "buttons": [
                       {
                         "id": "yootheme-button-4-0-1-2-0",
-                        "label": "Contact",
+                        "label": "Կապ",
                         "url": "?page_id=8",
                         "target": "_self",
-                        "style": "default"
+                        "style": "default",
+                        "contentTranslations": {
+                          "en": {
+                            "label": "Contact"
+                          },
+                          "ru": {
+                            "label": "Контакты"
+                          }
+                        }
                       }
                     ],
                     "size": "large",
@@ -4286,7 +4670,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Contact"
+          },
+          "ru": {
+            "title": "Контакты"
+          }
+        }
       },
       {
         "id": "contentLayout-mtpz1aks-450zs",
@@ -4395,8 +4787,8 @@
               {
                 "id": "heading-block-mtpz1aks-0xj6q",
                 "kind": "heading",
-                "headingText": "Follow Us on Instagram",
-                "title": "Follow Us on Instagram",
+                "headingText": "Հետևեք մեզ Instagram-ում",
+                "title": "Հետևեք մեզ Instagram-ում",
                 "headingLevel": "h2",
                 "headingSize": "h5",
                 "headingAlign": "center",
@@ -4410,6 +4802,16 @@
                   },
                   "effects": {},
                   "card": {}
+                },
+                "contentTranslations": {
+                  "en": {
+                    "headingText": "Follow Us on Instagram",
+                    "title": "Follow Us on Instagram"
+                  },
+                  "ru": {
+                    "headingText": "Подписывайтесь на нас в Instagram",
+                    "title": "Подписывайтесь на нас в Instagram"
+                  }
                 }
               }
             ]
@@ -4439,7 +4841,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 01",
+                        "imageAlt": "Slider 01"
+                      },
+                      "ru": {
+                        "title": "Slider 01",
+                        "imageAlt": "Slider 01"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-5-1-0-0-1",
@@ -4451,7 +4863,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 02",
+                        "imageAlt": "Slider 02"
+                      },
+                      "ru": {
+                        "title": "Slider 02",
+                        "imageAlt": "Slider 02"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-5-1-0-0-2",
@@ -4463,7 +4885,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 03",
+                        "imageAlt": "Slider 03"
+                      },
+                      "ru": {
+                        "title": "Slider 03",
+                        "imageAlt": "Slider 03"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-5-1-0-0-3",
@@ -4475,7 +4907,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 04",
+                        "imageAlt": "Slider 04"
+                      },
+                      "ru": {
+                        "title": "Slider 04",
+                        "imageAlt": "Slider 04"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-5-1-0-0-4",
@@ -4487,7 +4929,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 05",
+                        "imageAlt": "Slider 05"
+                      },
+                      "ru": {
+                        "title": "Slider 05",
+                        "imageAlt": "Slider 05"
+                      }
+                    }
                   },
                   {
                     "id": "yootheme-panel-slide-5-1-0-0-5",
@@ -4499,7 +4951,17 @@
                     "hoverVideoUrl": "",
                     "thumbnailUrl": "",
                     "showAction": false,
-                    "buttonUrl": "https://www.instagram.com/"
+                    "buttonUrl": "https://www.instagram.com/",
+                    "contentTranslations": {
+                      "en": {
+                        "title": "Slider 06",
+                        "imageAlt": "Slider 06"
+                      },
+                      "ru": {
+                        "title": "Slider 06",
+                        "imageAlt": "Slider 06"
+                      }
+                    }
                   }
                 ],
                 "carouselSettings": {
@@ -4675,8 +5137,8 @@
                   {
                     "id": "heading-block-mtpz1aks-t92os",
                     "kind": "heading",
-                    "headingText": "Follow Us on Instagram",
-                    "title": "Follow Us on Instagram",
+                    "headingText": "Հետևեք մեզ Instagram-ում",
+                    "title": "Հետևեք մեզ Instagram-ում",
                     "headingLevel": "h2",
                     "headingSize": "h5",
                     "headingAlign": "center",
@@ -4690,6 +5152,16 @@
                       },
                       "effects": {},
                       "card": {}
+                    },
+                    "contentTranslations": {
+                      "en": {
+                        "headingText": "Follow Us on Instagram",
+                        "title": "Follow Us on Instagram"
+                      },
+                      "ru": {
+                        "headingText": "Подписывайтесь на нас в Instagram",
+                        "title": "Подписывайтесь на нас в Instagram"
+                      }
                     }
                   }
                 ]
@@ -4740,7 +5212,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 01",
+                            "imageAlt": "Slider 01"
+                          },
+                          "ru": {
+                            "title": "Slider 01",
+                            "imageAlt": "Slider 01"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-5-1-0-0-1",
@@ -4752,7 +5234,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 02",
+                            "imageAlt": "Slider 02"
+                          },
+                          "ru": {
+                            "title": "Slider 02",
+                            "imageAlt": "Slider 02"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-5-1-0-0-2",
@@ -4764,7 +5256,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 03",
+                            "imageAlt": "Slider 03"
+                          },
+                          "ru": {
+                            "title": "Slider 03",
+                            "imageAlt": "Slider 03"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-5-1-0-0-3",
@@ -4776,7 +5278,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 04",
+                            "imageAlt": "Slider 04"
+                          },
+                          "ru": {
+                            "title": "Slider 04",
+                            "imageAlt": "Slider 04"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-5-1-0-0-4",
@@ -4788,7 +5300,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 05",
+                            "imageAlt": "Slider 05"
+                          },
+                          "ru": {
+                            "title": "Slider 05",
+                            "imageAlt": "Slider 05"
+                          }
+                        }
                       },
                       {
                         "id": "yootheme-panel-slide-5-1-0-0-5",
@@ -4800,7 +5322,17 @@
                         "hoverVideoUrl": "",
                         "thumbnailUrl": "",
                         "showAction": false,
-                        "buttonUrl": "https://www.instagram.com/"
+                        "buttonUrl": "https://www.instagram.com/",
+                        "contentTranslations": {
+                          "en": {
+                            "title": "Slider 06",
+                            "imageAlt": "Slider 06"
+                          },
+                          "ru": {
+                            "title": "Slider 06",
+                            "imageAlt": "Slider 06"
+                          }
+                        }
                       }
                     ],
                     "carouselSettings": {
@@ -4863,7 +5395,15 @@
               }
             ]
           }
-        ]
+        ],
+        "contentTranslations": {
+          "en": {
+            "title": "Instagram"
+          },
+          "ru": {
+            "title": "Instagram"
+          }
+        }
       }
     ],
     "updatedAt": "2026-09-06T15:33:30.451Z"
@@ -4902,7 +5442,7 @@
       {
         "id": "header-document",
         "kind": "contentLayout",
-        "title": "Header",
+        "title": "Էջագլուխ",
         "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -4923,7 +5463,15 @@
                 "headerBrandMode": "brand",
                 "headerBrandText": "Balou",
                 "imageAlt": "Balou logo",
-                "imageMaxWidth": 180
+                "imageMaxWidth": 180,
+                "contentTranslations": {
+                  "en": {
+                    "imageAlt": "Balou logo"
+                  },
+                  "ru": {
+                    "imageAlt": "Balou logo"
+                  }
+                }
               }
             ]
           },
@@ -4935,9 +5483,17 @@
               {
                 "id": "header-navigation",
                 "kind": "menu",
-                "title": "Navigation",
+                "title": "Նավագնացություն",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "menuActiveIndicator": "underline",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Navigation"
+                  },
+                  "ru": {
+                    "title": "Навигация"
+                  }
+                }
               }
             ]
           },
@@ -4949,10 +5505,23 @@
               {
                 "id": "header-button",
                 "kind": "button",
-                "buttonLabel": "Contact Us",
+                "buttonLabel": "Կապվել մեզ հետ",
                 "buttonUrl": "#contact",
                 "buttonStyle": "primary",
-                "size": "default"
+                "size": "default",
+                "contentTranslations": {
+                  "en": {
+                    "buttonLabel": "Contact Us"
+                  },
+                  "ru": {
+                    "buttonLabel": "Связаться с нами"
+                  }
+                }
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ]
           }
@@ -5037,10 +5606,18 @@
         "headerOffcanvasMode": "slide",
         "headerOffcanvasFlip": true,
         "headerOffcanvasOverlay": true,
-        "headerMobileLogoUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg"
+        "headerMobileLogoUrl": "https://balou.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg",
+        "contentTranslations": {
+          "en": {
+            "title": "Header"
+          },
+          "ru": {
+            "title": "Шапка"
+          }
+        }
       }
     ],
-    "updatedAt": "2026-09-07T14:34:10.825Z"
+    "updatedAt": "2026-09-24T18:08:36.422Z"
   },
   "footer": {
     "version": 1,
@@ -5053,7 +5630,7 @@
       {
         "id": "footer-document",
         "kind": "contentLayout",
-        "title": "Footer",
+        "title": "էջատակ",
         "background": "#17211d",
         "backgroundMode": "full",
         "contentMode": "boxed",
@@ -5102,6 +5679,16 @@
                     "textAlign": "left",
                     "textTransform": "uppercase"
                   }
+                },
+                "contentTranslations": {
+                  "en": {
+                    "title": "Balou",
+                    "body": "A concise closing statement that reinforces what you offer and who you help."
+                  },
+                  "ru": {
+                    "title": "Balou",
+                    "body": "A concise closing statement that reinforces what you offer and who you help."
+                  }
                 }
               }
             ]
@@ -5114,14 +5701,34 @@
               {
                 "id": "footer-links",
                 "kind": "list",
-                "title": "Explore",
+                "title": "Ուսումնասիրել",
                 "items": [
-                  "About",
+                  "Մոտ ",
                   "Services",
-                  "Testimonials",
-                  "Contact"
+                  "մեկնաբանություններ",
+                  "Կոնտակտ / Կապ"
                 ],
-                "listIcon": "arrowRight"
+                "listIcon": "arrowRight",
+                "contentTranslations": {
+                  "en": {
+                    "title": "Explore",
+                    "items": [
+                      "About",
+                      "Services",
+                      "Testimonials",
+                      "Contact"
+                    ]
+                  },
+                  "ru": {
+                    "title": "Исследовать",
+                    "items": [
+                      "Сведения",
+                      "Services",
+                      "Отзывы",
+                      "Связаться"
+                    ]
+                  }
+                }
               }
             ]
           },
@@ -5133,8 +5740,8 @@
               {
                 "id": "footer-contact",
                 "kind": "text",
-                "eyebrow": "Contact",
-                "title": "Start a conversation",
+                "eyebrow": "Կապ",
+                "title": "Սկսել զրույց",
                 "body": "hello@example.com\n+1 000 000 0000",
                 "typography": {
                   "title": {
@@ -5165,12 +5772,32 @@
                     "textAlign": "left",
                     "textTransform": "uppercase"
                   }
+                },
+                "contentTranslations": {
+                  "en": {
+                    "eyebrow": "Contact",
+                    "title": "Start a conversation",
+                    "body": "hello@example.com\n+1 000 000 0000"
+                  },
+                  "ru": {
+                    "eyebrow": "Контакты",
+                    "title": "Начать разговор",
+                    "body": "hello@example.com\n+1 000 000 0000"
+                  }
                 }
               }
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "contentTranslations": {
+          "en": {
+            "title": "Footer"
+          },
+          "ru": {
+            "title": "Footer"
+          }
+        }
       }
     ]
   },

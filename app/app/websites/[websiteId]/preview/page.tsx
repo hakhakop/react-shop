@@ -17,6 +17,8 @@ import {
 import { getWooCommerceConnection } from "@/lib/woocommerce";
 import { resolveCommerceRouteProjection } from "@/lib/commerceRouteProjection.server";
 import { resolveEnabledGlobalStarter } from "@/lib/globalStarters";
+import { resolvePostRouteProjection } from "@/lib/postRouteProjection.server";
+import { readBuilderCustomPages } from "@/lib/builderLayouts";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,18 @@ function previewPathWithSearch(websiteId: string, page?: string, product?: strin
   const query = params.toString();
   const path = `/app/websites/${websiteId}/preview`;
   return query ? `${path}?${query}` : path;
+}
+
+function singleSegmentSlug(path: string | undefined) {
+  if (!path) return null;
+  try {
+    const segments = new URL(path, "https://webpages.local").pathname
+      .split("/")
+      .filter(Boolean);
+    return segments.length === 1 ? decodeURIComponent(segments[0]) : null;
+  } catch {
+    return null;
+  }
 }
 
 export default async function WebsitePreviewPage({
@@ -141,6 +155,40 @@ export default async function WebsitePreviewPage({
           requestProductTagSlugs: query?.product_tag?.split(",").map((item) => item.trim()).filter(Boolean),
         }).catch(() => null)
       : null;
+  const unresolvedSingleSlug = query?.path
+    ? singleSegmentSlug(query.path)
+    : query?.page === requestedPage && /^[^/?#]+$/.test(requestedPage)
+      ? requestedPage
+      : null;
+  const postSlugCandidate = !deferPageDocumentToBuilder &&
+    unresolvedSingleSlug &&
+    ![
+      "home",
+      "shop",
+      "client",
+      "cart",
+      "checkout",
+      "my-account",
+      "search-results",
+      "product-category",
+      "product-category-specific",
+      "product-single",
+      "post-single",
+    ].includes(unresolvedSingleSlug)
+      ? unresolvedSingleSlug
+      : null;
+  const postProjection = postSlugCandidate
+    ? await readBuilderCustomPages({ websiteId: website.id }).then((pages) =>
+        pages.some((page) => page.slug === postSlugCandidate)
+          ? null
+          : resolvePostRouteProjection({
+              slug: postSlugCandidate,
+              website,
+              scope: { websiteId: website.id },
+            }),
+      ).catch(() => null)
+    : null;
+  const effectiveRequestedPage = postProjection ? "post-single" : requestedPage;
   const connection = getWooCommerceConnection(website);
   const corePageContent =
     requestedPage === "cart" || requestedPage === "page:cart" ? (
@@ -166,17 +214,17 @@ export default async function WebsitePreviewPage({
   return (
     <WebsiteFrontend
       website={website}
-      requestedPage={requestedPage}
+      requestedPage={effectiveRequestedPage}
       mode="preview"
-      pageLabelOverride={commerceProjection?.pageLabel}
+      pageLabelOverride={postProjection?.pageLabel ?? commerceProjection?.pageLabel}
       rendererProps={
-        commerceProjection?.rendererProps ?? (corePageContent
+        postProjection?.rendererProps ?? commerceProjection?.rendererProps ?? (corePageContent
             ? { pageContent: corePageContent }
             : undefined)
       }
-      layoutOverride={commerceProjection?.layout ?? undefined}
-      dynamicItemContextOverride={commerceProjection?.dynamicContext}
-      fallbackContent={corePageFallback}
+      layoutOverride={postProjection?.layout ?? commerceProjection?.layout ?? undefined}
+      dynamicItemContextOverride={postProjection?.dynamicContext ?? commerceProjection?.dynamicContext}
+      fallbackContent={postProjection?.fallbackContent ?? corePageFallback}
       builderIframeSelection={!isPublicGlobalStarterPreview && query?.builderFrame === "selection"}
       previewHeaderVariant={
         !isPublicGlobalStarterPreview &&

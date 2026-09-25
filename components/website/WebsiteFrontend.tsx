@@ -107,16 +107,18 @@ function frontendMaterializationKey(
   website: SaaSWebsite,
   layout: BuilderLayout,
   rootContext: DynamicItemContext | undefined,
+  contentLanguage: string,
 ) {
-  return `${website.id}:${layout.key}:${layout.updatedAt}:${rootContext ? JSON.stringify(rootContext) : "root"}`;
+  return `${website.id}:${layout.key}:${layout.updatedAt}:${contentLanguage}:${rootContext ? JSON.stringify(rootContext) : "root"}`;
 }
 
 async function materializeFrontendLayout(
   website: SaaSWebsite,
   layout: BuilderLayout,
   rootContext: DynamicItemContext | undefined,
+  contentLanguage: string,
 ) {
-  const key = frontendMaterializationKey(website, layout, rootContext);
+  const key = frontendMaterializationKey(website, layout, rootContext, contentLanguage);
   const cached = frontendMaterializationCache.get(key);
   if (cached?.value && cached.expiresAt > Date.now()) return cached.value;
   if (cached?.pending) return cached.pending;
@@ -409,6 +411,7 @@ export default async function WebsiteFrontend({
           website,
           resolvedMediaLayout,
           dynamicItemContextOverride ?? commerceProjection?.dynamicContext,
+          activeContentLanguage,
         )
       : Promise.resolve(null),
     resolveHeaderDropdownProjections(shellSettings, website),

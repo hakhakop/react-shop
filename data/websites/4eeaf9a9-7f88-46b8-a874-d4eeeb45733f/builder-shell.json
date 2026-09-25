@@ -205,7 +205,7 @@
   "menuItems": [
     {
       "id": "starter-home",
-      "label": "Home",
+      "label": "Գլխավոր",
       "url": "/",
       "parentId": null,
       "iconName": null,
@@ -213,11 +213,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Home"
+        },
+        "ru": {
+          "label": "Главная"
+        }
+      }
     },
     {
       "id": "starter-about",
-      "label": "About",
+      "label": "Մեր մասին",
       "url": "/#about",
       "parentId": null,
       "iconName": null,
@@ -225,11 +233,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "About"
+        },
+        "ru": {
+          "label": "О нас"
+        }
+      }
     },
     {
       "id": "starter-services",
-      "label": "Services",
+      "label": "Ծառայություններ",
       "url": "/#services",
       "parentId": null,
       "iconName": null,
@@ -237,11 +253,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Services"
+        },
+        "ru": {
+          "label": "Услуги"
+        }
+      }
     },
     {
       "id": "starter-contact",
-      "label": "Contact",
+      "label": "Կապ",
       "url": "/#contact",
       "parentId": null,
       "iconName": null,
@@ -249,11 +273,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Contact"
+        },
+        "ru": {
+          "label": "Контакты"
+        }
+      }
     },
     {
       "id": "menu_p53yzsmq0",
-      "label": "Company",
+      "label": "Ընկերություն",
       "url": "/company",
       "parentId": null,
       "iconName": null,
@@ -261,11 +293,19 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "Company"
+        },
+        "ru": {
+          "label": "Компания"
+        }
+      }
     },
     {
       "id": "menu_ygri1cm28",
-      "label": "story",
+      "label": "պատմություն",
       "url": "/story",
       "parentId": null,
       "iconName": null,
@@ -273,7 +313,15 @@
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all"
+      "visibility": "all",
+      "contentTranslations": {
+        "en": {
+          "label": "story"
+        },
+        "ru": {
+          "label": "story"
+        }
+      }
     }
   ],
   "namedMenus": [
@@ -283,7 +331,7 @@
       "items": [
         {
           "id": "main-menu-nav-bz8fzd",
-          "label": "Why DevStack?",
+          "label": "Ինչու՞ DevStack:",
           "url": "/why-devstack/",
           "parentId": null,
           "iconName": null,
@@ -299,11 +347,19 @@
             "slug": "why-devstack",
             "uri": "/why-devstack/",
             "sourceDatabaseId": 19
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Why DevStack?"
+            },
+            "ru": {
+              "label": "Почему DevStack?"
+            }
           }
         },
         {
           "id": "main-menu-nav-r7f9k3",
-          "label": "Deployment",
+          "label": "Տեղակայում",
           "url": "/?page_id=19#deployment",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -316,6 +372,14 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#deployment"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Deployment"
+            },
+            "ru": {
+              "label": "Развёртывание"
+            }
           }
         },
         {
@@ -333,11 +397,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#ci-cd"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "CI/CD"
+            },
+            "ru": {
+              "label": "CI/CD"
+            }
           }
         },
         {
           "id": "main-menu-nav-uhrthf",
-          "label": "Security",
+          "label": "Անվտանգություն",
           "url": "/?page_id=19#security",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -350,11 +422,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#security"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Security"
+            },
+            "ru": {
+              "label": "Безопасность"
+            }
           }
         },
         {
           "id": "main-menu-nav-1pw6ksr",
-          "label": "Features",
+          "label": "Հնարավորություններ",
           "url": "/?page_id=19#features",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -367,11 +447,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#features"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Features"
+            },
+            "ru": {
+              "label": "Возможности"
+            }
           }
         },
         {
           "id": "main-menu-nav-du3abv",
-          "label": "Automation",
+          "label": "Ավտոմատացում",
           "url": "/?page_id=19#automation",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -384,11 +472,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#automation"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Automation"
+            },
+            "ru": {
+              "label": "Automation"
+            }
           }
         },
         {
           "id": "main-menu-nav-rn8hmf",
-          "label": "Infrastructure",
+          "label": "መሰረተ ልማት",
           "url": "/?page_id=19#infrastructure",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -401,11 +497,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#infrastructure"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Infrastructure"
+            },
+            "ru": {
+              "label": "Инфраструктура"
+            }
           }
         },
         {
           "id": "main-menu-nav-wt4x0z",
-          "label": "Integrations",
+          "label": "Ինտեգրացիա",
           "url": "/?page_id=19#integrations",
           "parentId": "main-menu-nav-bz8fzd",
           "iconName": null,
@@ -418,11 +522,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=19#integrations"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Integrations"
+            },
+            "ru": {
+              "label": "Integrations"
+            }
           }
         },
         {
           "id": "main-menu-nav-12f81ng",
-          "label": "Enterprise",
+          "label": "Ձեռնարկություն",
           "url": "/enterprise/",
           "parentId": null,
           "iconName": null,
@@ -438,11 +550,19 @@
             "slug": "enterprise",
             "uri": "/enterprise/",
             "sourceDatabaseId": 2
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Enterprise"
+            },
+            "ru": {
+              "label": "Для бизнеса"
+            }
           }
         },
         {
           "id": "main-menu-nav-mk3ir2",
-          "label": "Powerful API",
+          "label": "Հզոր API",
           "url": "/?page_id=2#powerful-api",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -455,11 +575,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#powerful-api"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Powerful API"
+            },
+            "ru": {
+              "label": "Powerful API"
+            }
           }
         },
         {
           "id": "main-menu-nav-1oxpqls",
-          "label": "Project Management",
+          "label": "Ծրագրի կառավարում",
           "url": "/?page_id=2#project-management",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -472,11 +600,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#project-management"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Project Management"
+            },
+            "ru": {
+              "label": "Project Management"
+            }
           }
         },
         {
           "id": "main-menu-nav-1tav2x6",
-          "label": "Customer Stories",
+          "label": "Հաճախորդների պատմություններ",
           "url": "/?page_id=2#customer-stories",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -489,11 +625,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#customer-stories"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Customer Stories"
+            },
+            "ru": {
+              "label": "Customer Stories"
+            }
           }
         },
         {
           "id": "main-menu-nav-lw88oo",
-          "label": "Efficient Workflow",
+          "label": "Արդյունավետ աշխատանքային հոսք",
           "url": "/?page_id=2#efficient-workflow",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -506,11 +650,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#efficient-workflow"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Efficient Workflow"
+            },
+            "ru": {
+              "label": "Эффективный рабочий процесс"
+            }
           }
         },
         {
           "id": "main-menu-nav-dhnd35",
-          "label": "Collaboration",
+          "label": "Համագործակցություն",
           "url": "/?page_id=2#collaboration",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -523,11 +675,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#collaboration"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Collaboration"
+            },
+            "ru": {
+              "label": "Сотрудничество"
+            }
           }
         },
         {
           "id": "main-menu-nav-1dumps9",
-          "label": "Community",
+          "label": "Համայնք",
           "url": "/?page_id=2#community",
           "parentId": "main-menu-nav-12f81ng",
           "iconName": null,
@@ -540,11 +700,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=2#community"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Community"
+            },
+            "ru": {
+              "label": "Сообщество"
+            }
           }
         },
         {
           "id": "main-menu-nav-1dhtv25",
-          "label": "Pricing",
+          "label": "Գներ",
           "url": "/pricing/",
           "parentId": null,
           "iconName": null,
@@ -560,11 +728,19 @@
             "slug": "pricing",
             "uri": "/pricing/",
             "sourceDatabaseId": 21
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Pricing"
+            },
+            "ru": {
+              "label": "Цены"
+            }
           }
         },
         {
           "id": "main-menu-nav-16nwafo",
-          "label": "Developers",
+          "label": "Կառուցապատողներ",
           "url": "/feature-index/",
           "parentId": null,
           "iconName": null,
@@ -580,11 +756,19 @@
             "slug": "feature-index",
             "uri": "/feature-index/",
             "sourceDatabaseId": 20
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Developers"
+            },
+            "ru": {
+              "label": "Developers"
+            }
           }
         },
         {
           "id": "main-menu-nav-tkvjwf",
-          "label": "Getting Started",
+          "label": "Սկսել",
           "url": "/?page_id=24",
           "parentId": "main-menu-nav-16nwafo",
           "iconName": null,
@@ -597,11 +781,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=24"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Getting Started"
+            },
+            "ru": {
+              "label": "Начать"
+            }
           }
         },
         {
           "id": "main-menu-nav-yacrqi",
-          "label": "Learn the Basics",
+          "label": "Ծանոթացեք հիմունքներին",
           "url": "/?page_id=24",
           "parentId": "main-menu-nav-16nwafo",
           "iconName": null,
@@ -614,11 +806,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=24"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Learn the Basics"
+            },
+            "ru": {
+              "label": "Основы работы"
+            }
           }
         },
         {
           "id": "main-menu-nav-xvq0o1",
-          "label": "Configurations",
+          "label": "Կարգավորումներ",
           "url": "/?page_id=24",
           "parentId": "main-menu-nav-16nwafo",
           "iconName": null,
@@ -631,11 +831,19 @@
           "navigationTarget": {
             "kind": "custom",
             "uri": "/?page_id=24"
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Configurations"
+            },
+            "ru": {
+              "label": "Configurations"
+            }
           }
         },
         {
           "id": "main-menu-nav-18tg7o2",
-          "label": "Company",
+          "label": "Ընկերություն",
           "url": "/about/",
           "parentId": null,
           "iconName": null,
@@ -651,11 +859,19 @@
             "slug": "about",
             "uri": "/about/",
             "sourceDatabaseId": 4
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Company"
+            },
+            "ru": {
+              "label": "Компания"
+            }
           }
         },
         {
           "id": "main-menu-nav-aech2w",
-          "label": "About",
+          "label": "Մեր մասին",
           "url": "/about/",
           "parentId": "main-menu-nav-18tg7o2",
           "iconName": null,
@@ -671,11 +887,19 @@
             "slug": "about",
             "uri": "/about/",
             "sourceDatabaseId": 4
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "About"
+            },
+            "ru": {
+              "label": "О нас"
+            }
           }
         },
         {
           "id": "main-menu-nav-1sf1hxw",
-          "label": "Our Story",
+          "label": "Մեր պատմությունը",
           "url": "/our-story/",
           "parentId": "main-menu-nav-18tg7o2",
           "iconName": null,
@@ -691,11 +915,19 @@
             "slug": "our-story",
             "uri": "/our-story/",
             "sourceDatabaseId": 23
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Our Story"
+            },
+            "ru": {
+              "label": "Наша история"
+            }
           }
         },
         {
           "id": "main-menu-nav-6nyv72",
-          "label": "Careers",
+          "label": "Կարիերա",
           "url": "/careers/",
           "parentId": "main-menu-nav-18tg7o2",
           "iconName": null,
@@ -711,11 +943,19 @@
             "slug": "careers",
             "uri": "/careers/",
             "sourceDatabaseId": 3
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Careers"
+            },
+            "ru": {
+              "label": "Карьера"
+            }
           }
         },
         {
           "id": "main-menu-nav-60ytv2",
-          "label": "Job Description",
+          "label": "Աշխատանքի նկարագրություն",
           "url": "/job-description/",
           "parentId": "main-menu-nav-18tg7o2",
           "iconName": null,
@@ -731,11 +971,19 @@
             "slug": "job-description",
             "uri": "/job-description/",
             "sourceDatabaseId": 22
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Job Description"
+            },
+            "ru": {
+              "label": "Должностная инструкция"
+            }
           }
         },
         {
           "id": "main-menu-nav-1ld5o4f",
-          "label": "Blog",
+          "label": "Բլոգ",
           "url": "/blog/",
           "parentId": "main-menu-nav-18tg7o2",
           "iconName": null,
@@ -751,6 +999,14 @@
             "slug": "blog",
             "uri": "/blog/",
             "sourceDatabaseId": 65
+          },
+          "contentTranslations": {
+            "en": {
+              "label": "Blog"
+            },
+            "ru": {
+              "label": "Блог"
+            }
           }
         }
       ]
