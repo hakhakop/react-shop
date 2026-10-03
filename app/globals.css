@@ -1711,14 +1711,18 @@ a {
 .tm-box-decoration-secondary::before {
   content: "";
   position: absolute;
-  inset: -10px;
-  z-index: 0;
+  inset: 10px;
+  z-index: 1;
   pointer-events: none;
-  border-radius: var(--uk-theme-box-decoration-border-radius, 10px);
 }
 .tm-box-decoration-default::before {
-  bottom: 0;
+  transform: translate(0, 0);
+  background-color: transparent;
   background-image: var(--uk-theme-box-decoration-default-gradient, none);
+  border: 1px solid var(--uk-theme-box-decoration-default-border, rgba(0,0,0,0.1));
+}
+.tm-box-decoration-inverse.tm-box-decoration-default::before {
+  border-color: var(--uk-inverse-theme-box-decoration-default-border, rgba(255,255,255,0.7));
 }
 .tm-box-decoration-primary::before {
   backdrop-filter: var(--uk-theme-box-decoration-primary-glow-filter, none);
@@ -1742,18 +1746,6 @@ a {
   background: var(--uk-theme-box-decoration-secondary-background, transparent);
   border: 1px solid var(--uk-theme-box-decoration-secondary-border, transparent);
 }
-.tm-box-decoration-default img,
-.tm-box-decoration-primary img,
-.tm-box-decoration-secondary img {
-  position: relative;
-  z-index: 1;
-  border-radius: calc(var(--uk-theme-box-decoration-border-radius, 10px) * 0.7);
-}
-.tm-box-decoration-default img {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
 /* A YOOtheme box decoration is allowed to extend beyond its section edge.
    Raise only the owning section so the next sibling surface cannot paint over
    the authored frame or glow. */
@@ -2236,6 +2228,11 @@ a {
  * the structure; these shared rules keep imported and authored overlays
  * visually consistent in Builder and storefront previews. */
 .shop-builder-image-media:has(.shop-builder-image-overlay) { position: relative; overflow: hidden; }
+.shop-builder-image-media.tm-box-decoration-default:has(.shop-builder-image-overlay),
+.shop-builder-image-media.tm-box-decoration-primary:has(.shop-builder-image-overlay),
+.shop-builder-image-media.tm-box-decoration-secondary:has(.shop-builder-image-overlay) {
+  overflow: visible;
+}
 .shop-builder-image-overlay { z-index: 2; pointer-events: none; }
 .shop-builder-image-overlay-content { z-index: 3; max-width: 100%; pointer-events: none; }
 .shop-builder-image-overlay-content > * { pointer-events: auto; }

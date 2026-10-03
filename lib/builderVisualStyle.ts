@@ -68,6 +68,9 @@ export type BuilderLayoutStyle = {
   maxWidth?: string;
   maxWidthBreakpoint?: "small" | "medium" | "large" | "xlarge";
   marginMode?: string;
+  /** YOOtheme can author top and bottom flow margins independently. */
+  marginTopMode?: string;
+  marginBottomMode?: string;
   removeTopMargin?: boolean;
   removeBottomMargin?: boolean;
   blendWithPage?: boolean;

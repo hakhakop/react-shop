@@ -1,11 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createYoothemeThemeSettings } from "@/lib/builderThemeSettings";
+import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import {
   applyYoothemeHeaderImport,
   createYoothemeHeaderRecipe,
 } from "@/lib/yoothemeHeaderRecipe";
+import { headerLayoutBlockKinds, layoutBlockDescriptions, layoutBlockLabels } from "@/components/dashboard/builderRegistry";
 import type { BuilderState } from "@/components/dashboard/builderTypes";
+
+test("Header library exposes the same canonical Social element as page layouts", () => {
+  expect(headerLayoutBlockKinds).toContain("social");
+  expect(layoutBlockLabels.social).toBe("Social");
+  expect(layoutBlockDescriptions.social).toContain("Semantic social profile links");
+});
 
 const currentHeader: BuilderState = {
   page: "header",
@@ -69,6 +77,74 @@ test("recipe mode creates ordinary semantic Header rows only when selected", () 
   );
   expect(result.sections[0]?.layoutItems).toBeUndefined();
   expect(result.sections[0]?.headerPresetKey).toBeUndefined();
+});
+
+test("recipe imports YOOtheme social links as the shared Social element in configured slots", () => {
+  const theme = createYoothemeThemeSettings({
+    header: {
+      layout: "horizontal-right",
+      social: "header:end",
+      social_gap: "small",
+      social_items: [{ link: "https://example.com/social" }],
+    },
+    navbar: { sticky: 1 },
+    mobile: {
+      header: {
+        layout: "horizontal-right",
+        social: "header-mobile:start",
+        social_items: [{ link: "https://example.com/mobile-social" }],
+      },
+      dialog: { toggle: "navbar-mobile:end" },
+    },
+    logo: { text: "Example", image: "logo.svg", image_svg_inline: true },
+    menu: { positions: { navbar: { menu: 2 } } },
+  });
+  const recipe = createYoothemeHeaderRecipe(theme);
+  const desktop = recipe.rows.find((row) => row.headerVariant === "desktop");
+  const mobile = recipe.rows.find((row) => row.headerVariant === "mobile");
+  const allBlocks = (row: typeof desktop) => row?.columns.flatMap((column) => column.elements) ?? [];
+
+  expect(allBlocks(desktop)).toContainEqual(expect.objectContaining({
+    id: "header-social",
+    kind: "social",
+    socialItems: [{ id: "header-social-item-1", link: "https://example.com/social" }],
+    socialStyle: "icon",
+    socialGrid: "horizontal",
+    socialColumnGap: "small",
+  }));
+  expect(allBlocks(desktop)).toContainEqual(expect.objectContaining({
+    id: "header-logo",
+    imageSvgInline: true,
+  }));
+  expect(allBlocks(mobile)).toContainEqual(expect.objectContaining({
+    id: "header-mobile-social",
+    kind: "social",
+    socialItems: [{ id: "header-mobile-social-item-1", link: "https://example.com/mobile-social" }],
+    socialStyle: "icon",
+    socialGrid: "horizontal",
+    socialColumnGap: "small",
+  }));
+
+  const currentHeaderWithLegacySocial = {
+    ...currentHeader,
+    sections: [{
+      ...currentHeader.sections[0]!,
+      headerSocialPosition: "header:start",
+      headerSocialItems: [{ link: "https://old.example.com/social" }],
+    }],
+  };
+  const imported = applyYoothemeHeaderImport(currentHeaderWithLegacySocial, theme, "replace-from-recipe");
+  expect(imported.sections[0]).not.toHaveProperty("headerSocialPosition");
+  expect(imported.sections[0]).not.toHaveProperty("headerSocialItems");
+  const composition = resolveHeaderBuilderComposition(imported, {
+    sectionId: imported.sections[0]?.id,
+  });
+  expect(composition.elements.find((element) => element.type === "social")).toMatchObject({
+    id: "header-social",
+    type: "social",
+    socialItems: [{ id: "header-social-item-1", link: "https://example.com/social" }],
+    socialStyle: "icon",
+  });
 });
 
 test("Woolberry positions compile into desktop and mobile semantic slots", () => {

@@ -37,7 +37,7 @@ const presentation: BuilderMenuPresentationMap = {
     icon: "grid",
     submenuLayout: "mega",
     submenuColumns: 3,
-    submenuStretch: null,
+    submenuStretch: "navbar",
   submenuLarge: false,
   submenuRemoveHorizontalPadding: false,
   submenuRemoveVerticalPadding: false,
@@ -80,6 +80,7 @@ test("portable navigation round-trip preserves hierarchy, typed targets, duplica
   expect(installedPost.parentId).toBe(installedNews.id);
   expect(installedPost.subtitle).toBe("Featured story");
   expect(installed.presentation[installedNews.id]).toEqual(presentation["menu-2"]);
+  expect(installed.presentation[installedNews.id].submenuStretch).toBe("navbar");
 });
 
 test("connected absolute URLs become portable while external and anchor links remain unchanged", () => {

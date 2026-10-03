@@ -34,6 +34,8 @@ export type BuilderStructuralColumn = {
   span: number;
   className: string;
   style: CSSProperties;
+  surfaceClassName: string;
+  surfaceStyle: CSSProperties;
   stickyDeclaration?: string;
 };
 
@@ -152,6 +154,9 @@ function widthClass(value: string | undefined, breakpoint = "") {
   if (normalized === "auto" || normalized === "expand") {
     return `uk-width-${normalized}${breakpoint}`;
   }
+  if (["small", "medium", "large", "xlarge"].includes(normalized)) {
+    return `uk-width-${normalized}${breakpoint}`;
+  }
   if (/^\d+-\d+$/.test(normalized)) {
     return `uk-width-${normalized}${breakpoint}`;
   }
@@ -207,6 +212,11 @@ function columnStyle(column: BuilderColumn): CSSProperties {
     ...(!stickyOwnsVerticalAlignment && (column.verticalAlign === "middle" || column.verticalAlign === "bottom")
       ? { flexDirection: "row" }
       : {}),
+  };
+}
+
+function columnSurfaceStyle(column: BuilderColumn): CSSProperties {
+  return {
     ...(column.background?.color ? { backgroundColor: column.background.color } : {}),
     ...(column.background?.imageUrl
       ? {
@@ -215,7 +225,9 @@ function columnStyle(column: BuilderColumn): CSSProperties {
             : `url(${JSON.stringify(column.background.imageUrl)})`,
           backgroundPosition: normalizeYoothemeBackgroundPosition(column.background.position),
           backgroundSize: column.background.size,
-          backgroundRepeat: column.background.repeat,
+          // YOOtheme's background-image helper emits uk-background-norepeat
+          // unless repeat was explicitly selected in the source settings.
+          backgroundRepeat: column.background.repeat ?? "no-repeat",
         }
       : column.background?.gradient
         ? { backgroundImage: column.background.gradient }
@@ -223,12 +235,23 @@ function columnStyle(column: BuilderColumn): CSSProperties {
   };
 }
 
-function columnSurfaceClass(column: BuilderColumn) {
+function columnSurfaceClass(column: BuilderColumn, yoothemeSpacing = false) {
   const rawStyle = column.style?.trim().toLowerCase();
   const style = rawStyle === "muted" ? "tile-muted" : rawStyle === "hover" ? "card-hover" : rawStyle;
   const surface = style && style !== "none" ? style : undefined;
   const padding = column.padding?.trim().toLowerCase();
-  const paddingClass = padding === "none"
+  const isTileSurface = columnNeedsTileSurface(column);
+  const paddingClass = yoothemeSpacing && isTileSurface
+    ? padding === "none"
+      ? "uk-padding-remove"
+      : padding === "small" || padding === "sm"
+        ? "uk-tile-small"
+        : padding === "large" || padding === "lg"
+          ? "uk-tile-large"
+          : padding === "xlarge" || padding === "xl"
+            ? "uk-tile-xlarge"
+            : ""
+    : padding === "none"
     ? "uk-padding-remove"
     : padding === "small" || padding === "sm"
       ? "uk-padding-small"
@@ -266,6 +289,29 @@ function columnVisibilityClass(column: BuilderColumn) {
   return classes[0];
 }
 
+function isNegativeCssOffset(value: string | undefined) {
+  if (!value) return false;
+  return /^\s*-\s*(?:\d+(?:\.\d*)?|\.\d+)(?:px|%|vw|vh|vmin|vmax|rem|em)?\s*$/i.test(value);
+}
+
+/**
+ * An overflowing positioned child must be able to paint across sibling
+ * column surfaces, as it does in YOOtheme's grid. Promote only the owning
+ * column when its imported General offsets explicitly cross a column edge;
+ * the child's authored z-index continues to order it within that column.
+ */
+function columnHasOverflowingPositionedElement(column: BuilderColumn) {
+  return (column.elements ?? []).some((element) => {
+    const layout = element.visualStyle?.layout;
+    return (
+      layout?.position === "absolute" &&
+      [layout.top, layout.right, layout.bottom, layout.left].some(
+        isNegativeCssOffset,
+      )
+    );
+  });
+}
+
 function columnHasExpandedPanel(column: BuilderColumn) {
   return (column.elements ?? []).some(
     (element) => element.kind === "panel" && element.panelHeightExpand === true,
@@ -293,11 +339,25 @@ function columnClassName(
     }),
     columnOrderClasses(column),
     columnVisibilityClass(column),
+    columnHasOverflowingPositionedElement(column)
+      ? "shop-builder-column--has-overflowing-positioned-element"
+      : undefined,
     // YOOtheme's Panel "Fill the available column space" is represented by
     // the grid-item match modifier on the owning column, not by a fixed
     // height on the Panel itself.
     columnHasExpandedPanel(column) ? "uk-grid-item-match" : undefined,
-    columnSurfaceClass(column),
+  );
+}
+
+function columnNeedsTileSurface(column: BuilderColumn) {
+  const style = column.style?.trim().toLowerCase();
+  const hasBackground = Boolean(
+    column.background?.color || column.background?.imageUrl ||
+    column.background?.gradient || column.background?.videoUrl,
+  );
+  return Boolean(
+    style?.startsWith("tile-") ||
+    (!style && hasBackground),
   );
 }
 
@@ -420,6 +480,11 @@ export function resolveBuilderSectionStructure(
           legacyColumn,
         ),
         style: columnStyle(normalizedColumn),
+        surfaceClassName: compactClasses(
+          columnNeedsTileSurface(normalizedColumn) ? "uk-tile" : undefined,
+          columnSurfaceClass(normalizedColumn, row.spacingContract === "yootheme"),
+        ),
+        surfaceStyle: columnSurfaceStyle(normalizedColumn),
         stickyDeclaration: getBuilderColumnStickyDeclaration(normalizedColumn),
       } satisfies BuilderStructuralColumn;
     });

@@ -34,6 +34,25 @@ test("Gallery hover-video controls map to the canonical item media contract", ()
   expect(mapped.warnings.join("\n")).not.toContain("hover_video");
 });
 
+test("Gallery normalizes source image paths and maps alternate hover images", () => {
+  const mapped = mapYoothemeStaticContent({
+    ...fixture,
+    children: [{ ...fixture.children[0], children: [{ ...fixture.children[0].children[0], children: [{ ...fixture.children[0].children[0].children[0], children: [{
+      type: "gallery",
+      props: { show_hover_image: true },
+      children: [{ type: "gallery_item", props: {
+        image: "wp-content/uploads/yootheme/services.jpg",
+        hover_image: "wp-content/uploads/yootheme/services-hover.jpg",
+      } }],
+    }] }] }] }],
+  });
+  const gallery = mapped.sections[0]?.layoutItems?.[0]?.blocks?.[0] as any;
+  expect(gallery.gridShowHoverImage).toBe(true);
+  expect(gallery.galleryItems[0].imageUrl).toMatch(/\/wp-content\/uploads\/yootheme\/services\.jpg$/);
+  expect(gallery.galleryItems[0].hoverImageUrl).toMatch(/\/wp-content\/uploads\/yootheme\/services-hover\.jpg$/);
+  expect(mapped.warnings.join("\n")).not.toContain("hover_image");
+});
+
 test("Phase 11.3 reports Gallery-only runtime gaps instead of fabricating support", () => {
   const mapped = mapYoothemeStaticContent({
     ...fixture,

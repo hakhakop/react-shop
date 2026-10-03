@@ -185,6 +185,7 @@ export function createPortableNavigationPackage(input: {
 
     return {
       key,
+      ...(item.sourceMenuItemDatabaseId ? { sourceMenuItemDatabaseId: item.sourceMenuItemDatabaseId } : {}),
       ...(/^wp-(\d+)$/.test(item.id)
         ? { sourceMenuItemDatabaseId: Number(item.id.slice(3)) }
         : {}),
@@ -334,6 +335,7 @@ export function materializePortableNavigation(
       ...(item.dropdownContent ? { dropdownContent: structuredClone(item.dropdownContent) } : {}),
       ...(item.metadata ?? {}),
       portableKey: item.key,
+      ...(item.sourceMenuItemDatabaseId ? { sourceMenuItemDatabaseId: item.sourceMenuItemDatabaseId } : {}),
       navigationTarget: item.target,
     } as ReactMenuItem;
   });

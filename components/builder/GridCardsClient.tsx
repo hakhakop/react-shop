@@ -14,6 +14,7 @@ import {
   getUikitPanelLayoutClass,
   getUikitPanelMediaClass,
   getUikitPanelMediaStyle,
+  resolveYoothemeGridImageFit,
   getUikitTextClass,
   getUikitSvgColor,
   getUikitSvgColorClass,
@@ -379,6 +380,7 @@ export function GridCardsClient({
             "--shop-builder-grid-item-basis-tablet": itemBasisForColumns(tabletLandscapeColumns),
             "--shop-builder-grid-item-basis-desktop": itemBasisForColumns(desktopColumns),
             "--shop-builder-grid-item-basis-xlarge": itemBasisForColumns(largeScreenColumns),
+            "--shop-builder-grid-column-gap": columnGapCss,
             "--shop-builder-grid-row-gap": rowGapCss,
             columnGap: columnGapCss,
             rowGap: hasGridRuntimeEffect ? 0 : rowGapCss,
@@ -610,13 +612,16 @@ export function GridCardsClient({
               ? getUikitMarginClass(rawBlock.imageMarginTop, "top")
               : "";
             const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "1-2";
+            const declaredMediaFit = item.mediaFit ?? block.imageFit;
             // Explicit media alignment has higher precedence than Grid text
             // alignment. Without one, media participates in the same item
             // alignment contract as YOOtheme's inline Grid image.
             const mediaAlignment = (item as any).mediaAlignment ?? itemContentAlignment;
             const mediaStyle = getUikitPanelMediaStyle({
               ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
-              fit: item.mediaFit ?? block.imageFit,
+              fit: isYoothemeGrid
+                ? resolveYoothemeGridImageFit(declaredMediaFit, imageWidth, imageHeight)
+                : declaredMediaFit,
               alignment: mediaAlignment,
               position: (item as any).imagePosition ?? (block as any).imagePosition,
             });

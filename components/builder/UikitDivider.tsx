@@ -10,6 +10,7 @@ type Props = {
 export default function UikitDivider({ block }: Props) {
   const rawBlock = (block ?? {}) as any;
   const dividerStyle = rawBlock.dividerStyle || rawBlock.preset || "icon";
+  const DividerElement: "hr" | "div" = rawBlock.dividerElement === "div" ? "div" : "hr";
   const importedYootheme = rawBlock.spacingContract === "yootheme" || String(rawBlock.id ?? "").startsWith("yootheme-");
   const dividerClass = importedYootheme && dividerStyle === "default"
     ? "shop-builder-divider--bare"
@@ -33,7 +34,7 @@ export default function UikitDivider({ block }: Props) {
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--divider ${marginClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
-      <hr className={dividerClass} />
+      <DividerElement className={dividerClass} />
     </div>
   );
 }

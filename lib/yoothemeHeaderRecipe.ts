@@ -58,6 +58,29 @@ function column(id: string, headerSlot: BuilderColumn["headerSlot"], elements: B
   return { id, headerSlot, elements };
 }
 
+function socialElement(
+  id: string,
+  items: Array<{ link: string }>,
+  buttonStyle: boolean | undefined,
+  gap: string | undefined,
+): BuilderLayoutBlock {
+  const socialGap = gap === "collapse"
+    ? "none"
+    : gap === "small" || gap === "medium" || gap === "default" || gap === "large"
+      ? gap
+      : "small";
+  return {
+    id,
+    kind: "social",
+    socialItems: items.map((item, index) => ({ id: `${id}-item-${index + 1}`, link: item.link })),
+    socialStyle: buttonStyle ? "button" : "icon",
+    socialGrid: "horizontal",
+    socialGridBreakpoint: "always",
+    socialColumnGap: socialGap,
+    socialRowGap: socialGap,
+  };
+}
+
 /**
  * Compile the provider Header description into ordinary Builder rows, columns,
  * and elements. The semantic slots are metadata on those same columns; they do
@@ -85,6 +108,7 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
     ...(logoImage ? { imageUrl: logoImage } : {}),
     ...(text(logo.image_inverse) ? { imageInverseUrl: text(logo.image_inverse) } : {}),
     ...(text(logo.image_mobile) ? { imageMobileUrl: text(logo.image_mobile) } : {}),
+    ...(typeof logo.image_svg_inline === "boolean" ? { imageSvgInline: logo.image_svg_inline } : {}),
     imageAlt: logoText || "Site logo",
     headerBrandMode: logoImage ? "logo" : "brand",
     ...(logoText ? { headerBrandText: logoText } : {}),
@@ -113,6 +137,16 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
 
   const desktopStart: BuilderLayoutBlock[] = [];
   const desktopEnd: BuilderLayoutBlock[] = [];
+  const desktopSocialItems = Array.isArray(settings.headerSocialItems)
+    ? settings.headerSocialItems as Array<{ link: string }>
+    : [];
+  positioned(settings.headerSocialPosition, desktopStart, desktopEnd,
+    desktopSocialItems.length
+      ? socialElement("header-social", desktopSocialItems, settings.headerSocialStyle, settings.headerSocialGap)
+      : null);
+  if (desktopSocialItems.length && settings.headerSocialPosition && settings.headerSocialPosition !== "hide") {
+    createdElements.push("desktop social");
+  }
   positioned(settings.headerSearchPosition, desktopStart, desktopEnd,
     settings.headerSearchPosition && settings.headerSearchPosition !== "hide"
       ? utility("header-search", "headerSearch", "search") : null);
@@ -152,6 +186,16 @@ export function createYoothemeHeaderRecipe(theme: BuilderThemeSettings): Yoothem
   if (mobileLayout) {
     const mobileStart: BuilderLayoutBlock[] = [];
     const mobileEnd: BuilderLayoutBlock[] = [];
+    const mobileSocialItems = Array.isArray(settings.headerMobileSocialItems)
+      ? settings.headerMobileSocialItems as Array<{ link: string }>
+      : [];
+    positioned(settings.headerMobileSocialPosition, mobileStart, mobileEnd,
+      mobileSocialItems.length
+        ? socialElement("header-mobile-social", mobileSocialItems, settings.headerMobileSocialStyle, settings.headerMobileSocialGap)
+        : null);
+    if (mobileSocialItems.length && settings.headerMobileSocialPosition && settings.headerMobileSocialPosition !== "hide") {
+      createdElements.push("mobile social");
+    }
     const mobileLogo: BuilderLayoutBlock | null = logoBlock ? {
       ...logoBlock,
       id: "header-mobile-logo",
@@ -311,6 +355,7 @@ export function applyYoothemeHeaderDocumentImport(
   const ownedSection = { ...currentSection } as Record<string, unknown>;
   Object.keys(ownedSection).forEach((key) => {
     if (!key.startsWith("headerMobile")) return;
+    if (mode === "settings-only" && key === "headerMobileLogoUrl") return;
     const retainOnDesktop = key === "headerMobileBreakpoint" || key === "headerMobileComposition";
     const retainOnMobile = key === "headerMobileLogoUrl" || key === "headerMobileComposition";
     if ((variant === "desktop" && retainOnDesktop) || (variant === "mobile" && retainOnMobile)) return;
@@ -318,9 +363,32 @@ export function applyYoothemeHeaderDocumentImport(
   });
   if (variant === "desktop") delete ownedSection.headerDocumentVariant;
 
+  const importedSettings = getYoothemeHeaderDocumentSettings(theme, variant);
+  // Legacy Header-level social controls are only import inputs now. Their
+  // content/style/placement is represented by the canonical Social block in
+  // the recipe, or remains owned by the authored block in settings-only mode.
+  for (const key of [
+    "headerSocialPosition",
+    "headerSocialStyle",
+    "headerSocialGap",
+    "headerSocialItems",
+    "headerMobileSocialPosition",
+    "headerMobileSocialStyle",
+    "headerMobileSocialGap",
+    "headerMobileSocialItems",
+  ] as const) {
+    delete importedSettings[key];
+    if (mode === "replace-from-recipe") delete ownedSection[key];
+  }
+  // Settings-only imports never reinterpret the authored composition or assets.
+  if (mode === "settings-only") {
+    for (const key of ["headerLayout", "headerPresetKey", "headerMobileLayout", "headerSearchPosition", "headerDialogTogglePosition", "headerMobileLogoUrl", "headerInverseLogoUrl"] as const) {
+      delete importedSettings[key];
+    }
+  }
   const nextSection: BuilderSection = {
     ...ownedSection as BuilderSection,
-    ...getYoothemeHeaderDocumentSettings(theme, variant),
+    ...importedSettings,
     ...(mode === "replace-from-recipe" && recipeRows.length
       ? {
           headerPresetKey: undefined,
@@ -349,9 +417,39 @@ export function applyYoothemeHeaderImport(
   const settings = Object.fromEntries(
     Object.entries(recipe.settings).filter(([key]) => !STRUCTURAL_KEYS.has(key as keyof BuilderSection)),
   ) as Partial<BuilderSection>;
+  for (const key of [
+    "headerSocialPosition",
+    "headerSocialStyle",
+    "headerSocialGap",
+    "headerSocialItems",
+    "headerMobileSocialPosition",
+    "headerMobileSocialStyle",
+    "headerMobileSocialGap",
+    "headerMobileSocialItems",
+  ] as const) {
+    delete settings[key];
+  }
+  if (mode === "settings-only") {
+    for (const key of ["headerLayout", "headerMobileLayout", "headerSearchPosition", "headerDialogTogglePosition", "headerMobileLogoUrl", "headerInverseLogoUrl"] as const) delete settings[key];
+  }
+  const recipeSectionBase = { ...currentSection } as BuilderSection & Record<string, unknown>;
+  if (mode === "replace-from-recipe") {
+    for (const key of [
+      "headerSocialPosition",
+      "headerSocialStyle",
+      "headerSocialGap",
+      "headerSocialItems",
+      "headerMobileSocialPosition",
+      "headerMobileSocialStyle",
+      "headerMobileSocialGap",
+      "headerMobileSocialItems",
+    ]) {
+      delete recipeSectionBase[key];
+    }
+  }
   const nextSection: BuilderSection = mode === "replace-from-recipe"
     ? {
-        ...currentSection,
+        ...recipeSectionBase,
         ...settings,
         headerArchitectureVersion: 2,
         headerPresetKey: undefined,

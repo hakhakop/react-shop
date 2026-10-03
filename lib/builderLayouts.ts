@@ -78,6 +78,7 @@ export type BuilderGalleryItem = {
   id: string;
   imageUrl?: string;
   imageAlt?: string;
+  hoverImageUrl?: string;
   hoverVideoUrl?: string;
   title?: string;
   meta?: string;
@@ -89,7 +90,7 @@ export type BuilderGalleryItem = {
   linkAriaLabel?: string;
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
-    "imageUrl" | "imageAlt" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+    "imageUrl" | "imageAlt" | "hoverImageUrl" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
   >;
 };
 
@@ -840,6 +841,14 @@ export type BuilderSavedTemplate = {
   description?: string;
   sourcePage?: BuilderLayoutKey;
   design?: BuilderDesign;
+  /** Original YOOtheme JSON, retained so library application can use the latest mapper. */
+  sourceImport?: {
+    format: "yootheme-json" | "webpages-builder-json";
+    version: 1;
+    /** YOOtheme mapping migration level applied to the saved Builder snapshot. */
+    mapperVersion?: number;
+    payload: unknown;
+  };
   sections: BuilderSection[];
   updatedAt: string;
 };
@@ -1100,6 +1109,18 @@ export function isValidBuilderSavedTemplate(
     typeof template.title === "string" &&
     Array.isArray(template.sections) &&
     template.sections.every(isValidBuilderSection) &&
+    (template.sourceImport === undefined || (
+      !!template.sourceImport &&
+      typeof template.sourceImport === "object" &&
+      (template.sourceImport.format === "yootheme-json" ||
+        template.sourceImport.format === "webpages-builder-json") &&
+      template.sourceImport.version === 1 &&
+      (template.sourceImport.mapperVersion === undefined ||
+        (typeof template.sourceImport.mapperVersion === "number" &&
+          Number.isInteger(template.sourceImport.mapperVersion) &&
+          template.sourceImport.mapperVersion >= 0)) &&
+      "payload" in template.sourceImport
+    )) &&
     typeof template.updatedAt === "string"
   );
 }

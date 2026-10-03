@@ -44,13 +44,6 @@ export default function UikitButton({ block, scopeClassName }: Props) {
   const legacyGap = isImportedYoothemeButton ? uikitGridGapCss("small") : rawBlock.buttonGap || "0.75rem";
   const columnGap = rawBlock.buttonColumnGap ? uikitGridGapCss(rawBlock.buttonColumnGap) : legacyGap;
   const rowGap = rawBlock.buttonRowGap ? uikitGridGapCss(rawBlock.buttonRowGap) : legacyGap;
-  const defaultYoothemeButtonTokens = isImportedYoothemeButton && !rawBlock.size
-    ? {
-        "--uk-button-font-size": "var(--uk-base-font-size, 16px)",
-        "--uk-button-line-height": "var(--uk-global-control-height, 48px)",
-        "--uk-button-font-weight": "400",
-      }
-    : {};
   const yoothemeTextButtonTokens = isImportedYoothemeButton && !rawBlock.size
     ? {
         // YOOtheme text links keep the global base typography even when the
@@ -95,7 +88,7 @@ export default function UikitButton({ block, scopeClassName }: Props) {
             href={rawBlock.buttonUrl || "#"}
             style={{
               ...localOverride.style,
-              ...(rawBlock.buttonStyle === "text" ? yoothemeTextButtonTokens : defaultYoothemeButtonTokens),
+              ...(rawBlock.buttonStyle === "text" ? yoothemeTextButtonTokens : {}),
               ...localTypography.style,
             }}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
@@ -110,7 +103,7 @@ export default function UikitButton({ block, scopeClassName }: Props) {
             href={btn.url || "#"}
             style={{
               ...localOverride.style,
-              ...(btn.style === "text" ? yoothemeTextButtonTokens : defaultYoothemeButtonTokens),
+              ...(btn.style === "text" ? yoothemeTextButtonTokens : {}),
               ...localTypography.style,
             }}
             {...builderLinkTargetProps(btn.target)}

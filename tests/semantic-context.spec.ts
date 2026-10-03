@@ -97,22 +97,22 @@ test("imported inverse Button LESS tokens reach the shared runtime token owner",
   });
 });
 
-test("section color roles choose readable canonical text for imported surfaces", () => {
-  const yard = getUikitGlobalsCssVars({
+test("section color modes select the same normal and inverse palettes as YOOtheme", () => {
+  const darkMode = getUikitGlobalsCssVars({
     backgroundSecondary: "#1f1f1f",
     textColor: "rgba(0, 0, 0, 0.6)",
     inverseColor: "#fff",
-    sectionSecondaryColorMode: "light",
+    sectionSecondaryColorMode: "dark",
   });
-  const light = getUikitGlobalsCssVars({
+  const lightMode = getUikitGlobalsCssVars({
     backgroundSecondary: "#fff",
     textColor: "rgba(0, 0, 0, 0.6)",
     inverseColor: "#fff",
     sectionSecondaryColorMode: "light",
   });
 
-  expect(yard["--uikit-section-secondary-color"]).toBe("var(--uk-inverse-global-color, #fff)");
-  expect(light["--uikit-section-secondary-color"]).toBe("var(--uk-global-text-color, #111827)");
+  expect(darkMode["--uikit-section-secondary-color"]).toBe("var(--uk-global-text-color, #111827)");
+  expect(lightMode["--uikit-section-secondary-color"]).toBe("var(--uk-inverse-global-color, #fff)");
 });
 
 test("YOOtheme tile surfaces keep normal color, padding, square shape, and row stretch", () => {

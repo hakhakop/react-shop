@@ -1,11 +1,11 @@
 /**
  * Canonical runtime URL normalization for imported CMS media.
  *
- * YOOtheme exports commonly keep WordPress uploads root-relative.  A
+ * YOOtheme exports commonly keep WordPress uploads root-relative. A
  * WebPages storefront lives on a different origin, so those paths need the
- * configured CMS origin at the document boundary.  Only the WordPress upload
- * namespace is rewritten: WebPages-relative assets and already absolute URLs
- * remain untouched.
+ * configured CMS origin at the document boundary. Only the WordPress upload
+ * namespace is rewritten (including URLs copied from another tenant);
+ * WebPages-relative assets and external non-WordPress media URLs stay intact.
  */
 const WORDPRESS_UPLOAD_PATH = /^(?:(?:https?:)?\/\/[^/]+)?\/?wp-content\/uploads(?:\/|$)/i;
 

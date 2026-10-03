@@ -270,6 +270,8 @@ function renderMenuItems(
         key={item.id}
         className={`site-header-nav-item${
           hasChildren ? " has-children" : ""
+        }${level === 0 && !mobileMode && presentation.submenuStretch === "navbar" ? " is-stretch-navbar" : ""}${
+          level === 0 && !mobileMode && presentation.submenuStretch === "navbar-container" ? " is-stretch-navbar-container" : ""
         }${isBranchActive ? " is-active" : ""}${
           desktopParentToggle && expandedIds.has(item.id) ? " is-open" : ""
         }${level === 0 && pushAfter && itemIndex === pushAfter ? " is-pushed" : ""}`}
@@ -323,7 +325,7 @@ function renderMenuItems(
               {
                 "--submenu-columns": submenuColumns,
                 "--submenu-stretch": presentation.submenuStretch ?? "none",
-                ...(presentation.submenuWidth
+                ...(presentation.submenuWidth && !presentation.submenuStretch
                   ? { width: presentation.submenuWidth, maxWidth: "min(100vw - 30px, 1424px)" }
                   : {}),
                 ...(submenuLayout === "list"

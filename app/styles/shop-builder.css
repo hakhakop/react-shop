@@ -212,6 +212,7 @@ body.dark {
 }
 
 .shop-builder-section[data-theme="dark"],
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-secondary,
 .shop-builder-section.shop-builder-section--scheme-dark,
 .shop-builder-section.shop-builder-section--dark,
 .shop-builder-section.uk-light,
@@ -1004,8 +1005,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   background: currentColor;
 }
 
-/* Slideshow uses UIkit navigation primitives over the shared Swiper state
-   engine. The presentation remains isolated from every other carousel type. */
+/* Slideshow uses UIkit navigation primitives and UIkit's native state engine.
+   Keep their presentation isolated from every other carousel type. */
 .shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-prev.uk-slidenav,
 .shop-builder-swiper--slideshow.shop-builder-arrow-pos--overlay .swiper-button-next.uk-slidenav {
   width: 48px !important;
@@ -1032,8 +1033,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   right: var(--shop-builder-slideshow-slidenav-inset) !important;
 }
 
-/* The YOOtheme position choice owns the paired Slidenav placement. The
-   internal Swiper buttons remain the single navigation runtime. */
+/* The YOOtheme position choice owns the paired Slidenav placement. React
+   buttons call the same native UIkit slideshow instance as dot navigation. */
 .shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-left .swiper-button-prev.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; left: var(--shop-builder-slideshow-slidenav-inset) !important; transform: none !important; }
 .shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-left .swiper-button-next.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; left: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; right: auto !important; transform: none !important; }
 .shop-builder-swiper--slideshow.shop-builder-arrow-pos--top-right .swiper-button-prev.uk-slidenav { top: var(--shop-builder-slideshow-slidenav-inset) !important; right: calc(var(--shop-builder-slideshow-slidenav-inset) + 48px) !important; left: auto !important; transform: none !important; }
@@ -1071,6 +1072,38 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-swiper.shop-builder-swiper--slideshow .shop-builder-hero-slide-card,
 .shop-builder-swiper.shop-builder-swiper--slideshow [class*="swiper-slide-shadow"] {
   border-radius: 0 !important;
+}
+
+/* UIkit Slideshow is the motion engine for this semantic presentation. Swiper
+   supplies the shared React renderer only; keep its flex track inert so UIkit
+   can position each slide and run the source `pull` transition. */
+.shop-builder-swiper--slideshow .swiper.uk-slideshow {
+  overflow: hidden;
+}
+
+.shop-builder-swiper--slideshow .swiper-wrapper.uk-slideshow-items {
+  display: block;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  transform: none !important;
+}
+
+.shop-builder-swiper--slideshow .swiper-wrapper.uk-slideshow-items > .swiper-slide {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100%;
+  flex: none;
+  overflow: hidden;
+}
+
+.shop-builder-swiper--slideshow .shop-builder-slideshow-parallax-dim {
+  /* The first slide rests clear; UIkit applies the imported dim keyframes
+     while a slide enters or leaves. */
+  opacity: 0;
+  background-color: #000;
+  pointer-events: none;
 }
 
 /* Navigation is a frame overlay by default. Keeping this wrapper distinct
@@ -1494,21 +1527,29 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 
 /* A YOOtheme Slideshow only owns a source min-height when it is authored.
    Keep it separate from the generic WebPages Hero carousel fallback. */
-.shop-builder-swiper--slideshow .shop-builder-hero-slide-card,
-.shop-builder-swiper--slideshow .shop-builder-swiper-media {
-  min-height: var(--shop-builder-slideshow-min-height, auto);
-}
-
-/* Static YOOtheme slideshows use a media-led 16:9 frame unless an explicit
-   source height owns the geometry. This is distinct from the Hero minimum. */
-.shop-builder-swiper--slideshow .shop-builder-swiper-media {
-  aspect-ratio: var(--shop-builder-slideshow-aspect-ratio, 16 / 9) !important;
-  max-height: var(--shop-builder-slideshow-max-height, none);
-}
-
 .shop-builder-swiper--slideshow .shop-builder-hero-slide-card {
-  aspect-ratio: var(--shop-builder-slideshow-aspect-ratio, 16 / 9) !important;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto !important;
   max-height: var(--shop-builder-slideshow-max-height, none);
+  overflow: hidden;
+}
+
+.shop-builder-swiper--slideshow .shop-builder-swiper-media.uk-position-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto !important;
+  /* YOOtheme's image and dim parallax layers both stack at `auto`; keeping
+     the image at UIkit's stock cover z-index (1) paints it above the dim. */
+  z-index: auto;
+  max-height: none;
+  overflow: hidden;
 }
 
 /* Viewport height owns the frame, not merely its image child. This gives
@@ -1622,7 +1663,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   transition: opacity 300ms ease, transform 300ms ease;
 }
 
-.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-animation--parallax) .swiper-slide-active .shop-builder-swiper-content {
+.shop-builder-swiper--slideshow:not(.shop-builder-slideshow-overlay-animation--parallax) .uk-active .shop-builder-swiper-content {
   opacity: 1;
   transform: none;
 }
@@ -2471,6 +2512,16 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   grid-template-columns: var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr)));
   flex-wrap: wrap;
   gap: var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px));
+}
+
+/* UIkit positions Grid dividers inside its flex-grid gutter, which is built
+   from child padding and a negative track margin. The shared Builder Grid
+   uses CSS Grid gaps instead, so put each divider halfway into that gap.
+   Runtime masonry/parallax grids restore UIkit's flex geometry and retain its
+   native divider offset. */
+.shop-builder-grid.uk-grid-divider:not(.shop-builder-grid--runtime):not(.shop-builder-uikit-grid--runtime)
+  > :not(.uk-first-column)::before {
+  left: calc(var(--shop-builder-grid-column-gap, var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px))) / -2);
 }
 
 /* The rendered WebPages Grid is CSS Grid and owns its gutters through `gap`.
@@ -4092,6 +4143,15 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-content-layout-card > .shop-builder-column-content {
   width: 100%;
   min-width: 0;
+  /* Absolute YOOtheme artwork does not contribute to the inner surface's
+     intrinsic height. Let its surface fill the grid cell so the imported
+     background still paints behind the artwork and across the full column. */
+  flex: 1 1 auto;
+}
+
+.shop-builder-content-layout-card.shop-builder-column--has-overflowing-positioned-element
+  > .shop-builder-column-content {
+  height: 100%;
 }
 
 /* YOOtheme's sticky media target contains a relative panel, and the
@@ -4108,22 +4168,29 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 /* The structural column baseline above is intentionally transparent and
    guttered. Once a YOOtheme column surface is selected, the surface token
    must own those pixels instead of being hidden by the content-layout shell. */
-.shop-builder-content-layout-card.uk-card,
-.shop-builder-content-layout-card.uk-tile {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card,
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile {
   padding-left: 0 !important;
 }
-.shop-builder-content-layout-card.uk-card {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card {
   border-radius: var(--uk-card-border-radius, var(--builder-card-radius, 8px));
 }
-.shop-builder-content-layout-card.uk-tile {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile {
   /* UIkit tiles are open, square surfaces with their own vertical rhythm;
      they are not cards with a card radius or card padding. */
   border-radius: var(--uk-tile-border-radius, 0px);
   padding: var(--uk-tile-padding-vertical, 40px)
     var(--uk-tile-padding-horizontal, 15px) !important;
 }
-.shop-builder-content-layout-card.uk-tile-default,
-.shop-builder-content-layout-card.uk-tile-muted {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile.uk-padding-remove {
+  padding: 0 !important;
+}
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile.uk-tile-large {
+  padding-top: var(--uk-global-margin-large, 70px) !important;
+  padding-bottom: var(--uk-global-margin-large, 70px) !important;
+}
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-default,
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-muted {
   /* A tile inside an inverse section returns to the normal global palette,
      exactly as UIkit's tile surface does. */
   color: var(--uk-global-text-color, #111827) !important;
@@ -4134,33 +4201,43 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   --builder-active-text: var(--uk-global-text-color, #111827);
   --builder-active-heading: var(--uk-global-emphasis-color, var(--uk-global-text-color, #111827));
 }
-.shop-builder-content-layout-card.uk-card-default,
-.shop-builder-content-layout-card.uk-card-hover {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card-default,
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card-hover {
   background: var(--uk-card-default-background, var(--builder-card-background, #fff));
 }
-.shop-builder-content-layout-card.uk-card-primary {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card-primary {
   background: var(--uk-card-primary-background, var(--builder-primary, #1e87f0));
 }
-.shop-builder-content-layout-card.uk-card-secondary {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-card-secondary {
   background: var(--uk-card-secondary-background, var(--builder-secondary, #222));
 }
-.shop-builder-content-layout-card.uk-tile-default {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-default {
   background: var(--uk-tile-default-background, var(--builder-card-background, #fff));
 }
-.shop-builder-content-layout-card.uk-tile-muted {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-muted {
   background: var(--uk-tile-muted-background, var(--builder-muted-background, #f5f5f5));
 }
-.shop-builder-content-layout-card.uk-tile-primary {
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-primary {
   background: var(--uk-tile-primary-background, var(--builder-primary, #1e87f0));
 }
-.shop-builder-content-layout-card.uk-tile-secondary {
-  background: var(--uk-tile-secondary-background, var(--builder-secondary, #222));
+.shop-builder-content-layout-card > .shop-builder-column-content.uk-tile-secondary {
+  background: var(--uk-tile-secondary-background, var(--uk-global-secondary-background, var(--builder-secondary, #222)));
 }
 
 /* Imported absolute elements use the outer column content as their
    containing block, matching YOOtheme's panel origin. */
 .shop-builder-column-content:has(> .shop-builder-content-positioning-group) {
   position: relative;
+}
+
+/* An imported absolutely positioned child may intentionally extend beyond
+   its YOOtheme column. Give only that owning grid item a local stacking
+   context so a later sibling's tile background cannot cover the overflow;
+   the child retains its authored z-index inside this context. */
+.shop-builder-content-row
+  > .shop-builder-content-layout-card.shop-builder-column--has-overflowing-positioned-element {
+  position: relative;
+  z-index: 1;
 }
 
 .shop-builder-element-shell.yootheme-imported-spacing .shop-builder-title {
@@ -4184,7 +4261,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
    expanded content row. Imported shells keep their authored margin between
    siblings, but the last shell must terminate the row at its own box so the
    following grid starts at the same position as YOOtheme. */
-.shop-builder-content-layout-card:only-child > .shop-builder-column-content > .shop-builder-element-shell.yootheme-imported-spacing:last-child {
+.shop-builder-content-layout-card > .shop-builder-column-content > .shop-builder-element-shell.yootheme-imported-spacing:last-child {
   margin-bottom: 0 !important;
 }
 
@@ -4239,7 +4316,7 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 /* UIkit's tile rows use the grid's default stretch behavior. Scope the
    restoration to rows that actually contain tile surfaces so ordinary
    content-layout rows retain their intrinsic-height behavior. */
-.shop-builder-content-row:not(.uk-grid-match):has(> .shop-builder-content-layout-card.uk-tile) {
+.shop-builder-content-row:not(.uk-grid-match):has(> .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile) {
   align-items: stretch;
 }
 
@@ -4273,8 +4350,8 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card {
   padding-left: 0 !important;
 }
-.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card.uk-tile,
-.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card.uk-tile {
+.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile,
+.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile {
   /* Grid-collapse removes inter-column gutters, not the tile's own surface
      padding. UIkit keeps the latter so tile content stays inset. */
   padding-left: var(--uk-tile-padding-horizontal, 15px) !important;
@@ -4294,6 +4371,13 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 .shop-builder-content-row.uk-grid-large > .shop-builder-content-layout-card,
 .shop-builder-content-row.uk-grid-column-large > .shop-builder-content-layout-card {
   padding-left: var(--uk-global-medium-gutter, 40px) !important;
+}
+
+/* An explicitly unpadded imported tile keeps its source padding-none value
+   even inside UIkit's collapsed-grid tile gutter restoration. */
+.shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile.uk-padding-remove,
+.shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile.uk-padding-remove {
+  padding: 0 !important;
 }
 
 /* UIkit's row modifiers use the same gutter scale for wrapped tracks. */
@@ -4340,15 +4424,19 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
 }
 
 @media (min-width: 960px) {
-  .shop-builder-content-layout-card.uk-tile {
+  .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile {
     padding-top: var(--uk-tile-padding-vertical-m, 70px) !important;
     padding-bottom: var(--uk-tile-padding-vertical-m, 70px) !important;
     padding-left: var(--uk-tile-padding-horizontal-m, 40px) !important;
     padding-right: var(--uk-tile-padding-horizontal-m, 40px) !important;
   }
+  .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile.uk-tile-large {
+    padding-top: var(--uk-global-margin-xlarge, 140px) !important;
+    padding-bottom: var(--uk-global-margin-xlarge, 140px) !important;
+  }
 
-  .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card.uk-tile,
-  .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card.uk-tile {
+  .shop-builder-content-row.uk-grid-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile,
+  .shop-builder-content-row.uk-grid-column-collapse > .shop-builder-content-layout-card > .shop-builder-column-content.uk-tile {
     padding-left: var(--uk-tile-padding-horizontal-m, 40px) !important;
     padding-right: var(--uk-tile-padding-horizontal-m, 40px) !important;
   }
@@ -7223,6 +7311,43 @@ body:has(.site-footer-builder .shop-builder-section[data-uk-sticky*="start: -100
   text-transform: var(--webpages-font-tertiary-text-transform, inherit);
 }
 
+/* Imported semantic roles outrank UIkit's heading-size family rules. Inline
+   typography authored for an individual block still has normal precedence. */
+.shop-builder-main .shop-builder-title.webpages-typography-role-primary {
+  font-family: var(--webpages-font-primary, var(--uk-heading-font-family, inherit));
+  font-weight: var(--webpages-font-primary-weight, var(--uk-heading-font-weight, 400));
+  font-style: var(--webpages-font-primary-style, inherit);
+  letter-spacing: var(--webpages-font-primary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-primary-text-transform, inherit);
+}
+.shop-builder-main .shop-builder-title.webpages-typography-role-secondary {
+  font-family: var(--webpages-font-secondary, var(--uk-global-font-family, inherit));
+  font-weight: var(--webpages-font-secondary-weight, 400);
+  font-style: var(--webpages-font-secondary-style, inherit);
+  letter-spacing: var(--webpages-font-secondary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-secondary-text-transform, inherit);
+}
+.shop-builder-main .shop-builder-title.webpages-typography-role-tertiary {
+  font-family: var(--webpages-font-tertiary, var(--uk-global-font-family, inherit));
+  font-weight: var(--webpages-font-tertiary-weight, 400);
+  font-style: var(--webpages-font-tertiary-style, inherit);
+  letter-spacing: var(--webpages-font-tertiary-letter-spacing, inherit);
+  text-transform: var(--webpages-font-tertiary-text-transform, inherit);
+}
+.shop-builder-main .shop-builder-title[style*="--builder-heading-font-size"] {
+  font-size: var(--builder-heading-font-size) !important;
+}
+
+/* Plain content links inherit the active semantic link token, including the
+   section's inverse variant. Explicit UIkit text/link and button utilities
+   retain their authored colors. */
+.shop-builder-main a:not(.uk-button):not(.uk-icon-link):not([class*="uk-text-"]):not([class*="uk-link-"]):not([class*="button"]):not(.shop-builder-cta) {
+  color: var(--uk-global-link-color, var(--uk-button-link-color, currentColor));
+}
+.shop-builder-main a:not(.uk-button):not(.uk-icon-link):not([class*="uk-text-"]):not([class*="uk-link-"]):not([class*="button"]):not(.shop-builder-cta):hover {
+  color: var(--uk-global-link-hover-color, var(--uk-global-link-color, currentColor));
+}
+
 /* YOOtheme's image/overlay runtime resets the component title box before
    applying its semantic heading class. Without this shared reset, the
    browser's heading margin leaks into Overlay titles rendered as divs and
@@ -7272,16 +7397,17 @@ h5.shop-builder-title { font-size: var(--uk-base-font-size, 16px); line-height: 
 }
 h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
 
-/* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h2 { font-size: var(--uk-global-font-size-xlarge, 34px) !important; line-height: 1.3 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
+/* Keep the UIkit heading-size projection at normal cascade priority so
+   scoped YOOtheme Advanced CSS can still override an explicitly styled title. */
+.shop-builder-title.uk-h2 { font-size: var(--uk-global-font-size-xlarge, 34px); line-height: 1.3; font-weight: var(--uk-heading-font-weight, 400); }
 .shop-builder-title.uk-h3 {
-  font-size: var(--uk-heading-h3-font-size, var(--uk-global-font-size-large, 24px)) !important;
-  line-height: 1.4 !important;
-  font-weight: var(--uk-heading-h3-font-weight, var(--uk-heading-font-weight, 400)) !important;
+  font-size: var(--uk-heading-h3-font-size, var(--uk-global-font-size-large, 24px));
+  line-height: 1.4;
+  font-weight: var(--uk-heading-h3-font-weight, var(--uk-heading-font-weight, 400));
 }
-.shop-builder-title.uk-h4 { font-size: var(--uk-global-font-size-medium, 20px) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
-.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, var(--uk-base-font-size, 16px)) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
-.shop-builder-title.uk-h6 { font-size: var(--uk-heading-h6-font-size, var(--uk-global-font-size-small, 14px)) !important; line-height: 1.4 !important; font-weight: var(--uk-heading-font-weight, 400) !important; }
+.shop-builder-title.uk-h4 { font-size: var(--uk-global-font-size-medium, 20px); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
+.shop-builder-title.uk-h5 { font-size: var(--uk-heading-h5-font-size, var(--uk-base-font-size, 16px)); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
+.shop-builder-title.uk-h6 { font-size: var(--uk-heading-h6-font-size, var(--uk-global-font-size-small, 14px)); line-height: 1.4; font-weight: var(--uk-heading-font-weight, 400); }
 
 .shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
 .shop-builder-title.uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
@@ -7487,6 +7613,22 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
 .shop-builder-section.uk-section-large:not(.uk-padding-remove-bottom) {
   padding-bottom: var(--uk-section-padding-large, 70px) !important;
 }
+
+/* Imported YOOtheme sections can set top and bottom spacing independently. */
+.shop-builder-section--padding-top-none { padding-top: 0 !important; }
+.shop-builder-section--padding-bottom-none { padding-bottom: 0 !important; }
+.shop-builder-section--padding-top-xsmall { padding-top: var(--uk-section-padding-xsmall, 20px) !important; }
+.shop-builder-section--padding-bottom-xsmall { padding-bottom: var(--uk-section-padding-xsmall, 20px) !important; }
+.shop-builder-section--padding-top-small { padding-top: var(--uk-section-padding-small, 40px) !important; }
+.shop-builder-section--padding-bottom-small { padding-bottom: var(--uk-section-padding-small, 40px) !important; }
+.shop-builder-section--padding-top-default,
+.shop-builder-section--padding-top-medium { padding-top: var(--uk-section-padding-default, 40px) !important; }
+.shop-builder-section--padding-bottom-default,
+.shop-builder-section--padding-bottom-medium { padding-bottom: var(--uk-section-padding-default, 40px) !important; }
+.shop-builder-section--padding-top-large { padding-top: var(--uk-section-padding-large, 70px) !important; }
+.shop-builder-section--padding-bottom-large { padding-bottom: var(--uk-section-padding-large, 70px) !important; }
+.shop-builder-section--padding-top-xlarge { padding-top: var(--uk-section-padding-xlarge, 140px) !important; }
+.shop-builder-section--padding-bottom-xlarge { padding-bottom: var(--uk-section-padding-xlarge, 140px) !important; }
   .uk-section-xlarge {
     padding-top: var(--uk-section-padding-xlarge, 140px) !important;
     padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
@@ -7517,6 +7659,16 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   .shop-builder-section.uk-section-large:not(.uk-padding-remove-bottom) {
     padding-bottom: var(--uk-section-padding-large-m, 140px) !important;
   }
+  .shop-builder-section--padding-top-small { padding-top: var(--uk-section-padding-default-m, 70px) !important; }
+  .shop-builder-section--padding-bottom-small { padding-bottom: var(--uk-section-padding-default-m, 70px) !important; }
+  .shop-builder-section--padding-top-default,
+  .shop-builder-section--padding-top-medium { padding-top: var(--uk-section-padding-default-m, 70px) !important; }
+  .shop-builder-section--padding-bottom-default,
+  .shop-builder-section--padding-bottom-medium { padding-bottom: var(--uk-section-padding-default-m, 70px) !important; }
+  .shop-builder-section--padding-top-large { padding-top: var(--uk-section-padding-large-m, 140px) !important; }
+  .shop-builder-section--padding-bottom-large { padding-bottom: var(--uk-section-padding-large-m, 140px) !important; }
+  .shop-builder-section--padding-top-xlarge { padding-top: var(--uk-section-padding-xlarge-m, 210px) !important; }
+  .shop-builder-section--padding-bottom-xlarge { padding-bottom: var(--uk-section-padding-xlarge-m, 210px) !important; }
   .uk-section-xlarge {
     /* Section scale is owned by imported/canonical Section tokens. Do not
        combine it with the independent global-margin scale on desktop. */
@@ -7543,10 +7695,47 @@ h6.shop-builder-title { font-size: var(--uk-global-font-size-small, 14px); line-
   padding-right: 0 !important;
 }
 .uk-container-expand-left {
-  margin-left: calc(-50vw + 50%) !important;
+  margin-left: 0 !important;
 }
 .uk-container-expand-right {
-  margin-right: calc(-50vw + 50%) !important;
+  margin-right: 0 !important;
+}
+
+/* Match UIkit's one-sided container expansion while keeping the authored
+   max-width edge anchored. This lets imported sections grow toward one page
+   edge without changing their opposite alignment or adding local padding. */
+@media (min-width: 640px) {
+  .uk-container-expand-left.uk-container-xsmall,
+  .uk-container-expand-right.uk-container-xsmall {
+    max-width: calc(50vw + var(--uk-container-xsmall-max-width, 750px) / 2 - var(--uk-container-padding-horizontal-s, 30px));
+  }
+  .uk-container-expand-left.uk-container-small,
+  .uk-container-expand-right.uk-container-small {
+    max-width: calc(50vw + var(--uk-container-small-max-width, 900px) / 2 - var(--uk-container-padding-horizontal-s, 30px));
+  }
+}
+
+@media (min-width: 960px) {
+  .uk-container-expand-left.uk-container,
+  .uk-container-expand-right.uk-container {
+    max-width: calc(50vw + var(--uk-container-default-max-width, 1200px) / 2 - var(--uk-container-padding-horizontal-m, 40px));
+  }
+  .uk-container-expand-left.uk-container-xsmall,
+  .uk-container-expand-right.uk-container-xsmall {
+    max-width: calc(50vw + var(--uk-container-xsmall-max-width, 750px) / 2 - var(--uk-container-padding-horizontal-m, 40px));
+  }
+  .uk-container-expand-left.uk-container-small,
+  .uk-container-expand-right.uk-container-small {
+    max-width: calc(50vw + var(--uk-container-small-max-width, 900px) / 2 - var(--uk-container-padding-horizontal-m, 40px));
+  }
+  .uk-container-expand-left.uk-container-large,
+  .uk-container-expand-right.uk-container-large {
+    max-width: calc(50vw + var(--uk-container-large-max-width, 1400px) / 2 - var(--uk-container-padding-horizontal-m, 40px));
+  }
+  .uk-container-expand-left.uk-container-xlarge,
+  .uk-container-expand-right.uk-container-xlarge {
+    max-width: calc(50vw + var(--uk-container-xlarge-max-width, 1600px) / 2 - var(--uk-container-padding-horizontal-m, 40px));
+  }
 }
 
 /* UIkit Lightbox is appended to document.body. In Builder its real UIkit
@@ -7676,6 +7865,15 @@ body.is-visual-builder-active .uk-lightbox {
   font-size: var(--uk-heading-h5-font-size, 1rem) !important;
   line-height: var(--uk-heading-h5-line-height, 1.4) !important;
   font-weight: var(--uk-heading-h5-font-weight, var(--uk-heading-font-weight, 400)) !important;
+}
+
+/* Imported YOOtheme Grid titles can contain inline UIkit typography such as
+   `19<span class="uk-text-top uk-text-large">€</span>`. The legacy Builder
+   span reset makes every span a block, which pushes the currency onto a new
+   line. Preserve UIkit's inline formatting for this authored title utility. */
+.shop-builder-grid-card--yootheme .shop-builder-title .uk-text-top {
+  display: inline !important;
+  vertical-align: top !important;
 }
 
 .shop-builder-grid-card--yootheme .shop-builder-grid-content > .uk-panel.uk-margin-top {

@@ -75,12 +75,8 @@ export default function YoothemeImportPanel({ design, shellSettings, updateDesig
       const nextFiles = files ?? [];
       setSelectedFiles(nextFiles);
       const sources = await readSources(nextFiles, selectedPresetId);
-      // `_import.less` is a complete, versioned semantic source for themes
-      // such as DevStack. Requiring an unrelated style layer makes a valid
-      // Global Styles import look successful while preventing its Button
-      // tokens from ever reaching the canonical shell owner.
       if (!sources.some((source) => source.name.endsWith("_import.less"))) {
-        throw new Error("Select the YOOtheme _import.less file or a DevStack.zip containing it before previewing.");
+        throw new Error("Select the YOOtheme _import.less file or a theme archive containing it before previewing.");
       }
       setPreset(resolveYoothemeLess(sources, selectedPresetId));
     } catch (cause) {
@@ -122,9 +118,9 @@ export default function YoothemeImportPanel({ design, shellSettings, updateDesig
   return (
     <div className="builder-global-styles-group" data-testid="yootheme-import-panel">
       <div className="builder-card-title"><strong>YOOtheme Global Style Import</strong><span>semantic preview only</span></div>
-      <p className="builder-shell-note">Choose DevStack.zip, or select the LESS layers. Home.json is intentionally not accepted by this importer.</p>
-      <label className="builder-field"><span>DevStack style preset</span><select value={presetId} onChange={(event) => void changePreset(event.target.value as YoothemeDevstackPresetId)}>{YOOTHEME_DEVSTACK_PRESETS.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}</select></label>
-      <label className="builder-field"><span>DevStack LESS files</span><input type="file" accept=".zip,.less" multiple onChange={(event) => void preview(Array.from(event.target.files ?? []))} /></label>
+      <p className="builder-shell-note">Choose the theme `_import.less` override. WebPages supplies supported base YOOtheme/UIkit inheritance; page and Header structure are not imported here.</p>
+      <label className="builder-field"><span>Theme style preset</span><select value={presetId} onChange={(event) => void changePreset(event.target.value as YoothemeDevstackPresetId)}>{YOOTHEME_DEVSTACK_PRESETS.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}</select></label>
+      <label className="builder-field"><span>YOOtheme _import.less</span><input type="file" accept=".zip,.less" multiple onChange={(event) => void preview(Array.from(event.target.files ?? []))} /></label>
       {reading ? <p className="builder-shell-note">Resolving variables and LESS color functions…</p> : null}
       {error ? <p className="builder-shell-note" role="alert">{error}</p> : null}
       {preset ? (

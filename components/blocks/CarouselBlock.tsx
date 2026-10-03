@@ -288,6 +288,16 @@ type CarouselBlockProps = {
   breakpointPolicy?: ResponsiveBreakpointPolicy;
 };
 
+type UikitSlideshowInstance = {
+  index?: number;
+  show: (index: number | "next" | "previous") => Promise<unknown> | unknown;
+  $destroy?: (remove?: boolean) => void;
+};
+
+type UikitSlideshowApi = {
+  slideshow: (element: HTMLElement, options: Record<string, unknown>) => UikitSlideshowInstance;
+};
+
 function isPlaceholderSvgUrl(url?: string | null): boolean {
   if (!url || !url.trim()) return true;
   return url.includes("builder-image-placeholder.svg");
@@ -341,6 +351,7 @@ export default function CarouselBlock({
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const [activeSlideshowIndex, setActiveSlideshowIndex] = useState(0);
+  const [uikitSlideshow, setUikitSlideshow] = useState<UikitSlideshowInstance | null>(null);
   const [activeOverlayIndex, setActiveOverlayIndex] = useState(0);
   const [loadedOverlayImages, setLoadedOverlayImages] = useState<Set<string>>(() => new Set());
 
@@ -373,6 +384,82 @@ export default function CarouselBlock({
     });
     return () => window.cancelAnimationFrame(frame);
   }, [loadedOverlayImages, mainSwiper]);
+
+  const isSlideshowRuntime = settings?.presentation === "slideshow";
+  const slideshowRuntimeAspectRatio = toCssAspectRatio(settings?.slideshowRatio ?? settings?.aspectRatio) ?? "16 / 9";
+  const slideshowRuntimeSlideKey = slides.map((slide) => slide.id ?? "").join("|");
+  const runtimeBooleanSetting = (value: boolean | "true" | "false" | 1 | 0 | null | undefined, fallback: boolean) => {
+    if (value === undefined || value === null) return fallback;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value === 1;
+    return value === "true";
+  };
+
+  useEffect(() => {
+    const root = isSlideshowRuntime ? mainSwiper?.el as HTMLElement | undefined : undefined;
+    const list = root?.querySelector<HTMLElement>(".uk-slideshow-items");
+    if (!root || !list) return;
+
+    let cancelled = false;
+    let instance: UikitSlideshowInstance | undefined;
+    const items = Array.from(list.children) as HTMLElement[];
+    const handleItemShown = (event: Event) => {
+      const index = items.indexOf(event.currentTarget as HTMLElement);
+      if (index >= 0) setActiveSlideshowIndex(index);
+    };
+
+    // Swiper remains the shared React slide renderer and sizing shell, while
+    // UIkit owns this semantic YOOtheme Slideshow's movement, drag, autoplay,
+    // parallax and direction rules. The two runtimes never drive transforms
+    // on the same slides.
+    items.forEach((item, index) => {
+      item.style.removeProperty("transform");
+      item.style.removeProperty("z-index");
+      item.style.removeProperty("opacity");
+      item.style.removeProperty("transition-duration");
+      item.classList.remove("swiper-slide-active", "swiper-slide-prev", "swiper-slide-next", "swiper-slide-visible", "swiper-slide-fully-visible");
+      item.classList.toggle("uk-active", index === 0);
+      item.classList.toggle("uk-slide-active", index === 0);
+      item.classList.toggle("uk-transition-active", index === 0);
+      item.addEventListener("itemshown", handleItemShown);
+    });
+
+    void import("uikit").then((module) => {
+      if (cancelled) return;
+      const UIkit = (module.default ?? module) as unknown as UikitSlideshowApi;
+      instance = UIkit.slideshow(root, {
+        animation: ["slide", "fade", "scale", "pull", "push"].includes(settings?.effect ?? "")
+          ? settings?.effect
+          : "slide",
+        autoplay: runtimeBooleanSetting(settings?.autoplay, false),
+        autoplayInterval: Math.max(Number(settings?.autoplayDelayMs ?? 7000), 1000),
+        pauseOnHover: runtimeBooleanSetting(settings?.pauseOnHover, true),
+        ratio: slideshowRuntimeAspectRatio.replace(" / ", ":"),
+        minHeight: toCssDimension(settings?.slideshowMinHeight),
+        maxHeight: toCssDimension(settings?.slideshowMaxHeight),
+        selList: ".uk-slideshow-items",
+      });
+      setUikitSlideshow(instance);
+      setActiveSlideshowIndex(instance.index ?? 0);
+    });
+
+    return () => {
+      cancelled = true;
+      items.forEach((item) => item.removeEventListener("itemshown", handleItemShown));
+      instance?.$destroy?.();
+    };
+  }, [
+    isSlideshowRuntime,
+    mainSwiper,
+    settings?.effect,
+    settings?.autoplay,
+    settings?.autoplayDelayMs,
+    settings?.pauseOnHover,
+    settings?.slideshowMinHeight,
+    settings?.slideshowMaxHeight,
+    slideshowRuntimeAspectRatio,
+    slideshowRuntimeSlideKey,
+  ]);
 
   if (!slides || slides.length === 0) {
     return (
@@ -463,7 +550,7 @@ export default function CarouselBlock({
   // Panel Slider keeps UIkit's grid gutter as the visual gap owner. The
   // canonical value is projected through the root CSS variable below rather
   // than passed as a second Swiper gap (which would double the gutter).
-  const swiperSpaceBetween = isPanelSlider ? 0 : spaceBetween;
+  const swiperSpaceBetween = isPanelSlider || isSlideshow ? 0 : spaceBetween;
   const panelSliderIsEffectivelyLocked = (swiper: any) => {
     if (!isPanelSlider || !swiper?.wrapperEl) return Boolean(swiper?.isLocked);
     const trackStyle = window.getComputedStyle(swiper.wrapperEl);
@@ -478,19 +565,16 @@ export default function CarouselBlock({
     // grid span, rather than only Swiper's clipped viewport width.
     return totalItemSpan <= swiper.width + leadingGridGutter + 0.5;
   };
-  const applySlideshowNavigationPresentation = (swiper: any) => {
-    if (!isSlideshow) return;
-    const previous = swiper?.navigation?.prevEl as HTMLElement | undefined;
-    const next = swiper?.navigation?.nextEl as HTMLElement | undefined;
-    previous?.classList.add("uk-slidenav", "uk-slidenav-previous");
-    next?.classList.add("uk-slidenav", "uk-slidenav-next");
-  };
-
   const swiperEffect = (() => {
+    // UIkit owns movement for the semantic YOOtheme Slideshow presentation.
+    // Keep Swiper as the React slide renderer only, so it cannot race UIkit's
+    // pull transition or apply a second transform to the same slides.
+    if (isSlideshow) return "slide";
     if (swiperVariant === "coverflow" || swiperVariant === "showcase") return "coverflow";
     if (swiperVariant === "cards") return "cards";
     if (swiperVariant === "creative") return "creative";
     if (swiperVariant === "fade" || settings?.effect === "fade") return "fade";
+    if (settings?.effect === "pull" || settings?.effect === "push" || settings?.effect === "scale") return "creative";
     return "slide";
   })();
 
@@ -518,6 +602,27 @@ export default function CarouselBlock({
       : cardsPerView;
 
   const creativeEffect = (() => {
+    // Pull/push/scale can be used as Swiper Creative presets on generic
+    // carousels. The semantic YOOtheme Slideshow returns above and delegates
+    // those names to UIkit's native transitioner instead.
+    if (settings?.effect === "pull") {
+      return {
+        prev: { translate: ["-100%", 0, 0] },
+        next: { translate: ["30%", 0, 0] },
+      };
+    }
+    if (settings?.effect === "push") {
+      return {
+        prev: { translate: ["-30%", 0, 0] },
+        next: { translate: ["100%", 0, 0] },
+      };
+    }
+    if (settings?.effect === "scale") {
+      return {
+        prev: { scale: 1.5, opacity: 0 },
+        next: { scale: 1.5, opacity: 0 },
+      };
+    }
     switch (settings?.creativePreset) {
       case "deep":
         return {
@@ -577,7 +682,6 @@ export default function CarouselBlock({
   const overlayMargin = settings?.overlayMargin ?? "default";
   const overlayPosition = settings?.overlayPosition ?? (isSlideshow ? "center-left" : "bottom-left");
   const overlayAnimation = settings?.overlayAnimation ?? (isSlideshow ? "parallax" : "none");
-  const overlayParallax = settings?.overlayParallax ?? undefined;
   const overlayColor = settings?.overlayColor ?? "dark";
   const overlayTextColor = settings?.overlayTextColor ?? "auto";
   const overlayMode = settings?.overlayMode ?? "cover";
@@ -610,19 +714,6 @@ export default function CarouselBlock({
       ? overlayNavigationType === "dotnav"
       : paginationStyle !== "hidden" && booleanSetting(settings?.showDots, true);
   const showThumbnav = isSlideshow && slideshowNavigationType === "thumbnav";
-
-  const overlayParallaxStop = (
-    stops: { value: string; position?: number }[] | undefined,
-    fallback?: string,
-  ) => stops?.[stops.length - 1]?.value || fallback;
-  const overlayParallaxX = overlayParallaxStop(overlayParallax?.x);
-  const overlayParallaxY = overlayParallaxStop(overlayParallax?.y);
-  const overlayParallaxScale = overlayParallaxStop(overlayParallax?.scale);
-  const overlayParallaxRotate = overlayParallaxStop(overlayParallax?.rotate);
-  const overlayParallaxOpacity = overlayParallaxStop(overlayParallax?.opacity);
-  const hasCustomOverlayParallax = Boolean(
-    overlayParallaxX || overlayParallaxY || overlayParallaxScale || overlayParallaxRotate || overlayParallaxOpacity,
-  );
 
   const explicitSlideMode = settings?.slideMode ?? "auto";
   const headingLevel = settings?.headingLevel ?? undefined;
@@ -779,7 +870,8 @@ export default function CarouselBlock({
         slidesPerView={swiperSlidesPerView}
         spaceBetween={swiperSpaceBetween}
         effect={swiperEffect}
-        parallax={isSlideshow && overlayAnimation === "parallax"}
+        allowTouchMove={!isSlideshow}
+        parallax={!isSlideshow && overlayAnimation === "parallax"}
         speed={transitionSpeedMs}
         centeredSlides={booleanSetting(settings?.centered, swiperVariant === "coverflow" || swiperVariant === "showcase" || isMarquee)}
         thumbs={
@@ -814,10 +906,10 @@ export default function CarouselBlock({
         }}
         creativeEffect={creativeEffect}
         fadeEffect={{ crossFade: booleanSetting(settings?.fadeCrossFade, true) }}
-        loop={!is3DEffect && slides.length > 1 && (settings?.loop ?? true)}
-        rewind={is3DEffect && slides.length > 1}
+        loop={!isSlideshow && !is3DEffect && slides.length > 1 && (settings?.loop ?? true)}
+        rewind={!isSlideshow && is3DEffect && slides.length > 1}
         autoplay={
-          (isMarquee || booleanSetting(settings?.autoplay, false)) && slides.length > 1
+          !isSlideshow && (isMarquee || booleanSetting(settings?.autoplay, false)) && slides.length > 1
             ? {
                 delay: isMarquee ? 0 : autoplayDelayMs,
                 disableOnInteraction: false,
@@ -825,17 +917,15 @@ export default function CarouselBlock({
               }
             : false
         }
-        navigation={showArrows}
+        navigation={showArrows && !isSlideshow}
         // UIkit does not show slidenav when a Panel Slider has no overflow.
         // Swiper supplies the same runtime lock signal, shared by Builder and
         // storefront, rather than a Builder-only item-count approximation.
         watchOverflow
         onAfterInit={(swiper) => {
           if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
-          applySlideshowNavigationPresentation(swiper);
         }}
         onSlideChange={(swiper) => {
-          if (isSlideshow) setActiveSlideshowIndex(swiper.realIndex);
           if (overlayNavigationType === "dotnav") setActiveOverlayIndex(swiper.realIndex);
         }}
         onLock={(swiper) => {
@@ -899,9 +989,11 @@ export default function CarouselBlock({
               }
               : undefined
         }
-        className="w-full"
+        className={isSlideshow ? "w-full uk-slideshow" : "w-full"}
         wrapperClass={
-          isPanelSlider
+          isSlideshow
+            ? "swiper-wrapper uk-slideshow-items"
+            : isPanelSlider
             ? ["swiper-wrapper", "uk-slider-items", "uk-grid", hasPanelSliderDivider ? "uk-grid-divider" : ""].filter(Boolean).join(" ")
             : "swiper-wrapper"
         }
@@ -949,8 +1041,9 @@ export default function CarouselBlock({
             ) : null;
 
           // Decide effective slide mode
-          const effectiveMode =
-            explicitSlideMode === "panel"
+          const effectiveMode = isSlideshow
+            ? "hero"
+            : explicitSlideMode === "panel"
               ? "panel"
               : explicitSlideMode === "image-only"
               ? "image-only"
@@ -1597,9 +1690,9 @@ export default function CarouselBlock({
               <SwiperSlide key={slide.id || idx}>
                 <SlideshowItemElement className={`shop-builder-hero-slide-card ${slideshowItemTextContext}`.trim()}>
                   {isSlideshow && slide.videoUrl ? (
-                    <div className="shop-builder-swiper-media"><video src={slide.videoUrl} poster={slide.imageUrl || undefined} autoPlay muted loop playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                    <div className="shop-builder-swiper-media uk-position-cover" data-uk-slideshow-parallax="scale: 1,1.2,1.2"><video src={slide.videoUrl} poster={slide.imageUrl || undefined} autoPlay muted loop playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
                   ) : hasRealImage ? (
-                    <div className="shop-builder-swiper-media">
+                    <div className="shop-builder-swiper-media uk-position-cover" data-uk-slideshow-parallax="scale: 1,1.2,1.2">
                       <Image
                         src={slide.imageUrl!}
                         alt={slide.imageAlt ?? slide.title ?? ""}
@@ -1615,7 +1708,8 @@ export default function CarouselBlock({
                     </div>
                   ) : (
                     <div
-                      className="shop-builder-swiper-media shop-builder-swiper-media--hero-placeholder group cursor-pointer"
+                      className="shop-builder-swiper-media shop-builder-swiper-media--hero-placeholder uk-position-cover group cursor-pointer"
+                      data-uk-slideshow-parallax="scale: 1,1.2,1.2"
                       onClick={() => onUploadSlideImage?.(idx, slide.imageUrl ?? undefined)}
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950" />
@@ -1631,15 +1725,15 @@ export default function CarouselBlock({
                     </div>
                   )}
 
+                  <div
+                    className="shop-builder-slideshow-parallax-dim uk-position-cover"
+                    data-uk-slideshow-parallax="opacity: 0.5,0,0; backgroundColor: #000,#000"
+                    aria-hidden="true"
+                  />
+
                   <div className={overlayFrameClass}>
                     <div
                       className={overlayContentClass}
-                      data-swiper-parallax={isSlideshow && overlayAnimation === "parallax" && !hasCustomOverlayParallax ? "-30%" : undefined}
-                      data-swiper-parallax-x={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxX : undefined}
-                      data-swiper-parallax-y={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxY : undefined}
-                      data-swiper-parallax-scale={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxScale : undefined}
-                      data-swiper-parallax-rotate={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxRotate : undefined}
-                      data-swiper-parallax-opacity={isSlideshow && overlayAnimation === "parallax" ? overlayParallaxOpacity : undefined}
                     >
                     {slide.badge && (
                       <span className="shop-builder-swiper-badge">
@@ -1743,6 +1837,23 @@ export default function CarouselBlock({
         })}
       </Swiper>
 
+      {isSlideshow && showArrows && slides.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="swiper-button-prev uk-slidenav uk-slidenav-previous"
+            aria-label="Previous slide"
+            onClick={() => void uikitSlideshow?.show("previous")}
+          />
+          <button
+            type="button"
+            className="swiper-button-next uk-slidenav uk-slidenav-next"
+            aria-label="Next slide"
+            onClick={() => void uikitSlideshow?.show("next")}
+          />
+        </>
+      )}
+
       {isSlideshow && (showDots || showThumbnav) && (
         <div
           className="shop-builder-slideshow-navigation-frame"
@@ -1769,7 +1880,7 @@ export default function CarouselBlock({
                     className="shop-builder-slideshow-thumbnav-item"
                     aria-label={slide.navigationLabel || slide.title || `Go to slide ${index + 1}`}
                     aria-current={activeSlideshowIndex === index ? "true" : undefined}
-                    onClick={() => mainSwiper?.slideToLoop(index)}
+                    onClick={() => void uikitSlideshow?.show(index)}
                   >
                     {slideshowShowNavigationThumbnail && (slide.thumbnailUrl || slide.imageUrl) && !isPlaceholderSvgUrl(slide.thumbnailUrl || slide.imageUrl) ? (
                       <Image
@@ -1790,7 +1901,7 @@ export default function CarouselBlock({
                     className={`swiper-pagination-bullet ${activeSlideshowIndex === index ? "swiper-pagination-bullet-active" : ""}`.trim()}
                     aria-label={slide.navigationLabel || slide.title || `Go to slide ${index + 1}`}
                     aria-current={activeSlideshowIndex === index ? "true" : undefined}
-                    onClick={() => mainSwiper?.slideToLoop(index)}
+                    onClick={() => void uikitSlideshow?.show(index)}
                   />
                 )}
               </li>

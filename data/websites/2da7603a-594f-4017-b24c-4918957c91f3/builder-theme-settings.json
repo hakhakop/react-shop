@@ -1,0 +1,3647 @@
+{
+  "schemaVersion": 1,
+  "provider": "yootheme",
+  "active": true,
+  "themeId": "makai",
+  "displayName": "makai",
+  "sourceConfig": {
+    "style": "makai",
+    "site": {
+      "layout": "full",
+      "boxed": {
+        "alignment": 1,
+        "header_transparent": ""
+      },
+      "image_size": "cover",
+      "image_position": "center-center",
+      "image_effect": "fixed",
+      "toolbar_width": "xlarge",
+      "breadcrumbs_show_home": true,
+      "breadcrumbs_show_current": true,
+      "breadcrumbs_home_text": "",
+      "main_section": {
+        "height": true
+      },
+      "language_parent_icon": true,
+      "language_icon": true,
+      "breadcrumbs": false,
+      "padding": "small",
+      "padding_remove_top": false,
+      "padding_remove_bottom": false,
+      "toolbar_transparent": true,
+      "toolbar_center": false
+    },
+    "header": {
+      "layout": "horizontal-right",
+      "width": "xlarge",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social_gap": "small",
+      "search": "",
+      "social_style": false,
+      "social": "header:end",
+      "social_target": true,
+      "social_items": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ]
+    },
+    "navbar": {
+      "sticky": 1,
+      "dropdown_align": "left",
+      "offcanvas": [],
+      "dropbar": "",
+      "dropdown_boundary": false,
+      "style": ""
+    },
+    "mobile": {
+      "breakpoint": "l",
+      "header": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social": "",
+        "social_target": true,
+        "social_style": false,
+        "social_gap": "small",
+        "social_width": "20",
+        "social_items": [
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://instagram.com/"
+          },
+          {
+            "link": "https://tripadvisor.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 1
+      },
+      "dialog": {
+        "layout": "modal-center",
+        "toggle": "navbar-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "toggle_text": false,
+        "push_index": 1,
+        "text_center": true,
+        "dropdown": [],
+        "modal": {
+          "width": "2xlarge"
+        }
+      },
+      "search": "right",
+      "offcanvas": {
+        "overlay": true
+      }
+    },
+    "dialog": {
+      "layout": "offcanvas-top",
+      "toggle": "header:end",
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": true,
+        "overlay": true
+      }
+    },
+    "mobileHeader": {
+      "layout": "horizontal-right",
+      "search_layout": "input-dropdown",
+      "search_dropdown.stretch": "navbar",
+      "search_dropdown.size": true,
+      "search_icon": "left",
+      "social": "",
+      "social_target": true,
+      "social_style": false,
+      "social_gap": "small",
+      "social_width": "20",
+      "social_items": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ]
+    },
+    "mobileNavbar": {
+      "sticky": 1
+    },
+    "mobileDialog": {
+      "layout": "modal-center",
+      "toggle": "navbar-mobile:end",
+      "close": true,
+      "menu_style": "default",
+      "offcanvas": {
+        "mode": "slide",
+        "flip": true
+      },
+      "dropbar": {
+        "animation": "reveal-top"
+      },
+      "toggle_text": false,
+      "push_index": 1,
+      "text_center": true,
+      "dropdown": [],
+      "modal": {
+        "width": "2xlarge"
+      }
+    },
+    "mobileBreakpoint": "l",
+    "logo": {
+      "text": "MAKAI",
+      "image": "wp-content/uploads/yootheme/demo/logo.svg",
+      "image_inverse": "",
+      "image_mobile": "wp-content/uploads/yootheme/demo/logo-mobile.svg",
+      "image_svg_inline": true,
+      "image_dialog": ""
+    },
+    "menuPositions": {
+      "navbar": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 2
+      },
+      "header": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-left": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "toolbar-right": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "navbar-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "header-mobile": {
+        "style": "default",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": ""
+      },
+      "dialog-mobile": {
+        "style": "primary",
+        "image_margin": true,
+        "image_align": "center",
+        "menu": 3,
+        "divider": false
+      }
+    },
+    "menuItems": {
+      "20": {
+        "dropdown": {
+          "columns": 1
+        }
+      },
+      "21": {
+        "dropdown": {
+          "columns": 1,
+          "padding_remove_vertical": false,
+          "padding_remove_horizontal": false,
+          "stretch": "navbar"
+        },
+        "content": {
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m"
+                  },
+                  "children": [
+                    {
+                      "type": "grid",
+                      "props": {
+                        "content_column_breakpoint": "m",
+                        "content_margin": "small",
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_align": false,
+                        "grid_column_gap": "small",
+                        "grid_default": "4",
+                        "grid_divider": false,
+                        "grid_medium": "",
+                        "image_align": "top",
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_height": "250",
+                        "image_svg_color": "emphasis",
+                        "image_width": "380",
+                        "item_animation": true,
+                        "lightbox_bg_close": true,
+                        "link_style": "text",
+                        "link_text": "",
+                        "margin_bottom": "default",
+                        "margin_top": "default",
+                        "meta_align": "below-title",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "panel_image_no_padding": false,
+                        "panel_link": true,
+                        "parallax_easing": "1",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_image": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "show_video": true,
+                        "text_align": "center",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_link": false,
+                        "title_style": "h5"
+                      },
+                      "children": [
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                            "image": "wp-content/uploads/yootheme/demo/lessons-01.jpg",
+                            "link": "?page_id=2#beginners",
+                            "title": "Beginners Surf Course"
+                          }
+                        },
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                            "image": "wp-content/uploads/yootheme/demo/lessons-02.jpg",
+                            "link": "?page_id=2#advanced",
+                            "title": "Advanced Surf Course"
+                          }
+                        },
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                            "image": "wp-content/uploads/yootheme/demo/lessons-03.jpg",
+                            "link": "?page_id=2#kids",
+                            "title": "Kids Surf Course"
+                          }
+                        },
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                            "image": "wp-content/uploads/yootheme/demo/lessons-04.jpg",
+                            "link": "?page_id=2#corporate",
+                            "title": "Corporate Surf Course"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "props": []
+            }
+          ],
+          "version": "5.0.6",
+          "props": []
+        }
+      },
+      "22": {
+        "content": null,
+        "dropdown": {
+          "columns": 1,
+          "stretch": "navbar"
+        }
+      },
+      "23": {
+        "content": {
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "column_gap": "medium",
+                "layout": "1-5,1-5,1-5,2-5|1-3,1-3,1-3,1-1",
+                "margin_top": "remove"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-5",
+                    "width_small": "1-3"
+                  },
+                  "children": [
+                    {
+                      "type": "headline",
+                      "props": {
+                        "content": "Wetsuits",
+                        "image_align": "left",
+                        "image_margin": "xsmall",
+                        "link": "?page_id=19#wetsuits",
+                        "title_element": "div",
+                        "title_style": "h5"
+                      }
+                    },
+                    {
+                      "type": "nav",
+                      "props": {
+                        "grid": "1",
+                        "image_vertical_align": true,
+                        "nav_style": "navbar-dropdown-nav",
+                        "show_image": true,
+                        "show_meta": true
+                      },
+                      "children": [
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Full Suits",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Spring Suits",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Tops & Bottoms",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Women Suits",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Kids Suits",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Accessories",
+                            "link": "?page_id=19#wetsuits"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-5",
+                    "width_small": "1-3"
+                  },
+                  "children": [
+                    {
+                      "type": "headline",
+                      "props": {
+                        "content": "Surfboards",
+                        "image_align": "left",
+                        "image_margin": "xsmall",
+                        "link": "?page_id=19#surfboards",
+                        "title_element": "div",
+                        "title_style": "h5"
+                      }
+                    },
+                    {
+                      "type": "nav",
+                      "props": {
+                        "grid": "1",
+                        "image_vertical_align": true,
+                        "nav_style": "navbar-dropdown-nav",
+                        "show_image": true,
+                        "show_meta": true
+                      },
+                      "children": [
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Body Boards",
+                            "link": "?page_id=19#surfboards"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Performance Surfboards",
+                            "link": "?page_id=19#surfboards"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Soft Top Surfboards",
+                            "link": "?page_id=19#surfboards"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Hard Top Surfboards",
+                            "link": "?page_id=19#surfboards"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Surfboard Insurance",
+                            "link": "?page_id=19#surfboards"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-5",
+                    "width_small": "1-3"
+                  },
+                  "children": [
+                    {
+                      "type": "headline",
+                      "props": {
+                        "content": "Services",
+                        "image_align": "left",
+                        "image_margin": "xsmall",
+                        "link": "?page_id=19#carerepair",
+                        "title_element": "div",
+                        "title_style": "h5"
+                      }
+                    },
+                    {
+                      "type": "nav",
+                      "props": {
+                        "grid": "1",
+                        "image_vertical_align": true,
+                        "nav_style": "navbar-dropdown-nav",
+                        "show_image": true,
+                        "show_meta": true
+                      },
+                      "children": [
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Care & Repair",
+                            "link": "?page_id=19#carerepair"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Rental Reservation",
+                            "link": "?page_id=19#cta"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "FAQ",
+                            "link": "?page_id=2#faq"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Contact",
+                            "link": "?page_id=3"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "image",
+                      "props": {
+                        "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                        "image_height": "260",
+                        "image_svg_color": "emphasis",
+                        "image_svg_inline": true,
+                        "image_width": "260",
+                        "margin_bottom": "default",
+                        "margin_top": "default",
+                        "position": "absolute",
+                        "position_left": "130",
+                        "position_top": "130",
+                        "text_align": "right",
+                        "visibility": "xl"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "center-center",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "2-5",
+                    "width_small": "1-1"
+                  },
+                  "children": [
+                    {
+                      "type": "overlay",
+                      "props": {
+                        "image": "wp-content/uploads/yootheme/demo/lessons-hero-bg.jpg",
+                        "image_height": "400",
+                        "image_width": "600",
+                        "link": "?page_id=19",
+                        "link_style": "secondary",
+                        "link_text": "Book  Now",
+                        "margin_bottom": "default",
+                        "margin_top": "default",
+                        "meta": "Reservation",
+                        "meta_align": "above-title",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "overlay_hover": false,
+                        "overlay_mode": "cover",
+                        "overlay_position": "center",
+                        "overlay_style": "",
+                        "overlay_transition": "fade",
+                        "text_align": "center",
+                        "text_color": "light",
+                        "title": "Up to 10% Off",
+                        "title_element": "div",
+                        "title_hover_style": "reset",
+                        "title_margin": "remove",
+                        "title_style": "h3"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "version": "5.0.6",
+          "props": []
+        },
+        "dropdown": {
+          "columns": 1,
+          "stretch": "navbar"
+        }
+      },
+      "24": {
+        "content": {
+          "type": "fragment",
+          "children": [
+            {
+              "type": "row",
+              "props": {
+                "column_gap": "large",
+                "layout": "1-4,3-4",
+                "margin_top": "remove"
+              },
+              "children": [
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "bottom-right",
+                    "padding": "none",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "1-4"
+                  },
+                  "children": [
+                    {
+                      "type": "headline",
+                      "props": {
+                        "content": "About Us",
+                        "image_align": "left",
+                        "image_margin": "xsmall",
+                        "title_element": "div",
+                        "title_style": "h5"
+                      }
+                    },
+                    {
+                      "type": "nav",
+                      "props": {
+                        "grid": "1",
+                        "image_vertical_align": true,
+                        "nav_style": "navbar-dropdown-nav",
+                        "show_image": true,
+                        "show_meta": true
+                      },
+                      "children": [
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Our Story",
+                            "link": "?page_id=4"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Our Team",
+                            "link": "?page_id=4#team"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Certificates",
+                            "link": "?page_id=4#certificates"
+                          }
+                        },
+                        {
+                          "type": "nav_item",
+                          "props": {
+                            "content": "Journal",
+                            "link": "?page_id=26"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "image",
+                      "props": {
+                        "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                        "image_height": "260",
+                        "image_svg_color": "emphasis",
+                        "image_svg_inline": true,
+                        "image_width": "260",
+                        "margin_bottom": "default",
+                        "margin_top": "default",
+                        "position": "absolute",
+                        "position_left": "130",
+                        "position_top": "65",
+                        "text_align": "right",
+                        "visibility": "l"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "column",
+                  "props": {
+                    "image_position": "bottom-right",
+                    "padding": "none",
+                    "position_sticky_breakpoint": "m",
+                    "width_medium": "3-4"
+                  },
+                  "children": [
+                    {
+                      "type": "grid",
+                      "props": {
+                        "content_column_breakpoint": "m",
+                        "content_margin": "small",
+                        "filter_align": "left",
+                        "filter_all": true,
+                        "filter_grid_breakpoint": "m",
+                        "filter_grid_width": "auto",
+                        "filter_position": "top",
+                        "filter_style": "tab",
+                        "grid_column_gap": "small",
+                        "grid_default": "3",
+                        "grid_medium": "",
+                        "grid_row_gap": "small",
+                        "image_align": "top",
+                        "image_box_decoration_inverse": false,
+                        "image_grid_breakpoint": "m",
+                        "image_grid_width": "1-2",
+                        "image_height": "250",
+                        "image_svg_color": "emphasis",
+                        "image_width": "380",
+                        "item_animation": true,
+                        "lightbox_bg_close": true,
+                        "link_style": "default",
+                        "link_text": "",
+                        "margin_bottom": "default",
+                        "margin_top": "default",
+                        "meta_align": "above-title",
+                        "meta_color": "emphasis",
+                        "meta_element": "div",
+                        "meta_style": "text-meta",
+                        "panel_link": true,
+                        "parallax_easing": "1",
+                        "position": "relative",
+                        "position_z_index": "3",
+                        "show_content": true,
+                        "show_hover_image": true,
+                        "show_hover_video": true,
+                        "show_image": true,
+                        "show_link": true,
+                        "show_meta": true,
+                        "show_title": true,
+                        "show_video": true,
+                        "text_align": "center",
+                        "title_align": "top",
+                        "title_element": "div",
+                        "title_grid_breakpoint": "m",
+                        "title_grid_width": "1-2",
+                        "title_hover_style": "reset",
+                        "title_style": "h5"
+                      },
+                      "children": [
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                            "image": "wp-content/uploads/yootheme/demo/dropdown-about-story.jpg",
+                            "link": "?page_id=4",
+                            "meta": "",
+                            "title": "Our Story"
+                          }
+                        },
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                            "image": "wp-content/uploads/yootheme/demo/dropdown-about-team.jpg",
+                            "link": "?page_id=4#team",
+                            "meta": "",
+                            "title": "Meet Our Crew"
+                          }
+                        },
+                        {
+                          "type": "grid_item",
+                          "props": {
+                            "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                            "image": "wp-content/uploads/yootheme/demo/dropdown-about-journal.jpg",
+                            "link": "?page_id=26",
+                            "meta": "",
+                            "title": "Journal"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "version": "5.0.6",
+          "props": []
+        },
+        "dropdown": {
+          "columns": 1,
+          "stretch": "navbar"
+        }
+      },
+      "28": {
+        "content": null,
+        "dropdown": {
+          "columns": 1,
+          "stretch": "navbar"
+        }
+      }
+    },
+    "menu": {
+      "items": {
+        "20": {
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "21": {
+          "dropdown": {
+            "columns": 1,
+            "padding_remove_vertical": false,
+            "padding_remove_horizontal": false,
+            "stretch": "navbar"
+          },
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_align": false,
+                          "grid_column_gap": "small",
+                          "grid_default": "4",
+                          "grid_divider": false,
+                          "grid_medium": "",
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "250",
+                          "image_svg_color": "emphasis",
+                          "image_width": "380",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "text",
+                          "link_text": "",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_image_no_padding": false,
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "text_align": "center",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": false,
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-01.jpg",
+                              "link": "?page_id=2#beginners",
+                              "title": "Beginners Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-02.jpg",
+                              "link": "?page_id=2#advanced",
+                              "title": "Advanced Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-03.jpg",
+                              "link": "?page_id=2#kids",
+                              "title": "Kids Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-04.jpg",
+                              "link": "?page_id=2#corporate",
+                              "title": "Corporate Surf Course"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "props": []
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          }
+        },
+        "22": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "23": {
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "medium",
+                  "layout": "1-5,1-5,1-5,2-5|1-3,1-3,1-3,1-1",
+                  "margin_top": "remove"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Wetsuits",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#wetsuits",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Full Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Spring Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Tops & Bottoms",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Women Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Kids Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Accessories",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Surfboards",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#surfboards",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Body Boards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Performance Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Soft Top Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Hard Top Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Surfboard Insurance",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Services",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#carerepair",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Care & Repair",
+                              "link": "?page_id=19#carerepair"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Rental Reservation",
+                              "link": "?page_id=19#cta"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "FAQ",
+                              "link": "?page_id=2#faq"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Contact",
+                              "link": "?page_id=3"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                          "image_height": "260",
+                          "image_svg_color": "emphasis",
+                          "image_svg_inline": true,
+                          "image_width": "260",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "position": "absolute",
+                          "position_left": "130",
+                          "position_top": "130",
+                          "text_align": "right",
+                          "visibility": "xl"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "2-5",
+                      "width_small": "1-1"
+                    },
+                    "children": [
+                      {
+                        "type": "overlay",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/lessons-hero-bg.jpg",
+                          "image_height": "400",
+                          "image_width": "600",
+                          "link": "?page_id=19",
+                          "link_style": "secondary",
+                          "link_text": "Book  Now",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta": "Reservation",
+                          "meta_align": "above-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": false,
+                          "overlay_mode": "cover",
+                          "overlay_position": "center",
+                          "overlay_style": "",
+                          "overlay_transition": "fade",
+                          "text_align": "center",
+                          "text_color": "light",
+                          "title": "Up to 10% Off",
+                          "title_element": "div",
+                          "title_hover_style": "reset",
+                          "title_margin": "remove",
+                          "title_style": "h3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "24": {
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "large",
+                  "layout": "1-4,3-4",
+                  "margin_top": "remove"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "bottom-right",
+                      "padding": "none",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "About Us",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Our Story",
+                              "link": "?page_id=4"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Our Team",
+                              "link": "?page_id=4#team"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Certificates",
+                              "link": "?page_id=4#certificates"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Journal",
+                              "link": "?page_id=26"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                          "image_height": "260",
+                          "image_svg_color": "emphasis",
+                          "image_svg_inline": true,
+                          "image_width": "260",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "position": "absolute",
+                          "position_left": "130",
+                          "position_top": "65",
+                          "text_align": "right",
+                          "visibility": "l"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "bottom-right",
+                      "padding": "none",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "3-4"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "3",
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "image_align": "top",
+                          "image_box_decoration_inverse": false,
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "250",
+                          "image_svg_color": "emphasis",
+                          "image_width": "380",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "position": "relative",
+                          "position_z_index": "3",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "text_align": "center",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-story.jpg",
+                              "link": "?page_id=4",
+                              "meta": "",
+                              "title": "Our Story"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-team.jpg",
+                              "link": "?page_id=4#team",
+                              "meta": "",
+                              "title": "Meet Our Crew"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-journal.jpg",
+                              "link": "?page_id=26",
+                              "meta": "",
+                              "title": "Journal"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "28": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        }
+      },
+      "positions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 2
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "primary",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3,
+          "divider": false
+        }
+      }
+    }
+  },
+  "page": {
+    "layout": "full",
+    "alignment": "center",
+    "colorMode": "light"
+  },
+  "header": {
+    "source": {
+      "header": {
+        "layout": "horizontal-right",
+        "width": "xlarge",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social_gap": "small",
+        "search": "",
+        "social_style": false,
+        "social": "header:end",
+        "social_target": true,
+        "social_items": [
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://instagram.com/"
+          },
+          {
+            "link": "https://tripadvisor.com/"
+          }
+        ]
+      },
+      "navbar": {
+        "sticky": 1,
+        "dropdown_align": "left",
+        "offcanvas": [],
+        "dropbar": "",
+        "dropdown_boundary": false,
+        "style": ""
+      },
+      "mobile": {
+        "breakpoint": "l",
+        "header": {
+          "layout": "horizontal-right",
+          "search_layout": "input-dropdown",
+          "search_dropdown.stretch": "navbar",
+          "search_dropdown.size": true,
+          "search_icon": "left",
+          "social": "",
+          "social_target": true,
+          "social_style": false,
+          "social_gap": "small",
+          "social_width": "20",
+          "social_items": [
+            {
+              "link": "https://facebook.com/yootheme"
+            },
+            {
+              "link": "https://instagram.com/"
+            },
+            {
+              "link": "https://tripadvisor.com/"
+            }
+          ]
+        },
+        "navbar": {
+          "sticky": 1
+        },
+        "dialog": {
+          "layout": "modal-center",
+          "toggle": "navbar-mobile:end",
+          "close": true,
+          "menu_style": "default",
+          "offcanvas": {
+            "mode": "slide",
+            "flip": true
+          },
+          "dropbar": {
+            "animation": "reveal-top"
+          },
+          "toggle_text": false,
+          "push_index": 1,
+          "text_center": true,
+          "dropdown": [],
+          "modal": {
+            "width": "2xlarge"
+          }
+        },
+        "search": "right",
+        "offcanvas": {
+          "overlay": true
+        }
+      },
+      "dialog": {
+        "layout": "offcanvas-top",
+        "toggle": "header:end",
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true,
+          "overlay": true
+        }
+      },
+      "mobileHeader": {
+        "layout": "horizontal-right",
+        "search_layout": "input-dropdown",
+        "search_dropdown.stretch": "navbar",
+        "search_dropdown.size": true,
+        "search_icon": "left",
+        "social": "",
+        "social_target": true,
+        "social_style": false,
+        "social_gap": "small",
+        "social_width": "20",
+        "social_items": [
+          {
+            "link": "https://facebook.com/yootheme"
+          },
+          {
+            "link": "https://instagram.com/"
+          },
+          {
+            "link": "https://tripadvisor.com/"
+          }
+        ]
+      },
+      "mobileNavbar": {
+        "sticky": 1
+      },
+      "mobileDialog": {
+        "layout": "modal-center",
+        "toggle": "navbar-mobile:end",
+        "close": true,
+        "menu_style": "default",
+        "offcanvas": {
+          "mode": "slide",
+          "flip": true
+        },
+        "dropbar": {
+          "animation": "reveal-top"
+        },
+        "toggle_text": false,
+        "push_index": 1,
+        "text_center": true,
+        "dropdown": [],
+        "modal": {
+          "width": "2xlarge"
+        }
+      },
+      "mobileBreakpoint": "l",
+      "logo": {
+        "text": "MAKAI",
+        "image": "wp-content/uploads/yootheme/demo/logo.svg",
+        "image_inverse": "",
+        "image_mobile": "wp-content/uploads/yootheme/demo/logo-mobile.svg",
+        "image_svg_inline": true,
+        "image_dialog": ""
+      },
+      "menuPositions": {
+        "navbar": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 2
+        },
+        "header": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-left": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "toolbar-right": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "navbar-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "header-mobile": {
+          "style": "default",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": ""
+        },
+        "dialog-mobile": {
+          "style": "primary",
+          "image_margin": true,
+          "image_align": "center",
+          "menu": 3,
+          "divider": false
+        }
+      },
+      "menuItems": {
+        "20": {
+          "dropdown": {
+            "columns": 1
+          }
+        },
+        "21": {
+          "dropdown": {
+            "columns": 1,
+            "padding_remove_vertical": false,
+            "padding_remove_horizontal": false,
+            "stretch": "navbar"
+          },
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_align": false,
+                          "grid_column_gap": "small",
+                          "grid_default": "4",
+                          "grid_divider": false,
+                          "grid_medium": "",
+                          "image_align": "top",
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "250",
+                          "image_svg_color": "emphasis",
+                          "image_width": "380",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "text",
+                          "link_text": "",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta_align": "below-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_image_no_padding": false,
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "text_align": "center",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_link": false,
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-01.jpg",
+                              "link": "?page_id=2#beginners",
+                              "title": "Beginners Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-02.jpg",
+                              "link": "?page_id=2#advanced",
+                              "title": "Advanced Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-03.jpg",
+                              "link": "?page_id=2#kids",
+                              "title": "Kids Surf Course"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/lessons-04.jpg",
+                              "link": "?page_id=2#corporate",
+                              "title": "Corporate Surf Course"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "props": []
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          }
+        },
+        "22": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "23": {
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "medium",
+                  "layout": "1-5,1-5,1-5,2-5|1-3,1-3,1-3,1-1",
+                  "margin_top": "remove"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Wetsuits",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#wetsuits",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Full Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Spring Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Tops & Bottoms",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Women Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Kids Suits",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Accessories",
+                              "link": "?page_id=19#wetsuits"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Surfboards",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#surfboards",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Body Boards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Performance Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Soft Top Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Hard Top Surfboards",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Surfboard Insurance",
+                              "link": "?page_id=19#surfboards"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-5",
+                      "width_small": "1-3"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "Services",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "link": "?page_id=19#carerepair",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Care & Repair",
+                              "link": "?page_id=19#carerepair"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Rental Reservation",
+                              "link": "?page_id=19#cta"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "FAQ",
+                              "link": "?page_id=2#faq"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Contact",
+                              "link": "?page_id=3"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                          "image_height": "260",
+                          "image_svg_color": "emphasis",
+                          "image_svg_inline": true,
+                          "image_width": "260",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "position": "absolute",
+                          "position_left": "130",
+                          "position_top": "130",
+                          "text_align": "right",
+                          "visibility": "xl"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "center-center",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "2-5",
+                      "width_small": "1-1"
+                    },
+                    "children": [
+                      {
+                        "type": "overlay",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/lessons-hero-bg.jpg",
+                          "image_height": "400",
+                          "image_width": "600",
+                          "link": "?page_id=19",
+                          "link_style": "secondary",
+                          "link_text": "Book  Now",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta": "Reservation",
+                          "meta_align": "above-title",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "overlay_hover": false,
+                          "overlay_mode": "cover",
+                          "overlay_position": "center",
+                          "overlay_style": "",
+                          "overlay_transition": "fade",
+                          "text_align": "center",
+                          "text_color": "light",
+                          "title": "Up to 10% Off",
+                          "title_element": "div",
+                          "title_hover_style": "reset",
+                          "title_margin": "remove",
+                          "title_style": "h3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "24": {
+          "content": {
+            "type": "fragment",
+            "children": [
+              {
+                "type": "row",
+                "props": {
+                  "column_gap": "large",
+                  "layout": "1-4,3-4",
+                  "margin_top": "remove"
+                },
+                "children": [
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "bottom-right",
+                      "padding": "none",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "1-4"
+                    },
+                    "children": [
+                      {
+                        "type": "headline",
+                        "props": {
+                          "content": "About Us",
+                          "image_align": "left",
+                          "image_margin": "xsmall",
+                          "title_element": "div",
+                          "title_style": "h5"
+                        }
+                      },
+                      {
+                        "type": "nav",
+                        "props": {
+                          "grid": "1",
+                          "image_vertical_align": true,
+                          "nav_style": "navbar-dropdown-nav",
+                          "show_image": true,
+                          "show_meta": true
+                        },
+                        "children": [
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Our Story",
+                              "link": "?page_id=4"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Our Team",
+                              "link": "?page_id=4#team"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Certificates",
+                              "link": "?page_id=4#certificates"
+                            }
+                          },
+                          {
+                            "type": "nav_item",
+                            "props": {
+                              "content": "Journal",
+                              "link": "?page_id=26"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "image": "wp-content/uploads/yootheme/demo/badge-bg-01.svg",
+                          "image_height": "260",
+                          "image_svg_color": "emphasis",
+                          "image_svg_inline": true,
+                          "image_width": "260",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "position": "absolute",
+                          "position_left": "130",
+                          "position_top": "65",
+                          "text_align": "right",
+                          "visibility": "l"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "props": {
+                      "image_position": "bottom-right",
+                      "padding": "none",
+                      "position_sticky_breakpoint": "m",
+                      "width_medium": "3-4"
+                    },
+                    "children": [
+                      {
+                        "type": "grid",
+                        "props": {
+                          "content_column_breakpoint": "m",
+                          "content_margin": "small",
+                          "filter_align": "left",
+                          "filter_all": true,
+                          "filter_grid_breakpoint": "m",
+                          "filter_grid_width": "auto",
+                          "filter_position": "top",
+                          "filter_style": "tab",
+                          "grid_column_gap": "small",
+                          "grid_default": "3",
+                          "grid_medium": "",
+                          "grid_row_gap": "small",
+                          "image_align": "top",
+                          "image_box_decoration_inverse": false,
+                          "image_grid_breakpoint": "m",
+                          "image_grid_width": "1-2",
+                          "image_height": "250",
+                          "image_svg_color": "emphasis",
+                          "image_width": "380",
+                          "item_animation": true,
+                          "lightbox_bg_close": true,
+                          "link_style": "default",
+                          "link_text": "",
+                          "margin_bottom": "default",
+                          "margin_top": "default",
+                          "meta_align": "above-title",
+                          "meta_color": "emphasis",
+                          "meta_element": "div",
+                          "meta_style": "text-meta",
+                          "panel_link": true,
+                          "parallax_easing": "1",
+                          "position": "relative",
+                          "position_z_index": "3",
+                          "show_content": true,
+                          "show_hover_image": true,
+                          "show_hover_video": true,
+                          "show_image": true,
+                          "show_link": true,
+                          "show_meta": true,
+                          "show_title": true,
+                          "show_video": true,
+                          "text_align": "center",
+                          "title_align": "top",
+                          "title_element": "div",
+                          "title_grid_breakpoint": "m",
+                          "title_grid_width": "1-2",
+                          "title_hover_style": "reset",
+                          "title_style": "h5"
+                        },
+                        "children": [
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-story.jpg",
+                              "link": "?page_id=4",
+                              "meta": "",
+                              "title": "Our Story"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-team.jpg",
+                              "link": "?page_id=4#team",
+                              "meta": "",
+                              "title": "Meet Our Crew"
+                            }
+                          },
+                          {
+                            "type": "grid_item",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                              "image": "wp-content/uploads/yootheme/demo/dropdown-about-journal.jpg",
+                              "link": "?page_id=26",
+                              "meta": "",
+                              "title": "Journal"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "version": "5.0.6",
+            "props": []
+          },
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        },
+        "28": {
+          "content": null,
+          "dropdown": {
+            "columns": 1,
+            "stretch": "navbar"
+          }
+        }
+      }
+    },
+    "document": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "boxed",
+      "maxWidth": "xlarge",
+      "headerBehavior": "sticky",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "sticky",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "hide",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "modal-center",
+      "headerMobileDialogTogglePosition": "navbar-mobile:end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": true,
+      "headerMobileDialogPushAfter": 1,
+      "headerMobileOffcanvasMode": "slide",
+      "headerMobileOffcanvasFlip": true,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "header-end",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/demo/logo-mobile.svg"
+    },
+    "breakpoint": "1200px",
+    "mobileLayout": "horizontal-right",
+    "dialogLayout": "offcanvas-top",
+    "dialogToggle": "header:end"
+  },
+  "resolved": {
+    "shellSettings": {
+      "themePageLayout": "full",
+      "themePageContainerAlignment": "center",
+      "buttonTextTransform": "uppercase",
+      "navbarDropdownIndicator": "chevron",
+      "fontFamilyBody": "Montserrat",
+      "baseFontSize": "14px",
+      "baseLineHeight": "1.7",
+      "fontSize2XLarge": "42px",
+      "fontSizeXLarge": "36px",
+      "fontSizeLarge": "28px",
+      "fontSizeMedium": "19px",
+      "fontSizeSmall": "12px",
+      "fontFamilyPrimary": "Playfair Display",
+      "fontWeightPrimary": "700",
+      "textTransformPrimary": "inherit",
+      "letterSpacingPrimary": "inherit",
+      "fontStylePrimary": "inherit",
+      "fontFamilySecondary": "Montserrat",
+      "fontWeightSecondary": "700",
+      "textTransformSecondary": "uppercase",
+      "letterSpacingSecondary": "inherit",
+      "fontStyleSecondary": "inherit",
+      "fontFamilyTertiary": "Homemade Apple",
+      "fontWeightTertiary": "400",
+      "textColor": "#717171",
+      "emphasisColor": "#0D1724",
+      "mutedTextColor": "#A3A3A3",
+      "linkColor": "#0D1724",
+      "linkHoverColor": "#0E536D",
+      "inverseColor": "#FFFFFF",
+      "backgroundDefault": "#FFFFFF",
+      "backgroundMuted": "#f4f4f4",
+      "backgroundPrimary": "#0E536D",
+      "backgroundSecondary": "#0D1724",
+      "successColor": "#32d296",
+      "warningColor": "#faa05a",
+      "dangerColor": "#f0506e",
+      "borderWidth": "1px",
+      "borderColor": "rgba(0, 0, 0, 0.1)",
+      "borderRadius": "0",
+      "shadowSmall": "0 2px 8px rgba(0, 0, 0, 0.08)",
+      "shadowMedium": "0 5px 15px rgba(0, 0, 0, 0.12)",
+      "shadowLarge": "0 14px 25px rgba(0, 0, 0, 0.16)",
+      "shadowXLarge": "0 28px 50px rgba(0, 0, 0, 0.16)",
+      "marginDefault": "20px",
+      "marginSmall": "10px",
+      "marginMedium": "40px",
+      "marginLarge": "70px",
+      "marginXLarge": "140px",
+      "gridGutterDefault": "30px",
+      "gridGutterSmall": "15px",
+      "gridGutterMedium": "40px",
+      "gridGutterLarge": "70px",
+      "controlHeightDefault": "44px",
+      "buttonHeight": "44px",
+      "controlHeightSmall": "30px",
+      "controlHeightLarge": "55px",
+      "globalZIndex": "1000",
+      "baseInsBackground": "#f4f4f4",
+      "baseInsColor": "#0D1724",
+      "baseMarkBackground": "#f4f4f4",
+      "baseMarkColor": "#0D1724",
+      "selectionBackground": "#0E536D",
+      "headingSmallFontSizeResponsive": "55px",
+      "headingMediumFontSizeResponsive": "66px",
+      "headingLargeFontSizeResponsive": "90px",
+      "headingXLargeFontSizeResponsive": "130px",
+      "heading2XLargeFontSizeResponsive": "180px",
+      "heading3XLargeFontSizeResponsive": "250px",
+      "buttonFontSize": "12px",
+      "buttonLargeFontSize": "16px",
+      "buttonLargePaddingX": "25px",
+      "buttonDefaultBackground": "transparent",
+      "buttonDefaultHoverBackground": "#0D1724",
+      "buttonDefaultHoverText": "#FFFFFF",
+      "buttonDefaultActiveBackground": "#0e1826",
+      "buttonDefaultActiveText": "#FFFFFF",
+      "buttonPrimaryActiveBackground": "#0E536D",
+      "buttonSecondaryHoverBackground": "#0e1826",
+      "buttonLinkHoverColor": "#0E536D",
+      "buttonBorderWidth": "1px",
+      "buttonDefaultBorder": "#0D1724",
+      "buttonDefaultActiveBorder": "#0D1724",
+      "buttonInverseDefaultBackground": "transparent",
+      "buttonInverseDefaultText": "#FFFFFF",
+      "buttonInverseDefaultHoverBackground": "#FFFFFF",
+      "buttonInverseDefaultActiveBackground": "rgba(255, 255, 255, 0.9)",
+      "buttonInverseDefaultBorder": "#FFFFFF",
+      "containerSmall": "960px",
+      "containerLarge": "1360px",
+      "cardDefaultHoverBackground": "#FFFFFF",
+      "cardBackground": "#FFFFFF",
+      "cardDefaultBorder": "rgba(0, 0, 0, 0.1)",
+      "cardDefaultHoverBorder": "rgba(0, 0, 0, 0.1)",
+      "alertPrimaryBackground": "rgba(14, 83, 109, 0.8)",
+      "alertPrimaryColor": "#FFFFFF",
+      "alertSuccessBackground": "rgba(50, 210, 150, 0.8)",
+      "alertSuccessColor": "#FFFFFF",
+      "alertWarningBackground": "rgba(250, 160, 90, 0.8)",
+      "alertWarningColor": "#FFFFFF",
+      "alertDangerBackground": "rgba(240, 80, 110, 0.8)",
+      "alertDangerColor": "#FFFFFF",
+      "overlayPrimaryBackground": "rgba(14, 83, 109, 0.9)",
+      "searchIconColor": "#0D1724",
+      "searchDefaultBackground": "transparent",
+      "searchNavbarBackground": "transparent",
+      "searchToggleColor": "#717171",
+      "searchToggleHoverColor": "#0D1724",
+      "searchDefaultBorderWidth": "1px",
+      "searchDefaultBorder": "rgba(0, 0, 0, 0.1)",
+      "searchDefaultFocusBorder": "#0D1724",
+      "searchMediumBorderWidth": "1px",
+      "searchMediumBorder": "rgba(0, 0, 0, 0.1)",
+      "searchMediumFocusBorder": "#0D1724",
+      "searchLargeBorderWidth": "1px",
+      "searchLargeBorder": "rgba(0, 0, 0, 0.1)",
+      "searchLargeFocusBorder": "#0D1724",
+      "dropdownPadding": "20px",
+      "dropdownDropbarMargin": "0",
+      "dropdownDropbarPaddingTop": "15px",
+      "dropdownDropbarLargePaddingTop": "35px",
+      "dropdownNavItemHoverColor": "#0D1724",
+      "dropdownNavSubtitleFontSize": "12px",
+      "dropdownNavSublistItemHoverColor": "#0D1724",
+      "dropdownNavItemPaddingVertical": "10px",
+      "dropdownNavFontSize": "12px",
+      "dropdownNavSubtitleTextTransform": "none",
+      "dropbarPaddingTop": "30px",
+      "dropbarBackground": "#FFFFFF",
+      "offcanvasBarBackground": "#FFFFFF",
+      "offcanvasBarColorMode": "dark",
+      "navHeaderFontSize": "14px",
+      "navDefaultItemColor": "#717171",
+      "navDefaultItemHoverColor": "#0D1724",
+      "navDefaultSubtitleFontSize": "12px",
+      "navDefaultSublistItemHoverColor": "#0D1724",
+      "navPrimaryFontSize": "19px",
+      "navPrimaryItemColor": "#0D1724",
+      "navPrimaryItemHoverColor": "#0E536D",
+      "navPrimaryItemActiveColor": "#0E536D",
+      "navPrimarySubtitleFontSize": "14px",
+      "navPrimarySublistFontSize": "16px",
+      "navPrimarySublistItemHoverColor": "#0D1724",
+      "navPrimarySublistItemActiveColor": "#0E536D",
+      "navSecondarySubtitleColor": "#717171",
+      "navSecondarySublistFontSize": "14px",
+      "navDividersMarginTop": "7px",
+      "navSecondaryMarginTop": "15px",
+      "navSecondaryItemPaddingVertical": "8px",
+      "navDefaultFontWeight": "400",
+      "navDefaultSubtitleColor": "#A3A3A3",
+      "navDefaultSubtitleTextTransform": "none",
+      "navPrimarySubtitleColor": "#A3A3A3",
+      "navPrimarySubtitleFontFamily": "Montserrat",
+      "navPrimarySubtitleFontWeight": "normal",
+      "navPrimarySubtitleTextTransform": "none",
+      "navSecondaryFontWeight": "normal",
+      "navbarBackground": "#FFFFFF",
+      "navbarGap": "0px",
+      "navbarNavGap": "0px",
+      "navbarNavItemPaddingHorizontal": "25px",
+      "navbarNavItemColor": "#717171",
+      "navbarNavItemHoverColor": "#0D1724",
+      "navbarNavItemOnclickColor": "#717171",
+      "navbarItemPaddingHorizontal": "25px",
+      "navbarToggleColor": "#717171",
+      "navbarToggleHoverColor": "#0D1724",
+      "navbarDropdownShiftMargin": "-1px",
+      "navbarDropdownPadding": "25px",
+      "navbarDropdownBackground": "#FFFFFF",
+      "navbarDropdownLargeShiftMargin": "-1px",
+      "navbarDropdownDropbarShiftMargin": "24px",
+      "navbarDropdownDropbarLargeShiftMargin": "24px",
+      "navbarDropdownNavItemColor": "#717171",
+      "navbarDropdownNavItemHoverColor": "#0D1724",
+      "navbarPaddingTop": "15px",
+      "navbarPaddingBottom": "15px",
+      "navbarGapMedium": "0px",
+      "navbarNavGapMedium": "0px",
+      "navbarDropdownNavSublistPaddingLeft": "10px",
+      "navbarNavItemFontWeight": "400",
+      "navbarSubtitleColor": "#A3A3A3",
+      "navbarSubtitleTextTransform": "none",
+      "navbarPrimaryNavItemFontSize": "16px",
+      "navbarDropdownNavFontWeight": "400",
+      "navbarDropdownNavSubtitleTextTransform": "none",
+      "navbarMode": "full",
+      "navbarModeBorderVertical": "all",
+      "navbarBorderWidth": "1px",
+      "navbarBorder": "rgba(0, 0, 0, 0.1)",
+      "navbarDropdownBorderWidth": "1px",
+      "navbarDropdownBorder": "rgba(163, 163, 163, 0.3)",
+      "inverseNavbarNavItemColor": "rgba(255, 255, 255, 0.6)",
+      "inverseNavbarNavItemHoverColor": "rgba(255, 255, 255, 0.9)",
+      "inverseNavbarNavItemOnclickColor": "rgba(255, 255, 255, 0.5)",
+      "inverseNavbarNavItemActiveColor": "#FFFFFF",
+      "inverseNavbarItemColor": "#FFFFFF",
+      "inverseNavbarToggleColor": "#FFFFFF",
+      "inverseNavbarToggleHoverColor": "rgba(255, 255, 255, 0.7)",
+      "inverseNavbarBorder": "rgba(255, 255, 255, 0.6)",
+      "paginationMarginHorizontal": "15px",
+      "paginationItemPaddingVertical": "3px",
+      "paginationItemActiveColor": "#FFFFFF",
+      "paginationItemHeight": "30px",
+      "paginationItemActiveBackground": "#0E536D",
+      "paginationItemBorderWidth": "1px",
+      "inversePaginationItemActiveBackground": "#FFFFFF",
+      "logoFontSize": "19px",
+      "logoFontWeight": "700",
+      "logoTextTransform": "uppercase",
+      "inverseInverseColor": "#0D1724",
+      "navbarPaddingTopMedium": "15px",
+      "navbarPaddingBottomMedium": "15px",
+      "navbarItemPaddingHorizontalMedium": "25px",
+      "navbarNavItemPaddingHorizontalMedium": "25px",
+      "navbarNavItemHeight": "80px",
+      "navbarNavItemFontSize": "14px",
+      "navbarNavItemFontFamily": "Montserrat",
+      "navbarNavItemFontStyle": "inherit",
+      "navbarNavItemLetterSpacing": "inherit",
+      "navbarNavItemTextTransform": "uppercase",
+      "navbarNavItemActiveColor": "#0D1724",
+      "navbarDropdownMargin": "0",
+      "navbarDropdownWidth": "200px",
+      "navbarDropdownNavFontSize": "14px",
+      "navbarDropdownNavFontFamily": "Montserrat",
+      "navbarDropdownNavFontStyle": "inherit",
+      "navbarDropdownNavLetterSpacing": "inherit",
+      "navbarDropdownNavTextTransform": "uppercase",
+      "navbarDropdownNavItemActiveColor": "#0D1724",
+      "alertColor": "#717171",
+      "buttonRadius": "0",
+      "buttonSmallRadius": "0",
+      "buttonLargeRadius": "0",
+      "buttonTokenInheritance": {
+        "buttonPrimaryBackground": "inherit",
+        "buttonPrimaryText": "inherit",
+        "buttonDefaultBackground": "authored",
+        "buttonDefaultText": "inherit",
+        "buttonSecondaryBackground": "inherit",
+        "buttonTextColorSemantic": "inherit",
+        "buttonBorderWidth": "authored",
+        "buttonRadius": "inherit",
+        "buttonHoverBg": "inherit",
+        "buttonPrimaryHoverText": "inherit",
+        "buttonPrimaryHoverShadow": "inherit",
+        "buttonPrimaryHoverGradient": "inherit",
+        "buttonFontSize": "authored",
+        "buttonLargeFontSize": "authored",
+        "buttonFontFamily": "inherit",
+        "buttonFontStyle": "inherit",
+        "buttonFontWeight": "inherit",
+        "buttonLineHeight": "inherit",
+        "buttonTextTransform": "inherit",
+        "buttonBorderMode": "inherit",
+        "buttonBackgroundSize": "inherit",
+        "buttonBackgroundPosition": "inherit",
+        "buttonHoverBackgroundPosition": "inherit",
+        "buttonSmallFontSize": "inherit",
+        "buttonSmallLineHeight": "inherit",
+        "buttonSmallPaddingX": "inherit",
+        "buttonSmallRadius": "inherit",
+        "buttonLargeLineHeight": "inherit",
+        "buttonLargePaddingX": "authored",
+        "buttonLargeRadius": "inherit",
+        "buttonDefaultHoverBackground": "authored",
+        "buttonDefaultHoverText": "authored",
+        "buttonSecondaryHoverBackground": "authored",
+        "buttonSecondaryText": "inherit",
+        "buttonSecondaryHoverText": "inherit",
+        "buttonDefaultActiveBackground": "authored",
+        "buttonDefaultActiveText": "authored",
+        "buttonDefaultBorder": "authored",
+        "buttonDefaultHoverBorder": "inherit",
+        "buttonDefaultActiveBorder": "authored",
+        "buttonDefaultActiveShadow": "inherit",
+        "buttonPrimaryHoverBorder": "inherit",
+        "buttonPrimaryActiveBackground": "authored",
+        "buttonPrimaryActiveText": "inherit",
+        "buttonPrimaryActiveBorder": "inherit",
+        "buttonPrimaryActiveShadow": "inherit",
+        "buttonSecondaryBorder": "inherit",
+        "buttonSecondaryHoverBorder": "inherit",
+        "buttonSecondaryActiveBackground": "inherit",
+        "buttonSecondaryActiveText": "inherit",
+        "buttonSecondaryActiveBorder": "inherit",
+        "buttonSecondaryActiveShadow": "inherit",
+        "buttonInverseDefaultBackground": "authored",
+        "buttonInverseDefaultText": "authored",
+        "buttonInverseDefaultHoverBackground": "authored",
+        "buttonInverseDefaultHoverText": "inherit",
+        "buttonInverseDefaultActiveBackground": "authored",
+        "buttonInverseDefaultActiveText": "inherit",
+        "buttonInverseDefaultBorder": "authored",
+        "buttonInverseDefaultHoverBorder": "inherit",
+        "buttonInverseDefaultActiveBorder": "inherit",
+        "buttonInverseDefaultShadow": "inherit",
+        "buttonInversePrimaryShadow": "inherit",
+        "buttonInverseSecondaryBackground": "inherit",
+        "buttonInverseSecondaryText": "inherit",
+        "buttonInverseSecondaryHoverBackground": "inherit",
+        "buttonInverseSecondaryActiveBackground": "inherit",
+        "buttonInverseSecondaryBorder": "inherit",
+        "buttonInverseSecondaryHoverText": "inherit",
+        "buttonInverseSecondaryActiveText": "inherit",
+        "buttonDangerBackground": "inherit",
+        "buttonDangerText": "inherit",
+        "buttonDangerBorder": "inherit",
+        "buttonDangerHoverBackground": "inherit",
+        "buttonDangerHoverText": "inherit",
+        "buttonDangerHoverBorder": "inherit",
+        "buttonDangerHoverShadow": "inherit",
+        "buttonDangerActiveBackground": "inherit",
+        "buttonDangerActiveText": "inherit",
+        "buttonDangerActiveBorder": "inherit",
+        "buttonDangerActiveShadow": "inherit",
+        "buttonDisabledBackground": "inherit",
+        "buttonDisabledText": "inherit",
+        "buttonDisabledBorder": "inherit",
+        "buttonTextBackground": "inherit",
+        "buttonTextBorder": "inherit",
+        "buttonTextHoverBorder": "inherit",
+        "buttonTextActiveColor": "inherit",
+        "buttonLinkColor": "inherit",
+        "buttonLinkHoverColor": "authored",
+        "buttonBackdropFilter": "inherit",
+        "buttonTextHoverColor": "inherit",
+        "buttonTransitionDuration": "inherit",
+        "buttonPrimaryGradient": "inherit",
+        "buttonPrimaryActiveGradient": "inherit",
+        "buttonSecondaryHoverGradient": "inherit",
+        "buttonSecondaryActiveGradient": "inherit",
+        "buttonDefaultMode": "inherit",
+        "buttonDefaultGlowGradient": "inherit",
+        "buttonDefaultGlowFilter": "inherit",
+        "buttonDefaultHoverGlowFilter": "inherit",
+        "buttonPrimaryMode": "inherit",
+        "buttonPrimaryGlowGradient": "inherit",
+        "buttonPrimaryGlowFilter": "inherit",
+        "buttonPrimaryHoverGlowFilter": "inherit",
+        "buttonSecondaryMode": "inherit",
+        "buttonSecondaryGlowGradient": "inherit",
+        "buttonSecondaryGlowFilter": "inherit",
+        "buttonSecondaryHoverGlowFilter": "inherit",
+        "buttonDefaultShadow": "inherit",
+        "buttonDefaultHoverShadow": "inherit",
+        "buttonPrimaryShadow": "inherit",
+        "buttonSecondaryShadow": "inherit",
+        "buttonSecondaryHoverShadow": "inherit",
+        "buttonPaddingX": "authored"
+      },
+      "buttonLineHeight": "42px",
+      "buttonLargeLineHeight": "53px",
+      "buttonPaddingX": "20px",
+      "namedMenus": [
+        {
+          "id": "main-menu",
+          "name": "Main Menu",
+          "items": [
+            {
+              "id": "main-menu-nav-qwbfsm",
+              "label": "Product",
+              "url": "/product/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-qwbfsm",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "product",
+                "uri": "/product/",
+                "sourceDatabaseId": 19
+              }
+            },
+            {
+              "id": "main-menu-nav-1w0p56m",
+              "label": "Video Effects",
+              "url": "/?page_id=19#video-effects",
+              "parentId": "main-menu-nav-qwbfsm",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1w0p56m",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#video-effects"
+              }
+            },
+            {
+              "id": "main-menu-nav-15v1kxe",
+              "label": "Full Control",
+              "url": "/?page_id=19#full-control",
+              "parentId": "main-menu-nav-qwbfsm",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-15v1kxe",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#full-control"
+              }
+            },
+            {
+              "id": "main-menu-nav-154392u",
+              "label": "Data Privacy",
+              "url": "/?page_id=19#data-privacy",
+              "parentId": "main-menu-nav-qwbfsm",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-154392u",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#data-privacy"
+              }
+            },
+            {
+              "id": "main-menu-nav-9cb1z8",
+              "label": "Chat Features",
+              "url": "/?page_id=19#chat-features",
+              "parentId": "main-menu-nav-qwbfsm",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-9cb1z8",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#chat-features"
+              }
+            },
+            {
+              "id": "main-menu-nav-wwtsai",
+              "label": "More Features",
+              "url": "/?page_id=19#more-features",
+              "parentId": "main-menu-nav-qwbfsm",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-wwtsai",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=19#more-features"
+              }
+            },
+            {
+              "id": "main-menu-nav-1dhtv25",
+              "label": "Pricing",
+              "url": "/pricing/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1dhtv25",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "pricing",
+                "uri": "/pricing/",
+                "sourceDatabaseId": 20
+              }
+            },
+            {
+              "id": "main-menu-nav-aech2w",
+              "label": "About",
+              "url": "/about/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-aech2w",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "about",
+                "uri": "/about/",
+                "sourceDatabaseId": 4
+              }
+            },
+            {
+              "id": "main-menu-nav-1fzdt7q",
+              "label": "Careers ✨",
+              "url": "/careers/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1fzdt7q",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "careers",
+                "uri": "/careers/",
+                "sourceDatabaseId": 3
+              }
+            },
+            {
+              "id": "main-menu-nav-hc8hma",
+              "label": "Support",
+              "url": "/support/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-hc8hma",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "support",
+                "uri": "/support/",
+                "sourceDatabaseId": 21
+              }
+            },
+            {
+              "id": "main-menu-nav-xps04r",
+              "label": "Help Center",
+              "url": "/?page_id=21#help-center",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-xps04r",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=21#help-center"
+              }
+            },
+            {
+              "id": "main-menu-nav-shnai7",
+              "label": "First Steps",
+              "url": "/?page_id=21#first-steps",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-shnai7",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=21#first-steps"
+              }
+            },
+            {
+              "id": "main-menu-nav-b0k72q",
+              "label": "Documentation",
+              "url": "/?page_id=21#documentation",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-b0k72q",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=21#documentation"
+              }
+            },
+            {
+              "id": "main-menu-nav-6e9yau",
+              "label": "Accounts",
+              "url": "/?page_id=21#accounts",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-6e9yau",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=21#accounts"
+              }
+            },
+            {
+              "id": "main-menu-nav-5fz3z3",
+              "label": "Our Community",
+              "url": "/?page_id=21#our-community",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-5fz3z3",
+              "navigationTarget": {
+                "kind": "custom",
+                "uri": "/?page_id=21#our-community"
+              }
+            },
+            {
+              "id": "main-menu-nav-1llmiw5",
+              "label": "Updates",
+              "url": "/updates/",
+              "parentId": "main-menu-nav-hc8hma",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1llmiw5",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "updates",
+                "uri": "/updates/",
+                "sourceDatabaseId": 23
+              }
+            },
+            {
+              "id": "main-menu-nav-1ld5o4f",
+              "label": "Blog",
+              "url": "/blog/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1ld5o4f",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "blog",
+                "uri": "/blog/",
+                "sourceDatabaseId": 57
+              }
+            }
+          ]
+        },
+        {
+          "id": "main-menu-imported",
+          "name": "Main Menu (Imported)",
+          "items": [
+            {
+              "id": "main-menu-imported-nav-124oy63",
+              "label": "Home",
+              "url": "/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-124oy63",
+              "navigationTarget": {
+                "kind": "system",
+                "pageKey": "home",
+                "uri": "/",
+                "sourceDatabaseId": 1
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-1lajsw8",
+              "label": "Lessons",
+              "url": "/surf-lessons/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1lajsw8",
+              "dropdownContent": {
+                "id": "yootheme-fragment-0-0-0-0",
+                "kind": "sublayout",
+                "spacingContract": "yootheme",
+                "elementPadding": "none",
+                "sublayoutHtmlId": "",
+                "sublayoutClasses": "",
+                "sublayoutAttributes": "",
+                "sublayout": {
+                  "rows": [
+                    {
+                      "id": "yootheme-row-0-0-0-0-fragment-0",
+                      "layout": "1-col",
+                      "spacingContract": "yootheme",
+                      "columns": [
+                        {
+                          "id": "yootheme-row-0-0-0-0-fragment-0-column-0",
+                          "background": {
+                            "position": "center center"
+                          },
+                          "sticky": {
+                            "breakpoint": "m"
+                          },
+                          "elements": [
+                            {
+                              "id": "yootheme-grid-0-0-0-0-fragment-0-0-0",
+                              "kind": "grid",
+                              "gridSource": "static",
+                              "gridItems": [
+                                {
+                                  "id": "yootheme-grid-item-0-0-0-0-fragment-0-0-0-0",
+                                  "imageUrl": "https://makai.webpages.am/wp-content/uploads/yootheme/demo/lessons-01.jpg",
+                                  "imageAlt": "Beginners Surf Course",
+                                  "hoverImageUrl": "",
+                                  "hoverVideoUrl": "",
+                                  "title": "Beginners Surf Course",
+                                  "meta": "",
+                                  "text": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                                  "buttonUrl": "?page_id=2#beginners",
+                                  "buttonTarget": "_self",
+                                  "mediaFit": "natural",
+                                  "titleElement": "div",
+                                  "titleStyle": "h5"
+                                },
+                                {
+                                  "id": "yootheme-grid-item-0-0-0-0-fragment-0-0-0-1",
+                                  "imageUrl": "https://makai.webpages.am/wp-content/uploads/yootheme/demo/lessons-02.jpg",
+                                  "imageAlt": "Advanced Surf Course",
+                                  "hoverImageUrl": "",
+                                  "hoverVideoUrl": "",
+                                  "title": "Advanced Surf Course",
+                                  "meta": "",
+                                  "text": "Lorem ipsum dolor sit amet <br>adipiscing elit.",
+                                  "buttonUrl": "?page_id=2#advanced",
+                                  "buttonTarget": "_self",
+                                  "mediaFit": "natural",
+                                  "titleElement": "div",
+                                  "titleStyle": "h5"
+                                },
+                                {
+                                  "id": "yootheme-grid-item-0-0-0-0-fragment-0-0-0-2",
+                                  "imageUrl": "https://makai.webpages.am/wp-content/uploads/yootheme/demo/lessons-03.jpg",
+                                  "imageAlt": "Kids Surf Course",
+                                  "hoverImageUrl": "",
+                                  "hoverVideoUrl": "",
+                                  "title": "Kids Surf Course",
+                                  "meta": "",
+                                  "text": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                                  "buttonUrl": "?page_id=2#kids",
+                                  "buttonTarget": "_self",
+                                  "mediaFit": "natural",
+                                  "titleElement": "div",
+                                  "titleStyle": "h5"
+                                },
+                                {
+                                  "id": "yootheme-grid-item-0-0-0-0-fragment-0-0-0-3",
+                                  "imageUrl": "https://makai.webpages.am/wp-content/uploads/yootheme/demo/lessons-04.jpg",
+                                  "imageAlt": "Corporate Surf Course",
+                                  "hoverImageUrl": "",
+                                  "hoverVideoUrl": "",
+                                  "title": "Corporate Surf Course",
+                                  "meta": "",
+                                  "text": "Lorem ipsum dolor sit amet <br>adipiscing elit",
+                                  "buttonUrl": "?page_id=2#corporate",
+                                  "buttonTarget": "_self",
+                                  "mediaFit": "natural",
+                                  "titleElement": "div",
+                                  "titleStyle": "h5"
+                                }
+                              ],
+                              "gridShowImage": true,
+                              "gridShowHoverImage": true,
+                              "gridShowHoverVideo": true,
+                              "gridShowMeta": true,
+                              "gridShowText": true,
+                              "gridShowButton": true,
+                              "enableFilter": false,
+                              "filterStyle": "tabs",
+                              "gridItemRenderer": "plain",
+                              "gridCardVariant": "blank",
+                              "gridCardSize": "none",
+                              "gridCardHover": false,
+                              "panelImageNoPadding": false,
+                              "linkPanel": true,
+                              "panelHover": false,
+                              "panelExpand": "none",
+                              "panelContentWidth": "auto",
+                              "gridItemMaxWidth": "none",
+                              "gridTitlePlacement": "top",
+                              "gridTitleWidth": "1-2",
+                              "gridTitleColumnGap": "default",
+                              "gridTitleRowGap": "default",
+                              "gridTitleBreakpoint": "m",
+                              "gridMediaPlacement": "top",
+                              "gridGap": "small",
+                              "showDividers": false,
+                              "centerColumns": false,
+                              "centerRows": false,
+                              "gridParallaxJustify": false,
+                              "columnsPhonePortrait": "4",
+                              "gridMediaWidth": "1-2",
+                              "gridMediaColumnGap": "default",
+                              "gridMediaRowGap": "default",
+                              "gridMediaBreakpoint": "m",
+                              "gridMediaVerticalAlign": false,
+                              "imageWidth": "380px",
+                              "imageHeight": "250px",
+                              "imageSvgColor": "emphasis",
+                              "imageMarginTop": "default",
+                              "imageMaxWidth": 380,
+                              "imageShape": "none",
+                              "imageBoxDecoration": "none",
+                              "imageHoverTransition": "none",
+                              "linkImage": false,
+                              "enableLightbox": false,
+                              "linkTitle": false,
+                              "panelTitleHoverStyle": "none",
+                              "panelTitleAlign": "top",
+                              "panelTitleGridWidth": "1-2",
+                              "panelTitleGridBreakpoint": "medium",
+                              "panelTitleGridColumnGap": "default",
+                              "panelTitleGridRowGap": "default",
+                              "gridTitleSize": "h5",
+                              "metaStyle": "text-meta",
+                              "gridMetaAlign": "below-title",
+                              "gridMetaHtmlElement": "div",
+                              "gridContentAlign": false,
+                              "gridContentDropcap": false,
+                              "gridContentColumn": "none",
+                              "gridContentColumnDivider": false,
+                              "gridContentColumnBreakpoint": "m",
+                              "contentMarginTop": "small",
+                              "buttonStyle": "text",
+                              "buttonTarget": "_self",
+                              "fullWidthButton": false,
+                              "visualStyle": {
+                                "margin": {
+                                  "top": "0"
+                                },
+                                "card": {
+                                  "titleMargin": "0",
+                                  "buttonMargin": "0"
+                                },
+                                "layout": {
+                                  "textAlign": "center"
+                                },
+                                "effects": {}
+                              },
+                              "elementPadding": "none",
+                              "spacingContract": "yootheme"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "htmlElement": "div",
+                  "disabled": false
+                },
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
+              },
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "surf-lessons",
+                "uri": "/surf-lessons/",
+                "sourceDatabaseId": 2
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-1lodfu7",
+              "label": "Camps",
+              "url": "/surf-lessons",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1lodfu7",
+              "navigationTarget": {
+                "kind": "webpages-page",
+                "pageKey": "page:surf-lessons",
+                "slug": "surf-lessons",
+                "uri": "/surf-lessons"
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-nwnmtu",
+              "label": "Rentals",
+              "url": "/surf-rentals/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-nwnmtu",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "surf-rentals",
+                "uri": "/surf-rentals/",
+                "sourceDatabaseId": 19
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-ochuos",
+              "label": "About Us",
+              "url": "/about-us/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-ochuos",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "about-us",
+                "uri": "/about-us/",
+                "sourceDatabaseId": 4
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-p9k3z2",
+              "label": "Our Story",
+              "url": "/about-us/",
+              "parentId": "main-menu-imported-nav-ochuos",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-p9k3z2",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "about-us",
+                "uri": "/about-us/",
+                "sourceDatabaseId": 4
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-1m0wzpa",
+              "label": "Journal",
+              "url": "/journal/",
+              "parentId": "main-menu-imported-nav-ochuos",
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-1m0wzpa",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "journal",
+                "uri": "/journal/",
+                "sourceDatabaseId": 26
+              }
+            },
+            {
+              "id": "main-menu-imported-nav-33p5tz",
+              "label": "Contact",
+              "url": "/contact/",
+              "parentId": null,
+              "iconName": null,
+              "iconUrl": null,
+              "subtitle": null,
+              "mobileUrl": null,
+              "target": "_self",
+              "visibility": "all",
+              "portableKey": "nav-33p5tz",
+              "navigationTarget": {
+                "kind": "page",
+                "postType": "page",
+                "slug": "contact",
+                "uri": "/contact/",
+                "sourceDatabaseId": 3
+              }
+            }
+          ]
+        }
+      ],
+      "menuPresentation": {
+        "main-menu-imported-nav-1lajsw8": {
+          "showHeading": false,
+          "icon": null,
+          "submenuLayout": "list",
+          "submenuColumns": 3,
+          "submenuStretch": "navbar",
+          "submenuLarge": false,
+          "submenuRemoveHorizontalPadding": false,
+          "submenuRemoveVerticalPadding": false,
+          "submenuWidth": null,
+          "mobileAccordion": true,
+          "badgeText": null
+        }
+      }
+    },
+    "headerDocument": {
+      "headerArchitectureVersion": 2,
+      "headerLayout": "simple",
+      "headerWidthMode": "boxed",
+      "maxWidth": "xlarge",
+      "headerBehavior": "sticky",
+      "headerMobileBreakpoint": "1200px",
+      "headerMobileLayout": "horizontal-right",
+      "headerMobileComposition": "separate",
+      "headerMobileBehavior": "sticky",
+      "headerMobileSearchPosition": "right",
+      "headerMobileSearchLayout": "input-dropdown",
+      "headerMobileSearchDropdownStretch": "navbar",
+      "headerMobileSearchDropdownLarge": true,
+      "headerMobileSearchIconPosition": "left",
+      "headerMobileSocialPosition": "hide",
+      "headerMobileSocialStyle": false,
+      "headerMobileSocialGap": "small",
+      "headerMobileSocialItems": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ],
+      "headerMobileDialogLayout": "modal-center",
+      "headerMobileDialogTogglePosition": "navbar-mobile:end",
+      "headerMobileDialogClose": true,
+      "headerMobileDialogMenuStyle": "default",
+      "headerMobileDialogCenter": true,
+      "headerMobileDialogPushAfter": 1,
+      "headerMobileOffcanvasMode": "slide",
+      "headerMobileOffcanvasFlip": true,
+      "headerMobileOffcanvasOverlay": true,
+      "headerMobileDialogDropbarAnimation": "reveal-top",
+      "headerDropdownAlign": "left",
+      "headerDropdownAlignToNavbar": false,
+      "headerSearchPosition": "hide",
+      "headerSearchLayout": "input-dropdown",
+      "headerSearchDropdownStretch": "navbar",
+      "headerSearchDropdownLarge": true,
+      "headerSearchIconPosition": "left",
+      "headerSocialPosition": "header-end",
+      "headerSocialStyle": false,
+      "headerSocialGap": "small",
+      "headerSocialItems": [
+        {
+          "link": "https://facebook.com/yootheme"
+        },
+        {
+          "link": "https://instagram.com/"
+        },
+        {
+          "link": "https://tripadvisor.com/"
+        }
+      ],
+      "headerDialogLayout": "offcanvas-top",
+      "headerDialogTogglePosition": "header-end",
+      "headerDialogMenuStyle": "default",
+      "headerOffcanvasMode": "slide",
+      "headerOffcanvasFlip": true,
+      "headerOffcanvasOverlay": true,
+      "headerMobileLogoUrl": "wp-content/uploads/yootheme/demo/logo-mobile.svg"
+    }
+  },
+  "capabilities": {
+    "global": [],
+    "page": [
+      "site.layout",
+      "site.boxed.alignment",
+      "theme.layout",
+      "theme.alignment",
+      "theme.colorMode"
+    ],
+    "header": [
+      "site.toolbar_width",
+      "site.toolbar_center",
+      "header.layout",
+      "header.width",
+      "header.search_layout",
+      "header.search_dropdown.stretch",
+      "header.search_dropdown.size",
+      "header.search_icon",
+      "header.social_gap",
+      "header.search",
+      "header.social_style",
+      "header.social",
+      "header.social_target",
+      "header.social_items",
+      "navbar.sticky",
+      "navbar.dropdown_align",
+      "navbar.offcanvas",
+      "navbar.dropbar",
+      "navbar.dropdown_boundary",
+      "navbar.style",
+      "mobile.breakpoint",
+      "mobile.header",
+      "mobile.navbar",
+      "mobile.dialog",
+      "mobile.search",
+      "mobile.offcanvas",
+      "dialog.layout",
+      "dialog.toggle",
+      "dialog.menu_style",
+      "dialog.offcanvas",
+      "headerDocument.headerArchitectureVersion",
+      "headerDocument.headerPresetKey",
+      "headerDocument.headerLayout",
+      "headerDocument.headerWidthMode",
+      "headerDocument.maxWidth",
+      "headerDocument.headerBehavior",
+      "headerDocument.headerMobileBreakpoint",
+      "headerDocument.headerMobileLayout",
+      "headerDocument.headerMobileComposition",
+      "headerDocument.headerMobileBehavior",
+      "headerDocument.headerMobileSearchPosition",
+      "headerDocument.headerMobileSearchLayout",
+      "headerDocument.headerMobileSearchDropdownStretch",
+      "headerDocument.headerMobileSearchDropdownLarge",
+      "headerDocument.headerMobileSearchIconPosition",
+      "headerDocument.headerMobileSocialPosition",
+      "headerDocument.headerMobileSocialStyle",
+      "headerDocument.headerMobileSocialGap",
+      "headerDocument.headerMobileSocialItems",
+      "headerDocument.headerMobileDialogLayout",
+      "headerDocument.headerMobileDialogTogglePosition",
+      "headerDocument.headerMobileDialogClose",
+      "headerDocument.headerMobileDialogMenuStyle",
+      "headerDocument.headerMobileDialogCenter",
+      "headerDocument.headerMobileDialogPushAfter",
+      "headerDocument.headerMobileOffcanvasMode",
+      "headerDocument.headerMobileOffcanvasFlip",
+      "headerDocument.headerMobileOffcanvasOverlay",
+      "headerDocument.headerMobileDialogDropbarAnimation",
+      "headerDocument.headerDropdownAlign",
+      "headerDocument.headerDropdownAlignToNavbar",
+      "headerDocument.headerSearchPosition",
+      "headerDocument.headerSearchLayout",
+      "headerDocument.headerSearchDropdownStretch",
+      "headerDocument.headerSearchDropdownLarge",
+      "headerDocument.headerSearchIconPosition",
+      "headerDocument.headerSocialPosition",
+      "headerDocument.headerSocialStyle",
+      "headerDocument.headerSocialGap",
+      "headerDocument.headerSocialItems",
+      "headerDocument.headerDialogLayout",
+      "headerDocument.headerDialogTogglePosition",
+      "headerDocument.headerDialogMenuStyle",
+      "headerDocument.headerOffcanvasMode",
+      "headerDocument.headerOffcanvasFlip",
+      "headerDocument.headerOffcanvasOverlay",
+      "headerDocument.headerMobileLogoUrl"
+    ]
+  },
+  "unsupported": [],
+  "updatedAt": "2026-10-02T08:02:39.302Z"
+}

@@ -40,17 +40,27 @@ export default function BuilderDocumentRuntime({ children }: { children: ReactNo
 
     // The document runtime is intentionally mounted once, while page changes
     // replace the rendered builder subtree beneath it. Remount the animation
-    // owner when imported animation nodes are replaced so parallax never keeps
-    // stale geometry or stale scroll-parent bindings from the previous page.
+    // owner when imported animation nodes or their parallax settings change,
+    // so edits never keep stale geometry or scroll-parent bindings.
     const contentObserver = new MutationObserver((records) => {
       if (records.some((record) =>
         Array.from(record.addedNodes).some(hasAnimationNodes) ||
-        Array.from(record.removedNodes).some(hasAnimationNodes),
+        Array.from(record.removedNodes).some(hasAnimationNodes) ||
+        (record.type === "attributes" && (
+          record.attributeName === "data-builder-parallax" ||
+          record.attributeName === "data-builder-parallax-background" ||
+          record.attributeName === "data-builder-parallax-y"
+        )),
       )) {
         setAnimationRuntimeVersion((version) => version + 1);
       }
     });
-    contentObserver.observe(document.body, { childList: true, subtree: true });
+    contentObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-builder-parallax", "data-builder-parallax-background", "data-builder-parallax-y"],
+    });
 
     return () => {
       cancelled = true;

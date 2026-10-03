@@ -24,6 +24,13 @@ const headerButtonHoverEffect = (
     ? value
     : undefined;
 
+const legacySocialGap = (value?: string): BuilderLayoutBlock["socialColumnGap"] =>
+  value === "collapse"
+    ? "none"
+    : value === "small" || value === "medium" || value === "default" || value === "large"
+      ? value
+      : "small";
+
 /** Pure, client-safe Header document resolver shared by Builder and storefront. */
 export function resolveHeaderBuilderComposition(
   layout: (Pick<BuilderLayout, "sections"> & Partial<Pick<BuilderLayout, "key">>) | null | undefined,
@@ -172,12 +179,37 @@ export function resolveHeaderBuilderComposition(
       utilityVariant: block.headerUtilityVariant,
       ...sharedElementFields(block),
     }];
+    if (block.kind === "social") return [{
+      id: blockIds.get(block) ?? `header-social-${blockIndex}`,
+      type: "social",
+      socialItems: block.socialItems,
+      socialStyle: block.socialStyle,
+      socialGrid: block.socialGrid,
+      socialGridBreakpoint: block.socialGridBreakpoint,
+      socialColumnGap: block.socialColumnGap,
+      socialRowGap: block.socialRowGap,
+      socialIconWidth: block.socialIconWidth,
+      socialImageWidth: block.socialImageWidth,
+      socialImageHeight: block.socialImageHeight,
+      socialImageLoading: block.socialImageLoading,
+      socialImageSvgInline: block.socialImageSvgInline,
+      socialLinkTarget: block.socialLinkTarget,
+      socialLinkAriaLabel: block.socialLinkAriaLabel,
+      ...sharedElementFields(block),
+    }];
+    // Read documents written by the earlier Header-only social element shape.
     if (block.kind === "headerSocial") return [{
       id: blockIds.get(block) ?? `header-social-${blockIndex}`,
       type: "social",
-      socialItems: block.headerSocialItems,
-      socialStyle: block.headerSocialStyle,
-      socialGap: block.headerSocialGap,
+      socialItems: block.headerSocialItems?.map((item, index) => ({
+        id: `${blockIds.get(block) ?? `header-social-${blockIndex}`}-${index}`,
+        link: item.link,
+      })),
+      socialStyle: block.headerSocialStyle ? "button" : "icon",
+      socialColumnGap: legacySocialGap(block.headerSocialGap),
+      socialRowGap: legacySocialGap(block.headerSocialGap),
+      socialGrid: "horizontal",
+      socialGridBreakpoint: "always",
       ...sharedElementFields(block),
     }];
     if (block.id === "header-categories" || block.kind === "headerCategories") return [{
@@ -282,6 +314,7 @@ export function resolveHeaderBuilderComposition(
     documentLayout: section?.headerLayout,
     documentBehavior: section?.headerBehavior,
     documentWidthMode: section?.headerWidthMode,
+    documentMaxWidth: section?.maxWidth,
     documentBackgroundMode: section?.headerBackgroundMode,
     documentTextMode: section?.headerTextMode,
     documentBreakpoint: section?.headerBreakpoint,

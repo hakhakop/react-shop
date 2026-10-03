@@ -25,3 +25,11 @@ test("the refresh boundary does not special-case structural mutation types", asy
   expect(refreshEffect).toContain("authoredRevisionSignature");
 });
 
+test("a remounted iframe draft receiver always receives a fresh snapshot", async () => {
+  const source = await readFile(path.join(process.cwd(), "components/dashboard/DashboardBuilder.tsx"), "utf8");
+  const readyHandlerStart = source.indexOf("event.data.type === BUILDER_IFRAME_DRAFT_READY_MESSAGE");
+  const readyHandlerEnd = source.indexOf("event.data.type === BUILDER_IFRAME_DRAFT_ACK_MESSAGE", readyHandlerStart);
+  const readyHandler = source.slice(readyHandlerStart, readyHandlerEnd);
+
+  expect(readyHandler).toContain("postIframeDraftSnapshot(readyState, true)");
+});

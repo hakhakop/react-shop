@@ -76,6 +76,10 @@ const responsiveColumnWidthOptions = [
   { value: "5/6", label: "5/6" },
   { value: "auto", label: "Auto" },
   { value: "expand", label: "Expand" },
+  { value: "small", label: "Small (fixed)" },
+  { value: "medium", label: "Medium (fixed)" },
+  { value: "large", label: "Large (fixed)" },
+  { value: "xlarge", label: "X-Large (fixed)" },
 ] as const;
 
 const responsiveWidthFields = [

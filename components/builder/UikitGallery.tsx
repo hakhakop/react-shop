@@ -83,6 +83,7 @@ export default function UikitGallery({ block }: Props) {
       id: item.id || String(idx),
       imageUrl: sourceImageUrl || (isYoothemeGallery ? "" : DEFAULT_GALLERY_ITEMS[idx % 3].imageUrl),
       imageAlt: item.imageAlt || item.alt || item.title || "",
+      hoverImageUrl: item.hoverImageUrl || item.image_hover || item.hover_image || "",
       hoverVideoUrl: item.hoverVideoUrl || "",
       title: item.title || "",
       meta: item.meta || "",
@@ -108,6 +109,7 @@ export default function UikitGallery({ block }: Props) {
   const showMeta = rawBlock.gridShowMeta !== false;
   const showContent = rawBlock.gridShowText !== false;
   const showLink = rawBlock.gridShowButton !== false;
+  const showHoverImage = rawBlock.gridShowHoverImage === true;
   const showHoverVideo = rawBlock.gridShowHoverVideo === true;
 
   // React Lightbox Modal state
@@ -315,10 +317,13 @@ export default function UikitGallery({ block }: Props) {
                         height={isYoothemeGallery ? importedIntrinsicDimensions?.height : undefined}
                         {...imageAttributes}
                         style={{
-                          width: isYoothemeGallery ? "auto" : "100%",
+                          // YOOtheme's image_width controls the generated source
+                          // size, not a cap on the rendered Gallery tile. Stretch
+                          // the media across each responsive grid cell.
+                          width: "100%",
                           maxWidth: isYoothemeGallery ? "100%" : undefined,
                           height: isYoothemeGallery ? "auto" : imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
-                          objectFit: isYoothemeGallery ? undefined : imageStyle.objectFit,
+                          objectFit: isYoothemeGallery ? "cover" : imageStyle.objectFit,
                           display: "block",
                           ...(!isYoothemeGallery && imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
                         }}
@@ -331,6 +336,16 @@ export default function UikitGallery({ block }: Props) {
                           e.currentTarget.src = DEFAULT_GALLERY_ITEMS[index % 3].imageUrl;
                         }}
                       />
+                      {showHoverImage && item.hoverImageUrl ? (
+                        <img
+                          src={item.hoverImageUrl}
+                          alt=""
+                          aria-hidden="true"
+                          className="shop-builder-gallery-hover-image uk-position-cover uk-transition-fade"
+                          loading="lazy"
+                          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+                        />
+                      ) : null}
                       {showHoverVideo && item.hoverVideoUrl ? (
                         <video
                           className="shop-builder-gallery-hover-video uk-position-cover uk-transition-fade"
@@ -367,7 +382,7 @@ export default function UikitGallery({ block }: Props) {
                       overlayPosition independently positions its content panel. */}
                   {(showMeta || showTitle || showContent || showLink) && (
                     <div
-                      style={isYoothemeGallery ? { ...overlayThemeStyle, ...(hasOverlayLink ? { zIndex: 3, pointerEvents: "none" as const } : {}) } : {
+                      style={isYoothemeGallery ? { ...overlayThemeStyle, ...(hasOverlayLink ? { pointerEvents: "none" as const } : {}) } : {
                         position: "absolute", inset: 0, padding: "20px", color: "#ffffff", borderRadius: "12px",
                         background: "linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)",
                         display: "flex", flexDirection: "column", justifyContent: "flex-end", textAlign: titleAlign,
@@ -379,7 +394,8 @@ export default function UikitGallery({ block }: Props) {
                     >
                     <div className={isYoothemeGallery
                       ? `${overlayMode === "cover" ? `${overlayPositionClass} ${overlayMarginClass}` : ""} uk-overlay ${overlayPaddingClass} uk-margin-remove-first-child`.trim()
-                      : ""}>
+                      : ""}
+                      style={isYoothemeGallery ? { zIndex: 2 } : undefined}>
                       {showMeta && item.meta && rawBlock.panelMetaPosition !== "below-title" && (
                         <div
                           className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}

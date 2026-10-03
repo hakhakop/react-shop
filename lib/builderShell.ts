@@ -71,6 +71,7 @@ export type ReactMenuItem = {
   visibility?: "all" | "desktop" | "mobile";
   /** Stable cross-install identity used by versioned navigation packages. */
   portableKey?: string;
+  sourceMenuItemDatabaseId?: number;
   /** Structured portable target; rendering intentionally continues to use url. */
   navigationTarget?: import("@/lib/navigationPackage").PortableNavigationTarget;
 };
@@ -204,6 +205,7 @@ export type BuilderShellSettings = {
   backgroundMuted?: string;
   backgroundPrimary?: string;
   backgroundSecondary?: string;
+  tileSecondaryBackground?: string;
   /** UIkit section color modes are global semantic context tokens. */
   sectionDefaultColorMode?: "light" | "dark";
   sectionMutedColorMode?: "light" | "dark";
@@ -552,7 +554,11 @@ export type BuilderShellSettings = {
   navbarItemPaddingHorizontal?: string;
   navbarItemPaddingHorizontalMedium?: string;
   navbarBackdropFilter?: string;
+  /** YOOtheme's authored base color mode for the navbar; UIkit defaults to dark. */
+  navbarColorMode?: "light" | "dark" | string;
   navbarMode?: string;
+  /** Identifies YOOtheme navbar modes while preserving legacy tenant behavior. */
+  navbarBorderSemantics?: "yootheme";
   /** UIkit Navbar vertical divider mode: none, partial, or all. */
   navbarModeBorderVertical?: "none" | "partial" | "all" | string;
   navbarBorderWidth?: string;
@@ -703,8 +709,16 @@ export type BuilderShellSettings = {
   offcanvasOverlayBackground?: string;
   /** Canonical UIkit Logo presentation tokens. */
   logoFontSize?: string;
+  logoFontWeight?: string;
+  inverseNavbarBorder?: string;
+  inverseNavbarItemColor?: string;
+  inverseNavbarToggleColor?: string;
+  inverseNavbarToggleHoverColor?: string;
   logoTextTransform?: string;
+  inverseNavbarNavItemColor?: string;
   inverseNavbarNavItemHoverColor?: string;
+  inverseNavbarNavItemOnclickColor?: string;
+  inverseNavbarNavItemActiveColor?: string;
   /** Canonical UIkit/YOOtheme Alert presentation tokens. */
   alertBackground?: string;
   alertColor?: string;
@@ -781,6 +795,8 @@ export type BuilderShellSettings = {
   buttonSecondaryGlowFilter?: string;
   buttonSecondaryHoverGlowFilter?: string;
   themeBoxDecorationBorderRadius?: string;
+  themeBoxDecorationDefaultBorder?: string;
+  inverseThemeBoxDecorationDefaultBorder?: string;
   themeBoxDecorationDefaultGradient?: string;
   themeBoxDecorationPrimaryGlowFilter?: string;
   themeBoxDecorationPrimaryGlowGradient?: string;
@@ -1700,6 +1716,7 @@ function normalizeMenuItems(
         target: raw.target === "_blank" ? "_blank" : "_self",
         visibility,
         portableKey: typeof raw.portableKey === "string" ? raw.portableKey.trim() || undefined : undefined,
+        sourceMenuItemDatabaseId: typeof raw.sourceMenuItemDatabaseId === "number" && Number.isInteger(raw.sourceMenuItemDatabaseId) && raw.sourceMenuItemDatabaseId > 0 ? raw.sourceMenuItemDatabaseId : undefined,
         dropdownContent: normalizeMenuDropdown(raw.dropdownContent),
         navigationTarget:
           raw.navigationTarget && typeof raw.navigationTarget === "object" && !Array.isArray(raw.navigationTarget)

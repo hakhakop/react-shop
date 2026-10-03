@@ -549,14 +549,14 @@ export default function BuilderIframeSelectionBridge({
     body:has(style[data-builder-canvas-stable]) {
       overflow-x: clip !important;
     }
-    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"] {
+    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"]:not([data-overlap-header="true"]) {
       position: sticky !important;
       top: 0 !important;
       transform: none !important;
       visibility: visible !important;
       pointer-events: auto !important;
     }
-    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"].site-header--scroll-hidden {
+    html:has(style[data-builder-canvas-stable]) .site-header[data-builder-preview="true"].site-header--scroll-hidden:not([data-overlap-header="true"]) {
       position: sticky !important;
       top: 0 !important;
       transform: translateY(-110%) !important;

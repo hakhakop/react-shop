@@ -305,6 +305,7 @@ import { updateCanonicalBuilderColumn } from "@/lib/builderColumnEditing";
 import {
   builderLayoutKeys,
   getLayoutBlockKindsForState,
+  headerLayoutBlockKinds,
   layoutBlockLabels,
   layoutLabels,
   sectionLabels,
@@ -418,6 +419,7 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import { resolveSavedTemplateForApply } from "@/lib/builderTemplateImportReplay";
 import { menuDropdownFromSection, normalizeMenuDropdown } from "@/lib/menuDropdownLayout";
 import type { EmbeddedBuilderImportDestination } from "./EmbeddedBuilderHost";
 import {
@@ -2225,20 +2227,23 @@ function createProductDynamicBlock(
 function loadDraftForKey(
   key: BuilderLayoutKey,
   storageKeys: BuilderStorageKeys = defaultBuilderStorageKeys,
+  wordpressMediaOrigin?: string | null,
 ): BuilderState {
-  if (typeof window === "undefined") return getDefaultStateForKey(key);
+  const resolveMedia = (state: BuilderState) =>
+    resolveBuilderMediaUrls(state, wordpressMediaOrigin);
+  if (typeof window === "undefined") return resolveMedia(getDefaultStateForKey(key));
 
   try {
     const raw = window.localStorage.getItem(storageKeys.drafts);
-    if (!raw) return getDefaultStateForKey(key);
+    if (!raw) return resolveMedia(getDefaultStateForKey(key));
     const drafts = JSON.parse(raw) as Partial<
       Record<BuilderLayoutKey, BuilderState>
     >;
     const draft = drafts[key];
-    if (!draft?.sections?.length) return getDefaultStateForKey(key);
-    return normalizeBuilderState(draft, key);
+    if (!draft?.sections?.length) return resolveMedia(getDefaultStateForKey(key));
+    return resolveMedia(normalizeBuilderState(draft, key));
   } catch {
-    return getDefaultStateForKey(key);
+    return resolveMedia(getDefaultStateForKey(key));
   }
 }
 
@@ -2695,7 +2700,7 @@ export default function DashboardBuilder({
     initialPublishedState ?? (
       initialRequestedPage
         ? hydrateDocumentBuilderState(
-            loadDraftForKey(initialRequestedPage, storageKeys),
+            loadDraftForKey(initialRequestedPage, storageKeys, wordpressMediaOrigin),
             defaultShellSettings,
           )
         : defaultState
@@ -3259,7 +3264,6 @@ export default function DashboardBuilder({
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const [themeSettings, setThemeSettings] = useState<BuilderThemeSettings>(defaultBuilderThemeSettings);
-  const [themePreviewRevision, setThemePreviewRevision] = useState(0);
   // Tenant tokens belong to explicit Builder/preview roots, never <html>.
   // A stylesheet keeps the DOM readable and lets portalled tenant surfaces
   // opt in without leaking one site's theme into the application shell.
@@ -3371,9 +3375,7 @@ export default function DashboardBuilder({
   const [savedTemplates, setSavedTemplates] = useState<BuilderSavedTemplate[]>(
     [],
   );
-  const [templateStatus, setTemplateStatus] = useState(
-    "Templates save to React",
-  );
+  const [templateStatus, setTemplateStatus] = useState("");
   const [yoothemeImportWarnings, setYoothemeImportWarnings] = useState<string[]>([]);
   const [yoothemeImportPreview, setYoothemeImportPreview] = useState<{
     applyBlocked?: boolean;
@@ -3569,9 +3571,9 @@ export default function DashboardBuilder({
   const headerContextState = useMemo(
     () =>
       builderState.page === "header" || builderState.page === "footer"
-        ? shellPageContextState ?? pageContextStateRef.current ?? loadDraftForKey(headerContextKey, storageKeys)
+        ? shellPageContextState ?? pageContextStateRef.current ?? loadDraftForKey(headerContextKey, storageKeys, wordpressMediaOrigin)
         : builderState,
-    [builderState, headerContextKey, shellPageContextState, storageKeys],
+    [builderState, headerContextKey, shellPageContextState, storageKeys, wordpressMediaOrigin],
   );
   const shellContextPreviewRequestRef = useRef(0);
   const [shellContextRenderProjection, setShellContextRenderProjection] = useState<{
@@ -3631,7 +3633,14 @@ export default function DashboardBuilder({
       : headerContextState.sections;
     return {
       ...headerContextState,
-      sections: resolveContentSections(sections, contentLanguage, primaryContentLanguage),
+      // Header/Footer editing renders a page document as its locked context.
+      // Project imported WordPress paths through the active website exactly as
+      // the normal page draft bridge does; otherwise entering shell editing
+      // can restore the source site's media URLs into the canvas.
+      sections: resolveBuilderMediaUrls(
+        resolveContentSections(sections, contentLanguage, primaryContentLanguage),
+        wordpressMediaOrigin,
+      ),
     };
   }, [
     contentLanguage,
@@ -3639,6 +3648,7 @@ export default function DashboardBuilder({
     primaryContentLanguage,
     shellContextDynamicSignature,
     shellContextRenderProjection,
+    wordpressMediaOrigin,
   ]);
   const iframeComparisonPage = useMemo(() => {
     return builderEditorContext?.content.mode === "preview"
@@ -3686,7 +3696,6 @@ export default function DashboardBuilder({
     if (iframeComparisonPage === "product-category" && (categorySlug || candidateCategorySlug)) {
       params.set("category", categorySlug || candidateCategorySlug!);
     }
-    if (themePreviewRevision > 0) params.set("themeRevision", String(themePreviewRevision));
     if (!websiteId) {
       params.set("builderFrame", "selection");
       params.set("builderBridge", iframeDiagnosticMode);
@@ -3716,7 +3725,6 @@ export default function DashboardBuilder({
     templatePreviewCandidates,
     templatePreviewIdentity,
     iframeDiagnosticMode,
-    themePreviewRevision,
     websiteId,
     websiteRouteSegment,
   ]);
@@ -3834,8 +3842,8 @@ export default function DashboardBuilder({
   const footerDocumentState = useMemo(
     () => builderState.page === "footer"
       ? builderState
-      : footerDocumentPreviewState ?? hydrateDocumentBuilderState(loadDraftForKey("footer", storageKeys), shellSettings),
-    [builderState, footerDocumentPreviewState, shellSettings, storageKeys],
+      : footerDocumentPreviewState ?? hydrateDocumentBuilderState(loadDraftForKey("footer", storageKeys, wordpressMediaOrigin), shellSettings),
+    [builderState, footerDocumentPreviewState, shellSettings, storageKeys, wordpressMediaOrigin],
   );
   const footerDocumentSections = useMemo(
     () => resolveContentSections(
@@ -4320,7 +4328,7 @@ export default function DashboardBuilder({
   const availableLayoutBlockKinds = useMemo(
     () =>
       builderState.page === "header"
-        ? (["image", "menu", "button", "embed", "headerSearch", "headerWishlist", "headerCart", "headerAccount", "headerTheme", "headerCategories", "headerLanguage"] as LayoutBlockKind[])
+        ? headerLayoutBlockKinds
         : getLayoutBlockKindsForState(),
     [builderState.page],
   );
@@ -4522,7 +4530,7 @@ export default function DashboardBuilder({
     }
     const localDraft = initialRequestedPage
       ? hydrateDocumentBuilderState(
-          loadDraftForKey(initialRequestedPage, storageKeys),
+          loadDraftForKey(initialRequestedPage, storageKeys, wordpressMediaOrigin),
           shellSettings,
         )
       : hydrateDocumentBuilderState(
@@ -5018,7 +5026,7 @@ export default function DashboardBuilder({
     if (nextKey === builderState.page) return;
     setPublishedDocumentReady(false);
     const nextState = hydrateDocumentBuilderState(
-      loadDraftForKey(nextKey, storageKeys),
+      loadDraftForKey(nextKey, storageKeys, wordpressMediaOrigin),
       shellSettings,
     );
     setBuilderState(nextState);
@@ -5037,6 +5045,7 @@ export default function DashboardBuilder({
     searchParams,
     storageKeys,
     websiteId,
+    wordpressMediaOrigin,
   ]);
 
   useEffect(() => {
@@ -5397,7 +5406,11 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     const requestedPage = searchParams.get("page") ?? searchParams.get("template");
-    if (!draftReady || requestedPage !== "footer") return;
+    if (!draftReady) return;
+    if (requestedPage !== "footer") {
+      footerRouteHydrationRef.current = null;
+      return;
+    }
 
     const routeIdentity = `${websiteId ?? "root"}:footer:${searchParams.toString()}`;
     if (footerRouteHydrationRef.current === routeIdentity) return;
@@ -5407,47 +5420,86 @@ export default function DashboardBuilder({
     }
     footerRouteHydrationRef.current = routeIdentity;
 
+    // Treat a direct Footer route as an editing entry immediately, including
+    // when this site has no published Footer yet. Without this, the route can
+    // show the locked page context while the Footer document controls remain
+    // inactive (the navigation-button path sets these flags separately).
+    setHeaderSelected(false);
+    setFooterSelected(true);
+    setInspectorTab("layout");
+    setSectionSettingsOpen(true);
+    setSidebarCollapsed(false);
+    setSidebarTab("builder");
+
     let cancelled = false;
     void (async () => {
       try {
         const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "footer" }), {
           cache: "no-store",
         });
-        if (!response.ok || cancelled) return;
+        if (cancelled) return;
         const payload = (await response.json()) as { layout?: BuilderState | null };
-        if (cancelled || !payload.layout?.sections?.length) return;
-        const nextState = hydrateDocumentBuilderState(
-          normalizeBuilderState({
-            page: "footer",
-            targetType: "footer",
-            documentId: payload.layout.documentId,
-            displayName: payload.layout.displayName,
-            design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
-            sections: payload.layout.sections,
-          }, "footer"),
-          shellSettings,
-        );
+        if (cancelled) return;
+        const nextState = response.ok && payload.layout?.sections?.length
+          ? hydrateDocumentBuilderState(
+              normalizeBuilderState({
+                page: "footer",
+                targetType: "footer",
+                documentId: payload.layout.documentId,
+                displayName: payload.layout.displayName,
+                design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
+                sections: payload.layout.sections,
+              }, "footer"),
+              shellSettings,
+            )
+          : hydrateDocumentBuilderState(loadDraftForKey("footer", storageKeys, wordpressMediaOrigin), shellSettings);
         setFooterDocumentPreviewState(nextState);
         setBuilderState(nextState);
         undoHistoryRef.current = [structuredClone(nextState)];
         setCommittedBuilderStateSignature(JSON.stringify(nextState));
         setPublishedDocumentReady(true);
-        setSelectedId(nextState.sections[0]?.id ?? "");
+        const footerRootId = nextState.sections[0]?.id ?? "footer-document";
+        setSelectedId(footerRootId);
         setSelectedLayoutColumnKey(null);
         setSelectedLayoutBlockKey(null);
         setOpenLayoutItemId(null);
-        removeBuilderDraft(storageKeys, "footer");
-        restoredDraftKeysRef.current.delete("footer");
-        delete draftMetadataRef.current.footer;
+        // A direct `?page=footer` entry must establish the same editable
+        // document-root selection as entering Footer from the Builder UI.
+        // Otherwise the document loads, but Footer-specific inspector state
+        // stays unset until the user finds and clicks the in-canvas toolbar.
+        setHeaderSelected(false);
+        setFooterSelected(true);
+        setInspectorTab("layout");
+        setSectionSettingsOpen(true);
+        setSidebarCollapsed(false);
+        setSidebarTab("builder");
+        if (response.ok && payload.layout?.sections?.length) {
+          removeBuilderDraft(storageKeys, "footer");
+          restoredDraftKeysRef.current.delete("footer");
+          delete draftMetadataRef.current.footer;
+        }
       } catch {
-        // Keep the current state if the persisted Footer cannot be read.
+        if (cancelled) return;
+        // A missing published Footer is still an editable document. Fall back
+        // to the local/starter draft instead of leaving the route in context
+        // preview mode with no active Footer target.
+        const nextState = hydrateDocumentBuilderState(loadDraftForKey("footer", storageKeys, wordpressMediaOrigin), shellSettings);
+        setFooterDocumentPreviewState(nextState);
+        setBuilderState(nextState);
+        undoHistoryRef.current = [structuredClone(nextState)];
+        setCommittedBuilderStateSignature(JSON.stringify(nextState));
+        setPublishedDocumentReady(true);
+        setSelectedId(nextState.sections[0]?.id ?? "footer-document");
+        setSelectedLayoutColumnKey(null);
+        setSelectedLayoutBlockKey(null);
+        setOpenLayoutItemId(null);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [activeShellEntry, builderApiUrl, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
+  }, [activeShellEntry, builderApiUrl, builderState.page, draftReady, searchParams, shellSettings, storageKeys, websiteId]);
 
   const loadFooterDocumentPreview = useCallback(async () => {
     if (footerDocumentPreviewState) return footerDocumentPreviewState;
@@ -5580,7 +5632,7 @@ export default function DashboardBuilder({
     setTemplatePreviewCandidates([]);
     setTemplatePreviewIdentity(null);
     const nextState = options.state ?? hydrateDocumentBuilderState(
-      loadDraftForKey(nextKey, storageKeys),
+      loadDraftForKey(nextKey, storageKeys, wordpressMediaOrigin),
       shellSettings,
     );
     undoHistoryRef.current = [structuredClone(nextState)];
@@ -5607,7 +5659,7 @@ export default function DashboardBuilder({
 
   const switchBuilderTargetFromNavigation = useCallback(async (nextKey: BuilderLayoutKey) => {
     const localState = hydrateDocumentBuilderState(
-      loadDraftForKey(nextKey, storageKeys),
+      loadDraftForKey(nextKey, storageKeys, wordpressMediaOrigin),
       shellSettings,
     );
     // `loadDraftForKey` intentionally returns a one-section starter document
@@ -5639,7 +5691,7 @@ export default function DashboardBuilder({
       // published document cannot be loaded.
     }
     switchBuilderTarget(nextKey, { state: localState });
-  }, [builderApiUrl, shellSettings, storageKeys, switchBuilderTarget]);
+  }, [builderApiUrl, shellSettings, storageKeys, switchBuilderTarget, wordpressMediaOrigin]);
 
   const updateSelected = (patch: Partial<BuilderSection>) => {
     setBuilderState((current) => ({
@@ -6429,7 +6481,7 @@ export default function DashboardBuilder({
 
     const rootId =
       builderState.sections[0]?.id ??
-      loadDraftForKey(shellType === "header" ? activeHeaderDocumentKey : shellType, storageKeys).sections[0]?.id ??
+      loadDraftForKey(shellType === "header" ? activeHeaderDocumentKey : shellType, storageKeys, wordpressMediaOrigin).sections[0]?.id ??
       (shellType === "header" ? activeHeaderDocumentSectionId : "footer-document");
     selectSection(rootId, shouldOpenInspector);
     setHeaderSelected(shellType === "header");
@@ -6717,7 +6769,13 @@ export default function DashboardBuilder({
           event.data.documentKey === readyDocumentKey
         ) {
           iframeDraftReceiverReadyRef.current = true;
-          postIframeDraftSnapshot(readyState);
+          // StorefrontBuilderRenderer resets its local live draft whenever
+          // this receiver-ready effect mounts. A remount can happen during
+          // Fast Refresh while the iframe itself stays loaded, so the last
+          // revision may already be acknowledged even though the new
+          // receiver has no draft. READY is an explicit request for a fresh
+          // snapshot and must bypass the parent's delivery dedupe.
+          postIframeDraftSnapshot(readyState, true);
         } else if (event.data.type === BUILDER_IFRAME_DRAFT_ACK_MESSAGE) {
           const revision = Number(event.data.revision);
           if (Number.isFinite(revision)) {
@@ -6918,7 +6976,7 @@ export default function DashboardBuilder({
       shellType === "header"
         ? activeHeaderDocumentPreviewState ?? activeHeaderDocumentFallbackState
         : hydrateDocumentBuilderState(
-            loadDraftForKey(shellType, storageKeys),
+            loadDraftForKey(shellType, storageKeys, wordpressMediaOrigin),
             shellSettings,
           )
     );
@@ -8278,6 +8336,8 @@ export default function DashboardBuilder({
           buttonLabel: shellSettings.headerButtonLabel,
           buttonUrl: shellSettings.headerButtonUrl,
         },
+        // Reuse the canonical Builder Social block and defaults in Header.
+        social: { ...createLayoutBlock("social"), id: "header-social" },
         embed: {
           id: "header-spacer",
           kind: "embed",
@@ -9995,10 +10055,6 @@ export default function DashboardBuilder({
           body: JSON.stringify(nextThemeSettings),
         }).then((response) => {
           if (!response.ok) throw new Error("Theme settings autosave failed");
-          // The preview is an isolated server-rendered document. Bump its
-          // identity after persistence so semantic token edits, including
-          // Navbar → Nav Item height, are read by the Header renderer.
-          setThemePreviewRevision((revision) => revision + 1);
         }).catch(() => {
           setShellStatus("Theme settings autosave failed");
         });
@@ -10063,10 +10119,6 @@ export default function DashboardBuilder({
     setThemeSettings(nextThemeSettings);
     const saved = await saveBuilderThemeSettings(nextThemeSettings);
     if (!saved) return;
-    // WebsiteFrontend reads Theme Settings on the server. Change the iframe
-    // identity after the persisted import so the preview cannot keep the old
-    // page shell/Header projection in its isolated document.
-    setThemePreviewRevision((revision) => revision + 1);
 
     if (Object.keys(nextThemeSettings.resolved.shellSettings).length) {
       // Materialize the resolved provider projection in the WebPages shell
@@ -10521,11 +10573,13 @@ export default function DashboardBuilder({
     templateType,
     sections,
     design,
+    sourceImport,
   }: {
     title: string;
     templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
     sections: BuilderSection[];
     design?: BuilderDesign;
+    sourceImport?: BuilderSavedTemplate["sourceImport"];
   }) => {
     const pageTitle = getLayoutLabel(builderState.page, customPages);
     setTemplateStatus("Saving template...");
@@ -10552,6 +10606,7 @@ export default function DashboardBuilder({
                 : `Element template saved from ${pageTitle}`,
         sourcePage: builderState.page,
         design,
+        sourceImport,
         sections,
       }),
     });
@@ -10700,9 +10755,10 @@ export default function DashboardBuilder({
       .flatMap((column) => column.elements ?? [])[0];
 
   const applySavedTemplate = (
-    template: BuilderSavedTemplate,
+    sourceTemplate: BuilderSavedTemplate,
     options: { confirmReplace?: boolean } = {},
   ) => {
+    const template = resolveSavedTemplateForApply(sourceTemplate);
     const templateType = template.templateType ?? "page";
     if (options.confirmReplace !== false && templateType === "page" && builderState.sections.length > 0 &&
       !window.confirm(`Replace the current layout with “${template.title}”?`)) {
@@ -10927,7 +10983,10 @@ export default function DashboardBuilder({
     targetSectionId: string,
     placement: "above" | "below" | "replace",
   ) => {
-    const template = getSavedTemplateById(templateId);
+    const storedTemplate = getSavedTemplateById(templateId);
+    const template = storedTemplate
+      ? resolveSavedTemplateForApply(storedTemplate)
+      : undefined;
     const templateType = template?.templateType ?? "page";
     if (
       !template ||
@@ -10976,7 +11035,10 @@ export default function DashboardBuilder({
     placement: "before" | "after" | "replace",
     revealInspector = true,
   ) => {
-    const template = getSavedTemplateById(templateId);
+    const storedTemplate = getSavedTemplateById(templateId);
+    const template = storedTemplate
+      ? resolveSavedTemplateForApply(storedTemplate)
+      : undefined;
     if (!template || template.templateType !== "row") {
       setTemplateStatus("Drop row templates on row borders");
       return false;
@@ -11051,7 +11113,10 @@ export default function DashboardBuilder({
     placement?: "above" | "below" | "replace";
     revealInspector?: boolean;
   }) => {
-    const template = getSavedTemplateById(templateId);
+    const storedTemplate = getSavedTemplateById(templateId);
+    const template = storedTemplate
+      ? resolveSavedTemplateForApply(storedTemplate)
+      : undefined;
     if (!template || template.templateType !== "element") {
       setTemplateStatus("Drop element templates into columns");
       return false;
@@ -11554,6 +11619,11 @@ export default function DashboardBuilder({
           description: importedTemplate.description,
           sourcePage: importedTemplate.sourcePage,
           design: importedTemplate.design,
+          sourceImport: importedTemplate.sourceImport ?? {
+            format: "webpages-builder-json",
+            version: 1,
+            payload: parsed,
+          },
           sections: importedTemplate.sections,
         }),
       });
@@ -11686,7 +11756,7 @@ export default function DashboardBuilder({
         const currentHeaderState = builderStateRef.current.page === "header"
           ? builderStateRef.current
           : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
-              loadDraftForKey("header", storageKeys),
+              loadDraftForKey("header", storageKeys, wordpressMediaOrigin),
               shellSettings,
             );
         sections = materializeImportedHeaderDocument(
@@ -11712,6 +11782,12 @@ export default function DashboardBuilder({
         title,
         templateType: targetType,
         sections,
+        sourceImport: {
+          format: "yootheme-json",
+          version: 1,
+          mapperVersion: 1,
+          payload: parsed,
+        },
       });
       if (!savedTemplate) return false;
       setYoothemeImportWarnings(mapping.reportWarnings);
@@ -11776,7 +11852,7 @@ export default function DashboardBuilder({
         const currentHeaderState = builderStateRef.current.page === "header"
           ? builderStateRef.current
           : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
-          loadDraftForKey("header", storageKeys),
+          loadDraftForKey("header", storageKeys, wordpressMediaOrigin),
           shellSettings,
         );
         const nextHeaderState = materializeImportedHeaderDocument(currentHeaderState, patch);
@@ -11805,12 +11881,12 @@ export default function DashboardBuilder({
 
     const targetState = yoothemeImportPreview.targetPage === "footer"
       ? footerDocumentPreviewState ?? hydrateDocumentBuilderState(
-          loadDraftForKey("footer", storageKeys),
+          loadDraftForKey("footer", storageKeys, wordpressMediaOrigin),
           shellSettings,
         )
       : yoothemeImportPreview.targetPage === "header"
         ? headerDocumentPreviewState ?? hydrateDocumentBuilderState(
-            loadDraftForKey("header", storageKeys),
+            loadDraftForKey("header", storageKeys, wordpressMediaOrigin),
             shellSettings,
           )
         : builderStateRef.current;
@@ -11877,7 +11953,7 @@ export default function DashboardBuilder({
       const currentHeaderState = builderStateRef.current.page === "header"
         ? builderStateRef.current
         : headerDocumentPreviewState ?? hydrateDocumentBuilderState(
-        loadDraftForKey("header", storageKeys),
+        loadDraftForKey("header", storageKeys, wordpressMediaOrigin),
         shellSettings,
         );
       const nextHeaderState = materializeImportedHeaderDocument(currentHeaderState, patch);
@@ -13995,8 +14071,8 @@ export default function DashboardBuilder({
       <div className="builder-layout-dialog">
         <div className="builder-layout-header">
           <div>
-            <strong id="builder-contextual-library-title">Library</strong>
-            <span>Select a saved composition, then insert it into the current Structure selection.</span>
+            <strong id="builder-contextual-library-title">My Layouts</strong>
+            <span>Select a layout and choose how to insert it.</span>
           </div>
           <button
             type="button"
@@ -14017,9 +14093,12 @@ export default function DashboardBuilder({
             availableLibraryTypes={contextualLibraryTypes}
             libraryGroups={contextualLibraryGroups}
             savedTemplates={savedTemplates}
-            siteLibraryEnabled={Boolean(websiteId)}
             templateStatus={templateStatus}
             onLibraryTypeChange={setContextualLibraryType}
+            onSaveCurrent={(title) => saveTemplate(
+              builderState.page === "header" ? "header" : builderState.page === "footer" ? "footer" : "page",
+              title,
+            )}
             onApply={applySavedTemplate}
             onExport={exportSavedTemplate}
             onImport={importSavedTemplate}
@@ -19772,7 +19851,7 @@ const PreviewSection = memo(function PreviewSection({
             ? getUikitContainerClass(resolveUikitSectionContainerPreset(
                 section.maxWidth,
                 section.contentMode,
-              ))
+              ), section.expandOneSide)
             : ""
         } builder-preview-content-layout`}
       >
@@ -20245,9 +20324,9 @@ const PreviewSection = memo(function PreviewSection({
                   )}
 
                   <div
-                    className={`shop-builder-column-content${
+                    className={`shop-builder-column-content ${structuralColumn.surfaceClassName}${
                       structuralColumn.column.background?.videoUrl
-                        ? " shop-builder-column-content--media-sticky uk-tile uk-position-z-index"
+                        ? " shop-builder-column-content--media-sticky uk-position-z-index"
                         : ""
                     }${
                       structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
@@ -20257,6 +20336,7 @@ const PreviewSection = memo(function PreviewSection({
                           : ""
                     }`}
                     data-uk-sticky={structuralColumn.stickyDeclaration}
+                    style={structuralColumn.surfaceStyle}
                   >
                     {structuralColumn.column.background?.videoUrl ? (
                       <BuilderBackgroundVideo

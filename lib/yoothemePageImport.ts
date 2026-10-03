@@ -573,6 +573,8 @@ const sourceGeneralVisualStyle = (
   const left = sourcePositionValue(props.position_left);
   const zIndex = sourceZIndex(props.position_z_index);
   const marginMode = sourceMargin(props.margin);
+  const marginTopMode = sourceMargin(props.margin_top);
+  const marginBottomMode = sourceMargin(props.margin_bottom);
   const maxWidth = asString(props.maxwidth);
   const maxWidthBreakpoint = sourceBreakpoint(props.maxwidth_breakpoint);
   const blockAlign = sourceAlignment(props.block_align);
@@ -588,7 +590,7 @@ const sourceGeneralVisualStyle = (
   const customAttributes = asString(props.attributes) ?? asString(props.attrs);
   const customCss = asString(props.css);
 
-  if (!position && !top && !right && !bottom && !left && zIndex === undefined && !marginMode && !maxWidth && !blockAlign && !textAlign && !visibilityMode && !animation && !blendWithPage && !customClass && !customAttributes && !customCss && !props.margin_remove_top && !props.margin_remove_bottom) {
+  if (!position && !top && !right && !bottom && !left && zIndex === undefined && !marginMode && !marginTopMode && !marginBottomMode && !maxWidth && !blockAlign && !textAlign && !visibilityMode && !animation && !blendWithPage && !customClass && !customAttributes && !customCss && !props.margin_remove_top && !props.margin_remove_bottom) {
     return undefined;
   }
 
@@ -601,6 +603,8 @@ const sourceGeneralVisualStyle = (
       ...(left ? { left } : {}),
       ...(zIndex !== undefined ? { zIndex } : {}),
       ...(marginMode ? { marginMode } : {}),
+      ...(marginTopMode ? { marginTopMode } : {}),
+      ...(marginBottomMode ? { marginBottomMode } : {}),
       ...(props.margin_remove_top ? { removeTopMargin: true } : {}),
       ...(props.margin_remove_bottom ? { removeBottomMargin: true } : {}),
       ...(maxWidth ? { maxWidth } : {}),
@@ -2199,6 +2203,7 @@ const mapStaticElement = (
             : asString(props.image_box_decoration)) as "none" | "default" | "primary" | "secondary" | "shadow" | "mask",
         }
         : {}),
+      imageBoxDecorationInverse: sourceBoolean(props.image_box_decoration_inverse) ?? undefined,
       imageInverse: sourceBoolean(props.image_inverse) ?? undefined,
       imageSvgAnimate: sourceBoolean(props.image_svg_animate) ?? undefined,
       imageTextColor: ["light", "dark"].includes(String(props.text_color)) ? props.text_color as "light" | "dark" : undefined,
@@ -2206,18 +2211,22 @@ const mapStaticElement = (
   }
 
   if (type === "divider") {
-    const sourceStyle = asString(props.divider_element)?.toLowerCase();
-    const dividerStyle = sourceStyle === "icon" || sourceStyle === "small"
+    // YOOtheme separates the element tag from its visual style. In particular,
+    // Makai exports `divider_element: "div"` with `divider_style: "vertical"`.
+    const sourceStyle = asString(props.divider_style)?.toLowerCase();
+    const dividerStyle = sourceStyle === "icon" || sourceStyle === "small" || sourceStyle === "vertical"
       ? sourceStyle
       : "default";
+    const dividerElement = asString(props.divider_element)?.toLowerCase();
     warnUnsupported(path, props, [
-      "animation", "divider_element", "margin", "margin_remove_top", "margin_remove_bottom",
+      "animation", "divider_element", "divider_style", "margin", "margin_remove_top", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "divider"),
       kind: "divider",
       dividerStyle,
+      ...(dividerElement === "div" || dividerElement === "hr" ? { dividerElement } : {}),
       preset: dividerStyle,
       spacingContract: "yootheme",
       ...(sourceMargin(props.margin) ? { margin: sourceMargin(props.margin) } : {}),
@@ -2955,6 +2964,8 @@ const mapStaticElement = (
           {
             image: "imageUrl",
             image_alt: "imageAlt",
+            image_hover: "hoverImageUrl",
+            hover_image: "hoverImageUrl",
             hover_video: "hoverVideoUrl",
             title: "title",
             meta: "meta",
@@ -2966,13 +2977,14 @@ const mapStaticElement = (
           itemPath,
         );
         const sourceLink = asString(item.link);
-        ["video", "video_title", "hover_image", "text_color", "text_color_hover", "lightbox_image_focal_point", "lightbox_text_color", "image_focal_point", "hover_image_focal_point"].forEach((key) => {
+        ["video", "video_title", "text_color", "text_color_hover", "lightbox_image_focal_point", "lightbox_text_color", "image_focal_point", "hover_image_focal_point"].forEach((key) => {
           if (item[key] !== undefined && item[key] !== "" && item[key] !== false) warnings.push(path + "." + index + "." + key + ": DEFERRED — Gallery item runtime has no exact canonical consumer yet.");
         });
         return {
           id: sourcePathId(path + "." + index, "gallery-item"),
-          imageUrl: asString(item.image) ?? undefined,
+          imageUrl: resolveYoothemeAssetUrl(item.image) || undefined,
           imageAlt: asString(item.image_alt) ?? undefined,
+          hoverImageUrl: resolveYoothemeAssetUrl(item.image_hover ?? item.hover_image) || undefined,
           hoverVideoUrl: resolveYoothemeAssetUrl(item.hover_video),
           title: asString(item.title) ?? "",
           meta: asString(item.meta) ?? "",
@@ -3047,6 +3059,7 @@ const mapStaticElement = (
 
   if (type === "slideshow") {
     const dynamic = mapDynamicSource(node, {}, warnings, path);
+    const slideshowAnimation = asString(props.slideshow_animation) ?? "slide";
     const { slides, hasDynamicSource, hasUnsupportedDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
     if (hasUnsupportedDynamicSource) {
       reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings);
@@ -3139,7 +3152,13 @@ const mapStaticElement = (
         slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
         slidenavHoverOnly: props.slidenav_hover === true || props.slidenav_hover === "true",
         slidenavLarger: props.slidenav_large === true || props.slidenav_large === "true",
-        effect: props.slideshow_animation === "fade" ? "fade" : "slide",
+        // Preserve UIkit's native slideshow animation name in the shared
+        // carousel contract. The renderer adapts supported source effects;
+        // retaining the value also lets future adapters add effects without
+        // needing to re-interpret lossy imported data.
+        effect: ["slide", "fade", "scale", "pull", "push"].includes(slideshowAnimation)
+          ? slideshowAnimation
+          : "slide",
         overlayContainer: asString(props.overlay_container) || "none",
         overlayContainerPadding: asString(props.overlay_container_padding) || "default",
         overlayMargin: asString(props.overlay_margin) || "default",
@@ -3671,7 +3690,9 @@ const sourceBuilderRow = (
     ...(horizontalDistribution ? { horizontalDistribution } : {}),
     ...(asString(props.width) ? { maxWidth: asString(props.width)! } : {}),
     ...(sourceBoolean(props.padding_remove_horizontal) !== undefined ? { removeHorizontalPadding: sourceBoolean(props.padding_remove_horizontal) } : {}),
-    ...(props.expand === "left" || props.expand === "right" ? { expandOneSide: props.expand } : {}),
+    ...((props.width_expand ?? props.expand) === "left" || (props.width_expand ?? props.expand) === "right"
+      ? { expandOneSide: (props.width_expand ?? props.expand) as "left" | "right" }
+      : {}),
     ...(Object.keys(height).length ? { height } : {}),
     ...sourceRowMargin(props),
     ...(sourceLayoutHtmlElement(props.html_element) ? { htmlElement: sourceLayoutHtmlElement(props.html_element) } : {}),
@@ -3804,7 +3825,7 @@ export const mapYoothemeStaticContent = (
       contentMode: normalizedSection.contentMode ?? "boxed",
       maxWidth: normalizedSection.maxWidth ?? "default",
       removeHorizontalPadding: normalizedSection.removeHorizontalPadding ?? Boolean(sectionProps.padding_remove_horizontal),
-      expandOneSide: sectionProps.expand === "left" || sectionProps.expand === "right" ? sectionProps.expand : "none",
+      expandOneSide: normalizedSection.expandOneSide ?? "none",
       sectionHeight: normalizedSection.sectionHeight ?? "auto",
       heightOffset: normalizedSection.heightOffset,
       subtractHeightAbove: normalizedSection.subtractHeightAbove,
@@ -3827,6 +3848,7 @@ export const mapYoothemeStaticContent = (
       animation: sourceAnimation(sectionProps.animation) as any,
       animationDelay: sectionProps.animation_delay ? Number(sectionProps.animation_delay) : undefined,
       sectionTitlePosition: typeof sectionProps.title_position === "string" ? sectionProps.title_position : undefined,
+      sectionTitleText: typeof sectionProps.title === "string" ? sectionProps.title : undefined,
       sectionTitleRotation: sectionProps.title_rotation === "left" || sectionProps.title_rotation === "right" ? sectionProps.title_rotation : "none",
       sectionTitleBreakpoint: typeof sectionProps.title_breakpoint === "string" ? sectionProps.title_breakpoint : undefined,
       visible: true,

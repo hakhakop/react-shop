@@ -10,7 +10,6 @@ import HeaderNav from "./HeaderNav";
 import MenuDropdownContent from "./MenuDropdownContent";
 import type { BuilderLayout } from "@/lib/builderLayouts";
 import HeaderSearchControl from "./HeaderSearchControl";
-import HeaderSocialLinks from "./HeaderSocialLinks";
 import type { MenuItem } from "../lib/navigation";
 import type { HeaderSettings } from "../lib/themeSettings";
 import type {
@@ -31,6 +30,8 @@ import { typographyProps } from "@/lib/builderTypography";
 import WebsiteLanguageSwitcher from "@/components/website/WebsiteLanguageSwitcher";
 import UikitButton from "@/components/builder/UikitButton";
 import UikitImage from "@/components/builder/UikitImage";
+import UikitSocial from "@/components/builder/UikitSocial";
+import type { BuilderLayoutBlock as DashboardBuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
@@ -410,7 +411,7 @@ export default function HeaderShellView({
   );
   const renderBuilderElement = renderBuilderElementProp ?? (builderInteractionIdentity
     ? (element: HeaderBuilderElement, content: ReactNode, flexItemStyle?: CSSProperties) => (
-        <div style={flexItemStyle} data-builder-object-type="block" data-builder-section-id={activeDocumentSectionId}
+        <div style={{ display: "flex", alignItems: "center", height: "100%", ...flexItemStyle }} data-builder-object-type="block" data-builder-section-id={activeDocumentSectionId}
           data-builder-column-key={element.columnId ?? "header-main-row"} data-builder-block-key={element.id}>{content}</div>
       )
     : undefined);
@@ -500,16 +501,14 @@ export default function HeaderShellView({
     documentSettings.height,
     documentSettings.customHeight,
   );
-  const documentPaddingTop = resolveBuilderSpacing(
-    normalizeLegacyHeaderSpacing(headerComposition.documentTopSpacing) ?? "none",
-    "sectionPadding",
-    "none",
-  ).css;
-  const documentPaddingBottom = resolveBuilderSpacing(
-    normalizeLegacyHeaderSpacing(headerComposition.documentBottomSpacing) ?? "none",
-    "sectionPadding",
-    "none",
-  ).css;
+  const topSpacing = normalizeLegacyHeaderSpacing(headerComposition.documentTopSpacing);
+  const bottomSpacing = normalizeLegacyHeaderSpacing(headerComposition.documentBottomSpacing);
+  const documentPaddingTop = !topSpacing || topSpacing === "inherit"
+    ? "var(--header-theme-padding-top, var(--uk-navbar-padding-top, 0px))"
+    : resolveBuilderSpacing(topSpacing, "sectionPadding", "none").css;
+  const documentPaddingBottom = !bottomSpacing || bottomSpacing === "inherit"
+    ? "var(--header-theme-padding-bottom, var(--uk-navbar-padding-bottom, 0px))"
+    : resolveBuilderSpacing(bottomSpacing, "sectionPadding", "none").css;
   const documentMarginTop = resolveBuilderSpacing(
     normalizeLegacyHeaderSpacing(headerComposition.documentTopMargin) ?? "none",
     "sectionMargin",
@@ -614,6 +613,17 @@ export default function HeaderShellView({
   )
     ? navigationDividerMode ?? effectiveShellSettings.navbarModeBorderVertical
     : "none";
+  const importedNavbarBorderMode = effectiveShellSettings.navbarMode ?? "none";
+  const yoothemeNavbarBorderSemantics =
+    effectiveShellSettings.navbarBorderSemantics === "yootheme";
+  const yoothemeNavbarColorMode = effectiveShellSettings.navbarColorMode === "light" ? "light" : "dark";
+  const navbarBorderMode = yoothemeNavbarBorderSemantics && ["full", "top-bottom", "bottom", "bottom-full-width", "bottom-transparent"].includes(
+    importedNavbarBorderMode,
+  )
+    ? importedNavbarBorderMode
+    : yoothemeNavbarBorderSemantics && ["border", "border-always"].includes(importedNavbarBorderMode)
+      ? "bottom-full-width"
+      : "none";
   const dropdownIndicator = documentNavigation?.headerNavigationOverrides?.dropdownIndicator
     ? documentNavigation.menuDropdownIndicator ?? "none"
     : effectiveShellSettings.navbarDropdownIndicator === "chevron" ? "chevron" : "none";
@@ -633,9 +643,15 @@ export default function HeaderShellView({
     `site-header--navbar-line-position-${navbarLinePosition}`,
     `site-header--navbar-line-slide-${navbarLineSlide}`,
     `site-header--nav-hover-${navigationHoverVariant}`,
+    yoothemeNavbarBorderSemantics ? "site-header--navbar-yootheme-border-parity" : "",
+    yoothemeNavbarBorderSemantics ? `site-header--navbar-color-mode-${yoothemeNavbarColorMode}` : "",
+    `site-header--navbar-border-mode-${navbarBorderMode}`,
     `site-header--navbar-border-vertical-${navbarVerticalBorder}`,
     builderDraftPreview ? "site-header--builder-preview" : "",
     documentSettings.overlay ? "site-header--builder-overlay" : "",
+    effectiveInverseLogoUrl
+      ? "site-header--has-inverse-logo"
+      : "site-header--primary-logo-fallback",
     documentSettings.dropbarEnabled ? "site-header--dropdown-dropbar" : "",
     documentSettings.dropdownAlignToNavbar || documentSettings.dropbarEnabled
       ? "site-header--dropdown-boundary-navbar"
@@ -917,7 +933,7 @@ export default function HeaderShellView({
       if (element.type === "logo") content = renderLogoAndBrand(element);
       if (element.type === "button") content = renderHeaderButton(element);
       if (element.type === "spacer") content = <span className="header-builder-spacer-content" aria-hidden="true" />;
-      if (element.type === "social") content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
+      if (element.type === "social") content = <UikitSocial block={{ ...element, kind: "social" } as unknown as DashboardBuilderLayoutBlock} />;
       if (element.type === "utility" && element.utilityAction) {
         content = element.utilityAction === "search"
           ? <HeaderSearchControl layout={dialogSettings.searchLayout} stretch={dialogSettings.searchDropdownStretch} large={dialogSettings.searchDropdownLarge} iconPosition={dialogSettings.searchIconPosition} expandInput={dialogSettings.searchExpand} preventSubmit={dialogSettings.searchPreventSubmit} dropbarAnimation={dialogSettings.searchDropbarAnimation} removeHorizontalPadding={dialogSettings.searchDropbarRemoveHorizontalPadding} />
@@ -1191,7 +1207,7 @@ export default function HeaderShellView({
       );
     }
     if (element.type === "social") {
-      content = <HeaderSocialLinks items={element.socialItems ?? []} buttonStyle={element.socialStyle} gap={element.socialGap} />;
+      content = <UikitSocial block={{ ...element, kind: "social" } as unknown as DashboardBuilderLayoutBlock} />;
     }
     if (element.type === "categories") content = renderCategoriesMega(element);
     if (element.type === "language") {
@@ -1460,6 +1476,11 @@ export default function HeaderShellView({
         // Auto Header height is owned by the active UIkit Navbar token. Keep
         // the document value semantic instead of resolving a Circle-specific
         // pixel value into the Header document.
+        ...(headerComposition.documentMaxWidth && headerComposition.documentMaxWidth !== "none" && headerComposition.documentMaxWidth !== "expand"
+          ? { "--header-theme-max-width": ["xsmall", "small", "default", "medium", "large", "xlarge"].includes(headerComposition.documentMaxWidth)
+              ? `var(--uk-container-${headerComposition.documentMaxWidth === "medium" ? "default" : headerComposition.documentMaxWidth}-max-width)`
+              : headerComposition.documentMaxWidth }
+          : {}),
         "--header-builder-height": headerHeight ?? "var(--uk-navbar-nav-item-height, auto)",
         "--header-document-padding-top": documentPaddingTop,
         "--header-document-padding-bottom": documentPaddingBottom,

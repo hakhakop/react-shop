@@ -233,7 +233,15 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   navbarDropdownShiftMarginMedium: "0",
   navbarDropdownDropbarShiftMarginMedium: "0",
   navbarDropdownDropbarLargeShiftMarginMedium: "0",
+  logoFontWeight: "inherit",
+  inverseNavbarBorder: "var(--uk-inverse-global-border)",
+  inverseNavbarItemColor: "var(--uk-inverse-global-emphasis-color)",
+  inverseNavbarToggleColor: "var(--uk-inverse-global-color)",
+  inverseNavbarToggleHoverColor: "var(--uk-inverse-global-emphasis-color)",
+  inverseNavbarNavItemColor: "inherit",
   inverseNavbarNavItemHoverColor: "inherit",
+  inverseNavbarNavItemOnclickColor: "inherit",
+  inverseNavbarNavItemActiveColor: "inherit",
   imageDefaultRatio: "natural",
   // Matches the canonical BuilderShell default. YOOtheme does not imply a
   // crop mode for a bare Image, so dashboard hydration must not reintroduce

@@ -176,13 +176,79 @@ type ParallaxRuntime = {
   geometry?: ParallaxGeometry;
   applied: AppliedParallaxStyle;
   originalWillChange: string;
+  originalBackgroundPositionY: string;
+  originalBackgroundSize: string;
+  backgroundPositionBaseY: string;
 };
 
 type AppliedParallaxStyle = {
   transform?: string;
   opacity?: string;
   filter?: string;
+  backgroundPositionY?: string;
+  backgroundSize?: string;
   willChange?: string;
+};
+
+const backgroundImageDimensions = new Map<string, { width: number; height: number }>();
+const backgroundImageLoads = new Map<string, Promise<{ width: number; height: number } | undefined>>();
+const backgroundImageNotifications = new Set<string>();
+
+const getBackgroundImageDimensions = (node: HTMLElement) => {
+  const backgroundImage = getComputedStyle(node).backgroundImage;
+  const match = backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+  const src = match?.[1];
+  if (!src) return undefined;
+  const cached = backgroundImageDimensions.get(src);
+  if (cached) return cached;
+  if (typeof Image === "undefined") return undefined;
+  let loading = backgroundImageLoads.get(src);
+  if (!loading) {
+    loading = new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => {
+        const dimensions = { width: image.naturalWidth, height: image.naturalHeight };
+        backgroundImageDimensions.set(src, dimensions);
+        resolve(dimensions);
+      };
+      image.onerror = () => resolve(undefined);
+      image.src = src;
+    });
+    backgroundImageLoads.set(src, loading);
+  }
+  if (!backgroundImageNotifications.has(src)) {
+    backgroundImageNotifications.add(src);
+    void loading.then(() => window.dispatchEvent(new Event("resize")));
+  }
+  return undefined;
+};
+
+const backgroundCoverParallax = (
+  node: HTMLElement,
+  stops: BuilderParallaxStop[] | undefined,
+  value: string,
+  viewportHeight: number,
+  viewportWidth: number,
+) => {
+  if (getComputedStyle(node).backgroundSize !== "cover" || !stops || stops.length < 2) return undefined;
+  const image = getBackgroundImageDimensions(node);
+  if (!image) return undefined;
+  const values = stops.map((stop) => resolveParallaxOffset(stop.value, node, viewportHeight, viewportWidth, node.offsetHeight));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const down = values.indexOf(min) < values.indexOf(max);
+  const diff = max - min;
+  const positionOffset = (down ? -diff : 0) - (down ? min : max);
+  const expandedHeight = node.offsetHeight + diff;
+  const scale = Math.max(node.offsetWidth / image.width, expandedHeight / image.height);
+  const imageHeight = image.height * scale;
+  const overflow = Math.max(0, imageHeight - expandedHeight);
+  const animatedOffset = resolveParallaxOffset(value, node, viewportHeight, viewportWidth, node.offsetHeight);
+  const basePosition = getComputedStyle(node).backgroundPositionY || "50%";
+  return {
+    backgroundPositionY: `calc(max(${basePosition}, -${overflow}px) + ${positionOffset}px + ${animatedOffset}px)`,
+    backgroundSize: `${image.width * scale}px ${imageHeight}px`,
+  };
 };
 
 type ParallaxGeometry = {
@@ -466,7 +532,7 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       if (dashboardPaused || documentHidden) return;
       const viewportHeight = window.innerHeight || 1;
       const viewportWidth = window.innerWidth || 1;
-      const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; origin?: string; zIndex?: string; willChange?: string; clear?: boolean }> = [];
+      const writes: Array<{ node: HTMLElement; transform?: string; opacity?: string; filter?: string; backgroundPositionY?: string; backgroundSize?: string; origin?: string; zIndex?: string; willChange?: string; clear?: boolean }> = [];
       parallaxNodes.forEach((node) => {
         let runtime = parallaxRuntime.get(node);
         if (!runtime) {
@@ -479,6 +545,9 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
             target: resolveParallaxTarget(node, parallax.target),
             applied,
             originalWillChange: node.style.willChange,
+            originalBackgroundPositionY: node.style.backgroundPositionY,
+            originalBackgroundSize: node.style.backgroundSize,
+            backgroundPositionBaseY: getComputedStyle(node).backgroundPositionY || "50%",
           };
           geometryResizeObserver?.observe(runtime.target);
           geometryResizeObserver?.observe(node);
@@ -580,26 +649,43 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         const rotate = interpolateStops(parallax.rotate, eased, "rotate", node, viewportHeight, viewportWidth, nodeWidth);
         const opacity = interpolateStops(parallax.opacity, eased, "opacity", node, viewportHeight, viewportWidth, nodeWidth);
         const blur = interpolateStops(parallax.blur, eased, "blur", node, viewportHeight, viewportWidth, nodeWidth);
+        const isBackgroundPositionParallax = node.dataset.builderParallaxBackground === "y";
+        const backgroundOffset = isBackgroundPositionParallax && y !== undefined
+          ? y.trim().startsWith("-")
+            ? ` - ${y.trim().slice(1)}`
+            : ` + ${y.trim().replace(/^\+/, "")}`
+          : undefined;
+        const backgroundPositionY = backgroundOffset
+          ? `calc(${runtime.backgroundPositionBaseY} ${backgroundOffset})`
+          : undefined;
+        const coverParallax = isBackgroundPositionParallax && y !== undefined
+          ? backgroundCoverParallax(node, parallax.y, y, viewportHeight, viewportWidth)
+          : undefined;
+        const transformY = isBackgroundPositionParallax ? undefined : y;
         const transform = [
           x !== undefined ? `translateX(${x}${x.endsWith("%") || x.endsWith("vw") || x.endsWith("vh") || x.endsWith("px") ? "" : "px"})` : "",
-          y !== undefined ? `translateY(${y}${y.endsWith("%") || y.endsWith("vw") || y.endsWith("vh") || y.endsWith("px") ? "" : "px"})` : "",
+          transformY !== undefined ? `translateY(${transformY}${transformY.endsWith("%") || transformY.endsWith("vw") || transformY.endsWith("vh") || transformY.endsWith("px") ? "" : "px"})` : "",
           rotate !== undefined ? `rotate(${rotate}deg)` : "",
           scale !== undefined ? `scale(${scale})` : "",
         ].filter(Boolean).join(" ");
-        const willChange = layerPromotionMode && parallax.opacity?.length
-          ? "transform, opacity"
-          : "transform";
+        const willChange = isBackgroundPositionParallax
+          ? "background-position"
+          : layerPromotionMode && parallax.opacity?.length
+            ? "transform, opacity"
+            : "transform";
         writes.push({
           node,
           transform,
           ...(opacity !== undefined ? { opacity } : {}),
           ...(blur !== undefined ? { filter: `blur(${blur}${blur.endsWith("px") ? "" : "px"})` } : {}),
+          ...(backgroundPositionY !== undefined ? { backgroundPositionY } : {}),
+          ...(coverParallax ? { backgroundPositionY: coverParallax.backgroundPositionY, backgroundSize: coverParallax.backgroundSize } : {}),
           ...(parallax.transformOrigin ? { origin: parallax.transformOrigin.replaceAll("-", " ") } : {}),
           ...(parallax.zIndex ? { zIndex: "1" } : {}),
           willChange,
         });
       });
-      writes.forEach(({ node, clear, transform, opacity, filter, origin, zIndex, willChange }) => {
+      writes.forEach(({ node, clear, transform, opacity, filter, backgroundPositionY, backgroundSize, origin, zIndex, willChange }) => {
         const applied = parallaxRuntime.get(node)?.applied;
         if (!applied) return;
         if (clear) {
@@ -615,6 +701,18 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
             node.style.removeProperty("filter");
             applied.filter = undefined;
           }
+          if (applied.backgroundPositionY !== undefined) {
+            const original = parallaxRuntime.get(node)?.originalBackgroundPositionY;
+            if (original) node.style.backgroundPositionY = original;
+            else node.style.removeProperty("background-position-y");
+            applied.backgroundPositionY = undefined;
+          }
+          if (applied.backgroundSize !== undefined) {
+            const original = parallaxRuntime.get(node)?.originalBackgroundSize;
+            if (original) node.style.backgroundSize = original;
+            else node.style.removeProperty("background-size");
+            applied.backgroundSize = undefined;
+          }
           return;
         }
         const nextTransform = transform ?? "";
@@ -629,6 +727,14 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
         if (filter !== undefined && applied.filter !== filter) {
           node.style.filter = filter;
           applied.filter = filter;
+        }
+        if (backgroundPositionY !== undefined && applied.backgroundPositionY !== backgroundPositionY) {
+          node.style.backgroundPositionY = backgroundPositionY;
+          applied.backgroundPositionY = backgroundPositionY;
+        }
+        if (backgroundSize !== undefined && applied.backgroundSize !== backgroundSize) {
+          node.style.backgroundSize = backgroundSize;
+          applied.backgroundSize = backgroundSize;
         }
         if (willChange !== undefined && applied.willChange !== willChange) {
           if (node.style.willChange !== willChange) node.style.willChange = willChange;
@@ -657,6 +763,14 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       });
       parallaxNodes.forEach((node) => {
         node.style.removeProperty("transform");
+        if (node.dataset.builderParallaxBackground === "y") {
+          const runtime = parallaxRuntime.get(node);
+          const original = runtime?.originalBackgroundPositionY;
+          if (original) node.style.backgroundPositionY = original;
+          else node.style.removeProperty("background-position-y");
+          if (runtime?.originalBackgroundSize) node.style.backgroundSize = runtime.originalBackgroundSize;
+          else node.style.removeProperty("background-size");
+        }
         node.style.removeProperty("opacity");
         node.style.removeProperty("filter");
       });
@@ -757,6 +871,12 @@ export default function BuilderScrollAnimations({ dashboardMode = false }: Props
       parallaxNodes.forEach((node) => {
         node.style.removeProperty("transform");
         const runtime = parallaxRuntime.get(node);
+        if (node.dataset.builderParallaxBackground === "y") {
+          if (runtime?.originalBackgroundPositionY) node.style.backgroundPositionY = runtime.originalBackgroundPositionY;
+          else node.style.removeProperty("background-position-y");
+          if (runtime?.originalBackgroundSize) node.style.backgroundSize = runtime.originalBackgroundSize;
+          else node.style.removeProperty("background-size");
+        }
         if (dashboardMode && runtime?.originalWillChange) node.style.willChange = runtime.originalWillChange;
         else node.style.removeProperty("will-change");
       });

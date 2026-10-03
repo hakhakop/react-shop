@@ -7,6 +7,8 @@ import { findYoothemeCapability } from "@/lib/yoothemeCompatibilityRegistry";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
 import { resolveBuilderRowGap, resolveBuilderRowStyle } from "@/lib/builderRowStyles";
 import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
+import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import { resolveYoothemeLess } from "@/lib/yoothemeLessImporter";
 
 test("fresh Enterprise8 import writes canonical Rows and Columns", () => {
   const imported = mapYoothemeStaticContent(enterprise8);
@@ -72,6 +74,111 @@ test("does not invent a 40px top margin for an unconfigured YOOtheme row", () =>
   });
 
   expect(imported.sections[0]?.rows?.[1]?.topMargin).toBeUndefined();
+});
+
+test("imports fixed-side YOOtheme row widths and column background parallax into shared structure", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        props: { layout: "expand,large" },
+        children: [
+          { type: "column", props: { width_large: "expand", image: "media/cta.jpg", image_position: "center-left", image_size: "cover", image_parallax_bgy: "-5vw,4vw", image_parallax_easing: 1 }, children: [] },
+          { type: "column", props: { width_large: "large" }, children: [] },
+        ],
+      }],
+    }],
+  });
+  const section = imported.sections[0]!;
+  const row = section.rows![0]!;
+  const structure = resolveBuilderSectionStructure(section);
+
+  expect(row.layout).toBe("fixed-right");
+  expect(section.layoutItems?.[0]?.rowLayout).toBe("fixed-right");
+  expect(row.customLayout?.template).toBe("expand,large");
+  expect(row.columns[0]).toMatchObject({
+    responsiveWidths: { large: "expand" },
+    background: {
+      position: "left center",
+      size: "cover",
+      parallax: { y: [{ value: "-5vw" }, { value: "4vw" }], easing: 1 },
+    },
+  });
+  const staleImportedSection = {
+    ...section,
+    rows: section.rows!.map((candidate) => ({ ...candidate, layout: "2-col-equal" })),
+  };
+  expect(normalizeBuilderSectionLayout(staleImportedSection).rows[0]?.layout).toBe("fixed-right");
+  expect(structure.rows[0]?.columns.map((column) => column.className)).toEqual([
+    "uk-width-expand@l",
+    "uk-width-large@l",
+  ]);
+});
+
+test("imports YOOtheme image-decoration inverse and explicit column image repeat", () => {
+  const imported = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          props: { image: "media/column.jpg", image_repeat: "repeat-x" },
+          children: [{
+            type: "image",
+            props: {
+              image: "media/frame.jpg",
+              image_box_decoration: "default",
+              image_box_decoration_inverse: true,
+            },
+          }],
+        }],
+      }],
+    }],
+  });
+
+  const column = imported.sections[0].rows![0].columns[0];
+  expect(column.background).toMatchObject({ repeat: "repeat-x" });
+  expect(column.elements[0]).toMatchObject({
+    kind: "image",
+    imageBoxDecoration: "default",
+    imageBoxDecorationInverse: true,
+  });
+});
+
+test("imports default image decoration border tokens for normal and inverse surfaces", () => {
+  const result = resolveYoothemeLess([{
+    name: "master-makai/_import.less",
+    precedence: 1,
+    content: `
+      @theme-box-decoration-default-border: rgba(0,0,0,0.1);
+      @inverse-theme-box-decoration-default-border: rgba(255,255,255,0.7);
+    `,
+  }]);
+
+  expect(result.shellSettings).toMatchObject({
+    themeBoxDecorationDefaultBorder: "rgba(0, 0, 0, 0.1)",
+    inverseThemeBoxDecorationDefaultBorder: "rgba(255, 255, 255, 0.7)",
+  });
+});
+
+test("uses YOOtheme global secondary as tile-secondary unless the theme overrides it", () => {
+  const inherited = resolveYoothemeLess([{
+    name: "master-makai/_import.less",
+    precedence: 1,
+    content: "@global-secondary-background: #0D1724;",
+  }]).shellSettings;
+  const explicit = resolveYoothemeLess([{
+    name: "master-makai/_import.less",
+    precedence: 1,
+    content: "@global-secondary-background: #0D1724; @tile-secondary-background: #102030;",
+  }]).shellSettings;
+
+  expect(getUikitGlobalsCssVars(inherited)["--uk-tile-secondary-background"]).toBe("#0D1724");
+  expect(getUikitGlobalsCssVars(explicit)["--uk-tile-secondary-background"]).toBe("#102030");
 });
 
 test("keeps YOOtheme default pagination spacing", () => {
@@ -210,7 +317,7 @@ test("imports extended structural ownership without repeating Row state on Colum
           align: "center",
           width: "large",
           padding_remove_horizontal: true,
-          expand: "right",
+          width_expand: "right",
           height_value: "320",
           height_offset: "10",
           margin: "large",

@@ -3243,7 +3243,14 @@
               {
                 "id": "header-language",
                 "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
+                "headerLanguageDisplay": "code",
+                "elementAlign": "center"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -3338,7 +3345,7 @@
         }
       }
     ],
-    "updatedAt": "2026-09-24T06:13:03.574Z"
+    "updatedAt": "2026-10-03T17:42:23.404Z"
   },
   "footer": {
     "version": 1,

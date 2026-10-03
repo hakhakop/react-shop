@@ -727,6 +727,10 @@ export function getBuilderSectionClassName(
   const uikitSectionPad = getUikitSectionPaddingClass(
     section.sectionPadding ?? section.topSpacing ?? (section as any).sectionPaddingTop,
   );
+  const asymmetricSectionPadding = section.sectionPaddingTop && section.sectionPaddingBottom && section.sectionPaddingTop !== section.sectionPaddingBottom;
+  const sectionPaddingSideClasses = asymmetricSectionPadding
+    ? `shop-builder-section--padding-top-${section.sectionPaddingTop} shop-builder-section--padding-bottom-${section.sectionPaddingBottom}`
+    : "";
   const uikitSectionMargin = getUikitSectionMarginClass(
     section.margin ?? section.topMargin,
     section.removeTopMargin,
@@ -775,6 +779,7 @@ export function getBuilderSectionClassName(
 
   return [
     uikitSectionPad,
+    sectionPaddingSideClasses,
     uikitSectionMargin,
     uikitSectionStyle,
     preserveColorClass,
@@ -940,6 +945,7 @@ function SectionFrame({
       <div
         className={`shop-builder-section-content ${getUikitContainerClass(
           resolveUikitSectionContainerPreset(section.maxWidth, section.contentMode),
+          section.expandOneSide,
         )}`}
         data-gsap-stagger={
           section.kind === "hero" || section.kind === "embed" ? undefined : true
@@ -3041,9 +3047,9 @@ function ContentLayoutSection({
                       </div>
                     ) : (
                       <div
-                        className={`shop-builder-column-content${
+                        className={`shop-builder-column-content ${structuralColumn.surfaceClassName}${
                           structuralColumn.column.background?.videoUrl
-                            ? " shop-builder-column-content--media-sticky uk-tile uk-position-z-index"
+                            ? " shop-builder-column-content--media-sticky uk-position-z-index"
                             : ""
                         }${
                           structuralColumn.column.sticky?.mode === "column-within-row" && structuralColumn.column.verticalAlign === "middle"
@@ -3052,7 +3058,12 @@ function ContentLayoutSection({
                               ? " uk-flex uk-flex-bottom"
                               : ""
                         }`}
+                        data-builder-parallax={structuralColumn.column.background?.parallax?.y?.length
+                          ? JSON.stringify(structuralColumn.column.background.parallax)
+                          : undefined}
+                        data-builder-parallax-background={structuralColumn.column.background?.parallax?.y?.length ? "y" : undefined}
                         data-uk-sticky={structuralColumn.stickyDeclaration}
+                        style={structuralColumn.surfaceStyle}
                       >
                         {structuralColumn.column.background?.videoUrl ? (
                           <BuilderBackgroundVideo
@@ -3466,7 +3477,7 @@ function StorefrontBuilderRendererBase({
             ? firstVisibleSection.headerTextColor
             : undefined
         }
-        data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
+        data-overlap-header={isPageDocument && (transparentSectionHeader || pullUnderHeader || headerOverlay) ? "true" : undefined}
         data-section-default-color-mode={resolveSectionColorMode(shellSettings, "default")}
         data-section-muted-color-mode={resolveSectionColorMode(shellSettings, "muted")}
         data-section-primary-color-mode={resolveSectionColorMode(shellSettings, "primary")}

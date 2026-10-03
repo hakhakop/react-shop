@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, ReactNode, useState } from "react";
+import React, { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw, ChevronDown } from "lucide-react";
 import {
   resolveBuilderSpacing,
@@ -377,22 +377,26 @@ export function BuilderImageUrlControl({
   onChoose: () => void;
 }) {
   const hasImage = Boolean(value && value.trim());
+  const [previewFailed, setPreviewFailed] = useState(false);
+
+  useEffect(() => {
+    setPreviewFailed(false);
+  }, [value]);
 
   return (
     <div className={`builder-media-source-card${hasImage ? " has-media" : " is-empty"}`}>
       <button type="button" onClick={onChoose} className="builder-media-source-summary">
-        {hasImage ? (
+        {hasImage && !previewFailed ? (
           <img
             src={value}
             alt="Preview"
             className="builder-media-url-thumbnail"
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = "none";
-            }}
+            onError={() => setPreviewFailed(true)}
           />
         ) : (
           <div className="builder-media-url-thumbnail-empty">
             <ImageIcon size={22} />
+            {previewFailed ? <span className="builder-media-preview-unavailable">Preview unavailable</span> : null}
           </div>
         )}
         <span className="builder-media-source-copy" aria-hidden="true">

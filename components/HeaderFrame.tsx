@@ -148,7 +148,7 @@ export default function HeaderFrame({
     // Keep the editor canvas stable, but retain the intentional sticky
     // show-on-up affordance. The stable canvas CSS keeps the header in its
     // sticky layout slot so content never reflows.
-    if (scrollState || (builderPreviewDetected && behavior !== "sticky-on-scroll-up")) return;
+    if (scrollState) return;
     const getScrollY = () => {
       const previewShell = headerRef.current?.closest<HTMLElement>(".builder-preview-shell");
       if (previewShell) {
@@ -163,7 +163,9 @@ export default function HeaderFrame({
 
     const onScroll = () => {
       const nextScrollY = getScrollY();
-      if (builderIframePreview) {
+      if (builderIframePreview && behavior === "sticky-on-scroll-up") {
+        setScrolled(nextScrollY > 24);
+        scheduleUpdateRef.current();
         const delta = nextScrollY - previousScrollYRef.current;
         setHiddenByScroll((current) => {
           if (nextScrollY <= 24) return false;
@@ -297,6 +299,8 @@ export default function HeaderFrame({
           "builder-preview-section--scheme-dark",
           "builder-preview-section--scheme-light",
         ) ??
+        (firstSection?.classList.contains("uk-light") ? "light" :
+          firstSection?.classList.contains("uk-dark") ? "dark" : null) ??
         textModeFromBackground(firstSection) ??
         pageTextMode;
       const headerSurface =
@@ -320,7 +324,7 @@ export default function HeaderFrame({
             1,
       );
       const firstSectionOverlapEnabled =
-        pageRoot?.dataset.overlapHeader === "true";
+        sectionHeaderState.transparent || pageRoot?.dataset.overlapHeader === "true";
 
       const nextState = resolveEffectiveHeaderTextMode({
         configuredTextMode: textMode,
@@ -435,7 +439,7 @@ export default function HeaderFrame({
 
   const resolvedTextMode =
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
-  const effectiveOverlapHeader = overlapHeader || sectionHeaderState.pullUnder;
+  const effectiveOverlapHeader = overlapHeader || sectionTransparent || sectionHeaderState.pullUnder;
   return (
       <header
         id={id}

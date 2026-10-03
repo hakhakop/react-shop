@@ -18,6 +18,8 @@ const layers = [
     @internal-button-primary-glow-filter: blur(10px);
     @internal-button-primary-hover-glow-filter: blur(16px);
     @theme-box-decoration-border-radius: 10px;
+    @theme-box-decoration-default-border: rgba(0,0,0,0.1);
+    @inverse-theme-box-decoration-default-border: rgba(255,255,255,0.7);
     @theme-box-decoration-default-gradient: conic-gradient(red, blue);
     @internal-section-default-gradient: radial-gradient(red, transparent);
     @breakpoint-small: 640px;
@@ -52,6 +54,8 @@ test("YOOtheme resolver honors layer precedence and evaluates supported color fu
   assert.equal(preset.shellSettings.buttonPrimaryGlowFilter, "blur(10px)");
   assert.equal(preset.shellSettings.buttonPrimaryHoverGlowFilter, "blur(16px)");
   assert.equal(preset.shellSettings.themeBoxDecorationBorderRadius, "10px");
+  assert.equal(preset.shellSettings.themeBoxDecorationDefaultBorder, "rgba(0, 0, 0, 0.1)");
+  assert.equal(preset.shellSettings.inverseThemeBoxDecorationDefaultBorder, "rgba(255, 255, 255, 0.7)");
   assert.equal(preset.shellSettings.themeBoxDecorationDefaultGradient, "conic-gradient(red, blue)");
   assert.equal(preset.shellSettings.backgroundDefaultGradient, "radial-gradient(red, transparent)");
   assert.match(String(preset.shellSettings.linkHoverColor), /^#/);

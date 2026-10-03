@@ -228,3 +228,72 @@ test("static slideshow and overlay-slider fields normalize into shared carousel 
     overlayStyle: "primary",
   });
 });
+
+test("YOOtheme pull slideshow animation survives import for the shared renderer", () => {
+  const mapped = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
+      type: "slideshow",
+      props: { slideshow_animation: "pull" },
+      children: [{ type: "slideshow_item", props: { title: "First", image: "first.jpg" } }],
+    }] }] }] }],
+  });
+  const slideshow = mapped.sections[0]?.layoutItems?.[0]?.blocks?.find((block) => block.kind === "slideshow");
+
+  expect(slideshow?.carouselSettings?.effect).toBe("pull");
+});
+
+test("Makai slideshow uses UIkit pull, drag, dots, and imported parallax layers", async ({ page }) => {
+  await page.goto("/makai", { waitUntil: "domcontentloaded" });
+  const slideshow = page.locator(".shop-builder-swiper--slideshow").first();
+  const list = slideshow.locator(".uk-slideshow-items");
+  await expect(list).toBeVisible();
+  await expect(list).toHaveAttribute("style", /aspect-ratio: 16 \/ 9/);
+
+  const firstImageLayer = list.locator("[data-uk-slideshow-parallax='scale: 1,1.2,1.2']").first();
+  const firstDimLayer = list.locator("[data-uk-slideshow-parallax='opacity: 0.5,0,0; backgroundColor: #000,#000']").first();
+  await expect(firstImageLayer).toBeAttached();
+  await expect(firstDimLayer).toBeAttached();
+  await expect(firstDimLayer).toHaveCSS("opacity", "0");
+
+  const dots = slideshow.locator(".shop-builder-slideshow-navigation-frame button");
+  await expect(dots).toHaveCount(3);
+  await dots.nth(1).click();
+  const incoming = list.locator(":scope > .uk-slide-enter");
+  await expect(incoming).toHaveCount(1);
+  await expect(incoming).toHaveCSS("position", "absolute");
+  await expect(incoming.locator(".shop-builder-swiper-media")).toHaveCSS("z-index", "auto");
+  await expect(incoming.locator(".shop-builder-slideshow-parallax-dim")).toHaveCSS("z-index", "auto");
+  await expect.poll(async () => {
+    const slideBox = await incoming.boundingBox();
+    const frameBox = await list.boundingBox();
+    return slideBox && frameBox ? Math.abs(slideBox.y - frameBox.y) : Number.POSITIVE_INFINITY;
+  }).toBeLessThan(1);
+  await expect.poll(async () => incoming.locator(".shop-builder-swiper-media").evaluate((media) => getComputedStyle(media).transform))
+    .not.toBe("none");
+  await expect.poll(async () => Number(await incoming.locator(".shop-builder-slideshow-parallax-dim").evaluate((dim) => getComputedStyle(dim).opacity)))
+    .toBeGreaterThan(0);
+  expect(await incoming.evaluate((slide) => {
+    const dim = slide.querySelector<HTMLElement>(".shop-builder-slideshow-parallax-dim")!;
+    const media = slide.querySelector<HTMLElement>(".shop-builder-swiper-media")!;
+    dim.style.pointerEvents = "auto";
+    const rect = slide.getBoundingClientRect();
+    const stack = document.elementsFromPoint(rect.x + 30, rect.y + rect.height / 2);
+    return stack.indexOf(dim) >= 0 && stack.indexOf(media) > stack.indexOf(dim);
+  })).toBe(true);
+  await expect(list.locator(":scope > .uk-slide-enter")).toHaveCount(0, { timeout: 5000 });
+  await expect(list.locator(":scope > .uk-active")).toHaveAttribute("aria-label", "2 of 3");
+  await expect(list.locator(":scope > .uk-active .shop-builder-slideshow-parallax-dim")).toHaveCSS("opacity", "0");
+  await expect(list.locator(":scope > .uk-active .shop-builder-swiper-media")).toHaveCSS("transform", "matrix(1.2, 0, 0, 1.2, 0, 0)");
+
+  const frame = await list.boundingBox();
+  expect(frame).not.toBeNull();
+  if (!frame) return;
+  await page.mouse.move(frame.x + frame.width * 0.75, frame.y + frame.height * 0.5);
+  await page.mouse.down();
+  await page.mouse.move(frame.x + frame.width * 0.25, frame.y + frame.height * 0.5, { steps: 8 });
+  await page.mouse.up();
+  await expect(list.locator(":scope > .uk-slide-enter")).toHaveCount(1);
+  await expect(list.locator(":scope > .uk-slide-enter")).toHaveCount(0, { timeout: 5000 });
+  await expect(list.locator(":scope > .uk-active")).toHaveAttribute("aria-label", "3 of 3");
+});

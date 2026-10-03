@@ -887,6 +887,10 @@ export default function ReactMenuEditorPanel({
             const isSelected = selectedId === node.id;
             const isDragging = draggingMenuId === node.id;
             const isDragOver = dragOverMenuId === node.id;
+            const selectedNodeItem = isSelected ? menuItems.find((item) => item.id === node.id) : undefined;
+            const hasSubmenu = node.depth === 0 && Boolean(selectedNodeItem) && (
+              Boolean(selectedNodeItem?.dropdownContent) || menuItems.some((item) => item.parentId === node.id)
+            );
             return (
               <div
                 key={node.id}
@@ -1163,6 +1167,24 @@ export default function ReactMenuEditorPanel({
                           placeholder="Optional badge"
                         />
                       </label>
+                      {hasSubmenu && (
+                        <label className="builder-field">
+                          <span>Dropdown stretch</span>
+                          <select
+                            value={menuPresentation[node.id]?.submenuStretch ?? "default"}
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              handleUpdatePresentation(node.id, {
+                                submenuStretch: value === "navbar" || value === "navbar-container" ? value : null,
+                              });
+                            }}
+                          >
+                            <option value="default">Default dropdown width</option>
+                            <option value="navbar">Stretch to navbar width</option>
+                            <option value="navbar-container">Stretch to navbar container</option>
+                          </select>
+                        </label>
+                      )}
                       <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
                         <input
                           type="checkbox"

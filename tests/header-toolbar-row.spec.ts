@@ -91,3 +91,34 @@ test("Headers without a Toolbar row retain their existing composition", () => {
     "header-navigation",
   ]);
 });
+
+test("Header Social uses the same canonical Social element contract as page layouts", () => {
+  const layout = headerLayout();
+  layout.sections[0]!.rows![0]!.columns[0]!.elements.push({
+    id: "header-social-links",
+    kind: "social",
+    socialItems: [{ id: "instagram", link: "https://instagram.com/example", iconName: "instagram" }],
+    socialStyle: "button",
+    socialGrid: "vertical",
+    socialGridBreakpoint: "medium",
+    socialColumnGap: "large",
+    socialRowGap: "small",
+    socialIconWidth: 24,
+    socialLinkTarget: "_blank",
+  });
+
+  const composition = resolveHeaderBuilderComposition(layout);
+
+  expect(composition.elements).toContainEqual(expect.objectContaining({
+    id: "header-social-links",
+    type: "social",
+    socialItems: [{ id: "instagram", link: "https://instagram.com/example", iconName: "instagram" }],
+    socialStyle: "button",
+    socialGrid: "vertical",
+    socialGridBreakpoint: "medium",
+    socialColumnGap: "large",
+    socialRowGap: "small",
+    socialIconWidth: 24,
+    socialLinkTarget: "_blank",
+  }));
+});

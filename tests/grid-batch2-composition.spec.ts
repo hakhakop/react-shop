@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
-import { getUikitMarginClass } from "@/lib/uikitTokens";
+import { getUikitMarginClass, resolveYoothemeGridImageFit } from "@/lib/uikitTokens";
 
 const fixture = {
   type: "layout", children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [{
@@ -102,6 +102,22 @@ test("YOOtheme Grid dimensions remain intrinsic under responsive tracks", () => 
   expect(renderer).toContain('height={resolvedIntrinsicImageHeight}');
 });
 
+test("CSS Grid dividers center in the authored column gap while UIkit runtime grids retain native geometry", () => {
+  const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
+  const styles = readFileSync(resolve(process.cwd(), "app/styles/shop-builder.css"), "utf8");
+  expect(renderer).toContain('"--shop-builder-grid-column-gap": columnGapCss');
+  expect(styles).toContain(".shop-builder-grid.uk-grid-divider:not(.shop-builder-grid--runtime):not(.shop-builder-uikit-grid--runtime)");
+  expect(styles).toContain("calc(var(--shop-builder-grid-column-gap,");
+});
+
+test("YOOtheme dimensioned Grid images crop instead of stretching source media", () => {
+  expect(resolveYoothemeGridImageFit("natural", "380px", "250px")).toBe("cover");
+  expect(resolveYoothemeGridImageFit(undefined, "380", "250")).toBe("cover");
+  expect(resolveYoothemeGridImageFit("contain", "380px", "250px")).toBe("contain");
+  expect(resolveYoothemeGridImageFit("fill", "380px", "250px")).toBe("fill");
+  expect(resolveYoothemeGridImageFit("natural", "auto", "250px")).toBeUndefined();
+});
+
 test("YOOtheme Grid restores Advanced CSS item compatibility classes", () => {
   const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
   expect(renderer).toContain('"uk-first-column"');
@@ -191,4 +207,9 @@ test("YOOtheme Grid title does not receive an invented top-margin fallback", () 
   const renderer = readFileSync(resolve(process.cwd(), "components/builder/GridCardsClient.tsx"), "utf8");
   expect(renderer).toContain("${titleMarginTopClass} ${isYoothemeGrid ? \"uk-margin-remove-bottom\" : \"\"}");
   expect(renderer).not.toContain('titleMarginTopClass || (isYoothemeGrid ? "uk-margin-top" : "")');
+});
+
+test("YOOtheme Grid title keeps inline UIkit text-top spans beside the title text", () => {
+  const styles = readFileSync(resolve(process.cwd(), "app/styles/shop-builder.css"), "utf8");
+  expect(styles).toContain(".shop-builder-grid-card--yootheme .shop-builder-title .uk-text-top {\n  display: inline !important;\n  vertical-align: top !important;");
 });

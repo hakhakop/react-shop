@@ -11,38 +11,15 @@ import { fontFamilyStack } from "@/lib/webFonts";
 import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 import { resolveSectionColorMode } from "@/lib/semanticBackgrounds";
 
-function colorLuminance(value: string): number | null {
-  const hex = value.trim().match(/^#([0-9a-f]{3,8})$/i)?.[1];
-  const rgb = hex
-    ? (hex.length === 3 || hex.length === 4
-      ? hex.slice(0, 3).split("").map((part) => part + part)
-      : [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)])
-        .map((part) => parseInt(part, 16))
-    : value.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i)?.slice(1).map(Number);
-  if (!rgb || rgb.length !== 3 || rgb.some((channel) => !Number.isFinite(channel))) return null;
-  return rgb.map((channel) => channel / 255).reduce((sum, channel, index) => {
-    const linear = channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
-    return sum + linear * [0.2126, 0.7152, 0.0722][index];
-  }, 0);
-}
-
-function shouldUseInverseText(
+function sectionModeUsesInverseText(
   mode: "light" | "dark",
-  background: string,
-  normalText: string,
-  inverseText: string,
 ) {
-  if (mode === "dark") return true;
-  const bg = colorLuminance(background);
-  const normal = colorLuminance(normalText);
-  const inverse = colorLuminance(inverseText);
-  if (bg === null || normal === null || inverse === null) return false;
-  const contrast = (foreground: number) => {
-    const lighter = Math.max(bg, foreground);
-    const darker = Math.min(bg, foreground);
-    return (lighter + 0.05) / (darker + 0.05);
-  };
-  return contrast(inverse) > contrast(normal);
+  // Match UIkit/YOOtheme color-mode semantics: `dark` selects the normal
+  // foreground palette and `light` selects its inverse palette. The mode is
+  // an authored design token; inferring a different palette from the surface
+  // color breaks imported Global Styles parity (for example, Makai's white
+  // default section uses dark mode and the normal gray text palette).
+  return mode === "light";
 }
 
 function yoothemeButtonTextArrow(color: string) {
@@ -142,8 +119,11 @@ export function getUikitGlobalsCssVars(
   const buttonLargeRadius = shellSettings?.buttonLargeRadius || buttonRadius;
   const inheritedFamily = (family: string, fallback: string) => family.trim().toLowerCase() === "inherit" ? fallback : family;
   const bodyFamily = value("fontFamilyBody", "system-ui");
-  const headingFamily = inheritedFamily(value("fontFamilyHeading", "inherit"), bodyFamily);
-  const primaryFamily = inheritedFamily(value("fontFamilyPrimary", "inherit"), headingFamily);
+  const primaryFamily = inheritedFamily(value("fontFamilyPrimary", "inherit"), bodyFamily);
+  // YOOtheme's Primary family is the default heading family unless an explicit
+  // Heading token overrides it. This keeps imported role tokens semantic while
+  // preserving a tenant's separately-authored heading choice.
+  const headingFamily = inheritedFamily(value("fontFamilyHeading", "inherit"), primaryFamily);
   const secondaryFamily = inheritedFamily(value("fontFamilySecondary", "inherit"), bodyFamily);
   const tertiaryFamily = inheritedFamily(value("fontFamilyTertiary", "inherit"), bodyFamily);
   const buttonBorderWidth = value("buttonBorderWidth", value("borderWidth", "1px"));
@@ -193,11 +173,10 @@ export function getUikitGlobalsCssVars(
   const globalInverse = value("inverseColor", "#fff");
   const globalLink = value("linkColor", primary);
   const globalBorder = value("borderColor", "transparent");
-  // Keep the authored mode, but repair imported themes where a dark semantic
-  // surface is paired with an unreadable normal text token. The existing
-  // canonical normal/inverse tokens remain the only sources of color.
-  const sectionTextColor = (mode: "light" | "dark", background: string) =>
-    shouldUseInverseText(mode, background, globalText, globalInverse)
+  // Section modes are foreground palette tokens in UIkit/YOOtheme, not a
+  // request to infer text color from the surface's luminance.
+  const sectionTextColor = (mode: "light" | "dark") =>
+    sectionModeUsesInverseText(mode)
       ? "var(--uk-inverse-global-color, #fff)"
       : "var(--uk-global-text-color, #111827)";
   // UIkit has three heading tiers: base, tablet/medium, and laptop/large.
@@ -319,10 +298,10 @@ export function getUikitGlobalsCssVars(
     "--uk-section-muted-color-mode": sectionColorModes.muted,
     "--uk-section-primary-color-mode": sectionColorModes.primary,
     "--uk-section-secondary-color-mode": sectionColorModes.secondary,
-    "--uikit-section-default-color": sectionTextColor(sectionColorModes.default, backgroundDefault),
-    "--uikit-section-muted-color": sectionTextColor(sectionColorModes.muted, backgroundMuted),
-    "--uikit-section-primary-color": sectionTextColor(sectionColorModes.primary, backgroundPrimary),
-    "--uikit-section-secondary-color": sectionTextColor(sectionColorModes.secondary, backgroundSecondary),
+    "--uikit-section-default-color": sectionTextColor(sectionColorModes.default),
+    "--uikit-section-muted-color": sectionTextColor(sectionColorModes.muted),
+    "--uikit-section-primary-color": sectionTextColor(sectionColorModes.primary),
+    "--uikit-section-secondary-color": sectionTextColor(sectionColorModes.secondary),
     "--webpages-background-default-image": backgroundDefaultImage,
     "--webpages-background-muted-image": backgroundMutedImage,
     "--webpages-background-primary-image": backgroundPrimaryImage,
@@ -414,6 +393,9 @@ export function getUikitGlobalsCssVars(
     // of falling back to the generic UIkit blue when a utility is used.
     "--uk-global-primary-background": primary,
     "--uk-global-secondary-background": value("backgroundSecondary", "#111827"),
+    // UIkit's tile-secondary surface inherits the site's secondary global
+    // background unless a theme explicitly overrides the tile token.
+    "--uk-tile-secondary-background": value("tileSecondaryBackground", value("backgroundSecondary", "#111827")),
     "--uk-inverse-global-color": value("inverseTextColor", `color-mix(in srgb, ${globalInverse} 70%, transparent)`),
     "--uk-inverse-global-emphasis-color": value("inverseEmphasisColor", globalInverse),
     "--uk-inverse-global-muted-color": value("inverseMutedTextColor", `color-mix(in srgb, ${globalInverse} 50%, transparent)`),
@@ -523,6 +505,7 @@ export function getUikitGlobalsCssVars(
     "--uk-button-primary-text": buttonValue("buttonPrimaryText", globalInverse),
     "--uk-button-primary-hover-background": buttonValue("buttonHoverBg", buttonValue("buttonPrimaryBackground", primary)),
     "--uk-button-font-size": value("buttonFontSize", "15px"),
+    "--uk-button-padding-x": value("buttonPaddingX", "18px"),
     "--uk-button-font-family": value("buttonFontFamily", "inherit"),
     "--uk-button-font-style": value("buttonFontStyle", "normal"),
     "--uk-button-font-weight": value("buttonFontWeight", "600"),
@@ -627,7 +610,9 @@ export function getUikitGlobalsCssVars(
     "--uk-button-secondary-render-background": buttonValue("buttonSecondaryMode", "none") === "glow" ? "transparent" : buttonValue("buttonSecondaryBackground", "#e5e7eb"),
     "--uk-button-secondary-render-gradient": buttonValue("buttonSecondaryMode", "none") === "glow" ? "none" : "none",
     "--uk-theme-box-decoration-border-radius": value("themeBoxDecorationBorderRadius", "10px"),
-    "--uk-theme-box-decoration-default-gradient": value("themeBoxDecorationDefaultGradient", "conic-gradient(from 70deg, #FD3D8F, #B823C3, #4901AC, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)"),
+    "--uk-theme-box-decoration-default-border": value("themeBoxDecorationDefaultBorder", "rgba(0,0,0,0.1)"),
+    "--uk-inverse-theme-box-decoration-default-border": value("inverseThemeBoxDecorationDefaultBorder", "rgba(255,255,255,0.7)"),
+    "--uk-theme-box-decoration-default-gradient": value("themeBoxDecorationDefaultGradient", "none"),
     "--uk-theme-box-decoration-primary-glow-filter": value("themeBoxDecorationPrimaryGlowFilter", "blur(7px)"),
     "--uk-theme-box-decoration-primary-glow-gradient": value("themeBoxDecorationPrimaryGlowGradient", "conic-gradient(from 70deg, #FD3D8F, #B823C3, #4901AC, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)"),
     "--uk-theme-box-decoration-primary-background": value("themeBoxDecorationPrimaryBackground", "rgba(255,255,255,0.1)"),
@@ -875,6 +860,11 @@ export function getUikitGlobalsCssVars(
     "--uk-nav-dividers-box-shadow": value("navDividersBoxShadow", "none"),
 
     // Navbar
+    "--uk-navbar-item-padding-horizontal": value("navbarItemPaddingHorizontal", "0"),
+    "--uk-inverse-navbar-border": value("inverseNavbarBorder", "var(--uk-inverse-global-border)"),
+    "--uk-inverse-navbar-item-color": value("inverseNavbarItemColor", "var(--uk-inverse-global-emphasis-color)"),
+    "--uk-inverse-navbar-toggle-color": value("inverseNavbarToggleColor", "var(--uk-inverse-global-color)"),
+    "--uk-inverse-navbar-toggle-hover-color": value("inverseNavbarToggleHoverColor", "var(--uk-inverse-global-emphasis-color)"),
     "--uk-navbar-background": value("navbarBackground", backgroundDefault),
     "--uk-theme-headerbar-color-mode": value("themeHeaderbarColorMode", "light"),
     "--uk-theme-headerbar-font-size": value("themeHeaderbarFontSize", "inherit"),
@@ -904,6 +894,10 @@ export function getUikitGlobalsCssVars(
     "--uk-navbar-nav-item-hover-color": value("navbarNavItemHoverColor", primary),
     "--uk-navbar-nav-item-onclick-color": value("navbarNavItemOnclickColor", primary),
     "--uk-navbar-nav-item-active-color": value("navbarNavItemActiveColor", primary),
+    "--uk-inverse-navbar-nav-item-color": value("inverseNavbarNavItemColor", "var(--uk-inverse-global-color)"),
+    "--uk-inverse-navbar-nav-item-hover-color": value("inverseNavbarNavItemHoverColor", "var(--uk-inverse-global-emphasis-color)"),
+    "--uk-inverse-navbar-nav-item-onclick-color": value("inverseNavbarNavItemOnclickColor", "var(--uk-inverse-global-color)"),
+    "--uk-inverse-navbar-nav-item-active-color": value("inverseNavbarNavItemActiveColor", "var(--uk-inverse-global-emphasis-color)"),
     "--uk-navbar-nav-item-hover-background": value("navbarNavItemHoverBackground", "transparent"),
     "--uk-navbar-nav-item-active-background": value("navbarNavItemActiveBackground", "transparent"),
     "--uk-navbar-nav-item-hover-text-shadow": value("navbarNavItemHoverTextShadow", "none"),
@@ -995,6 +989,7 @@ export function getUikitGlobalsCssVars(
     "--uk-navbar-mode-border-vertical": value("navbarModeBorderVertical", "none"),
     "--uk-navbar-border-width": value("navbarBorderWidth", value("borderWidth", "1px")),
     "--uk-navbar-border": value("navbarBorder", globalBorder),
+    "--uk-navbar-border-theme": value("navbarBorder", globalBorder),
     "--uk-navbar-dropdown-border-radius": value("navbarDropdownBorderRadius", "12px"),
     "--uk-navbar-nav-item-line-gradient": value("navbarNavItemLineGradient", "transparent"),
     "--uk-navbar-nav-item-line-border-radius": value("navbarNavItemLineBorderRadius", "0"),
@@ -1071,6 +1066,7 @@ export function getUikitGlobalsCssVars(
     "--uk-offcanvas-bar-color-mode": value("offcanvasBarColorMode", "dark"),
     "--uk-offcanvas-overlay-background": value("offcanvasOverlayBackground", "rgba(0,0,0,.8)"),
     // Logo
+    "--uk-logo-font-weight": value("logoFontWeight", "inherit"),
     "--uk-logo-font-size": value("logoFontSize", "20px"),
     "--uk-logo-text-transform": value("logoTextTransform", "none"),
 

@@ -251,7 +251,22 @@ export function normalizeBuilderSectionLayout(
   section: BuilderSection,
 ): NormalizedBuilderSectionLayout {
   if (section.rows !== undefined) {
-    return { source: "canonical", rows: section.rows, conflicts: [] };
+    const rows = section.rows.map((row) => {
+      const sourceLayout = row.customLayout?.template;
+      if (!sourceLayout) return row;
+      const inferredLayout = normalizeLayoutToUikitPreset(sourceLayout);
+      const inferredPreset = UIKIT_LAYOUT_PRESETS[inferredLayout];
+      if (inferredPreset.columnCount !== row.columns.length) return row;
+      const currentLayout = normalizeLayoutToUikitPreset(row.layout);
+      const currentIsEqualFallback = currentLayout === `${row.columns.length}-col-equal`;
+      if (!currentIsEqualFallback || inferredLayout === currentLayout) return row;
+      // Early YOOtheme imports stored an unsupported named-width template in
+      // customLayout but left the visible Row preset at its count-based equal
+      // fallback. Resolve that redundant fallback at the read boundary while
+      // preserving the exact responsive widths on each Column.
+      return { ...row, layout: inferredLayout };
+    });
+    return { source: "canonical", rows, conflicts: [] };
   }
 
   const conflicts: BuilderSectionLayoutConflict[] = [];

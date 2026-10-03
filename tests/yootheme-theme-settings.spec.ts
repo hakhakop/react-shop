@@ -173,6 +173,65 @@ test("applies a YOOtheme root-menu dropdown only to its stable WordPress menu it
   expect(result.menuPresentation["wp-999"]).toBeUndefined();
 });
 
+test("recovers imported dropdown stretch from fragment identity when legacy menu IDs are missing", () => {
+  const source = JSON.parse(
+    readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
+  );
+  source.menu.items = {
+    21: {
+      dropdown: { stretch: "navbar" },
+      content: {
+        title: "Beginners Surf Course",
+        image: "wp-content/uploads/lessons-01.jpg",
+        content: "Learn to surf with our Makai school.",
+      },
+    },
+  };
+  const settings = createYoothemeThemeSettings(source);
+  const result = applyBuilderThemeSettings(
+    {
+      ...defaultBuilderShellSettings,
+      namedMenus: [{
+        id: "main-menu-imported",
+        name: "Main Menu (Imported)",
+        items: [
+          {
+            id: "lessons",
+            label: "Lessons",
+            url: "/lessons",
+            dropdownContent: {
+              id: "lessons-dropdown",
+              kind: "sublayout",
+              sublayout: {
+                rows: [{
+                  id: "row",
+                  layout: "1-col",
+                  columns: [{
+                    id: "column",
+                    elements: [{
+                      id: "grid",
+                      kind: "grid",
+                      gridItems: [{
+                        id: "course",
+                        title: "Beginners Surf Course",
+                        imageUrl: "https://makai.webpages.am/wp-content/uploads/lessons-01.jpg",
+                        text: "Learn to surf with our Makai school.",
+                      }],
+                    }],
+                  }],
+                }],
+              },
+            },
+          },
+        ],
+      }],
+    },
+    settings,
+  );
+
+  expect(result.menuPresentation.lessons?.submenuStretch).toBe("navbar");
+});
+
 test("maps standard mobile Header alignment without using a preset", () => {
   const source = JSON.parse(
     readFileSync("tests/fixtures/yootheme-jack-theme-settings.json", "utf8"),
@@ -242,6 +301,22 @@ test("renders Jack Baker's imported Navbar line as a semantic strike-through", (
   expect(headerCss).toContain("bottom: var(--uk-navbar-nav-item-line-margin-vertical, -1px)");
   expect(headerCss).toContain("right: calc(100% - var(--uk-navbar-nav-item-line-margin-horizontal, 0px))");
   expect(headerCss).toContain("background: var(--uk-navbar-nav-item-line-hover-background, currentColor)");
+});
+
+test("uses YOOtheme Primary as the default heading family but preserves explicit Heading", () => {
+  const imported = getUikitGlobalsCssVars({
+    fontFamilyBody: "Montserrat",
+    fontFamilyPrimary: "Playfair Display",
+  });
+  expect(imported["--uk-heading-font-family"]).toContain("Playfair Display");
+
+  const explicitHeading = getUikitGlobalsCssVars({
+    fontFamilyBody: "Montserrat",
+    fontFamilyPrimary: "Playfair Display",
+    fontFamilyHeading: "Manrope",
+  });
+  expect(explicitHeading["--uk-heading-font-family"]).toContain("Manrope");
+  expect(explicitHeading["--webpages-font-primary"]).toContain("Playfair Display");
 });
 
 test("keeps Header row layout on the shared inspector path", () => {

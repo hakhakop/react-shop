@@ -14,15 +14,39 @@ function attributesValue(attributes: BuilderLayoutAdvancedSettings["attributes"]
 
 export default function ColumnCapabilityPanel({ column, tab, update, openWordPressMediaPicker }: Props) {
   const updateBackground = (patch: Partial<NonNullable<BuilderColumn["background"]>>) => update({ background: { ...(column.background ?? {}), ...patch } });
+  const backgroundParallax = column.background?.parallax;
+  const backgroundParallaxEnabled = Boolean(backgroundParallax?.y?.length);
+  const updateBackgroundParallax = (patch: Partial<NonNullable<BuilderColumn["background"]>["parallax"]>) =>
+    updateBackground({ parallax: { ...(backgroundParallax ?? {}), ...patch } });
+  const updateBackgroundParallaxStop = (index: 0 | 1, value: string) => {
+    const current = backgroundParallax?.y ?? [{ value: "-5vw" }, { value: "4vw" }];
+    const y = [...current];
+    y[index] = { ...(y[index] ?? { value: "" }), value };
+    updateBackgroundParallax({ y });
+  };
   const updateSticky = (patch: Partial<NonNullable<BuilderColumn["sticky"]>>) => update({ sticky: { ...(column.sticky ?? {}), ...patch } });
   const updateAdvanced = (patch: Partial<BuilderLayoutAdvancedSettings>) => update({ advanced: { ...(column.advanced ?? {}), ...patch } });
   const stickyMode = column.sticky?.mode ?? (column.sticky?.topOffset || column.sticky?.bottomOffset ? "column-within-row" : "none");
   const stickyEnabled = stickyMode !== "none";
+  const backgroundControls = <>
+    <InspectorFieldRow label="Image"><BuilderImageUrlControl value={column.background?.imageUrl ?? ""} placeholder="http://" chooseLabel="Select Image" onChange={(event) => updateBackground({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Image", currentUrl: column.background?.imageUrl, onSelect: (media) => updateBackground({ imageUrl: media.sourceUrl }) })} /></InspectorFieldRow>
+    <InspectorFieldRow label="Video"><BuilderImageUrlControl value={column.background?.videoUrl ?? ""} placeholder="http://" chooseLabel="Select Video" onChange={(event) => updateBackground({ videoUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Video", currentUrl: column.background?.videoUrl, onSelect: (media) => updateBackground({ videoUrl: media.sourceUrl }) })} /></InspectorFieldRow>
+    <InspectorFieldRow label="Image Position"><InspectorSelect value={column.background?.position ?? "center center"} options={["left top", "center top", "right top", "left center", "center center", "right center", "left bottom", "center bottom", "right bottom"].map((value) => ({ value, label: value.replace(/(^| )([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`) }))} onChange={(position) => updateBackground({ position })} ariaLabel="Column background image position" /></InspectorFieldRow>
+    <InspectorFieldRow label="Image Size"><InspectorSelect value={column.background?.size ?? "cover"} options={[{ value: "auto", label: "Auto" }, { value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} onChange={(size) => updateBackground({ size })} ariaLabel="Column background image size" /></InspectorFieldRow>
+    <InspectorFieldRow label="Image Repeat"><InspectorSelect value={column.background?.repeat ?? "no-repeat"} options={[{ value: "no-repeat", label: "No Repeat" }, { value: "repeat", label: "Repeat" }, { value: "repeat-x", label: "Repeat X" }, { value: "repeat-y", label: "Repeat Y" }]} onChange={(repeat) => updateBackground({ repeat })} ariaLabel="Column background image repeat" /></InspectorFieldRow>
+    <InspectorFieldRow label="Background Image Parallax"><InspectorSwitch checked={backgroundParallaxEnabled} disabled={!column.background?.imageUrl} onChange={(enabled) => updateBackground({ parallax: enabled ? { ...(backgroundParallax ?? {}), y: backgroundParallax?.y?.length ? backgroundParallax.y : [{ value: "-5vw" }, { value: "4vw" }], easing: backgroundParallax?.easing ?? 1 } : undefined })} label="Background image parallax" /></InspectorFieldRow>
+    {backgroundParallaxEnabled ? <>
+      <div className="builder-two-column">
+        <InspectorFieldRow label="Vertical Start"><InspectorTextField value={backgroundParallax?.y?.[0]?.value ?? ""} onChange={(value) => updateBackgroundParallaxStop(0, value)} ariaLabel="Background parallax vertical start" /></InspectorFieldRow>
+        <InspectorFieldRow label="Vertical End"><InspectorTextField value={backgroundParallax?.y?.[1]?.value ?? ""} onChange={(value) => updateBackgroundParallaxStop(1, value)} ariaLabel="Background parallax vertical end" /></InspectorFieldRow>
+      </div>
+      <InspectorFieldRow label="Easing"><InspectorTextField value={backgroundParallax?.easing === undefined ? "" : String(backgroundParallax.easing)} onChange={(value) => { const easing = value.trim() === "" ? undefined : Number(value); updateBackgroundParallax({ easing: easing !== undefined && Number.isFinite(easing) ? easing : undefined }); }} ariaLabel="Background parallax easing" /></InspectorFieldRow>
+    </> : null}
+  </>;
 
   if (tab === "style") return <div className="builder-inspector-stack" data-canonical-owner="BuilderColumn">
     <InspectorDivision title="BACKGROUND" summary={column.background?.imageUrl || column.background?.videoUrl ? "Media" : "None"}>
-      <InspectorFieldRow label="Image"><BuilderImageUrlControl value={column.background?.imageUrl ?? ""} placeholder="http://" chooseLabel="Select Image" onChange={(event) => updateBackground({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Image", currentUrl: column.background?.imageUrl, onSelect: (media) => updateBackground({ imageUrl: media.sourceUrl }) })} /></InspectorFieldRow>
-      <InspectorFieldRow label="Video"><BuilderImageUrlControl value={column.background?.videoUrl ?? ""} placeholder="http://" chooseLabel="Select Video" onChange={(event) => updateBackground({ videoUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Video", currentUrl: column.background?.videoUrl, onSelect: (media) => updateBackground({ videoUrl: media.sourceUrl }) })} /></InspectorFieldRow>
+      {backgroundControls}
     </InspectorDivision>
     <InspectorDivision title="APPEARANCE" summary={column.style ?? "None"}>
       <InspectorFieldRow label="Style"><InspectorSelect value={column.style ?? "none"} options={[{ value: "none", label: "None" }, { value: "default", label: "Card Default" }, { value: "primary", label: "Card Primary" }, { value: "secondary", label: "Card Secondary" }, { value: "card-hover", label: "Card Hover" }, { value: "tile-default", label: "Tile Default" }, { value: "tile-muted", label: "Tile Muted" }, { value: "tile-primary", label: "Tile Primary" }, { value: "tile-secondary", label: "Tile Secondary" }]} onChange={(style) => update({ style: style === "none" ? undefined : style })} ariaLabel="Column style" /></InspectorFieldRow>
@@ -43,8 +67,7 @@ export default function ColumnCapabilityPanel({ column, tab, update, openWordPre
     </InspectorDivision>
     {tab === "settings" ? <>
       <InspectorDivision title="BACKGROUND" summary={column.background?.imageUrl || column.background?.videoUrl ? "Media" : "None"}>
-        <InspectorFieldRow label="Image"><BuilderImageUrlControl value={column.background?.imageUrl ?? ""} placeholder="http://" chooseLabel="Select Image" onChange={(event) => updateBackground({ imageUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Image", currentUrl: column.background?.imageUrl, onSelect: (media) => updateBackground({ imageUrl: media.sourceUrl }) })} /></InspectorFieldRow>
-        <InspectorFieldRow label="Video"><BuilderImageUrlControl value={column.background?.videoUrl ?? ""} placeholder="http://" chooseLabel="Select Video" onChange={(event) => updateBackground({ videoUrl: event.target.value || undefined })} onChoose={() => openWordPressMediaPicker?.({ title: "Column Video", currentUrl: column.background?.videoUrl, onSelect: (media) => updateBackground({ videoUrl: media.sourceUrl }) })} /></InspectorFieldRow>
+        {backgroundControls}
       </InspectorDivision>
       <InspectorDivision title="APPEARANCE" summary={column.style ?? "None"}>
         <InspectorFieldRow label="Style"><InspectorSelect value={column.style ?? "none"} options={[{ value: "none", label: "None" }, { value: "default", label: "Card Default" }, { value: "primary", label: "Card Primary" }, { value: "secondary", label: "Card Secondary" }, { value: "card-hover", label: "Card Hover" }, { value: "tile-default", label: "Tile Default" }, { value: "tile-muted", label: "Tile Muted" }, { value: "tile-primary", label: "Tile Primary" }, { value: "tile-secondary", label: "Tile Secondary" }]} onChange={(style) => update({ style: style === "none" ? undefined : style })} ariaLabel="Column style" /></InspectorFieldRow>

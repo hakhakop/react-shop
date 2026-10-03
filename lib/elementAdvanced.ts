@@ -215,9 +215,12 @@ function scopeCssRules(source: string, scopeSelector: string): string {
 }
 
 /** Scopes selectors per element and makes keyframes unique to that element. */
-export function scopeElementCss(source: string | undefined, scope: string) {
+export function scopeElementCss(source: string | undefined, scope: string, rootSelector?: string) {
   if (!source?.trim()) return "";
-  const scopeSelector = `[data-builder-element-scope="${scope}"]`;
+  const elementRoot = `[data-builder-element-scope="${scope}"]`;
+  const scopeSelector = rootSelector
+    ? `.shop-builder-main ${elementRoot} ${rootSelector}`
+    : elementRoot;
   let css = source.replace(/@(?:import|namespace)[^;]+;/gi, "");
   const keyframes = new Map<string, string>();
   const retainedKeyframes: string[] = [];

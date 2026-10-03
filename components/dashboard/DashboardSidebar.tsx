@@ -1045,7 +1045,6 @@ export default function DashboardSidebar({
                 mode="management"
                 libraryType={templateLibraryTab}
                 savedTemplates={savedTemplates}
-                siteLibraryEnabled={Boolean(websiteId)}
                 templateStatus={templateStatus}
                 onLibraryTypeChange={setTemplateLibraryTab}
                 onOpenDocument={(type) => onSwitchBuilderTarget(type)}

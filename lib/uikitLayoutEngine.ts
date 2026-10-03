@@ -299,6 +299,11 @@ export function normalizeLayoutToUikitPreset(layoutKey?: string): UikitLayoutPre
   // Exact fraction / dash / ratio mappings matching YOOtheme & WebPages canonical presets
   if (key === "whole" || key === "12" || key === "1" || key === "1-1" || key === "1/1") return "1-col";
   if (key === "halves" || key === "6-6" || key === "2-col" || key === "1-2,1-2" || key === "1/2,1/2") return "2-col-equal";
+  // YOOtheme names the fixed side by its UIkit width token. Preserve the
+  // semantic Fixed-Right/Left preset while column responsiveWidths retain the
+  // authored `small|medium|large|xlarge` size at each breakpoint.
+  if (/^expand,(?:small|medium|large|xlarge)$/.test(key)) return "fixed-right";
+  if (/^(?:small|medium|large|xlarge),expand$/.test(key)) return "fixed-left";
   if (key === "thirds-1-2" || key === "4-8" || key === "1-2" || key === "1-3,2-3" || key === "1/3,2/3") return "thirds-1-2";
   if (key === "thirds-2-1" || key === "8-4" || key === "2-1" || key === "2-3,1-3" || key === "2/3,1/3") return "thirds-2-1";
   if (key === "thirds" || key === "4-4-4" || key === "1-1-1" || key === "3-col" || key === "1-3,1-3,1-3" || key === "1/3,1/3,1/3") return "3-col-equal";

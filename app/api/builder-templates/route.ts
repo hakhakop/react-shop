@@ -21,17 +21,8 @@ function withLibraryScope(
 }
 
 async function readVisibleTemplates(scope: { websiteId?: string }) {
-  if (!scope.websiteId) {
-    return withLibraryScope(await readBuilderSavedTemplates(), "shared");
-  }
-  const [siteTemplates, sharedTemplates] = await Promise.all([
-    readBuilderSavedTemplates(scope),
-    readBuilderSavedTemplates(),
-  ]);
-  return [
-    ...withLibraryScope(siteTemplates, "site"),
-    ...withLibraryScope(sharedTemplates, "shared"),
-  ];
+  const templates = await readBuilderSavedTemplates(scope);
+  return withLibraryScope(templates, scope.websiteId ? "site" : "shared");
 }
 
 function slugifyTemplateId(value: string) {
@@ -92,6 +83,7 @@ export async function POST(request: NextRequest) {
       ? normalizeBuilderLayoutKey(String(body.sourcePage))
       : existing?.sourcePage,
     design: body.design,
+    sourceImport: body.sourceImport ?? existing?.sourceImport,
     sections,
     updatedAt: new Date().toISOString(),
   };

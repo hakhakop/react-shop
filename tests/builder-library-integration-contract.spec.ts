@@ -1,6 +1,21 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { resolveBuilderLibraryImportFormat } from "@/lib/layoutLibrary";
+
+test("one Library upload routes portable Builder JSON and YOOtheme JSON by format", () => {
+  expect(resolveBuilderLibraryImportFormat({
+    exportType: "webpages-builder-template",
+    template: { templateType: "section", sections: [] },
+  })).toEqual({ source: "webpages", templateType: "section" });
+  expect(resolveBuilderLibraryImportFormat({
+    sections: [{ id: "section-1", kind: "contentLayout", visible: true }],
+  })).toEqual({ source: "webpages", templateType: undefined });
+  expect(resolveBuilderLibraryImportFormat({ name: "YOOtheme layout", children: [] })).toEqual({
+    source: "yootheme",
+    templateType: undefined,
+  });
+});
 
 test("Builder Library uses existing saved-template persistence and preserves document context", async () => {
   const source = await readFile(path.join(process.cwd(), "components/dashboard/DashboardBuilder.tsx"), "utf8");
@@ -32,17 +47,20 @@ test("Builder Library uses existing saved-template persistence and preserves doc
   expect(source).not.toContain("builder-routing.json");
   expect(source).not.toContain("templatePreviewIdentityStorage");
   expect(librarySurface).toContain("activeLibraryTypes");
-  expect(librarySurface).toContain("replace the entire layout");
+  expect(librarySurface).toContain('aria-label="Insert layout"');
   expect(librarySurface).toContain("imported !== false");
+  expect(librarySurface).toContain("resolveBuilderLibraryImportFormat");
+  expect(librarySurface).toContain("pendingImport.targetType");
+  expect(librarySurface).toContain("Upload Layout");
+  expect(librarySurface).not.toContain("Import YOOtheme Layout");
   expect(source).toContain("acceptedTypes.includes(importedType)");
   expect(source).toContain("templateType: importedType");
   expect(source).toContain('targetType === "element"');
-  expect(librarySurface).toContain('"This Site" : "Shared"');
-  expect(librarySurface).toContain('template.libraryScope ?? "shared"');
-  expect(librarySurface).toContain("templateIsReadOnlyShared");
-  expect(dashboardStyles).toContain(
-    ".builder-library-surface.is-contextual .builder-template-row > .builder-icon-button {\n  display: inline-flex;",
-  );
+  expect(librarySurface).not.toContain('"This Site" : "Shared"');
+  expect(librarySurface).not.toContain("templateIsReadOnlyShared");
+  expect(source).not.toContain("Templates save to React");
+  expect(dashboardStyles).toContain(".builder-template-row:hover .builder-template-row-actions");
+  expect(dashboardStyles).toContain(".builder-library-context-actions select");
 });
 
 test("Builder Library persistence separates website and shared stores", async () => {
@@ -52,9 +70,9 @@ test("Builder Library persistence separates website and shared stores", async ()
 
   expect(route).toContain("getAuthorizedWebsiteBuilderScope(request)");
   expect(route).toContain('readBuilderSavedTemplates(scope)');
-  expect(route).toContain('readBuilderSavedTemplates()');
-  expect(route).toContain('withLibraryScope(siteTemplates, "site")');
-  expect(route).toContain('withLibraryScope(sharedTemplates, "shared")');
+  expect(route).not.toContain('readBuilderSavedTemplates()');
+  expect(route).toContain('return withLibraryScope(templates, scope.websiteId ? "site" : "shared")');
+  expect(route).not.toContain("sharedTemplates");
   expect(storage).toContain('getBuilderTemplatesPath(websiteId?: string)');
   expect(layouts).toContain('getBuilderTemplatesPath(scope.websiteId)');
 });

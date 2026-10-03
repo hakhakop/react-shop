@@ -231,6 +231,8 @@ test("WordPress upload URLs resolve once at the shared Builder media boundary", 
   const origin = "https://cms.example.test/";
   expect(resolveWordPressMediaUrl("/wp-content/uploads/yootheme/hero.jpg", origin))
     .toBe("https://cms.example.test/wp-content/uploads/yootheme/hero.jpg");
+  expect(resolveWordPressMediaUrl("https://circle.webpages.am/wp-content/uploads/yootheme/services.jpg", origin))
+    .toBe("https://cms.example.test/wp-content/uploads/yootheme/services.jpg");
   expect(resolveWordPressMediaUrl("https://cdn.example.test/hero.jpg", origin))
     .toBe("https://cdn.example.test/hero.jpg");
   expect(resolveWordPressMediaUrl("/assets/logo.svg", origin)).toBe("/assets/logo.svg");
@@ -243,12 +245,14 @@ test("WordPress upload URLs resolve once at the shared Builder media boundary", 
     imageUrl: "/wp-content/uploads/yootheme/hero.jpg",
     thumbnailUrl: "/wp-content/uploads/yootheme/thumb.jpg",
     gridItems: [{ imageUrl: "/wp-content/uploads/yootheme/card.jpg" }],
+    galleryItems: [{ imageUrl: "https://circle.webpages.am/wp-content/uploads/yootheme/services.jpg", hoverImageUrl: "/wp-content/uploads/yootheme/services-hover.jpg" }],
     customAsset: "/assets/logo.svg",
     text: '<img src="/wp-content/uploads/yootheme/check.svg">',
   }, origin)).toEqual({
     imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/hero.jpg",
     thumbnailUrl: "https://cms.example.test/wp-content/uploads/yootheme/thumb.jpg",
     gridItems: [{ imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/card.jpg" }],
+    galleryItems: [{ imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/services.jpg", hoverImageUrl: "https://cms.example.test/wp-content/uploads/yootheme/services-hover.jpg" }],
     customAsset: "/assets/logo.svg",
     text: '<img src="https://cms.example.test/wp-content/uploads/yootheme/check.svg">',
   });

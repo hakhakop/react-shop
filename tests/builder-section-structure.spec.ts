@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
 import enterprise8 from "@/tests/fixtures/yootheme-compatibility/sources/enterprise8.json";
-import type { BuilderSection } from "@/components/dashboard/builderTypes";
+import type { BuilderColumn, BuilderSection } from "@/components/dashboard/builderTypes";
 import { resolveBuilderSectionStructure } from "@/lib/builderSectionStructure";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
 
@@ -161,6 +161,75 @@ test("Panel fill projects UIkit's item-match modifier onto its owning column", (
   expect(structure.rows[0].columns[1].className).not.toContain("uk-grid-item-match");
 });
 
+test("promotes only columns whose absolute elements overflow an authored edge", () => {
+  const section: BuilderSection = {
+    id: "overflowing-layer",
+    kind: "contentLayout",
+    title: "",
+    background: "transparent",
+    visible: true,
+    rows: [{
+      id: "overflow-row",
+      layout: "2-col-equal",
+      spacingContract: "yootheme",
+      columns: [
+        {
+          id: "overlapping-artwork",
+          elements: [{
+            id: "artwork",
+            kind: "image",
+            visualStyle: { layout: { position: "absolute", right: "-8vw", zIndex: 0 } },
+          }] as NonNullable<BuilderColumn["elements"]>,
+        },
+        {
+          id: "ordinary-content",
+          elements: [{
+            id: "ordinary",
+            kind: "image",
+            visualStyle: { layout: { position: "absolute", right: "8vw", zIndex: 0 } },
+          }] as NonNullable<BuilderColumn["elements"]>,
+        },
+      ],
+    }],
+  };
+
+  const columns = resolveBuilderSectionStructure(section).rows[0].columns;
+  expect(columns[0].className).toContain("shop-builder-column--has-overflowing-positioned-element");
+  expect(columns[1].className).not.toContain("shop-builder-column--has-overflowing-positioned-element");
+  expect(columns[0].column.elements[0].visualStyle?.layout?.zIndex).toBe(0);
+});
+
+test("projects YOOtheme column backgrounds and tile padding onto the inner surface", () => {
+  const structure = resolveBuilderSectionStructure({
+    id: "column-surface",
+    kind: "contentLayout", title: "", background: "transparent", visible: true,
+    rows: [{
+      id: "surface-row",
+      layout: "2-col-equal",
+      spacingContract: "yootheme",
+      columns: [{
+        id: "image-surface",
+        background: { imageUrl: "/media/bg.jpg", position: "left center", size: "contain" },
+        padding: "large",
+        verticalAlign: "middle",
+        elements: [],
+      }, {
+        id: "default-tile",
+        style: "tile-default",
+        elements: [],
+      }],
+    }],
+  }).rows[0].columns;
+
+  expect(structure[0].className).not.toContain("uk-tile");
+  expect(structure[0].style.backgroundImage).toBeUndefined();
+  expect(structure[0].surfaceClassName).toContain("uk-tile");
+  expect(structure[0].surfaceClassName).toContain("uk-tile-large");
+  expect(structure[0].surfaceStyle.backgroundRepeat).toBe("no-repeat");
+  expect(structure[0].surfaceStyle.backgroundPosition).toBe("left center");
+  expect(structure[1].surfaceClassName).toContain("uk-tile-default");
+});
+
 test("keeps authored responsive widths without an equal-column fallback", () => {
   const structure = resolveBuilderSectionStructure({
     id: "pricing-plan",
@@ -193,6 +262,10 @@ test("Builder and storefront consume the shared structure outside interaction ch
     resolve(process.cwd(), "components/dashboard/DashboardBuilder.tsx"),
     "utf8",
   );
+  const stylesheet = readFileSync(
+    resolve(process.cwd(), "app/styles/shop-builder.css"),
+    "utf8",
+  );
 
   for (const source of [storefront, builder]) {
     expect(source).toContain("resolveBuilderSectionStructure(section");
@@ -202,4 +275,10 @@ test("Builder and storefront consume the shared structure outside interaction ch
   expect(builder).toContain("builderInteractionFrameClassName(rowTarget)");
   expect(builder).toContain("builderInteractionClassName(");
   expect(storefront).not.toContain("builderInteractionFrameClassName");
+
+  const overflowLayerRule = stylesheet.match(
+    /\.shop-builder-content-row\s*>\s*\.shop-builder-content-layout-card\.shop-builder-column--has-overflowing-positioned-element\s*\{([^}]+)\}/,
+  )?.[1];
+  expect(overflowLayerRule).toContain("position: relative;");
+  expect(overflowLayerRule).toContain("z-index: 1;");
 });

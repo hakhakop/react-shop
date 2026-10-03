@@ -66,7 +66,7 @@
    part of the menu is positioned above the preview viewport. */
 .site-header.site-header--builder-preview .site-header-nav {
   flex-wrap: nowrap;
-  gap: clamp(0.4rem, 0.5vw, var(--header-builder-menu-gap, 1.4rem));
+  gap: var(--header-builder-menu-gap, var(--uk-navbar-nav-gap, 1.4rem));
   min-width: 0;
   height: 100%;
   max-height: 100%;
@@ -1263,8 +1263,12 @@ html.dark .site-header {
   display: none;
 }
 
-.site-header[data-header-text-mode="light"] .site-header-logo-primary {
+.site-header.site-header--has-inverse-logo[data-header-text-mode="light"] .site-header-logo-primary {
   display: none;
+}
+
+.site-header.site-header--primary-logo-fallback[data-header-text-mode="light"] .site-header-logo-primary {
+  display: block;
 }
 
 .site-header[data-header-text-mode="light"] .site-header-logo-img-wrap > .site-header-logo-inverse {
@@ -1273,6 +1277,16 @@ html.dark .site-header {
 
 .site-header[data-header-text-mode="light"] .site-header-logo-img-wrap > img:not(.site-header-logo-inverse) {
   display: none;
+}
+
+/* Inline YOOtheme logos inherit their SVG paint from the active Header color
+   mode. The surrounding logo link otherwise wins with the global link token. */
+.site-header[data-header-text-mode="light"]:not([data-scrolled="true"]) .site-header-logo-img-wrap {
+  color: inherit !important;
+}
+.site-header[data-header-text-mode="light"]:not([data-scrolled="true"])
+  .site-header-logo-primary .shop-builder-stylable-svg-host {
+  color: inherit !important;
 }
 
 @media (max-width: 959px) {
@@ -1351,12 +1365,55 @@ html.dark .site-header {
   text-decoration: none !important;
 }
 
-/* UIkit/YOOtheme navbar-mode-border-vertical parity. The global token owns
- * the mode; these selectors adapt the same behavior to WebPages' header DOM. */
-.site-header--navbar-border-vertical-partial .site-header-nav {
+/* Adapt YOOtheme's navbar border modes to the Header Builder's row, columns,
+   and item elements. The Builder document remains the source of composition. */
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-full .site-header-builder-primary-row {
+  box-sizing: border-box;
+  border: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+@media (min-width: 901px) {
+  .site-header.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-bottom-full-width::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset-inline: 0;
+    /* Keep the full-width rule on the inner navbar row's bottom edge when
+       the theme adds vertical navbar padding (Makai uses 15px). */
+    bottom: var(--header-document-padding-bottom, 0px);
+    height: var(--uk-navbar-border-width, 1px);
+    background: var(--uk-navbar-border, transparent);
+    pointer-events: none;
+  }
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-top-bottom .site-header-builder-primary-row {
+  border-block: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-bottom .site-header-builder-primary-row,
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-bottom-transparent .site-header-builder-primary-row {
+  border-bottom: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-bottom-full-width .site-header-builder-primary-row {
+  border-bottom: 0;
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-bottom-transparent[data-section-header-transparent="true"]:not([data-scrolled="true"]) {
+  --uk-navbar-border: transparent;
+}
+
+.site-header--navbar-border-vertical-partial:not(.site-header--navbar-yootheme-border-parity) .site-header-nav {
   border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
   border-right: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
   padding-inline: var(--uk-container-padding-horizontal, 0px);
+  align-self: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.site-header--navbar-border-vertical-partial.site-header--navbar-yootheme-border-parity .site-header-nav {
   align-self: stretch;
   align-items: stretch;
   height: 100%;
@@ -1386,12 +1443,86 @@ html.dark .site-header {
   justify-content: center;
 }
 
-.site-header--navbar-border-vertical-all .site-header-nav-item:not(:first-child) {
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-full.site-header--navbar-border-vertical-all .header-builder-columns {
+  gap: var(--uk-navbar-gap, 0px);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-partial
+  .header-builder-columns
+  > :first-child
+  .header-builder-column {
+  border-right: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-partial
+  .header-builder-columns
+  > :last-child
+  .header-builder-column {
+  border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-all
+  .header-builder-columns
+  > :not(:first-child)
+  .header-builder-column:not(:has(.header-builder-element--navigation)) {
+  border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-all
+  .header-builder-columns
+  > :not(:first-child)
+  .header-builder-column:has(.header-builder-element--navigation)
+  .site-header-nav {
+  border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-all
+  .header-builder-element:not(.header-builder-element--navigation),
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-all .site-header-mobile-menu-toggle {
+  align-self: stretch;
+  box-sizing: border-box;
+  height: 100%;
+  border-right: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-vertical-all
+  .site-header-nav
+  > .site-header-nav-item
+  > .site-header-nav-link {
+  border-right: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-full.site-header--navbar-border-vertical-all
+  .header-builder-column:has(.site-header-nav)
+  .site-header-nav-item:last-child
+  > .site-header-nav-link {
+  border-right: 0;
+}
+
+.site-header--navbar-yootheme-border-parity.site-header--navbar-border-mode-full.site-header--navbar-border-vertical-all
+  .header-builder-columns
+  > :last-child
+  .header-builder-column
+  > :last-child
+  .header-builder-element:not(.header-builder-element--navigation) {
+  border-right: 0;
+}
+
+.site-header--navbar-border-vertical-all .site-header-nav-link {
+  height: var(--header-builder-height, 90px);
+  box-sizing: border-box;
+}
+
+/* Older WebPages tenants store a similarly named vertical-divider setting,
+   but its legacy meaning is limited to menu items. */
+.site-header--navbar-border-vertical-all:not(.site-header--navbar-yootheme-border-parity)
+  .site-header-nav-item:not(:first-child) {
   position: relative;
   padding-left: var(--uk-navbar-nav-item-padding-horizontal, 0px);
 }
 
-.site-header--navbar-border-vertical-all .site-header-nav-item:not(:first-child)::before {
+.site-header--navbar-border-vertical-all:not(.site-header--navbar-yootheme-border-parity)
+  .site-header-nav-item:not(:first-child)::before {
   content: "";
   position: absolute;
   left: 0;
@@ -1399,11 +1530,6 @@ html.dark .site-header {
   bottom: 0;
   border-left: var(--uk-navbar-border-width, 1px) solid var(--uk-navbar-border, transparent);
   pointer-events: none;
-}
-
-.site-header--navbar-border-vertical-all .site-header-nav-link {
-  height: var(--header-builder-height, 90px);
-  box-sizing: border-box;
 }
 
 .site-header-nav-icon {
@@ -1537,15 +1663,67 @@ html.dark .site-header {
 
 .site-header-nav-submenu--builder .shop-builder-sublayout { min-width: 0; text-align: start; }
 
-/* YOOtheme's per-item `dropdown.stretch` is intentionally opt-in. A normal
- * builder dropdown retains its compact width; imported navbar dropdowns can
- * use the same container-wide geometry as their source. */
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar-container,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar {
-  width: min(var(--uk-container-default-max-width, 1424px), calc(100vw - 32px));
-  max-width: calc(100vw - 32px);
+/* YOOtheme's per-item `dropdown.stretch` is intentionally opt-in. `navbar`
+ * spans the actual Header primary row; `navbar-container` stays within its
+ * semantic container width. Promote that row to the containing block only
+ * for stretched dropdowns, keeping compact siblings item-anchored. */
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar),
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container),
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar),
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) {
+  position: relative;
+}
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar) .header-builder-columns,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-columns,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar) .header-builder-column,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-column,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar) .header-builder-element--navigation,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-element--navigation,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar) .site-header-nav-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container) .site-header-nav-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar) .site-header-nav,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-builder-primary-row:has(.site-header-nav-item.is-stretch-navbar-container) .site-header-nav,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar) .header-builder-columns,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-columns,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar) .header-builder-column,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-column,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar) .header-builder-element--navigation,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) .header-builder-element--navigation,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar) .site-header-nav-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) .site-header-nav-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar) .site-header-nav,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-main-inner:not(:has(.site-header-builder-primary-row)):has(.site-header-nav-item.is-stretch-navbar-container) .site-header-nav,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar-container {
+  position: static;
+}
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar {
+  position: static;
+}
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar > .site-header-nav-submenu.is-stretch-navbar {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  right: auto;
+  left: 0;
+  transform: translateY(8px);
+}
+/* In full-border mode the absolute containing block's percentage excludes the
+   row borders. Extend by those semantic border tokens so the dropdown edge
+   meets the visible outer navbar frame exactly. */
+.site-header.site-header--navbar-border-mode-full:not(.site-header--dropdown-dropbar)
+  .site-header-nav-item.is-stretch-navbar > .site-header-nav-submenu.is-stretch-navbar {
+  width: calc(100% + var(--uk-navbar-border-width, 1px) + var(--uk-navbar-border-width, 1px));
+}
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar-container > .site-header-nav-submenu.is-stretch-navbar-container {
+  box-sizing: border-box;
+  width: min(var(--uk-container-default-max-width, 1424px), 100%);
+  min-width: 0;
+  max-width: 100%;
+  right: auto;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 8px);
 }
 .site-header-nav-submenu--builder.is-large { padding: calc(var(--uk-navbar-dropdown-padding, var(--uk-dropdown-padding, .95rem)) * 1.5); }
 .site-header-nav-submenu--builder.is-flush-horizontal { padding-inline: 0; }
@@ -1671,20 +1849,15 @@ html.dark .site-header {
 }
 
 /* Imported YOOtheme item-level stretching takes precedence over the compact
-   builder-dropdown fallback and the header-level dropbar width. */
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar-container,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-submenu--builder.is-stretch-navbar {
-  right: auto;
-  left: 50%;
-  min-width: min(var(--uk-container-default-max-width, 1424px), calc(100vw - 32px));
-  transform: translate(-50%, 8px);
+   builder-dropdown fallback and the header-level alignment preference. */
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar:hover > .site-header-nav-submenu.is-stretch-navbar,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar:focus-within > .site-header-nav-submenu.is-stretch-navbar,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar.is-open > .site-header-nav-submenu.is-stretch-navbar {
+  transform: translateY(0);
 }
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:hover > .site-header-nav-submenu--builder.is-stretch-navbar-container,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:hover > .site-header-nav-submenu--builder.is-stretch-navbar,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:focus-within > .site-header-nav-submenu--builder.is-stretch-navbar-container,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item:focus-within > .site-header-nav-submenu--builder.is-stretch-navbar,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-open > .site-header-nav-submenu--builder.is-stretch-navbar-container,
-.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-open > .site-header-nav-submenu--builder.is-stretch-navbar {
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar-container:hover > .site-header-nav-submenu.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar-container:focus-within > .site-header-nav-submenu.is-stretch-navbar-container,
+.site-header:not(.site-header--dropdown-dropbar) .site-header-nav-item.is-stretch-navbar-container.is-open > .site-header-nav-submenu.is-stretch-navbar-container {
   transform: translate(-50%, 0);
 }
 
@@ -3266,14 +3439,26 @@ body[data-storefront-preset="princity"] .category-mega-card,
 
 /* Nav links */
 .site-header[data-header-text-mode="light"] .site-header-nav-link {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: var(--uk-inverse-navbar-nav-item-color, rgba(255, 255, 255, 0.8)) !important;
 }
 
 .site-header[data-header-text-mode="light"] .site-header-nav-link:hover,
+.site-header[data-header-text-mode="light"] .site-header-nav-link:focus-visible,
+.site-header[data-header-text-mode="light"] .site-header-nav-link:active,
 .site-header[data-header-text-mode="light"] .site-header-nav-link.is-active,
 .site-header[data-header-text-mode="light"] .site-header-nav-link[aria-current="page"],
 .site-header[data-header-text-mode="light"] .site-header-nav-link[data-active="true"] {
-  color: rgba(255, 255, 255, 1) !important;
+  color: var(--uk-inverse-navbar-nav-item-hover-color, rgba(255, 255, 255, 1)) !important;
+}
+
+.site-header[data-header-text-mode="light"] .site-header-nav-link:active {
+  color: var(--uk-inverse-navbar-nav-item-onclick-color, var(--uk-inverse-navbar-nav-item-hover-color, rgba(255, 255, 255, 1))) !important;
+}
+
+.site-header[data-header-text-mode="light"] .site-header-nav-link.is-active,
+.site-header[data-header-text-mode="light"] .site-header-nav-link[aria-current="page"],
+.site-header[data-header-text-mode="light"] .site-header-nav-link[data-active="true"] {
+  color: var(--uk-inverse-navbar-nav-item-active-color, rgba(255, 255, 255, 1)) !important;
 }
 
 /* Category burger toggle */
@@ -4713,12 +4898,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header-search[data-search-stretch="navbar"] { width: min(100%, var(--uk-container-default-max-width, 1200px)); }
 .site-header-search[data-search-stretch="navbar-container"] { width: 100%; }
 
-.site-header-social { display: inline-flex; align-items: center; gap: var(--uk-grid-gutter, 30px); }
-.site-header-social--gap-collapse { gap: 0; }
-.site-header-social--gap-small { gap: var(--uk-grid-small-gutter, 15px); }
-.site-header-social--gap-medium { gap: var(--uk-grid-medium-gutter, 40px); }
-.site-header-social--gap-large { gap: var(--uk-grid-large-gutter, 70px); }
-.site-header-social a { color: inherit; display: inline-flex; align-items: center; justify-content: center; }
 .site-header-brand { font-size: var(--uk-logo-font-size, inherit); text-transform: var(--uk-logo-text-transform, none); }
 
 .site-header--logo-padding-remove .site-header-builder-column:first-child,
@@ -4827,7 +5006,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) .site-header-top,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) .site-header-main,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) .site-header-main-inner,
-.site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) .site-header-builder-primary-row,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) .site-header-builder-extra-row,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
 .site-header[data-section-header-transparent="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner,
@@ -4838,7 +5016,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header.site-header--background-none:not([data-scrolled="true"]) .site-header-top,
 .site-header.site-header--background-none:not([data-scrolled="true"]) .site-header-main,
 .site-header.site-header--background-none:not([data-scrolled="true"]) .site-header-main-inner,
-.site-header.site-header--background-none:not([data-scrolled="true"]) .site-header-builder-primary-row,
 .site-header.site-header--background-none:not([data-scrolled="true"]) .site-header-builder-extra-row,
 .site-header.site-header--background-none:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
 .site-header.site-header--background-none:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner,
@@ -5284,4 +5461,57 @@ body[data-storefront-preset="princity"] .category-mega-card,
     border-bottom-width: 0 !important;
     border-bottom-color: transparent !important;
   }
+}
+
+/* Imported presentation follows the existing Builder composition. */
+.site-header-brand { font-weight: var(--uk-logo-font-weight, inherit); }
+.site-header--builder-width-boxed[style*="--header-theme-max-width"] .site-header-main-inner {
+  max-width: var(--header-theme-max-width);
+}
+.header-builder-element--logo,
+.header-builder-element--utility {
+  padding-inline: var(--header-theme-item-padding, var(--uk-navbar-item-padding-horizontal, 0));
+}
+.site-header[data-header-text-mode="light"] {
+  --uk-navbar-border: var(--uk-inverse-navbar-border);
+}
+.site-header.site-header--navbar-yootheme-border-parity.site-header--navbar-color-mode-light[data-header-text-mode="light"],
+.site-header.site-header--navbar-yootheme-border-parity.site-header--navbar-color-mode-dark[data-header-text-mode="dark"] {
+  /* The active text mode matches the theme's base navbar mode. */
+  --uk-navbar-border: var(--uk-navbar-border-theme, var(--uk-navbar-border));
+}
+.site-header.site-header--navbar-yootheme-border-parity.site-header--navbar-color-mode-dark[data-header-text-mode="light"],
+.site-header.site-header--navbar-yootheme-border-parity.site-header--navbar-color-mode-light[data-header-text-mode="dark"] {
+  /* YOOtheme switches navbar divider colors through its inverse tokens. */
+  --uk-navbar-border: var(--uk-inverse-navbar-border, var(--uk-navbar-border-theme, var(--uk-navbar-border)));
+}
+.site-header[data-header-text-mode="light"] .site-header-brand {
+  color: var(--uk-inverse-navbar-item-color);
+}
+.site-header[data-header-text-mode="light"] .header-builder-element--utility .site-header-actions :is(button, a) {
+  color: var(--uk-inverse-navbar-toggle-color) !important;
+}
+.site-header[data-header-text-mode="light"] .header-builder-element--utility .site-header-actions :is(button, a):hover {
+  color: var(--uk-inverse-navbar-toggle-hover-color) !important;
+}
+@media (min-width: 960px) {
+  .site-header {
+    --header-theme-item-padding: var(--uk-navbar-item-padding-horizontal-m, var(--uk-navbar-item-padding-horizontal, 0));
+    --header-theme-padding-top: var(--uk-navbar-padding-top-m, var(--uk-navbar-padding-top, 0px));
+    --header-theme-padding-bottom: var(--uk-navbar-padding-bottom-m, var(--uk-navbar-padding-bottom, 0px));
+  }
+}
+
+/* Pull-behind is section-owned and must survive document sticky rules. */
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0;
+  right: 0;
+}
+.site-header[data-overlap-header="true"][data-scrolled="true"]:not([data-header-behavior="static"]) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0;
+  right: 0;
 }

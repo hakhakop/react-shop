@@ -163,6 +163,8 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
     rawBlock.imageBoxDecoration !== "shadow"
       ? `tm-box-decoration-${rawBlock.imageBoxDecoration} uk-inline`
       : "";
+  const imageDecorationInverseClass =
+    rawBlock.imageBoxDecorationInverse ? "tm-box-decoration-inverse" : "";
   const imageHoverShadow = rawBlock.imageHoverBoxShadow ?? rawBlock.imageHoverShadow;
   const imageHoverShadowClass =
     imageHoverShadow && imageHoverShadow !== "none"
@@ -347,7 +349,7 @@ export default function UikitImage({ block, isCanvas, shellSettings }: Props) {
         }}
       >
         <div
-          className={`shop-builder-image-media ${imageDecorationClass} ${isBottomShadow ? "uk-box-shadow-bottom" : ""} ${imageHoverShadowClass} ${hasAdvancedCss ? "has-advanced-css" : ""} ${rawBlock.overlayHover || hasHoverImage || hasHoverVideo ? "uk-transition-toggle" : ""} ${mediaAspectRatio ? "uk-cover-container" : ""} ${
+          className={`shop-builder-image-media ${imageDecorationClass} ${imageDecorationInverseClass} ${isBottomShadow ? "uk-box-shadow-bottom" : ""} ${imageHoverShadowClass} ${hasAdvancedCss ? "has-advanced-css" : ""} ${rawBlock.overlayHover || hasHoverImage || hasHoverVideo ? "uk-transition-toggle" : ""} ${mediaAspectRatio ? "uk-cover-container" : ""} ${
             isPlaceholder ? "is-empty" : ""
           }`.trim()}
           data-image-ratio={mediaAspectRatio ? "true" : undefined}

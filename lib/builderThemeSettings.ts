@@ -1,5 +1,5 @@
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
-import type { BuilderShellSettings } from "@/lib/builderShell";
+import type { BuilderShellSettings, ReactMenuItem } from "@/lib/builderShell";
 import { normalizeYoothemeHeaderDocument } from "@/lib/yoothemeImportContract";
 import { resolveYoothemeLess, type YoothemeLessSource } from "@/lib/yoothemeLessImporter";
 
@@ -283,6 +283,44 @@ function sourceConfig(root: RecordValue) {
   };
 }
 
+function collectDropdownContentTokens(value: unknown, tokens = new Set<string>()): Set<string> {
+  if (typeof value === "string") {
+    const normalized = value.trim().replace(/^https?:\/\/[^/]+/i, "").replace(/^\/+/, "").toLowerCase();
+    // Theme fragments share many short UIkit settings. Use authored content
+    // and media/route references to identify the corresponding imported menu
+    // item when an older navigation import did not retain its WP menu ID.
+    if (normalized.length >= 14 || /(?:uploads\/|page_id=|(?:^|\/)#[\w-]+)/i.test(normalized)) {
+      tokens.add(normalized);
+    }
+  } else if (Array.isArray(value)) {
+    value.forEach((item) => collectDropdownContentTokens(item, tokens));
+  } else if (value && typeof value === "object") {
+    Object.values(value as Record<string, unknown>).forEach((item) => collectDropdownContentTokens(item, tokens));
+  }
+  return tokens;
+}
+
+function matchMenuItemByDropdownContent(
+  sourceContent: unknown,
+  items: ReactMenuItem[],
+): ReactMenuItem | undefined {
+  const sourceTokens = collectDropdownContentTokens(sourceContent);
+  if (sourceTokens.size < 3) return undefined;
+  const matches = items.flatMap((item) => {
+    if (!item.dropdownContent) return [];
+    const itemTokens = collectDropdownContentTokens(item.dropdownContent);
+    const overlap = [...sourceTokens].filter((token) => itemTokens.has(token)).length;
+    const confidence = overlap / Math.min(sourceTokens.size, itemTokens.size || 1);
+    return overlap >= 3 && confidence >= 0.35 ? [{ item, overlap, confidence }] : [];
+  }).sort((a, b) => b.overlap - a.overlap || b.confidence - a.confidence);
+  const best = matches[0];
+  const next = matches[1];
+  // Ambiguous fragments must remain untouched; source identity is more
+  // important than guessing and assigning another item's dropdown settings.
+  if (!best || (next && best.overlap === next.overlap && best.confidence === next.confidence)) return undefined;
+  return best.item;
+}
+
 export function normalizeBuilderThemeSettings(value: unknown): BuilderThemeSettings {
   const raw = record(value);
   const page = record(raw.page);
@@ -479,12 +517,19 @@ export function applyBuilderThemeSettings(
   ].forEach((key) => delete providerGlobalStyles[key]);
   const sourceMenuItems = record(themeSettings.sourceConfig.menuItems);
   const menuPresentation = { ...shellSettings.menuPresentation };
+  const allMenuItems = [...shellSettings.menuItems, ...shellSettings.namedMenus.flatMap((menu) => menu.items)];
   for (const [sourceId, rawItem] of Object.entries(sourceMenuItems)) {
-    const dropdown = record(record(rawItem).dropdown);
+    const sourceMenuItem = record(rawItem);
+    const dropdown = record(sourceMenuItem.dropdown);
     if (!Object.keys(dropdown).length) continue;
-    const matchingItems = shellSettings.menuItems.filter((item) =>
+    const matchingItems = allMenuItems.filter((item) =>
+      String(item.sourceMenuItemDatabaseId) === sourceId ||
       item.id === sourceId || item.id === `wp-${sourceId}` || item.portableKey === sourceId || item.portableKey === `wp-${sourceId}`,
     );
+    if (matchingItems.length === 0 && sourceMenuItem.content) {
+      const contentMatch = matchMenuItemByDropdownContent(sourceMenuItem.content, allMenuItems);
+      if (contentMatch) matchingItems.push(contentMatch);
+    }
     for (const item of matchingItems) {
       const previous = menuPresentation[item.id];
       menuPresentation[item.id] = {

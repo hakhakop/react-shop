@@ -106,6 +106,7 @@ export type BuilderGalleryItem = {
   id: string;
   imageUrl?: string;
   imageAlt?: string;
+  hoverImageUrl?: string;
   hoverVideoUrl?: string;
   title?: string;
   meta?: string;
@@ -117,7 +118,7 @@ export type BuilderGalleryItem = {
   linkAriaLabel?: string;
   dynamicContext?: DynamicContentContextDescriptor;
   dynamicBindings?: DynamicFieldBindings<
-    "imageUrl" | "imageAlt" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
+    "imageUrl" | "imageAlt" | "hoverImageUrl" | "hoverVideoUrl" | "title" | "meta" | "content" | "linkUrl" | "linkLabel"
   >;
 };
 
@@ -614,6 +615,7 @@ export type BuilderLayoutBlock = {
   imageIconColor?: string;
   imageTextColor?: string;
   imageBoxDecoration?: "none" | "default" | "primary" | "secondary" | "shadow" | "mask" | (string & {});
+  imageBoxDecorationInverse?: boolean;
   imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
@@ -1140,6 +1142,7 @@ export type BuilderLayoutBlock = {
     animation?: string;
   };
   dividerStyle?: "default" | "small" | "icon" | "vertical";
+  dividerElement?: "hr" | "div";
   alertStyle?: "primary" | "success" | "warning" | "danger";
 };
 
@@ -1290,6 +1293,9 @@ export type BuilderSection = {
   overlap?: boolean;
   textColor?: "none" | "light" | "dark";
   sectionPadding?: "none" | "xsmall" | "small" | "default" | "medium" | "large" | "xlarge";
+  /** Independent YOOtheme section padding presets, used when top and bottom differ. */
+  sectionPaddingTop?: "none" | "xsmall" | "small" | "default" | "medium" | "large" | "xlarge";
+  sectionPaddingBottom?: "none" | "xsmall" | "small" | "default" | "medium" | "large" | "xlarge";
   removeTopPadding?: boolean;
   removeBottomPadding?: boolean;
   htmlElement?: "div" | "section" | "header" | "footer" | "aside" | "main";
@@ -1298,6 +1304,8 @@ export type BuilderSection = {
   headerTextColor?: "none" | "light" | "dark";
   animationDelay?: number | string;
   sectionTitlePosition?: string;
+  /** Source text for YOOtheme's decorative section title. `title` remains the Builder section name. */
+  sectionTitleText?: string;
   sectionTitleRotation?: "left" | "right" | "none";
   sectionTitleBreakpoint?: string;
   colorScheme?: SectionColorScheme;
@@ -1531,7 +1539,8 @@ export type BuilderSection = {
     speed?: number;
     align?: "center" | "start";
     dragFree?: boolean;
-    effect?: "slide" | "fade";
+    /** YOOtheme/UIkit slideshow transition, adapted by the shared renderer. */
+    effect?: "slide" | "fade" | "scale" | "pull" | "push" | string;
     spaceBetween?: number;
     coverflowRotate?: number;
     coverflowDepth?: number;
@@ -1733,6 +1742,14 @@ export type BuilderSavedTemplate = {
   description?: string;
   sourcePage?: BuilderLayoutKey;
   design?: BuilderDesign;
+  /** Original YOOtheme JSON, retained so library application can use the latest mapper. */
+  sourceImport?: {
+    format: "yootheme-json" | "webpages-builder-json";
+    version: 1;
+    /** YOOtheme mapping migration level applied to the saved Builder snapshot. */
+    mapperVersion?: number;
+    payload: unknown;
+  };
   sections: BuilderSection[];
   updatedAt: string;
 };

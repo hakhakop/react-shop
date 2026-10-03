@@ -51,6 +51,10 @@
       "submenuLayout": "mega",
       "submenuColumns": 2,
       "submenuWidth": "850px",
+      "submenuStretch": null,
+      "submenuLarge": false,
+      "submenuRemoveHorizontalPadding": false,
+      "submenuRemoveVerticalPadding": false,
       "mobileAccordion": true,
       "badgeText": null
     },
@@ -60,6 +64,10 @@
       "submenuLayout": "mega",
       "submenuColumns": 2,
       "submenuWidth": "850px",
+      "submenuStretch": null,
+      "submenuLarge": false,
+      "submenuRemoveHorizontalPadding": false,
+      "submenuRemoveVerticalPadding": false,
       "mobileAccordion": true,
       "badgeText": null
     },
@@ -69,6 +77,10 @@
       "submenuLayout": "list",
       "submenuColumns": 1,
       "submenuWidth": null,
+      "submenuStretch": null,
+      "submenuLarge": false,
+      "submenuRemoveHorizontalPadding": false,
+      "submenuRemoveVerticalPadding": false,
       "mobileAccordion": true,
       "badgeText": null
     }
@@ -152,15 +164,16 @@
   "cardBackground": "rgba(255, 255, 255, 0.08)",
   "cardBackdropFilter": "blur(25px)",
   "cardDefaultColorMode": "light",
-  "overlayDefaultBackground": "rgba(255, 255, 255, 0.15)",
-  "overlayDefaultBackdropFilter": "blur(15px)",
-  "overlayPrimaryBackdropFilter": "blur(15px)",
+  "overlayDefaultBackground": "rgba(90, 91, 92, 0.5)",
+  "overlayDefaultBackdropFilter": "blur(25px)",
+  "overlayPrimaryBackground": "transparent",
+  "overlayPrimaryBackdropFilter": "blur(25px)",
   "cardPrimaryBackground": "linear-gradient(30deg, #812FCB 0%, #D91F71 40%, #FF1445 70%, #ED7E65 100%)",
   "cardSecondaryBackground": "#000",
   "cardBorderRadius": "8px",
   "cardBorderColor": "#e5e7eb",
   "cardBorderWidth": "1px",
-  "cardShadow": "none",
+  "cardShadow": "0 8px 24px rgba(0, 0, 0, 0.08)",
   "cardShadowHover": "0 12px 30px rgba(0, 0, 0, 0.12)",
   "cardDefaultHoverShadow": "0 12px 30px rgba(0, 0, 0, 0.12)",
   "cardPrimaryShadow": "none",
@@ -187,7 +200,7 @@
   "cardHeaderSpacing": "20px",
   "cardFooterSpacing": "20px",
   "cardPaddingSmall": "15px",
-  "cardPaddingDefault": "40px",
+  "cardPaddingDefault": "30px",
   "cardPaddingLarge": "40px",
   "imageDefaultRatio": "natural",
   "imageDefaultFit": "natural",
@@ -238,13 +251,6 @@
       "id": "circle-home",
       "label": "Գլխավոր",
       "url": "/",
-      "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Home"
@@ -252,19 +258,19 @@
         "ru": {
           "label": "Главная"
         }
-      }
-    },
-    {
-      "id": "circle-product",
-      "label": "Ապրանք",
-      "url": "/product-2",
+      },
       "parentId": null,
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all",
+      "visibility": "all"
+    },
+    {
+      "id": "circle-product",
+      "label": "Ապրանք",
+      "url": "/product-2",
       "contentTranslations": {
         "en": {
           "label": "Product"
@@ -272,19 +278,19 @@
         "ru": {
           "label": "Продукт"
         }
-      }
+      },
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-product-video-effects",
       "label": "Տեսանյութի էֆեկտներ",
       "url": "/product-2#video-effects",
-      "parentId": "circle-product",
-      "iconName": "lighting",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lighting.svg",
-      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Video Effects",
@@ -294,19 +300,19 @@
           "label": "Видеоэффекты",
           "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam"
         }
-      }
+      },
+      "parentId": "circle-product",
+      "iconName": "lighting",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lighting.svg",
+      "subtitle": "Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-product-full-control",
       "label": "Լիակատար վերահսկողություն",
       "url": "/product-2#full-control",
-      "parentId": "circle-product",
-      "iconName": "trouble-shooting",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-trouble-shooting.svg",
-      "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Full Control",
@@ -316,19 +322,19 @@
           "label": "Полный контроль",
           "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum"
         }
-      }
+      },
+      "parentId": "circle-product",
+      "iconName": "trouble-shooting",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-trouble-shooting.svg",
+      "subtitle": "At vero eos et accusam et justo duo dolores et ea rebum",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-product-data-privacy",
       "label": "Տվյալների գաղտնիություն",
       "url": "/product-2#data-privacy",
-      "parentId": "circle-product",
-      "iconName": "lock",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lock.svg",
-      "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Data Privacy",
@@ -338,19 +344,19 @@
           "label": "Конфиденциальность данных",
           "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt"
         }
-      }
+      },
+      "parentId": "circle-product",
+      "iconName": "lock",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-lock.svg",
+      "subtitle": "Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-product-chat-features",
       "label": "Զրույցի հնարավորություններ",
       "url": "/product-2#chat-features",
-      "parentId": "circle-product",
-      "iconName": "chat",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
-      "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et",
-      "mobileUrl": "/product-2#chat-features-mobile",
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Chat Features",
@@ -360,19 +366,19 @@
           "label": "Возможности чата",
           "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et"
         }
-      }
+      },
+      "parentId": "circle-product",
+      "iconName": "chat",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
+      "subtitle": "Sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et",
+      "mobileUrl": "/product-2#chat-features-mobile",
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-product-more-features",
       "label": "Այլ գործառույթներ",
       "url": "/product-2#more-features",
-      "parentId": "circle-product",
-      "iconName": "rocket",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-rocket.svg",
-      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "More Features",
@@ -382,19 +388,19 @@
           "label": "Дополнительные функции",
           "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat"
         }
-      }
+      },
+      "parentId": "circle-product",
+      "iconName": "rocket",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-rocket.svg",
+      "subtitle": "Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-pricing",
       "label": "Գներ",
       "url": "/pricing",
-      "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Pricing"
@@ -402,19 +408,19 @@
         "ru": {
           "label": "Цены"
         }
-      }
-    },
-    {
-      "id": "circle-about",
-      "label": "Մեր մասին",
-      "url": "/about",
+      },
       "parentId": null,
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all",
+      "visibility": "all"
+    },
+    {
+      "id": "circle-about",
+      "label": "Մեր մասին",
+      "url": "/about",
       "contentTranslations": {
         "en": {
           "label": "About"
@@ -422,19 +428,19 @@
         "ru": {
           "label": "О нас"
         }
-      }
-    },
-    {
-      "id": "circle-careers",
-      "label": "Աշխատատեղեր ✨",
-      "url": "/careers",
+      },
       "parentId": null,
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all",
+      "visibility": "all"
+    },
+    {
+      "id": "circle-careers",
+      "label": "Աշխատատեղեր ✨",
+      "url": "/careers",
       "contentTranslations": {
         "en": {
           "label": "Careers ✨"
@@ -442,19 +448,19 @@
         "ru": {
           "label": "Вакансии"
         }
-      }
-    },
-    {
-      "id": "circle-careers-job-description",
-      "label": "Աշխատանքի նկարագրություն",
-      "url": "/job-description",
-      "parentId": "circle-careers",
+      },
+      "parentId": null,
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "mobile",
+      "visibility": "all"
+    },
+    {
+      "id": "circle-careers-job-description",
+      "label": "Աշխատանքի նկարագրություն",
+      "url": "/job-description",
       "contentTranslations": {
         "en": {
           "label": "Job Description"
@@ -462,19 +468,19 @@
         "ru": {
           "label": "Должностная инструкция"
         }
-      }
-    },
-    {
-      "id": "circle-support",
-      "label": "Աջակցություն",
-      "url": "/support",
-      "parentId": null,
+      },
+      "parentId": "circle-careers",
       "iconName": null,
       "iconUrl": null,
       "subtitle": null,
       "mobileUrl": null,
       "target": "_self",
-      "visibility": "all",
+      "visibility": "mobile"
+    },
+    {
+      "id": "circle-support",
+      "label": "Աջակցություն",
+      "url": "/support",
       "contentTranslations": {
         "en": {
           "label": "Support"
@@ -482,19 +488,19 @@
         "ru": {
           "label": "Поддержка"
         }
-      }
+      },
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-help-center",
       "label": "Օգնության կենտրոն",
       "url": "/support#help-center",
-      "parentId": "circle-support",
-      "iconName": "chat",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
-      "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Help Center",
@@ -504,19 +510,19 @@
           "label": "Центр помощи",
           "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "chat",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-chat.svg",
+      "subtitle": "Diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-first-steps",
       "label": "Առաջին քայլեր",
       "url": "/support#first-steps",
-      "parentId": "circle-support",
-      "iconName": "tutorials",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-tutorials.svg",
-      "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "First Steps",
@@ -526,19 +532,19 @@
           "label": "Первые шаги",
           "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "tutorials",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-tutorials.svg",
+      "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam sed diam voluptua",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-documentation",
       "label": "Փաստաթղթեր",
       "url": "/support#documentation",
-      "parentId": "circle-support",
-      "iconName": "technology",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-technology.svg",
-      "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Documentation",
@@ -548,19 +554,19 @@
           "label": "Документация",
           "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "technology",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-technology.svg",
+      "subtitle": "Eirmod tempor invidunt ut labore et dolore magna aliquyam",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-accounts",
       "label": "Հաշիվներ",
       "url": "/support#accounts",
-      "parentId": "circle-support",
-      "iconName": "account",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-account.svg",
-      "subtitle": "Էլիտր սեդ դիամ նոնումի էիրմոդ ժամանակավոր ինվիդունտ ուտ լաբորե և դոլորե մագնա ալիքվյամ",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Accounts",
@@ -570,19 +576,19 @@
           "label": "Учётные записи",
           "subtitle": "Elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "account",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-account.svg",
+      "subtitle": "Էլիտր սեդ դիամ նոնումի էիրմոդ ժամանակավոր ինվիդունտ ուտ լաբորե և դոլորե մագնա ալիքվյամ",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-community",
       "label": "Մեր համայնքը",
       "url": "/support#our-community",
-      "parentId": "circle-support",
-      "iconName": "heart",
-      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-heart.svg",
-      "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Our Community",
@@ -592,19 +598,19 @@
           "label": "Наше сообщество",
           "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "heart",
+      "iconUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/icon-heart.svg",
+      "subtitle": "Consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-support-updates",
       "label": "Թարմացումներ",
       "url": "/updates",
-      "parentId": "circle-support",
-      "iconName": "download",
-      "iconUrl": null,
-      "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore",
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Updates",
@@ -614,19 +620,19 @@
           "label": "Обновления",
           "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore"
         }
-      }
+      },
+      "parentId": "circle-support",
+      "iconName": "download",
+      "iconUrl": null,
+      "subtitle": "Sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore",
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     },
     {
       "id": "circle-blog",
       "label": "Բլոգ",
       "url": "/blog",
-      "parentId": null,
-      "iconName": null,
-      "iconUrl": null,
-      "subtitle": null,
-      "mobileUrl": null,
-      "target": "_self",
-      "visibility": "all",
       "contentTranslations": {
         "en": {
           "label": "Blog"
@@ -634,9 +640,17 @@
         "ru": {
           "label": "Блог"
         }
-      }
+      },
+      "parentId": null,
+      "iconName": null,
+      "iconUrl": null,
+      "subtitle": null,
+      "mobileUrl": null,
+      "target": "_self",
+      "visibility": "all"
     }
   ],
+  "namedMenus": [],
   "headerInverseLogoUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-inverted.svg",
   "headerMobileLogoUrl": "https://circle.webpages.am/wp-content/uploads/yootheme/logo-mobile.svg",
   "headerStickyShowOnUp": true,
@@ -645,7 +659,7 @@
   "headerDropbarEnabled": false,
   "headerParentIconEnabled": false,
   "headerClickModeEnabled": false,
-  "updatedAt": "2026-08-27T08:18:01.532Z",
+  "updatedAt": "2026-09-30T17:16:17.922Z",
   "buttonTextTransform": "none",
   "emphasisColor": "#FFF",
   "mutedTextColor": "rgba(255, 255, 255, 0.5)",
@@ -760,7 +774,7 @@
   "navbarNavItemLineTransitionDuration": "0.35s",
   "navbarNavItemLineOpacity": "0.4",
   "navbarItemPaddingHorizontalMedium": "30px",
-  "navbarMode": "border-always",
+  "navbarMode": "bottom-full-width",
   "navbarBorderWidth": "1px",
   "navbarBorder": "rgba(255, 255, 255, 0.08)",
   "navbarDropdownBorderRadius": "8px",
@@ -1919,7 +1933,7 @@
   "largeTextFontSize": "24px",
   "pageContainerMaxWidth": "1600px",
   "navDividerMarginVertical": "0",
-  "navDefaultFontSize": "9px",
+  "navDefaultFontSize": "14px",
   "navDefaultSubtitleFontSize": "12px",
   "navDefaultSubtitleFontWeight": "inherit",
   "navDefaultHeaderColor": "inherit",
@@ -1940,17 +1954,17 @@
   "inverseNavSecondaryItemActiveBackground": "transparent",
   "navbarNavItemHeight": "80px",
   "navbarNavItemOnclickColor": "inherit",
-  "navbarNavItemActiveColor": "inherit",
+  "navbarNavItemActiveColor": "#FFF",
   "navbarNavItemFontSize": "16px",
   "navbarNavItemTextTransform": "none",
   "navbarPrimaryNavItemFontSize": "20px",
   "navbarSubtitleFontSize": "12px",
   "navbarSubtitleColor": "inherit",
   "navbarNavItemLinePositionMode": "bottom",
-  "navbarNavItemLineHeight": "0",
-  "navbarNavItemLineHoverHeight": "0",
-  "navbarNavItemLineOnclickHeight": "0",
-  "navbarNavItemLineActiveHeight": "0",
+  "navbarNavItemLineHeight": "1px",
+  "navbarNavItemLineHoverHeight": "1px",
+  "navbarNavItemLineOnclickHeight": "1px",
+  "navbarNavItemLineActiveHeight": "1px",
   "navbarDropdownShiftMargin": "0",
   "navbarDropdownLargeShiftMargin": "0",
   "navbarDropdownDropbarShiftMargin": "0",
@@ -1959,7 +1973,7 @@
   "navbarDropdownNavSubtitleFontSize": "12px",
   "navbarDropdownNavSubtitleColor": "inherit",
   "navbarDropdownNavItemPaddingVertical": "0",
-  "navbarDropdownNavFontSize": "14px",
+  "navbarDropdownNavFontSize": "16px",
   "navbarDropdownShiftMarginMedium": "0",
   "navbarDropdownDropbarShiftMarginMedium": "0",
   "navbarDropdownDropbarLargeShiftMarginMedium": "0",
@@ -2031,5 +2045,66 @@
   "paginationItemMode": "glow",
   "paginationItemGlowGradient": "conic-gradient(from 60deg, #E8533C, #FD3D8F, #B823C3, #063AD8, #4901AC, #B823C3, #FD3D8F, #E8533C)",
   "paginationItemGlowFilter": "blur(10px)",
-  "paginationItemGlowOpacity": "0"
+  "paginationItemGlowOpacity": "0",
+  "searchPlaceholderColor": "#FFF",
+  "searchDefaultBackground": "rgba(160, 130, 255, 0.06)",
+  "searchDefaultBorderWidth": "1px",
+  "searchDefaultBorder": "rgba(255, 255, 255, 0.11)",
+  "searchDefaultFocusBorder": "rgba(255, 255, 255, 0.11)",
+  "searchNavbarBorderWidth": "1px",
+  "searchNavbarBorder": "rgba(255, 255, 255, 0.11)",
+  "searchNavbarFocusBorder": "rgba(255, 255, 255, 0.11)",
+  "searchMediumBorderWidth": "1px",
+  "searchMediumBorder": "rgba(255, 255, 255, 0.11)",
+  "searchMediumFocusBorder": "rgba(255, 255, 255, 0.11)",
+  "searchLargeBorderWidth": "1px",
+  "searchLargeBorder": "rgba(255, 255, 255, 0.11)",
+  "searchLargeFocusBorder": "rgba(255, 255, 255, 0.11)",
+  "dropdownBackground": "rgba(27, 23, 31, 0.5)",
+  "dropdownColorMode": "light",
+  "dropdownDropbarMargin": "0",
+  "dropdownDropbarLargePaddingTop": "35px",
+  "dropdownNavItemHoverColor": "#F8154C",
+  "dropdownNavSublistItemHoverColor": "#F8154C",
+  "dropbarColorMode": "light",
+  "offcanvasBarPaddingVertical": "30px",
+  "offcanvasBarPaddingHorizontal": "30px",
+  "offcanvasBarBackground": "#000000",
+  "offcanvasOverlayBackground": "rgba(0, 0, 0, 0.68)",
+  "navPrimarySublistItemColor": "rgba(255, 255, 255, 0.7)",
+  "inverseNavbarItemColor": "#000",
+  "inverseNavbarBorder": "rgba(0, 0, 0, 0.12)",
+  "logoFontSize": "20px",
+  "logoFontWeight": "600",
+  "logoTextTransform": "uppercase",
+  "navbarPaddingTopMedium": "0px",
+  "navbarPaddingBottomMedium": "0px",
+  "navbarNavItemFontFamily": "Inter",
+  "navbarNavItemFontStyle": "normal",
+  "navbarNavItemFontWeight": "400",
+  "navbarNavItemLetterSpacing": "0",
+  "navbarDropdownNavFontFamily": "Inter",
+  "navbarDropdownNavFontStyle": "normal",
+  "navbarDropdownNavLetterSpacing": "0",
+  "navbarDropdownNavTextTransform": "none",
+  "navDefaultSubtitleFontFamily": "inherit",
+  "navDefaultSubtitleTextTransform": "none",
+  "navDefaultSublistItemColor": "inherit",
+  "navPrimaryFontSize": "22px",
+  "navPrimarySublistFontSize": "18px",
+  "navPrimarySubtitleFontFamily": "inherit",
+  "navPrimarySubtitleTextTransform": "none",
+  "navbarSubtitleFontFamily": "inherit",
+  "navbarSubtitleFontWeight": "400",
+  "navbarSubtitleTextTransform": "none",
+  "navbarDropdownNavSubtitleFontFamily": "inherit",
+  "navbarDropdownNavSubtitleFontWeight": "400",
+  "navbarDropdownNavSubtitleTextTransform": "none",
+  "inverseNavbarToggleColor": "var(--uk-inverse-global-color)",
+  "inverseNavbarToggleHoverColor": "var(--uk-inverse-global-emphasis-color)",
+  "inverseNavbarNavItemColor": "inherit",
+  "inverseNavbarNavItemOnclickColor": "inherit",
+  "inverseNavbarNavItemActiveColor": "inherit",
+  "navbarBorderSemantics": "yootheme",
+  "navbarColorMode": "light"
 }

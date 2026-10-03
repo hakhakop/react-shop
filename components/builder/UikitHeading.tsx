@@ -172,6 +172,9 @@ export default function UikitHeading({ block }: Props) {
 
   const customGradientStyle = {
     ...(localTypography.style ?? {}),
+    ...(localTypography.style?.fontSize ? {
+      "--builder-heading-font-size": String(localTypography.style.fontSize),
+    } : {}),
     ...(isCustomGradient ? {
         backgroundImage: `linear-gradient(${rawBlock.textGradientCustomAngle ?? 135}deg, ${rawBlock.textGradientCustomStart ?? "#ffffff"}, ${rawBlock.textGradientCustomEnd ?? "#c084fc"})`,
         WebkitBackgroundClip: "text",
@@ -185,7 +188,7 @@ export default function UikitHeading({ block }: Props) {
     plainHeadingContent
   );
 
-  const headingProps = { className: titleClassName, style: customGradientStyle };
+  const headingProps = { className: titleClassName, style: customGradientStyle as React.CSSProperties };
   const uncoloredHtml = headingHtml !== undefined && !colorClass;
 
   return (

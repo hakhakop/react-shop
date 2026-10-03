@@ -591,7 +591,11 @@ export function YoothemeLessImportModal({
 
   const handleParse = () => {
     if (!lessText.trim()) {
-      setError("Paste or upload a LESS file before importing.");
+      setError("Paste or upload a YOOtheme _import.less file before importing.");
+      return;
+    }
+    if (/^theme\.[^.]+\.less$/i.test(sourceName) && /@import\s/i.test(lessText)) {
+      setError("This is a theme entry file, not the style override. Choose vendor/assets/uikit-themes/master-<theme>/_import.less instead.");
       return;
     }
     const resolved = resolveYoothemeLess([
@@ -623,11 +627,9 @@ export function YoothemeLessImportModal({
           <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700 }}>Import YOOtheme LESS Styles</h3>
           <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}><X size={18} /></button>
         </div>
-        <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "12px" }}>
-          Upload a YOOtheme <code>.less</code> file or paste its variables below. The same semantic Global Styles resolver used by Import LESS will map supported values.
-        </p>
+        <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "12px" }}>Upload the theme override at <code>vendor/assets/uikit-themes/master-&lt;theme&gt;/_import.less</code>. WebPages supplies the supported base YOOtheme navbar inheritance.</p>
         <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 10px", border: "1px solid #334155", borderRadius: "7px", color: "#cbd5e1", cursor: "pointer", fontSize: "12px", fontWeight: 600, marginBottom: "12px" }}>
-          <Upload size={14} /> Upload LESS file
+          <Upload size={14} /> Upload _import.less
           <input
             type="file"
             accept=".less,text/plain"
@@ -636,6 +638,7 @@ export function YoothemeLessImportModal({
           />
         </label>
         {sourceName !== "pasted.less" && <p style={{ fontSize: "11px", color: "#94a3b8", margin: "-4px 0 10px" }}>Loaded {sourceName}</p>}
+        <p style={{ fontSize: "11px", color: "#94a3b8", margin: "0 0 6px" }}>Or paste standalone LESS declarations:</p>
         <textarea
           value={lessText}
           onChange={(e) => setLessText(e.target.value)}

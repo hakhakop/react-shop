@@ -291,6 +291,17 @@ export default function GalleryCapabilityPanel({
                     />
                   </InspectorFieldRow>
                   <InspectorFieldRow label="Image alt" dynamicBinding={dynamicBinding("imageAlt")}><InspectorTextField value={item.imageAlt ?? ""} onChange={(imageAlt) => updateItem({ imageAlt })} placeholder="Image description" /></InspectorFieldRow>
+                  <InspectorFieldRow label="Hover image" dynamicBinding={dynamicBinding("hoverImageUrl")}>
+                    <BuilderImageUrlControl
+                      value={item.hoverImageUrl ?? ""}
+                      onChange={(event) => updateItem({ hoverImageUrl: event.target.value.trim() || undefined })}
+                      onChoose={() => openWordPressMediaPicker?.({
+                        title: `Gallery item ${index + 1} hover image`,
+                        currentUrl: item.hoverImageUrl,
+                        onSelect: (media) => updateItem({ hoverImageUrl: media.sourceUrl }),
+                      })}
+                    />
+                  </InspectorFieldRow>
                   <InspectorFieldRow label="Hover video" dynamicBinding={dynamicBinding("hoverVideoUrl")}>
                     <InspectorTextField value={item.hoverVideoUrl ?? ""} onChange={(hoverVideoUrl) => updateItem({ hoverVideoUrl })} placeholder="https://…" />
                   </InspectorFieldRow>

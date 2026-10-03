@@ -7,6 +7,8 @@ import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 test("imported Gallery composes only truthful Image controls and preserves source dimension semantics", () => {
   const panel = readFileSync(resolve(process.cwd(), "components/dashboard/inspector/panels/GalleryCapabilityPanel.tsx"), "utf8");
   const gallery = readFileSync(resolve(process.cwd(), "components/builder/UikitGallery.tsx"), "utf8");
+  const inspectorControls = readFileSync(resolve(process.cwd(), "components/dashboard/inspector/panels/InspectorSharedControls.tsx"), "utf8");
+  const dashboardStyles = readFileSync(resolve(process.cwd(), "app/styles/dashboard.css"), "utf8");
 
   expect(panel).toContain("showFrameControls={!isImportedYoothemeGallery}");
   expect(panel).toContain("showFocalPoint={!isImportedYoothemeGallery}");
@@ -14,6 +16,12 @@ test("imported Gallery composes only truthful Image controls and preserves sourc
   expect(panel).toContain("showDecoration={!isImportedYoothemeGallery}");
   expect(panel).toContain("DynamicContentInspectorGroup");
   expect(panel).toContain('dynamicBinding("imageUrl")');
+  expect(panel).toContain('dynamicBinding("hoverImageUrl")');
+  expect(panel).toContain('value={item.hoverImageUrl ?? ""}');
+  expect(inspectorControls).toContain('className="builder-media-url-thumbnail"');
+  expect(inspectorControls).toContain('onError={() => setPreviewFailed(true)}');
+  expect(dashboardStyles).toContain(".builder-media-source-card.is-empty .builder-media-source-summary");
+  expect(dashboardStyles).toContain(".builder-media-preview-unavailable");
   expect(panel).toContain('label="Hover video" dynamicBinding={dynamicBinding("hoverVideoUrl")}');
   expect(panel).toContain('onChange={(hoverVideoUrl) => updateItem({ hoverVideoUrl })}');
   expect(panel).toContain('dynamicBinding("content")');
@@ -22,7 +30,11 @@ test("imported Gallery composes only truthful Image controls and preserves sourc
   expect(gallery).toContain("resolveGalleryImageIntrinsicDimensions(rawBlock.imageWidth, rawBlock.imageHeight)");
   expect(gallery).toContain('width={isYoothemeGallery ? importedIntrinsicDimensions?.width : undefined}');
   expect(gallery).toContain('height={isYoothemeGallery ? importedIntrinsicDimensions?.height : undefined}');
-  expect(gallery).toContain('width: isYoothemeGallery ? "auto" : "100%"');
+  expect(gallery).toContain('width: "100%"');
+  expect(gallery).toContain("showHoverImage && item.hoverImageUrl");
+  expect(gallery).toContain("shop-builder-gallery-hover-image uk-position-cover uk-transition-fade");
+  expect(gallery).toContain("{ ...overlayThemeStyle, ...(hasOverlayLink ? { pointerEvents: \"none\" as const } : {}) }");
+  expect(gallery).toContain("style={isYoothemeGallery ? { zIndex: 2 } : undefined}");
   expect(gallery).toContain('height: isYoothemeGallery ? "auto"');
   expect(gallery).toContain('className="shop-builder-gallery-image-placeholder"');
   expect(gallery).toContain('isYoothemeGallery ? baseGridClass.replace("uk-grid-match", "").trim()');

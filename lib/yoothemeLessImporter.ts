@@ -235,7 +235,10 @@ function evaluateFunction(name: string, args: string[]) {
   const colors = args.map(parseColor);
   if (name === "fade") {
     if (!colors[0] || !args[1]) return null;
-    return formatColor([colors[0][0], colors[0][1], colors[0][2], Math.max(0, Math.min(1, percentage(args[1]))) * colors[0][3]]);
+    // LESS fade() sets an absolute alpha value; it does not multiply the
+    // source alpha. Makai intentionally fades an already translucent global
+    // border to 10%, which must remain 0.1 rather than becoming 0.01.
+    return formatColor([colors[0][0], colors[0][1], colors[0][2], Math.max(0, Math.min(1, percentage(args[1])))]);
   }
   if (name === "darken" || name === "lighten") {
     if (!colors[0] || !args[1]) return null;
@@ -416,6 +419,7 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "global-primary-background": { destination: "shellSettings.backgroundPrimary", domain: "Background" },
   "global-primary-background-image": { destination: "shellSettings.backgroundPrimaryImage", domain: "Background" },
   "global-secondary-background": { destination: "shellSettings.backgroundSecondary", domain: "Background" },
+  "tile-secondary-background": { destination: "shellSettings.tileSecondaryBackground", domain: "Surfaces" },
   "global-secondary-background-image": { destination: "shellSettings.backgroundSecondaryImage", domain: "Background" },
   "global-success-background": { destination: "shellSettings.successColor", domain: "Colors" },
   "global-warning-background": { destination: "shellSettings.warningColor", domain: "Colors" },
@@ -538,6 +542,7 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "button-primary-hover-box-shadow": { destination: "shellSettings.buttonPrimaryHoverShadow", domain: "Buttons" },
   "button-primary-hover-gradient": { destination: "shellSettings.buttonPrimaryHoverGradient", domain: "Buttons" },
   "button-font-size": { destination: "shellSettings.buttonFontSize", domain: "Buttons" },
+  "button-padding-horizontal": { destination: "shellSettings.buttonPaddingX", domain: "Buttons" },
   "button-large-font-size": { destination: "shellSettings.buttonLargeFontSize", domain: "Buttons" },
   "button-font-family": { destination: "shellSettings.buttonFontFamily", domain: "Buttons" },
   "button-font-style": { destination: "shellSettings.buttonFontStyle", domain: "Buttons" },
@@ -639,6 +644,8 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "internal-button-secondary-glow-filter": { destination: "shellSettings.buttonSecondaryGlowFilter", domain: "Buttons" },
   "internal-button-secondary-hover-glow-filter": { destination: "shellSettings.buttonSecondaryHoverGlowFilter", domain: "Buttons" },
   "theme-box-decoration-border-radius": { destination: "shellSettings.themeBoxDecorationBorderRadius", domain: "Images" },
+  "theme-box-decoration-default-border": { destination: "shellSettings.themeBoxDecorationDefaultBorder", domain: "Images" },
+  "inverse-theme-box-decoration-default-border": { destination: "shellSettings.inverseThemeBoxDecorationDefaultBorder", domain: "Images" },
   "theme-box-decoration-default-gradient": { destination: "shellSettings.themeBoxDecorationDefaultGradient", domain: "Images" },
   "theme-box-decoration-primary-glow-filter": { destination: "shellSettings.themeBoxDecorationPrimaryGlowFilter", domain: "Images" },
   "theme-box-decoration-primary-glow-gradient": { destination: "shellSettings.themeBoxDecorationPrimaryGlowGradient", domain: "Images" },
@@ -891,6 +898,11 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "offcanvas-bar-background": { destination: "shellSettings.offcanvasBarBackground", domain: "Offcanvas" },
   "offcanvas-bar-color-mode": { destination: "shellSettings.offcanvasBarColorMode", domain: "Offcanvas" },
   "offcanvas-overlay-background": { destination: "shellSettings.offcanvasOverlayBackground", domain: "Offcanvas" },
+  "logo-font-weight": { destination: "shellSettings.logoFontWeight", domain: "Logo" },
+  "inverse-navbar-border": { destination: "shellSettings.inverseNavbarBorder", domain: "Navbar" },
+  "inverse-navbar-item-color": { destination: "shellSettings.inverseNavbarItemColor", domain: "Navbar" },
+  "inverse-navbar-toggle-color": { destination: "shellSettings.inverseNavbarToggleColor", domain: "Navbar" },
+  "inverse-navbar-toggle-hover-color": { destination: "shellSettings.inverseNavbarToggleHoverColor", domain: "Navbar" },
   "logo-font-size": { destination: "shellSettings.logoFontSize", domain: "Logo" },
   "logo-text-transform": { destination: "shellSettings.logoTextTransform", domain: "Logo" },
   "navbar-gap": { destination: "shellSettings.navbarGap", domain: "Navbar" },
@@ -932,8 +944,12 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "navbar-item-padding-horizontal": { destination: "shellSettings.navbarItemPaddingHorizontal", domain: "Navbar" },
   "navbar-item-padding-horizontal-m": { destination: "shellSettings.navbarItemPaddingHorizontalMedium", domain: "Navbar" },
   "navbar-backdrop-filter": { destination: "shellSettings.navbarBackdropFilter", domain: "Navbar" },
+  "navbar-color-mode": { destination: "shellSettings.navbarColorMode", domain: "Navbar" },
   "navbar-mode": { destination: "shellSettings.navbarMode", domain: "Navbar" },
   "navbar-mode-border-vertical": { destination: "shellSettings.navbarModeBorderVertical", domain: "Navbar" },
+  // YOOtheme 5 renamed these tokens while retaining the same semantic modes.
+  "navbar-border-mode": { destination: "shellSettings.navbarMode", domain: "Navbar" },
+  "navbar-border-vertical-mode": { destination: "shellSettings.navbarModeBorderVertical", domain: "Navbar" },
   "navbar-border-width": { destination: "shellSettings.navbarBorderWidth", domain: "Navbar" },
   "navbar-border": { destination: "shellSettings.navbarBorder", domain: "Navbar" },
   "navbar-nav-item-line-mode": { destination: "shellSettings.navbarNavItemLineMode", domain: "Navbar" },
@@ -1051,7 +1067,10 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "dropbar-background": { destination: "shellSettings.dropbarBackground", domain: "Dropbar" },
   "dropbar-color": { destination: "shellSettings.dropbarColor", domain: "Dropbar" },
   "dropbar-color-mode": { destination: "shellSettings.dropbarColorMode", domain: "Dropbar" },
+  "inverse-navbar-nav-item-color": { destination: "shellSettings.inverseNavbarNavItemColor", domain: "Navbar" },
   "inverse-navbar-nav-item-hover-color": { destination: "shellSettings.inverseNavbarNavItemHoverColor", domain: "Navbar" },
+  "inverse-navbar-nav-item-onclick-color": { destination: "shellSettings.inverseNavbarNavItemOnclickColor", domain: "Navbar" },
+  "inverse-navbar-nav-item-active-color": { destination: "shellSettings.inverseNavbarNavItemActiveColor", domain: "Navbar" },
 };
 
 function setNested(target: Record<string, unknown>, path: string, value: string) {
@@ -1066,17 +1085,21 @@ function controlTextLineHeight(height: unknown, borderWidth: unknown, fallback: 
   return `${Math.max(0, Number(heightMatch[1]) - Number(borderMatch[1]) * 2)}px`;
 }
 
-export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: YoothemeDevstackPresetId = "devstack-light-blue"): YoothemeSemanticPreset {
+export function resolveYoothemeLess(
+  sources: YoothemeLessSource[],
+  presetId: YoothemeDevstackPresetId = "devstack-light-blue",
+): YoothemeSemanticPreset {
   const presetDefinition = YOOTHEME_DEVSTACK_PRESETS.find((preset) => preset.id === presetId) ?? YOOTHEME_DEVSTACK_PRESETS[2];
   const ordered = [...sources].sort((a, b) => a.precedence - b.precedence);
   const { latest, all } = getLatestDeclarations(ordered);
   const rawValues = new Map([...latest.entries()].map(([name, declaration]) => [name, declaration.rawValue]));
   // These are UIkit's semantic button defaults, not WebPages defaults. They
   // must be written on every YOOtheme style import so an earlier WebPages
-  // global (for example uppercase labels) cannot remain active merely because
-  // the LESS layer relies on UIkit's default rather than redeclaring it.
+  // global cannot remain active merely because the LESS layer relies on
+  // UIkit's defaults rather than redeclaring them.
   const shellSettings: Record<string, unknown> = {
-    buttonTextTransform: "none",
+    buttonTextTransform: "uppercase",
+    navbarBorderSemantics: "yootheme",
     // UIkit renders a parent icon for navbar entries that own dropdowns.
     // This semantic default has no LESS variable of its own, but it is part
     // of YOOtheme's generated navbar markup and must survive future imports.
@@ -1121,7 +1144,11 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
       row.note = resolved.reason;
       unsupported.push(row);
     } else {
-      setNested(shellSettings, mapping.destination, resolved.value);
+      const importedValue = mapping.destination === "shellSettings.navbarMode"
+        && resolved.value === "border-always"
+        ? "bottom-full-width"
+        : resolved.value;
+      setNested(shellSettings, mapping.destination, importedValue);
       // `buttonHeight` is a legacy component alias. Keep it synchronized on
       // import while `controlHeightDefault` remains the canonical global owner.
       if (variable === "global-control-height") shellSettings.buttonHeight = resolved.value;
@@ -1129,6 +1156,41 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
       if (previous.length > 1) conflicts.push(row);
     }
   }
+
+  // YOOtheme theme `_import.less` files intentionally contain only theme
+  // overrides. The shared UIkit/master Navbar layers provide these inherited
+  // values during YOOtheme's real compilation. Project the same stable
+  // inheritance into existing WebPages semantic owners so a theme override
+  // remains a useful, self-contained import without uploading UIkit itself.
+  const inheritNavbar = (sourceVariable: string, destination: string, value: unknown) => {
+    if (!latest.has(sourceVariable) && typeof value === "string" && value.trim()) {
+      shellSettings[destination] = value;
+    }
+  };
+  inheritNavbar("navbar-color-mode", "navbarColorMode", "dark");
+  inheritNavbar("navbar-padding-top-m", "navbarPaddingTopMedium", shellSettings.navbarPaddingTop ?? "0px");
+  inheritNavbar("navbar-padding-bottom-m", "navbarPaddingBottomMedium", shellSettings.navbarPaddingBottom ?? "0px");
+  inheritNavbar("navbar-item-padding-horizontal-m", "navbarItemPaddingHorizontalMedium", shellSettings.navbarItemPaddingHorizontal ?? "0px");
+  inheritNavbar("navbar-nav-item-padding-horizontal-m", "navbarNavItemPaddingHorizontalMedium", shellSettings.navbarNavItemPaddingHorizontal ?? "15px");
+  inheritNavbar("navbar-gap-m", "navbarGapMedium", shellSettings.navbarGap ?? "0px");
+  inheritNavbar("navbar-nav-gap-m", "navbarNavGapMedium", shellSettings.navbarNavGap ?? "0px");
+  inheritNavbar("navbar-nav-item-height", "navbarNavItemHeight", "80px");
+  inheritNavbar("navbar-nav-item-font-size", "navbarNavItemFontSize", shellSettings.baseFontSize ?? "16px");
+  inheritNavbar("navbar-nav-item-font-family", "navbarNavItemFontFamily", shellSettings.fontFamilySecondary ?? shellSettings.fontFamilyBody ?? "inherit");
+  inheritNavbar("navbar-nav-item-font-style", "navbarNavItemFontStyle", shellSettings.fontStyleSecondary ?? "inherit");
+  inheritNavbar("navbar-nav-item-font-weight", "navbarNavItemFontWeight", shellSettings.fontWeightSecondary ?? "inherit");
+  inheritNavbar("navbar-nav-item-letter-spacing", "navbarNavItemLetterSpacing", shellSettings.letterSpacingSecondary ?? "inherit");
+  inheritNavbar("navbar-nav-item-text-transform", "navbarNavItemTextTransform", shellSettings.textTransformSecondary ?? "inherit");
+  inheritNavbar("navbar-nav-item-active-color", "navbarNavItemActiveColor", shellSettings.emphasisColor);
+  inheritNavbar("navbar-dropdown-margin", "navbarDropdownMargin", "0");
+  inheritNavbar("navbar-dropdown-width", "navbarDropdownWidth", "200px");
+  inheritNavbar("navbar-dropdown-nav-font-size", "navbarDropdownNavFontSize", shellSettings.baseFontSize ?? "16px");
+  inheritNavbar("navbar-dropdown-nav-font-family", "navbarDropdownNavFontFamily", shellSettings.fontFamilySecondary ?? shellSettings.fontFamilyBody ?? "inherit");
+  inheritNavbar("navbar-dropdown-nav-font-style", "navbarDropdownNavFontStyle", shellSettings.fontStyleSecondary ?? "inherit");
+  inheritNavbar("navbar-dropdown-nav-font-weight", "navbarDropdownNavFontWeight", shellSettings.fontWeightSecondary ?? "inherit");
+  inheritNavbar("navbar-dropdown-nav-letter-spacing", "navbarDropdownNavLetterSpacing", shellSettings.letterSpacingSecondary ?? "inherit");
+  inheritNavbar("navbar-dropdown-nav-text-transform", "navbarDropdownNavTextTransform", shellSettings.textTransformSecondary ?? "inherit");
+  inheritNavbar("navbar-dropdown-nav-item-active-color", "navbarDropdownNavItemActiveColor", shellSettings.emphasisColor);
 
   // UIkit's default Alert color inherits @global-color. Preserve that source
   // inheritance in the canonical Alert owner when the theme does not provide

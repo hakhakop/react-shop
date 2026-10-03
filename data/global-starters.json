@@ -140,5 +140,25 @@
     },
     "createdAt": "2026-09-21T08:36:34.003Z",
     "updatedAt": "2026-09-21T08:36:36.539Z"
+  },
+  {
+    "id": "global-3fe418d5-c016-49c5-b48d-9a61d0c1742f",
+    "sourceWebsiteId": "2da7603a-594f-4017-b24c-4918957c91f3",
+    "title": "Makai",
+    "description": "",
+    "category": "WebPages",
+    "sortOrder": 0,
+    "enabled": true,
+    "preview": {
+      "tone": "sage",
+      "rows": [
+        86,
+        58,
+        74,
+        62
+      ]
+    },
+    "createdAt": "2026-09-25T22:09:32.162Z",
+    "updatedAt": "2026-09-25T22:09:32.162Z"
   }
 ]

@@ -146,30 +146,32 @@ export function getUikitSectionStyleClass(style?: string): string {
 /**
  * Maps WebPages container preset to UIkit container bounds.
  */
-export function getUikitContainerClass(preset?: string): string {
-  if (!preset) return "uk-container";
+export function getUikitContainerClass(
+  preset?: string,
+  expandOneSide?: "left" | "right" | "none",
+): string {
+  const p = preset?.toLowerCase();
+  const base = !p
+    ? "uk-container"
+    : p === "xsmall" || p === "xs"
+      ? "uk-container uk-container-xsmall"
+      : p === "small" || p === "narrow" || p === "sm"
+        ? "uk-container uk-container-small"
+        : p === "large" || p === "wide" || p === "lg"
+          ? "uk-container uk-container-large"
+          : p === "xlarge" || p === "xl"
+            ? "uk-container uk-container-xlarge"
+            : p === "expand" || p === "full"
+              ? "uk-container uk-container-expand"
+              : p === "none"
+                ? ""
+                : "uk-container";
 
-  const p = preset.toLowerCase();
-  if (p === "xsmall" || p === "xs") {
-    return "uk-container uk-container-xsmall";
-  }
-  if (p === "small" || p === "narrow" || p === "sm") {
-    return "uk-container uk-container-small";
-  }
-  if (p === "large" || p === "wide" || p === "lg") {
-    return "uk-container uk-container-large";
-  }
-  if (p === "xlarge" || p === "xl") {
-    return "uk-container uk-container-xlarge";
-  }
-  if (p === "none") {
-    return "";
-  }
-  if (p === "expand" || p === "full") {
-    return "uk-container uk-container-expand";
-  }
-
-  return "uk-container";
+  // Expansion applies to an existing constrained UIkit container. A `none`
+  // width has no container edge to expand, so keep it unmodified.
+  return base && expandOneSide && expandOneSide !== "none"
+    ? `${base} uk-container-expand-${expandOneSide}`
+    : base;
 }
 
 /**
@@ -327,11 +329,13 @@ export function getUikitCardClass(
   // Padding modifier
   const pad = options?.padding?.toLowerCase();
   if (pad === "none" || pad === "0") {
-    classes.push("uk-card-none");
+    classes.push(isTile ? "uk-padding-remove" : "uk-card-none");
   } else if (pad === "small" || pad === "xs" || pad === "sm") {
-    classes.push(isTile ? "uk-padding-small" : "uk-card-small");
+    classes.push(isTile ? "uk-tile-small" : "uk-card-small");
   } else if (pad === "large" || pad === "lg" || pad === "xl") {
-    classes.push(isTile ? "uk-padding-large" : "uk-card-large");
+    classes.push(isTile ? "uk-tile-large" : "uk-card-large");
+  } else if (isTile && (pad === "xlarge" || pad === "2xl" || pad === "3xl")) {
+    classes.push("uk-tile-xlarge");
   }
 
   // Hover modifier
@@ -412,6 +416,23 @@ export function getUikitPanelMediaStyle(options: {
     objectFit: fit,
     backgroundPosition: focal ?? (options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center center"),
   };
+}
+
+/**
+ * YOOtheme creates a cropped media rendition when both Grid image dimensions
+ * are authored. Imported documents retain the source image URL, so the shared
+ * renderer must reproduce that crop in the browser instead of stretching the
+ * original into the dimensioned frame. Explicit fit values still win.
+ */
+export function resolveYoothemeGridImageFit(
+  fit: "cover" | "contain" | "fill" | "natural" | undefined,
+  width: string | undefined,
+  height: string | undefined,
+): "cover" | "contain" | "fill" | undefined {
+  if (fit === "cover" || fit === "contain" || fit === "fill") return fit;
+  const isConcreteDimension = (value: string | undefined) =>
+    Boolean(value && /^\d+(?:\.\d+)?(?:px)?$/.test(value.trim()));
+  return isConcreteDimension(width) && isConcreteDimension(height) ? "cover" : undefined;
 }
 
 export type UikitAccordionStyle = "default" | "divided" | "striped" | "minimal";

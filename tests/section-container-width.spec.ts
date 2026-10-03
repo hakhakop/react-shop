@@ -25,6 +25,9 @@ test("YOOtheme None and Expand retain distinct container semantics", () => {
   expect(getUikitContainerClass(resolveUikitSectionContainerPreset("xlarge", "none"))).toBe(
     "uk-container uk-container-xlarge",
   );
+  expect(getUikitContainerClass("large", "right")).toBe(
+    "uk-container uk-container-large uk-container-expand-right",
+  );
 });
 
 test("builder row projection preserves the responsive section gutter", async () => {
@@ -50,6 +53,12 @@ test("builder row projection preserves the responsive section gutter", async () 
   );
   expect(shopCss).toContain(
     ".shop-builder-content-row--yootheme {",
+  );
+  expect(shopCss).toContain(
+    ".uk-container-expand-left.uk-container-large,\n  .uk-container-expand-right.uk-container-large",
+  );
+  expect(shopCss).toContain(
+    "50vw + var(--uk-container-large-max-width, 1400px) / 2 - var(--uk-container-padding-horizontal-m, 40px)",
   );
   expect(shopCss).toContain(
     "width: calc(100% + var(--shop-builder-row-column-gutter)) !important;",

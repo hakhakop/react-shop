@@ -138,8 +138,16 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
         : undefined;
   const height = string(props.height);
   const sectionHeight = height === "viewport" && bool(props.height_offset_top) ? "viewport-percent" : height === "viewport" ? "viewport" : height === "viewport-20" ? "viewport-20" : height === "viewport-percent" ? "viewport-percent" : height === "none" || height === "auto" ? "auto" : undefined;
-  const padding = string(props.padding);
-  const sectionPadding = padding === "none" || padding === "xsmall" || padding === "small" || padding === "default" || padding === "medium" || padding === "large" || padding === "xlarge" ? padding : padding === "x-small" ? "xsmall" : undefined;
+  const normalizePadding = (value: unknown) => {
+    const source = string(value);
+    return source === "none" || source === "xsmall" || source === "small" || source === "default" || source === "medium" || source === "large" || source === "xlarge"
+      ? source
+      : source === "x-small" ? "xsmall" : undefined;
+  };
+  const padding = normalizePadding(props.padding);
+  const sectionPaddingTop = normalizePadding(props.padding_top);
+  const sectionPaddingBottom = normalizePadding(props.padding_bottom);
+  const sectionPadding = padding ?? (sectionPaddingTop && sectionPaddingTop === sectionPaddingBottom ? sectionPaddingTop : undefined);
   const vertical = string(props.vertical_align);
   const titlePosition = string(props.title_position);
   const titleRotation = string(props.title_rotation);
@@ -155,6 +163,7 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   const imageSize = string(props.image_size);
   const imageRepeat = string(props.image_repeat);
   const className = string(props.class);
+  const expandOneSide = string(props.width_expand) ?? string(props.expand);
   const visibility = string(props.visibility);
   const classVisibility = className?.match(/(?:^|\s)uk-(visible|hidden)@([smlx])(?:\s|$)/);
   const visibilityMode = visibility === "s" || visibility === "m" || visibility === "l" || visibility === "xl"
@@ -181,9 +190,13 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
     ...(bool(props.height_offset_top) ? { subtractHeightAbove: true } : {}),
     ...(vertical === "middle" || vertical === "center" ? { contentVerticalAlign: "center" } : vertical === "bottom" ? { contentVerticalAlign: "bottom" } : vertical === "top" ? { contentVerticalAlign: "top" } : {}),
     ...(sectionPadding ? { sectionPadding } : {}),
+    ...(sectionPaddingTop && sectionPaddingBottom && sectionPaddingTop !== sectionPaddingBottom
+      ? { sectionPaddingTop, sectionPaddingBottom }
+      : {}),
     ...(bool(props.padding_remove_top) ? { removeTopPadding: true } : {}),
     ...(bool(props.padding_remove_bottom) ? { removeBottomPadding: true } : {}),
     ...(bool(props.padding_remove_horizontal) ? { removeHorizontalPadding: true } : {}),
+    ...(expandOneSide === "left" || expandOneSide === "right" ? { expandOneSide } : {}),
     ...(bool(props.preserve_color) ? { preserveColor: true } : {}),
     ...(bool(props.overlap) ? { overlap: true } : {}),
     ...(string(props.margin) ? { margin: string(props.margin) as any } : {}),
@@ -239,10 +252,19 @@ export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<
 
 /** Element typography stays an explicit local override; omitted properties inherit. */
 export function normalizeYoothemeTypography(props: Record<string, unknown>): { typography?: TypographySettings } {
-  const transform = string(props.text_transform);
+  // YOOtheme Advanced CSS uses `.el-element` for component-root declarations.
+  // Promote the portable typography properties to WebPages' canonical local
+  // typography settings so UIkit utility classes cannot shadow them later.
+  const rootCss = string(props.css)?.match(/\.el-element\s*\{([^}]*)\}/i)?.[1] ?? "";
+  const rootCssValue = (property: string) => {
+    const value = rootCss.match(new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*([^;]+)`, "i"))?.[1]?.trim().replace(/\s*!important\s*$/i, "");
+    return value && !/[{};]/.test(value) && !/(?:url|expression)\s*\(/i.test(value) ? value : undefined;
+  };
+  const transform = rootCssValue("text-transform") ?? string(props.text_transform);
+  const fontSize = rootCssValue("font-size") ?? string(props.font_size);
   const typography: TypographySettings = {
     ...(string(props.font_family) ? { fontFamily: string(props.font_family) } : {}),
-    ...(string(props.font_size) ? { fontSize: string(props.font_size) } : {}),
+    ...(fontSize ? { fontSize } : {}),
     ...(string(props.font_weight) ? { fontWeight: string(props.font_weight) } : {}),
     ...(string(props.letter_spacing) ? { letterSpacing: string(props.letter_spacing) } : {}),
     ...(string(props.line_height) ? { lineHeight: string(props.line_height) } : {}),
@@ -422,7 +444,8 @@ export function normalizeYoothemeHeaderDocument(root: Record<string, unknown>): 
     headerPresetKey: undefined,
     ...(headerLayout ? { headerLayout } : {}),
     ...(width === "full" || width === "expand" ? { headerWidthMode: "full" as const } : {}),
-    ...(width === "default" || width === "boxed" ? { headerWidthMode: "boxed" as const } : {}),
+    ...(width === "default" || width === "boxed" || width === "small" || width === "large" || width === "xlarge" ? { headerWidthMode: "boxed" as const } : {}),
+    ...(width === "default" || width === "small" || width === "large" || width === "xlarge" ? { maxWidth: width } : {}),
     ...(headerBehavior ? { headerBehavior } : {}),
   };
 

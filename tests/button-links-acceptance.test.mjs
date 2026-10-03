@@ -159,7 +159,7 @@ test("YOOtheme Button globals preserve derived control geometry", () => {
     },
   ]);
 
-  assert.equal(preset.shellSettings.buttonTextTransform, "none");
+  assert.equal(preset.shellSettings.buttonTextTransform, "uppercase");
   assert.equal(preset.shellSettings.buttonLineHeight, "44px");
   assert.equal(preset.shellSettings.buttonLargeLineHeight, "52px");
   assert.equal(preset.shellSettings.buttonLargePaddingX, "40px");

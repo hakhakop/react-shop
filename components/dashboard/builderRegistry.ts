@@ -112,6 +112,22 @@ export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "gallery",
 ];
 
+/** Canonical element types that can be placed in the shared Header builder. */
+export const headerLayoutBlockKinds: LayoutBlockKind[] = [
+  "image",
+  "menu",
+  "button",
+  "social",
+  "embed",
+  "headerSearch",
+  "headerWishlist",
+  "headerCart",
+  "headerAccount",
+  "headerTheme",
+  "headerCategories",
+  "headerLanguage",
+];
+
 export const productLayoutBlockKinds: LayoutBlockKind[] = [
   "productHero",
   "productInfoStack",

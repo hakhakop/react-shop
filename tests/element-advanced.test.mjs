@@ -60,3 +60,11 @@ test("YOOtheme .el-element targets the scoped element root, including inside res
   assert.doesNotMatch(css, new RegExp(`${root} \\.el-element`));
   assert.match(css, new RegExp(`@media \\(max-width: 639px\\) \\{\\s*${root}:hover \\.el-image, ${root} \\.el-link\\{\\s*opacity: \\.9;\\s*\\}`));
 });
+
+test("YOOtheme headline root CSS targets the canonical heading node", () => {
+  const scope = elementAdvancedScope({ id: "headline-with-custom-size" });
+  const css = scopeElementCss(".el-element { font-size: 30px; text-transform: none; }", scope, ".shop-builder-title");
+
+  assert.match(css, new RegExp(`\\.shop-builder-main \\[data-builder-element-scope="${scope}"\\] \.shop-builder-title\\{`));
+  assert.doesNotMatch(css, new RegExp(`\\[data-builder-element-scope="${scope}"\\]\\{`));
+});

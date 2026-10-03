@@ -92,6 +92,17 @@ function getYoothemeMarginClass(value?: string) {
   return getUikitMarginClass(margin);
 }
 
+function getYoothemeMarginSideClass(value: string | undefined, side: "top" | "bottom") {
+  const margin = value?.trim().toLowerCase();
+  if (!margin) return "";
+  if (margin === "none" || margin === "remove-vertical") return `uk-margin-remove-${side}`;
+  if (margin === "default") return `uk-margin-${side}`;
+  if (["small", "medium", "large", "xlarge"].includes(margin)) {
+    return `uk-margin-${margin}-${side}`;
+  }
+  return "";
+}
+
 function getYoothemeWidthClass(
   maxWidth?: string,
   breakpoint?: string,
@@ -120,6 +131,8 @@ export function getGeneralElementShellClassName(block: GeneralElementShellBlock)
     // origin. Applying `uk-margin` here adds 20px to authored offsets such as
     // `top: -388px` and makes the Builder image visibly lower than YOOtheme.
     isPositioned ? "" : getYoothemeMarginClass(layout?.marginMode),
+    isPositioned ? "" : getYoothemeMarginSideClass(layout?.marginTopMode, "top"),
+    isPositioned ? "" : getYoothemeMarginSideClass(layout?.marginBottomMode, "bottom"),
     layout?.removeTopMargin ? "uk-margin-remove-top" : "",
     layout?.removeBottomMargin ? "uk-margin-remove-bottom" : "",
   ].filter(Boolean).join(" ");
@@ -136,6 +149,8 @@ function shellVisualStyle(block: GeneralElementShellBlock) {
   // inline margin on the same shell.
   const {
     marginMode,
+    marginTopMode,
+    marginBottomMode,
     removeTopMargin,
     removeBottomMargin,
     // Imported YOOtheme max widths belong to UIkit's width utility contract,
@@ -152,12 +167,14 @@ function shellVisualStyle(block: GeneralElementShellBlock) {
     // object as inline CSS as well applies the top margin twice. UIkit's
     // margin utility is sibling-aware (`* + .uk-margin-*`), so the class is
     // the authoritative representation for imported flow elements.
-    margin: positioned || marginMode ? undefined : visual.margin,
+    margin: positioned || marginMode || marginTopMode || marginBottomMode ? undefined : visual.margin,
     // YOOtheme's positioned elements use `top`/`left` as their authored
     // origin. A source `margin` value is not applied to that wrapper; keeping
     // it in the inline layout shifts panels and decorative layers away from
     // the same section boundary. Flow elements still retain their margin.
-    layout: positioned ? { ...layout, marginMode: undefined } : layout,
+    layout: positioned
+      ? { ...layout, marginMode: undefined, marginTopMode: undefined, marginBottomMode: undefined }
+      : { ...layout, marginMode: undefined, marginTopMode: undefined, marginBottomMode: undefined },
     ...(Object.keys(effects).length ? { effects } : {}),
   };
 }

@@ -329,10 +329,10 @@
     "enabledLanguages": [
       "hy"
     ],
-    "status": "preparing",
+    "status": "active",
     "creationRequestId": "5d2e3a6f-034f-4e66-90b7-bcfe28921bfe",
     "createdAt": "2026-09-25T18:42:16.102Z",
-    "updatedAt": "2026-09-25T18:51:00.843Z",
+    "updatedAt": "2026-10-03T17:37:58.657Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://makai.webpages.am",
@@ -347,6 +347,6 @@
       "technicalNotes": "",
       "updatedAt": "2026-09-25T18:50:34.639Z"
     },
-    "lastPublishedAt": "2026-09-25T18:51:00.843Z"
+    "lastPublishedAt": "2026-10-03T17:37:58.657Z"
   }
 ]
